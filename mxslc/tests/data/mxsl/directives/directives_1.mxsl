@@ -1,0 +1,14 @@
+#define x 0.5
+color3 c = color3(x, 1.0, x);
+
+#define y 3.14 * 2.0
+float circum = y * 10.0;
+
+#define gamma 2.2
+color3 d = color3(x ^ gamma, 1.0 ^ gamma, x ^ gamma);
+
+#define srgb x ^ gamma
+color3 e = color3(srgb);
+
+#define inv_srgb 1.0 - srgb
+color3 f = color3(inv_srgb);

@@ -12,4 +12,8 @@
 # TODO add post process to check extract: index < in.data_size
 # TODO add support for displacementshaders
 # TODO if statements
+# TODO x < n < y style comparisons
+# TODO color3(v) -> v as color3
+# TODO python style / for joining two paths
+# TODO decltype
 ```  

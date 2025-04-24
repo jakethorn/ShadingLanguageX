@@ -1,0 +1,42 @@
+#define X 1.5
+
+#if X > 1.0
+#if X < 2.0
+float a = 0.0;
+#else
+float a = 1.0;
+#endif
+#endif
+
+float b = a ^ 2.2;
+
+#define X 2.5
+
+#if X > 1.0
+#if X < 2.0
+float c = 2.0;
+#else
+float c = 3.0;
+#endif
+#endif
+
+float d = c ^ 2.2;
+
+#define X -0.5
+
+#if X > 1.0
+#if X < 2.0
+float e = 4.0;
+#else
+float e = 5.0;
+#endif
+#else
+#if X > -0.4
+float e = 6.0;
+#else
+float e = 7.0;
+#endif
+#endif
+
+
+float f = e ^ 2.2;

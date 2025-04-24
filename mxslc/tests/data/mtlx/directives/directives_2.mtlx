@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine3 name="global__b" type="color3">
+    <input name="in1" type="float" value="0.2" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.8" />
+  </combine3>
+  <combine3 name="global__c" type="color3">
+    <input name="in1" type="float" value="0.2" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.8" />
+  </combine3>
+  <power name="global__c2" type="color3">
+    <input name="in1" type="color3" nodename="global__c" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <combine3 name="global__d" type="color3">
+    <input name="in1" type="float" value="0.2" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.8" />
+  </combine3>
+</materialx>

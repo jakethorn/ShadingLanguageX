@@ -2,13 +2,11 @@ from pathlib import Path
 from typing import Any
 
 from .Keyword import AliasType, Keyword
-from .SourceFile import SourceFile
 from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
 
 
-# TODO file and line probably dont need default values
 class Token:
-    def __init__(self, type_: str, lexeme: str = None, file: SourceFile = None, line=0):
+    def __init__(self, type_: str, lexeme: str = None, file: Path = None, line: int = None):
         self.__type = type_
         self.__lexeme = lexeme or type_
         self.__file = file
@@ -42,12 +40,18 @@ class Token:
         return self.__lexeme
 
     @property
+    def file(self) -> Path:
+        return self.__file
+
+    @property
     def line(self) -> int:
         return self.__line
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, str):
             return self.type == other
+        if isinstance(other, Token):
+            return self.lexeme == other.lexeme
         return super().__eq__(other)
 
     def __str__(self) -> str:

@@ -7,4 +7,8 @@ STRING_LITERAL = "<string-literal>"
 FILENAME_LITERAL = "<filename-literal>"
 
 # Misc. Tokens
-EOF = "<eof>"
+COMMENT = "<comment>"
+EOL = "\n"
+EOF = chr(26)
+
+SURFACE_MAIN = "main"

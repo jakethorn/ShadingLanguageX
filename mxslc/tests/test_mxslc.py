@@ -36,6 +36,10 @@ _overwrite_all_expected = False
     ("properties_1", False),
     ("mountain", False),
     ("expr_stmt_1", False),
+    ("directives/directives_1", False),
+    ("directives/directives_2", False),
+    ("directives/directives_3", False),
+    ("directives/directives_4", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")
@@ -53,7 +57,7 @@ def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     with open(expected_path, "r") as f:
         expected = f.read()
 
-    assert actual.replace("\\", "/") == expected.replace("\\", "/")
-
     if not (overwrite_expected or _overwrite_all_expected):
         actual_path.unlink()
+
+    assert actual.replace("\\", "/") == expected.replace("\\", "/")

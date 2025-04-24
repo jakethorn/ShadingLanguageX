@@ -12,7 +12,7 @@ var_assign  → variable "=" expression ";" ;
 cmp_assign  → variable ( "+=" | "-=" | "*=" | "/=" | "%=" | "^=" | "&=" | "|=" ) expression ";" ;  
   variable  → IDENTIFIER ( "." IDENTIFIER )?  
 for_loop    → "for" "(" TYPE IDENTIFIER "=" constant ":" constant ( ":" constant )? ")" "{" statement* "}" ;  
-  constant  → LITERAL | IDENTIFIER ; 
+  constant  → FLOAT_LITERAL | IDENTIFIER ; 
 expr_stmt   → func_call | stdlib_call ";" ;
   
 expression  → logic ;  

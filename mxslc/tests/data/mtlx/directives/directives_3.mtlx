@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="global__g" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </add>
+  <add name="global__i" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" value="9" />
+  </add>
+  <add name="global__j" type="float">
+    <input name="in1" type="float" value="10" />
+    <input name="in2" type="float" value="11" />
+  </add>
+</materialx>

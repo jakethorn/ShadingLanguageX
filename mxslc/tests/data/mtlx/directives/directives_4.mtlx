@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <power name="global__b" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <power name="global__d" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <power name="global__f" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+</materialx>

@@ -1,25 +1,29 @@
 from pathlib import Path
 
 from . import mtlx, state
+from .Preprocess import macros
+from .Preprocess.process import process as preprocess
 from .Statements import Statement
 from .parse import parse
 from .post_process import post_process
-from .pre_process import pre_process
 from .scan import scan
 
 
-def compile_file(mxsl_path: str | Path, mtlx_path: str | Path = None) -> None:
+def compile_file(mxsl_path: str | Path, mtlx_path: str | Path = None, *, add_include_dirs: list[Path] = None) -> None:
     mxsl_filepaths = _handle_mxsl_path(mxsl_path)
 
     for mxsl_filepath in mxsl_filepaths:
         mtlx_filepath = _handle_mtlx_path(mtlx_path, mxsl_filepath)
 
+        macros.clear()
         mtlx.clear()
         state.clear()
 
-        mxsl_files = pre_process(mxsl_filepath, other_include_dirs=[], defines=[])
-        tokens = scan(mxsl_files)
-        statements = parse(tokens)
+        include_dirs = (add_include_dirs or []) + [mxsl_filepath.parent, Path(".")]
+
+        tokens = scan(mxsl_filepath)
+        processed_tokens = preprocess(tokens, include_dirs)
+        statements = parse(processed_tokens)
         _compile(statements)
         post_process()
 
