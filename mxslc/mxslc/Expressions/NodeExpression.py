@@ -1,6 +1,3 @@
-from pathlib import Path
-from typing import Any
-
 from . import Expression
 from .. import mtlx
 from ..Keyword import DataType

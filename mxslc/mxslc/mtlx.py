@@ -24,6 +24,10 @@ type Constant = bool | int | float | mx.Vector2 | mx.Vector3 | mx.Vector4 | mx.C
 _document: mx.Document = mx.createDocument()
 
 
+def get_document() -> mx.Document:
+    return _document
+
+
 def get_xml() -> str:
     return mx.writeToXmlString(_document)
 

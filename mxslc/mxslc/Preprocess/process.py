@@ -7,7 +7,7 @@ from ..CompileError import CompileError
 from ..Token import Token
 from ..TokenReader import TokenReader
 from ..scan import scan
-from ..token_types import EOF, IDENTIFIER, EOL
+from ..token_types import IDENTIFIER, EOL
 
 
 # TODO
@@ -16,12 +16,12 @@ from ..token_types import EOF, IDENTIFIER, EOL
 # this can lead to differences in behaviour
 
 
-def process(tokens: list[Token], include_dirs: list[Path], is_main=True) -> list[Token]:
+def process(tokens: list[Token], include_dirs: list[Path], is_main: bool) -> list[Token]:
     return Processor(tokens, include_dirs, is_main).process()
 
 
 class Processor(TokenReader):
-    def __init__(self, tokens: list[Token], include_dirs: list[Path], is_main=True):
+    def __init__(self, tokens: list[Token], include_dirs: list[Path], is_main: bool):
         super().__init__(tokens)
         self.__include_dirs = include_dirs
         self.__is_main = is_main
@@ -29,10 +29,8 @@ class Processor(TokenReader):
     def process(self) -> list[Token]:
         processed_tokens = []
         self.__define_main()
-        while self._peek() != EOF:
+        while self._reading_tokens():
             processed_tokens.extend(self.__process_next())
-        if self.__is_main:
-            processed_tokens.append(self._match(EOF))
         return processed_tokens
 
     def __process_next(self) -> list[Token]:

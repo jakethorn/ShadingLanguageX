@@ -9,6 +9,12 @@ class TokenReader(ABC):
         self.__tokens = tokens
         self.__index = 0
 
+    def _reading_tokens(self) -> bool:
+        """
+        Returns true if there are more tokens to read.
+        """
+        return self.__index < len(self.__tokens)
+
     def _peek(self) -> Token:
         """
         Peek next token.

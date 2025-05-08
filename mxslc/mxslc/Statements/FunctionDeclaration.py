@@ -8,6 +8,7 @@ from ..Parameter import Parameter
 from ..StandardLibrary import StandardLibrary
 from ..Token import Token
 
+# TODO change params to a ParameterList instead of list[Parameter]
 
 class FunctionDeclaration(Statement):
     def __init__(self, data_type: Token, identifier: Token, params: list[Parameter], body: list[Statement], return_expr: Expression):

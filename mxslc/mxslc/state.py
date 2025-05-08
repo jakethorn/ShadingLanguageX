@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from . import mtlx
 from .CompileError import CompileError
 from .Statements import FunctionDeclaration, ForLoop
 from .Token import Token
-from .token_types import IDENTIFIER
+from .scan import as_token
 
 
 class _State:
@@ -93,12 +91,20 @@ def add_node(identifier: Token, node: mtlx.Node) -> None:
     _state.add_node(identifier, node)
 
 
-def get_node(identifier: Token) -> mtlx.Node:
-    return _state.get_node(identifier)
+def get_node(identifier: str | Token) -> mtlx.Node:
+    return _state.get_node(as_token(identifier))
 
 
-def set_node(identifier: Token, node: mtlx.Node) -> None:
-    _state.set_node(identifier, node)
+def set_node(identifier: str | Token, node: mtlx.Node) -> None:
+    _state.set_node(as_token(identifier), node)
+
+
+def is_node(identifier: str) -> bool:
+    try:
+        get_node(identifier)
+        return True
+    except CompileError:
+        return False
 
 
 def clear() -> None:
@@ -112,10 +118,16 @@ def add_function(func: FunctionDeclaration) -> None:
     _state.add_function(func)
 
 
-def get_function(identifier: Token | str) -> FunctionDeclaration:
-    if isinstance(identifier, str):
-        identifier = Token(IDENTIFIER, identifier)
-    return _state.get_function(identifier)
+def get_function(identifier: str | Token) -> FunctionDeclaration:
+    return _state.get_function(as_token(identifier))
+
+
+def is_function(identifier: str) -> bool:
+    try:
+        get_function(identifier)
+        return True
+    except CompileError:
+        return False
 
 
 def enter_scope(namespace: str) -> None:

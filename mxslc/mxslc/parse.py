@@ -7,7 +7,7 @@ from .StandardLibrary import StandardLibrary
 from .Statements import *
 from .Token import Token
 from .TokenReader import TokenReader
-from .token_types import EOF, IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
+from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
 
 
 def parse(tokens: list[Token]) -> list[Statement]:
@@ -23,7 +23,7 @@ class Parser(TokenReader):
 
     def __program(self) -> list[Statement]:
         statements = []
-        while self._peek() != EOF:
+        while self._reading_tokens():
             statements.append(self.__statement())
         return statements
 
@@ -105,25 +105,25 @@ class Parser(TokenReader):
 
     def __assignment(self) -> Statement:
         identifier = self._match(IDENTIFIER)
-        property = self._match(IDENTIFIER) if self._consume(".") else None
+        property_ = self._match(IDENTIFIER) if self._consume(".") else None
         token = self._peek()
         if token == "=":
-            return self.__variable_assignment(identifier, property)
+            return self.__variable_assignment(identifier, property_)
         if token in ["+=", "-=", "*=", "/=", "%=", "^=", "&=", "|="]:
-            return self.__compound_assignment(identifier, property)
+            return self.__compound_assignment(identifier, property_)
         raise CompileError(token.line, f"Unexpected token: '{token.lexeme}'.")
 
-    def __variable_assignment(self, identifier: Token, property: Token) -> VariableAssignment:
+    def __variable_assignment(self, identifier: Token, property_: Token) -> VariableAssignment:
         self._match("=")
         right = self.__expression()
         self._match(";")
-        return VariableAssignment(identifier, property, right)
+        return VariableAssignment(identifier, property_, right)
 
-    def __compound_assignment(self, identifier: Token, property: Token) -> CompoundAssignment:
+    def __compound_assignment(self, identifier: Token, property_: Token) -> CompoundAssignment:
         operator = self._match("+=", "-=", "*=", "/=", "%=", "^=", "&=", "|=")
         right = self.__expression()
         self._match(";")
-        return CompoundAssignment(identifier, property, operator, right)
+        return CompoundAssignment(identifier, property_, operator, right)
 
     def __for_loop(self) -> ForLoop:
         self._match(Keyword.FOR)

@@ -3,18 +3,26 @@ from pathlib import Path
 
 from .Keyword import KEYWORDS
 from .Token import Token
-from .token_types import EOF, IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, FILENAME_LITERAL, STRING_LITERAL, EOL, COMMENT
+from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, FILENAME_LITERAL, STRING_LITERAL, EOL, COMMENT
 
 
-def scan(file: Path) -> list[Token]:
-    return Scanner(file).scan()
+def scan(source: str | Path) -> list[Token]:
+    """
+    Scans a source file or code snippet and returns a list of tokens.
+    :param source: Source file or code snippet to scan.
+    """
+    return Scanner(source).scan()
+
+
+def as_token(value: str | Token) -> Token:
+    if isinstance(value, Token):
+        return value
+    return scan(value)[0]
 
 
 class Scanner:
-    def __init__(self, file: Path):
-        self.__file = file
-        with open(file, "r") as f:
-            self.__source = f.read()
+    def __init__(self, source: str | Path):
+        self.__file, self.__source = self.__read_source(source)
         self.__index = 0
         self.__line = 1
 
@@ -30,8 +38,14 @@ class Scanner:
                 self.__index += len(token.lexeme)
             else:
                 self.__index += 1
-        tokens.append(self.__token(EOF))
         return tokens
+
+    def __read_source(self, source: str | Path) -> tuple[Path | None, str]:
+        if isinstance(source, str):
+            return None, source
+        else:
+            with open(source, "r") as f:
+                return source, f.read()
 
     def __identify_token(self) -> Token | None:
         if comment := self.__get_line_comment():
