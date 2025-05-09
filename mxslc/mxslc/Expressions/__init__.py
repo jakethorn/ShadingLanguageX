@@ -13,4 +13,3 @@ from .UnaryExpression import UnaryExpression
 from .NodeConstructor import NodeConstructor
 from .IndexingExpression import IndexingExpression
 from .TernaryRelationalExpression import TernaryRelationalExpression
-from .NodeExpression import NodeExpression, ConstantExpression

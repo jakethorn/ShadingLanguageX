@@ -1,36 +1,36 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <standard_surface name="main__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node12" />
+    <input name="base_color" type="color3" nodename="node11" />
   </standard_surface>
-  <image name="node2" type="color4">
+  <image name="node1" type="color4">
     <input name="file" type="filename" value="butterfly1.png" />
   </image>
-  <extract name="node4" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="node3" type="float">
+    <input name="in" type="color4" nodename="node1" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node5" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="node4" type="float">
+    <input name="in" type="color4" nodename="node1" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <extract name="node6" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="node5" type="float">
+    <input name="in" type="color4" nodename="node1" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <combine3 name="node7" type="color3">
-    <input name="in1" type="float" nodename="node4" />
-    <input name="in2" type="float" nodename="node5" />
-    <input name="in3" type="float" nodename="node6" />
+  <combine3 name="node6" type="color3">
+    <input name="in1" type="float" nodename="node3" />
+    <input name="in2" type="float" nodename="node4" />
+    <input name="in3" type="float" nodename="node5" />
   </combine3>
-  <combine3 name="node11" type="color3">
+  <combine3 name="node10" type="color3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <multiply name="node12" type="color3">
-    <input name="in1" type="color3" nodename="node7" />
-    <input name="in2" type="color3" nodename="node11" />
+  <multiply name="node11" type="color3">
+    <input name="in1" type="color3" nodename="node6" />
+    <input name="in2" type="color3" nodename="node10" />
   </multiply>
   <surfacematerial name="mxsl_material" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="main__surface" />

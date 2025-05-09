@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <standard_surface name="main__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node6" />
+    <input name="base_color" type="color3" nodename="node4" />
   </standard_surface>
-  <combine3 name="node6" type="color3">
+  <combine3 name="node4" type="color3">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
     <input name="in3" type="float" value="0" />

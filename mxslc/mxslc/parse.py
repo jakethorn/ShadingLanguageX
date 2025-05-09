@@ -95,7 +95,7 @@ class Parser(TokenReader):
         while self._peek() != "}":
             statements.append(self.__statement())
         self._match("}")
-        return_expr = ConstantExpression(0)
+        return_expr = LiteralExpression(Token(INT_LITERAL, "0"))
         return FunctionDeclaration(Token(INTEGER), identifier, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:

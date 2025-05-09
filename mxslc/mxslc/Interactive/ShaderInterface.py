@@ -5,10 +5,10 @@ from typing import Sequence
 
 import MaterialX as mx
 
+from .InteractiveExpression import InteractiveExpression
 from .. import state, mtlx
 from ..Argument import Argument
 from ..CompileError import CompileError
-from ..Expressions import NodeExpression, ConstantExpression
 from ..Keyword import DataType
 from ..Parameter import Parameter
 
@@ -82,8 +82,4 @@ def _to_mtlx_node(value: mx.Node | mtlx.Constant) -> mtlx.Node:
 
 
 def _to_arg_list(args: Sequence[mx.Node | mtlx.Constant]) -> list[Argument]:
-    return [
-        Argument(NodeExpression(mtlx.Node(a)) if isinstance(a, mx.Node) else ConstantExpression(a))
-        for a
-        in args
-    ]
+    return [Argument(InteractiveExpression(a)) for a in args]
