@@ -1,2 +1,2 @@
 from .InteractiveCompiler import InteractiveCompiler
-from .globals import globals_
+from .ShaderInterface import ShaderInterface

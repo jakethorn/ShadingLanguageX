@@ -3,7 +3,7 @@ from typing import Sequence
 
 import MaterialX as mx
 
-from .globals import Globals, globals_
+from .ShaderInterface import ShaderInterface
 from .. import mtlx, state
 from ..Preprocess import macros
 from ..compile import compile_
@@ -17,16 +17,16 @@ class InteractiveCompiler:
         self.clear()
 
     @property
-    def globals(self) -> Globals:
-        return globals_
-
-    @property
     def document(self) -> mx.Document:
         return mtlx.get_document()
 
     @property
     def xml(self) -> str:
         return mtlx.get_xml()
+
+    @property
+    def shader(self) -> ShaderInterface:
+        return ShaderInterface()
 
     def include(self, mxsl_path: str | Path) -> None:
         mxsl_filepaths = handle_mxsl_path(mxsl_path)

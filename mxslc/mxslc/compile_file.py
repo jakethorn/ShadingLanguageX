@@ -4,7 +4,7 @@ from typing import Sequence
 import MaterialX as mx
 
 from . import mtlx, state
-from .Interactive import globals_
+from .Interactive.ShaderInterface import ShaderInterface
 from .Preprocess import macros
 from .compile import compile_
 from .file_utils import handle_mxsl_path, handle_mtlx_path
@@ -39,8 +39,9 @@ def compile_file(mxsl_path: str | Path,
 
 
 def _call_main(file: Path, name: str | None, args: Sequence[mx.Node | mtlx.Constant]) -> None:
+    shader = ShaderInterface()
     if name is None:
-        if "main" in globals_ and globals_.main.file == file:
-            globals_.main(args)
+        if "main" in shader and shader.main.file == file:
+            shader.main(*args)
     else:
-        globals_[name](args)
+        shader[name](*args)

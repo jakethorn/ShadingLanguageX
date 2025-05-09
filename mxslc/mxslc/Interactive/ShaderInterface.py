@@ -13,7 +13,7 @@ from ..Keyword import DataType
 from ..Parameter import Parameter
 
 
-class Globals:
+class ShaderInterface:
     def __getattr__(self, name: str) -> mx.Node | Function:
         return self[name]
 
@@ -43,9 +43,6 @@ class Globals:
     def __str__(self) -> str:
         # TODO this. list all variables and functions in the global scope
         raise NotImplementedError()
-
-
-globals_ = Globals()
 
 
 class Function:
