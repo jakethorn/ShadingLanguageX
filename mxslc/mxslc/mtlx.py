@@ -14,6 +14,7 @@ from .Keyword import DataType, FILENAME, VECTOR_TYPES, COLOR_TYPES, FLOAT, STRIN
 
 
 type Constant = bool | int | float | mx.Vector2 | mx.Vector3 | mx.Vector4 | mx.Color3 | mx.Color4 | str | Path
+type Value = mx.Node | Constant
 
 
 #
@@ -193,7 +194,7 @@ def convert(in_: Node, output_type: DataType) -> Node:
 #
 
 
-def type_of(value: Node | Constant) -> DataType:
+def type_of(value: Value) -> DataType:
     if isinstance(value, Node):
         return value.data_type
     if isinstance(value, bool):

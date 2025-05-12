@@ -6,7 +6,7 @@ from ..Keyword import DataType
 
 
 class InteractiveExpression(Expression):
-    def __init__(self, value: mx.Node | mtlx.Constant):
+    def __init__(self, value: mtlx.Value):
         super().__init__(-1)
         if isinstance(value, mx.Node):
             self.__node = mtlx.Node(value)

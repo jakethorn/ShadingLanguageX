@@ -38,7 +38,7 @@ def compile_file(mxsl_path: str | Path,
         print(f"{mxsl_filepath.name} compiled successfully.")
 
 
-def _call_main(file: Path, name: str | None, args: Sequence[mx.Node | mtlx.Constant]) -> None:
+def _call_main(file: Path, name: str | None, args: Sequence[mtlx.Value]) -> None:
     shader = ShaderInterface()
     if name is None:
         if "main" in shader and shader.main.file == file:

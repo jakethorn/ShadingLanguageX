@@ -14,4 +14,6 @@
 # TODO python style / for joining two paths
 # TODO decltype
 # TODO allow private members
+# TODO ^ is pow for number types and xor for bools
+# TODO my_var[0] = 1.0;
 ```  
