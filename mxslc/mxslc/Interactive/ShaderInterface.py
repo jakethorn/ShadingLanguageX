@@ -10,8 +10,10 @@ from .InteractiveNode import InteractiveNode
 from .. import state, mtlx
 from ..Argument import Argument
 from ..CompileError import CompileError
-from ..Keyword import DataType
-from ..Parameter import Parameter
+from ..Expressions import StandardLibraryCall
+from ..StandardLibrary import StandardLibrary
+from ..Token import Token
+from ..token_types import IDENTIFIER
 
 
 class ShaderInterface:
@@ -29,6 +31,8 @@ class ShaderInterface:
             return InteractiveNode(state.get_node(name))
         if state.is_function(name):
             return Function(name)
+        if name in StandardLibrary:
+            return StandardLibraryFunction(name)
         raise CompileError(-1, f"No variable or function: '{name}'.")
 
     def __setitem__(self, name: str, value: mtlx.Value) -> None:
@@ -55,25 +59,21 @@ class Function:
         return InteractiveNode(node)
 
     @property
-    def name(self) -> str:
-        return self.__function.name
-
-    @property
-    def return_type(self) -> DataType:
-        return self.__function.data_type
-
-    @property
-    def parameters(self) -> list[Parameter]:
-        # TODO change type hint from list[parameter] to ParameterList
-        return self.__function.params
-
-    @property
     def file(self) -> Path:
         return self.__function.file
 
     @property
     def line(self) -> int:
         return self.__function.line
+
+
+class StandardLibraryFunction:
+    def __init__(self, name: str):
+        self.__name = name
+
+    def __call__(self, *args: mtlx.Value | InteractiveNode) -> InteractiveNode:
+        call = StandardLibraryCall(Token(IDENTIFIER, self.__name), _to_arg_list(args))
+        return InteractiveNode(call.evaluate())
 
 
 def _to_mtlx_node(value: mtlx.Value) -> mtlx.Node:

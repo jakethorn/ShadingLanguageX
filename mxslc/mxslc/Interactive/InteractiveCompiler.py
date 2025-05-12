@@ -24,8 +24,7 @@ class InteractiveCompiler:
     def xml(self) -> str:
         return mtlx.get_xml()
 
-    @property
-    def shader(self) -> ShaderInterface:
+    def get_shader_interface(self) -> ShaderInterface:
         return ShaderInterface()
 
     def include(self, mxsl_path: str | Path) -> None:
