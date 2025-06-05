@@ -7,15 +7,15 @@ from ..Keyword import DataType
 
 class InteractiveExpression(Expression):
     def __init__(self, value: mtlx.Value):
-        super().__init__(-1)
+        super().__init__(None)
         if isinstance(value, mx.Node):
             self.__node = mtlx.Node(value)
         else:
             self.__node = mtlx.constant(value)
 
     @property
-    def data_type(self) -> DataType:
+    def _data_type(self) -> DataType:
         return self.__node.data_type
 
-    def create_node(self) -> mtlx.Node:
+    def _evaluate(self) -> mtlx.Node:
         return self.__node

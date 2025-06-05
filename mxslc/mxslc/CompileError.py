@@ -11,5 +11,7 @@ class CompileError(Exception):
 
         if file is not None and line is not None:
             super().__init__(f"{token.file.name}, line {token.line}: {message}")
+        elif line is not None:
+            super().__init__(f"line {token.line}: {message}")
         else:
             super().__init__(message)

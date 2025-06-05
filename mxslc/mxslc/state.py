@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from . import mtlx
+from . import mtlx, utils
 from .CompileError import CompileError
+from .Keyword import DataType
+from .Parameter import ParameterList
 from .Statements import FunctionDeclaration, ForLoop
 from .Token import Token
 from .scan import as_token
@@ -13,7 +15,7 @@ class State:
         self.__global = global_ or self
         self.__parent = parent
         self.__nodes: dict[str, mtlx.Node] = {}
-        self.__functions: dict[str, FunctionDeclaration] = {}
+        self.__functions: list[FunctionDeclaration] = []
 
     @property
     def is_global(self) -> bool:
@@ -72,18 +74,47 @@ class State:
         return f"{self.__namespace}__{name}"
 
     def add_function(self, func: FunctionDeclaration) -> None:
-        if func.name in self.__functions:
-            raise CompileError(f"Function name '{func.name}' already exists.", func.identifier)
-        assert func not in self.__functions.values()
-        self.__functions[func.name] = func
+        assert func not in self.__functions
+        self.__functions.append(func)
 
-    def get_function(self, identifier: Token) -> FunctionDeclaration:
-        name = identifier.lexeme
-        if name in self.__functions:
-            return self.__functions[name]
-        if name in self.__global.__functions:
-            return self.__global.__functions[name]
-        raise CompileError(f"Function name '{name}' does not exist.", identifier)
+    def get_function(self, identifier: Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> FunctionDeclaration:
+        matching_funcs = [
+            f
+            for f
+            # TODO also search local functions
+            in self.__global.__functions
+            if f.is_match(identifier.lexeme, valid_types, args)
+        ]
+        if len(matching_funcs) == 0:
+            raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, valid_types, args)}' does not exist.", identifier)
+        elif len(matching_funcs) == 1:
+            return matching_funcs[0]
+        else:
+            raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, valid_types, args)}' is ambiguous.", identifier)
+
+    def get_function_parameter_types(self, identifier: Token, param_index: int | str) -> list[DataType]:
+        matching_funcs = [
+            f
+            for f
+            # TODO also search local functions
+            in self.__global.__functions
+            if f.is_match(identifier.lexeme)
+        ]
+        if isinstance(param_index, int):
+            return [
+                f.params[param_index].data_type
+                for f
+                in matching_funcs
+                if len(f.params) > param_index
+            ]
+        if isinstance(param_index, str):
+            return [
+                ParameterList(f.params)[param_index].data_type
+                for f
+                in matching_funcs
+                if param_index in ParameterList(f.params)
+            ]
+        raise AssertionError
 
     def __str__(self) -> str:
         output = ""
@@ -122,7 +153,7 @@ def is_node(identifier: str) -> bool:
 def clear() -> None:
     global _state
     while not _state.is_global:
-        _state = _state.__parent
+        _state = _state.parent
     _state.clear()
 
 
@@ -130,8 +161,12 @@ def add_function(func: FunctionDeclaration) -> None:
     _state.add_function(func)
 
 
-def get_function(identifier: str | Token) -> FunctionDeclaration:
-    return _state.get_function(as_token(identifier))
+def get_function(identifier: str | Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> FunctionDeclaration:
+    return _state.get_function(as_token(identifier), valid_types, args)
+
+
+def get_function_parameter_types(identifier: str | Token, param_index: int | str) -> list[DataType]:
+    return _state.get_function_parameter_types(as_token(identifier), param_index)
 
 
 def is_function(identifier: str) -> bool:

@@ -8,50 +8,50 @@
     <input name="in1" type="vector2" nodename="main__uv" />
     <input name="in2" type="float" value="1.5" />
   </multiply>
-  <modulo name="node6" type="vector2">
+  <modulo name="node7" type="vector2">
     <input name="in1" type="vector2" nodename="fract_v2__v2" />
     <input name="in2" type="float" value="1" />
   </modulo>
   <subtract name="main__uv2" type="vector2">
-    <input name="in1" type="vector2" nodename="node6" />
+    <input name="in1" type="vector2" nodename="node7" />
     <input name="in2" type="float" value="0.5" />
   </subtract>
-  <magnitude name="node8" type="float">
+  <magnitude name="node9" type="float">
     <input name="in" type="vector2" nodename="main__uv2" />
   </magnitude>
-  <exp name="node10" type="float">
-    <input name="in" type="float" nodename="node13" />
-  </exp>
   <magnitude name="node11" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <subtract name="node13" type="float">
+  <subtract name="exp__in" type="float">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" nodename="node11" />
   </subtract>
+  <exp name="node13" type="float">
+    <input name="in" type="float" nodename="exp__in" />
+  </exp>
   <multiply name="update_finalColor__d" type="float">
-    <input name="in1" type="float" nodename="node8" />
-    <input name="in2" type="float" nodename="node10" />
+    <input name="in1" type="float" nodename="node9" />
+    <input name="in2" type="float" nodename="node13" />
   </multiply>
-  <magnitude name="node14" type="float">
+  <magnitude name="node15" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <multiply name="node18" type="float">
+  <multiply name="node19" type="float">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
-  <add name="node19" type="float">
-    <input name="in1" type="float" nodename="node14" />
-    <input name="in2" type="float" nodename="node18" />
+  <add name="node20" type="float">
+    <input name="in1" type="float" nodename="node15" />
+    <input name="in2" type="float" nodename="node19" />
   </add>
-  <time name="node20" type="float" />
-  <multiply name="node22" type="float">
-    <input name="in1" type="float" nodename="node20" />
+  <time name="node21" type="float" />
+  <multiply name="node24" type="float">
+    <input name="in1" type="float" nodename="node21" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
   <add name="palette__t" type="float">
-    <input name="in1" type="float" nodename="node19" />
-    <input name="in2" type="float" nodename="node22" />
+    <input name="in1" type="float" nodename="node20" />
+    <input name="in2" type="float" nodename="node24" />
   </add>
   <combine3 name="palette__a" type="vector3">
     <input name="in1" type="float" value="0.5" />
@@ -73,66 +73,66 @@
     <input name="in2" type="float" value="0.416" />
     <input name="in3" type="float" value="0.557" />
   </combine3>
-  <cos name="node37" type="vector3">
-    <input name="in" type="vector3" nodename="node45" />
-  </cos>
-  <multiply name="node41" type="vector3">
+  <multiply name="node42" type="vector3">
     <input name="in1" type="vector3" nodename="palette__c" />
     <input name="in2" type="float" nodename="palette__t" />
   </multiply>
-  <add name="node43" type="vector3">
-    <input name="in1" type="vector3" nodename="node41" />
+  <add name="node44" type="vector3">
+    <input name="in1" type="vector3" nodename="node42" />
     <input name="in2" type="vector3" nodename="palette__d" />
   </add>
-  <convert name="node44" type="vector3">
+  <convert name="node45" type="vector3">
     <input name="in" type="float" value="6.28318" />
   </convert>
-  <multiply name="node45" type="vector3">
-    <input name="in1" type="vector3" nodename="node44" />
-    <input name="in2" type="vector3" nodename="node43" />
+  <multiply name="cos__in" type="vector3">
+    <input name="in1" type="vector3" nodename="node45" />
+    <input name="in2" type="vector3" nodename="node44" />
   </multiply>
-  <multiply name="node46" type="vector3">
+  <cos name="node46" type="vector3">
+    <input name="in" type="vector3" nodename="cos__in" />
+  </cos>
+  <multiply name="node48" type="vector3">
     <input name="in1" type="vector3" nodename="palette__b" />
-    <input name="in2" type="vector3" nodename="node37" />
+    <input name="in2" type="vector3" nodename="node46" />
   </multiply>
   <add name="update_finalColor__col" type="vector3">
     <input name="in1" type="vector3" nodename="palette__a" />
-    <input name="in2" type="vector3" nodename="node46" />
+    <input name="in2" type="vector3" nodename="node48" />
   </add>
-  <sin name="node47" type="float">
-    <input name="in" type="float" nodename="node52" />
-  </sin>
-  <multiply name="node50" type="float">
+  <multiply name="node51" type="float">
     <input name="in1" type="float" nodename="update_finalColor__d" />
     <input name="in2" type="float" value="8" />
   </multiply>
-  <time name="node51" type="float" />
-  <add name="node52" type="float">
-    <input name="in1" type="float" nodename="node50" />
-    <input name="in2" type="float" nodename="node51" />
+  <time name="node52" type="float" />
+  <add name="sin__in" type="float">
+    <input name="in1" type="float" nodename="node51" />
+    <input name="in2" type="float" nodename="node52" />
   </add>
+  <sin name="node54" type="float">
+    <input name="in" type="float" nodename="sin__in" />
+  </sin>
   <divide name="update_finalColor__d2" type="float">
-    <input name="in1" type="float" nodename="node47" />
+    <input name="in1" type="float" nodename="node54" />
     <input name="in2" type="float" value="8" />
   </divide>
   <absval name="update_finalColor__d3" type="float">
     <input name="in" type="float" nodename="update_finalColor__d2" />
   </absval>
-  <divide name="node57" type="float">
+  <divide name="node60" type="float">
     <input name="in1" type="float" value="0.01" />
     <input name="in2" type="float" nodename="update_finalColor__d3" />
   </divide>
   <power name="update_finalColor__d4" type="float">
-    <input name="in1" type="float" nodename="node57" />
+    <input name="in1" type="float" nodename="node60" />
     <input name="in2" type="float" value="1.2" />
   </power>
-  <multiply name="node62" type="vector3">
+  <multiply name="node65" type="vector3">
     <input name="in1" type="vector3" nodename="update_finalColor__col" />
     <input name="in2" type="float" nodename="update_finalColor__d4" />
   </multiply>
   <add name="main__finalColor2" type="vector3">
     <input name="in1" type="vector3" nodename="main__finalColor" />
-    <input name="in2" type="vector3" nodename="node62" />
+    <input name="in2" type="vector3" nodename="node65" />
   </add>
   <add name="main__i2" type="float">
     <input name="in1" type="float" value="0" />
@@ -142,50 +142,50 @@
     <input name="in1" type="vector2" nodename="main__uv2" />
     <input name="in2" type="float" value="1.5" />
   </multiply>
-  <modulo name="node69" type="vector2">
+  <modulo name="node72" type="vector2">
     <input name="in1" type="vector2" nodename="fract_v2__v3" />
     <input name="in2" type="float" value="1" />
   </modulo>
   <subtract name="main__uv3" type="vector2">
-    <input name="in1" type="vector2" nodename="node69" />
+    <input name="in1" type="vector2" nodename="node72" />
     <input name="in2" type="float" value="0.5" />
   </subtract>
-  <magnitude name="node71" type="float">
+  <magnitude name="node74" type="float">
     <input name="in" type="vector2" nodename="main__uv3" />
   </magnitude>
-  <exp name="node73" type="float">
-    <input name="in" type="float" nodename="node76" />
-  </exp>
-  <magnitude name="node74" type="float">
+  <magnitude name="node76" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <subtract name="node76" type="float">
+  <subtract name="exp__in2" type="float">
     <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" nodename="node74" />
+    <input name="in2" type="float" nodename="node76" />
   </subtract>
+  <exp name="node78" type="float">
+    <input name="in" type="float" nodename="exp__in2" />
+  </exp>
   <multiply name="update_finalColor__d5" type="float">
-    <input name="in1" type="float" nodename="node71" />
-    <input name="in2" type="float" nodename="node73" />
+    <input name="in1" type="float" nodename="node74" />
+    <input name="in2" type="float" nodename="node78" />
   </multiply>
-  <magnitude name="node77" type="float">
+  <magnitude name="node80" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <multiply name="node81" type="float">
+  <multiply name="node84" type="float">
     <input name="in1" type="float" nodename="main__i2" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
-  <add name="node82" type="float">
-    <input name="in1" type="float" nodename="node77" />
-    <input name="in2" type="float" nodename="node81" />
+  <add name="node85" type="float">
+    <input name="in1" type="float" nodename="node80" />
+    <input name="in2" type="float" nodename="node84" />
   </add>
-  <time name="node83" type="float" />
-  <multiply name="node85" type="float">
-    <input name="in1" type="float" nodename="node83" />
+  <time name="node86" type="float" />
+  <multiply name="node89" type="float">
+    <input name="in1" type="float" nodename="node86" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
   <add name="palette__t2" type="float">
-    <input name="in1" type="float" nodename="node82" />
-    <input name="in2" type="float" nodename="node85" />
+    <input name="in1" type="float" nodename="node85" />
+    <input name="in2" type="float" nodename="node89" />
   </add>
   <combine3 name="palette__a2" type="vector3">
     <input name="in1" type="float" value="0.5" />
@@ -207,66 +207,66 @@
     <input name="in2" type="float" value="0.416" />
     <input name="in3" type="float" value="0.557" />
   </combine3>
-  <cos name="node100" type="vector3">
-    <input name="in" type="vector3" nodename="node108" />
-  </cos>
-  <multiply name="node104" type="vector3">
+  <multiply name="node107" type="vector3">
     <input name="in1" type="vector3" nodename="palette__c2" />
     <input name="in2" type="float" nodename="palette__t2" />
   </multiply>
-  <add name="node106" type="vector3">
-    <input name="in1" type="vector3" nodename="node104" />
+  <add name="node109" type="vector3">
+    <input name="in1" type="vector3" nodename="node107" />
     <input name="in2" type="vector3" nodename="palette__d2" />
   </add>
-  <convert name="node107" type="vector3">
+  <convert name="node110" type="vector3">
     <input name="in" type="float" value="6.28318" />
   </convert>
-  <multiply name="node108" type="vector3">
-    <input name="in1" type="vector3" nodename="node107" />
-    <input name="in2" type="vector3" nodename="node106" />
+  <multiply name="cos__in2" type="vector3">
+    <input name="in1" type="vector3" nodename="node110" />
+    <input name="in2" type="vector3" nodename="node109" />
   </multiply>
-  <multiply name="node109" type="vector3">
+  <cos name="node111" type="vector3">
+    <input name="in" type="vector3" nodename="cos__in2" />
+  </cos>
+  <multiply name="node113" type="vector3">
     <input name="in1" type="vector3" nodename="palette__b2" />
-    <input name="in2" type="vector3" nodename="node100" />
+    <input name="in2" type="vector3" nodename="node111" />
   </multiply>
   <add name="update_finalColor__col2" type="vector3">
     <input name="in1" type="vector3" nodename="palette__a2" />
-    <input name="in2" type="vector3" nodename="node109" />
+    <input name="in2" type="vector3" nodename="node113" />
   </add>
-  <sin name="node110" type="float">
-    <input name="in" type="float" nodename="node115" />
-  </sin>
-  <multiply name="node113" type="float">
+  <multiply name="node116" type="float">
     <input name="in1" type="float" nodename="update_finalColor__d5" />
     <input name="in2" type="float" value="8" />
   </multiply>
-  <time name="node114" type="float" />
-  <add name="node115" type="float">
-    <input name="in1" type="float" nodename="node113" />
-    <input name="in2" type="float" nodename="node114" />
+  <time name="node117" type="float" />
+  <add name="sin__in2" type="float">
+    <input name="in1" type="float" nodename="node116" />
+    <input name="in2" type="float" nodename="node117" />
   </add>
+  <sin name="node119" type="float">
+    <input name="in" type="float" nodename="sin__in2" />
+  </sin>
   <divide name="update_finalColor__d6" type="float">
-    <input name="in1" type="float" nodename="node110" />
+    <input name="in1" type="float" nodename="node119" />
     <input name="in2" type="float" value="8" />
   </divide>
   <absval name="update_finalColor__d7" type="float">
     <input name="in" type="float" nodename="update_finalColor__d6" />
   </absval>
-  <divide name="node120" type="float">
+  <divide name="node125" type="float">
     <input name="in1" type="float" value="0.01" />
     <input name="in2" type="float" nodename="update_finalColor__d7" />
   </divide>
   <power name="update_finalColor__d8" type="float">
-    <input name="in1" type="float" nodename="node120" />
+    <input name="in1" type="float" nodename="node125" />
     <input name="in2" type="float" value="1.2" />
   </power>
-  <multiply name="node125" type="vector3">
+  <multiply name="node130" type="vector3">
     <input name="in1" type="vector3" nodename="update_finalColor__col2" />
     <input name="in2" type="float" nodename="update_finalColor__d8" />
   </multiply>
   <add name="main__finalColor3" type="vector3">
     <input name="in1" type="vector3" nodename="main__finalColor2" />
-    <input name="in2" type="vector3" nodename="node125" />
+    <input name="in2" type="vector3" nodename="node130" />
   </add>
   <add name="main__i3" type="float">
     <input name="in1" type="float" nodename="main__i2" />
@@ -276,50 +276,50 @@
     <input name="in1" type="vector2" nodename="main__uv3" />
     <input name="in2" type="float" value="1.5" />
   </multiply>
-  <modulo name="node132" type="vector2">
+  <modulo name="node137" type="vector2">
     <input name="in1" type="vector2" nodename="fract_v2__v4" />
     <input name="in2" type="float" value="1" />
   </modulo>
   <subtract name="main__uv4" type="vector2">
-    <input name="in1" type="vector2" nodename="node132" />
+    <input name="in1" type="vector2" nodename="node137" />
     <input name="in2" type="float" value="0.5" />
   </subtract>
-  <magnitude name="node134" type="float">
+  <magnitude name="node139" type="float">
     <input name="in" type="vector2" nodename="main__uv4" />
   </magnitude>
-  <exp name="node136" type="float">
-    <input name="in" type="float" nodename="node139" />
-  </exp>
-  <magnitude name="node137" type="float">
+  <magnitude name="node141" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <subtract name="node139" type="float">
+  <subtract name="exp__in3" type="float">
     <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" nodename="node137" />
+    <input name="in2" type="float" nodename="node141" />
   </subtract>
+  <exp name="node143" type="float">
+    <input name="in" type="float" nodename="exp__in3" />
+  </exp>
   <multiply name="update_finalColor__d9" type="float">
-    <input name="in1" type="float" nodename="node134" />
-    <input name="in2" type="float" nodename="node136" />
+    <input name="in1" type="float" nodename="node139" />
+    <input name="in2" type="float" nodename="node143" />
   </multiply>
-  <magnitude name="node140" type="float">
+  <magnitude name="node145" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <multiply name="node144" type="float">
+  <multiply name="node149" type="float">
     <input name="in1" type="float" nodename="main__i3" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
-  <add name="node145" type="float">
-    <input name="in1" type="float" nodename="node140" />
-    <input name="in2" type="float" nodename="node144" />
+  <add name="node150" type="float">
+    <input name="in1" type="float" nodename="node145" />
+    <input name="in2" type="float" nodename="node149" />
   </add>
-  <time name="node146" type="float" />
-  <multiply name="node148" type="float">
-    <input name="in1" type="float" nodename="node146" />
+  <time name="node151" type="float" />
+  <multiply name="node154" type="float">
+    <input name="in1" type="float" nodename="node151" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
   <add name="palette__t3" type="float">
-    <input name="in1" type="float" nodename="node145" />
-    <input name="in2" type="float" nodename="node148" />
+    <input name="in1" type="float" nodename="node150" />
+    <input name="in2" type="float" nodename="node154" />
   </add>
   <combine3 name="palette__a3" type="vector3">
     <input name="in1" type="float" value="0.5" />
@@ -341,66 +341,66 @@
     <input name="in2" type="float" value="0.416" />
     <input name="in3" type="float" value="0.557" />
   </combine3>
-  <cos name="node163" type="vector3">
-    <input name="in" type="vector3" nodename="node171" />
-  </cos>
-  <multiply name="node167" type="vector3">
+  <multiply name="node172" type="vector3">
     <input name="in1" type="vector3" nodename="palette__c3" />
     <input name="in2" type="float" nodename="palette__t3" />
   </multiply>
-  <add name="node169" type="vector3">
-    <input name="in1" type="vector3" nodename="node167" />
+  <add name="node174" type="vector3">
+    <input name="in1" type="vector3" nodename="node172" />
     <input name="in2" type="vector3" nodename="palette__d3" />
   </add>
-  <convert name="node170" type="vector3">
+  <convert name="node175" type="vector3">
     <input name="in" type="float" value="6.28318" />
   </convert>
-  <multiply name="node171" type="vector3">
-    <input name="in1" type="vector3" nodename="node170" />
-    <input name="in2" type="vector3" nodename="node169" />
+  <multiply name="cos__in3" type="vector3">
+    <input name="in1" type="vector3" nodename="node175" />
+    <input name="in2" type="vector3" nodename="node174" />
   </multiply>
-  <multiply name="node172" type="vector3">
+  <cos name="node176" type="vector3">
+    <input name="in" type="vector3" nodename="cos__in3" />
+  </cos>
+  <multiply name="node178" type="vector3">
     <input name="in1" type="vector3" nodename="palette__b3" />
-    <input name="in2" type="vector3" nodename="node163" />
+    <input name="in2" type="vector3" nodename="node176" />
   </multiply>
   <add name="update_finalColor__col3" type="vector3">
     <input name="in1" type="vector3" nodename="palette__a3" />
-    <input name="in2" type="vector3" nodename="node172" />
+    <input name="in2" type="vector3" nodename="node178" />
   </add>
-  <sin name="node173" type="float">
-    <input name="in" type="float" nodename="node178" />
-  </sin>
-  <multiply name="node176" type="float">
+  <multiply name="node181" type="float">
     <input name="in1" type="float" nodename="update_finalColor__d9" />
     <input name="in2" type="float" value="8" />
   </multiply>
-  <time name="node177" type="float" />
-  <add name="node178" type="float">
-    <input name="in1" type="float" nodename="node176" />
-    <input name="in2" type="float" nodename="node177" />
+  <time name="node182" type="float" />
+  <add name="sin__in3" type="float">
+    <input name="in1" type="float" nodename="node181" />
+    <input name="in2" type="float" nodename="node182" />
   </add>
+  <sin name="node184" type="float">
+    <input name="in" type="float" nodename="sin__in3" />
+  </sin>
   <divide name="update_finalColor__d10" type="float">
-    <input name="in1" type="float" nodename="node173" />
+    <input name="in1" type="float" nodename="node184" />
     <input name="in2" type="float" value="8" />
   </divide>
   <absval name="update_finalColor__d11" type="float">
     <input name="in" type="float" nodename="update_finalColor__d10" />
   </absval>
-  <divide name="node183" type="float">
+  <divide name="node190" type="float">
     <input name="in1" type="float" value="0.01" />
     <input name="in2" type="float" nodename="update_finalColor__d11" />
   </divide>
   <power name="update_finalColor__d12" type="float">
-    <input name="in1" type="float" nodename="node183" />
+    <input name="in1" type="float" nodename="node190" />
     <input name="in2" type="float" value="1.2" />
   </power>
-  <multiply name="node188" type="vector3">
+  <multiply name="node195" type="vector3">
     <input name="in1" type="vector3" nodename="update_finalColor__col3" />
     <input name="in2" type="float" nodename="update_finalColor__d12" />
   </multiply>
   <add name="main__finalColor4" type="vector3">
     <input name="in1" type="vector3" nodename="main__finalColor3" />
-    <input name="in2" type="vector3" nodename="node188" />
+    <input name="in2" type="vector3" nodename="node195" />
   </add>
   <add name="main__i4" type="float">
     <input name="in1" type="float" nodename="main__i3" />
@@ -410,50 +410,50 @@
     <input name="in1" type="vector2" nodename="main__uv4" />
     <input name="in2" type="float" value="1.5" />
   </multiply>
-  <modulo name="node195" type="vector2">
+  <modulo name="node202" type="vector2">
     <input name="in1" type="vector2" nodename="fract_v2__v5" />
     <input name="in2" type="float" value="1" />
   </modulo>
   <subtract name="main__uv5" type="vector2">
-    <input name="in1" type="vector2" nodename="node195" />
+    <input name="in1" type="vector2" nodename="node202" />
     <input name="in2" type="float" value="0.5" />
   </subtract>
-  <magnitude name="node197" type="float">
+  <magnitude name="node204" type="float">
     <input name="in" type="vector2" nodename="main__uv5" />
   </magnitude>
-  <exp name="node199" type="float">
-    <input name="in" type="float" nodename="node202" />
-  </exp>
-  <magnitude name="node200" type="float">
+  <magnitude name="node206" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <subtract name="node202" type="float">
+  <subtract name="exp__in4" type="float">
     <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" nodename="node200" />
+    <input name="in2" type="float" nodename="node206" />
   </subtract>
+  <exp name="node208" type="float">
+    <input name="in" type="float" nodename="exp__in4" />
+  </exp>
   <multiply name="update_finalColor__d13" type="float">
-    <input name="in1" type="float" nodename="node197" />
-    <input name="in2" type="float" nodename="node199" />
+    <input name="in1" type="float" nodename="node204" />
+    <input name="in2" type="float" nodename="node208" />
   </multiply>
-  <magnitude name="node203" type="float">
+  <magnitude name="node210" type="float">
     <input name="in" type="vector2" nodename="main__uv" />
   </magnitude>
-  <multiply name="node207" type="float">
+  <multiply name="node214" type="float">
     <input name="in1" type="float" nodename="main__i4" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
-  <add name="node208" type="float">
-    <input name="in1" type="float" nodename="node203" />
-    <input name="in2" type="float" nodename="node207" />
+  <add name="node215" type="float">
+    <input name="in1" type="float" nodename="node210" />
+    <input name="in2" type="float" nodename="node214" />
   </add>
-  <time name="node209" type="float" />
-  <multiply name="node211" type="float">
-    <input name="in1" type="float" nodename="node209" />
+  <time name="node216" type="float" />
+  <multiply name="node219" type="float">
+    <input name="in1" type="float" nodename="node216" />
     <input name="in2" type="float" value="0.4" />
   </multiply>
   <add name="palette__t4" type="float">
-    <input name="in1" type="float" nodename="node208" />
-    <input name="in2" type="float" nodename="node211" />
+    <input name="in1" type="float" nodename="node215" />
+    <input name="in2" type="float" nodename="node219" />
   </add>
   <combine3 name="palette__a4" type="vector3">
     <input name="in1" type="float" value="0.5" />
@@ -475,71 +475,71 @@
     <input name="in2" type="float" value="0.416" />
     <input name="in3" type="float" value="0.557" />
   </combine3>
-  <cos name="node226" type="vector3">
-    <input name="in" type="vector3" nodename="node234" />
-  </cos>
-  <multiply name="node230" type="vector3">
+  <multiply name="node237" type="vector3">
     <input name="in1" type="vector3" nodename="palette__c4" />
     <input name="in2" type="float" nodename="palette__t4" />
   </multiply>
-  <add name="node232" type="vector3">
-    <input name="in1" type="vector3" nodename="node230" />
+  <add name="node239" type="vector3">
+    <input name="in1" type="vector3" nodename="node237" />
     <input name="in2" type="vector3" nodename="palette__d4" />
   </add>
-  <convert name="node233" type="vector3">
+  <convert name="node240" type="vector3">
     <input name="in" type="float" value="6.28318" />
   </convert>
-  <multiply name="node234" type="vector3">
-    <input name="in1" type="vector3" nodename="node233" />
-    <input name="in2" type="vector3" nodename="node232" />
+  <multiply name="cos__in4" type="vector3">
+    <input name="in1" type="vector3" nodename="node240" />
+    <input name="in2" type="vector3" nodename="node239" />
   </multiply>
-  <multiply name="node235" type="vector3">
+  <cos name="node241" type="vector3">
+    <input name="in" type="vector3" nodename="cos__in4" />
+  </cos>
+  <multiply name="node243" type="vector3">
     <input name="in1" type="vector3" nodename="palette__b4" />
-    <input name="in2" type="vector3" nodename="node226" />
+    <input name="in2" type="vector3" nodename="node241" />
   </multiply>
   <add name="update_finalColor__col4" type="vector3">
     <input name="in1" type="vector3" nodename="palette__a4" />
-    <input name="in2" type="vector3" nodename="node235" />
+    <input name="in2" type="vector3" nodename="node243" />
   </add>
-  <sin name="node236" type="float">
-    <input name="in" type="float" nodename="node241" />
-  </sin>
-  <multiply name="node239" type="float">
+  <multiply name="node246" type="float">
     <input name="in1" type="float" nodename="update_finalColor__d13" />
     <input name="in2" type="float" value="8" />
   </multiply>
-  <time name="node240" type="float" />
-  <add name="node241" type="float">
-    <input name="in1" type="float" nodename="node239" />
-    <input name="in2" type="float" nodename="node240" />
+  <time name="node247" type="float" />
+  <add name="sin__in4" type="float">
+    <input name="in1" type="float" nodename="node246" />
+    <input name="in2" type="float" nodename="node247" />
   </add>
+  <sin name="node249" type="float">
+    <input name="in" type="float" nodename="sin__in4" />
+  </sin>
   <divide name="update_finalColor__d14" type="float">
-    <input name="in1" type="float" nodename="node236" />
+    <input name="in1" type="float" nodename="node249" />
     <input name="in2" type="float" value="8" />
   </divide>
   <absval name="update_finalColor__d15" type="float">
     <input name="in" type="float" nodename="update_finalColor__d14" />
   </absval>
-  <divide name="node246" type="float">
+  <divide name="node255" type="float">
     <input name="in1" type="float" value="0.01" />
     <input name="in2" type="float" nodename="update_finalColor__d15" />
   </divide>
   <power name="update_finalColor__d16" type="float">
-    <input name="in1" type="float" nodename="node246" />
+    <input name="in1" type="float" nodename="node255" />
     <input name="in2" type="float" value="1.2" />
   </power>
-  <multiply name="node251" type="vector3">
+  <multiply name="node260" type="vector3">
     <input name="in1" type="vector3" nodename="update_finalColor__col4" />
     <input name="in2" type="float" nodename="update_finalColor__d16" />
   </multiply>
   <add name="main__finalColor5" type="vector3">
     <input name="in1" type="vector3" nodename="main__finalColor4" />
-    <input name="in2" type="vector3" nodename="node251" />
+    <input name="in2" type="vector3" nodename="node260" />
   </add>
   <standard_surface name="main__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node253" />
+    <input name="base_color" type="color3" nodename="node304" />
   </standard_surface>
-  <convert name="node253" type="color3">
+  <convert name="node304" type="color3">
     <input name="in" type="vector3" nodename="main__finalColor5" />
   </convert>
   <surfacematerial name="mxsl_material" type="material">

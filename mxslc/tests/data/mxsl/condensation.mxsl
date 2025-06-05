@@ -15,7 +15,7 @@ color3 background()
     float n = noise2d(5.0, 0.0, texcoord=uv * 100.0);
     vec2 m = mix(ruv, uv, n);
 
-    color3 c = image(BG_IMG, clamp(m));
+    color3 c = image(BG_IMG, texcoord=clamp(m));
     return c;
 }
 
@@ -110,7 +110,7 @@ clear_uv = if (to_drop < DROP_SIZE) { drop_uv };
 // surface
 //
 
-color3 clear = image(BG_IMG, clear_uv);
+color3 clear = image(BG_IMG, texcoord=clear_uv);
 
 blurred *= 0.8;
 clear *= 1.2;

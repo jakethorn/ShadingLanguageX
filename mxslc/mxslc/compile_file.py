@@ -3,7 +3,7 @@ from typing import Sequence
 
 from . import mtlx, state
 from .Interactive.ShaderInterface import ShaderInterface
-from .Preprocess.macros import undefine_all_macros, Macro, define_macro
+from .Preprocessor.macros import undefine_all_macros, Macro, define_macro
 from .compile import compile_
 from .file_utils import handle_mxsl_path, handle_mtlx_path
 from .post_process import post_process

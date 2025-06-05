@@ -5,15 +5,19 @@ from mxslc.Keyword import DataType, FLOAT, INTEGER, VECTOR_TYPES, COLOR_TYPES
 
 class IndexingExpression(Expression):
     def __init__(self, expr: Expression, indexer: Expression):
-        super().__init__(indexer.token, expr, indexer)
+        super().__init__(indexer.token)
         self.__expr = expr
         self.__indexer = indexer
 
+    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+        self.__expr.init(VECTOR_TYPES + COLOR_TYPES)
+        self.__indexer.init(INTEGER)
+
     @property
-    def data_type(self) -> DataType:
+    def _data_type(self) -> DataType:
         return FLOAT
 
-    def create_node(self) -> mtlx.Node:
-        index = self.__indexer.evaluate(INTEGER)
-        value = self.__expr.evaluate(VECTOR_TYPES + COLOR_TYPES)
+    def _evaluate(self) -> mtlx.Node:
+        index = self.__indexer.evaluate()
+        value = self.__expr.evaluate()
         return mtlx.extract(value, index)

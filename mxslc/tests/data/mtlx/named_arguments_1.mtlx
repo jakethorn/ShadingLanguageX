@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
+  <texcoord name="noise2d__texcoord" type="vector2" />
   <noise2d name="global__n" type="float">
     <input name="amplitude" type="float" value="1" />
     <input name="pivot" type="float" value="0" />
-    <input name="texcoord" type="vector2" nodename="node4" />
+    <input name="texcoord" type="vector2" nodename="noise2d__texcoord" />
   </noise2d>
-  <texcoord name="node4" type="vector2" />
 </materialx>

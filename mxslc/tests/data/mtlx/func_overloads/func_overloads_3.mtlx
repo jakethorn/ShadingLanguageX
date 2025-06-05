@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="global__f" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <divide name="node5" type="float">
+    <input name="in1" type="float" value="6" />
+    <input name="in2" type="float" value="2" />
+  </divide>
+  <convert name="global__v" type="vector3">
+    <input name="in" type="float" nodename="node5" />
+  </convert>
+  <convert name="foo__a3" type="vector3">
+    <input name="in" type="float" value="7" />
+  </convert>
+  <multiply name="global__w" type="vector3">
+    <input name="in1" type="vector3" nodename="foo__a3" />
+    <input name="in2" type="float" value="3" />
+  </multiply>
+  <convert name="foo__a4" type="vector3">
+    <input name="in" type="float" value="8" />
+  </convert>
+  <extract name="node11" type="float">
+    <input name="in" type="vector3" nodename="foo__a4" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <subtract name="global__g" type="float">
+    <input name="in1" type="float" nodename="node11" />
+    <input name="in2" type="float" value="4" />
+  </subtract>
+</materialx>

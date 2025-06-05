@@ -1,4 +1,5 @@
 from pathlib import Path
+from warnings import warn
 
 import MaterialX as mx
 import pytest
@@ -27,6 +28,7 @@ def test_main_function(filename: str, main_function: str | None, main_args: list
     expected_path = (Path(__file__).parent / "data" / "mtlx" / filename).with_suffix(".mtlx")
 
     if overwrite_expected or _overwrite_all_expected:
+        warn(f"Expected data for {filename} is being overwritten.")
         actual_path = expected_path
 
     mxslc.compile_file(mxsl_path, actual_path, main_func=main_function, main_args=main_args)
@@ -55,6 +57,7 @@ def test_additional_macros(filename: str, add_macros: list[Macro], overwrite_exp
     expected_path = (Path(__file__).parent / "data" / "mtlx" / filename).with_suffix(".mtlx")
 
     if overwrite_expected or _overwrite_all_expected:
+        warn(f"Expected data for {filename} is being overwritten.")
         actual_path = expected_path
 
     mxslc.compile_file(mxsl_path, actual_path, add_macros=add_macros)
@@ -80,6 +83,7 @@ def test_additional_include_dirs(filename: str, add_include_dirs: list[Path], ov
     expected_path = (Path(__file__).parent / "data" / "mtlx" / filename).with_suffix(".mtlx")
 
     if overwrite_expected or _overwrite_all_expected:
+        warn(f"Expected data for {filename} is being overwritten.")
         actual_path = expected_path
 
     mxslc.compile_file(mxsl_path, actual_path, add_include_dirs=add_include_dirs)

@@ -9,7 +9,7 @@ color3 clerp(color3 a, color3 b, float lower, float upper, float t)
 
 // calc height and color
 vec2 uv = position().xz / 5.0 + 1.0;
-float height = image("textures\mountain1.png", uv);
+float height = image("textures\mountain1.png", texcoord=uv);
 
 // bug: i have to set first parameter to get a float-type output
 float tree_noise = noise2d(1.0, texcoord = uv * 500.0) * 0.5 + 0.5;

@@ -1,7 +1,8 @@
 float x = 1.0;
 float y = 2.0;
 
-float z = if (texcoord().x < 0.5) { x } else { y };
+vec2 uv = texcoord();
+float z = if (uv.x < 0.5) { x } else { y };
 
 color3 red()
 {

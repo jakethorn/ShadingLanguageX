@@ -34,11 +34,11 @@ surfaceshader main()
 
     // paint walls
     color4 words = color4();
-    words = if (room_pos.x >  0.99) { image(wall1, wall_uvs.zy) };
-    words = if (room_pos.y < -0.99) { image(ceilg, vec2(wall_uvs.x, -wall_uvs.z)) };
-    words = if (room_pos.x < -0.99) { image(wall2, vec2(-wall_uvs.z, wall_uvs.y)) };
-    words = if (room_pos.z < -0.99) { image(wall3, wall_uvs.xy) };
-    words = if (room_pos.y >  0.99) { image(floor, wall_uvs.xz) };
+    words = if (room_pos.x >  0.99) { image(wall1, texcoord=wall_uvs.zy) };
+    words = if (room_pos.y < -0.99) { image(ceilg, texcoord=vec2(wall_uvs.x, -wall_uvs.z)) };
+    words = if (room_pos.x < -0.99) { image(wall2, texcoord=vec2(-wall_uvs.z, wall_uvs.y)) };
+    words = if (room_pos.z < -0.99) { image(wall3, texcoord=wall_uvs.xy) };
+    words = if (room_pos.y >  0.99) { image(floor, texcoord=wall_uvs.xz) };
 
     // ambient occlusion
     float ao = 1.0 - clamp(distance(vec3(0.0), room_pos) - 0.9);

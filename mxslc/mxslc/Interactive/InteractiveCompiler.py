@@ -5,7 +5,7 @@ import MaterialX as mx
 
 from .ShaderInterface import ShaderInterface
 from .. import mtlx, state
-from ..Preprocess.macros import undefine_all_macros
+from ..Preprocessor.macros import undefine_all_macros
 from ..compile import compile_
 from ..file_utils import handle_mxsl_path
 from ..post_process import post_process

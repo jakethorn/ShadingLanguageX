@@ -1,3 +1,4 @@
+from .Expressions import Expression
 from .Keyword import DataType
 from .Token import Token
 
@@ -9,7 +10,7 @@ class Parameter:
     Represents a parameter to a function, constructor or standard library call.
     Function and constructor calls will only ever have one data_type, but standard library calls can have multple.
     """
-    def __init__(self, name: Token | str, data_types: Token | DataType | list[DataType]):
+    def __init__(self, name: Token | str, data_types: Token | DataType | list[DataType], default_value: Expression = None):
         if isinstance(name, Token):
             self.__name_token = name
             self.__name = name.lexeme
@@ -24,9 +25,15 @@ class Parameter:
             self.__data_type_token = None
             self.__data_types = data_types if isinstance(data_types, list) else [data_types]
 
+        self.__default_value = default_value
+
     @property
     def name(self) -> str:
         return self.__name
+
+    @property
+    def data_type(self) -> DataType:
+        return self.__data_types[0]
 
     @property
     def data_types(self) -> list[DataType]:
@@ -40,6 +47,9 @@ class Parameter:
     def data_type_token(self) -> Token:
         return self.__data_type_token
 
+    @property
+    def default_value(self) -> Expression:
+        return self.__default_value
 
 
 class ParameterList:

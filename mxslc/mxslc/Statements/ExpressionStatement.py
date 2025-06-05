@@ -7,4 +7,4 @@ class ExpressionStatement(Statement):
         self.__expr = expr
 
     def execute(self) -> None:
-        self.__expr.evaluate()
+        self.__expr.init_evaluate()

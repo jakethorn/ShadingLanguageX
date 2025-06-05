@@ -1,42 +1,42 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <texcoord name="node1" type="vector2" />
-  <extract name="node2" type="float">
-    <input name="in" type="vector2" nodename="node1" />
+  <texcoord name="global__uv" type="vector2" />
+  <extract name="node3" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <ifgreatereq name="node4" type="float">
+  <ifgreatereq name="node5" type="float">
     <input name="value1" type="float" value="0.5" />
-    <input name="value2" type="float" nodename="node2" />
+    <input name="value2" type="float" nodename="node3" />
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
   </ifgreatereq>
   <ifequal name="global__z" type="float">
-    <input name="value1" type="float" nodename="node4" />
+    <input name="value1" type="float" nodename="node5" />
     <input name="value2" type="float" value="1" />
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </ifequal>
-  <add name="node9" type="float">
+  <add name="node10" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </add>
   <add name="global__f" type="float">
-    <input name="in1" type="float" nodename="node9" />
+    <input name="in1" type="float" nodename="node10" />
     <input name="in2" type="float" nodename="global__z" />
   </add>
-  <convert name="node12" type="float">
+  <convert name="node13" type="float">
     <input name="in" type="integer" value="1" />
   </convert>
-  <convert name="node14" type="float">
+  <convert name="node15" type="float">
     <input name="in" type="integer" value="0" />
   </convert>
-  <convert name="node16" type="float">
+  <convert name="node17" type="float">
     <input name="in" type="integer" value="0" />
   </convert>
   <combine3 name="global__r" type="color3">
-    <input name="in1" type="float" nodename="node12" />
-    <input name="in2" type="float" nodename="node14" />
-    <input name="in3" type="float" nodename="node16" />
+    <input name="in1" type="float" nodename="node13" />
+    <input name="in2" type="float" nodename="node15" />
+    <input name="in3" type="float" nodename="node17" />
   </combine3>
 </materialx>

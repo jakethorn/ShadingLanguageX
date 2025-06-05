@@ -1,22 +1,22 @@
 from pathlib import Path
 
 from . import mtlx
-from .Keyword import DataType, FLOAT, BOOLEAN
-from .StandardLibrary import StandardLibrary
+from .Keyword import DataType, FLOAT, BOOLEAN, Keyword
 from .utils import is_path
 
 
 def post_process() -> None:
     _add_material_node()
     _remove_dot_nodes()
+    _remove_null_nodes()
     _remove_constant_nodes()
     _fix_logic_nodes()
     _remove_convert_nodes()
 
 
 def _add_material_node() -> None:
-    surfaceshader_nodes = mtlx.get_nodes(StandardLibrary.STANDARD_SURFACE)
-    displacementshader_nodes = mtlx.get_nodes(StandardLibrary.DISPLACEMENT)
+    surfaceshader_nodes = mtlx.get_nodes("standard_surface")
+    displacementshader_nodes = mtlx.get_nodes("displacement")
     if len(surfaceshader_nodes) > 0 or len(displacementshader_nodes) > 0:
         material_node = mtlx.create_material_node("mxsl_material")
         if len(surfaceshader_nodes) > 0:
@@ -43,6 +43,12 @@ def _remove_dot_nodes() -> None:
         for input_name, node in dot_node.get_outputs():
             node.set_input(input_name, input_node)
         mtlx.remove_node(dot_node)
+
+
+def _remove_null_nodes() -> None:
+    null_nodes = mtlx.get_nodes(Keyword.NULL)
+    for null_node in null_nodes:
+        mtlx.remove_node(null_node)
 
 
 def _remove_constant_nodes() -> None:

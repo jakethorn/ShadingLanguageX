@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <standard_surface name="global__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node2" />
+    <input name="base_color" type="color3" nodename="node44" />
   </standard_surface>
-  <convert name="node2" type="color3">
+  <convert name="node44" type="color3">
     <input name="in" type="float" value="2" />
   </convert>
   <surfacematerial name="mxsl_material" type="material">

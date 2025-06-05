@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="node3" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <convert name="foo__a2" type="vector3">
+    <input name="in" type="float" value="6" />
+  </convert>
+  <extract name="node6" type="float">
+    <input name="in" type="vector3" nodename="foo__a2" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <add name="node8" type="float">
+    <input name="in1" type="float" nodename="node6" />
+    <input name="in2" type="float" value="2" />
+  </add>
+  <ifequal name="node12" type="float">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="4" />
+  </ifequal>
+</materialx>

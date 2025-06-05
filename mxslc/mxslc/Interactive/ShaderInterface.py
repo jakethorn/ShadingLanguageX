@@ -10,10 +10,6 @@ from .InteractiveNode import InteractiveNode
 from .. import state, mtlx
 from ..Argument import Argument
 from ..CompileError import CompileError
-from ..Expressions import StandardLibraryCall
-from ..StandardLibrary import StandardLibrary
-from ..Token import Token
-from ..token_types import IDENTIFIER
 
 
 class ShaderInterface:
@@ -31,8 +27,6 @@ class ShaderInterface:
             return InteractiveNode(state.get_node(name))
         if state.is_function(name):
             return Function(name)
-        if name in StandardLibrary:
-            return StandardLibraryFunction(name)
         raise CompileError(f"No variable or function named '{name}' found.")
 
     def __setitem__(self, name: str, value: mtlx.Value) -> None:
@@ -65,15 +59,6 @@ class Function:
     @property
     def line(self) -> int:
         return self.__function.line
-
-
-class StandardLibraryFunction:
-    def __init__(self, name: str):
-        self.__name = name
-
-    def __call__(self, *args: mtlx.Value | InteractiveNode) -> InteractiveNode:
-        call = StandardLibraryCall(Token(IDENTIFIER, self.__name), _to_arg_list(args))
-        return InteractiveNode(call.evaluate())
 
 
 def _to_mtlx_node(value: mtlx.Value) -> mtlx.Node:

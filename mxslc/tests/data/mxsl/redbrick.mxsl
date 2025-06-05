@@ -3,14 +3,15 @@
 //
 
 vec2 uv = texcoord() / 10.0;
-color3 albedo = image("textures\albedo.tif", uv);
-float matao = image("textures\matao.tif", uv);
-float metal = image("textures\metal.tif", uv);
-float rough = image("textures\rough.tif", uv);
-vec3 normal = image("textures\normal.tif", uv);
+color3 albedo = image("textures\albedo.tif", texcoord=uv);
+float matao = image("textures\matao.tif", texcoord=uv);
+float metal = image("textures\metal.tif", texcoord=uv);
+float rough = image("textures\rough.tif", texcoord=uv);
+vec3 normal = image("textures\normal.tif", texcoord=uv);
+normal.y = 1.0 - normal.y;
 
 surfaceshader surface = standard_surface();
 surface.base_color = albedo * matao * color3(0.5, 0.1, 0.1);
 surface.metalness = metal;
 surface.specular_roughness = rough;
-surface.normal = normalmap(normal, "tangent", 1.0, -normal("world"), -tangent("world"));
+surface.normal = normalmap(normal);

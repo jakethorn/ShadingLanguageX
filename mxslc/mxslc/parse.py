@@ -3,7 +3,6 @@ from .CompileError import CompileError
 from .Expressions import *
 from .Keyword import DATA_TYPES, Keyword, INTEGER
 from .Parameter import Parameter
-from .StandardLibrary import StandardLibrary
 from .Statements import *
 from .Token import Token
 from .TokenReader import TokenReader
@@ -101,7 +100,11 @@ class Parser(TokenReader):
     def __parameter(self) -> Parameter:
         data_type = self._match(*DATA_TYPES)
         identifier = self._match(IDENTIFIER)
-        return Parameter(identifier, data_type)
+        if self._consume("="):
+            default_value = self.__expression()
+        else:
+            default_value = None
+        return Parameter(identifier, data_type, default_value)
 
     def __assignment(self) -> Statement:
         identifier = self._match(IDENTIFIER)
@@ -222,22 +225,18 @@ class Parser(TokenReader):
 
     def __primary(self) -> Expression:
         # literal
-        if literal := self._consume(Keyword.TRUE, Keyword.FALSE, INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL):
+        if literal := self._consume(Keyword.TRUE, Keyword.FALSE, INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL, Keyword.NULL):
             return LiteralExpression(literal)
         # grouping
         if self._consume("("):
             expr = self.__expression()
             self._match(")")
             return GroupingExpression(expr)
-        # stdlib call / function call / identifier
+        # function call / identifier
         if identifier := self._consume(IDENTIFIER):
+            # function call
             if self._peek() == "(":
-                # stdlib call
-                if identifier.lexeme in StandardLibrary:
-                    return self.__standard_library_call(identifier)
-                # function call
-                else:
-                    return self.__function_call(identifier)
+                return self.__function_call(identifier)
             # identifier
             else:
                 return IdentifierExpression(identifier)
@@ -295,17 +294,6 @@ class Parser(TokenReader):
                 args.append(self.__argument())
             self._match(")")
         return ConstructorCall(data_type, args)
-
-    def __standard_library_call(self, identifier: Token) -> Expression:
-        self._match("(")
-        if self._consume(")"):
-            args = []
-        else:
-            args = [self.__argument()]
-            while self._consume(","):
-                args.append(self.__argument())
-            self._match(")")
-        return StandardLibraryCall(identifier, args)
 
     def __function_call(self, identifier: Token) -> Expression:
         self._match("(")

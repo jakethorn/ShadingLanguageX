@@ -6,7 +6,9 @@ from typing import Any
 import MaterialX as mx
 
 from .Keyword import DataType, FILENAME, VECTOR_TYPES, COLOR_TYPES, FLOAT, STRING, SHADER_TYPES, BOOLEAN, INTEGER, \
-    VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, MATERIAL
+    VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, MATERIAL, Keyword
+
+# TODO rename this document mx_utils
 
 #
 # Types
@@ -88,10 +90,16 @@ class Node:
 
     # TODO maybe pass in the token instead of the value, so we dont have to do this filename dance
     def set_input(self, name: str, value: Any) -> None:
-        self.__source.setConnectedNode(name, None)
-        if isinstance(value, Node):
-            self.__source.setConnectedNode(name, value.__source)
+        if value is None:
+            self.__source.removeInput(name)
+            return
+        elif isinstance(value, Node):
+            if value.is_null_node:
+                self.__source.removeInput(name)
+            else:
+                self.__source.setConnectedNode(name, value.__source)
         else:
+            self.__source.setConnectedNode(name, None)
             if isinstance(value, Path):
                 self.__source.setInputValue(name, str(value), FILENAME)
             else:
@@ -109,6 +117,10 @@ class Node:
     def get_outputs(self) -> list[tuple[str, Node]]:
         downstream_ports: list[mx.Input] = self.__source.getDownstreamPorts()
         return [(p.getName(), Node(p.getParent())) for p in downstream_ports]
+
+    @property
+    def is_null_node(self) -> bool:
+        return self.category == Keyword.NULL
 
 
 def get_source(node: Node) -> mx.Node:
@@ -130,6 +142,11 @@ def create_material_node(name: str) -> Node:
 
 def remove_node(node: Node) -> None:
     _document.removeNode(node.name)
+
+
+def get_node(name="") -> Node:
+    node = _document.getNode(name)
+    return Node(node) if node else None
 
 
 def get_nodes(category="") -> list[Node]:
@@ -218,3 +235,11 @@ def type_of(value: Value) -> DataType:
     if isinstance(value, Path):
         return FILENAME
     raise AssertionError
+
+
+def get_null_node(data_type: DataType) -> Node:
+    null_nodes = get_nodes(Keyword.NULL)
+    for node in null_nodes:
+        if data_type == node.data_type:
+            return node
+    return create_node(Keyword.NULL, data_type)

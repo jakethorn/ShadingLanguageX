@@ -4,6 +4,8 @@ from .Keyword import DataType
 from .Token import Token
 
 
+# TODO add position index (maybe to parameter as well)
+# TODO maybe this can inherit from Expression
 class Argument:
     """
     Represents a positional or named argument to a function, constructor or standard library call.
@@ -32,5 +34,5 @@ class Argument:
     def expression(self) -> Expression:
         return self.__expr
 
-    def evaluate(self, valid_types: DataType | list[DataType] = None) -> mtlx.Node:
-        return self.__expr.evaluate(valid_types)
+    def evaluate(self) -> mtlx.Node:
+        return self.__expr.evaluate()

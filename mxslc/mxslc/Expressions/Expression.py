@@ -10,26 +10,34 @@ from ..utils import as_list
 
 
 class Expression(ABC):
-    def __init__(self, token: Token, *child_expressions: Expression):
+    def __init__(self, token: Token | None):
         self.__token = token
-        self.__child_expressions = child_expressions
         self.__initialized = False
+        self.__valid_types = []
 
-    def __init(self):
-        for child_expression in self.__child_expressions:
-            if child_expression:
-                child_expression.__init()
+    def init(self, valid_types: DataType | list[DataType] = None) -> None:
         if not self.__initialized:
-            self.init()
+            self.__valid_types = as_list(valid_types) or DATA_TYPES
+            self._init_subexpr(self.__valid_types)
+            self._init(self.__valid_types)
             self.__initialized = True
 
     #virtualmethod
-    def init(self):
+    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+        ...
+
+    #virtualmethod
+    def _init(self, valid_types: list[DataType]) -> None:
         ...
 
     @property
-    @abstractmethod
     def data_type(self) -> DataType:
+        assert self.__initialized
+        return self._data_type
+
+    @property
+    @abstractmethod
+    def _data_type(self) -> DataType:
         ...
 
     @property
@@ -40,21 +48,23 @@ class Expression(ABC):
     def token(self) -> Token:
         return self.__token
 
-    def evaluate(self, valid_types: DataType | list[DataType] = None) -> mtlx.Node:
-        self.__init()
-        node = self.create_node()
+    def evaluate(self) -> mtlx.Node:
+        assert self.__initialized
+        node = self._evaluate()
         assert node.data_type == self.data_type
-
-        valid_types = as_list(valid_types) or DATA_TYPES
-        node = _implicit_int_to_float(node, valid_types)
-        if node.data_type not in valid_types:
-            raise CompileError(f"Invalid data type. Expected one of {valid_types}, but got {node.data_type}.", self.token)
+        node = _implicit_int_to_float(node, self.__valid_types)
+        if node.data_type not in self.__valid_types:
+            raise CompileError(f"Invalid data type. Expected one of {self.__valid_types}, but got {node.data_type}.", self.token)
 
         return node
 
     @abstractmethod
-    def create_node(self) -> mtlx.Node:
+    def _evaluate(self) -> mtlx.Node:
         ...
+
+    def init_evaluate(self, valid_types: DataType | list[DataType] = None) -> mtlx.Node:
+        self.init(valid_types)
+        return self.evaluate()
 
 
 def _implicit_int_to_float(node: mtlx.Node, valid_types: list[DataType]) -> mtlx.Node:

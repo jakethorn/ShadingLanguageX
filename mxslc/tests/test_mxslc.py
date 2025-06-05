@@ -1,4 +1,5 @@
 from pathlib import Path
+from warnings import warn
 
 import pytest
 
@@ -42,6 +43,12 @@ _overwrite_all_expected = False
     ("directives/directives_4", False),
     ("directives/directives_5", False),
     ("tern_rel_expr_1", False),
+    ("func_overloads/func_overloads_1", False),
+    ("func_overloads/func_overloads_2", False),
+    ("func_overloads/func_overloads_3", False),
+    ("func_overloads/func_overloads_4", False),
+    ("func_overloads/func_overloads_5", False),
+    ("func_overloads/func_overloads_6", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")
@@ -49,6 +56,7 @@ def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     expected_path = (Path(__file__).parent / "data" / "mtlx" / filename).with_suffix(".mtlx")
 
     if overwrite_expected or _overwrite_all_expected:
+        warn(f"Expected data for {filename} is being overwritten.")
         actual_path = expected_path
 
     mxslc.compile_file(mxsl_path, actual_path)

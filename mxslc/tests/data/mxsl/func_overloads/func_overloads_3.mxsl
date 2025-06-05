@@ -1,0 +1,24 @@
+float foo(float a)
+{
+    return a + 1.0;
+}
+
+vec3 foo(float a)
+{
+    return vec3(a / 2.0);
+}
+
+vec3 foo(vec3 a)
+{
+    return a * 3.0;
+}
+
+float foo(vec3 a)
+{
+    return a.z - 4.0;
+}
+
+float f = foo(5.0);
+vec3 v = foo(6.0);
+vec3 w = foo(vec3(7.0));
+float g = foo(vec3(8.0));

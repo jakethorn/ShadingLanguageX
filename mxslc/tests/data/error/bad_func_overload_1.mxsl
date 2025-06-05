@@ -1,0 +1,31 @@
+float my_func(float a, bool b)
+{
+    return a * if (b) {2.0} else {3.0};
+}
+
+float my_func(vec2 a, bool b)
+{
+    return a.x * if (b) {2.0} else {3.0};
+}
+
+float foo()
+{
+    return 1.0;
+}
+
+vec2 foo()
+{
+    return vec2(4.0, 5.0);
+}
+
+color3 bar()
+{
+    return color3(1.0, 0.0, 0.0);
+}
+
+bool bar()
+{
+    return true;
+}
+
+float f = my_func(foo(), bar());

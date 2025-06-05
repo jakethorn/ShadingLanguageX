@@ -40,11 +40,11 @@ surfaceshader main()
 
     // paint walls
     color4 walls = color4();
-    walls = if (room_pos.x >  0.99) { image(wall1_file, wall_uvs.zy) };
-    walls = if (room_pos.y < -0.99) { image(ceilg_file, vec2(wall_uvs.x, -wall_uvs.z)) };
-    walls = if (room_pos.x < -0.99) { image(wall2_file, vec2(-wall_uvs.z, wall_uvs.y)) };
-    walls = if (room_pos.z < -0.99) { image(wall3_file, wall_uvs.xy) };
-    walls = if (room_pos.y >  0.99) { image(floor_file, wall_uvs.xz) };
+    walls = if (room_pos.x >  0.99) { image(wall1_file, texcoord=wall_uvs.zy) };
+    walls = if (room_pos.y < -0.99) { image(ceilg_file, texcoord=vec2(wall_uvs.x, -wall_uvs.z)) };
+    walls = if (room_pos.x < -0.99) { image(wall2_file, texcoord=vec2(-wall_uvs.z, wall_uvs.y)) };
+    walls = if (room_pos.z < -0.99) { image(wall3_file, texcoord=wall_uvs.xy) };
+    walls = if (room_pos.y >  0.99) { image(floor_file, texcoord=wall_uvs.xz) };
 
     // do midplane raycast
     float midplane_dist = raycast_midplane(origin, view_dir, 0.0);
@@ -52,7 +52,7 @@ surfaceshader main()
     midplane_pos.y *= -1.0;
 
     // place table
-    color4 table = image(table_file, (midplane_pos.xy + 1.0) / 2.0);
+    color4 table = image(table_file, texcoord=(midplane_pos.xy + 1.0) / 2.0);
 
     // combine walls and table
     color4 room = color4();

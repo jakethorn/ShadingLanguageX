@@ -3,7 +3,6 @@ from .. import mtlx, state
 from ..CompileError import CompileError
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Keyword import DataType
-from ..StandardLibrary import StandardLibrary
 from ..Token import Token
 from ..utils import type_of_swizzle
 
@@ -19,7 +18,8 @@ class VariableAssignment(Statement):
         node = state.get_node(self.identifier)
         if self.swizzle is None:
             self.execute_as_identifier(node)
-        elif node.category == StandardLibrary.STANDARD_SURFACE:
+        # TODO do the same for displacement
+        elif node.category == "standard_surface":
             self.execute_as_surface_input(node)
         else:
             self.execute_as_swizzle(node)
@@ -29,9 +29,8 @@ class VariableAssignment(Statement):
         state.set_node(self.identifier, new_node)
 
     def execute_as_surface_input(self, surface_node: mtlx.Node) -> None:
-        params = StandardLibrary.STANDARD_SURFACE.parameters()
-        if self.swizzle in params:
-            input_type = params[self.swizzle].data_types[0]
+        if self.swizzle in _standard_surface_inputs:
+            input_type = _standard_surface_inputs[self.swizzle]
         else:
             raise CompileError(f"Input '{self.swizzle}' does not exist in the standard surface.", self.identifier)
         surface_node.set_input(self.swizzle, self.evaluate_right(input_type))
@@ -60,4 +59,50 @@ class VariableAssignment(Statement):
     def evaluate_right(self, valid_type: DataType) -> mtlx.Node:
         if isinstance(self.right, IfExpression) and self.right.otherwise is None:
             self.right.otherwise = IdentifierExpression(self.identifier)
-        return self.right.evaluate(valid_type)
+        return self.right.init_evaluate(valid_type)
+
+
+_standard_surface_inputs: dict[str, DataType] = {
+    "base": DataType.FLOAT,
+    "base_color": DataType.COLOR3,
+    "diffuse_roughness": DataType.FLOAT,
+    "metalness": DataType.FLOAT,
+    "specular": DataType.FLOAT,
+    "specular_color": DataType.COLOR3,
+    "specular_roughness": DataType.FLOAT,
+    "specular_IOR": DataType.FLOAT,
+    "specular_anisotropy": DataType.FLOAT,
+    "specular_rotation": DataType.FLOAT,
+    "transmission": DataType.FLOAT,
+    "transmission_color": DataType.COLOR3,
+    "transmission_depth": DataType.FLOAT,
+    "transmission_scatter": DataType.COLOR3,
+    "transmission_scatter_anisotropy": DataType.FLOAT,
+    "transmission_dispersion": DataType.FLOAT,
+    "transmission_extra_roughness": DataType.FLOAT,
+    "subsurface": DataType.FLOAT,
+    "subsurface_color": DataType.COLOR3,
+    "subsurface_radius": DataType.COLOR3,
+    "subsurface_scale": DataType.FLOAT,
+    "subsurface_anisotropy": DataType.FLOAT,
+    "sheen": DataType.FLOAT,
+    "sheen_color": DataType.COLOR3,
+    "sheen_roughness": DataType.FLOAT,
+    "coat": DataType.FLOAT,
+    "coat_color": DataType.COLOR3,
+    "coat_roughness": DataType.FLOAT,
+    "coat_anisotropy": DataType.FLOAT,
+    "coat_rotation": DataType.FLOAT,
+    "coat_IOR": DataType.FLOAT,
+    "coat_normal": DataType.VECTOR3,
+    "coat_affect_color": DataType.FLOAT,
+    "coat_affect_roughness": DataType.FLOAT,
+    "thin_film_thickness": DataType.FLOAT,
+    "thin_film_IOR": DataType.FLOAT,
+    "emission": DataType.FLOAT,
+    "emission_color": DataType.COLOR3,
+    "opacity": DataType.COLOR3,
+    "thin_walled": DataType.BOOLEAN,
+    "normal": DataType.VECTOR3,
+    "tangent": DataType.VECTOR3
+}

@@ -1,4 +1,0 @@
-vector3 crossproduct(vector3 a, vector3 b)
-{
-    return vec3();
-}

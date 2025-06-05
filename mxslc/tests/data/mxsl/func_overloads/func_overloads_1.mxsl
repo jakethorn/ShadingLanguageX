@@ -1,0 +1,18 @@
+float foo(float a)
+{
+    return a + 1.0;
+}
+
+float foo(vec3 a)
+{
+    return a.y + 2.0;
+}
+
+float foo(bool a)
+{
+    return if (a) { 3.0 } else { 4.0 };
+}
+
+foo(5.0);
+foo(vec3(6.0));
+foo(true);

@@ -3,36 +3,50 @@ import re
 from . import Expression
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType, VECTOR_TYPES, COLOR_TYPES
+from ..Keyword import DataType
 from ..Token import Token
 from ..utils import type_of_swizzle
 
 
 class SwizzleExpression(Expression):
     def __init__(self, left: Expression, swizzle: Token):
-        super().__init__(swizzle, left)
+        super().__init__(swizzle)
         self.left = left
         self.swizzle = swizzle.lexeme
-        self.is_vector_swizzle = re.match(r"[xyzw]", self.swizzle)
 
-    def init(self):
         if not re.fullmatch(r"([xyzw]{1,4}|[rgba]{1,4})", self.swizzle):
             raise CompileError(f"'{self.swizzle}' is not a valid swizzle.", self.token)
-        if self.left.data_size < 4 and ("w" in self.swizzle or "a" in self.swizzle):
-            raise CompileError(f"'{self.swizzle}' is not a valid swizzle for a {self.left.data_type}.", self.token)
-        if self.left.data_size < 3 and ("z" in self.swizzle or "b" in self.swizzle):
-            raise CompileError(f"'{self.swizzle}' is not a valid swizzle for a {self.left.data_type}.", self.token)
+
+    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+        self.left.init(self.__valid_left_types())
 
     @property
-    def data_type(self) -> DataType:
+    def _data_type(self) -> DataType:
         return type_of_swizzle(self.swizzle)
 
-    def create_node(self) -> mtlx.Node:
-        valid_types = VECTOR_TYPES if self.is_vector_swizzle else COLOR_TYPES
-        left_node = self.left.evaluate(valid_types)
-
+    def _evaluate(self) -> mtlx.Node:
+        left_node = self.left.evaluate()
         if len(self.swizzle) == 1:
             return mtlx.extract(left_node, self.swizzle)
         else:
             channels = [mtlx.extract(left_node, c) for c in self.swizzle]
             return mtlx.combine(channels, self.data_type)
+
+    def __valid_left_types(self) -> list[DataType]:
+        if "x" in self.swizzle:
+            return [DataType.VECTOR2, DataType.VECTOR3, DataType.VECTOR4]
+        if "y" in self.swizzle:
+            return [DataType.VECTOR2, DataType.VECTOR3, DataType.VECTOR4]
+        if "z" in self.swizzle:
+            return [DataType.VECTOR3, DataType.VECTOR4]
+        if "w" in self.swizzle:
+            return [DataType.VECTOR4]
+        if "r" in self.swizzle:
+            return [DataType.COLOR3, DataType.COLOR4]
+        if "g" in self.swizzle:
+            return [DataType.COLOR3, DataType.COLOR4]
+        if "b" in self.swizzle:
+            return [DataType.COLOR3, DataType.COLOR4]
+        if "a" in self.swizzle:
+            return [DataType.COLOR4]
+        raise CompileError(f"'{self.swizzle}' is not a valid swizzle.", self.token)

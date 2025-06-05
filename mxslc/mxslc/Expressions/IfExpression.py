@@ -8,23 +8,28 @@ from ..Token import Token
 # TODO implement if else
 class IfExpression(Expression):
     def __init__(self, token: Token, clause: Expression, then: Expression, otherwise: Expression):
-        super().__init__(token, clause, then, otherwise)
+        super().__init__(token)
         self.clause = clause
         self.then = then
         self.otherwise = otherwise
 
-    def init(self):
+    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+        self.clause.init(BOOLEAN)
+        self.then.init(valid_types)
+        self.otherwise.init(valid_types)
+
+    def _init(self, valid_types: list[DataType]) -> None:
         if self.then.data_type != self.otherwise.data_type:
             raise CompileError(f"Branches must be of same data type, but were {self.then.data_type} and {self.otherwise.data_type}.", self.token)
 
     @property
-    def data_type(self) -> DataType:
+    def _data_type(self) -> DataType:
         return self.then.data_type
 
-    def create_node(self) -> mtlx.Node:
-        clause_node = self.clause.evaluate(BOOLEAN)
-        then_node = self.then.evaluate(NUMERIC_TYPES)
-        otherwise_node = self.otherwise.evaluate(NUMERIC_TYPES)
+    def _evaluate(self) -> mtlx.Node:
+        clause_node = self.clause.evaluate()
+        then_node = self.then.evaluate()
+        otherwise_node = self.otherwise.evaluate()
 
         node = mtlx.create_node("ifequal", self.data_type)
         node.set_input("value1", clause_node)

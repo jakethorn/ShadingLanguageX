@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="node3" type="float">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <divide name="node6" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="6" />
+  </divide>
+  <ifequal name="node11" type="float">
+    <input name="value1" type="float" value="0" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </ifequal>
+  <multiply name="node12" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" nodename="node11" />
+  </multiply>
+</materialx>

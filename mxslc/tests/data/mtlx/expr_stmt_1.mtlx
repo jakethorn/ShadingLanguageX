@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <texcoord name="global__uv" type="vector2" />
-  <displacement name="node1" type="displacementshader">
-    <input name="displacement" type="vector3" nodename="node2" />
-    <input name="scale" type="float" nodename="node8" />
-  </displacement>
-  <tangent name="node2" type="vector3">
+  <tangent name="displacement__displacement" type="vector3">
     <input name="space" type="string" value="object" />
   </tangent>
-  <extract name="node5" type="float">
+  <extract name="node6" type="float">
     <input name="in" type="vector2" nodename="global__uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node7" type="float">
+  <extract name="node8" type="float">
     <input name="in" type="vector2" nodename="global__uv" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <multiply name="node8" type="float">
-    <input name="in1" type="float" nodename="node5" />
-    <input name="in2" type="float" nodename="node7" />
+  <multiply name="displacement__scale" type="float">
+    <input name="in1" type="float" nodename="node6" />
+    <input name="in2" type="float" nodename="node8" />
   </multiply>
+  <displacement name="node1" type="displacementshader">
+    <input name="displacement" type="vector3" nodename="displacement__displacement" />
+    <input name="scale" type="float" nodename="displacement__scale" />
+  </displacement>
   <surfacematerial name="mxsl_material" type="material">
     <input name="displacementshader" type="displacementshader" nodename="node1" />
   </surfacematerial>

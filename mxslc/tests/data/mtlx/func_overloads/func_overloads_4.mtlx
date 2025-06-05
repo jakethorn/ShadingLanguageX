@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <ifequal name="node5" type="float">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </ifequal>
+  <multiply name="global__f" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="node5" />
+  </multiply>
+</materialx>

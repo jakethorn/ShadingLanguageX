@@ -1,0 +1,11 @@
+float foo()
+{
+    return 4.0 * 2.0;
+}
+
+float foo(float a = 1.0)
+{
+    return a * 2.0;
+}
+
+foo();

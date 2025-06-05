@@ -1,6 +1,6 @@
 from . import Statement
 from .. import state
-from ..Expressions import Expression, StandardLibraryCall
+from ..Expressions import Expression
 from ..Keyword import DataType
 from ..Token import Token
 
@@ -12,8 +12,5 @@ class VariableDeclaration(Statement):
         self.__right = right
 
     def execute(self) -> None:
-        if isinstance(self.__right, StandardLibraryCall):
-            self.__right.assignment_data_type = self.__data_type
-
-        node = self.__right.evaluate(self.__data_type)
+        node = self.__right.init_evaluate(self.__data_type)
         state.add_node(self.__identifier, node)

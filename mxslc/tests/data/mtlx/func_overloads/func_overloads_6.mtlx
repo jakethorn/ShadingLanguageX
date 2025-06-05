@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="global__f" type="float">
+    <input name="in" type="float" value="2" />
+    <input name="max" type="float" value="10" />
+  </randomfloat>
+  <randomfloat name="global__g" type="float">
+    <input name="in" type="float" value="2" />
+    <input name="max" type="float" value="10" />
+  </randomfloat>
+</materialx>
