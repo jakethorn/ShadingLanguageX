@@ -33,6 +33,7 @@ class DataType(StrEnum):
     SURFACESHADER = auto()
     DISPLACEMENTSHADER = auto()
     MATERIAL = auto()
+    T = "T"
 
     @property
     def size(self) -> int:

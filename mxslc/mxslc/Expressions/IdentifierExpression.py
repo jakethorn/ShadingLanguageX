@@ -9,6 +9,9 @@ class IdentifierExpression(Expression):
         super().__init__(identifier)
         self.__identifier = identifier
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        return self
+
     @property
     def _data_type(self) -> DataType:
         node = state.get_node(self.__identifier)

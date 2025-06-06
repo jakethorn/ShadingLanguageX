@@ -4,6 +4,7 @@ from ..CompileError import CompileError
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Keyword import DataType
 from ..Token import Token
+from ..token_types import IDENTIFIER
 from ..utils import type_of_swizzle
 
 
@@ -13,6 +14,11 @@ class VariableAssignment(Statement):
         self.identifier = identifier
         self.swizzle = swizzle.lexeme if swizzle else None
         self.right = right
+
+    def instantiate_templated_types(self, data_type: DataType) -> Statement:
+        swizzle = Token(IDENTIFIER, self.swizzle) if self.swizzle else None
+        right = self.right.instantiate_templated_types(data_type)
+        return VariableAssignment(self.identifier, swizzle, right)
 
     def execute(self) -> None:
         node = state.get_node(self.identifier)

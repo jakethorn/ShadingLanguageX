@@ -15,6 +15,10 @@ class Expression(ABC):
         self.__initialized = False
         self.__valid_types = []
 
+    @abstractmethod
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        ...
+
     def init(self, valid_types: DataType | list[DataType] = None) -> None:
         if not self.__initialized:
             self.__valid_types = as_list(valid_types) or DATA_TYPES

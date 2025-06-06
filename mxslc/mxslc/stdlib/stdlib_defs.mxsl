@@ -108,59 +108,14 @@ surfaceshader standard_surface(
 
 // ----------------  mix  ----------------
 
-float mix(float fg, float bg, float mix)
+T mix<float, vec2, vec3, vec4, color3, color4>(T fg, T bg, T mix)
 {
-    return {"mix", float: fg=fg, bg=bg, mix=mix};
+    return {"mix", T: fg=fg, bg=bg, mix=mix};
 }
 
-color3 mix(color3 fg, color3 bg, float mix)
+T mix<vec2, vec3, vec4, color3, color4>(T fg, T bg, float mix)
 {
-    return {"mix", color3: fg=fg, bg=bg, mix=mix};
-}
-
-color3 mix(color3 fg, color3 bg, color3 mix)
-{
-    return {"mix", color3: fg=fg, bg=bg, mix=mix};
-}
-
-color4 mix(color4 fg, color4 bg, float mix)
-{
-    return {"mix", color4: fg=fg, bg=bg, mix=mix};
-}
-
-color4 mix(color4 fg, color4 bg, color4 mix)
-{
-    return {"mix", color4: fg=fg, bg=bg, mix=mix};
-}
-
-vec2 mix(vec2 fg, vec2 bg, float mix)
-{
-    return {"mix", vec2: fg=fg, bg=bg, mix=mix};
-}
-
-vec2 mix(vec2 fg, vec2 bg, vec2 mix)
-{
-    return {"mix", vec2: fg=fg, bg=bg, mix=mix};
-}
-
-vec3 mix(vec3 fg, vec3 bg, float mix)
-{
-    return {"mix", vec3: fg=fg, bg=bg, mix=mix};
-}
-
-vec3 mix(vec3 fg, vec3 bg, vec3 mix)
-{
-    return {"mix", vec3: fg=fg, bg=bg, mix=mix};
-}
-
-vec4 mix(vec4 fg, vec4 bg, float mix)
-{
-    return {"mix", vec4: fg=fg, bg=bg, mix=mix};
-}
-
-vec4 mix(vec4 fg, vec4 bg, vec4 mix)
-{
-    return {"mix", vec4: fg=fg, bg=bg, mix=mix};
+    return {"mix", T: fg=fg, bg=bg, mix=mix};
 }
 
 // ----------------  normalmap  ----------------
@@ -184,492 +139,177 @@ vec3 dotproduct(vec3 in1, vec3 in2)
 
 // ----------------  dotproduct  ----------------
 
-float dotproduct(vec2 in1, vec2 in2)
-{
-    return {"dotproduct", float: in1=in1, in2=in2};
-}
-
-float dotproduct(vec3 in1, vec3 in2)
-{
-    return {"dotproduct", float: in1=in1, in2=in2};
-}
-
-float dotproduct(vec4 in1, vec4 in2)
+float dotproduct<vec2, vec3, vec4>(T in1, T in2)
 {
     return {"dotproduct", float: in1=in1, in2=in2};
 }
 
 // ----------------  distance  ----------------
 
-float distance(vec2 in1, vec2 in2)
-{
-    return {"distance", float: in1=in1, in2=in2};
-}
-
-float distance(vec3 in1, vec3 in2)
-{
-    return {"distance", float: in1=in1, in2=in2};
-}
-
-float distance(vec4 in1, vec4 in2)
+float distance<vec2, vec3, vec4>(T in1, T in2)
 {
     return {"distance", float: in1=in1, in2=in2};
 }
 
 // ----------------  magnitude  ----------------
 
-float magnitude(vec2 in)
-{
-    return {"magnitude", float: in=in};
-}
-
-float magnitude(vec3 in)
-{
-    return {"magnitude", float: in=in};
-}
-
-float magnitude(vec4 in)
+float magnitude<vec2, vec3, vec4>(T in)
 {
     return {"magnitude", float: in=in};
 }
 
 // ----------------  normalize  ----------------
 
-vec2 normalize(vec2 in)
+T normalize<vec2, vec3, vec4>(T in)
 {
-    return {"normalize", vec2: in=in};
-}
-
-vec3 normalize(vec3 in)
-{
-    return {"normalize", vec3: in=in};
-}
-
-vec4 normalize(vec4 in)
-{
-    return {"normalize", vec4: in=in};
+    return {"normalize", T: in=in};
 }
 
 // ----------------  max  ----------------
 
-float max(float in1, float in2)
+T max<float, vec2, vec3, vec4, color3, color4>(T in1, T in2)
 {
-    return {"max", float: in1=in1, in2=in2};
+    return {"max", T: in1=in1, in2=in2};
 }
 
-vec2 max(vec2 in1, vec2 in2)
+T max<vec2, vec3, vec4, color3, color4>(T in1, float in2)
 {
-    return {"max", vec2: in1=in1, in2=in2};
+    return {"max", T: in1=in1, in2=in2};
 }
 
-vec3 max(vec3 in1, vec3 in2)
+T max<vec2, vec3, vec4, color3, color4>(float in1, T in2)
 {
-    return {"max", vec3: in1=in1, in2=in2};
+    return {"max", T: in1=in2, in2=in1};
 }
 
-vec4 max(vec4 in1, vec4 in2)
-{
-    return {"max", vec4: in1=in1, in2=in2};
-}
-
-color3 max(color3 in1, color3 in2)
-{
-    return {"max", color3: in1=in1, in2=in2};
-}
-
-color4 max(color4 in1, color4 in2)
-{
-    return {"max", color4: in1=in1, in2=in2};
-}
-
-vec2 max(vec2 in1, float in2)
-{
-    return {"max", vec2: in1=in1, in2=in2};
-}
-
-vec3 max(vec3 in1, float in2)
-{
-    return {"max", vec3: in1=in1, in2=in2};
-}
-
-vec4 max(vec4 in1, float in2)
-{
-    return {"max", vec4: in1=in1, in2=in2};
-}
-
-color3 max(color3 in1, float in2)
-{
-    return {"max", color3: in1=in1, in2=in2};
-}
-
-color4 max(color4 in1, float in2)
-{
-    return {"max", color4: in1=in1, in2=in2};
-}
-
-float max(float in1, float in2, float in3)
+T max<float, vec2, vec3, vec4, color3, color4>(T in1, T in2, T in3)
 {
     return max(in1, max(in2, in3));
 }
 
+T max<float, vec2, vec3, vec4, color3, color4>(T in1, T in2, T in3, T in4)
+{
+    return max(in1, max(in2, max(in3, in4)));
+}
+
+T max<float, vec2, vec3, vec4, color3, color4>(T in1, T in2, T in3, T in4, T in5)
+{
+    return max(in1, max(in2, max(in3, max(in4, in5))));
+}
+
 // ----------------  min  ----------------
 
-float min(float in1, float in2)
+T min<float, vec2, vec3, vec4, color3, color4>(T in1, T in2)
 {
-    return {"min", float: in1=in1, in2=in2};
+    return {"min", T: in1=in1, in2=in2};
 }
 
-vec2 min(vec2 in1, vec2 in2)
+T min<vec2, vec3, vec4, color3, color4>(T in1, float in2)
 {
-    return {"min", vec2: in1=in1, in2=in2};
+    return {"min", T: in1=in1, in2=in2};
 }
 
-vec3 min(vec3 in1, vec3 in2)
+T min<vec2, vec3, vec4, color3, color4>(float in1, T in2)
 {
-    return {"min", vec3: in1=in1, in2=in2};
+    return {"min", T: in1=in2, in2=in1};
 }
 
-vec4 min(vec4 in1, vec4 in2)
-{
-    return {"min", vec4: in1=in1, in2=in2};
-}
-
-color3 min(color3 in1, color3 in2)
-{
-    return {"min", color3: in1=in1, in2=in2};
-}
-
-color4 min(color4 in1, color4 in2)
-{
-    return {"min", color4: in1=in1, in2=in2};
-}
-
-vec2 min(vec2 in1, float in2)
-{
-    return {"min", vec2: in1=in1, in2=in2};
-}
-
-vec3 min(vec3 in1, float in2)
-{
-    return {"min", vec3: in1=in1, in2=in2};
-}
-
-vec4 min(vec4 in1, float in2)
-{
-    return {"min", vec4: in1=in1, in2=in2};
-}
-
-color3 min(color3 in1, float in2)
-{
-    return {"min", color3: in1=in1, in2=in2};
-}
-
-color4 min(color4 in1, float in2)
-{
-    return {"min", color4: in1=in1, in2=in2};
-}
-
-float min(float in1, float in2, float in3)
+T min<float, vec2, vec3, vec4, color3, color4>(T in1, T in2, T in3)
 {
     return min(in1, min(in2, in3));
 }
 
+T min<float, vec2, vec3, vec4, color3, color4>(T in1, T in2, T in3, T in4)
+{
+    return min(in1, min(in2, min(in3, in4)));
+}
+
+T min<float, vec2, vec3, vec4, color3, color4>(T in1, T in2, T in3, T in4, T in5)
+{
+    return min(in1, min(in2, min(in3, min(in4, in5))));
+}
+
 // ----------------  clamp  ----------------
 
-float clamp(float in, float low = null, float high = null)
+T clamp<float, vec2, vec3, vec4, color3, color4>(T in, T low = null, T high = null)
 {
-    return {"clamp", float: in=in, low=low, high=high};
+    return {"clamp", T: in=in, low=low, high=high};
 }
 
-vec2 clamp(vec2 in, vec2 low = null, vec2 high = null)
+T clamp<vec2, vec3, vec4, color3, color4>(T in, float low, float high)
 {
-    return {"clamp", vec2: in=in, low=low, high=high};
-}
-
-vec3 clamp(vec3 in, vec3 low = null, vec3 high = null)
-{
-    return {"clamp", vec3: in=in, low=low, high=high};
-}
-
-vec4 clamp(vec4 in, vec4 low = null, vec4 high = null)
-{
-    return {"clamp", vec4: in=in, low=low, high=high};
-}
-
-color3 clamp(color3 in, color3 low = null, color3 high = null)
-{
-    return {"clamp", color3: in=in, low=low, high=high};
-}
-
-color4 clamp(color4 in, color4 low = null, color4 high = null)
-{
-    return {"clamp", color4: in=in, low=low, high=high};
-}
-
-vec2 clamp(vec2 in, float low, float high)
-{
-    return {"clamp", vec2: in=in, low=low, high=high};
-}
-
-vec3 clamp(vec3 in, float low, float high)
-{
-    return {"clamp", vec3: in=in, low=low, high=high};
-}
-
-vec4 clamp(vec4 in, float low, float high)
-{
-    return {"clamp", vec4: in=in, low=low, high=high};
-}
-
-color3 clamp(color3 in, float low, float high)
-{
-    return {"clamp", color3: in=in, low=low, high=high};
-}
-
-color4 clamp(color4 in, float low, float high)
-{
-    return {"clamp", color4: in=in, low=low, high=high};
+    return {"clamp", T: in=in, low=low, high=high};
 }
 
 // ----------------  exp  ----------------
 
-float exp(float in)
+T exp<float, vec2, vec3, vec4>(T in)
 {
-    return {"exp", float: in=in};
-}
-
-vec2 exp(vec2 in)
-{
-    return {"exp", vec2: in=in};
-}
-
-vec3 exp(vec3 in)
-{
-    return {"exp", vec3: in=in};
-}
-
-vec4 exp(vec4 in)
-{
-    return {"exp", vec4: in=in};
+    return {"exp", T: in=in};
 }
 
 // ----------------  cos  ----------------
 
-float cos(float in)
+T cos<float, vec2, vec3, vec4>(T in)
 {
-    return {"cos", float: in=in};
-}
-
-vec2 cos(vec2 in)
-{
-    return {"cos", vec2: in=in};
-}
-
-vec3 cos(vec3 in)
-{
-    return {"cos", vec3: in=in};
-}
-
-vec4 cos(vec4 in)
-{
-    return {"cos", vec4: in=in};
+    return {"cos", T: in=in};
 }
 
 // ----------------  sin  ----------------
 
-float sin(float in)
+T sin<float, vec2, vec3, vec4>(T in)
 {
-    return {"sin", float: in=in};
-}
-
-vec2 sin(vec2 in)
-{
-    return {"sin", vec2: in=in};
-}
-
-vec3 sin(vec3 in)
-{
-    return {"sin", vec3: in=in};
-}
-
-vec4 sin(vec4 in)
-{
-    return {"sin", vec4: in=in};
+    return {"sin", T: in=in};
 }
 
 // ----------------  round  ----------------
 
-float round(float in)
+T round<float, vec2, vec3, vec4, color3, color4>(T in)
 {
-    return {"round", float: in=in};
-}
-
-vec2 round(vec2 in)
-{
-    return {"round", vec2: in=in};
-}
-
-vec3 round(vec3 in)
-{
-    return {"round", vec3: in=in};
-}
-
-vec4 round(vec4 in)
-{
-    return {"round", vec4: in=in};
-}
-
-color3 round(color3 in)
-{
-    return {"round", color3: in=in};
-}
-
-color4 round(color4 in)
-{
-    return {"round", color4: in=in};
+    return {"round", T: in=in};
 }
 
 int round(float in)
 {
-    return {"round", float: in=in};
+    return {"round", int: in=in};
 }
 
 // ----------------  ceil  ----------------
 
-float ceil(float in)
+T ceil<float, vec2, vec3, vec4, color3, color4>(T in)
 {
-    return {"ceil", float: in=in};
-}
-
-vec2 ceil(vec2 in)
-{
-    return {"ceil", vec2: in=in};
-}
-
-vec3 ceil(vec3 in)
-{
-    return {"ceil", vec3: in=in};
-}
-
-vec4 ceil(vec4 in)
-{
-    return {"ceil", vec4: in=in};
-}
-
-color3 ceil(color3 in)
-{
-    return {"ceil", color3: in=in};
-}
-
-color4 ceil(color4 in)
-{
-    return {"ceil", color4: in=in};
+    return {"ceil", T: in=in};
 }
 
 int ceil(float in)
 {
-    return {"ceil", float: in=in};
+    return {"ceil", int: in=in};
 }
 
 // ----------------  floor  ----------------
 
-float floor(float in)
+T floor<float, vec2, vec3, vec4, color3, color4>(T in)
 {
-    return {"floor", float: in=in};
-}
-
-vec2 floor(vec2 in)
-{
-    return {"floor", vec2: in=in};
-}
-
-vec3 floor(vec3 in)
-{
-    return {"floor", vec3: in=in};
-}
-
-vec4 floor(vec4 in)
-{
-    return {"floor", vec4: in=in};
-}
-
-color3 floor(color3 in)
-{
-    return {"floor", color3: in=in};
-}
-
-color4 floor(color4 in)
-{
-    return {"floor", color4: in=in};
+    return {"floor", T: in=in};
 }
 
 int floor(float in)
 {
-    return {"floor", float: in=in};
+    return {"floor", int: in=in};
 }
 
 // ----------------  absval  ----------------
 
-float absval(float in)
+T absval<float, vec2, vec3, vec4, color3, color4>(T in)
 {
-    return {"absval", float: in=in};
-}
-
-vec2 absval(vec2 in)
-{
-    return {"absval", vec2: in=in};
-}
-
-vec3 absval(vec3 in)
-{
-    return {"absval", vec3: in=in};
-}
-
-vec4 absval(vec4 in)
-{
-    return {"absval", vec4: in=in};
-}
-
-color3 absval(color3 in)
-{
-    return {"absval", color3: in=in};
-}
-
-color4 absval(color4 in)
-{
-    return {"absval", color4: in=in};
+    return {"absval", T: in=in};
 }
 
 // ----------------  fract  ----------------
 
-float fract(float in)
+T fract<float, vec2, vec3, vec4, color3, color4>(T in)
 {
-    return {"fract", float: in=in};
-}
-
-vec2 fract(vec2 in)
-{
-    return {"fract", vec2: in=in};
-}
-
-vec3 fract(vec3 in)
-{
-    return {"fract", vec3: in=in};
-}
-
-vec4 fract(vec4 in)
-{
-    return {"fract", vec4: in=in};
-}
-
-color3 fract(color3 in)
-{
-    return {"fract", color3: in=in};
-}
-
-color4 fract(color4 in)
-{
-    return {"fract", color4: in=in};
+    return {"fract", T: in=in};
 }
 
 // ----------------  time  ----------------
@@ -721,9 +361,9 @@ vec3 position(string space = null)
 
 // ----------------  noise2d  ----------------
 
-float noise2d(float amplitude = null, float pivot = null, vector2 texcoord = null)
+T noise2d<float, vec2, vec3, vec4>(T amplitude = null, float pivot = null, vector2 texcoord = null)
 {
-    return {"noise2d", float: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
+    return {"noise2d", T: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
 }
 
 color3 noise2d(vec3 amplitude = null, float pivot = null, vector2 texcoord = null)
@@ -736,44 +376,9 @@ color4 noise2d(vec4 amplitude = null, float pivot = null, vector2 texcoord = nul
     return {"noise2d", color4: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
 }
 
-vec2 noise2d(vec2 amplitude = null, float pivot = null, vector2 texcoord = null)
+T noise2d<vec2, vec3, vec4, color3, color4>(float amplitude = null, float pivot = null, vector2 texcoord = null)
 {
-    return {"noise2d", vec2: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-vec3 noise2d(vec3 amplitude = null, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", vec3: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-vec4 noise2d(vec4 amplitude = null, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", vec4: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-color3 noise2d(float amplitude, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", color3: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-color4 noise2d(float amplitude, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", color4: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-vec2 noise2d(float amplitude, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", vec2: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-vec3 noise2d(float amplitude, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", vec3: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
-}
-
-vec4 noise2d(float amplitude, float pivot = null, vector2 texcoord = null)
-{
-    return {"noise2d", vec4: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
+    return {"noise2d", T: amplitude=amplitude, pivot=pivot, texcoord=texcoord};
 }
 
 // ----------------  randomfloat  ----------------
@@ -790,34 +395,10 @@ float randomfloat(int in, float min = null, float max = null, int seed = null)
 
 // ----------------  image  ----------------
 
-float image(filename file, string layer = null, float default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
+T image<float, vec2, vec3, vec4, color3, color4>
+(filename file, string layer = null, T default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
 {
-    return {"image", float: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
-}
-
-vec2 image(filename file, string layer = null, vec2 default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
-{
-    return {"image", vec2: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
-}
-
-vec3 image(filename file, string layer = null, vec3 default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
-{
-    return {"image", vec3: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
-}
-
-vec4 image(filename file, string layer = null, vec4 default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
-{
-    return {"image", vec4: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
-}
-
-color3 image(filename file, string layer = null, color3 default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
-{
-    return {"image", color3: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
-}
-
-color4 image(filename file, string layer = null, color4 default = null, vec2 texcoord = null, string uaddressmode = null, string vaddressmode = null, string filtertype = null)
-{
-    return {"image", color4: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
+    return {"image", T: file=file, layer=layer, default=default, texcoord=texcoord, uaddressmode=uaddressmode, vaddressmode=vaddressmode, filtertype=filtertype};
 }
 
 #endif // STDLIB_DEFS

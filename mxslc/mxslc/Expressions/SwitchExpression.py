@@ -13,6 +13,11 @@ class SwitchExpression(Expression):
         self.__which = which
         self.__values = values
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        which = self.__which.instantiate_templated_types(data_type)
+        values = [v.instantiate_templated_types(data_type) for v in self.__values]
+        return SwitchExpression(self.token, which, values)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.__which.init([INTEGER, FLOAT])
         for value in self.__values:

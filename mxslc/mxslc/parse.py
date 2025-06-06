@@ -49,9 +49,9 @@ class Parser(TokenReader):
         token = self._peek()
         if token == "=":
             return self.__variable_declaration(data_type, identifier)
-        if token == "(":
+        if token in ["(", "<"]:
             return self.__function_declaration(data_type, identifier)
-        raise CompileError(f"Expected '=' or '(', but found '{token.lexeme}'.", token)
+        raise CompileError(f"Unexpected token: '{token.lexeme}'.", token)
 
     def __variable_declaration(self, data_type: Token, identifier: Token) -> VariableDeclaration:
         self._match("=")
@@ -60,6 +60,12 @@ class Parser(TokenReader):
         return VariableDeclaration(data_type, identifier, right)
 
     def __function_declaration(self, data_type: Token, identifier: Token) -> FunctionDeclaration:
+        template_types = []
+        if self._consume("<"):
+            template_types.append(self._match(*DATA_TYPES))
+            while self._consume(","):
+                template_types.append(self._match(*DATA_TYPES))
+            self._match(">")
         self._match("(")
         if self._consume(")"):
             params = []
@@ -76,11 +82,17 @@ class Parser(TokenReader):
         return_expr = self.__expression()
         self._match(";")
         self._match("}")
-        return FunctionDeclaration(data_type, identifier, params, statements, return_expr)
+        return FunctionDeclaration(data_type, identifier, template_types, params, statements, return_expr)
 
     def __void_function_declaration(self) -> FunctionDeclaration:
         self._match(Keyword.VOID)
         identifier = self._match(IDENTIFIER)
+        template_types = []
+        if self._consume("<"):
+            template_types.append(self._match(*DATA_TYPES))
+            while self._consume(","):
+                template_types.append(self._match(*DATA_TYPES))
+            self._match(">")
         self._match("(")
         if self._consume(")"):
             params = []
@@ -95,7 +107,7 @@ class Parser(TokenReader):
             statements.append(self.__statement())
         self._match("}")
         return_expr = LiteralExpression(Token(INT_LITERAL, "0"))
-        return FunctionDeclaration(Token(INTEGER), identifier, params, statements, return_expr)
+        return FunctionDeclaration(Token(INTEGER), identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
         data_type = self._match(*DATA_TYPES)

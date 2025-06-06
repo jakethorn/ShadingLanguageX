@@ -13,6 +13,12 @@ class IfExpression(Expression):
         self.then = then
         self.otherwise = otherwise
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        clause = self.clause.instantiate_templated_types(data_type)
+        then = self.then.instantiate_templated_types(data_type)
+        otherwise = self.otherwise.instantiate_templated_types(data_type)
+        return IfExpression(self.token, clause, then, otherwise)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.clause.init(BOOLEAN)
         self.then.init(valid_types)

@@ -5,6 +5,7 @@ from .. import mtlx
 from ..CompileError import CompileError
 from ..Keyword import DataType
 from ..Token import Token
+from ..token_types import IDENTIFIER
 from ..utils import type_of_swizzle
 
 
@@ -16,6 +17,10 @@ class SwizzleExpression(Expression):
 
         if not re.fullmatch(r"([xyzw]{1,4}|[rgba]{1,4})", self.swizzle):
             raise CompileError(f"'{self.swizzle}' is not a valid swizzle.", self.token)
+
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        left = self.left.instantiate_templated_types(data_type)
+        return SwizzleExpression(left, Token(IDENTIFIER, self.swizzle))
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.left.init(self.__valid_left_types())

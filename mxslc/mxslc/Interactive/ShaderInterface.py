@@ -13,7 +13,7 @@ from ..CompileError import CompileError
 
 
 class ShaderInterface:
-    def __getattr__(self, name: str) -> InteractiveNode | Function:
+    def __getattr__(self, name: str) -> InteractiveNode | InteractiveFunction:
         return self[name]
 
     def __setattr__(self, name: str, value: mtlx.Value) -> None:
@@ -22,11 +22,11 @@ class ShaderInterface:
     def __contains__(self, name: str) -> bool:
         return state.is_node(name) or state.is_function(name)
 
-    def __getitem__(self, name: str) -> InteractiveNode | Function:
+    def __getitem__(self, name: str) -> InteractiveNode | InteractiveFunction:
         if state.is_node(name):
             return InteractiveNode(state.get_node(name))
         if state.is_function(name):
-            return Function(name)
+            return InteractiveFunction(name)
         raise CompileError(f"No variable or function named '{name}' found.")
 
     def __setitem__(self, name: str, value: mtlx.Value) -> None:
@@ -44,7 +44,7 @@ class ShaderInterface:
         raise NotImplementedError()
 
 
-class Function:
+class InteractiveFunction:
     def __init__(self, name: str):
         self.__function = state.get_function(name)
 

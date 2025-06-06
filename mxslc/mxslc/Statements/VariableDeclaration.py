@@ -11,6 +11,11 @@ class VariableDeclaration(Statement):
         self.__identifier = identifier
         self.__right = right
 
+    def instantiate_templated_types(self, data_type: DataType) -> Statement:
+        data_type_token = Token(data_type if self.__data_type is DataType.T else self.__data_type)
+        right = self.__right.instantiate_templated_types(data_type)
+        return VariableDeclaration(data_type_token, self.__identifier, right)
+
     def execute(self) -> None:
         node = self.__right.init_evaluate(self.__data_type)
         state.add_node(self.__identifier, node)

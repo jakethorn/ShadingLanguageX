@@ -17,6 +17,10 @@ class UnaryExpression(Expression):
         self.__op = op
         self.__right = right
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        right = self.__right.instantiate_templated_types(data_type)
+        return UnaryExpression(self.__op, right)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         valid_types = BOOLEAN if self.__op in ["!", Keyword.NOT] else NUMERIC_TYPES
         self.__right.init(valid_types)

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from . import mtlx, utils
 from .CompileError import CompileError
+from .Function import Function
 from .Keyword import DataType
 from .Parameter import ParameterList
-from .Statements import FunctionDeclaration, ForLoop
+from .Statements import ForLoop
 from .Token import Token
 from .scan import as_token
 
@@ -15,7 +16,7 @@ class State:
         self.__global = global_ or self
         self.__parent = parent
         self.__nodes: dict[str, mtlx.Node] = {}
-        self.__functions: list[FunctionDeclaration] = []
+        self.__functions: list[Function] = []
 
     @property
     def is_global(self) -> bool:
@@ -73,11 +74,11 @@ class State:
     def get_full_name(self, name: str) -> str:
         return f"{self.__namespace}__{name}"
 
-    def add_function(self, func: FunctionDeclaration) -> None:
+    def add_function(self, func: Function) -> None:
         assert func not in self.__functions
         self.__functions.append(func)
 
-    def get_function(self, identifier: Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> FunctionDeclaration:
+    def get_function(self, identifier: Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
         matching_funcs = [
             f
             for f
@@ -109,10 +110,10 @@ class State:
             ]
         if isinstance(param_index, str):
             return [
-                ParameterList(f.params)[param_index].data_type
+                f.params[param_index].data_type
                 for f
                 in matching_funcs
-                if param_index in ParameterList(f.params)
+                if param_index in f.params
             ]
         raise AssertionError
 
@@ -157,11 +158,11 @@ def clear() -> None:
     _state.clear()
 
 
-def add_function(func: FunctionDeclaration) -> None:
+def add_function(func: Function) -> None:
     _state.add_function(func)
 
 
-def get_function(identifier: str | Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> FunctionDeclaration:
+def get_function(identifier: str | Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
     return _state.get_function(as_token(identifier), valid_types, args)
 
 

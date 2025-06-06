@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from .Keyword import AliasType, Keyword
+from .Keyword import AliasType, Keyword, DataType
 from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
 
 
@@ -59,9 +59,9 @@ class Token:
         return super().__eq__(other)
 
     def __str__(self) -> str:
-        if self.__type == ";":
-            return self.__type + "\n"
-        elif self.__type == self.__lexeme:
-            return self.__type
+        if self.type == ";":
+            return self.type + "\n"
+        elif self.type == self.lexeme:
+            return self.type
         else:
-            return f"({self.__type}: {self.__lexeme})"
+            return f"({self.type}: {self.lexeme})"

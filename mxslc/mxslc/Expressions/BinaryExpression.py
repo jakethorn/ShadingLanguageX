@@ -28,6 +28,11 @@ class ArithmeticExpression(BinaryExpression):
             "^": "power"
         }[self.operator.type]
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        left = self.left.instantiate_templated_types(data_type)
+        right = self.right.instantiate_templated_types(data_type)
+        return ArithmeticExpression(left, self.operator, right)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         if set(valid_types) == {DataType.INTEGER, DataType.FLOAT}:
             self.left.init(valid_types)
@@ -94,6 +99,11 @@ class ComparisonExpression(BinaryExpression):
     def __init__(self, left: Expression, operator: Token, right: Expression):
         super().__init__(left, operator, right)
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        left = self.left.instantiate_templated_types(data_type)
+        right = self.right.instantiate_templated_types(data_type)
+        return ComparisonExpression(left, self.operator, right)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.left.init([BOOLEAN, INTEGER, FLOAT])
         self.right.init([BOOLEAN, INTEGER, FLOAT])
@@ -137,6 +147,11 @@ class ComparisonExpression(BinaryExpression):
 class LogicExpression(BinaryExpression):
     def __init__(self, left: Expression, operator: Token, right: Expression):
         super().__init__(left, operator, right)
+
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        left = self.left.instantiate_templated_types(data_type)
+        right = self.right.instantiate_templated_types(data_type)
+        return LogicExpression(left, self.operator, right)
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.left.init(BOOLEAN)

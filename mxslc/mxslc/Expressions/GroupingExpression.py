@@ -8,6 +8,10 @@ class GroupingExpression(Expression):
         super().__init__(expr.token)
         self.__expr = expr
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        expr = self.__expr.instantiate_templated_types(data_type)
+        return GroupingExpression(expr)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.__expr.init(valid_types)
 

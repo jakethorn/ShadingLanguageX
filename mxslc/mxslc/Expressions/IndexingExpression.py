@@ -9,6 +9,11 @@ class IndexingExpression(Expression):
         self.__expr = expr
         self.__indexer = indexer
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        expr = self.__expr.instantiate_templated_types(data_type)
+        indexer = self.__indexer.instantiate_templated_types(data_type)
+        return IndexingExpression(expr, indexer)
+
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         self.__expr.init(VECTOR_TYPES + COLOR_TYPES)
         self.__indexer.init(INTEGER)

@@ -13,6 +13,9 @@ class InteractiveExpression(Expression):
         else:
             self.__node = mtlx.constant(value)
 
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        return self
+
     @property
     def _data_type(self) -> DataType:
         return self.__node.data_type

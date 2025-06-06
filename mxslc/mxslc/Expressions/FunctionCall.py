@@ -1,6 +1,5 @@
 from . import Expression
 from .. import state, mtlx
-from ..Argument import Argument
 from ..Keyword import DataType
 from ..Token import Token
 
@@ -9,11 +8,15 @@ class FunctionCall(Expression):
     """
     Represents a call to a user-defined function.
     """
-    def __init__(self, identifier: Token, args: list[Argument]):
+    def __init__(self, identifier: Token, args: list["Argument"]):
         super().__init__(identifier)
-        self.__func = None
         self.__identifier = identifier
         self.__args = args
+        self.__func = None
+
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        args = [a.instantiate_templated_types(data_type) for a in self.__args]
+        return FunctionCall(self.__identifier, args)
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         for i, arg in enumerate(self.__args):
@@ -26,7 +29,7 @@ class FunctionCall(Expression):
 
     @property
     def _data_type(self) -> DataType:
-        return self.__func.data_type
+        return self.__func.return_type
 
     def _evaluate(self) -> mtlx.Node:
         return self.__func.invoke(self.__args)

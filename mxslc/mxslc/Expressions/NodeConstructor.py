@@ -1,21 +1,21 @@
 from . import Expression
 from .. import mtlx
-from ..Argument import Argument
 from ..CompileError import CompileError
 from ..Keyword import DataType
 from ..Token import Token
 
-# TODO the following todo can probably be ignored/deleted
 
-# TODO make this work with assignment data type like with standard library calls
-# TODO actually, just improve the assignment data type system to work with any expression that wants it
-# TODO it doesnt even need to be assignment, let Expression.evaluate handle it instead of VariableDeclaration
 class NodeConstructor(Expression):
-    def __init__(self, category: Token, data_type: Token, args: list[Argument]):
+    def __init__(self, category: Token, data_type: Token, args: list["Argument"]):
         super().__init__(category)
         self.__category = category.value
         self.__data_type = DataType(data_type.type)
         self.__args = args
+
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        data_type_token = Token(data_type if self.__data_type is DataType.T else self.__data_type)
+        args = [a.instantiate_templated_types(data_type) for a in self.__args]
+        return NodeConstructor(self.token, data_type_token, args)
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         for arg in self.__args:
