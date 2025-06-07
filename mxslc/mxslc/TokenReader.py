@@ -17,19 +17,25 @@ class TokenReader(ABC):
 
     def _peek(self) -> Token:
         """
-        Peek next token.
+        Peek current token.
         """
         return self.__tokens[self.__index]
 
     def _peek_next(self) -> Token:
         """
-        Peek next next token.
+        Peek next token.
         """
         return self.__tokens[self.__index + 1]
 
+    def _peek_next_next(self) -> Token:
+        """
+        Peek next next token.
+        """
+        return self.__tokens[self.__index + 2]
+
     def _consume(self, *token_types: str) -> Token | None:
         """
-        Consume next token if it matches one of the token types.
+        Consume current token if it matches one of the token types.
         """
         token = self._peek()
         if len(token_types) == 0 or token in token_types:

@@ -247,7 +247,7 @@ class Parser(TokenReader):
         # function call / identifier
         if identifier := self._consume(IDENTIFIER):
             # function call
-            if self._peek() == "(":
+            if (self._peek() == "(") or (self._peek() == "<" and self._peek_next() in DATA_TYPES and self._peek_next_next() == ">"):
                 return self.__function_call(identifier)
             # identifier
             else:
@@ -308,6 +308,10 @@ class Parser(TokenReader):
         return ConstructorCall(data_type, args)
 
     def __function_call(self, identifier: Token) -> Expression:
+        template_type = None
+        if self._consume("<"):
+            template_type = self._match(*DATA_TYPES)
+            self._match(">")
         self._match("(")
         if self._consume(")"):
             args = []
@@ -316,7 +320,7 @@ class Parser(TokenReader):
             while self._consume(","):
                 args.append(self.__argument())
             self._match(")")
-        return FunctionCall(identifier, args)
+        return FunctionCall(identifier, template_type, args)
 
     def __node_constructor(self) -> NodeConstructor:
         self._match("{")
