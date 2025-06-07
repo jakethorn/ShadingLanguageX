@@ -1,0 +1,6 @@
+T convert<vec2, vec3, vec4, color3, color4>(float x)
+{
+    return T(x);
+}
+
+color3 gray = convert(0.8);

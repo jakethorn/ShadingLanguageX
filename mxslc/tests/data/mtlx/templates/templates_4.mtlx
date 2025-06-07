@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <convert name="node2" type="color3">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <multiply name="global__gray" type="color3">
+    <input name="in1" type="color3" nodename="node2" />
+    <input name="in2" type="float" value="0.8" />
+  </multiply>
+</materialx>

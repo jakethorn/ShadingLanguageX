@@ -1,0 +1,6 @@
+T foo<float, color3>(float x)
+{
+    return T(x);
+}
+
+color3 gray = color3(1.0) * foo<float>(0.8);

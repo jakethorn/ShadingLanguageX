@@ -1,0 +1,1 @@
+image("albedo.png", texcoord=texcoord());

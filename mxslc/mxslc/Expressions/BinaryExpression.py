@@ -42,24 +42,24 @@ class ArithmeticExpression(BinaryExpression):
             self.left.init(valid_types)
             self.right.init(valid_types)
         elif len(valid_types) == 1 and valid_types[0] in VECTOR_TYPES + COLOR_TYPES:
-            ambiguous_left = False
+            left_error = None
             try:
                 self.left.init([FLOAT, *valid_types])
-            except CompileError as left_error:
-                ambiguous_left = True
-            ambiguous_right = False
+            except CompileError as e:
+                left_error = e
+            right_error = None
             try:
                 self.right.init([FLOAT, *valid_types])
-            except CompileError as right_error:
-                ambiguous_right = True
-            if ambiguous_left and ambiguous_right:
+            except CompileError as e:
+                right_error = e
+            if left_error and right_error:
                 raise left_error
-            elif ambiguous_left:
+            elif left_error:
                 if self.right.data_type == FLOAT:
                     self.left.init(valid_types)
                 else:
                     raise left_error
-            elif ambiguous_right:
+            elif right_error:
                 if self.left.data_type == FLOAT:
                     self.right.init(valid_types)
                 else:

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <image name="global__a" type="float">
+    <input name="file" type="filename" value="albedo.png" />
+  </image>
+</materialx>

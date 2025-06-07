@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <convert name="global__gray" type="color3">
+    <input name="in" type="float" value="0.8" />
+  </convert>
+</materialx>

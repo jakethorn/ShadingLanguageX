@@ -1,0 +1,6 @@
+T foo<float, vec2>()
+{
+    return image("albedo.png");
+}
+
+float a = foo();
