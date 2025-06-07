@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from . import mtlx
+from .DataType import DataType
 from .Expressions import Expression
-from .Keyword import DataType
 from .Token import Token
 
 

@@ -1,6 +1,6 @@
 from . import Expression
 from .. import mtlx
-from ..Keyword import DataType
+from ..DataType import DataType
 
 
 class GroupingExpression(Expression):

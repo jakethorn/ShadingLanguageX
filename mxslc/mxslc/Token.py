@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from .Keyword import AliasType, Keyword, DataType
+from .Keyword import Keyword
 from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
 
 
@@ -12,9 +12,17 @@ class Token:
         self.__file = file
         self.__line = line
 
-        # account for aliases
-        if self.__type in AliasType:
-            self.__type = AliasType(self.__type).real
+        # data type aliases
+        if self.__type == Keyword.BOOL:
+            self.__type = Keyword.BOOLEAN
+        if self.__type == Keyword.INT:
+            self.__type = Keyword.INTEGER
+        if self.__type == Keyword.VEC2:
+            self.__type = Keyword.VECTOR2
+        if self.__type == Keyword.VEC3:
+            self.__type = Keyword.VECTOR3
+        if self.__type == Keyword.VEC4:
+            self.__type = Keyword.VECTOR4
 
         # parse value
         self.__value = None
@@ -56,12 +64,7 @@ class Token:
             return self.type == other
         if isinstance(other, Token):
             return self.lexeme == other.lexeme
-        return super().__eq__(other)
+        return False
 
     def __str__(self) -> str:
-        if self.type == ";":
-            return self.type + "\n"
-        elif self.type == self.lexeme:
-            return self.type
-        else:
-            return f"({self.type}: {self.lexeme})"
+        return self.lexeme

@@ -1,14 +1,15 @@
 from . import Expression
 from .. import mtlx
-from ..Keyword import DataType, Keyword, BOOLEAN, NUMERIC_TYPES
+from ..DataType import DataType, BOOLEAN, NUMERIC_TYPES
+from ..Keyword import Keyword
 from ..Token import Token
 
 
 class UnaryExpression(Expression):
     """
     Examples:
-        bool not_a = !a;
-        bool not_b = not b;
+        bool b = !a;
+        bool c = not b;
         float neg_pi = -3.14;
         vec3 v = vec3(-1.0, +1.0, -1.0);
     """
@@ -22,8 +23,8 @@ class UnaryExpression(Expression):
         return UnaryExpression(self.__op, right)
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        valid_types = BOOLEAN if self.__op in ["!", Keyword.NOT] else NUMERIC_TYPES
-        self.__right.init(valid_types)
+        valid_sub_types = BOOLEAN if self.__op in ["!", Keyword.NOT] else NUMERIC_TYPES
+        self.__right.init(valid_sub_types)
 
     @property
     def _data_type(self) -> DataType:

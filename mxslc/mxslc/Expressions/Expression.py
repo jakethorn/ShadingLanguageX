@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType, INTEGER, FLOAT, DATA_TYPES
+from ..DataType import DataType, INTEGER, FLOAT
+from ..Keyword import Keyword
 from ..Token import Token
 from ..utils import as_list
 
@@ -21,7 +22,7 @@ class Expression(ABC):
 
     def init(self, valid_types: DataType | list[DataType] = None) -> None:
         if not self.__initialized:
-            self.__valid_types = as_list(valid_types) or DATA_TYPES
+            self.__valid_types = as_list(valid_types) or Keyword.DATA_TYPES()
             self._init_subexpr(self.__valid_types)
             self._init(self.__valid_types)
             self.__initialized = True
@@ -72,7 +73,7 @@ class Expression(ABC):
 
 
 def _implicit_int_to_float(node: mtlx.Node, valid_types: list[DataType]) -> mtlx.Node:
-    is_int = node.data_type is INTEGER
+    is_int = node.data_type == INTEGER
     int_is_valid = INTEGER in valid_types
     float_is_valid = FLOAT in valid_types
     if is_int and not int_is_valid and float_is_valid:

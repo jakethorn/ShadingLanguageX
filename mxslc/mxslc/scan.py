@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 from .CompileError import CompileError
-from .Keyword import KEYWORDS
+from .Keyword import Keyword
 from .Token import Token
 from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, FILENAME_LITERAL, STRING_LITERAL, EOL, COMMENT
 
@@ -67,7 +67,7 @@ class Scanner:
         if directive := self.__get_directive():
             return self.__token(directive)
         if word := self.__get_word():
-            if word in KEYWORDS:
+            if word in Keyword:
                 return self.__token(word)
             else:
                 return self.__token(IDENTIFIER, word)

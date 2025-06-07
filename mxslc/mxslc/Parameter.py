@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import Iterator
 
+from .DataType import DataType
 from .Expressions import Expression
-from .Keyword import DataType
 from .Token import Token
 
 
@@ -60,13 +60,11 @@ class ParameterList:
         return [p.name for p in self.__params]
 
     def instantiate_templated_parameters(self, data_type: DataType) -> ParameterList:
-        params = []
-        for param in self.__params:
-            if param.data_type is DataType.T:
-                params.append(Parameter(param.name_token, data_type, param.default_value))
-            else:
-                params.append(param)
-        return ParameterList(params)
+        return ParameterList([
+            Parameter(p.name_token, p.data_type.instantiate(data_type), p.default_value)
+            for p
+            in self.__params
+        ])
 
     def __getitem__(self, index: int | str) -> Parameter:
         if isinstance(index, int):
@@ -80,11 +78,17 @@ class ParameterList:
     def __len__(self) -> int:
         return len(self.__params)
 
-    def __contains__(self, param_name: str) -> bool:
-        for param in self.__params:
-            if param.name == param_name:
-                return True
-        return False
+    def __contains__(self, index: int | str | Parameter) -> bool:
+        if isinstance(index, int):
+            return index < len(self.__params)
+        if isinstance(index, str):
+            for param in self.__params:
+                if param.name == index:
+                    return True
+            return False
+        if isinstance(index, Parameter):
+            return index in self.__params
+        raise TypeError
 
     def __iter__(self) -> Iterator[Parameter]:
         yield from self.__params

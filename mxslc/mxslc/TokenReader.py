@@ -43,6 +43,7 @@ class TokenReader(ABC):
             return token
         return None
 
+    # TODO maybe change this (and consume) to take str I list[str] instead of *str
     def _match(self, *token_types: str) -> Token:
         """
         Same as consume, but raise a compile error if no match was found.

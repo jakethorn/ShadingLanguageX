@@ -1,8 +1,8 @@
 from . import Statement
 from .. import state
 from ..CompileError import CompileError
+from ..DataType import DataType
 from ..Function import Function
-from ..Keyword import DataType
 from ..Parameter import Parameter, ParameterList
 from ..Token import Token
 
@@ -16,8 +16,8 @@ class FunctionDeclaration(Statement):
         self.__body = body
         self.__return_expr = return_expr
 
-        return_type = DataType(return_type.type)
-        template_types = [DataType(t.type) for t in template_types]
+        return_type = DataType(return_type)
+        template_types = [DataType(t) for t in template_types]
         params = ParameterList(params)
 
         self.__funcs: list[Function] = []
@@ -26,7 +26,7 @@ class FunctionDeclaration(Statement):
             self.__funcs.append(func)
         else:
             for template_type in template_types:
-                concrete_return_type = template_type if return_type is DataType.T else return_type
+                concrete_return_type = return_type.instantiate(template_type)
                 concrete_params = params.instantiate_templated_parameters(template_type)
                 concrete_body = [s.instantiate_templated_types(template_type) for s in body]
                 concrete_return_expr = return_expr.instantiate_templated_types(template_type)
@@ -36,7 +36,7 @@ class FunctionDeclaration(Statement):
     def instantiate_templated_types(self, data_type: DataType) -> Statement:
         if len(self.__template_types) > 0:
             raise CompileError("Cannot declare nested templated functions.", self.__identifier)
-        return FunctionDeclaration(self.__return_type, self.__identifier, [Token(data_type)], self.__params, self.__body, self.__return_expr)
+        return FunctionDeclaration(self.__return_type, self.__identifier, [data_type.as_token], self.__params, self.__body, self.__return_expr)
 
     def execute(self) -> None:
         for func in self.__funcs:

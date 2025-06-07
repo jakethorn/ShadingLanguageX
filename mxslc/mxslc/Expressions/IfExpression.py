@@ -1,7 +1,7 @@
 from . import Expression
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType, BOOLEAN, NUMERIC_TYPES
+from ..DataType import DataType, BOOLEAN
 from ..Token import Token
 
 

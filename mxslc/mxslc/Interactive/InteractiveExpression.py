@@ -1,8 +1,8 @@
 import MaterialX as mx
 
 from .. import mtlx
+from ..DataType import DataType
 from ..Expressions import Expression
-from ..Keyword import DataType
 
 
 class InteractiveExpression(Expression):

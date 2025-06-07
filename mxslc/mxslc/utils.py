@@ -1,7 +1,7 @@
 import re
 from typing import Sequence, Generator, Any
 
-from .Keyword import FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, DataType
+from mxslc.DataType import DataType, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3
 
 
 def type_of_swizzle(swizzle: str) -> DataType:
@@ -39,9 +39,9 @@ def is_path(literal: Any) -> bool:
 
 def types_string(types: list[DataType]) -> str:
     if len(types) == 1:
-        return types[0]
+        return str(types[0])
     else:
-        return f"<{', '.join(types)}>"
+        return f"<{', '.join([str(t) for t in types])}>"
 
 
 def function_signature_string(name: str, valid_types: list[DataType] | None, args: list["Argument"] | None) -> str:
@@ -52,10 +52,13 @@ def function_signature_string(name: str, valid_types: list[DataType] | None, arg
     if args is not None and len(args) > 0:
         output += "("
         for i, arg in enumerate(args):
-            index_name = f"arg{i}"
-            output += f"{arg.data_type} {index_name if arg.is_positional else arg.name}, "
-        output = output[:-2]
-        output += ")"
+            if arg.is_positional:
+                output += f"{arg.data_type} arg{i}, "
+        output += "..., "
+        for i, arg in enumerate(args):
+            if arg.is_named:
+                output += f"{arg.data_type} {arg.name}, "
+        output += "...)"
     else:
         output += "()"
     return output

@@ -1,17 +1,17 @@
 from . import Expression
 from .. import mtlx
-from ..Keyword import DataType, FLOAT_TYPES
+from ..DataType import DataType, FLOAT_TYPES
 from ..Token import Token
 
 
 class ConstructorCall(Expression):
     def __init__(self, data_type: Token, args: list["Argument"]):
         super().__init__(data_type)
-        self.__data_type = DataType(data_type.type)
+        self.__data_type = DataType(data_type)
         self.__args = args
 
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        data_type_token = Token(data_type if self.__data_type is DataType.T else self.__data_type)
+        data_type_token = self.__data_type.instantiate(data_type).as_token
         args = [a.instantiate_templated_types(data_type) for a in self.__args]
         return ConstructorCall(data_type_token, args)
 

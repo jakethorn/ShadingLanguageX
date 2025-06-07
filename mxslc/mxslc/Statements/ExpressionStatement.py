@@ -1,6 +1,6 @@
 from . import Statement
+from ..DataType import DataType
 from ..Expressions import Expression
-from ..Keyword import DataType
 
 
 class ExpressionStatement(Statement):

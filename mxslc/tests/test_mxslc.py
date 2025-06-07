@@ -49,6 +49,7 @@ _overwrite_all_expected = False
     ("func_overloads/func_overloads_4", False),
     ("func_overloads/func_overloads_5", False),
     ("func_overloads/func_overloads_6", False),
+    ("templates/templates_1", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

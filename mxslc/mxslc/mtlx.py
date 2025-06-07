@@ -5,8 +5,9 @@ from typing import Any
 
 import MaterialX as mx
 
-from .Keyword import DataType, FILENAME, VECTOR_TYPES, COLOR_TYPES, FLOAT, STRING, SHADER_TYPES, BOOLEAN, INTEGER, \
-    VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, MATERIAL, Keyword
+from .DataType import DataType, FILENAME, MATERIAL, VECTOR_TYPES, COLOR_TYPES, INTEGER, FLOAT, STRING, SHADER_TYPES, \
+    BOOLEAN, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4
+from .Keyword import Keyword
 
 # TODO rename this document mx_utils
 
@@ -72,7 +73,7 @@ class Node:
 
     @data_type.setter
     def data_type(self, data_type: DataType) -> None:
-        self.__source.setType(data_type)
+        self.__source.setType(str(data_type))
 
     @property
     def data_size(self) -> int:
@@ -101,7 +102,7 @@ class Node:
         else:
             self.__source.setConnectedNode(name, None)
             if isinstance(value, Path):
-                self.__source.setInputValue(name, str(value), FILENAME)
+                self.__source.setInputValue(name, str(value), Keyword.FILENAME)
             else:
                 self.__source.setInputValue(name, value)
 
@@ -112,7 +113,7 @@ class Node:
         return DataType(self.__source.getInput(name).getType())
 
     def set_input_data_type(self, name: str, data_type: DataType) -> str:
-        return self.__source.getInput(name).setType(data_type)
+        return self.__source.getInput(name).setType(str(data_type))
 
     def get_outputs(self) -> list[tuple[str, Node]]:
         downstream_ports: list[mx.Input] = self.__source.getDownstreamPorts()
@@ -133,7 +134,7 @@ def get_source(node: Node) -> mx.Node:
 
 
 def create_node(category: str, data_type: DataType, name="") -> Node:
-    return Node(_document.addNode(category, name, data_type))
+    return Node(_document.addNode(category, name, str(data_type)))
 
 
 def create_material_node(name: str) -> Node:
@@ -167,7 +168,7 @@ def constant(value: Constant) -> Node:
 def extract(in_: Node, index: Node | int | str) -> Node:
     assert in_.data_type in [*VECTOR_TYPES, *COLOR_TYPES]
     if isinstance(index, Node):
-        assert index.data_type is INTEGER
+        assert index.data_type == INTEGER
     if isinstance(index, str):
         index = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3}[index]
     node = create_node("extract", FLOAT)

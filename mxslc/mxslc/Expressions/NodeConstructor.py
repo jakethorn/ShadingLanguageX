@@ -1,7 +1,7 @@
 from . import Expression
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType
+from ..DataType import DataType
 from ..Token import Token
 
 
@@ -9,11 +9,11 @@ class NodeConstructor(Expression):
     def __init__(self, category: Token, data_type: Token, args: list["Argument"]):
         super().__init__(category)
         self.__category = category.value
-        self.__data_type = DataType(data_type.type)
+        self.__data_type = DataType(data_type)
         self.__args = args
 
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        data_type_token = Token(data_type if self.__data_type is DataType.T else self.__data_type)
+        data_type_token = self.__data_type.instantiate(data_type).as_token
         args = [a.instantiate_templated_types(data_type) for a in self.__args]
         return NodeConstructor(self.token, data_type_token, args)
 

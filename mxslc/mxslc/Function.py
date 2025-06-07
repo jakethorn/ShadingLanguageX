@@ -2,8 +2,8 @@ from pathlib import Path
 
 from . import mtlx, state
 from .Argument import Argument
+from .DataType import DataType
 from .Expressions import Expression
-from .Keyword import DataType
 from .Parameter import ParameterList, Parameter
 from .Token import Token
 
@@ -34,9 +34,17 @@ class Function:
     def line(self) -> int:
         return self.__line
 
-    def is_match(self, name: str, return_types: list[DataType] = None, args: list[Argument] = None) -> bool:
+    def is_match(self, name: str, template_type: DataType = None, return_types: list[DataType] = None, args: list[Argument] = None) -> bool:
         if self.__name != name:
             return False
+
+        if template_type is not None:
+            if self.return_type.is_templated and self.return_type != template_type:
+                return False
+
+            for param in self.__params:
+                if param.data_type.is_templated and param.data_type != template_type:
+                    return False
 
         if return_types is not None:
             if self.__return_type not in return_types:

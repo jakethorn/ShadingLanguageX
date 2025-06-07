@@ -1,7 +1,8 @@
 from . import Expression
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType, Keyword, FILENAME, STRING, FLOAT, INTEGER, BOOLEAN
+from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, STRING, FILENAME
+from ..Keyword import Keyword
 from ..Token import Token
 from ..token_types import INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL, STRING_LITERAL
 

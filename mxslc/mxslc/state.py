@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from . import mtlx, utils
 from .CompileError import CompileError
+from .DataType import DataType
 from .Function import Function
-from .Keyword import DataType
-from .Parameter import ParameterList
 from .Statements import ForLoop
 from .Token import Token
 from .scan import as_token
@@ -78,22 +77,23 @@ class State:
         assert func not in self.__functions
         self.__functions.append(func)
 
-    def get_function(self, identifier: Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
+    def get_function(self, identifier: Token, template_type: DataType = None, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
         matching_funcs = [
             f
             for f
             # TODO also search local functions
             in self.__global.__functions
-            if f.is_match(identifier.lexeme, valid_types, args)
+            if f.is_match(identifier.lexeme, template_type, valid_types, args)
         ]
         if len(matching_funcs) == 0:
             raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, valid_types, args)}' does not exist.", identifier)
         elif len(matching_funcs) == 1:
             return matching_funcs[0]
         else:
-            raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, valid_types, args)}' is ambiguous.", identifier)
+            return_types = [f.return_type for f in matching_funcs]
+            raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, return_types, args)}' is ambiguous.", identifier)
 
-    def get_function_parameter_types(self, identifier: Token, param_index: int | str) -> list[DataType]:
+    def get_function_parameter_types(self, identifier: Token, template_type: DataType, param_index: int | str) -> list[DataType]:
         matching_funcs = [
             f
             for f
@@ -101,21 +101,12 @@ class State:
             in self.__global.__functions
             if f.is_match(identifier.lexeme)
         ]
-        if isinstance(param_index, int):
-            return [
-                f.params[param_index].data_type
-                for f
-                in matching_funcs
-                if len(f.params) > param_index
-            ]
-        if isinstance(param_index, str):
-            return [
-                f.params[param_index].data_type
-                for f
-                in matching_funcs
-                if param_index in f.params
-            ]
-        raise AssertionError
+        return [
+            f.params[param_index].data_type.instantiate(template_type)
+            for f
+            in matching_funcs
+            if param_index in f.params
+        ]
 
     def __str__(self) -> str:
         output = ""
@@ -162,12 +153,12 @@ def add_function(func: Function) -> None:
     _state.add_function(func)
 
 
-def get_function(identifier: str | Token, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
-    return _state.get_function(as_token(identifier), valid_types, args)
+def get_function(identifier: str | Token, template_type: DataType = None, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
+    return _state.get_function(as_token(identifier), template_type, valid_types, args)
 
 
-def get_function_parameter_types(identifier: str | Token, param_index: int | str) -> list[DataType]:
-    return _state.get_function_parameter_types(as_token(identifier), param_index)
+def get_function_parameter_types(identifier: str | Token, template_type: DataType, param_index: int | str) -> list[DataType]:
+    return _state.get_function_parameter_types(as_token(identifier), template_type, param_index)
 
 
 def is_function(identifier: str) -> bool:

@@ -1,7 +1,7 @@
 from . import Expression
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType, INTEGER, FLOAT
+from ..DataType import DataType, INTEGER, FLOAT
 from ..Token import Token
 
 

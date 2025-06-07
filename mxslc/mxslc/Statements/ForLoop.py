@@ -1,7 +1,7 @@
 from . import Statement
 from .. import state, mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType
+from ..DataType import DataType
 from ..Token import Token
 from ..token_types import FLOAT_LITERAL
 
@@ -18,7 +18,7 @@ class ForLoop(Statement):
         self.statements = statements
 
     def instantiate_templated_types(self, data_type: DataType) -> Statement:
-        data_type_token = Token(data_type) if DataType(self.data_type.type) is DataType.T else self.data_type
+        data_type_token = DataType(self.data_type).instantiate(data_type).as_token
         statements = [s.instantiate_templated_types(data_type) for s in self.statements]
         return ForLoop(data_type_token, self.identifier, self.start_value, self.value2, self.value3, statements)
 

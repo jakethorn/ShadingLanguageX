@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-from mxslc.Keyword import DataType
+from ..DataType import DataType
 
 
 class Statement(ABC):

@@ -1,6 +1,7 @@
 from . import Expression, ComparisonExpression, LogicExpression
 from .. import mtlx
-from ..Keyword import DataType, BOOLEAN, Keyword
+from ..DataType import DataType, BOOLEAN
+from ..Keyword import Keyword
 from ..Token import Token
 
 

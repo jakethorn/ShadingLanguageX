@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from . import mtlx
-from .Keyword import DataType, FLOAT, BOOLEAN, Keyword
+from .DataType import BOOLEAN, FLOAT
+from .Keyword import Keyword
 from .utils import is_path
 
 
@@ -65,7 +66,7 @@ def _remove_constant_nodes() -> None:
 def _remove_logic_nodes() -> None:
     removable_nodes = set()
     ifequal_nodes = mtlx.get_nodes("ifequal")
-    ifequal_nodes = [n for n in ifequal_nodes if n.data_type != DataType.BOOLEAN]
+    ifequal_nodes = [n for n in ifequal_nodes if n.data_type != BOOLEAN]
     for ifequal_node in ifequal_nodes:
         comparison_node = ifequal_node.get_input("value1")
         ifequal_node.category = comparison_node.category
@@ -144,7 +145,7 @@ def _remove_convert_nodes() -> None:
 
 
 def _fix_logic_node_input(node: mtlx.Node, input_name: str) -> None:
-    if node.get_input_data_type(input_name) is BOOLEAN:
+    if node.get_input_data_type(input_name) == BOOLEAN:
         input_value = node.get_input(input_name)
         if isinstance(input_value, mtlx.Node):
             node.set_input_data_type(input_name, FLOAT)

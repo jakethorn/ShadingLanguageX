@@ -3,7 +3,8 @@ from abc import ABC
 from . import Expression
 from .. import mtlx, utils
 from ..CompileError import CompileError
-from ..Keyword import DataType, INTEGER, BOOLEAN, FLOAT, Keyword, VECTOR_TYPES, COLOR_TYPES
+from ..DataType import DataType, INTEGER, FLOAT, VECTOR_TYPES, COLOR_TYPES, BOOLEAN
+from ..Keyword import Keyword
 from ..Token import Token
 from ..utils import one
 
@@ -34,38 +35,38 @@ class ArithmeticExpression(BinaryExpression):
         return ArithmeticExpression(left, self.operator, right)
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        if set(valid_types) == {DataType.INTEGER, DataType.FLOAT}:
+        if set(valid_types) == {INTEGER, FLOAT}:
             self.left.init(valid_types)
             self.right.init(self.left.data_type)
-        elif len(valid_types) == 1 and valid_types[0] in [DataType.INTEGER, DataType.FLOAT]:
+        elif len(valid_types) == 1 and valid_types[0] in [INTEGER, FLOAT]:
             self.left.init(valid_types)
             self.right.init(valid_types)
         elif len(valid_types) == 1 and valid_types[0] in VECTOR_TYPES + COLOR_TYPES:
             ambiguous_left = False
             try:
-                self.left.init([DataType.FLOAT, *valid_types])
+                self.left.init([FLOAT, *valid_types])
             except CompileError as left_error:
                 ambiguous_left = True
             ambiguous_right = False
             try:
-                self.right.init([DataType.FLOAT, *valid_types])
+                self.right.init([FLOAT, *valid_types])
             except CompileError as right_error:
                 ambiguous_right = True
             if ambiguous_left and ambiguous_right:
                 raise left_error
             elif ambiguous_left:
-                if self.right.data_type is DataType.FLOAT:
+                if self.right.data_type == FLOAT:
                     self.left.init(valid_types)
                 else:
                     raise left_error
             elif ambiguous_right:
-                if self.left.data_type is DataType.FLOAT:
+                if self.left.data_type == FLOAT:
                     self.right.init(valid_types)
                 else:
                     raise right_error
         elif any(t in VECTOR_TYPES + COLOR_TYPES for t in valid_types):
-            self.left.init([DataType.FLOAT, *valid_types])
-            self.right.init([DataType.FLOAT, *valid_types])
+            self.left.init([FLOAT, *valid_types])
+            self.right.init([FLOAT, *valid_types])
         else:
             raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.types_string(valid_types)}.", self.token)
 

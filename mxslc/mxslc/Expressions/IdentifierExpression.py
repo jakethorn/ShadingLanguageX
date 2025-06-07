@@ -1,6 +1,6 @@
 from . import Expression
 from .. import state, mtlx
-from ..Keyword import DataType
+from ..DataType import DataType
 from ..Token import Token
 
 

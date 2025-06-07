@@ -3,7 +3,7 @@ import re
 from . import Expression
 from .. import mtlx
 from ..CompileError import CompileError
-from ..Keyword import DataType
+from ..DataType import DataType, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3
 from ..Token import Token
 from ..token_types import IDENTIFIER
 from ..utils import type_of_swizzle
@@ -39,19 +39,19 @@ class SwizzleExpression(Expression):
 
     def __valid_left_types(self) -> list[DataType]:
         if "x" in self.swizzle:
-            return [DataType.VECTOR2, DataType.VECTOR3, DataType.VECTOR4]
+            return [VECTOR2, VECTOR3, VECTOR4]
         if "y" in self.swizzle:
-            return [DataType.VECTOR2, DataType.VECTOR3, DataType.VECTOR4]
+            return [VECTOR2, VECTOR3, VECTOR4]
         if "z" in self.swizzle:
-            return [DataType.VECTOR3, DataType.VECTOR4]
+            return [VECTOR3, VECTOR4]
         if "w" in self.swizzle:
-            return [DataType.VECTOR4]
+            return [VECTOR4]
         if "r" in self.swizzle:
-            return [DataType.COLOR3, DataType.COLOR4]
+            return [COLOR3, COLOR4]
         if "g" in self.swizzle:
-            return [DataType.COLOR3, DataType.COLOR4]
+            return [COLOR3, COLOR4]
         if "b" in self.swizzle:
-            return [DataType.COLOR3, DataType.COLOR4]
+            return [COLOR3, COLOR4]
         if "a" in self.swizzle:
-            return [DataType.COLOR4]
+            return [COLOR4]
         raise CompileError(f"'{self.swizzle}' is not a valid swizzle.", self.token)

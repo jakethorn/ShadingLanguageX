@@ -1,6 +1,6 @@
 from mxslc import mtlx
+from mxslc.DataType import DataType, VECTOR_TYPES, INTEGER, COLOR_TYPES, FLOAT
 from mxslc.Expressions import Expression
-from mxslc.Keyword import DataType, FLOAT, INTEGER, VECTOR_TYPES, COLOR_TYPES
 
 
 class IndexingExpression(Expression):
