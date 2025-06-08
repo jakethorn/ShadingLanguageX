@@ -48,7 +48,7 @@ class State:
                 ...
         if name in self.__global.__nodes:
             return self.__global.__nodes[name]
-        raise CompileError(f"Variable name '{name}' does not exist.", identifier)
+        raise CompileError(f"Variable '{name}' does not exist.", identifier)
 
     def set_node(self, identifier: Token, node: mtlx.Node) -> None:
         name = identifier.lexeme

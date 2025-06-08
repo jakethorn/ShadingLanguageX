@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="node3" type="float">
+    <input name="in1" type="float" value="0.8" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <add name="node6" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="1" />
+  </add>
+</materialx>

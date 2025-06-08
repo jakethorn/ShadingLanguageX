@@ -1,0 +1,12 @@
+
+float bar()
+{
+    return 5.7;
+}
+
+float foo(float a = bar() - 5.0)
+{
+    return a + 1.0;
+}
+
+foo();

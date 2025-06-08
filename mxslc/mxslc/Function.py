@@ -61,12 +61,7 @@ class Function:
         return True
 
     def invoke(self, args: list[Argument]) -> mtlx.Node:
-        args = self.__sort_args(args)
-
-        arg_nodes = []
-        for param, arg in zip(self.__params, args):
-            arg_node = arg.init_evaluate(param.data_type)
-            arg_nodes.append(arg_node)
+        arg_nodes = [a.evaluate() for a in self.__sort_args(args)]
 
         state.enter_scope(self.__name)
 

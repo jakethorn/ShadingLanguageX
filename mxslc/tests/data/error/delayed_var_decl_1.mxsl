@@ -1,0 +1,9 @@
+
+float foo(float a = a_default_value)
+{
+    return a + 1.0;
+}
+
+float a_default_value = 0.8;
+
+foo();
