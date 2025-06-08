@@ -51,11 +51,11 @@ def function_signature_string(name: str, valid_types: list[DataType] | None, arg
     output += name
     if args is not None and len(args) > 0:
         output += "("
-        for i, arg in enumerate(args):
+        for arg in args:
             if arg.is_positional:
-                output += f"{arg.data_type} arg{i}, "
+                output += f"{arg.data_type} arg{arg.position}, "
         output += "..., "
-        for i, arg in enumerate(args):
+        for arg in args:
             if arg.is_named:
                 output += f"{arg.data_type} {arg.name}, "
         output += "...)"

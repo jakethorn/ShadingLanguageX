@@ -12,6 +12,7 @@ from mxslc.CompileError import CompileError
     ("bad_func_overload_2", None, []),
     ("ambiguous_function_1", None, []),
     ("ambiguous_function_2", None, []),
+    ("bad_func_call_1", None, []),
 ])
 def test_mxslc_compile_error(filename: str, main_function: str | None, main_args: list) -> None:
     mxsl_path = (Path(__file__).parent / "data" / "error" / filename).with_suffix(".mxsl")

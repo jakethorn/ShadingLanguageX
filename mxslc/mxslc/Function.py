@@ -41,7 +41,6 @@ class Function:
         if template_type is not None:
             if self.return_type.is_templated and self.return_type != template_type:
                 return False
-
             for param in self.__params:
                 if param.data_type.is_templated and param.data_type != template_type:
                     return False
@@ -51,26 +50,10 @@ class Function:
                 return False
 
         if args is not None:
-            if len(args) > len(self.__params):
+            try:
+                satisfied_params = [self.__params[a] for a in args]
+            except IndexError:
                 return False
-
-            for arg in args:
-                if arg.is_named and arg.name not in self.__params.names:
-                    return False
-
-            satisfied_params = []
-            for i, arg in enumerate(args):
-                if arg.is_positional:
-                    param = self.__params[i]
-                    if arg.data_type != param.data_type:
-                        return False
-                    satisfied_params.append(param)
-                else:
-                    param = self.__params[arg.name]
-                    if arg.data_type != param.data_type:
-                        return False
-                    satisfied_params.append(param)
-
             for param in self.__params:
                 if param not in satisfied_params and param.default_value is None:
                     return False
@@ -103,10 +86,6 @@ class Function:
         pairs: dict[Parameter, Expression] = {}
         for param in self.__params:
             pairs[param] = param.default_value
-        for i, arg in enumerate(args):
-            if arg.is_positional:
-                pairs[self.__params[i]] = arg.expression
-            else:
-                pairs[self.__params[arg.name]] = arg.expression
-        assert all([e is not None for e in pairs.values()])
+        for arg in args:
+            pairs[self.__params[arg]] = arg.expression
         return list(pairs.values())

@@ -19,7 +19,7 @@ class NodeConstructor(Expression):
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         for arg in self.__args:
-            arg.expression.init()
+            arg.init()
 
     def _init(self, valid_types: list[DataType]) -> None:
         # Check arguments are valid

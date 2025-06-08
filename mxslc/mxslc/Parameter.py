@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Iterator
 
+from .Argument import Argument
 from .DataType import DataType
 from .Expressions import Expression
 from .Token import Token
@@ -66,14 +67,21 @@ class ParameterList:
             in self.__params
         ])
 
-    def __getitem__(self, index: int | str) -> Parameter:
-        if isinstance(index, int):
+    def __getitem__(self, index: int | str | Argument) -> Parameter:
+        if isinstance(index, int) and index < len(self.__params):
             return self.__params[index]
-        else:
+        elif isinstance(index, str):
             for param in self.__params:
                 if param.name == index:
                     return param
-        raise IndexError(f"No parameter found with the name '{index}'.")
+        elif isinstance(index, Argument):
+            if index.is_positional:
+                param = self[index.position]
+            else:
+                param = self[index.name]
+            if param.data_type == index.data_type:
+                return param
+        raise IndexError(f"No parameter found with the index '{index}'.")
 
     def __len__(self) -> int:
         return len(self.__params)

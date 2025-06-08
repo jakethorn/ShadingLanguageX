@@ -27,10 +27,10 @@ class FunctionCall(Expression):
         # TODO this can be improved by passing the previously initialised arg type to the following and filtering
         # possibilities based on the previous arg type.
         # also by filtering the return type by the template type like I do for parameter types
-        for i, arg in enumerate(self.__args):
-            param_index = i if arg.is_positional else arg.name
+        for arg in self.__args:
+            param_index = arg.position if arg.is_positional else arg.name
             valid_arg_types = state.get_function_parameter_types(self.__identifier, self.__template_type, param_index)
-            arg.expression.init(valid_arg_types)
+            arg.init(valid_arg_types)
 
     def _init(self, valid_types: list[DataType]) -> None:
         self.__func = state.get_function(self.__identifier, self.__template_type, valid_types, self.__args)

@@ -3,19 +3,22 @@ from __future__ import annotations
 from . import mtlx
 from .DataType import DataType
 from .Expressions import Expression
-from .Token import Token
+from .Token import Token, IdentifierToken
 
 
-# TODO add position index (maybe to parameter as well) then remove all enumate(args) code
-# TODO maybe this can inherit from Expression
+# TODO add position index (maybe to parameter as well) then remove all enumerate(args) code
 class Argument:
     """
-    Represents a positional or named argument to a function, constructor or standard library call.
+    Represents a positional or named argument to a function, constructor or node constructor.
     """
-    def __init__(self, expr: Expression, name: Token = None):
+    def __init__(self, expr: Expression, position: int, name: Token = None):
         self.__expr = expr
+        self.__position = position
         self.__name = name.lexeme if name is not None else None
-        self.__name_token = name
+
+    @property
+    def position(self) -> int:
+        return self.__position
 
     @property
     def name(self) -> str:
@@ -38,7 +41,10 @@ class Argument:
         return self.__expr
 
     def instantiate_templated_types(self, data_type: DataType) -> Argument:
-        return Argument(self.__expr.instantiate_templated_types(data_type), self.__name_token)
+        return Argument(self.__expr.instantiate_templated_types(data_type), self.position, IdentifierToken(self.name))
+
+    def init(self, valid_types: DataType | list[DataType] = None) -> None:
+        self.__expr.init(valid_types)
 
     def evaluate(self) -> mtlx.Node:
         return self.__expr.evaluate()

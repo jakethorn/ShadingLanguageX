@@ -17,10 +17,10 @@ class ConstructorCall(Expression):
 
     def _init_subexpr(self, valid_types: list[DataType]) -> None:
         if len(self.__args) == 1:
-            self.__args[0].expression.init()
+            self.__args[0].init()
         if len(self.__args) > 1:
             for arg in self.__args:
-                arg.expression.init(FLOAT_TYPES)
+                arg.init(FLOAT_TYPES)
 
     @property
     def _data_type(self) -> DataType:

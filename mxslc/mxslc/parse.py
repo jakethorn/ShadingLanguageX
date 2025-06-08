@@ -301,9 +301,7 @@ class Parser(TokenReader):
         if self._consume(")"):
             args = []
         else:
-            args = [self.__argument()]
-            while self._consume(","):
-                args.append(self.__argument())
+            args = self.__argument_list()
             self._match(")")
         return ConstructorCall(data_type, args)
 
@@ -316,9 +314,7 @@ class Parser(TokenReader):
         if self._consume(")"):
             args = []
         else:
-            args = [self.__argument()]
-            while self._consume(","):
-                args.append(self.__argument())
+            args = self.__argument_list()
             self._match(")")
         return FunctionCall(identifier, template_type, args)
 
@@ -327,18 +323,25 @@ class Parser(TokenReader):
         category = self._match(STRING_LITERAL)
         self._match(",")
         data_type = self._match(*Keyword.DATA_TYPES())
-        args = []
         if self._consume(":"):
-            args.append(self.__argument())
-            while self._consume(","):
-                args.append(self.__argument())
+            args = self.__argument_list()
+        else:
+            args = []
         self._match("}")
         return NodeConstructor(category, data_type, args)
 
-    def __argument(self) -> Argument:
+    def __argument_list(self) -> list[Argument]:
+        args = [self.__argument(0)]
+        i = 1
+        while self._consume(","):
+            args.append(self.__argument(i))
+            i += 1
+        return args
+
+    def __argument(self, index: int) -> Argument:
         if self._peek() == IDENTIFIER and self._peek_next() == "=":
             name = self._match(IDENTIFIER)
             self._match("=")
         else:
             name = None
-        return Argument(self.__expression(), name)
+        return Argument(self.__expression(), index, name)

@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any
 
 from .Keyword import Keyword
-from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
+from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL, IDENTIFIER
 
 
 class Token:
@@ -68,3 +68,14 @@ class Token:
 
     def __str__(self) -> str:
         return self.lexeme
+
+
+class IdentifierToken(Token):
+    def __new__(cls, lexeme: str, file: Path = None, line: int = None):
+        if lexeme is None:
+            return None
+        else:
+            return super().__new__(cls)
+
+    def __init__(self, lexeme: str, file: Path = None, line: int = None):
+        super().__init__(IDENTIFIER, lexeme, file, line)

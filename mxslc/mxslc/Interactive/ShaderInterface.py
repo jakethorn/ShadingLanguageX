@@ -69,8 +69,10 @@ def _to_mtlx_node(value: mtlx.Value) -> mtlx.Node:
 
 def _to_arg_list(args: Sequence[mtlx.Value | InteractiveNode]) -> list[Argument]:
     arg_list = []
-    for arg in args:
+    for i, arg in enumerate(args):
         if isinstance(arg, InteractiveNode):
             arg = arg.node
-        arg_list.append(Argument(InteractiveExpression(arg)))
+        expr_arg = Argument(InteractiveExpression(arg), i)
+        expr_arg.init()
+        arg_list.append(expr_arg)
     return arg_list
