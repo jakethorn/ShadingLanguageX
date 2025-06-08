@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from . import mtlx, utils
+from . import mx_utils, utils
 from .CompileError import CompileError
 from .DataType import DataType
 from .Function import Function
@@ -14,7 +14,7 @@ class State:
         self.__namespace = namespace
         self.__global = global_ or self
         self.__parent = parent
-        self.__nodes: dict[str, mtlx.Node] = {}
+        self.__nodes: dict[str, mx_utils.Node] = {}
         self.__functions: list[Function] = []
 
     @property
@@ -29,7 +29,7 @@ class State:
     def parent(self) -> State:
         return self.__parent
 
-    def add_node(self, identifier: Token, node: mtlx.Node) -> None:
+    def add_node(self, identifier: Token, node: mx_utils.Node) -> None:
         name = identifier.lexeme
         if name in self.__nodes:
             raise CompileError(f"Variable name '{name}' already exists.", identifier)
@@ -37,7 +37,7 @@ class State:
         self.__nodes[name] = node
         node.name = self.get_full_name(name)
 
-    def get_node(self, identifier: Token) -> mtlx.Node:
+    def get_node(self, identifier: Token) -> mx_utils.Node:
         name = identifier.lexeme
         if name in self.__nodes:
             return self.__nodes[name]
@@ -50,7 +50,7 @@ class State:
             return self.__global.__nodes[name]
         raise CompileError(f"Variable '{name}' does not exist.", identifier)
 
-    def set_node(self, identifier: Token, node: mtlx.Node) -> None:
+    def set_node(self, identifier: Token, node: mx_utils.Node) -> None:
         name = identifier.lexeme
         assert node not in self.__nodes.values()
         if name in self.__nodes:
@@ -122,15 +122,15 @@ class State:
 _state = State("global")
 
 
-def add_node(identifier: Token, node: mtlx.Node) -> None:
+def add_node(identifier: Token, node: mx_utils.Node) -> None:
     _state.add_node(identifier, node)
 
 
-def get_node(identifier: str | Token) -> mtlx.Node:
+def get_node(identifier: str | Token) -> mx_utils.Node:
     return _state.get_node(as_token(identifier))
 
 
-def set_node(identifier: str | Token, node: mtlx.Node) -> None:
+def set_node(identifier: str | Token, node: mx_utils.Node) -> None:
     _state.set_node(as_token(identifier), node)
 
 

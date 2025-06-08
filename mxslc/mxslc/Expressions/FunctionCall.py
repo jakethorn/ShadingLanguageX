@@ -1,5 +1,5 @@
 from . import Expression
-from .. import state, mtlx
+from .. import state, mx_utils
 from ..DataType import DataType
 from ..Token import Token
 
@@ -39,5 +39,5 @@ class FunctionCall(Expression):
     def _data_type(self) -> DataType:
         return self.__func.return_type
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         return self.__func.invoke(self.__args)

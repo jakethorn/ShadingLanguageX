@@ -4,7 +4,7 @@ from typing import Sequence
 import MaterialX as mx
 
 from .ShaderInterface import ShaderInterface
-from .. import mtlx, state
+from .. import mx_utils, state
 from ..Preprocessor.macros import undefine_all_macros
 from ..compile import compile_
 from ..file_utils import handle_mxsl_path
@@ -18,11 +18,11 @@ class InteractiveCompiler:
 
     @property
     def document(self) -> mx.Document:
-        return mtlx.get_document()
+        return mx_utils.get_document()
 
     @property
     def xml(self) -> str:
-        return mtlx.get_xml()
+        return mx_utils.get_xml()
 
     def get_shader_interface(self) -> ShaderInterface:
         return ShaderInterface()
@@ -46,9 +46,9 @@ class InteractiveCompiler:
         elif not mtlx_filepath.parent.is_dir():
             raise FileNotFoundError(f"No such directory: '{mtlx_filepath.parent}'. Set mkdir=True to create it when saving the file.")
         with open(mtlx_filepath, "w") as file:
-            file.write(mtlx.get_xml())
+            file.write(mx_utils.get_xml())
 
     def clear(self) -> None:
         undefine_all_macros()
-        mtlx.clear()
+        mx_utils.clear()
         state.clear()

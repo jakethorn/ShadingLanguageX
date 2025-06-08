@@ -1,5 +1,5 @@
 from . import Expression
-from .. import mtlx
+from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN
 from ..Token import Token
@@ -32,12 +32,12 @@ class IfExpression(Expression):
     def _data_type(self) -> DataType:
         return self.then.data_type
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         clause_node = self.clause.evaluate()
         then_node = self.then.evaluate()
         otherwise_node = self.otherwise.evaluate()
 
-        node = mtlx.create_node("ifequal", self.data_type)
+        node = mx_utils.create_node("ifequal", self.data_type)
         node.set_input("value1", clause_node)
         node.set_input("value2", True)
         node.set_input("in1", then_node)

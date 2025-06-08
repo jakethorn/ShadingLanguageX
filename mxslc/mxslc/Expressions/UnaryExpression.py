@@ -1,5 +1,5 @@
 from . import Expression
-from .. import mtlx
+from .. import mx_utils
 from ..DataType import DataType, BOOLEAN, NUMERIC_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
@@ -30,14 +30,14 @@ class UnaryExpression(Expression):
     def _data_type(self) -> DataType:
         return self.__right.data_type
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         if self.__op in ["!", Keyword.NOT]:
-            node = mtlx.create_node("not", BOOLEAN)
+            node = mx_utils.create_node("not", BOOLEAN)
             node.set_input("in", self.__right.evaluate())
             return node
         elif self.__op == "-":
             right_node = self.__right.evaluate()
-            node = mtlx.create_node("subtract", right_node.data_type)
+            node = mx_utils.create_node("subtract", right_node.data_type)
             node.set_input("in1", right_node.data_type.zeros())
             node.set_input("in2", right_node)
             return node

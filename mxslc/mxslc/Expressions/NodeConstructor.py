@@ -1,5 +1,5 @@
 from . import Expression
-from .. import mtlx
+from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Token import Token
@@ -31,8 +31,8 @@ class NodeConstructor(Expression):
     def _data_type(self) -> DataType:
         return self.__data_type
 
-    def _evaluate(self) -> mtlx.Node:
-        node = mtlx.create_node(self.__category, self.data_type)
+    def _evaluate(self) -> mx_utils.Node:
+        node = mx_utils.create_node(self.__category, self.data_type)
         for arg in self.__args:
             node.set_input(arg.name, arg.evaluate())
         return node

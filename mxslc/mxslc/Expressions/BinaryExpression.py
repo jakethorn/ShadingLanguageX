@@ -1,7 +1,7 @@
 from abc import ABC
 
 from . import Expression
-from .. import mtlx, utils
+from .. import mx_utils, utils
 from ..CompileError import CompileError
 from ..DataType import DataType, INTEGER, FLOAT, VECTOR_TYPES, COLOR_TYPES, BOOLEAN
 from ..Keyword import Keyword
@@ -83,14 +83,14 @@ class ArithmeticExpression(BinaryExpression):
         else:
             return self.right.data_type
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         left_node = self.left.evaluate()
         right_node = self.right.evaluate()
 
         if left_node.data_size < right_node.data_size:
-            left_node = mtlx.convert(left_node, right_node.data_type)
+            left_node = mx_utils.convert(left_node, right_node.data_type)
 
-        node = mtlx.create_node(self.node_type, self.data_type)
+        node = mx_utils.create_node(self.node_type, self.data_type)
         node.set_input("in1", left_node)
         node.set_input("in2", right_node)
         return node
@@ -117,7 +117,7 @@ class ComparisonExpression(BinaryExpression):
     def _data_type(self) -> DataType:
         return BOOLEAN
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         node_type = {
             "!=": "ifequal",
             "==": "ifequal",
@@ -133,12 +133,12 @@ class ComparisonExpression(BinaryExpression):
         if self.operator in ["<", "<="]:
             left_node, right_node = right_node, left_node
 
-        comp_node = mtlx.create_node(node_type, BOOLEAN)
+        comp_node = mx_utils.create_node(node_type, BOOLEAN)
         comp_node.set_input("value1", left_node)
         comp_node.set_input("value2", right_node)
 
         if node_type == "!=":
-            bang_node = mtlx.create_node("not", BOOLEAN)
+            bang_node = mx_utils.create_node("not", BOOLEAN)
             bang_node.set_input("in", comp_node)
             return bang_node
         else:
@@ -162,7 +162,7 @@ class LogicExpression(BinaryExpression):
     def _data_type(self) -> DataType:
         return BOOLEAN
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         node_type = {
             "&": "and",
             Keyword.AND: "and",
@@ -170,7 +170,7 @@ class LogicExpression(BinaryExpression):
             Keyword.OR: "or"
         }[self.operator.type]
 
-        node = mtlx.create_node(node_type, BOOLEAN)
+        node = mx_utils.create_node(node_type, BOOLEAN)
         node.set_input("in1", self.left.evaluate())
         node.set_input("in2", self.right.evaluate())
         return node

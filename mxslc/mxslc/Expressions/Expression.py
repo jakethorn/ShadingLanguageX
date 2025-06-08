@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from .. import mtlx
+from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, INTEGER, FLOAT
 from ..Keyword import Keyword
@@ -53,7 +53,7 @@ class Expression(ABC):
     def token(self) -> Token:
         return self.__token
 
-    def evaluate(self) -> mtlx.Node:
+    def evaluate(self) -> mx_utils.Node:
         assert self.__initialized
         node = self._evaluate()
         assert node.data_type == self.data_type
@@ -64,19 +64,19 @@ class Expression(ABC):
         return node
 
     @abstractmethod
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         ...
 
-    def init_evaluate(self, valid_types: DataType | list[DataType] = None) -> mtlx.Node:
+    def init_evaluate(self, valid_types: DataType | list[DataType] = None) -> mx_utils.Node:
         self.init(valid_types)
         return self.evaluate()
 
 
-def _implicit_int_to_float(node: mtlx.Node, valid_types: list[DataType]) -> mtlx.Node:
+def _implicit_int_to_float(node: mx_utils.Node, valid_types: list[DataType]) -> mx_utils.Node:
     is_int = node.data_type == INTEGER
     int_is_valid = INTEGER in valid_types
     float_is_valid = FLOAT in valid_types
     if is_int and not int_is_valid and float_is_valid:
-        return mtlx.convert(node, FLOAT)
+        return mx_utils.convert(node, FLOAT)
     else:
         return node

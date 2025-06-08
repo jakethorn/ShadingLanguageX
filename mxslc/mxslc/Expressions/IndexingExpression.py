@@ -1,4 +1,4 @@
-from mxslc import mtlx
+from mxslc import mx_utils
 from mxslc.DataType import DataType, VECTOR_TYPES, INTEGER, COLOR_TYPES, FLOAT
 from mxslc.Expressions import Expression
 
@@ -22,7 +22,7 @@ class IndexingExpression(Expression):
     def _data_type(self) -> DataType:
         return FLOAT
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         index = self.__indexer.evaluate()
         value = self.__expr.evaluate()
-        return mtlx.extract(value, index)
+        return mx_utils.extract(value, index)

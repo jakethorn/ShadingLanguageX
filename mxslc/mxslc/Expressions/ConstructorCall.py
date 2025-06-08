@@ -1,5 +1,5 @@
 from . import Expression
-from .. import mtlx
+from .. import mx_utils
 from ..DataType import DataType, FLOAT_TYPES
 from ..Token import Token
 
@@ -26,7 +26,7 @@ class ConstructorCall(Expression):
     def _data_type(self) -> DataType:
         return self.__data_type
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         if len(self.__args) == 0:
             return self.__constant_node()
         elif len(self.__args) == 1:
@@ -34,22 +34,22 @@ class ConstructorCall(Expression):
         else:
             return self.__combine_node()
 
-    def __constant_node(self) -> mtlx.Node:
-        return mtlx.constant(self.data_type.zeros())
+    def __constant_node(self) -> mx_utils.Node:
+        return mx_utils.constant(self.data_type.zeros())
 
-    def __convert_node(self) -> mtlx.Node:
-        return mtlx.convert(self.__args[0].evaluate(), self.data_type)
+    def __convert_node(self) -> mx_utils.Node:
+        return mx_utils.convert(self.__args[0].evaluate(), self.data_type)
 
-    def __combine_node(self) -> mtlx.Node:
+    def __combine_node(self) -> mx_utils.Node:
         channels = []
         # fill channels with args
         for arg in self.__args:
-            new_channels = mtlx.extract_all(arg.evaluate())
+            new_channels = mx_utils.extract_all(arg.evaluate())
             for new_channel in new_channels:
                 channels.append(new_channel)
                 if len(channels) == self.data_size:
-                    return mtlx.combine(channels, self.data_type)
+                    return mx_utils.combine(channels, self.data_type)
         # fill remaining channels (if any) with zeros
         while len(channels) < self.data_size:
-            channels.append(mtlx.constant(0.0))
-        return mtlx.combine(channels, self.data_type)
+            channels.append(mx_utils.constant(0.0))
+        return mx_utils.combine(channels, self.data_type)

@@ -9,7 +9,6 @@ from .DataType import DataType, FILENAME, MATERIAL, VECTOR_TYPES, COLOR_TYPES, I
     BOOLEAN, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4
 from .Keyword import Keyword
 
-# TODO rename this document mx_utils
 
 #
 # Types
@@ -47,6 +46,12 @@ def clear() -> None:
 
 
 class Node:
+    def __new__(cls, source: mx.Node):
+        if source is None:
+            return None
+        else:
+            return super().__new__(cls)
+
     def __init__(self, source: mx.Node):
         self.__source = source
 
@@ -89,11 +94,9 @@ class Node:
         else:
             return self.__source.getInputValue(name)
 
-    # TODO maybe pass in the token instead of the value, so we dont have to do this filename dance
     def set_input(self, name: str, value: Any) -> None:
         if value is None:
             self.__source.removeInput(name)
-            return
         elif isinstance(value, Node):
             if value.is_null_node:
                 self.__source.removeInput(name)
@@ -146,12 +149,19 @@ def remove_node(node: Node) -> None:
 
 
 def get_node(name="") -> Node:
-    node = _document.getNode(name)
-    return Node(node) if node else None
+    return Node(_document.getNode(name))
 
 
 def get_nodes(category="") -> list[Node]:
     return [Node(n) for n in _document.getNodes(category)]
+
+
+def get_null_node(data_type: DataType) -> Node:
+    null_nodes = get_nodes(Keyword.NULL)
+    for node in null_nodes:
+        if data_type == node.data_type:
+            return node
+    return create_node(Keyword.NULL, data_type)
 
 
 #
@@ -236,11 +246,3 @@ def type_of(value: Value) -> DataType:
     if isinstance(value, Path):
         return FILENAME
     raise AssertionError
-
-
-def get_null_node(data_type: DataType) -> Node:
-    null_nodes = get_nodes(Keyword.NULL)
-    for node in null_nodes:
-        if data_type == node.data_type:
-            return node
-    return create_node(Keyword.NULL, data_type)

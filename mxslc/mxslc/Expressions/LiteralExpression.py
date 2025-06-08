@@ -1,5 +1,5 @@
 from . import Expression
-from .. import mtlx
+from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, STRING, FILENAME
 from ..Keyword import Keyword
@@ -33,8 +33,8 @@ class LiteralExpression(Expression):
             Keyword.NULL: self.__null_type
         }[self.__literal.type]
 
-    def _evaluate(self) -> mtlx.Node:
+    def _evaluate(self) -> mx_utils.Node:
         if self.__literal.type == Keyword.NULL:
-            return mtlx.get_null_node(self.__null_type)
+            return mx_utils.get_null_node(self.__null_type)
         else:
-            return mtlx.constant(self.__literal.value)
+            return mx_utils.constant(self.__literal.value)

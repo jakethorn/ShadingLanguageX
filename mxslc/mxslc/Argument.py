@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from . import mtlx
+from . import mx_utils
 from .DataType import DataType
 from .Expressions import Expression
 from .Token import Token, IdentifierToken
@@ -45,5 +45,5 @@ class Argument:
     def init(self, valid_types: DataType | list[DataType] = None) -> None:
         self.__expr.init(valid_types)
 
-    def evaluate(self) -> mtlx.Node:
+    def evaluate(self) -> mx_utils.Node:
         return self.__expr.evaluate()

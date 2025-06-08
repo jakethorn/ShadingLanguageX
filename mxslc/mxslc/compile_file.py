@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Sequence
 
-from . import mtlx, state
+from . import mx_utils, state
 from .Interactive.ShaderInterface import ShaderInterface
 from .Preprocessor.macros import undefine_all_macros, Macro, define_macro
 from .compile import compile_
@@ -13,7 +13,7 @@ def compile_file(mxsl_path: str | Path,
                  mtlx_path: str | Path = None,
                  *,
                  main_func: str = None,
-                 main_args: Sequence[mtlx.Value] = None,
+                 main_args: Sequence[mx_utils.Value] = None,
                  add_include_dirs: Sequence[Path] = None,
                  add_macros: Sequence[str | Macro] = None) -> None:
     main_args = main_args or []
@@ -26,7 +26,7 @@ def compile_file(mxsl_path: str | Path,
         mtlx_filepath = handle_mtlx_path(mtlx_path, mxsl_filepath)
 
         undefine_all_macros()
-        mtlx.clear()
+        mx_utils.clear()
         state.clear()
 
         include_dirs = add_include_dirs + [mxsl_filepath.parent, Path(".")]
@@ -39,12 +39,12 @@ def compile_file(mxsl_path: str | Path,
         post_process()
 
         with open(mtlx_filepath, "w") as file:
-            file.write(mtlx.get_xml())
+            file.write(mx_utils.get_xml())
 
         print(f"{mxsl_filepath.name} compiled successfully.")
 
 
-def _call_main(file: Path, name: str | None, args: Sequence[mtlx.Value]) -> None:
+def _call_main(file: Path, name: str | None, args: Sequence[mx_utils.Value]) -> None:
     shader = ShaderInterface()
     if name is None:
         if "main" in shader and shader.main.file == file:

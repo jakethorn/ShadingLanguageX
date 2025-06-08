@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from . import mtlx, state
+from . import mx_utils, state
 from .Argument import Argument
 from .DataType import DataType
 from .Expressions import Expression
@@ -60,7 +60,7 @@ class Function:
 
         return True
 
-    def invoke(self, args: list[Argument]) -> mtlx.Node:
+    def invoke(self, args: list[Argument]) -> mx_utils.Node:
         arg_nodes = [a.evaluate() for a in self.__sort_args(args)]
 
         state.enter_scope(self.__name)

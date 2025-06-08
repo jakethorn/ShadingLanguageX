@@ -1,5 +1,5 @@
 from . import Statement
-from .. import state, mtlx
+from .. import state, mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Token import Token
@@ -30,7 +30,7 @@ class ForLoop(Statement):
         i = start_value
         while i <= end_value:
             state.enter_scope(self.NAMESPACE)
-            state.add_node(self.identifier, mtlx.constant(i))
+            state.add_node(self.identifier, mx_utils.constant(i))
             for statement in self.statements:
                 statement.execute()
             state.exit_scope()

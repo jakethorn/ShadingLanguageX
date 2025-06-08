@@ -1,5 +1,5 @@
 from . import Expression
-from .. import mtlx
+from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, INTEGER, FLOAT
 from ..Token import Token
@@ -33,8 +33,8 @@ class SwitchExpression(Expression):
     def _data_type(self) -> DataType:
         return self.__values[0].data_type
 
-    def _evaluate(self) -> mtlx.Node:
-        node = mtlx.create_node("switch", self.data_type)
+    def _evaluate(self) -> mx_utils.Node:
+        node = mx_utils.create_node("switch", self.data_type)
         node.set_input("which", self.__which.evaluate())
         for i, value in enumerate(self.__values):
             node.set_input(f"in{i+1}", value.evaluate())
