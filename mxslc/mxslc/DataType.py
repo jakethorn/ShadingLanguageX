@@ -7,25 +7,11 @@ import MaterialX as mx
 from mxslc.Keyword import Keyword
 from mxslc.Token import Token
 
-_data_type_strs = [
-    Keyword.BOOLEAN,
-    Keyword.INTEGER,
-    Keyword.FLOAT,
-    Keyword.VECTOR2,
-    Keyword.VECTOR3,
-    Keyword.VECTOR4,
-    Keyword.COLOR3,
-    Keyword.COLOR4,
-    Keyword.STRING,
-    Keyword.FILENAME,
-    Keyword.SURFACESHADER,
-    Keyword.DISPLACEMENTSHADER,
-    Keyword.MATERIAL,
-    Keyword.T
-]
-
 
 class DataType:
+    """
+    Represents a data type (e.g., float, vector3, string).
+    """
     def __init__(self, data_type: Token | str, is_templated=False):
         if isinstance(data_type, Token):
             self.__data_type = data_type.type
@@ -33,7 +19,7 @@ class DataType:
             self.__data_type = data_type
         else:
             raise TypeError
-        assert self.__data_type in _data_type_strs
+        assert self.__data_type in Keyword.DATA_TYPES()
 
         self.__is_templated = is_templated
 
@@ -88,14 +74,6 @@ class DataType:
 
     def __str__(self) -> str:
         return self.__data_type
-
-    @staticmethod
-    def is_data_type(data_type: Token | str) -> bool:
-        try:
-            _ = DataType(data_type)
-        except (TypeError, AssertionError):
-            return False
-        return True
 
 
 BOOLEAN = DataType(Keyword.BOOLEAN)

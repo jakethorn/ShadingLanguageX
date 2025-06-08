@@ -9,21 +9,21 @@ from .Token import Token
 
 
 class Function:
-    def __init__(self, return_type: DataType, name: Token, params: ParameterList, body: list["Statement"], return_expr: Expression):
+    def __init__(self, return_type: DataType, identifier: Token, params: ParameterList, body: list["Statement"], return_expr: Expression):
         self.__return_type = return_type
-        self.__name = name.lexeme
+        self.__name = identifier.lexeme
         self.__params = params
         self.__body = body
         self.__return_expr = return_expr
-        self.__file = name.file
-        self.__line = name.line
+        self.__file = identifier.file
+        self.__line = identifier.line
 
     @property
     def return_type(self) -> DataType:
         return self.__return_type
 
     @property
-    def params(self) -> ParameterList:
+    def parameters(self) -> ParameterList:
         return self.__params
 
     @property

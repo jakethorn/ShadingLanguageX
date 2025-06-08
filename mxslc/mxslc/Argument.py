@@ -6,7 +6,6 @@ from .Expressions import Expression
 from .Token import Token, IdentifierToken
 
 
-# TODO add position index (maybe to parameter as well) then remove all enumerate(args) code
 class Argument:
     """
     Represents a positional or named argument to a function, constructor or node constructor.

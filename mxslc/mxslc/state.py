@@ -102,10 +102,10 @@ class State:
             if f.is_match(identifier.lexeme)
         ]
         return [
-            f.params[param_index].data_type.instantiate(template_type)
+            f.parameters[param_index].data_type.instantiate(template_type)
             for f
             in matching_funcs
-            if param_index in f.params
+            if param_index in f.parameters
         ]
 
     def __str__(self) -> str:
