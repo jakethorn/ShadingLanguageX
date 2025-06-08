@@ -11,19 +11,13 @@ class Parameter:
     """
     Represents a parameter to a function or constructor call.
     """
-    def __init__(self, name: Token | str, data_type: Token | DataType, default_value: Expression = None):
-        if isinstance(name, Token):
-            self.__name_token = name
-            self.__name = name.lexeme
-        else:
-            self.__name_token = None
-            self.__name = name
+    def __init__(self, identifier: Token, data_type: Token | DataType, default_value: Expression = None):
+        self.__identifier = identifier
+        self.__name = identifier.lexeme
 
         if isinstance(data_type, Token):
-            self.__data_type_token = data_type
-            self.__data_type = DataType(data_type.type)
+            self.__data_type = DataType(data_type)
         else:
-            self.__data_type_token = None
             self.__data_type = data_type
 
         self.__default_value = default_value
@@ -33,16 +27,12 @@ class Parameter:
         return self.__name
 
     @property
+    def identifier(self) -> Token:
+        return self.__identifier
+
+    @property
     def data_type(self) -> DataType:
         return self.__data_type
-
-    @property
-    def name_token(self) -> Token:
-        return self.__name_token
-
-    @property
-    def data_type_token(self) -> Token:
-        return self.__data_type_token
 
     @property
     def default_value(self) -> Expression:
@@ -56,13 +46,9 @@ class ParameterList:
     def __init__(self, params: list[Parameter]):
         self.__params = params
 
-    @property
-    def names(self) -> list[str]:
-        return [p.name for p in self.__params]
-
     def instantiate_templated_parameters(self, data_type: DataType) -> ParameterList:
         return ParameterList([
-            Parameter(p.name_token, p.data_type.instantiate(data_type), p.default_value)
+            Parameter(p.identifier, p.data_type.instantiate(data_type), p.default_value)
             for p
             in self.__params
         ])

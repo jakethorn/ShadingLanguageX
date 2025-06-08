@@ -10,10 +10,10 @@ class Argument:
     """
     Represents a positional or named argument to a function, constructor or node constructor.
     """
-    def __init__(self, expr: Expression, position: int, name: Token = None):
+    def __init__(self, expr: Expression, position: int, identifier: Token = None):
         self.__expr = expr
         self.__position = position
-        self.__name = name.lexeme if name is not None else None
+        self.__name = identifier.lexeme if identifier is not None else None
 
     @property
     def position(self) -> int:

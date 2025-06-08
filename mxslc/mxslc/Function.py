@@ -66,7 +66,7 @@ class Function:
         state.enter_scope(self.__name)
 
         for param, arg_node in zip(self.__params, arg_nodes):
-            state.add_node(param.name_token, arg_node)
+            state.add_node(param.identifier, arg_node)
 
         for statement in self.__body:
             statement.execute()
