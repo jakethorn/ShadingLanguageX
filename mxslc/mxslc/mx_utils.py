@@ -5,8 +5,7 @@ from typing import Any
 
 import MaterialX as mx
 
-from .DataType import DataType, FILENAME, MATERIAL, VECTOR_TYPES, COLOR_TYPES, INTEGER, FLOAT, STRING, SHADER_TYPES, \
-    BOOLEAN, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4
+from .DataType import DataType, FILENAME, MATERIAL, INTEGER, FLOAT, STRING, SHADER_TYPES, BOOLEAN, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, MULTI_ELEM_TYPES
 from .Keyword import Keyword
 
 
@@ -176,7 +175,7 @@ def constant(value: Constant) -> Node:
 
 
 def extract(in_: Node, index: Node | int | str) -> Node:
-    assert in_.data_type in [*VECTOR_TYPES, *COLOR_TYPES]
+    assert in_.data_type in MULTI_ELEM_TYPES
     if isinstance(index, Node):
         assert index.data_type == INTEGER
     if isinstance(index, str):
@@ -190,7 +189,7 @@ def extract(in_: Node, index: Node | int | str) -> Node:
 def extract_all(in_: Node) -> list[Node]:
     if in_.data_type == FLOAT:
         return [in_]
-    elif in_.data_type in [*VECTOR_TYPES, *COLOR_TYPES]:
+    elif in_.data_type in MULTI_ELEM_TYPES:
         extract_nodes = []
         for i in range(in_.data_size):
             extract_nodes.append(extract(in_, i))

@@ -4,35 +4,37 @@ from abc import ABC, abstractmethod
 
 from .. import mx_utils
 from ..CompileError import CompileError
-from ..DataType import DataType, INTEGER, FLOAT
-from ..Keyword import Keyword
+from ..DataType import DataType, INTEGER, FLOAT, DATA_TYPES
 from ..Token import Token
-from ..utils import as_list
 
 
 class Expression(ABC):
     def __init__(self, token: Token | None):
         self.__token = token
         self.__initialized = False
-        self.__valid_types = []
+        self.__valid_types: set[DataType] = set()
 
     @abstractmethod
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
         ...
 
-    def init(self, valid_types: DataType | list[DataType] = None) -> None:
+    def init(self, valid_types: DataType | set[DataType] = None) -> None:
         if not self.__initialized:
-            self.__valid_types = as_list(valid_types) or Keyword.DATA_TYPES()
+            self.__valid_types = _clean_data_types(valid_types)
+            if len(self.__valid_types) == 0:
+                raise CompileError("Bad expr 1", self.token)
             self._init_subexpr(self.__valid_types)
             self._init(self.__valid_types)
+            if self._data_type not in self.__valid_types:
+                raise CompileError("Bad expr 2", self.token)
             self.__initialized = True
 
     #virtualmethod
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
         ...
 
     #virtualmethod
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         ...
 
     @property
@@ -67,12 +69,22 @@ class Expression(ABC):
     def _evaluate(self) -> mx_utils.Node:
         ...
 
-    def init_evaluate(self, valid_types: DataType | list[DataType] = None) -> mx_utils.Node:
+    def init_evaluate(self, valid_types: DataType | set[DataType] = None) -> mx_utils.Node:
         self.init(valid_types)
         return self.evaluate()
 
 
-def _implicit_int_to_float(node: mx_utils.Node, valid_types: list[DataType]) -> mx_utils.Node:
+def _clean_data_types(data_types: DataType | set[DataType]) -> set[DataType]:
+    if data_types is None:
+        return DATA_TYPES
+    if isinstance(data_types, DataType):
+        return {data_types}
+    elif isinstance(data_types, set):
+        return data_types
+    raise TypeError
+
+
+def _implicit_int_to_float(node: mx_utils.Node, valid_types: set[DataType]) -> mx_utils.Node:
     is_int = node.data_type == INTEGER
     int_is_valid = INTEGER in valid_types
     float_is_valid = FLOAT in valid_types

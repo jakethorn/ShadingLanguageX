@@ -1,5 +1,5 @@
 from mxslc import mx_utils
-from mxslc.DataType import DataType, VECTOR_TYPES, INTEGER, COLOR_TYPES, FLOAT
+from mxslc.DataType import DataType, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from mxslc.Expressions import Expression
 
 
@@ -14,8 +14,8 @@ class IndexingExpression(Expression):
         indexer = self.__indexer.instantiate_templated_types(data_type)
         return IndexingExpression(expr, indexer)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        self.__expr.init(VECTOR_TYPES + COLOR_TYPES)
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        self.__expr.init(MULTI_ELEM_TYPES)
         self.__indexer.init(INTEGER)
 
     @property

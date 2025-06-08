@@ -77,7 +77,7 @@ class State:
         assert func not in self.__functions
         self.__functions.append(func)
 
-    def get_function(self, identifier: Token, template_type: DataType = None, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
+    def get_function(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> Function:
         matching_funcs = [
             f
             for f
@@ -90,23 +90,23 @@ class State:
         elif len(matching_funcs) == 1:
             return matching_funcs[0]
         else:
-            return_types = [f.return_type for f in matching_funcs]
+            return_types = {f.return_type for f in matching_funcs}
             raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, return_types, args)}' is ambiguous.", identifier)
 
-    def get_function_parameter_types(self, identifier: Token, template_type: DataType, param_index: int | str) -> list[DataType]:
+    def get_function_parameter_types(self, valid_types: set[DataType], identifier: Token, template_type: DataType, param_index: int | str) -> set[DataType]:
         matching_funcs = [
             f
             for f
             # TODO also search local functions
             in self.__global.__functions
-            if f.is_match(identifier.lexeme)
+            if f.is_match(identifier.lexeme, template_type, valid_types)
         ]
-        return [
-            f.parameters[param_index].data_type.instantiate(template_type)
+        return {
+            f.parameters[param_index].data_type
             for f
             in matching_funcs
             if param_index in f.parameters
-        ]
+        }
 
     def __str__(self) -> str:
         output = ""
@@ -153,12 +153,12 @@ def add_function(func: Function) -> None:
     _state.add_function(func)
 
 
-def get_function(identifier: str | Token, template_type: DataType = None, valid_types: list[DataType] = None, args: list["Argument"] = None) -> Function:
+def get_function(identifier: str | Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> Function:
     return _state.get_function(as_token(identifier), template_type, valid_types, args)
 
 
-def get_function_parameter_types(identifier: str | Token, template_type: DataType, param_index: int | str) -> list[DataType]:
-    return _state.get_function_parameter_types(as_token(identifier), template_type, param_index)
+def get_function_parameter_types(valid_types: set[DataType], identifier: str | Token, template_type: DataType, param_index: int | str) -> set[DataType]:
+    return _state.get_function_parameter_types(valid_types, as_token(identifier), template_type, param_index)
 
 
 def is_function(identifier: str) -> bool:

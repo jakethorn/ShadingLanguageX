@@ -1,6 +1,6 @@
 from . import Expression
 from .. import mx_utils
-from ..DataType import DataType, BOOLEAN, NUMERIC_TYPES
+from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
 
@@ -22,8 +22,11 @@ class UnaryExpression(Expression):
         right = self.__right.instantiate_templated_types(data_type)
         return UnaryExpression(self.__op, right)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        valid_sub_types = BOOLEAN if self.__op in ["!", Keyword.NOT] else NUMERIC_TYPES
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        if self.__op in ["!", Keyword.NOT]:
+            valid_sub_types = BOOLEAN
+        else:
+            valid_sub_types = valid_types & ({INTEGER, FLOAT} | MULTI_ELEM_TYPES)
         self.__right.init(valid_sub_types)
 
     @property

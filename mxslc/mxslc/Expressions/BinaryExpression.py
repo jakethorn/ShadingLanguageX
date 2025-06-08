@@ -3,7 +3,7 @@ from abc import ABC
 from . import Expression
 from .. import mx_utils, utils
 from ..CompileError import CompileError
-from ..DataType import DataType, INTEGER, FLOAT, VECTOR_TYPES, COLOR_TYPES, BOOLEAN
+from ..DataType import DataType, INTEGER, FLOAT, BOOLEAN, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
 from ..utils import one
@@ -34,22 +34,23 @@ class ArithmeticExpression(BinaryExpression):
         right = self.right.instantiate_templated_types(data_type)
         return ArithmeticExpression(left, self.operator, right)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        # TODO clean this up
         if set(valid_types) == {INTEGER, FLOAT}:
             self.left.init(valid_types)
             self.right.init(self.left.data_type)
-        elif len(valid_types) == 1 and valid_types[0] in [INTEGER, FLOAT]:
+        elif len(valid_types) == 1 and list(valid_types)[0] in [INTEGER, FLOAT]:
             self.left.init(valid_types)
             self.right.init(valid_types)
-        elif len(valid_types) == 1 and valid_types[0] in VECTOR_TYPES + COLOR_TYPES:
+        elif len(valid_types) == 1 and list(valid_types)[0] in MULTI_ELEM_TYPES:
             left_error = None
             try:
-                self.left.init([FLOAT, *valid_types])
+                self.left.init({FLOAT} | valid_types)
             except CompileError as e:
                 left_error = e
             right_error = None
             try:
-                self.right.init([FLOAT, *valid_types])
+                self.right.init({FLOAT} | valid_types)
             except CompileError as e:
                 right_error = e
             if left_error and right_error:
@@ -64,13 +65,13 @@ class ArithmeticExpression(BinaryExpression):
                     self.right.init(valid_types)
                 else:
                     raise right_error
-        elif any(t in VECTOR_TYPES + COLOR_TYPES for t in valid_types):
-            self.left.init([FLOAT, *valid_types])
-            self.right.init([FLOAT, *valid_types])
+        elif any(t in MULTI_ELEM_TYPES for t in valid_types):
+            self.left.init({FLOAT} | valid_types)
+            self.right.init({FLOAT} | valid_types)
         else:
-            raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.types_string(valid_types)}.", self.token)
+            raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.types_string(list(valid_types))}.", self.token)
 
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         if one(e.data_type == INTEGER for e in [self.left, self.right]):
             raise CompileError("Integers cannot be combined with other types.", self.token)
         if all(e.data_size > 1 for e in [self.left, self.right]) and self.left.data_type != self.right.data_type:
@@ -105,11 +106,21 @@ class ComparisonExpression(BinaryExpression):
         right = self.right.instantiate_templated_types(data_type)
         return ComparisonExpression(left, self.operator, right)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        self.left.init([BOOLEAN, INTEGER, FLOAT])
-        self.right.init([BOOLEAN, INTEGER, FLOAT])
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        if self.operator.type in ["!=", "=="]:
+            valid_sub_types = {BOOLEAN, INTEGER, FLOAT}
+        else:
+            valid_sub_types = {INTEGER, FLOAT}
 
-    def _init(self, valid_types: list[DataType]) -> None:
+        left_error = _try_init(self.left, valid_sub_types)
+        right_error = _try_init(self.right, valid_sub_types)
+        if left_error and right_error:
+            raise left_error
+        elif left_error:
+            self.left.init(self.right.data_type)
+        elif right_error:
+            self.right.init(self.left.data_type)
+
         if self.left.data_type != self.right.data_type:
             raise CompileError(f"Cannot compare a {self.left.data_type} and a {self.right.data_type}.", self.token)
 
@@ -154,7 +165,7 @@ class LogicExpression(BinaryExpression):
         right = self.right.instantiate_templated_types(data_type)
         return LogicExpression(left, self.operator, right)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
         self.left.init(BOOLEAN)
         self.right.init(BOOLEAN)
 
@@ -174,3 +185,12 @@ class LogicExpression(BinaryExpression):
         node.set_input("in1", self.left.evaluate())
         node.set_input("in2", self.right.evaluate())
         return node
+
+
+def _try_init(expr: Expression, valid_types: set[DataType]) -> Exception:
+    error = None
+    try:
+        expr.init(valid_types)
+    except CompileError as e:
+        error = e
+    return error

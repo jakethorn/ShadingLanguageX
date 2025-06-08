@@ -12,9 +12,9 @@ class IdentifierExpression(Expression):
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
         return self
 
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         # raises exception if node is not found
-        state.get_node(self.__identifier)
+        _ = state.get_node(self.__identifier)
 
     @property
     def _data_type(self) -> DataType:

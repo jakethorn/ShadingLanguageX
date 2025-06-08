@@ -25,18 +25,9 @@
     <input name="in1" type="float" nodename="node10" />
     <input name="in2" type="float" nodename="global__z" />
   </add>
-  <convert name="node13" type="float">
-    <input name="in" type="integer" value="1" />
-  </convert>
-  <convert name="node15" type="float">
-    <input name="in" type="integer" value="0" />
-  </convert>
-  <convert name="node17" type="float">
-    <input name="in" type="integer" value="0" />
-  </convert>
   <combine3 name="global__r" type="color3">
-    <input name="in1" type="float" nodename="node13" />
-    <input name="in2" type="float" nodename="node15" />
-    <input name="in3" type="float" nodename="node17" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+    <input name="in3" type="float" value="0" />
   </combine3>
 </materialx>

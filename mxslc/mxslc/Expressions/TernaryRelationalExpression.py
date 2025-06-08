@@ -19,7 +19,7 @@ class TernaryRelationalExpression(Expression):
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
         return self.__and.instantiate_templated_types(data_type)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
         self.__and.init(BOOLEAN)
 
     @property

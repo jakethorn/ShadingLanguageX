@@ -42,7 +42,7 @@ class Argument:
     def instantiate_templated_types(self, data_type: DataType) -> Argument:
         return Argument(self.__expr.instantiate_templated_types(data_type), self.position, IdentifierToken(self.name))
 
-    def init(self, valid_types: DataType | list[DataType] = None) -> None:
+    def init(self, valid_types: DataType | set[DataType] = None) -> None:
         self.__expr.init(valid_types)
 
     def evaluate(self) -> mx_utils.Node:

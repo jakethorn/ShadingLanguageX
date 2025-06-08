@@ -17,11 +17,11 @@ class NodeConstructor(Expression):
         args = [a.instantiate_templated_types(data_type) for a in self.__args]
         return NodeConstructor(self.token, data_type_token, args)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
         for arg in self.__args:
             arg.init()
 
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         # Check arguments are valid
         for arg in self.__args:
             if arg.name is None:

@@ -18,16 +18,16 @@ class SwitchExpression(Expression):
         values = [v.instantiate_templated_types(data_type) for v in self.__values]
         return SwitchExpression(self.token, which, values)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        self.__which.init([INTEGER, FLOAT])
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        self.__which.init({INTEGER, FLOAT})
         for value in self.__values:
             value.init(valid_types)
 
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         data_type = self.__values[0].data_type
         for value in self.__values[1:]:
             if value.data_type != data_type:
-                raise CompileError("All cases must be the same data type.", self.token)
+                raise CompileError("All switch cases must evaluate to the same data type.", self.token)
 
     @property
     def _data_type(self) -> DataType:

@@ -19,12 +19,21 @@ class IfExpression(Expression):
         otherwise = self.otherwise.instantiate_templated_types(data_type)
         return IfExpression(self.token, clause, then, otherwise)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        self.clause.init(BOOLEAN)
-        self.then.init(valid_types)
-        self.otherwise.init(valid_types)
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        if self.otherwise is None:
+            raise CompileError("No else branch provided in if expression", self.token)
 
-    def _init(self, valid_types: list[DataType]) -> None:
+        self.clause.init(BOOLEAN)
+
+        then_error = _try_init(self.then, valid_types)
+        otherwise_error = _try_init(self.otherwise, valid_types)
+        if then_error and otherwise_error:
+            raise then_error
+        elif then_error:
+            self.then.init(self.otherwise.data_type)
+        elif otherwise_error:
+            self.otherwise.init(self.then.data_type)
+
         if self.then.data_type != self.otherwise.data_type:
             raise CompileError(f"Branches must be of same data type, but were {self.then.data_type} and {self.otherwise.data_type}.", self.token)
 
@@ -44,3 +53,12 @@ class IfExpression(Expression):
         node.set_input("in2", otherwise_node)
 
         return node
+
+
+def _try_init(expr: Expression, valid_types: set[DataType]) -> Exception:
+    error = None
+    try:
+        expr.init(valid_types)
+    except CompileError as e:
+        error = e
+    return error

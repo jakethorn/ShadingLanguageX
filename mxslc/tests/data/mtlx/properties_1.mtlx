@@ -1,54 +1,42 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <convert name="node2" type="float">
-    <input name="in" type="integer" value="1" />
-  </convert>
-  <convert name="node4" type="float">
-    <input name="in" type="integer" value="2" />
-  </convert>
-  <convert name="node6" type="float">
-    <input name="in" type="integer" value="3" />
-  </convert>
-  <convert name="node8" type="float">
-    <input name="in" type="integer" value="4" />
-  </convert>
   <combine4 name="global__v1" type="vector4">
-    <input name="in1" type="float" nodename="node2" />
-    <input name="in2" type="float" nodename="node4" />
-    <input name="in3" type="float" nodename="node6" />
-    <input name="in4" type="float" nodename="node8" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+    <input name="in4" type="float" value="4" />
   </combine4>
-  <extract name="node10" type="float">
+  <extract name="node6" type="float">
     <input name="in" type="vector4" nodename="global__v1" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node11" type="float">
+  <extract name="node7" type="float">
     <input name="in" type="vector4" nodename="global__v1" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <extract name="node12" type="float">
+  <extract name="node8" type="float">
     <input name="in" type="vector4" nodename="global__v1" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <combine3 name="node13" type="vector3">
-    <input name="in1" type="float" nodename="node10" />
-    <input name="in2" type="float" nodename="node11" />
-    <input name="in3" type="float" nodename="node12" />
+  <combine3 name="node9" type="vector3">
+    <input name="in1" type="float" nodename="node6" />
+    <input name="in2" type="float" nodename="node7" />
+    <input name="in3" type="float" nodename="node8" />
   </combine3>
-  <extract name="node14" type="float">
-    <input name="in" type="vector3" nodename="node13" />
+  <extract name="node10" type="float">
+    <input name="in" type="vector3" nodename="node9" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node15" type="float">
-    <input name="in" type="vector3" nodename="node13" />
+  <extract name="node11" type="float">
+    <input name="in" type="vector3" nodename="node9" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <combine2 name="node16" type="vector2">
-    <input name="in1" type="float" nodename="node14" />
-    <input name="in2" type="float" nodename="node15" />
+  <combine2 name="node12" type="vector2">
+    <input name="in1" type="float" nodename="node10" />
+    <input name="in2" type="float" nodename="node11" />
   </combine2>
   <extract name="global__x1" type="float">
-    <input name="in" type="vector2" nodename="node16" />
+    <input name="in" type="vector2" nodename="node12" />
     <input name="index" type="integer" value="0" />
   </extract>
   <combine4 name="global__c1" type="color4">
@@ -57,25 +45,25 @@
     <input name="in3" type="float" value="1" />
     <input name="in4" type="float" value="1" />
   </combine4>
-  <extract name="node23" type="float">
+  <extract name="node19" type="float">
     <input name="in" type="color4" nodename="global__c1" />
     <input name="index" type="integer" value="3" />
   </extract>
-  <extract name="node24" type="float">
+  <extract name="node20" type="float">
     <input name="in" type="color4" nodename="global__c1" />
     <input name="index" type="integer" value="3" />
   </extract>
-  <extract name="node25" type="float">
+  <extract name="node21" type="float">
     <input name="in" type="color4" nodename="global__c1" />
     <input name="index" type="integer" value="3" />
   </extract>
-  <combine3 name="node26" type="color3">
-    <input name="in1" type="float" nodename="node23" />
-    <input name="in2" type="float" nodename="node24" />
-    <input name="in3" type="float" nodename="node25" />
+  <combine3 name="node22" type="color3">
+    <input name="in1" type="float" nodename="node19" />
+    <input name="in2" type="float" nodename="node20" />
+    <input name="in3" type="float" nodename="node21" />
   </combine3>
   <extract name="global__x2" type="float">
-    <input name="in" type="color3" nodename="node26" />
+    <input name="in" type="color3" nodename="node22" />
     <input name="index" type="integer" value="1" />
   </extract>
   <combine2 name="global__v2" type="vector2">

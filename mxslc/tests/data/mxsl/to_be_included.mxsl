@@ -6,5 +6,5 @@ float z = if (uv.x < 0.5) { x } else { y };
 
 color3 red()
 {
-    return color3(1, 0, 0);
+    return color3(1.0, 0.0, 0.0);
 }

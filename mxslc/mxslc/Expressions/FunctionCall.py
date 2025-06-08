@@ -23,16 +23,14 @@ class FunctionCall(Expression):
         args = [a.instantiate_templated_types(data_type) for a in self.__args]
         return FunctionCall(self.__identifier, data_type_token, args)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
-        # TODO this can be improved by passing the previously initialised arg type to the following and filtering
-        # possibilities based on the previous arg type.
-        # also by filtering the return type by the template type like I do for parameter types
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        # TODO this can be improved by passing the previously initialised arg to the following arg and filtering possibilities based on the previous arg type.
         for arg in self.__args:
             param_index = arg.position if arg.is_positional else arg.name
-            valid_arg_types = state.get_function_parameter_types(self.__identifier, self.__template_type, param_index)
+            valid_arg_types = state.get_function_parameter_types(valid_types, self.__identifier, self.__template_type, param_index)
             arg.init(valid_arg_types)
 
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         self.__func = state.get_function(self.__identifier, self.__template_type, valid_types, self.__args)
 
     @property

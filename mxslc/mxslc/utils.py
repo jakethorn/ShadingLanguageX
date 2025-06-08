@@ -17,15 +17,6 @@ def type_of_swizzle(swizzle: str) -> DataType:
     raise AssertionError
 
 
-def as_list(value: Any) -> list[Any] | None:
-    if value is None:
-        return None
-    elif isinstance(value, list):
-        return list(set(value))
-    else:
-        return [value]
-
-
 def one(values: Sequence[bool] | Generator[bool, None, None]) -> bool:
     return len([v for v in values if v]) == 1
 
@@ -37,14 +28,14 @@ def is_path(literal: Any) -> bool:
     return literal.endswith(".tif") or literal.endswith(".png") or literal.endswith(".jpg")
 
 
-def types_string(types: list[DataType]) -> str:
+def types_string(types: set[DataType]) -> str:
     if len(types) == 1:
-        return str(types[0])
+        return str(list(types)[0])
     else:
         return f"<{', '.join([str(t) for t in types])}>"
 
 
-def function_signature_string(name: str, valid_types: list[DataType] | None, args: list["Argument"] | None) -> str:
+def function_signature_string(name: str, valid_types: set[DataType] | None, args: list["Argument"] | None) -> str:
     output = ""
     if valid_types is not None:
         output += types_string(valid_types) + " "

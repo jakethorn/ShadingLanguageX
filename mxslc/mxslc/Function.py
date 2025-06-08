@@ -34,7 +34,7 @@ class Function:
     def line(self) -> int:
         return self.__line
 
-    def is_match(self, name: str, template_type: DataType = None, return_types: list[DataType] = None, args: list[Argument] = None) -> bool:
+    def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
         if self.__name != name:
             return False
 

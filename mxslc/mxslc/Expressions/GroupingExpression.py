@@ -4,6 +4,11 @@ from ..DataType import DataType
 
 
 class GroupingExpression(Expression):
+    """
+    Examples:
+        float x = 1.0 * (2.0 + 3.0);
+                        ^         ^
+    """
     def __init__(self, expr: Expression):
         super().__init__(expr.token)
         self.__expr = expr
@@ -12,7 +17,7 @@ class GroupingExpression(Expression):
         expr = self.__expr.instantiate_templated_types(data_type)
         return GroupingExpression(expr)
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
         self.__expr.init(valid_types)
 
     @property

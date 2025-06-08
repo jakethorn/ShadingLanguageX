@@ -16,10 +16,10 @@ class LiteralExpression(Expression):
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
         return self
 
-    def _init(self, valid_types: list[DataType]) -> None:
+    def _init(self, valid_types: set[DataType]) -> None:
         if self.__literal.type == Keyword.NULL and len(valid_types) > 1:
             raise CompileError(f"null type is ambiguous.", self.token)
-        self.__null_type = valid_types[0]
+        self.__null_type = list(valid_types)[0]
 
     @property
     def _data_type(self) -> DataType:

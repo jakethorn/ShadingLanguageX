@@ -22,7 +22,7 @@ class SwizzleExpression(Expression):
         left = self.left.instantiate_templated_types(data_type)
         return SwizzleExpression(left, Token(IDENTIFIER, self.swizzle))
 
-    def _init_subexpr(self, valid_types: list[DataType]) -> None:
+    def _init_subexpr(self, valid_types: set[DataType]) -> None:
         self.left.init(self.__valid_left_types())
 
     @property
@@ -37,21 +37,21 @@ class SwizzleExpression(Expression):
             channels = [mx_utils.extract(left_node, c) for c in self.swizzle]
             return mx_utils.combine(channels, self.data_type)
 
-    def __valid_left_types(self) -> list[DataType]:
+    def __valid_left_types(self) -> set[DataType]:
         if "x" in self.swizzle:
-            return [VECTOR2, VECTOR3, VECTOR4]
+            return {VECTOR2, VECTOR3, VECTOR4}
         if "y" in self.swizzle:
-            return [VECTOR2, VECTOR3, VECTOR4]
+            return {VECTOR2, VECTOR3, VECTOR4}
         if "z" in self.swizzle:
-            return [VECTOR3, VECTOR4]
+            return {VECTOR3, VECTOR4}
         if "w" in self.swizzle:
-            return [VECTOR4]
+            return {VECTOR4}
         if "r" in self.swizzle:
-            return [COLOR3, COLOR4]
+            return {COLOR3, COLOR4}
         if "g" in self.swizzle:
-            return [COLOR3, COLOR4]
+            return {COLOR3, COLOR4}
         if "b" in self.swizzle:
-            return [COLOR3, COLOR4]
+            return {COLOR3, COLOR4}
         if "a" in self.swizzle:
-            return [COLOR4]
+            return {COLOR4}
         raise CompileError(f"'{self.swizzle}' is not a valid swizzle.", self.token)
