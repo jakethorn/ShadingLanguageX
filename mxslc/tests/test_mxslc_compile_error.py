@@ -16,6 +16,9 @@ from mxslc.CompileError import CompileError
     ("bad_func_call_1", None, []),
     ("delayed_var_decl_1", None, []),
     ("missing_semi_1", None, []),
+    ("bad_data_type_1", None, []),
+    ("bad_data_type_2", None, []),
+    ("bad_data_type_3", None, []),
 ])
 def test_mxslc_compile_error(filename: str, main_function: str | None, main_args: list) -> None:
     mxsl_path = (Path(__file__).parent / "data" / "error" / filename).with_suffix(".mxsl")

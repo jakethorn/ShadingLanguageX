@@ -1,7 +1,7 @@
 import re
 from typing import Sequence, Generator, Any
 
-from mxslc.DataType import DataType, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3
+from mxslc.DataType import DataType, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3, DATA_TYPES
 
 
 def type_of_swizzle(swizzle: str) -> DataType:
@@ -31,15 +31,19 @@ def is_path(literal: Any) -> bool:
 def types_string(types: set[DataType]) -> str:
     if len(types) == 1:
         return str(list(types)[0])
+    elif types == DATA_TYPES:
+        return "any"
     else:
         return f"<{', '.join([str(t) for t in types])}>"
 
 
-def function_signature_string(name: str, valid_types: set[DataType] | None, args: list["Argument"] | None) -> str:
+def function_signature_string(return_types: set[DataType] | None, name: str, template_type: DataType | None, args: list["Argument"] | None) -> str:
     output = ""
-    if valid_types is not None:
-        output += types_string(valid_types) + " "
+    if return_types:
+        output += types_string(return_types) + " "
     output += name
+    if template_type:
+        output += f"<{template_type}>"
     if args:
         output += "("
         for arg in args:

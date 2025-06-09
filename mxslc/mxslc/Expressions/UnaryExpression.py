@@ -1,5 +1,6 @@
 from . import Expression
-from .. import mx_utils
+from .. import mx_utils, utils
+from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
@@ -27,6 +28,8 @@ class UnaryExpression(Expression):
             valid_sub_types = BOOLEAN
         else:
             valid_sub_types = valid_types & ({INTEGER, FLOAT} | MULTI_ELEM_TYPES)
+            if len(valid_sub_types) == 0:
+                raise CompileError(f"Invalid data type for unary expression: {utils.types_string(valid_types)}.", self.__op)
         self.__right.init(valid_sub_types)
 
     @property

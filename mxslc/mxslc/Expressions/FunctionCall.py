@@ -1,5 +1,6 @@
 from . import Expression
-from .. import state, mx_utils
+from .. import state, mx_utils, utils
+from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Token import Token
 
@@ -28,6 +29,8 @@ class FunctionCall(Expression):
         for arg in self.__args:
             param_index = arg.position if arg.is_positional else arg.name
             valid_arg_types = state.get_function_parameter_types(valid_types, self.__identifier, self.__template_type, param_index)
+            if len(valid_arg_types) == 0:
+                raise CompileError(f"Function signature '{utils.function_signature_string(valid_types, self.__identifier.lexeme, self.__template_type, None)}' does not exist.", self.__identifier)
             arg.init(valid_arg_types)
 
     def _init(self, valid_types: set[DataType]) -> None:

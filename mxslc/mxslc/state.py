@@ -86,12 +86,12 @@ class State:
             if f.is_match(identifier.lexeme, template_type, valid_types, args)
         ]
         if len(matching_funcs) == 0:
-            raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, valid_types, args)}' does not exist.", identifier)
+            raise CompileError(f"Function signature '{utils.function_signature_string(valid_types, identifier.lexeme, template_type, args)}' does not exist.", identifier)
         elif len(matching_funcs) == 1:
             return matching_funcs[0]
         else:
             return_types = {f.return_type for f in matching_funcs}
-            raise CompileError(f"Function signature '{utils.function_signature_string(identifier.lexeme, return_types, args)}' is ambiguous.", identifier)
+            raise CompileError(f"Function signature '{utils.function_signature_string(return_types, identifier.lexeme, template_type, args)}' is ambiguous.", identifier)
 
     def get_function_parameter_types(self, valid_types: set[DataType], identifier: Token, template_type: DataType, param_index: int | str) -> set[DataType]:
         matching_funcs = [
