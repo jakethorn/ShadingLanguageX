@@ -28,6 +28,13 @@ def is_path(literal: Any) -> bool:
     return literal.endswith(".tif") or literal.endswith(".png") or literal.endswith(".jpg")
 
 
+def string(value: Any) -> str | None:
+    if value is None:
+        return None
+    else:
+        return str(value)
+
+
 def types_string(types: set[DataType]) -> str:
     if len(types) == 1:
         return str(list(types)[0])

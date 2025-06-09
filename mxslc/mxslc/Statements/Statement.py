@@ -6,7 +6,7 @@ from ..DataType import DataType
 
 class Statement(ABC):
     @abstractmethod
-    def instantiate_templated_types(self, data_type: DataType) -> Statement:
+    def instantiate_templated_types(self, template_type: DataType) -> Statement:
         ...
 
     @abstractmethod

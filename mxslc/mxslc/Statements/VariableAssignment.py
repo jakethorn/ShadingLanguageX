@@ -4,51 +4,56 @@ from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Token import Token
-from ..token_types import IDENTIFIER
 from ..utils import type_of_swizzle
 
 
-# TODO rename swizzle to property
 class VariableAssignment(Statement):
-    def __init__(self, identifier: Token, swizzle: Token, right: Expression):
-        self.identifier = identifier
-        self.swizzle = swizzle.lexeme if swizzle else None
-        self.right = right
+    def __init__(self, identifier: Token, property_: str | None, right: Expression):
+        self.__identifier = identifier
+        self.__property = property_
+        self.__right = right
 
-    def instantiate_templated_types(self, data_type: DataType) -> Statement:
-        swizzle = Token(IDENTIFIER, self.swizzle) if self.swizzle else None
-        right = self.right.instantiate_templated_types(data_type)
-        return VariableAssignment(self.identifier, swizzle, right)
+    def instantiate_templated_types(self, template_type: DataType) -> Statement:
+        right = self.__right.instantiate_templated_types(template_type)
+        return VariableAssignment(self.__identifier, self.__property, right)
 
     def execute(self) -> None:
-        node = state.get_node(self.identifier)
-        if self.swizzle is None:
+        node = state.get_node(self.__identifier)
+        if self.__property is None:
             self.execute_as_identifier(node)
-        # TODO do the same for displacement
         elif node.category == "standard_surface":
+            self.execute_as_surface_input(node)
+        elif node.category == "displacement":
             self.execute_as_surface_input(node)
         else:
             self.execute_as_swizzle(node)
 
     def execute_as_identifier(self, old_node: mx_utils.Node) -> None:
         new_node = self.evaluate_right(old_node.data_type)
-        state.set_node(self.identifier, new_node)
+        state.set_node(self.__identifier, new_node)
 
     def execute_as_surface_input(self, surface_node: mx_utils.Node) -> None:
-        if self.swizzle in _standard_surface_inputs:
-            input_type = _standard_surface_inputs[self.swizzle]
+        if self.__property in _standard_surface_inputs:
+            input_type = _standard_surface_inputs[self.__property]
         else:
-            raise CompileError(f"Input '{self.swizzle}' does not exist in the standard surface.", self.identifier)
-        surface_node.set_input(self.swizzle, self.evaluate_right(input_type))
+            raise CompileError(f"Input '{self.__property}' does not exist in the standard surface shader.", self.__identifier)
+        surface_node.set_input(self.__property, self.evaluate_right(input_type))
+
+    def execute_as_displacement_input(self, displacement_node: mx_utils.Node) -> None:
+        if self.__property in _standard_surface_inputs:
+            input_types = _standard_surface_inputs[self.__property]
+        else:
+            raise CompileError(f"Input '{self.__property}' does not exist in the displacement shader.", self.__identifier)
+        displacement_node.set_input(self.__property, self.evaluate_right(input_types))
 
     def execute_as_swizzle(self, old_node: mx_utils.Node) -> None:
         # evaluate right hand expression
-        right_node = self.evaluate_right(type_of_swizzle(self.swizzle))
+        right_node = self.evaluate_right(type_of_swizzle(self.__property))
 
         # split into channels corresponding to swizzle
         right_channels = mx_utils.extract_all(right_node)
         swizzle_channel_map = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3}
-        swizzle_channels = [swizzle_channel_map[c] for c in self.swizzle]
+        swizzle_channels = [swizzle_channel_map[c] for c in self.__property]
         assert len(right_channels) == len(swizzle_channels)
 
         # get default channels of old variable
@@ -60,12 +65,13 @@ class VariableAssignment(Statement):
 
         # combine into final node
         node = mx_utils.combine(data, old_node.data_type)
-        state.set_node(self.identifier, node)
+        state.set_node(self.__identifier, node)
 
-    def evaluate_right(self, valid_type: DataType) -> mx_utils.Node:
-        if isinstance(self.right, IfExpression) and self.right.otherwise is None:
-            self.right.otherwise = IdentifierExpression(self.identifier)
-        return self.right.init_evaluate(valid_type)
+    def evaluate_right(self, valid_types: DataType | set[DataType]) -> mx_utils.Node:
+        # TODO fix if expressions to work with surface/displacement shader properties
+        if isinstance(self.__right, IfExpression) and self.__right.otherwise is None:
+            self.__right.otherwise = IdentifierExpression(self.__identifier)
+        return self.__right.init_evaluate(valid_types)
 
 
 _standard_surface_inputs: dict[str, DataType] = {
@@ -111,4 +117,9 @@ _standard_surface_inputs: dict[str, DataType] = {
     "thin_walled": BOOLEAN,
     "normal": VECTOR3,
     "tangent": VECTOR3
+}
+
+_displacement_inputs: dict[str, set[DataType]] = {
+    "displacement": {FLOAT, VECTOR3},
+    "scale": {FLOAT}
 }

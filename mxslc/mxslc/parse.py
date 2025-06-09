@@ -1,12 +1,14 @@
 from .Argument import Argument
 from .CompileError import CompileError
+from .DataType import DataType
 from .Expressions import *
 from .Keyword import Keyword
-from .Parameter import Parameter
+from .Parameter import Parameter, ParameterList
 from .Statements import *
 from .Token import Token
 from .TokenReader import TokenReader
 from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
+from .utils import string
 
 
 def parse(tokens: list[Token]) -> list[Statement]:
@@ -57,9 +59,9 @@ class Parser(TokenReader):
         self._match("=")
         right = self.__expression()
         self._match(";")
-        return VariableDeclaration(data_type, identifier, right)
+        return VariableDeclaration(DataType(data_type), identifier, right)
 
-    def __function_declaration(self, data_type: Token, identifier: Token) -> FunctionDeclaration:
+    def __function_declaration(self, return_type: Token, identifier: Token) -> FunctionDeclaration:
         template_types = []
         if self._consume("<"):
             template_types.append(self._match(*Keyword.DATA_TYPES()))
@@ -82,7 +84,7 @@ class Parser(TokenReader):
         return_expr = self.__expression()
         self._match(";")
         self._match("}")
-        return FunctionDeclaration(data_type, identifier, template_types, params, statements, return_expr)
+        return FunctionDeclaration(DataType(return_type), identifier, {DataType(t) for t in template_types}, ParameterList(params), statements, return_expr)
 
     def __void_function_declaration(self) -> FunctionDeclaration:
         self._match(Keyword.VOID)
@@ -132,7 +134,7 @@ class Parser(TokenReader):
         self._match("=")
         right = self.__expression()
         self._match(";")
-        return VariableAssignment(identifier, property_, right)
+        return VariableAssignment(identifier, string(property_), right)
 
     def __compound_assignment(self, identifier: Token, property_: Token) -> CompoundAssignment:
         operator = self._match("+=", "-=", "*=", "/=", "%=", "^=", "&=", "|=")
