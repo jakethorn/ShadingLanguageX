@@ -59,7 +59,7 @@ class Parser(TokenReader):
         self._match("=")
         right = self.__expression()
         self._match(";")
-        return VariableDeclaration(DataType(data_type), identifier, right)
+        return VariableDeclaration(data_type, identifier, right)
 
     def __function_declaration(self, return_type: Token, identifier: Token) -> FunctionDeclaration:
         template_types = []
@@ -84,7 +84,7 @@ class Parser(TokenReader):
         return_expr = self.__expression()
         self._match(";")
         self._match("}")
-        return FunctionDeclaration(DataType(return_type), identifier, {DataType(t) for t in template_types}, ParameterList(params), statements, return_expr)
+        return FunctionDeclaration(return_type, identifier, template_types, params, statements, return_expr)
 
     def __void_function_declaration(self) -> FunctionDeclaration:
         self._match(Keyword.VOID)
@@ -134,7 +134,7 @@ class Parser(TokenReader):
         self._match("=")
         right = self.__expression()
         self._match(";")
-        return VariableAssignment(identifier, string(property_), right)
+        return VariableAssignment(identifier, property_, right)
 
     def __compound_assignment(self, identifier: Token, property_: Token) -> CompoundAssignment:
         operator = self._match("+=", "-=", "*=", "/=", "%=", "^=", "&=", "|=")

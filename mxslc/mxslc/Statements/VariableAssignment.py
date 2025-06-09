@@ -4,13 +4,13 @@ from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Token import Token
-from ..utils import type_of_swizzle
+from ..utils import type_of_swizzle, string
 
 
 class VariableAssignment(Statement):
-    def __init__(self, identifier: Token, property_: str | None, right: Expression):
+    def __init__(self, identifier: Token, property_: Token | str | None, right: Expression):
         self.__identifier = identifier
-        self.__property = property_
+        self.__property = string(property_)
         self.__right = right
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:

@@ -23,4 +23,5 @@
 # TODO use pathlike instead of specific Path/str types
 # TODO -n --node-graphs argument that specifies functions and loops should use nodegraphs
 # TODO add check that named arguments always come after positional for functions
+# TODO allow loop iteration variables to int/vecs/colors as well as floats
 ```  

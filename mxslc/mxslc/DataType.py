@@ -1,27 +1,33 @@
 from __future__ import annotations
 
-from typing import Any
-
 import MaterialX as mx
 
-from mxslc.Keyword import Keyword
-from mxslc.Token import Token
+from . import mx_utils
+from .Keyword import Keyword
+from .Token import Token
 
 
 class DataType:
     """
-    Represents a data type (e.g., float, vector3, string).
+    Represents a data type (e.g., float, vector3, string, etc...).
     """
-    def __init__(self, data_type: Token | str, is_templated=False):
+    def __init__(self, data_type: Token | DataType | str, is_templated=False):
         if isinstance(data_type, Token):
             self.__data_type = data_type.type
+        elif isinstance(data_type, DataType):
+            self.__data_type = data_type.__data_type
         elif isinstance(data_type, str):
             self.__data_type = data_type
         else:
             raise TypeError
         assert self.__data_type in Keyword.DATA_TYPES()
 
-        self.__is_templated = is_templated
+        if is_templated:
+            self.__is_templated = True
+        elif isinstance(data_type, DataType):
+            self.__is_templated = data_type.__is_templated
+        else:
+            self.__is_templated = False
 
     @property
     def is_templated(self):
@@ -29,7 +35,7 @@ class DataType:
 
     def instantiate(self, template_type: DataType) -> DataType:
         if self.is_templated and template_type is not None:
-            return DataType(template_type.__data_type, is_templated=True)
+            return DataType(template_type, is_templated=True)
         else:
             return self
 
@@ -46,7 +52,7 @@ class DataType:
             Keyword.COLOR4: 4
         }[Keyword(self.__data_type)]
 
-    def zeros(self) -> Any:
+    def zeros(self) -> mx_utils.Constant:
         return {
             Keyword.BOOLEAN: False,
             Keyword.INTEGER: 0,
@@ -58,11 +64,14 @@ class DataType:
             Keyword.COLOR4: mx.Color4()
         }[Keyword(self.__data_type)]
 
+    # TODO delete function when im not using it anymore
     @property
     def as_token(self) -> Token:
         return Token(self.__data_type)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Token | DataType | str) -> bool:
+        if isinstance(other, Token):
+            return self.__data_type == other.type
         if isinstance(other, DataType):
             return self.__data_type == other.__data_type
         if isinstance(other, str):

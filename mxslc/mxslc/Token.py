@@ -68,14 +68,3 @@ class Token:
 
     def __str__(self) -> str:
         return self.lexeme
-
-
-class IdentifierToken(Token):
-    def __new__(cls, lexeme: str, file: Path = None, line: int = None):
-        if lexeme is None:
-            return None
-        else:
-            return super().__new__(cls)
-
-    def __init__(self, lexeme: str, file: Path = None, line: int = None):
-        super().__init__(IDENTIFIER, lexeme, file, line)

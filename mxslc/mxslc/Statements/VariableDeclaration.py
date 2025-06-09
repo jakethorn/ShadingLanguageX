@@ -6,8 +6,8 @@ from ..Token import Token
 
 
 class VariableDeclaration(Statement):
-    def __init__(self, data_type: DataType, identifier: Token, right: Expression):
-        self.__data_type = data_type
+    def __init__(self, data_type: Token | DataType, identifier: Token, right: Expression):
+        self.__data_type = DataType(data_type)
         self.__identifier = identifier
         self.__right = right
 

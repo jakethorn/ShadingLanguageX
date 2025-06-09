@@ -1,7 +1,7 @@
 from . import Statement
 from .. import state, mx_utils
 from ..CompileError import CompileError
-from ..DataType import DataType
+from ..DataType import DataType, FLOAT
 from ..Token import Token
 from ..token_types import FLOAT_LITERAL
 
@@ -9,29 +9,32 @@ from ..token_types import FLOAT_LITERAL
 class ForLoop(Statement):
     NAMESPACE = "<loop>"
 
-    def __init__(self, data_type: Token, identifier: Token, start_value: Token, value2: Token, value3: Token, statements: list[Statement]):
-        self.data_type = data_type
-        self.identifier = identifier
-        self.start_value = start_value
-        self.value2 = value2
-        self.value3 = value3
-        self.statements = statements
+    def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, statements: list[Statement]):
+        self.__iter_var_type = DataType(iter_var_type)
+        self.__identifier = identifier
+        self.__start_value = start_value
+        self.__value2 = value2
+        self.__value3 = value3
+        self.__statements = statements
 
-    def instantiate_templated_types(self, data_type: DataType) -> Statement:
-        data_type_token = DataType(self.data_type).instantiate(data_type).as_token
-        statements = [s.instantiate_templated_types(data_type) for s in self.statements]
-        return ForLoop(data_type_token, self.identifier, self.start_value, self.value2, self.value3, statements)
+        if iter_var_type != FLOAT:
+            raise CompileError("Loop iteration variable must be a float.", self.__identifier)
+
+    def instantiate_templated_types(self, template_type: DataType) -> Statement:
+        iter_var_type = self.__iter_var_type.instantiate(template_type)
+        statements = [s.instantiate_templated_types(template_type) for s in self.__statements]
+        return ForLoop(iter_var_type, self.__identifier, self.__start_value, self.__value2, self.__value3, statements)
 
     def execute(self) -> None:
-        start_value = _get_loop_value(self.start_value)
-        incr_value = _get_loop_value(self.value2) if self.value3 is not None else 1.0
-        end_value = _get_loop_value(self.value3 or self.value2)
+        start_value = _get_loop_value(self.__start_value)
+        incr_value = _get_loop_value(self.__value2) if self.__value3 else 1.0
+        end_value = _get_loop_value(self.__value3 or self.__value2)
 
         i = start_value
         while i <= end_value:
             state.enter_scope(self.NAMESPACE)
-            state.add_node(self.identifier, mx_utils.constant(i))
-            for statement in self.statements:
+            state.add_node(self.__identifier, mx_utils.constant(i))
+            for statement in self.__statements:
                 statement.execute()
             state.exit_scope()
             i += incr_value
@@ -45,4 +48,4 @@ def _get_loop_value(token: Token) -> float:
         if node.category == "constant":
             return node.get_input("value")
         else:
-            raise CompileError("For loop variables can only be float literals or constant values.", token)
+            raise CompileError("For loop variables can only be literals or constant values.", token)

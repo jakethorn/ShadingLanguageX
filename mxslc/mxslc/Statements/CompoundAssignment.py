@@ -16,4 +16,4 @@ class CompoundAssignment(VariableAssignment):
         else:
             expr = LogicExpression(left, binary_op, right)
 
-        super().__init__(identifier, string(swizzle), expr)
+        super().__init__(identifier, swizzle, expr)

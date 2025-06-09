@@ -33,7 +33,7 @@ class TokenReader(ABC):
         """
         return self.__peek(2)
 
-    def _consume(self, *token_types: str) -> Token | None:
+    def _consume(self, *token_types: str | list[str]) -> Token | None:
         """
         Consume current token if it matches one of the token types.
         """
@@ -44,7 +44,7 @@ class TokenReader(ABC):
         return None
 
     # TODO maybe change this (and consume) to take str I list[str] instead of *str
-    def _match(self, *token_types: str) -> Token:
+    def _match(self, *token_types: str | list[str]) -> Token:
         """
         Same as consume, but raise a compile error if no match was found.
         """
@@ -57,3 +57,13 @@ class TokenReader(ABC):
         if self.__index + future >= len(self.__tokens):
             raise CompileError(f"Unexpected end of file.", self.__tokens[-1])
         return self.__tokens[self.__index + future]
+
+
+def _compile_token_types(token_types: tuple[str | list[str], ...]) -> list[str]:
+    result = []
+    for t in token_types:
+        if isinstance(t, str):
+            result.append(t)
+        elif isinstance(t, list):
+            result.extend(t)
+        return result

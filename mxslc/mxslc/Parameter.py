@@ -13,18 +13,12 @@ class Parameter:
     """
     def __init__(self, identifier: Token, data_type: Token | DataType, default_value: Expression = None):
         self.__identifier = identifier
-        self.__name = identifier.lexeme
-
-        if isinstance(data_type, Token):
-            self.__data_type = DataType(data_type)
-        else:
-            self.__data_type = data_type
-
+        self.__data_type = DataType(data_type)
         self.__default_value = default_value
 
     @property
     def name(self) -> str:
-        return self.__name
+        return self.__identifier.lexeme
 
     @property
     def identifier(self) -> Token:
@@ -35,7 +29,7 @@ class Parameter:
         return self.__data_type
 
     @property
-    def default_value(self) -> Expression:
+    def default_value(self) -> Expression | None:
         return self.__default_value
 
 
@@ -43,12 +37,15 @@ class ParameterList:
     """
     A list of parameters that can be accessed by their position or name.
     """
-    def __init__(self, params: list[Parameter]):
-        self.__params = params
+    def __init__(self, params: ParameterList | list[Parameter]):
+        if isinstance(params, ParameterList):
+            self.__params = params.__params
+        else:
+            self.__params = params
 
-    def instantiate_templated_parameters(self, data_type: DataType) -> ParameterList:
+    def instantiate_templated_parameters(self, template_type: DataType) -> ParameterList:
         return ParameterList([
-            Parameter(p.identifier, p.data_type.instantiate(data_type), p.default_value)
+            Parameter(p.identifier, p.data_type.instantiate(template_type), p.default_value)
             for p
             in self.__params
         ])
