@@ -1,0 +1,13 @@
+
+T foo<vec2, vec3>()
+{
+    T v = T(2.3);
+    return v;
+}
+
+T bar<vec2, vec3>(T x)
+{
+    return x * 2.0;
+}
+
+vec2 v = bar(-foo());

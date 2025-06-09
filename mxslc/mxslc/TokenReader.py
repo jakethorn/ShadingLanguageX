@@ -19,19 +19,19 @@ class TokenReader(ABC):
         """
         Peek current token.
         """
-        return self.__tokens[self.__index]
+        return self.__peek(0)
 
     def _peek_next(self) -> Token:
         """
         Peek next token.
         """
-        return self.__tokens[self.__index + 1]
+        return self.__peek(1)
 
     def _peek_next_next(self) -> Token:
         """
         Peek next next token.
         """
-        return self.__tokens[self.__index + 2]
+        return self.__peek(2)
 
     def _consume(self, *token_types: str) -> Token | None:
         """
@@ -52,3 +52,8 @@ class TokenReader(ABC):
             return token
         token = self._peek()
         raise CompileError(f"Expected {token_types}, but found '{token.lexeme}'.", token)
+
+    def __peek(self, future: int) -> Token:
+        if self.__index + future >= len(self.__tokens):
+            raise CompileError(f"Unexpected end of file.", self.__tokens[-1])
+        return self.__tokens[self.__index + future]

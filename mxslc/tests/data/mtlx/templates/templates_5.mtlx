@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <convert name="foo__v" type="vector2">
+    <input name="in" type="float" value="2.3" />
+  </convert>
+  <multiply name="global__v" type="vector2">
+    <input name="in1" type="vector2" nodename="foo__v" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+</materialx>

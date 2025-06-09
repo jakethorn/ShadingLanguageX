@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <convert name="foo__v" type="vector2">
+    <input name="in" type="float" value="2.3" />
+  </convert>
+  <subtract name="bar__x" type="vector2">
+    <input name="in1" type="vector2" value="0, 0" />
+    <input name="in2" type="vector2" nodename="foo__v" />
+  </subtract>
+  <multiply name="global__v" type="vector2">
+    <input name="in1" type="vector2" nodename="bar__x" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+</materialx>

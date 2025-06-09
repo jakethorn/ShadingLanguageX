@@ -40,16 +40,20 @@ def function_signature_string(name: str, valid_types: set[DataType] | None, args
     if valid_types is not None:
         output += types_string(valid_types) + " "
     output += name
-    if args is not None and len(args) > 0:
+    if args:
         output += "("
         for arg in args:
             if arg.is_positional:
                 output += f"{arg.data_type} arg{arg.position}, "
-        output += "..., "
-        for arg in args:
-            if arg.is_named:
-                output += f"{arg.data_type} {arg.name}, "
-        output += "...)"
+        if any(arg.is_named for arg in args):
+            output += "..., "
+            for arg in args:
+                if arg.is_named:
+                    output += f"{arg.data_type} {arg.name}, "
+            output += "...)"
+        else:
+            output = output[:-2]
+            output += ")"
     else:
         output += "()"
     return output
