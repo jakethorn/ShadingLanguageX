@@ -17,7 +17,7 @@ class ForLoop(Statement):
         self.__value3 = value3
         self.__statements = statements
 
-        if iter_var_type != FLOAT:
+        if self.__iter_var_type != FLOAT:
             raise CompileError("Loop iteration variable must be a float.", self.__identifier)
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:

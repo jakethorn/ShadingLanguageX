@@ -11,6 +11,12 @@ class DataType:
     """
     Represents a data type (e.g., float, vector3, string, etc...).
     """
+    def __new__(cls, data_type: Token | DataType | str, is_templated=False):
+        if data_type is None:
+            return None
+        else:
+            return super().__new__(cls)
+
     def __init__(self, data_type: Token | DataType | str, is_templated=False):
         if isinstance(data_type, Token):
             self.__data_type = data_type.type
@@ -64,7 +70,6 @@ class DataType:
             Keyword.COLOR4: mx.Color4()
         }[Keyword(self.__data_type)]
 
-    # TODO delete function when im not using it anymore
     @property
     def as_token(self) -> Token:
         return Token(self.__data_type)

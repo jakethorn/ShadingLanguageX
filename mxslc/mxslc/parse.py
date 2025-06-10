@@ -1,14 +1,12 @@
 from .Argument import Argument
 from .CompileError import CompileError
-from .DataType import DataType
 from .Expressions import *
 from .Keyword import Keyword
-from .Parameter import Parameter, ParameterList
+from .Parameter import Parameter
 from .Statements import *
 from .Token import Token
 from .TokenReader import TokenReader
 from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
-from .utils import string
 
 
 def parse(tokens: list[Token]) -> list[Statement]:
@@ -46,7 +44,7 @@ class Parser(TokenReader):
         raise CompileError(f"Expected return statement, data type keyword, identifier or 'for', but found '{token.lexeme}'.", token)
 
     def __declaration(self) -> Statement:
-        data_type = self._match(*Keyword.DATA_TYPES())
+        data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
         token = self._peek()
         if token == "=":
@@ -61,12 +59,13 @@ class Parser(TokenReader):
         self._match(";")
         return VariableDeclaration(data_type, identifier, right)
 
+    # TODO combine `__function_declaration` and `__void_function_declaration`
     def __function_declaration(self, return_type: Token, identifier: Token) -> FunctionDeclaration:
         template_types = []
         if self._consume("<"):
-            template_types.append(self._match(*Keyword.DATA_TYPES()))
+            template_types.append(self._match(Keyword.DATA_TYPES()))
             while self._consume(","):
-                template_types.append(self._match(*Keyword.DATA_TYPES()))
+                template_types.append(self._match(Keyword.DATA_TYPES()))
             self._match(">")
         self._match("(")
         if self._consume(")"):
@@ -91,9 +90,9 @@ class Parser(TokenReader):
         identifier = self._match(IDENTIFIER)
         template_types = []
         if self._consume("<"):
-            template_types.append(self._match(*Keyword.DATA_TYPES()))
+            template_types.append(self._match(Keyword.DATA_TYPES()))
             while self._consume(","):
-                template_types.append(self._match(*Keyword.DATA_TYPES()))
+                template_types.append(self._match(Keyword.DATA_TYPES()))
             self._match(">")
         self._match("(")
         if self._consume(")"):
@@ -112,7 +111,7 @@ class Parser(TokenReader):
         return FunctionDeclaration(Token(Keyword.INTEGER), identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
-        data_type = self._match(*Keyword.DATA_TYPES())
+        data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
         if self._consume("="):
             default_value = self.__expression()
@@ -145,7 +144,7 @@ class Parser(TokenReader):
     def __for_loop(self) -> ForLoop:
         self._match(Keyword.FOR)
         self._match("(")
-        data_type = self._match(*Keyword.DATA_TYPES())
+        data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
         self._match("=")
         literal1 = self._match(FLOAT_LITERAL, IDENTIFIER)
@@ -186,9 +185,9 @@ class Parser(TokenReader):
         right = None
 
         relational_operators = [">", ">=", "<", "<="]
-        if op1 := self._consume(*relational_operators):
+        if op1 := self._consume(relational_operators):
             middle = self.__term()
-        if op2 := self._consume(*relational_operators):
+        if op2 := self._consume(relational_operators):
             right = self.__term()
 
         if middle is None:
@@ -298,7 +297,7 @@ class Parser(TokenReader):
         return SwitchExpression(keyword, which, values)
 
     def __constructor_call(self) -> Expression:
-        data_type = self._match(*Keyword.DATA_TYPES())
+        data_type = self._match(Keyword.DATA_TYPES())
         self._match("(")
         if self._consume(")"):
             args = []
@@ -310,7 +309,7 @@ class Parser(TokenReader):
     def __function_call(self, identifier: Token) -> Expression:
         template_type = None
         if self._consume("<"):
-            template_type = self._match(*Keyword.DATA_TYPES())
+            template_type = self._match(Keyword.DATA_TYPES())
             self._match(">")
         self._match("(")
         if self._consume(")"):
@@ -324,7 +323,7 @@ class Parser(TokenReader):
         self._match("{")
         category = self._match(STRING_LITERAL)
         self._match(",")
-        data_type = self._match(*Keyword.DATA_TYPES())
+        data_type = self._match(Keyword.DATA_TYPES())
         if self._consume(":"):
             args = self.__argument_list()
         else:

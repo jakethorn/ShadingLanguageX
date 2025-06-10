@@ -10,10 +10,10 @@ class ConstructorCall(Expression):
         self.__data_type = DataType(data_type)
         self.__args = args
 
-    def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        data_type_token = self.__data_type.instantiate(data_type).as_token
-        args = [a.instantiate_templated_types(data_type) for a in self.__args]
-        return ConstructorCall(data_type_token, args)
+    def instantiate_templated_types(self, template_type: DataType) -> Expression:
+        data_type = self.__data_type.instantiate(template_type).as_token
+        args = [a.instantiate_templated_types(template_type) for a in self.__args]
+        return ConstructorCall(data_type, args)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         if len(self.__args) == 1:

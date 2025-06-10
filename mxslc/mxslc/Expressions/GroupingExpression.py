@@ -10,11 +10,11 @@ class GroupingExpression(Expression):
                         ^         ^
     """
     def __init__(self, expr: Expression):
-        super().__init__(expr.token)
+        super().__init__(expr._token)
         self.__expr = expr
 
-    def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        expr = self.__expr.instantiate_templated_types(data_type)
+    def instantiate_templated_types(self, template_type: DataType) -> Expression:
+        expr = self.__expr.instantiate_templated_types(template_type)
         return GroupingExpression(expr)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:

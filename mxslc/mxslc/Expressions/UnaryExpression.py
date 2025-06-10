@@ -19,9 +19,9 @@ class UnaryExpression(Expression):
         self.__op = op
         self.__right = right
 
-    def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        right = self.__right.instantiate_templated_types(data_type)
-        return UnaryExpression(self.__op, right)
+    def instantiate_templated_types(self, template_type: DataType) -> Expression:
+        right = self.__right.instantiate_templated_types(template_type)
+        return UnaryExpression(self._token, right)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         if self.__op in ["!", Keyword.NOT]:

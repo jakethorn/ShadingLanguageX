@@ -5,13 +5,13 @@ from mxslc.Expressions import Expression
 
 class IndexingExpression(Expression):
     def __init__(self, expr: Expression, indexer: Expression):
-        super().__init__(indexer.token)
+        super().__init__(indexer._token)
         self.__expr = expr
         self.__indexer = indexer
 
-    def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        expr = self.__expr.instantiate_templated_types(data_type)
-        indexer = self.__indexer.instantiate_templated_types(data_type)
+    def instantiate_templated_types(self, template_type: DataType) -> Expression:
+        expr = self.__expr.instantiate_templated_types(template_type)
+        indexer = self.__indexer.instantiate_templated_types(template_type)
         return IndexingExpression(expr, indexer)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:

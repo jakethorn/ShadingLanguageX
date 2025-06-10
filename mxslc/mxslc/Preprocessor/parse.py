@@ -42,9 +42,9 @@ class Parser(TokenReader):
         right = None
 
         relational_operators = [">", ">=", "<", "<="]
-        if op1 := self._consume(*relational_operators):
+        if op1 := self._consume(relational_operators):
             middle = self.__term()
-        if op2 := self._consume(*relational_operators):
+        if op2 := self._consume(relational_operators):
             right = self.__term()
 
         if middle is None:

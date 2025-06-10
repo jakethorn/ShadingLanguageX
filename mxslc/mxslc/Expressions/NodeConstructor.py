@@ -6,16 +6,16 @@ from ..Token import Token
 
 
 class NodeConstructor(Expression):
-    def __init__(self, category: Token, data_type: Token, args: list["Argument"]):
+    def __init__(self, category: Token, data_type: Token | DataType, args: list["Argument"]):
         super().__init__(category)
         self.__category = category.value
         self.__data_type = DataType(data_type)
         self.__args = args
 
-    def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        data_type_token = self.__data_type.instantiate(data_type).as_token
-        args = [a.instantiate_templated_types(data_type) for a in self.__args]
-        return NodeConstructor(self.token, data_type_token, args)
+    def instantiate_templated_types(self, template_type: DataType) -> Expression:
+        data_type = self.__data_type.instantiate(template_type)
+        args = [a.instantiate_templated_types(template_type) for a in self.__args]
+        return NodeConstructor(self._token, data_type, args)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         for arg in self.__args:
@@ -25,7 +25,7 @@ class NodeConstructor(Expression):
         # Check arguments are valid
         for arg in self.__args:
             if arg.name is None:
-                raise CompileError("Unnamed argument in node constructors.", self.token)
+                raise CompileError("Unnamed argument in node constructors.", self._token)
 
     @property
     def _data_type(self) -> DataType:

@@ -9,20 +9,20 @@ class FunctionCall(Expression):
     """
     Represents a call to a user-defined or standard library function.
     """
-    def __init__(self, identifier: Token, template_type: Token, args: list["Argument"]):
+    def __init__(self, identifier: Token, template_type: Token | DataType | None, args: list["Argument"]):
         super().__init__(identifier)
         self.__identifier = identifier
-        self.__template_type = DataType(template_type) if template_type else None
+        self.__template_type = DataType(template_type)
         self.__args = args
         self.__func = None
 
-    def instantiate_templated_types(self, data_type: DataType) -> Expression:
-        if self.__template_type is None:
-            data_type_token = None
+    def instantiate_templated_types(self, template_type: DataType) -> Expression:
+        if self.__template_type:
+            data_type = self.__template_type.instantiate(template_type)
         else:
-            data_type_token = self.__template_type.instantiate(data_type).as_token
-        args = [a.instantiate_templated_types(data_type) for a in self.__args]
-        return FunctionCall(self.__identifier, data_type_token, args)
+            data_type = None
+        args = [a.instantiate_templated_types(template_type) for a in self.__args]
+        return FunctionCall(self._token, data_type, args)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         # TODO this can be improved by passing the previously initialised arg to the following arg and filtering possibilities based on the previous arg type.
