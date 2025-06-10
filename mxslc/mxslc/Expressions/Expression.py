@@ -10,8 +10,12 @@ from ..Token import Token
 
 class Expression(ABC):
     def __init__(self, token: Token | None):
-        self._token = token
+        self.__token = token
         self.__initialized = False
+
+    @property
+    def token(self) -> Token:
+        return self.__token
 
     @abstractmethod
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
@@ -21,11 +25,11 @@ class Expression(ABC):
         if not self.__initialized:
             valid_types = _as_set(valid_types)
             if len(valid_types) == 0:
-                raise CompileError("Incompatible data types.", self._token)
+                raise CompileError("Incompatible data types.", self.token)
             self._init_subexpr(valid_types)
             self._init(valid_types)
             if self._data_type not in valid_types:
-                raise CompileError(f"Invalid data type. Expected {utils.types_string(valid_types)}, but got {self._data_type}.", self._token)
+                raise CompileError(f"Invalid data type. Expected {utils.types_string(valid_types)}, but got {self._data_type}.", self.token)
             self.__initialized = True
 
     #virtualmethod

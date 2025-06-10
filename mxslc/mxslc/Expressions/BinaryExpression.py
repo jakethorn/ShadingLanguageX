@@ -1,6 +1,7 @@
 from abc import ABC
 
 from . import Expression
+from .expression_utils import init_linked_expressions
 from .. import mx_utils, utils
 from ..CompileError import CompileError
 from ..DataType import DataType, INTEGER, FLOAT, BOOLEAN, MULTI_ELEM_TYPES
@@ -69,13 +70,13 @@ class ArithmeticExpression(BinaryExpression):
             self._left.init({FLOAT} | valid_types)
             self._right.init({FLOAT} | valid_types)
         else:
-            raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.types_string(valid_types)}.", self._token)
+            raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.types_string(valid_types)}.", self.token)
 
     def _init(self, valid_types: set[DataType]) -> None:
         if one(e.data_type == INTEGER for e in [self._left, self._right]):
-            raise CompileError("Integers cannot be combined with other types.", self._token)
+            raise CompileError("Integers cannot be combined with other types.", self.token)
         if all(e.data_size > 1 for e in [self._left, self._right]) and self._left.data_type != self._right.data_type:
-            raise CompileError(f"Cannot {self.node_type} a {self._left.data_type} and a {self._right.data_type}.", self._token)
+            raise CompileError(f"Cannot {self.node_type} a {self._left.data_type} and a {self._right.data_type}.", self.token)
 
     @property
     def _data_type(self) -> DataType:
@@ -111,18 +112,7 @@ class ComparisonExpression(BinaryExpression):
             valid_sub_types = {BOOLEAN, INTEGER, FLOAT}
         else:
             valid_sub_types = {INTEGER, FLOAT}
-
-        left_error = _try_init(self._left, valid_sub_types)
-        right_error = _try_init(self._right, valid_sub_types)
-        if left_error and right_error:
-            raise left_error
-        elif left_error:
-            self._left.init(self._right.data_type)
-        elif right_error:
-            self._right.init(self._left.data_type)
-
-        if self._left.data_type != self._right.data_type:
-            raise CompileError(f"Cannot compare a {self._left.data_type} and a {self._right.data_type}.", self._token)
+        init_linked_expressions(self._left, self._right, valid_sub_types)
 
     @property
     def _data_type(self) -> DataType:
@@ -185,12 +175,3 @@ class LogicExpression(BinaryExpression):
         node.set_input("in1", self._left.evaluate())
         node.set_input("in2", self._right.evaluate())
         return node
-
-
-def _try_init(expr: Expression, valid_types: set[DataType]) -> Exception:
-    error = None
-    try:
-        expr.init(valid_types)
-    except CompileError as e:
-        error = e
-    return error

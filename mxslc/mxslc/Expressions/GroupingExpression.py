@@ -10,7 +10,7 @@ class GroupingExpression(Expression):
                         ^         ^
     """
     def __init__(self, expr: Expression):
-        super().__init__(expr._token)
+        super().__init__(expr.token)
         self.__expr = expr
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:

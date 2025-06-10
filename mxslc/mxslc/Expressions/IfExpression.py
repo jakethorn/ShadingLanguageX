@@ -1,4 +1,5 @@
 from . import Expression
+from .expression_utils import init_linked_expressions
 from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN
@@ -25,16 +26,14 @@ class IfExpression(Expression):
         clause = self.__clause.instantiate_templated_types(template_type)
         then = self.__then.instantiate_templated_types(template_type)
         otherwise = self.__otherwise.instantiate_templated_types(template_type)
-        return IfExpression(self._token, clause, then, otherwise)
+        return IfExpression(self.token, clause, then, otherwise)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         if self.__otherwise is None:
-            raise CompileError("No else branch provided in if expression", self._token)
+            raise CompileError("No else branch provided in if expression", self.token)
 
         self.__clause.init(BOOLEAN)
-        _init_pair(self.__then, self.__otherwise, valid_types)
-        if self.__then.data_type != self.__otherwise.data_type:
-            raise CompileError(f"Branches must be of same data type, but were {self.__then.data_type} and {self.__otherwise.data_type}.", self._token)
+        init_linked_expressions(self.__then, self.__otherwise, valid_types)
 
     @property
     def _data_type(self) -> DataType:
@@ -52,23 +51,3 @@ class IfExpression(Expression):
         node.set_input("in2", otherwise_node)
 
         return node
-
-
-def _try_init(expr: Expression, valid_types: set[DataType]) -> Exception:
-    error = None
-    try:
-        expr.init(valid_types)
-    except CompileError as e:
-        error = e
-    return error
-
-
-def _init_pair(expr1: Expression, expr2: Expression, valid_types: set[DataType]) -> None:
-    error1 = _try_init(expr1, valid_types)
-    error2 = _try_init(expr2, valid_types)
-    if error1 and error2:
-        raise error1
-    elif error1:
-        expr1.init(expr2.data_type)
-    elif error2:
-        expr2.init(expr1.data_type)

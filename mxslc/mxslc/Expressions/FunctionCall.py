@@ -22,7 +22,7 @@ class FunctionCall(Expression):
         else:
             data_type = None
         args = [a.instantiate_templated_types(template_type) for a in self.__args]
-        return FunctionCall(self._token, data_type, args)
+        return FunctionCall(self.__identifier, data_type, args)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         # TODO this can be improved by passing the previously initialised arg to the following arg and filtering possibilities based on the previous arg type.

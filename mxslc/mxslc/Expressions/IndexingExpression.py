@@ -5,7 +5,7 @@ from mxslc.Expressions import Expression
 
 class IndexingExpression(Expression):
     def __init__(self, expr: Expression, indexer: Expression):
-        super().__init__(indexer._token)
+        super().__init__(indexer.token)
         self.__expr = expr
         self.__indexer = indexer
 

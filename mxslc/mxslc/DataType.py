@@ -39,8 +39,8 @@ class DataType:
     def is_templated(self):
         return self.__data_type == Keyword.T or self.__is_templated
 
-    def instantiate(self, template_type: DataType) -> DataType:
-        if self.is_templated and template_type is not None:
+    def instantiate(self, template_type: DataType | None) -> DataType:
+        if self.is_templated and template_type:
             return DataType(template_type, is_templated=True)
         else:
             return self

@@ -10,7 +10,7 @@ class IdentifierExpression(Expression):
         self.__identifier = identifier
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
-        return IdentifierExpression(self._token)
+        return IdentifierExpression(self.__identifier)
 
     def _init(self, valid_types: set[DataType]) -> None:
         # raises exception if node is not found
