@@ -26,3 +26,6 @@ class GroupingExpression(Expression):
 
     def _evaluate(self) -> mx_utils.Node:
         return self.__expr.evaluate()
+
+    def __str__(self) -> str:
+        return f"({self.__expr})"

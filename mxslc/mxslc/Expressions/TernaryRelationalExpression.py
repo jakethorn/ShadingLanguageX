@@ -28,3 +28,6 @@ class TernaryRelationalExpression(Expression):
 
     def _evaluate(self) -> mx_utils.Node:
         return self.__and.evaluate()
+
+    def __str__(self) -> str:
+        raise NotImplementedError

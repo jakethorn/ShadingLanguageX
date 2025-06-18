@@ -26,3 +26,6 @@ class IndexingExpression(Expression):
         index = self.__indexer.evaluate()
         value = self.__expr.evaluate()
         return mx_utils.extract(value, index)
+
+    def __str__(self) -> str:
+        return f"{self.__expr}[{self.__indexer}]"

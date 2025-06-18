@@ -38,3 +38,11 @@ class LiteralExpression(Expression):
             return mx_utils.get_null_node(self.__null_type)
         else:
             return mx_utils.constant(self.__literal.value)
+
+    def __str__(self) -> str:
+        return str(self.__literal)
+
+
+class NullExpression(LiteralExpression):
+    def __init__(self):
+        super().__init__(Token(Keyword.NULL))

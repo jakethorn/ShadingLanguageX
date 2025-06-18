@@ -54,3 +54,6 @@ class SwizzleExpression(Expression):
         if "a" in self.__swizzle:
             return {COLOR4}
         raise CompileError(f"'{self.__swizzle}' is not a valid swizzle.", self.token)
+
+    def __str__(self) -> str:
+        return f"{self.__left}.{self.__swizzle}"

@@ -53,3 +53,6 @@ class ConstructorCall(Expression):
         while len(channels) < self.data_size:
             channels.append(mx_utils.constant(0.0))
         return mx_utils.combine(channels, self.data_type)
+
+    def __str__(self) -> str:
+        return f"{self.__data_type}({', '.join([str(a.expression) for a in self.__args])})"

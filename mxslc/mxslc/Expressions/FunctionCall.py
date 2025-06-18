@@ -52,3 +52,6 @@ class FunctionCall(Expression):
                 found_named = True
             if found_named and arg.is_positional:
                 raise CompileError("Named arguments must come after positional arguments.", self.__identifier)
+
+    def __str__(self) -> str:
+        return f"{self.__identifier}({', '.join([str(a.expression) for a in self.__args])})"

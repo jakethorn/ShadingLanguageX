@@ -26,3 +26,6 @@ class IdentifierExpression(Expression):
         new_node = mx_utils.create_node("dot", self.data_type)
         new_node.set_input("in", old_node)
         return new_node
+
+    def __str__(self) -> str:
+        return str(self.__identifier)

@@ -49,3 +49,6 @@ class UnaryExpression(Expression):
             return node
         else:
             return self.__right.evaluate()
+
+    def __str__(self) -> str:
+        return f"{self.__op} {self.__right}"

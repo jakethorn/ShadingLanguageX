@@ -71,3 +71,8 @@ class Token:
 
     def __hash__(self) -> int:
         return hash(self.type)
+
+
+class IdentifierToken(Token):
+    def __init__(self, lexeme: str, file: Path = None, line: int = None):
+        super().__init__(IDENTIFIER, lexeme, file, line)

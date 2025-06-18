@@ -19,3 +19,6 @@ class VariableDeclaration(Statement):
     def execute(self) -> None:
         node = self.__right.init_evaluate(self.__data_type)
         state.add_node(self.__identifier, node)
+
+    def __str__(self) -> str:
+        return f"{self.__data_type} {self.__identifier} = {self.__right};"

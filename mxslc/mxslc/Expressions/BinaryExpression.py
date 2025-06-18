@@ -17,6 +17,9 @@ class BinaryExpression(Expression, ABC):
         self._op = op
         self._right = right
 
+    def __str__(self) -> str:
+        return f"{self._left} {self._op} {self._right}"
+
 
 class ArithmeticExpression(BinaryExpression):
     def __init__(self, left: Expression, op: Token, right: Expression):
