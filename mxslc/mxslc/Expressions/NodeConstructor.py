@@ -36,3 +36,6 @@ class NodeConstructor(Expression):
         for arg in self.__args:
             node.set_input(arg.name, arg.evaluate())
         return node
+
+    def __str__(self) -> str:
+        return f'{{"{self.__category}", {self.__data_type}: {', '.join([a.name+"="+str(a.expression) for a in self.__args])}}}'

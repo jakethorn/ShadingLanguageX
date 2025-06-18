@@ -54,4 +54,4 @@ class FunctionCall(Expression):
                 raise CompileError("Named arguments must come after positional arguments.", self.__identifier)
 
     def __str__(self) -> str:
-        return f"{self.__identifier}({', '.join([str(a.expression) for a in self.__args])})"
+        return f"{self.__identifier}({', '.join([a.name+'='+str(a.expression) for a in self.__args])})"

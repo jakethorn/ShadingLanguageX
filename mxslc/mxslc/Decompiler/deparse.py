@@ -1,9 +1,13 @@
+import re
+from pathlib import Path
+
 import MaterialX as mx
 
 from ..Argument import Argument
 from ..DataType import DataType, BOOLEAN
 from ..Expressions import IdentifierExpression, LiteralExpression, Expression, ArithmeticExpression, \
-    ComparisonExpression, IfExpression, LogicExpression, UnaryExpression, ConstructorCall, IndexingExpression
+    ComparisonExpression, IfExpression, LogicExpression, UnaryExpression, ConstructorCall, IndexingExpression, \
+    SwitchExpression, FunctionCall
 from ..Expressions.LiteralExpression import NullExpression
 from ..Keyword import Keyword
 from ..Statements import Statement, VariableDeclaration
@@ -33,6 +37,10 @@ def _category_to_expression(category: str, data_type: DataType, args: list[Argum
     if category == "extract":
         return IndexingExpression(_get_expression(args, "in"), _get_expression(args, "index"))
 
+    if category == "switch":
+        values = [a.expression for a in args if "in" in a.name]
+        return SwitchExpression(Token(Keyword.SWITCH), _get_expression(args, "which"), values)
+
     if category in _arithmetic_ops:
         return ArithmeticExpression(_get_expression(args, 0), Token(_arithmetic_ops[category]), _get_expression(args, 1))
 
@@ -48,6 +56,8 @@ def _category_to_expression(category: str, data_type: DataType, args: list[Argum
     if category in _unary_ops:
         return UnaryExpression(Token(_unary_ops[category]), _get_expression(args, "in"))
 
+    if category in _get_stdlib_functions():
+        return FunctionCall(IdentifierToken(category), None, args)
 
     raise AssertionError
 
@@ -80,6 +90,13 @@ def _get_expression(args: list[Argument], index: int | str) -> Expression:
                 return arg.expression
         return NullExpression()
     raise AssertionError
+
+
+def _get_stdlib_functions() -> set[str]:
+    stdlib_defs_path = Path(__file__).parent.parent / "stdlib_defs.mxsl"
+    with open(stdlib_defs_path) as f:
+        stdlib_defs = f.read()
+    return {f.replace('"', '') for f in re.findall('"[a-z_]+"', stdlib_defs)}
 
 
 _arithmetic_ops = {
