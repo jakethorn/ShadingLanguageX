@@ -7,27 +7,28 @@ from ..Argument import Argument
 from ..DataType import DataType, BOOLEAN
 from ..Expressions import IdentifierExpression, LiteralExpression, Expression, ArithmeticExpression, \
     ComparisonExpression, IfExpression, LogicExpression, UnaryExpression, ConstructorCall, IndexingExpression, \
-    SwitchExpression, FunctionCall
+    SwitchExpression, FunctionCall, NodeConstructor
 from ..Expressions.LiteralExpression import NullExpression
 from ..Keyword import Keyword
 from ..Statements import Statement, VariableDeclaration
 from ..Token import IdentifierToken, Token
+from ..token_types import STRING_LITERAL
 
 
 def deparse(nodes: list[mx.Node]) -> list[Statement]:
-    ...
+    return [_de_execute(n) for n in nodes]
 
 
 def _de_execute(node: mx.Node) -> VariableDeclaration:
-    args = _inputs_to_arguments(node)
-
-    data_type = Token(node.getType())
+    category = node.getCategory()
     identifier = IdentifierToken(node.getName())
-    return VariableDeclaration(data_type, identifier)
+    data_type = DataType(node.getType())
+    args = _inputs_to_arguments(node)
+    expr = _build_expression(category, data_type, args)
+    return VariableDeclaration(data_type, identifier, expr)
 
 
-def _category_to_expression(category: str, data_type: DataType, args: list[Argument]) -> Expression:
-
+def _build_expression(category: str, data_type: DataType, args: list[Argument]) -> Expression:
     if category == "constant":
         return _get_expression(args, 0)
 
@@ -59,7 +60,8 @@ def _category_to_expression(category: str, data_type: DataType, args: list[Argum
     if category in _get_stdlib_functions():
         return FunctionCall(IdentifierToken(category), None, args)
 
-    raise AssertionError
+    category_token = Token(STRING_LITERAL, category)
+    return NodeConstructor(category_token, data_type, args)
 
 
 def _inputs_to_arguments(node: mx.Node) -> list[Argument]:
@@ -93,10 +95,13 @@ def _get_expression(args: list[Argument], index: int | str) -> Expression:
 
 
 def _get_stdlib_functions() -> set[str]:
-    stdlib_defs_path = Path(__file__).parent.parent / "stdlib_defs.mxsl"
-    with open(stdlib_defs_path) as f:
-        stdlib_defs = f.read()
-    return {f.replace('"', '') for f in re.findall('"[a-z_]+"', stdlib_defs)}
+    global _stdlib_functions
+    if len(_stdlib_functions) == 0:
+        stdlib_defs_path = Path(__file__).parent.parent / "stdlib" / "stdlib_defs.mxsl"
+        with open(stdlib_defs_path) as f:
+            stdlib_defs = f.read()
+        _stdlib_functions = {f.replace('"', '') for f in re.findall('"[a-z_]+"', stdlib_defs)}
+    return _stdlib_functions
 
 
 _arithmetic_ops = {
@@ -122,3 +127,5 @@ _logic_ops = {
 _unary_ops = {
     "not": "!",
 }
+
+_stdlib_functions: set[str] = set()
