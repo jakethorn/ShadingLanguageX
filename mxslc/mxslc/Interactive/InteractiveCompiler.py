@@ -7,7 +7,7 @@ from .ShaderInterface import ShaderInterface
 from .. import mx_utils, state
 from ..Preprocessor.macros import undefine_all_macros
 from ..compile import compile_
-from ..file_utils import handle_mxsl_path
+from ..file_utils import handle_input_path
 from ..post_process import post_process
 
 
@@ -28,7 +28,7 @@ class InteractiveCompiler:
         return ShaderInterface()
 
     def include(self, mxsl_path: str | Path) -> None:
-        mxsl_filepaths = handle_mxsl_path(mxsl_path)
+        mxsl_filepaths = handle_input_path(mxsl_path)
 
         for mxsl_filepath in mxsl_filepaths:
             include_dirs = [*self.__add_include_dirs, mxsl_filepath.parent, Path(".")]

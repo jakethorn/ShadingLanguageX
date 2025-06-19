@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="main__p" type="vector3" />
+  <combine3 name="node6" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="50" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <add name="main__p2" type="vector3">
+    <input name="in1" type="vector3" nodename="main__p" />
+    <input name="in2" type="vector3" nodename="node6" />
+  </add>
+  <extract name="node8" type="float">
+    <input name="in" type="vector3" nodename="main__p2" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node9" type="float">
+    <input name="in" type="vector3" nodename="main__p2" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <combine2 name="node10" type="vector2">
+    <input name="in1" type="float" nodename="node8" />
+    <input name="in2" type="float" nodename="node9" />
+  </combine2>
+  <multiply name="main__uv" type="vector2">
+    <input name="in1" type="vector2" nodename="node10" />
+    <input name="in2" type="float" value="5" />
+  </multiply>
+  <noise2d name="main__noise" type="float">
+    <input name="amplitude" type="float" value="0.5" />
+    <input name="pivot" type="float" value="0" />
+    <input name="texcoord" type="vector2" nodename="main__uv" />
+  </noise2d>
+  <combine3 name="main__fire" type="color3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0.2" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <ifgreater name="node20" type="float">
+    <input name="value1" type="float" nodename="main__noise" />
+    <input name="value2" type="float" value="0.1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <multiply name="node24" type="color3">
+    <input name="in1" type="color3" nodename="main__fire" />
+    <input name="in2" type="float" nodename="main__noise" />
+  </multiply>
+  <ifequal name="main__color" type="color3">
+    <input name="value1" type="float" nodename="node20" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="main__fire" />
+    <input name="in2" type="color3" nodename="node24" />
+  </ifequal>
+  <multiply name="node28" type="float">
+    <input name="in1" type="float" nodename="main__noise" />
+    <input name="in2" type="float" value="4" />
+  </multiply>
+  <subtract name="main__opacity" type="float">
+    <input name="in1" type="float" value="0.9" />
+    <input name="in2" type="float" nodename="node28" />
+  </subtract>
+  <standard_surface name="main__surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="main__color" />
+    <input name="opacity" type="color3" nodename="node73" />
+  </standard_surface>
+  <convert name="node73" type="color3">
+    <input name="in" type="float" nodename="main__opacity" />
+  </convert>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="main__surface" />
+  </surfacematerial>
+</materialx>

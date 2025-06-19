@@ -5,7 +5,7 @@ from . import mx_utils, state
 from .Interactive.ShaderInterface import ShaderInterface
 from .Preprocessor.macros import undefine_all_macros, Macro, define_macro
 from .compile import compile_
-from .file_utils import handle_mxsl_path, handle_mtlx_path
+from .file_utils import handle_input_path, handle_output_path
 from .post_process import post_process
 
 
@@ -20,10 +20,10 @@ def compile_file(mxsl_path: str | Path,
     add_include_dirs = add_include_dirs or []
     add_macros = add_macros or []
 
-    mxsl_filepaths = handle_mxsl_path(mxsl_path)
+    mxsl_filepaths = handle_input_path(mxsl_path)
 
     for mxsl_filepath in mxsl_filepaths:
-        mtlx_filepath = handle_mtlx_path(mtlx_path, mxsl_filepath)
+        mtlx_filepath = handle_output_path(mtlx_path, mxsl_filepath)
 
         undefine_all_macros()
         mx_utils.clear()

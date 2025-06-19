@@ -23,3 +23,16 @@ def init_linked_expressions(expr1: Expression, expr2: Expression, valid_types: s
         expr2.init(expr1.data_type)
     if expr1.data_type != expr2.data_type:
         raise CompileError(f"Expressions must evaluate to the same type, but were `{expr1.data_type}` and `{expr2.data_type}`.", expr1.token)
+
+
+def format_args(args: list["Argument"], *, with_names: bool) -> str:
+    result = ""
+    if len(args) == 0:
+        return result
+    for arg in args:
+        if with_names and arg.name:
+            result += f"{arg.name}={arg.expression}"
+        else:
+            result += f"{arg.expression}"
+        result += ", "
+    return result[:-2]

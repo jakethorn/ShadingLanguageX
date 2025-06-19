@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="node1" type="vector2" />
+  <multiply name="main__scaled_uv" type="vector2">
+    <input name="in1" type="vector2" nodename="node1" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <extract name="floor__in" type="float">
+    <input name="in" type="vector2" nodename="main__scaled_uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <floor name="node5" type="float">
+    <input name="in" type="float" nodename="floor__in" />
+  </floor>
+  <extract name="floor__in2" type="float">
+    <input name="in" type="vector2" nodename="main__scaled_uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <floor name="node8" type="float">
+    <input name="in" type="float" nodename="floor__in2" />
+  </floor>
+  <multiply name="node11" type="float">
+    <input name="in1" type="float" nodename="node8" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <add name="main__seed" type="float">
+    <input name="in1" type="float" nodename="node5" />
+    <input name="in2" type="float" nodename="node11" />
+  </add>
+  <randomcolor name="main__c" type="color3">
+    <input name="in" type="float" nodename="main__seed" />
+  </randomcolor>
+  <standard_surface name="node12" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="main__c" />
+  </standard_surface>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="node12" />
+  </surfacematerial>
+</materialx>

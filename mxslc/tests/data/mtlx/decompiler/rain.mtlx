@@ -1,0 +1,1470 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="node2" type="vector2" />
+  <convert name="node4" type="vector2">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <subtract name="background__uv" type="vector2">
+    <input name="in1" type="vector2" nodename="node4" />
+    <input name="in2" type="vector2" nodename="node2" />
+  </subtract>
+  <extract name="randomfloat__in" type="float">
+    <input name="in" type="vector2" nodename="background__uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <subtract name="randomfloat__min" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="background__rx" type="float">
+    <input name="in" type="float" nodename="randomfloat__in" />
+    <input name="min" type="float" nodename="randomfloat__min" />
+    <input name="max" type="float" value="0.01" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <extract name="randomfloat__in2" type="float">
+    <input name="in" type="vector2" nodename="background__uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <subtract name="randomfloat__min2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="background__ry" type="float">
+    <input name="in" type="float" nodename="randomfloat__in2" />
+    <input name="min" type="float" nodename="randomfloat__min2" />
+    <input name="max" type="float" value="0.01" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="background__r" type="vector2">
+    <input name="in1" type="float" nodename="background__rx" />
+    <input name="in2" type="float" nodename="background__ry" />
+  </combine2>
+  <add name="background__ruv" type="vector2">
+    <input name="in1" type="vector2" nodename="background__uv" />
+    <input name="in2" type="vector2" nodename="background__r" />
+  </add>
+  <multiply name="noise2d__texcoord" type="vector2">
+    <input name="in1" type="vector2" nodename="background__uv" />
+    <input name="in2" type="float" value="100" />
+  </multiply>
+  <noise2d name="background__n" type="float">
+    <input name="amplitude" type="float" value="5" />
+    <input name="pivot" type="float" value="0" />
+    <input name="texcoord" type="vector2" nodename="noise2d__texcoord" />
+  </noise2d>
+  <mix name="background__m" type="vector2">
+    <input name="fg" type="vector2" nodename="background__ruv" />
+    <input name="bg" type="vector2" nodename="background__uv" />
+    <input name="mix" type="float" nodename="background__n" />
+  </mix>
+  <clamp name="image__texcoord" type="vector2">
+    <input name="in" type="vector2" nodename="background__m" />
+  </clamp>
+  <image name="background__c" type="color3">
+    <input name="file" type="filename" value="textures\skyline.png" />
+    <input name="texcoord" type="vector2" nodename="image__texcoord" />
+  </image>
+  <multiply name="global__TAIL_SIZE" type="float">
+    <input name="in1" type="float" value="0.015" />
+    <input name="in2" type="float" value="0.9" />
+  </multiply>
+  <texcoord name="global__UV" type="vector2" />
+  <divide name="global__INV_NUM_DROPS" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="10" />
+  </divide>
+  <extract name="node45" type="float">
+    <input name="in" type="vector2" nodename="global__UV" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node47" type="float">
+    <input name="in" type="vector2" nodename="global__UV" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <modulo name="node49" type="float">
+    <input name="in1" type="float" nodename="node47" />
+    <input name="in2" type="float" nodename="global__INV_NUM_DROPS" />
+  </modulo>
+  <subtract name="global__CHANNEL" type="float">
+    <input name="in1" type="float" nodename="node45" />
+    <input name="in2" type="float" nodename="node49" />
+  </subtract>
+  <divide name="global__HALF_CHANNEL" type="float">
+    <input name="in1" type="float" nodename="global__INV_NUM_DROPS" />
+    <input name="in2" type="float" value="2" />
+  </divide>
+  <add name="global__CHANNEL_MIDDLE" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL" />
+    <input name="in2" type="float" nodename="global__HALF_CHANNEL" />
+  </add>
+  <subtract name="node55" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="global__HALF_CHANNEL" />
+  </subtract>
+  <add name="global__CHANNEL_LEFT" type="float">
+    <input name="in1" type="float" nodename="node55" />
+    <input name="in2" type="float" value="0.015" />
+  </add>
+  <subtract name="global__CHANNEL_RGHT" type="float">
+    <input name="in1" type="float" nodename="global__HALF_CHANNEL" />
+    <input name="in2" type="float" value="0.015" />
+  </subtract>
+  <randomfloat name="node60" type="float">
+    <input name="in" type="float" nodename="global__CHANNEL" />
+  </randomfloat>
+  <multiply name="node66" type="float">
+    <input name="in1" type="float" nodename="node60" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <add name="global__progress2" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL" />
+    <input name="in2" type="float" nodename="node66" />
+  </add>
+  <time name="node68" type="float" />
+  <divide name="node71" type="float">
+    <input name="in1" type="float" nodename="node68" />
+    <input name="in2" type="float" value="5" />
+  </divide>
+  <add name="global__progress3" type="float">
+    <input name="in1" type="float" nodename="global__progress2" />
+    <input name="in2" type="float" nodename="node71" />
+  </add>
+  <modulo name="global__progress4" type="float">
+    <input name="in1" type="float" nodename="global__progress3" />
+    <input name="in2" type="float" value="2" />
+  </modulo>
+  <combine2 name="global__tail_pos" type="vector2">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0" />
+  </combine2>
+  <divide name="_loop___fn" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node81" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node82" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="node81" />
+  </subtract>
+  <add name="randomfloat__in4" type="float">
+    <input name="in1" type="float" nodename="node82" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min3" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s" type="float">
+    <input name="in" type="float" nodename="randomfloat__in4" />
+    <input name="min" type="float" nodename="randomfloat__min3" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node91" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node94" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="_loop___s" />
+  </add>
+  <ifequal name="global__sway2" type="float">
+    <input name="value1" type="float" nodename="node91" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node94" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <clamp name="global__sway3" type="float">
+    <input name="in" type="float" nodename="global__sway2" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node101" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway3" />
+  </add>
+  <combine2 name="_loop___tail_pos1" type="vector2">
+    <input name="in1" type="float" nodename="node101" />
+    <input name="in2" type="float" nodename="_loop___fn" />
+  </combine2>
+  <distance name="_loop___to_tail" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos1" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node108" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node111" type="float">
+    <input name="value1" type="float" nodename="node108" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="node111" />
+  </add>
+  <ifgreatereq name="node114" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos2" type="vector2">
+    <input name="value1" type="float" nodename="node114" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos1" />
+    <input name="in2" type="vector2" nodename="global__tail_pos" />
+  </ifequal>
+  <divide name="_loop___fn2" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node122" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node123" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="node122" />
+  </subtract>
+  <add name="randomfloat__in5" type="float">
+    <input name="in1" type="float" nodename="node123" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min4" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s2" type="float">
+    <input name="in" type="float" nodename="randomfloat__in5" />
+    <input name="min" type="float" nodename="randomfloat__min4" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node132" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn2" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node135" type="float">
+    <input name="in1" type="float" nodename="global__sway3" />
+    <input name="in2" type="float" nodename="_loop___s2" />
+  </add>
+  <ifequal name="global__sway4" type="float">
+    <input name="value1" type="float" nodename="node132" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node135" />
+    <input name="in2" type="float" nodename="global__sway3" />
+  </ifequal>
+  <clamp name="global__sway5" type="float">
+    <input name="in" type="float" nodename="global__sway4" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node142" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway5" />
+  </add>
+  <combine2 name="_loop___tail_pos2" type="vector2">
+    <input name="in1" type="float" nodename="node142" />
+    <input name="in2" type="float" nodename="_loop___fn2" />
+  </combine2>
+  <distance name="_loop___to_tail2" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos2" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node149" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail2" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node152" type="float">
+    <input name="value1" type="float" nodename="node149" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail3" type="float">
+    <input name="in1" type="float" nodename="global__tail2" />
+    <input name="in2" type="float" nodename="node152" />
+  </add>
+  <ifgreatereq name="node155" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail2" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos3" type="vector2">
+    <input name="value1" type="float" nodename="node155" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos2" />
+    <input name="in2" type="vector2" nodename="global__tail_pos2" />
+  </ifequal>
+  <divide name="_loop___fn3" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node163" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node164" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" nodename="node163" />
+  </subtract>
+  <add name="randomfloat__in6" type="float">
+    <input name="in1" type="float" nodename="node164" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min5" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s3" type="float">
+    <input name="in" type="float" nodename="randomfloat__in6" />
+    <input name="min" type="float" nodename="randomfloat__min5" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node173" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn3" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node176" type="float">
+    <input name="in1" type="float" nodename="global__sway5" />
+    <input name="in2" type="float" nodename="_loop___s3" />
+  </add>
+  <ifequal name="global__sway6" type="float">
+    <input name="value1" type="float" nodename="node173" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node176" />
+    <input name="in2" type="float" nodename="global__sway5" />
+  </ifequal>
+  <clamp name="global__sway7" type="float">
+    <input name="in" type="float" nodename="global__sway6" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node183" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway7" />
+  </add>
+  <combine2 name="_loop___tail_pos3" type="vector2">
+    <input name="in1" type="float" nodename="node183" />
+    <input name="in2" type="float" nodename="_loop___fn3" />
+  </combine2>
+  <distance name="_loop___to_tail3" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos3" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node190" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail3" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node193" type="float">
+    <input name="value1" type="float" nodename="node190" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail4" type="float">
+    <input name="in1" type="float" nodename="global__tail3" />
+    <input name="in2" type="float" nodename="node193" />
+  </add>
+  <ifgreatereq name="node196" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail3" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos4" type="vector2">
+    <input name="value1" type="float" nodename="node196" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos3" />
+    <input name="in2" type="vector2" nodename="global__tail_pos3" />
+  </ifequal>
+  <divide name="_loop___fn4" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node204" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node205" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" nodename="node204" />
+  </subtract>
+  <add name="randomfloat__in7" type="float">
+    <input name="in1" type="float" nodename="node205" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min6" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s4" type="float">
+    <input name="in" type="float" nodename="randomfloat__in7" />
+    <input name="min" type="float" nodename="randomfloat__min6" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node214" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn4" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node217" type="float">
+    <input name="in1" type="float" nodename="global__sway7" />
+    <input name="in2" type="float" nodename="_loop___s4" />
+  </add>
+  <ifequal name="global__sway8" type="float">
+    <input name="value1" type="float" nodename="node214" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node217" />
+    <input name="in2" type="float" nodename="global__sway7" />
+  </ifequal>
+  <clamp name="global__sway9" type="float">
+    <input name="in" type="float" nodename="global__sway8" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node224" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway9" />
+  </add>
+  <combine2 name="_loop___tail_pos4" type="vector2">
+    <input name="in1" type="float" nodename="node224" />
+    <input name="in2" type="float" nodename="_loop___fn4" />
+  </combine2>
+  <distance name="_loop___to_tail4" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos4" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node231" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail4" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node234" type="float">
+    <input name="value1" type="float" nodename="node231" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail5" type="float">
+    <input name="in1" type="float" nodename="global__tail4" />
+    <input name="in2" type="float" nodename="node234" />
+  </add>
+  <ifgreatereq name="node237" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail4" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos5" type="vector2">
+    <input name="value1" type="float" nodename="node237" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos4" />
+    <input name="in2" type="vector2" nodename="global__tail_pos4" />
+  </ifequal>
+  <divide name="_loop___fn5" type="float">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node245" type="float">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node246" type="float">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" nodename="node245" />
+  </subtract>
+  <add name="randomfloat__in8" type="float">
+    <input name="in1" type="float" nodename="node246" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min7" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s5" type="float">
+    <input name="in" type="float" nodename="randomfloat__in8" />
+    <input name="min" type="float" nodename="randomfloat__min7" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node255" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn5" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node258" type="float">
+    <input name="in1" type="float" nodename="global__sway9" />
+    <input name="in2" type="float" nodename="_loop___s5" />
+  </add>
+  <ifequal name="global__sway10" type="float">
+    <input name="value1" type="float" nodename="node255" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node258" />
+    <input name="in2" type="float" nodename="global__sway9" />
+  </ifequal>
+  <clamp name="global__sway11" type="float">
+    <input name="in" type="float" nodename="global__sway10" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node265" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway11" />
+  </add>
+  <combine2 name="_loop___tail_pos5" type="vector2">
+    <input name="in1" type="float" nodename="node265" />
+    <input name="in2" type="float" nodename="_loop___fn5" />
+  </combine2>
+  <distance name="_loop___to_tail5" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos5" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node272" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail5" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node275" type="float">
+    <input name="value1" type="float" nodename="node272" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail6" type="float">
+    <input name="in1" type="float" nodename="global__tail5" />
+    <input name="in2" type="float" nodename="node275" />
+  </add>
+  <ifgreatereq name="node278" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail5" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos6" type="vector2">
+    <input name="value1" type="float" nodename="node278" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos5" />
+    <input name="in2" type="vector2" nodename="global__tail_pos5" />
+  </ifequal>
+  <divide name="_loop___fn6" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node286" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node287" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" nodename="node286" />
+  </subtract>
+  <add name="randomfloat__in9" type="float">
+    <input name="in1" type="float" nodename="node287" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min8" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s6" type="float">
+    <input name="in" type="float" nodename="randomfloat__in9" />
+    <input name="min" type="float" nodename="randomfloat__min8" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node296" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn6" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node299" type="float">
+    <input name="in1" type="float" nodename="global__sway11" />
+    <input name="in2" type="float" nodename="_loop___s6" />
+  </add>
+  <ifequal name="global__sway12" type="float">
+    <input name="value1" type="float" nodename="node296" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node299" />
+    <input name="in2" type="float" nodename="global__sway11" />
+  </ifequal>
+  <clamp name="global__sway13" type="float">
+    <input name="in" type="float" nodename="global__sway12" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node306" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway13" />
+  </add>
+  <combine2 name="_loop___tail_pos6" type="vector2">
+    <input name="in1" type="float" nodename="node306" />
+    <input name="in2" type="float" nodename="_loop___fn6" />
+  </combine2>
+  <distance name="_loop___to_tail6" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos6" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node313" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail6" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node316" type="float">
+    <input name="value1" type="float" nodename="node313" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail7" type="float">
+    <input name="in1" type="float" nodename="global__tail6" />
+    <input name="in2" type="float" nodename="node316" />
+  </add>
+  <ifgreatereq name="node319" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail6" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos7" type="vector2">
+    <input name="value1" type="float" nodename="node319" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos6" />
+    <input name="in2" type="vector2" nodename="global__tail_pos6" />
+  </ifequal>
+  <divide name="_loop___fn7" type="float">
+    <input name="in1" type="float" value="6" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node327" type="float">
+    <input name="in1" type="float" value="6" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node328" type="float">
+    <input name="in1" type="float" value="6" />
+    <input name="in2" type="float" nodename="node327" />
+  </subtract>
+  <add name="randomfloat__in10" type="float">
+    <input name="in1" type="float" nodename="node328" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min9" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s7" type="float">
+    <input name="in" type="float" nodename="randomfloat__in10" />
+    <input name="min" type="float" nodename="randomfloat__min9" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node337" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn7" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node340" type="float">
+    <input name="in1" type="float" nodename="global__sway13" />
+    <input name="in2" type="float" nodename="_loop___s7" />
+  </add>
+  <ifequal name="global__sway14" type="float">
+    <input name="value1" type="float" nodename="node337" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node340" />
+    <input name="in2" type="float" nodename="global__sway13" />
+  </ifequal>
+  <clamp name="global__sway15" type="float">
+    <input name="in" type="float" nodename="global__sway14" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node347" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway15" />
+  </add>
+  <combine2 name="_loop___tail_pos7" type="vector2">
+    <input name="in1" type="float" nodename="node347" />
+    <input name="in2" type="float" nodename="_loop___fn7" />
+  </combine2>
+  <distance name="_loop___to_tail7" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos7" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node354" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail7" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node357" type="float">
+    <input name="value1" type="float" nodename="node354" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail8" type="float">
+    <input name="in1" type="float" nodename="global__tail7" />
+    <input name="in2" type="float" nodename="node357" />
+  </add>
+  <ifgreatereq name="node360" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail7" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos8" type="vector2">
+    <input name="value1" type="float" nodename="node360" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos7" />
+    <input name="in2" type="vector2" nodename="global__tail_pos7" />
+  </ifequal>
+  <divide name="_loop___fn8" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node368" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node369" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" nodename="node368" />
+  </subtract>
+  <add name="randomfloat__in11" type="float">
+    <input name="in1" type="float" nodename="node369" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min10" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s8" type="float">
+    <input name="in" type="float" nodename="randomfloat__in11" />
+    <input name="min" type="float" nodename="randomfloat__min10" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node378" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn8" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node381" type="float">
+    <input name="in1" type="float" nodename="global__sway15" />
+    <input name="in2" type="float" nodename="_loop___s8" />
+  </add>
+  <ifequal name="global__sway16" type="float">
+    <input name="value1" type="float" nodename="node378" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node381" />
+    <input name="in2" type="float" nodename="global__sway15" />
+  </ifequal>
+  <clamp name="global__sway17" type="float">
+    <input name="in" type="float" nodename="global__sway16" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node388" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway17" />
+  </add>
+  <combine2 name="_loop___tail_pos8" type="vector2">
+    <input name="in1" type="float" nodename="node388" />
+    <input name="in2" type="float" nodename="_loop___fn8" />
+  </combine2>
+  <distance name="_loop___to_tail8" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos8" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node395" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail8" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node398" type="float">
+    <input name="value1" type="float" nodename="node395" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail9" type="float">
+    <input name="in1" type="float" nodename="global__tail8" />
+    <input name="in2" type="float" nodename="node398" />
+  </add>
+  <ifgreatereq name="node401" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail8" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos9" type="vector2">
+    <input name="value1" type="float" nodename="node401" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos8" />
+    <input name="in2" type="vector2" nodename="global__tail_pos8" />
+  </ifequal>
+  <divide name="_loop___fn9" type="float">
+    <input name="in1" type="float" value="8" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node409" type="float">
+    <input name="in1" type="float" value="8" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node410" type="float">
+    <input name="in1" type="float" value="8" />
+    <input name="in2" type="float" nodename="node409" />
+  </subtract>
+  <add name="randomfloat__in12" type="float">
+    <input name="in1" type="float" nodename="node410" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min11" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s9" type="float">
+    <input name="in" type="float" nodename="randomfloat__in12" />
+    <input name="min" type="float" nodename="randomfloat__min11" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node419" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn9" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node422" type="float">
+    <input name="in1" type="float" nodename="global__sway17" />
+    <input name="in2" type="float" nodename="_loop___s9" />
+  </add>
+  <ifequal name="global__sway18" type="float">
+    <input name="value1" type="float" nodename="node419" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node422" />
+    <input name="in2" type="float" nodename="global__sway17" />
+  </ifequal>
+  <clamp name="global__sway19" type="float">
+    <input name="in" type="float" nodename="global__sway18" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node429" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway19" />
+  </add>
+  <combine2 name="_loop___tail_pos9" type="vector2">
+    <input name="in1" type="float" nodename="node429" />
+    <input name="in2" type="float" nodename="_loop___fn9" />
+  </combine2>
+  <distance name="_loop___to_tail9" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos9" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node436" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail9" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node439" type="float">
+    <input name="value1" type="float" nodename="node436" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail10" type="float">
+    <input name="in1" type="float" nodename="global__tail9" />
+    <input name="in2" type="float" nodename="node439" />
+  </add>
+  <ifgreatereq name="node442" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail9" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos10" type="vector2">
+    <input name="value1" type="float" nodename="node442" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos9" />
+    <input name="in2" type="vector2" nodename="global__tail_pos9" />
+  </ifequal>
+  <divide name="_loop___fn10" type="float">
+    <input name="in1" type="float" value="9" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node450" type="float">
+    <input name="in1" type="float" value="9" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node451" type="float">
+    <input name="in1" type="float" value="9" />
+    <input name="in2" type="float" nodename="node450" />
+  </subtract>
+  <add name="randomfloat__in13" type="float">
+    <input name="in1" type="float" nodename="node451" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min12" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s10" type="float">
+    <input name="in" type="float" nodename="randomfloat__in13" />
+    <input name="min" type="float" nodename="randomfloat__min12" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node460" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn10" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node463" type="float">
+    <input name="in1" type="float" nodename="global__sway19" />
+    <input name="in2" type="float" nodename="_loop___s10" />
+  </add>
+  <ifequal name="global__sway20" type="float">
+    <input name="value1" type="float" nodename="node460" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node463" />
+    <input name="in2" type="float" nodename="global__sway19" />
+  </ifequal>
+  <clamp name="global__sway21" type="float">
+    <input name="in" type="float" nodename="global__sway20" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node470" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway21" />
+  </add>
+  <combine2 name="_loop___tail_pos10" type="vector2">
+    <input name="in1" type="float" nodename="node470" />
+    <input name="in2" type="float" nodename="_loop___fn10" />
+  </combine2>
+  <distance name="_loop___to_tail10" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos10" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node477" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail10" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node480" type="float">
+    <input name="value1" type="float" nodename="node477" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail11" type="float">
+    <input name="in1" type="float" nodename="global__tail10" />
+    <input name="in2" type="float" nodename="node480" />
+  </add>
+  <ifgreatereq name="node483" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail10" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos11" type="vector2">
+    <input name="value1" type="float" nodename="node483" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos10" />
+    <input name="in2" type="vector2" nodename="global__tail_pos10" />
+  </ifequal>
+  <divide name="_loop___fn11" type="float">
+    <input name="in1" type="float" value="10" />
+    <input name="in2" type="float" value="100" />
+  </divide>
+  <modulo name="node491" type="float">
+    <input name="in1" type="float" value="10" />
+    <input name="in2" type="float" value="3" />
+  </modulo>
+  <subtract name="node492" type="float">
+    <input name="in1" type="float" value="10" />
+    <input name="in2" type="float" nodename="node491" />
+  </subtract>
+  <add name="randomfloat__in14" type="float">
+    <input name="in1" type="float" nodename="node492" />
+    <input name="in2" type="float" nodename="global__CHANNEL" />
+  </add>
+  <subtract name="randomfloat__min13" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="_loop___s11" type="float">
+    <input name="in" type="float" nodename="randomfloat__in14" />
+    <input name="min" type="float" nodename="randomfloat__min13" />
+    <input name="max" type="float" value="0.01" />
+  </randomfloat>
+  <ifgreater name="node501" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="_loop___fn11" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <add name="node504" type="float">
+    <input name="in1" type="float" nodename="global__sway21" />
+    <input name="in2" type="float" nodename="_loop___s11" />
+  </add>
+  <ifequal name="global__sway22" type="float">
+    <input name="value1" type="float" nodename="node501" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node504" />
+    <input name="in2" type="float" nodename="global__sway21" />
+  </ifequal>
+  <clamp name="global__sway23" type="float">
+    <input name="in" type="float" nodename="global__sway22" />
+    <input name="low" type="float" nodename="global__CHANNEL_LEFT" />
+    <input name="high" type="float" nodename="global__CHANNEL_RGHT" />
+  </clamp>
+  <add name="node511" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway23" />
+  </add>
+  <combine2 name="_loop___tail_pos11" type="vector2">
+    <input name="in1" type="float" nodename="node511" />
+    <input name="in2" type="float" nodename="_loop___fn11" />
+  </combine2>
+  <distance name="_loop___to_tail11" type="float">
+    <input name="in1" type="vector2" nodename="_loop___tail_pos11" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node518" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail11" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="node521" type="float">
+    <input name="value1" type="float" nodename="node518" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <add name="global__tail12" type="float">
+    <input name="in1" type="float" nodename="global__tail11" />
+    <input name="in2" type="float" nodename="node521" />
+  </add>
+  <ifgreatereq name="node524" type="float">
+    <input name="value1" type="float" nodename="global__TAIL_SIZE" />
+    <input name="value2" type="float" nodename="_loop___to_tail11" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__tail_pos12" type="vector2">
+    <input name="value1" type="float" nodename="node524" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="_loop___tail_pos11" />
+    <input name="in2" type="vector2" nodename="global__tail_pos11" />
+  </ifequal>
+  <add name="node529" type="float">
+    <input name="in1" type="float" nodename="global__CHANNEL_MIDDLE" />
+    <input name="in2" type="float" nodename="global__sway23" />
+  </add>
+  <combine2 name="global__drop_pos" type="vector2">
+    <input name="in1" type="float" nodename="node529" />
+    <input name="in2" type="float" nodename="global__progress4" />
+  </combine2>
+  <distance name="global__to_drop" type="float">
+    <input name="in1" type="vector2" nodename="global__drop_pos" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <ifgreatereq name="node535" type="float">
+    <input name="value1" type="float" value="0.015" />
+    <input name="value2" type="float" nodename="global__to_drop" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__drop" type="float">
+    <input name="value1" type="float" nodename="node535" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <extract name="node539" type="float">
+    <input name="in" type="vector2" nodename="global__tail_pos12" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <ifgreatereq name="node541" type="float">
+    <input name="value1" type="float" nodename="global__progress4" />
+    <input name="value2" type="float" nodename="node539" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <clamp name="node542" type="float">
+    <input name="in" type="float" nodename="global__tail12" />
+  </clamp>
+  <ifequal name="node547" type="float">
+    <input name="value1" type="float" nodename="node541" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" nodename="node542" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <subtract name="node550" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="global__drop" />
+  </subtract>
+  <multiply name="global__in_tail" type="float">
+    <input name="in1" type="float" nodename="node547" />
+    <input name="in2" type="float" nodename="node550" />
+  </multiply>
+  <extract name="node554" type="float">
+    <input name="in" type="vector2" nodename="global__UV" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <subtract name="node555" type="float">
+    <input name="in1" type="float" nodename="global__progress4" />
+    <input name="in2" type="float" nodename="node554" />
+  </subtract>
+  <divide name="node558" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1.25" />
+  </divide>
+  <multiply name="node559" type="float">
+    <input name="in1" type="float" nodename="node555" />
+    <input name="in2" type="float" nodename="node558" />
+  </multiply>
+  <multiply name="node561" type="float">
+    <input name="in1" type="float" nodename="node559" />
+    <input name="in2" type="float" nodename="global__in_tail" />
+  </multiply>
+  <subtract name="global__tail14" type="float">
+    <input name="in1" type="float" nodename="global__in_tail" />
+    <input name="in2" type="float" nodename="node561" />
+  </subtract>
+  <clamp name="global__tail15" type="float">
+    <input name="in" type="float" nodename="global__tail14" />
+  </clamp>
+  <distance name="global__to_tail" type="float">
+    <input name="in1" type="vector2" nodename="global__tail_pos12" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </distance>
+  <extract name="node568" type="float">
+    <input name="in" type="vector2" nodename="global__tail_pos12" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node570" type="float">
+    <input name="in" type="vector2" nodename="global__UV" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <subtract name="node571" type="float">
+    <input name="in1" type="float" nodename="node568" />
+    <input name="in2" type="float" nodename="node570" />
+  </subtract>
+  <divide name="node573" type="float">
+    <input name="in1" type="float" nodename="node571" />
+    <input name="in2" type="float" nodename="global__TAIL_SIZE" />
+  </divide>
+  <combine2 name="global__tail_norm" type="vector2">
+    <input name="in1" type="float" nodename="node573" />
+    <input name="in2" type="float" value="0" />
+  </combine2>
+  <ifgreater name="node577" type="float">
+    <input name="value1" type="float" nodename="global__in_tail" />
+    <input name="value2" type="float" value="0.5" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <combine2 name="node581" type="vector2">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0" />
+  </combine2>
+  <ifequal name="global__tail_norm2" type="vector2">
+    <input name="value1" type="float" nodename="node577" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="global__tail_norm" />
+    <input name="in2" type="vector2" nodename="node581" />
+  </ifequal>
+  <combine2 name="mix__fg2" type="vector2">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0" />
+  </combine2>
+  <mix name="global__tail_norm3" type="vector2">
+    <input name="fg" type="vector2" nodename="mix__fg2" />
+    <input name="bg" type="vector2" nodename="global__tail_norm2" />
+    <input name="mix" type="float" nodename="global__tail15" />
+  </mix>
+  <subtract name="node589" type="vector2">
+    <input name="in1" type="vector2" nodename="global__drop_pos" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </subtract>
+  <divide name="global__drop_norm" type="vector2">
+    <input name="in1" type="vector2" nodename="node589" />
+    <input name="in2" type="float" value="0.015" />
+  </divide>
+  <ifgreatereq name="node593" type="float">
+    <input name="value1" type="float" value="0.015" />
+    <input name="value2" type="float" nodename="global__to_drop" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <combine2 name="node597" type="vector2">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0" />
+  </combine2>
+  <ifequal name="global__drop_norm2" type="vector2">
+    <input name="value1" type="float" nodename="node593" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="global__drop_norm" />
+    <input name="in2" type="vector2" nodename="node597" />
+  </ifequal>
+  <convert name="node600" type="vector2">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <subtract name="global__inv_uv" type="vector2">
+    <input name="in1" type="vector2" nodename="node600" />
+    <input name="in2" type="vector2" nodename="global__UV" />
+  </subtract>
+  <extract name="node602" type="float">
+    <input name="in" type="vector2" nodename="global__inv_uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node604" type="float">
+    <input name="in" type="vector2" nodename="global__UV" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node606" type="float">
+    <input name="in" type="vector2" nodename="global__tail_pos12" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <subtract name="node607" type="float">
+    <input name="in1" type="float" nodename="node604" />
+    <input name="in2" type="float" nodename="node606" />
+  </subtract>
+  <multiply name="node609" type="float">
+    <input name="in1" type="float" nodename="node607" />
+    <input name="in2" type="float" value="5" />
+  </multiply>
+  <add name="node610" type="float">
+    <input name="in1" type="float" nodename="node602" />
+    <input name="in2" type="float" nodename="node609" />
+  </add>
+  <extract name="node612" type="float">
+    <input name="in" type="vector2" nodename="global__inv_uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <combine2 name="global__tail_uv" type="vector2">
+    <input name="in1" type="float" nodename="node610" />
+    <input name="in2" type="float" nodename="node612" />
+  </combine2>
+  <extract name="node614" type="float">
+    <input name="in" type="vector2" nodename="global__tail_uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="randomfloat__in15" type="float">
+    <input name="in" type="vector2" nodename="global__UV" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <subtract name="randomfloat__min14" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.01" />
+  </subtract>
+  <randomfloat name="node616" type="float">
+    <input name="in" type="float" nodename="randomfloat__in15" />
+    <input name="min" type="float" nodename="randomfloat__min14" />
+    <input name="max" type="float" value="0.01" />
+    <input name="seed" type="integer" value="2" />
+  </randomfloat>
+  <add name="node622" type="float">
+    <input name="in1" type="float" nodename="node614" />
+    <input name="in2" type="float" nodename="node616" />
+  </add>
+  <extract name="node623" type="float">
+    <input name="in" type="vector2" nodename="global__tail_uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node624" type="float">
+    <input name="in" type="vector2" nodename="global__tail_uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <combine2 name="global__tail_uv2" type="vector2">
+    <input name="in1" type="float" nodename="node622" />
+    <input name="in2" type="float" nodename="node624" />
+  </combine2>
+  <ifgreater name="node627" type="float">
+    <input name="value1" type="float" nodename="global__in_tail" />
+    <input name="value2" type="float" value="0.5" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <ifequal name="global__tail_uv3" type="vector2">
+    <input name="value1" type="float" nodename="node627" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="global__tail_uv2" />
+    <input name="in2" type="vector2" nodename="global__inv_uv" />
+  </ifequal>
+  <subtract name="node633" type="vector2">
+    <input name="in1" type="vector2" nodename="global__UV" />
+    <input name="in2" type="vector2" nodename="global__drop_pos" />
+  </subtract>
+  <multiply name="node635" type="vector2">
+    <input name="in1" type="vector2" nodename="node633" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <add name="global__drop_uv" type="vector2">
+    <input name="in1" type="vector2" nodename="global__inv_uv" />
+    <input name="in2" type="vector2" nodename="node635" />
+  </add>
+  <ifgreatereq name="node638" type="float">
+    <input name="value1" type="float" value="0.015" />
+    <input name="value2" type="float" nodename="global__to_drop" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__drop_uv2" type="vector2">
+    <input name="value1" type="float" nodename="node638" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="global__drop_uv" />
+    <input name="in2" type="vector2" nodename="global__inv_uv" />
+  </ifequal>
+  <ifgreatereq name="node643" type="float">
+    <input name="value1" type="float" value="0.015" />
+    <input name="value2" type="float" nodename="global__to_drop" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__drop_and_tail_norm" type="vector2">
+    <input name="value1" type="float" nodename="node643" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="global__drop_norm2" />
+    <input name="in2" type="vector2" nodename="global__tail_norm3" />
+  </ifequal>
+  <ifgreatereq name="node648" type="float">
+    <input name="value1" type="float" value="0.015" />
+    <input name="value2" type="float" nodename="global__to_drop" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__clear_uv2" type="vector2">
+    <input name="value1" type="float" nodename="node648" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="vector2" nodename="global__drop_uv2" />
+    <input name="in2" type="vector2" nodename="global__inv_uv" />
+  </ifequal>
+  <image name="global__clear" type="color3">
+    <input name="file" type="filename" value="textures\skyline.png" />
+    <input name="texcoord" type="vector2" nodename="global__clear_uv2" />
+  </image>
+  <multiply name="global__blurred2" type="color3">
+    <input name="in1" type="color3" nodename="background__c" />
+    <input name="in2" type="float" value="0.8" />
+  </multiply>
+  <multiply name="global__clear2" type="color3">
+    <input name="in1" type="color3" nodename="global__clear" />
+    <input name="in2" type="float" value="1.2" />
+  </multiply>
+  <multiply name="node664" type="float">
+    <input name="in1" type="float" nodename="global__drop" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <multiply name="node667" type="float">
+    <input name="in1" type="float" nodename="global__tail15" />
+    <input name="in2" type="float" value="0.8" />
+  </multiply>
+  <add name="clamp__in15" type="float">
+    <input name="in1" type="float" nodename="node664" />
+    <input name="in2" type="float" nodename="node667" />
+  </add>
+  <clamp name="global__clarity" type="float">
+    <input name="in" type="float" nodename="clamp__in15" />
+  </clamp>
+  <multiply name="node674" type="float">
+    <input name="in1" type="float" nodename="global__drop" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <multiply name="node677" type="float">
+    <input name="in1" type="float" nodename="global__tail15" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <add name="node678" type="float">
+    <input name="in1" type="float" nodename="node674" />
+    <input name="in2" type="float" nodename="node677" />
+  </add>
+  <subtract name="global__roughness" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="node678" />
+  </subtract>
+  <mix name="global__base_color" type="color3">
+    <input name="fg" type="color3" nodename="global__blurred2" />
+    <input name="bg" type="color3" nodename="global__clear2" />
+    <input name="mix" type="float" nodename="global__clarity" />
+  </mix>
+  <standard_surface name="global__surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="global__base_color" />
+    <input name="specular_roughness" type="float" nodename="node727" />
+    <input name="normal" type="vector3" nodename="node742" />
+  </standard_surface>
+  <add name="clamp__in16" type="float">
+    <input name="in1" type="float" value="0.2" />
+    <input name="in2" type="float" nodename="global__roughness" />
+  </add>
+  <clamp name="node727" type="float">
+    <input name="in" type="float" nodename="clamp__in16" />
+  </clamp>
+  <normal name="node731" type="vector3">
+    <input name="space" type="string" value="world" />
+  </normal>
+  <extract name="node733" type="float">
+    <input name="in" type="vector3" nodename="node731" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node735" type="float">
+    <input name="in" type="vector2" nodename="global__drop_and_tail_norm" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <extract name="node736" type="float">
+    <input name="in" type="vector2" nodename="global__drop_and_tail_norm" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <combine2 name="node737" type="vector2">
+    <input name="in1" type="float" nodename="node735" />
+    <input name="in2" type="float" nodename="node736" />
+  </combine2>
+  <divide name="node739" type="vector2">
+    <input name="in1" type="vector2" nodename="node737" />
+    <input name="in2" type="float" value="2" />
+  </divide>
+  <extract name="node740" type="float">
+    <input name="in" type="vector2" nodename="node739" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node741" type="float">
+    <input name="in" type="vector2" nodename="node739" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <combine3 name="node742" type="vector3">
+    <input name="in1" type="float" nodename="node733" />
+    <input name="in2" type="float" nodename="node740" />
+    <input name="in3" type="float" nodename="node741" />
+  </combine3>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="global__surface" />
+  </surfacematerial>
+</materialx>

@@ -1,32 +1,35 @@
 from pathlib import Path
 
 
-def handle_mxsl_path(mxsl_path: str | Path) -> list[Path]:
-    if mxsl_path is None:
-        raise TypeError("Path to .mxsl file was empty.")
-    if not isinstance(mxsl_path, str | Path):
-        raise TypeError(f"Path to .mxsl file was an invalid type: '{type(mxsl_path)}'.")
-    mxsl_path = Path(mxsl_path).resolve()
-    if not mxsl_path.exists():
-        raise FileNotFoundError(f"No such file or directory: '{mxsl_path}'.")
-    if mxsl_path.is_file():
-        return [mxsl_path]
-    if mxsl_path.is_dir():
-        return list(mxsl_path.glob("*.mxsl"))
-    raise ValueError("Bad mxsl_path.")
+def handle_input_path(input_path: str | Path, extension=".mxsl") -> list[Path]:
+    if input_path is None:
+        raise TypeError(f"Path to {extension} file was empty.")
+    if not isinstance(input_path, str | Path):
+        raise TypeError(f"Path to {extension} file was an invalid type: '{type(input_path)}'.")
+    input_path = Path(input_path).resolve()
+    if not input_path.exists():
+        raise FileNotFoundError(f"No such file or directory: '{input_path}'.")
+    if input_path.is_file():
+        return [input_path]
+    if input_path.is_dir():
+        input_filepaths = list(input_path.glob(f"*{extension}"))
+        if len(input_filepaths) == 0:
+            raise FileNotFoundError(f"No {extension} files found in directory: '{input_path}'.")
+        return input_filepaths
+    raise ValueError(f"Invalid input path: '{input_path}'.")
 
 
-def handle_mtlx_path(mtlx_path: str | Path | None, mxsl_file: Path) -> Path:
-    if mtlx_path is None:
-        return mxsl_file.with_suffix(".mtlx")
-    if not isinstance(mtlx_path, str | Path):
-        raise TypeError(f"Path to .mtlx file was an invalid type: '{type(mtlx_path)}'.")
-    mtlx_path = Path(mtlx_path).resolve()
-    if mtlx_path.is_file():
-        return mtlx_path
-    if mtlx_path.is_dir():
-        return mtlx_path / (mxsl_file.stem + ".mtlx")
-    if mtlx_path.suffix != ".mtlx":
-        mtlx_path /= (mxsl_file.stem + ".mtlx")
-    mtlx_path.parent.mkdir(parents=True, exist_ok=True)
-    return mtlx_path
+def handle_output_path(output_path: str | Path | None, input_filepath: Path, extension=".mtlx") -> Path:
+    if output_path is None:
+        return input_filepath.with_suffix(extension)
+    if not isinstance(output_path, str | Path):
+        raise TypeError(f"Path to {extension} file was an invalid type: '{type(output_path)}'.")
+    output_path = Path(output_path).resolve()
+    if output_path.is_file():
+        return output_path
+    if output_path.is_dir():
+        return output_path / (input_filepath.stem + extension)
+    if output_path.suffix != extension:
+        output_path /= (input_filepath.stem + extension)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    return output_path

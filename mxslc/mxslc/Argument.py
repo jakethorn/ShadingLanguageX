@@ -49,4 +49,7 @@ class Argument:
         return self.__expr.evaluate()
 
     def __str__(self):
-        return f"{self.name}={self.expression}"
+        if self.name:
+            return f"{self.name}={self.expression}"
+        else:
+            return f"{self.expression}"

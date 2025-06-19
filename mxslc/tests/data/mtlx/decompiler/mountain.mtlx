@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="node1" type="vector3" />
+  <extract name="node3" type="float">
+    <input name="in" type="vector3" nodename="node1" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node4" type="float">
+    <input name="in" type="vector3" nodename="node1" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <combine2 name="node5" type="vector2">
+    <input name="in1" type="float" nodename="node3" />
+    <input name="in2" type="float" nodename="node4" />
+  </combine2>
+  <divide name="node7" type="vector2">
+    <input name="in1" type="vector2" nodename="node5" />
+    <input name="in2" type="float" value="5" />
+  </divide>
+  <add name="global__uv" type="vector2">
+    <input name="in1" type="vector2" nodename="node7" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <image name="global__height" type="float">
+    <input name="file" type="filename" value="textures\mountain1.png" />
+    <input name="texcoord" type="vector2" nodename="global__uv" />
+  </image>
+  <multiply name="noise2d__texcoord" type="vector2">
+    <input name="in1" type="vector2" nodename="global__uv" />
+    <input name="in2" type="float" value="500" />
+  </multiply>
+  <noise2d name="node9" type="float">
+    <input name="amplitude" type="float" value="1" />
+    <input name="texcoord" type="vector2" nodename="noise2d__texcoord" />
+  </noise2d>
+  <multiply name="node23" type="float">
+    <input name="in1" type="float" nodename="node9" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <add name="global__tree_noise" type="float">
+    <input name="in1" type="float" nodename="node23" />
+    <input name="in2" type="float" value="0.5" />
+  </add>
+  <combine3 name="global__water" type="color3">
+    <input name="in1" type="float" value="0.2" />
+    <input name="in2" type="float" value="0.2" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <combine3 name="global__beach" type="color3">
+    <input name="in1" type="float" value="0.7" />
+    <input name="in2" type="float" value="0.7" />
+    <input name="in3" type="float" value="0.3" />
+  </combine3>
+  <combine3 name="node34" type="color3">
+    <input name="in1" type="float" value="0.1" />
+    <input name="in2" type="float" value="0.6" />
+    <input name="in3" type="float" value="0.1" />
+  </combine3>
+  <multiply name="global__trees" type="color3">
+    <input name="in1" type="color3" nodename="node34" />
+    <input name="in2" type="float" nodename="global__tree_noise" />
+  </multiply>
+  <combine3 name="global__rocks" type="color3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <min name="node39" type="float">
+    <input name="in1" type="float" nodename="node42" />
+    <input name="in2" type="float" nodename="node45" />
+  </min>
+  <ifgreater name="node42" type="float">
+    <input name="value1" type="float" nodename="global__height" />
+    <input name="value2" type="float" value="0.0132" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <ifgreatereq name="node45" type="float">
+    <input name="value1" type="float" value="0.0158" />
+    <input name="value2" type="float" nodename="global__height" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <subtract name="node50" type="float">
+    <input name="in1" type="float" nodename="global__height" />
+    <input name="in2" type="float" value="0.0132" />
+  </subtract>
+  <subtract name="node53" type="float">
+    <input name="in1" type="float" value="0.0158" />
+    <input name="in2" type="float" value="0.0132" />
+  </subtract>
+  <divide name="mix__mix" type="float">
+    <input name="in1" type="float" nodename="node50" />
+    <input name="in2" type="float" nodename="node53" />
+  </divide>
+  <mix name="node46" type="color3">
+    <input name="fg" type="color3" nodename="global__water" />
+    <input name="bg" type="color3" nodename="global__beach" />
+    <input name="mix" type="float" nodename="mix__mix" />
+  </mix>
+  <ifequal name="clerp__retval2" type="color3">
+    <input name="value1" type="float" nodename="node39" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="node46" />
+    <input name="in2" type="color3" nodename="global__water" />
+  </ifequal>
+  <ifgreater name="node59" type="float">
+    <input name="value1" type="float" nodename="global__height" />
+    <input name="value2" type="float" value="0.0158" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <ifequal name="clerp__retval3" type="color3">
+    <input name="value1" type="float" nodename="node59" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="global__beach" />
+    <input name="in2" type="color3" nodename="clerp__retval2" />
+  </ifequal>
+  <ifgreater name="node64" type="float">
+    <input name="value1" type="float" nodename="global__height" />
+    <input name="value2" type="float" value="0.0158" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <min name="node65" type="float">
+    <input name="in1" type="float" nodename="node68" />
+    <input name="in2" type="float" nodename="node71" />
+  </min>
+  <ifgreater name="node68" type="float">
+    <input name="value1" type="float" nodename="global__height" />
+    <input name="value2" type="float" value="0.5" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <ifgreatereq name="node71" type="float">
+    <input name="value1" type="float" value="0.8" />
+    <input name="value2" type="float" nodename="global__height" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <subtract name="node76" type="float">
+    <input name="in1" type="float" nodename="global__height" />
+    <input name="in2" type="float" value="0.5" />
+  </subtract>
+  <subtract name="node79" type="float">
+    <input name="in1" type="float" value="0.8" />
+    <input name="in2" type="float" value="0.5" />
+  </subtract>
+  <divide name="mix__mix2" type="float">
+    <input name="in1" type="float" nodename="node76" />
+    <input name="in2" type="float" nodename="node79" />
+  </divide>
+  <mix name="node72" type="color3">
+    <input name="fg" type="color3" nodename="global__trees" />
+    <input name="bg" type="color3" nodename="global__rocks" />
+    <input name="mix" type="float" nodename="mix__mix2" />
+  </mix>
+  <ifequal name="clerp__retval5" type="color3">
+    <input name="value1" type="float" nodename="node65" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="node72" />
+    <input name="in2" type="color3" nodename="global__trees" />
+  </ifequal>
+  <ifgreater name="node85" type="float">
+    <input name="value1" type="float" nodename="global__height" />
+    <input name="value2" type="float" value="0.8" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <ifequal name="clerp__retval6" type="color3">
+    <input name="value1" type="float" nodename="node85" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="global__rocks" />
+    <input name="in2" type="color3" nodename="clerp__retval5" />
+  </ifequal>
+  <ifequal name="global__c2" type="color3">
+    <input name="value1" type="float" nodename="node64" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="clerp__retval6" />
+    <input name="in2" type="color3" nodename="clerp__retval3" />
+  </ifequal>
+  <extract name="node91" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node92" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <subtract name="node95" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="global__height" />
+  </subtract>
+  <combine3 name="global__base_color" type="color3">
+    <input name="in1" type="float" nodename="node91" />
+    <input name="in2" type="float" nodename="node92" />
+    <input name="in3" type="float" nodename="node95" />
+  </combine3>
+  <min name="node96" type="float">
+    <input name="in1" type="float" nodename="node100" />
+    <input name="in2" type="float" nodename="node104" />
+  </min>
+  <extract name="node98" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifgreatereq name="node100" type="float">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" nodename="node98" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <extract name="node102" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <ifgreatereq name="node104" type="float">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" nodename="node102" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifequal name="global__base_color2" type="color3">
+    <input name="value1" type="float" nodename="node96" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="color3" nodename="global__c2" />
+    <input name="in2" type="color3" nodename="global__base_color" />
+  </ifequal>
+  <min name="node107" type="float">
+    <input name="in1" type="float" nodename="node108" />
+    <input name="in2" type="float" nodename="node119" />
+  </min>
+  <min name="node108" type="float">
+    <input name="in1" type="float" nodename="node112" />
+    <input name="in2" type="float" nodename="node116" />
+  </min>
+  <extract name="node110" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifgreatereq name="node112" type="float">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" nodename="node110" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <extract name="node114" type="float">
+    <input name="in" type="vector2" nodename="global__uv" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <ifgreatereq name="node116" type="float">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" nodename="node114" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreatereq>
+  <ifgreater name="node119" type="float">
+    <input name="value1" type="float" value="0.0132" />
+    <input name="value2" type="float" nodename="global__height" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifgreater>
+  <ifequal name="global__rough" type="float">
+    <input name="value1" type="float" nodename="node107" />
+    <input name="value2" type="float" value="1" />
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+  </ifequal>
+  <standard_surface name="global__surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="global__base_color2" />
+    <input name="specular_roughness" type="float" nodename="global__rough" />
+  </standard_surface>
+  <tangent name="displacement__displacement" type="vector3">
+    <input name="space" type="string" value="object" />
+  </tangent>
+  <multiply name="displacement__scale" type="float">
+    <input name="in1" type="float" nodename="global__height" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <displacement name="global__displacement" type="displacementshader">
+    <input name="displacement" type="vector3" nodename="displacement__displacement" />
+    <input name="scale" type="float" nodename="displacement__scale" />
+  </displacement>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="global__surface" />
+    <input name="displacementshader" type="displacementshader" nodename="global__displacement" />
+  </surfacematerial>
+</materialx>

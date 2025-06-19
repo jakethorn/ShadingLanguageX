@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine3 name="global__node47" type="color3">
+    <input name="in1" type="float" value="0.944" />
+    <input name="in2" type="float" value="0.776" />
+    <input name="in3" type="float" value="0.373" />
+  </combine3>
+  <combine3 name="standard_surface__specular_color" type="color3">
+    <input name="in1" type="float" value="0.944" />
+    <input name="in2" type="float" value="0.776" />
+    <input name="in3" type="float" value="0.373" />
+  </combine3>
+  <standard_surface name="global__main__goldsrf" type="surfaceshader">
+    <input name="base" type="float" value="1" />
+    <input name="base_color" type="color3" nodename="global__node47" />
+    <input name="metalness" type="float" value="1" />
+    <input name="specular" type="float" value="1" />
+    <input name="specular_color" type="color3" nodename="standard_surface__specular_color" />
+    <input name="specular_roughness" type="float" value="0.02" />
+  </standard_surface>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="global__main__goldsrf" />
+  </surfacematerial>
+</materialx>

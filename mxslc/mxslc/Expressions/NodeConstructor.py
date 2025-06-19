@@ -1,4 +1,5 @@
 from . import Expression
+from .expression_utils import format_args
 from .. import mx_utils
 from ..CompileError import CompileError
 from ..DataType import DataType
@@ -38,4 +39,4 @@ class NodeConstructor(Expression):
         return node
 
     def __str__(self) -> str:
-        return f'{{"{self.__category}", {self.__data_type}: {', '.join([a.name+"="+str(a.expression) for a in self.__args])}}}'
+        return f'{{"{self.__category}", {self.__data_type}: {format_args(self.__args, with_names=True)}}}'

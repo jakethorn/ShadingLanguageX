@@ -1,4 +1,5 @@
 from . import Expression
+from .expression_utils import format_args
 from .. import state, mx_utils, utils
 from ..CompileError import CompileError
 from ..DataType import DataType
@@ -54,4 +55,4 @@ class FunctionCall(Expression):
                 raise CompileError("Named arguments must come after positional arguments.", self.__identifier)
 
     def __str__(self) -> str:
-        return f"{self.__identifier}({', '.join([a.name+'='+str(a.expression) for a in self.__args])})"
+        return f"{self.__identifier}({format_args(self.__args, with_names=True)})"

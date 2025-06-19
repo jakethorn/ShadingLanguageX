@@ -1,0 +1,548 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="global__main__uv" type="vector2" />
+  <convert name="global__main__finalColor" type="vector3">
+    <input name="in" type="float" value="0" />
+  </convert>
+  <multiply name="global__fract_v2__v2" type="vector2">
+    <input name="in1" type="vector2" nodename="global__main__uv" />
+    <input name="in2" type="float" value="1.5" />
+  </multiply>
+  <modulo name="global__node7" type="vector2">
+    <input name="in1" type="vector2" nodename="global__fract_v2__v2" />
+    <input name="in2" type="float" value="1" />
+  </modulo>
+  <subtract name="global__main__uv2" type="vector2">
+    <input name="in1" type="vector2" nodename="global__node7" />
+    <input name="in2" type="float" value="0.5" />
+  </subtract>
+  <magnitude name="global__node9" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv2" />
+  </magnitude>
+  <magnitude name="global__node11" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <subtract name="global__exp__in" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="global__node11" />
+  </subtract>
+  <exp name="global__node13" type="float">
+    <input name="in" type="float" nodename="global__exp__in" />
+  </exp>
+  <multiply name="global__update_finalColor__d" type="float">
+    <input name="in1" type="float" nodename="global__node9" />
+    <input name="in2" type="float" nodename="global__node13" />
+  </multiply>
+  <magnitude name="global__node15" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <multiply name="global__node19" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__node20" type="float">
+    <input name="in1" type="float" nodename="global__node15" />
+    <input name="in2" type="float" nodename="global__node19" />
+  </add>
+  <time name="global__node21" type="float" />
+  <multiply name="global__node24" type="float">
+    <input name="in1" type="float" nodename="global__node21" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__palette__t" type="float">
+    <input name="in1" type="float" nodename="global__node20" />
+    <input name="in2" type="float" nodename="global__node24" />
+  </add>
+  <combine3 name="global__palette__a" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__b" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__c" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <combine3 name="global__palette__d" type="vector3">
+    <input name="in1" type="float" value="0.263" />
+    <input name="in2" type="float" value="0.416" />
+    <input name="in3" type="float" value="0.557" />
+  </combine3>
+  <multiply name="global__node42" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__c" />
+    <input name="in2" type="float" nodename="global__palette__t" />
+  </multiply>
+  <add name="global__node44" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node42" />
+    <input name="in2" type="vector3" nodename="global__palette__d" />
+  </add>
+  <convert name="global__node45" type="vector3">
+    <input name="in" type="float" value="6.28318" />
+  </convert>
+  <multiply name="global__cos__in" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node45" />
+    <input name="in2" type="vector3" nodename="global__node44" />
+  </multiply>
+  <cos name="global__node46" type="vector3">
+    <input name="in" type="vector3" nodename="global__cos__in" />
+  </cos>
+  <multiply name="global__node48" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__b" />
+    <input name="in2" type="vector3" nodename="global__node46" />
+  </multiply>
+  <add name="global__update_finalColor__col" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__a" />
+    <input name="in2" type="vector3" nodename="global__node48" />
+  </add>
+  <multiply name="global__node51" type="float">
+    <input name="in1" type="float" nodename="global__update_finalColor__d" />
+    <input name="in2" type="float" value="8" />
+  </multiply>
+  <time name="global__node52" type="float" />
+  <add name="global__sin__in" type="float">
+    <input name="in1" type="float" nodename="global__node51" />
+    <input name="in2" type="float" nodename="global__node52" />
+  </add>
+  <sin name="global__node54" type="float">
+    <input name="in" type="float" nodename="global__sin__in" />
+  </sin>
+  <divide name="global__update_finalColor__d2" type="float">
+    <input name="in1" type="float" nodename="global__node54" />
+    <input name="in2" type="float" value="8" />
+  </divide>
+  <absval name="global__update_finalColor__d3" type="float">
+    <input name="in" type="float" nodename="global__update_finalColor__d2" />
+  </absval>
+  <divide name="global__node60" type="float">
+    <input name="in1" type="float" value="0.01" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d3" />
+  </divide>
+  <power name="global__update_finalColor__d4" type="float">
+    <input name="in1" type="float" nodename="global__node60" />
+    <input name="in2" type="float" value="1.2" />
+  </power>
+  <multiply name="global__node65" type="vector3">
+    <input name="in1" type="vector3" nodename="global__update_finalColor__col" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d4" />
+  </multiply>
+  <add name="global__main__finalColor2" type="vector3">
+    <input name="in1" type="vector3" nodename="global__main__finalColor" />
+    <input name="in2" type="vector3" nodename="global__node65" />
+  </add>
+  <add name="global__main__i2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <multiply name="global__fract_v2__v3" type="vector2">
+    <input name="in1" type="vector2" nodename="global__main__uv2" />
+    <input name="in2" type="float" value="1.5" />
+  </multiply>
+  <modulo name="global__node72" type="vector2">
+    <input name="in1" type="vector2" nodename="global__fract_v2__v3" />
+    <input name="in2" type="float" value="1" />
+  </modulo>
+  <subtract name="global__main__uv3" type="vector2">
+    <input name="in1" type="vector2" nodename="global__node72" />
+    <input name="in2" type="float" value="0.5" />
+  </subtract>
+  <magnitude name="global__node74" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv3" />
+  </magnitude>
+  <magnitude name="global__node76" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <subtract name="global__exp__in2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="global__node76" />
+  </subtract>
+  <exp name="global__node78" type="float">
+    <input name="in" type="float" nodename="global__exp__in2" />
+  </exp>
+  <multiply name="global__update_finalColor__d5" type="float">
+    <input name="in1" type="float" nodename="global__node74" />
+    <input name="in2" type="float" nodename="global__node78" />
+  </multiply>
+  <magnitude name="global__node80" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <multiply name="global__node84" type="float">
+    <input name="in1" type="float" nodename="global__main__i2" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__node85" type="float">
+    <input name="in1" type="float" nodename="global__node80" />
+    <input name="in2" type="float" nodename="global__node84" />
+  </add>
+  <time name="global__node86" type="float" />
+  <multiply name="global__node89" type="float">
+    <input name="in1" type="float" nodename="global__node86" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__palette__t2" type="float">
+    <input name="in1" type="float" nodename="global__node85" />
+    <input name="in2" type="float" nodename="global__node89" />
+  </add>
+  <combine3 name="global__palette__a2" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__b2" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__c2" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <combine3 name="global__palette__d2" type="vector3">
+    <input name="in1" type="float" value="0.263" />
+    <input name="in2" type="float" value="0.416" />
+    <input name="in3" type="float" value="0.557" />
+  </combine3>
+  <multiply name="global__node107" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__c2" />
+    <input name="in2" type="float" nodename="global__palette__t2" />
+  </multiply>
+  <add name="global__node109" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node107" />
+    <input name="in2" type="vector3" nodename="global__palette__d2" />
+  </add>
+  <convert name="global__node110" type="vector3">
+    <input name="in" type="float" value="6.28318" />
+  </convert>
+  <multiply name="global__cos__in2" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node110" />
+    <input name="in2" type="vector3" nodename="global__node109" />
+  </multiply>
+  <cos name="global__node111" type="vector3">
+    <input name="in" type="vector3" nodename="global__cos__in2" />
+  </cos>
+  <multiply name="global__node113" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__b2" />
+    <input name="in2" type="vector3" nodename="global__node111" />
+  </multiply>
+  <add name="global__update_finalColor__col2" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__a2" />
+    <input name="in2" type="vector3" nodename="global__node113" />
+  </add>
+  <multiply name="global__node116" type="float">
+    <input name="in1" type="float" nodename="global__update_finalColor__d5" />
+    <input name="in2" type="float" value="8" />
+  </multiply>
+  <time name="global__node117" type="float" />
+  <add name="global__sin__in2" type="float">
+    <input name="in1" type="float" nodename="global__node116" />
+    <input name="in2" type="float" nodename="global__node117" />
+  </add>
+  <sin name="global__node119" type="float">
+    <input name="in" type="float" nodename="global__sin__in2" />
+  </sin>
+  <divide name="global__update_finalColor__d6" type="float">
+    <input name="in1" type="float" nodename="global__node119" />
+    <input name="in2" type="float" value="8" />
+  </divide>
+  <absval name="global__update_finalColor__d7" type="float">
+    <input name="in" type="float" nodename="global__update_finalColor__d6" />
+  </absval>
+  <divide name="global__node125" type="float">
+    <input name="in1" type="float" value="0.01" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d7" />
+  </divide>
+  <power name="global__update_finalColor__d8" type="float">
+    <input name="in1" type="float" nodename="global__node125" />
+    <input name="in2" type="float" value="1.2" />
+  </power>
+  <multiply name="global__node130" type="vector3">
+    <input name="in1" type="vector3" nodename="global__update_finalColor__col2" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d8" />
+  </multiply>
+  <add name="global__main__finalColor3" type="vector3">
+    <input name="in1" type="vector3" nodename="global__main__finalColor2" />
+    <input name="in2" type="vector3" nodename="global__node130" />
+  </add>
+  <add name="global__main__i3" type="float">
+    <input name="in1" type="float" nodename="global__main__i2" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <multiply name="global__fract_v2__v4" type="vector2">
+    <input name="in1" type="vector2" nodename="global__main__uv3" />
+    <input name="in2" type="float" value="1.5" />
+  </multiply>
+  <modulo name="global__node137" type="vector2">
+    <input name="in1" type="vector2" nodename="global__fract_v2__v4" />
+    <input name="in2" type="float" value="1" />
+  </modulo>
+  <subtract name="global__main__uv4" type="vector2">
+    <input name="in1" type="vector2" nodename="global__node137" />
+    <input name="in2" type="float" value="0.5" />
+  </subtract>
+  <magnitude name="global__node139" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv4" />
+  </magnitude>
+  <magnitude name="global__node141" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <subtract name="global__exp__in3" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="global__node141" />
+  </subtract>
+  <exp name="global__node143" type="float">
+    <input name="in" type="float" nodename="global__exp__in3" />
+  </exp>
+  <multiply name="global__update_finalColor__d9" type="float">
+    <input name="in1" type="float" nodename="global__node139" />
+    <input name="in2" type="float" nodename="global__node143" />
+  </multiply>
+  <magnitude name="global__node145" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <multiply name="global__node149" type="float">
+    <input name="in1" type="float" nodename="global__main__i3" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__node150" type="float">
+    <input name="in1" type="float" nodename="global__node145" />
+    <input name="in2" type="float" nodename="global__node149" />
+  </add>
+  <time name="global__node151" type="float" />
+  <multiply name="global__node154" type="float">
+    <input name="in1" type="float" nodename="global__node151" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__palette__t3" type="float">
+    <input name="in1" type="float" nodename="global__node150" />
+    <input name="in2" type="float" nodename="global__node154" />
+  </add>
+  <combine3 name="global__palette__a3" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__b3" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__c3" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <combine3 name="global__palette__d3" type="vector3">
+    <input name="in1" type="float" value="0.263" />
+    <input name="in2" type="float" value="0.416" />
+    <input name="in3" type="float" value="0.557" />
+  </combine3>
+  <multiply name="global__node172" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__c3" />
+    <input name="in2" type="float" nodename="global__palette__t3" />
+  </multiply>
+  <add name="global__node174" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node172" />
+    <input name="in2" type="vector3" nodename="global__palette__d3" />
+  </add>
+  <convert name="global__node175" type="vector3">
+    <input name="in" type="float" value="6.28318" />
+  </convert>
+  <multiply name="global__cos__in3" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node175" />
+    <input name="in2" type="vector3" nodename="global__node174" />
+  </multiply>
+  <cos name="global__node176" type="vector3">
+    <input name="in" type="vector3" nodename="global__cos__in3" />
+  </cos>
+  <multiply name="global__node178" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__b3" />
+    <input name="in2" type="vector3" nodename="global__node176" />
+  </multiply>
+  <add name="global__update_finalColor__col3" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__a3" />
+    <input name="in2" type="vector3" nodename="global__node178" />
+  </add>
+  <multiply name="global__node181" type="float">
+    <input name="in1" type="float" nodename="global__update_finalColor__d9" />
+    <input name="in2" type="float" value="8" />
+  </multiply>
+  <time name="global__node182" type="float" />
+  <add name="global__sin__in3" type="float">
+    <input name="in1" type="float" nodename="global__node181" />
+    <input name="in2" type="float" nodename="global__node182" />
+  </add>
+  <sin name="global__node184" type="float">
+    <input name="in" type="float" nodename="global__sin__in3" />
+  </sin>
+  <divide name="global__update_finalColor__d10" type="float">
+    <input name="in1" type="float" nodename="global__node184" />
+    <input name="in2" type="float" value="8" />
+  </divide>
+  <absval name="global__update_finalColor__d11" type="float">
+    <input name="in" type="float" nodename="global__update_finalColor__d10" />
+  </absval>
+  <divide name="global__node190" type="float">
+    <input name="in1" type="float" value="0.01" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d11" />
+  </divide>
+  <power name="global__update_finalColor__d12" type="float">
+    <input name="in1" type="float" nodename="global__node190" />
+    <input name="in2" type="float" value="1.2" />
+  </power>
+  <multiply name="global__node195" type="vector3">
+    <input name="in1" type="vector3" nodename="global__update_finalColor__col3" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d12" />
+  </multiply>
+  <add name="global__main__finalColor4" type="vector3">
+    <input name="in1" type="vector3" nodename="global__main__finalColor3" />
+    <input name="in2" type="vector3" nodename="global__node195" />
+  </add>
+  <add name="global__main__i4" type="float">
+    <input name="in1" type="float" nodename="global__main__i3" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <multiply name="global__fract_v2__v5" type="vector2">
+    <input name="in1" type="vector2" nodename="global__main__uv4" />
+    <input name="in2" type="float" value="1.5" />
+  </multiply>
+  <modulo name="global__node202" type="vector2">
+    <input name="in1" type="vector2" nodename="global__fract_v2__v5" />
+    <input name="in2" type="float" value="1" />
+  </modulo>
+  <subtract name="global__main__uv5" type="vector2">
+    <input name="in1" type="vector2" nodename="global__node202" />
+    <input name="in2" type="float" value="0.5" />
+  </subtract>
+  <magnitude name="global__node204" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv5" />
+  </magnitude>
+  <magnitude name="global__node206" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <subtract name="global__exp__in4" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="global__node206" />
+  </subtract>
+  <exp name="global__node208" type="float">
+    <input name="in" type="float" nodename="global__exp__in4" />
+  </exp>
+  <multiply name="global__update_finalColor__d13" type="float">
+    <input name="in1" type="float" nodename="global__node204" />
+    <input name="in2" type="float" nodename="global__node208" />
+  </multiply>
+  <magnitude name="global__node210" type="float">
+    <input name="in" type="vector2" nodename="global__main__uv" />
+  </magnitude>
+  <multiply name="global__node214" type="float">
+    <input name="in1" type="float" nodename="global__main__i4" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__node215" type="float">
+    <input name="in1" type="float" nodename="global__node210" />
+    <input name="in2" type="float" nodename="global__node214" />
+  </add>
+  <time name="global__node216" type="float" />
+  <multiply name="global__node219" type="float">
+    <input name="in1" type="float" nodename="global__node216" />
+    <input name="in2" type="float" value="0.4" />
+  </multiply>
+  <add name="global__palette__t4" type="float">
+    <input name="in1" type="float" nodename="global__node215" />
+    <input name="in2" type="float" nodename="global__node219" />
+  </add>
+  <combine3 name="global__palette__a4" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__b4" type="vector3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="global__palette__c4" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <combine3 name="global__palette__d4" type="vector3">
+    <input name="in1" type="float" value="0.263" />
+    <input name="in2" type="float" value="0.416" />
+    <input name="in3" type="float" value="0.557" />
+  </combine3>
+  <multiply name="global__node237" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__c4" />
+    <input name="in2" type="float" nodename="global__palette__t4" />
+  </multiply>
+  <add name="global__node239" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node237" />
+    <input name="in2" type="vector3" nodename="global__palette__d4" />
+  </add>
+  <convert name="global__node240" type="vector3">
+    <input name="in" type="float" value="6.28318" />
+  </convert>
+  <multiply name="global__cos__in4" type="vector3">
+    <input name="in1" type="vector3" nodename="global__node240" />
+    <input name="in2" type="vector3" nodename="global__node239" />
+  </multiply>
+  <cos name="global__node241" type="vector3">
+    <input name="in" type="vector3" nodename="global__cos__in4" />
+  </cos>
+  <multiply name="global__node243" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__b4" />
+    <input name="in2" type="vector3" nodename="global__node241" />
+  </multiply>
+  <add name="global__update_finalColor__col4" type="vector3">
+    <input name="in1" type="vector3" nodename="global__palette__a4" />
+    <input name="in2" type="vector3" nodename="global__node243" />
+  </add>
+  <multiply name="global__node246" type="float">
+    <input name="in1" type="float" nodename="global__update_finalColor__d13" />
+    <input name="in2" type="float" value="8" />
+  </multiply>
+  <time name="global__node247" type="float" />
+  <add name="global__sin__in4" type="float">
+    <input name="in1" type="float" nodename="global__node246" />
+    <input name="in2" type="float" nodename="global__node247" />
+  </add>
+  <sin name="global__node249" type="float">
+    <input name="in" type="float" nodename="global__sin__in4" />
+  </sin>
+  <divide name="global__update_finalColor__d14" type="float">
+    <input name="in1" type="float" nodename="global__node249" />
+    <input name="in2" type="float" value="8" />
+  </divide>
+  <absval name="global__update_finalColor__d15" type="float">
+    <input name="in" type="float" nodename="global__update_finalColor__d14" />
+  </absval>
+  <divide name="global__node255" type="float">
+    <input name="in1" type="float" value="0.01" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d15" />
+  </divide>
+  <power name="global__update_finalColor__d16" type="float">
+    <input name="in1" type="float" nodename="global__node255" />
+    <input name="in2" type="float" value="1.2" />
+  </power>
+  <multiply name="global__node260" type="vector3">
+    <input name="in1" type="vector3" nodename="global__update_finalColor__col4" />
+    <input name="in2" type="float" nodename="global__update_finalColor__d16" />
+  </multiply>
+  <add name="global__main__finalColor5" type="vector3">
+    <input name="in1" type="vector3" nodename="global__main__finalColor4" />
+    <input name="in2" type="vector3" nodename="global__node260" />
+  </add>
+  <convert name="global__node304" type="color3">
+    <input name="in" type="vector3" nodename="global__main__finalColor5" />
+  </convert>
+  <standard_surface name="global__main__surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="global__node304" />
+  </standard_surface>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="global__main__surface" />
+  </surfacematerial>
+</materialx>

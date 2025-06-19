@@ -1,4 +1,5 @@
 from . import Expression
+from .expression_utils import format_args
 from .. import mx_utils
 from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES
 from ..Token import Token
@@ -55,4 +56,4 @@ class ConstructorCall(Expression):
         return mx_utils.combine(channels, self.data_type)
 
     def __str__(self) -> str:
-        return f"{self.__data_type}({', '.join([str(a.expression) for a in self.__args])})"
+        return f"{self.__data_type}({format_args(self.__args, with_names=False)})"

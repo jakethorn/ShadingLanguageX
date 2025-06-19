@@ -1,0 +1,1476 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="node1" type="vector3">
+    <input name="space" type="string" value="world" />
+  </position>
+  <extract name="node3" type="float">
+    <input name="in" type="vector3" nodename="node1" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node4" type="float">
+    <input name="in" type="vector3" nodename="node1" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <combine2 name="node5" type="vector2">
+    <input name="in1" type="float" nodename="node3" />
+    <input name="in2" type="float" nodename="node4" />
+  </combine2>
+  <multiply name="get_waves__pos" type="vector2">
+    <input name="in1" type="vector2" nodename="node5" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <magnitude name="node7" type="float">
+    <input name="in" type="vector2" nodename="get_waves__pos" />
+  </magnitude>
+  <multiply name="get_waves__wave_phase_shift" type="float">
+    <input name="in1" type="float" nodename="node7" />
+    <input name="in2" type="float" value="0.1" />
+  </multiply>
+  <sin name="node10" type="float">
+    <input name="in" type="float" value="0" />
+  </sin>
+  <cos name="node12" type="float">
+    <input name="in" type="float" value="0" />
+  </cos>
+  <combine2 name="_loop___p" type="vector2">
+    <input name="in1" type="float" nodename="node10" />
+    <input name="in2" type="float" nodename="node12" />
+  </combine2>
+  <time name="node17" type="float" />
+  <multiply name="node20" type="float">
+    <input name="in1" type="float" nodename="node17" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <add name="wave_dx__time" type="float">
+    <input name="in1" type="float" nodename="node20" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node14" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p" />
+    <input name="in2" type="vector2" nodename="get_waves__pos" />
+  </dotproduct>
+  <multiply name="node23" type="float">
+    <input name="in1" type="float" nodename="node14" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <add name="wave_dx__x" type="float">
+    <input name="in1" type="float" nodename="node23" />
+    <input name="in2" type="float" nodename="wave_dx__time" />
+  </add>
+  <sin name="node25" type="float">
+    <input name="in" type="float" nodename="wave_dx__x" />
+  </sin>
+  <subtract name="exp__in" type="float">
+    <input name="in1" type="float" nodename="node25" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave" type="float">
+    <input name="in" type="float" nodename="exp__in" />
+  </exp>
+  <cos name="node30" type="float">
+    <input name="in" type="float" nodename="wave_dx__x" />
+  </cos>
+  <multiply name="wave_dx__dx" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave" />
+    <input name="in2" type="float" nodename="node30" />
+  </multiply>
+  <subtract name="node34" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx" />
+  </subtract>
+  <combine2 name="_loop___res" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave" />
+    <input name="in2" type="float" nodename="node34" />
+  </combine2>
+  <extract name="node38" type="float">
+    <input name="in" type="vector2" nodename="_loop___res" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node39" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p" />
+    <input name="in2" type="float" nodename="node38" />
+  </multiply>
+  <multiply name="node41" type="vector2">
+    <input name="in1" type="vector2" nodename="node39" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <multiply name="node43" type="vector2">
+    <input name="in1" type="vector2" nodename="node41" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos2" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos" />
+    <input name="in2" type="vector2" nodename="node43" />
+  </add>
+  <extract name="node46" type="float">
+    <input name="in" type="vector2" nodename="_loop___res" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node48" type="float">
+    <input name="in1" type="float" nodename="node46" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <add name="get_waves__sum_of_values2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="node48" />
+  </add>
+  <add name="get_waves__sum_of_weights2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <mix name="get_waves__weight2" type="float">
+    <input name="fg" type="float" value="1" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq2" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult2" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter2" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node60" type="float">
+    <input name="in" type="float" nodename="get_waves__iter2" />
+  </sin>
+  <cos name="node62" type="float">
+    <input name="in" type="float" nodename="get_waves__iter2" />
+  </cos>
+  <combine2 name="_loop___p2" type="vector2">
+    <input name="in1" type="float" nodename="node60" />
+    <input name="in2" type="float" nodename="node62" />
+  </combine2>
+  <time name="node67" type="float" />
+  <multiply name="node70" type="float">
+    <input name="in1" type="float" nodename="node67" />
+    <input name="in2" type="float" nodename="get_waves__time_mult2" />
+  </multiply>
+  <add name="wave_dx__time2" type="float">
+    <input name="in1" type="float" nodename="node70" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node64" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p2" />
+    <input name="in2" type="vector2" nodename="get_waves__pos2" />
+  </dotproduct>
+  <multiply name="node73" type="float">
+    <input name="in1" type="float" nodename="node64" />
+    <input name="in2" type="float" nodename="get_waves__freq2" />
+  </multiply>
+  <add name="wave_dx__x2" type="float">
+    <input name="in1" type="float" nodename="node73" />
+    <input name="in2" type="float" nodename="wave_dx__time2" />
+  </add>
+  <sin name="node75" type="float">
+    <input name="in" type="float" nodename="wave_dx__x2" />
+  </sin>
+  <subtract name="exp__in2" type="float">
+    <input name="in1" type="float" nodename="node75" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave2" type="float">
+    <input name="in" type="float" nodename="exp__in2" />
+  </exp>
+  <cos name="node80" type="float">
+    <input name="in" type="float" nodename="wave_dx__x2" />
+  </cos>
+  <multiply name="wave_dx__dx2" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave2" />
+    <input name="in2" type="float" nodename="node80" />
+  </multiply>
+  <subtract name="node84" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx2" />
+  </subtract>
+  <combine2 name="_loop___res2" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave2" />
+    <input name="in2" type="float" nodename="node84" />
+  </combine2>
+  <extract name="node88" type="float">
+    <input name="in" type="vector2" nodename="_loop___res2" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node89" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p2" />
+    <input name="in2" type="float" nodename="node88" />
+  </multiply>
+  <multiply name="node91" type="vector2">
+    <input name="in1" type="vector2" nodename="node89" />
+    <input name="in2" type="float" nodename="get_waves__weight2" />
+  </multiply>
+  <multiply name="node93" type="vector2">
+    <input name="in1" type="vector2" nodename="node91" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos3" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos2" />
+    <input name="in2" type="vector2" nodename="node93" />
+  </add>
+  <extract name="node96" type="float">
+    <input name="in" type="vector2" nodename="_loop___res2" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node98" type="float">
+    <input name="in1" type="float" nodename="node96" />
+    <input name="in2" type="float" nodename="get_waves__weight2" />
+  </multiply>
+  <add name="get_waves__sum_of_values3" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values2" />
+    <input name="in2" type="float" nodename="node98" />
+  </add>
+  <add name="get_waves__sum_of_weights3" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights2" />
+    <input name="in2" type="float" nodename="get_waves__weight2" />
+  </add>
+  <mix name="get_waves__weight3" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight2" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq3" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq2" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult3" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult2" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter3" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter2" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node110" type="float">
+    <input name="in" type="float" nodename="get_waves__iter3" />
+  </sin>
+  <cos name="node112" type="float">
+    <input name="in" type="float" nodename="get_waves__iter3" />
+  </cos>
+  <combine2 name="_loop___p3" type="vector2">
+    <input name="in1" type="float" nodename="node110" />
+    <input name="in2" type="float" nodename="node112" />
+  </combine2>
+  <time name="node117" type="float" />
+  <multiply name="node120" type="float">
+    <input name="in1" type="float" nodename="node117" />
+    <input name="in2" type="float" nodename="get_waves__time_mult3" />
+  </multiply>
+  <add name="wave_dx__time3" type="float">
+    <input name="in1" type="float" nodename="node120" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node114" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p3" />
+    <input name="in2" type="vector2" nodename="get_waves__pos3" />
+  </dotproduct>
+  <multiply name="node123" type="float">
+    <input name="in1" type="float" nodename="node114" />
+    <input name="in2" type="float" nodename="get_waves__freq3" />
+  </multiply>
+  <add name="wave_dx__x3" type="float">
+    <input name="in1" type="float" nodename="node123" />
+    <input name="in2" type="float" nodename="wave_dx__time3" />
+  </add>
+  <sin name="node125" type="float">
+    <input name="in" type="float" nodename="wave_dx__x3" />
+  </sin>
+  <subtract name="exp__in3" type="float">
+    <input name="in1" type="float" nodename="node125" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave3" type="float">
+    <input name="in" type="float" nodename="exp__in3" />
+  </exp>
+  <cos name="node130" type="float">
+    <input name="in" type="float" nodename="wave_dx__x3" />
+  </cos>
+  <multiply name="wave_dx__dx3" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave3" />
+    <input name="in2" type="float" nodename="node130" />
+  </multiply>
+  <subtract name="node134" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx3" />
+  </subtract>
+  <combine2 name="_loop___res3" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave3" />
+    <input name="in2" type="float" nodename="node134" />
+  </combine2>
+  <extract name="node138" type="float">
+    <input name="in" type="vector2" nodename="_loop___res3" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node139" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p3" />
+    <input name="in2" type="float" nodename="node138" />
+  </multiply>
+  <multiply name="node141" type="vector2">
+    <input name="in1" type="vector2" nodename="node139" />
+    <input name="in2" type="float" nodename="get_waves__weight3" />
+  </multiply>
+  <multiply name="node143" type="vector2">
+    <input name="in1" type="vector2" nodename="node141" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos4" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos3" />
+    <input name="in2" type="vector2" nodename="node143" />
+  </add>
+  <extract name="node146" type="float">
+    <input name="in" type="vector2" nodename="_loop___res3" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node148" type="float">
+    <input name="in1" type="float" nodename="node146" />
+    <input name="in2" type="float" nodename="get_waves__weight3" />
+  </multiply>
+  <add name="get_waves__sum_of_values4" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values3" />
+    <input name="in2" type="float" nodename="node148" />
+  </add>
+  <add name="get_waves__sum_of_weights4" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights3" />
+    <input name="in2" type="float" nodename="get_waves__weight3" />
+  </add>
+  <mix name="get_waves__weight4" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight3" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq4" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq3" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult4" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult3" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter4" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter3" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node160" type="float">
+    <input name="in" type="float" nodename="get_waves__iter4" />
+  </sin>
+  <cos name="node162" type="float">
+    <input name="in" type="float" nodename="get_waves__iter4" />
+  </cos>
+  <combine2 name="_loop___p4" type="vector2">
+    <input name="in1" type="float" nodename="node160" />
+    <input name="in2" type="float" nodename="node162" />
+  </combine2>
+  <time name="node167" type="float" />
+  <multiply name="node170" type="float">
+    <input name="in1" type="float" nodename="node167" />
+    <input name="in2" type="float" nodename="get_waves__time_mult4" />
+  </multiply>
+  <add name="wave_dx__time4" type="float">
+    <input name="in1" type="float" nodename="node170" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node164" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p4" />
+    <input name="in2" type="vector2" nodename="get_waves__pos4" />
+  </dotproduct>
+  <multiply name="node173" type="float">
+    <input name="in1" type="float" nodename="node164" />
+    <input name="in2" type="float" nodename="get_waves__freq4" />
+  </multiply>
+  <add name="wave_dx__x4" type="float">
+    <input name="in1" type="float" nodename="node173" />
+    <input name="in2" type="float" nodename="wave_dx__time4" />
+  </add>
+  <sin name="node175" type="float">
+    <input name="in" type="float" nodename="wave_dx__x4" />
+  </sin>
+  <subtract name="exp__in4" type="float">
+    <input name="in1" type="float" nodename="node175" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave4" type="float">
+    <input name="in" type="float" nodename="exp__in4" />
+  </exp>
+  <cos name="node180" type="float">
+    <input name="in" type="float" nodename="wave_dx__x4" />
+  </cos>
+  <multiply name="wave_dx__dx4" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave4" />
+    <input name="in2" type="float" nodename="node180" />
+  </multiply>
+  <subtract name="node184" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx4" />
+  </subtract>
+  <combine2 name="_loop___res4" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave4" />
+    <input name="in2" type="float" nodename="node184" />
+  </combine2>
+  <extract name="node188" type="float">
+    <input name="in" type="vector2" nodename="_loop___res4" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node189" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p4" />
+    <input name="in2" type="float" nodename="node188" />
+  </multiply>
+  <multiply name="node191" type="vector2">
+    <input name="in1" type="vector2" nodename="node189" />
+    <input name="in2" type="float" nodename="get_waves__weight4" />
+  </multiply>
+  <multiply name="node193" type="vector2">
+    <input name="in1" type="vector2" nodename="node191" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos5" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos4" />
+    <input name="in2" type="vector2" nodename="node193" />
+  </add>
+  <extract name="node196" type="float">
+    <input name="in" type="vector2" nodename="_loop___res4" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node198" type="float">
+    <input name="in1" type="float" nodename="node196" />
+    <input name="in2" type="float" nodename="get_waves__weight4" />
+  </multiply>
+  <add name="get_waves__sum_of_values5" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values4" />
+    <input name="in2" type="float" nodename="node198" />
+  </add>
+  <add name="get_waves__sum_of_weights5" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights4" />
+    <input name="in2" type="float" nodename="get_waves__weight4" />
+  </add>
+  <mix name="get_waves__weight5" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight4" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq5" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq4" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult5" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult4" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter5" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter4" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node210" type="float">
+    <input name="in" type="float" nodename="get_waves__iter5" />
+  </sin>
+  <cos name="node212" type="float">
+    <input name="in" type="float" nodename="get_waves__iter5" />
+  </cos>
+  <combine2 name="_loop___p5" type="vector2">
+    <input name="in1" type="float" nodename="node210" />
+    <input name="in2" type="float" nodename="node212" />
+  </combine2>
+  <time name="node217" type="float" />
+  <multiply name="node220" type="float">
+    <input name="in1" type="float" nodename="node217" />
+    <input name="in2" type="float" nodename="get_waves__time_mult5" />
+  </multiply>
+  <add name="wave_dx__time5" type="float">
+    <input name="in1" type="float" nodename="node220" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node214" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p5" />
+    <input name="in2" type="vector2" nodename="get_waves__pos5" />
+  </dotproduct>
+  <multiply name="node223" type="float">
+    <input name="in1" type="float" nodename="node214" />
+    <input name="in2" type="float" nodename="get_waves__freq5" />
+  </multiply>
+  <add name="wave_dx__x5" type="float">
+    <input name="in1" type="float" nodename="node223" />
+    <input name="in2" type="float" nodename="wave_dx__time5" />
+  </add>
+  <sin name="node225" type="float">
+    <input name="in" type="float" nodename="wave_dx__x5" />
+  </sin>
+  <subtract name="exp__in5" type="float">
+    <input name="in1" type="float" nodename="node225" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave5" type="float">
+    <input name="in" type="float" nodename="exp__in5" />
+  </exp>
+  <cos name="node230" type="float">
+    <input name="in" type="float" nodename="wave_dx__x5" />
+  </cos>
+  <multiply name="wave_dx__dx5" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave5" />
+    <input name="in2" type="float" nodename="node230" />
+  </multiply>
+  <subtract name="node234" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx5" />
+  </subtract>
+  <combine2 name="_loop___res5" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave5" />
+    <input name="in2" type="float" nodename="node234" />
+  </combine2>
+  <extract name="node238" type="float">
+    <input name="in" type="vector2" nodename="_loop___res5" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node239" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p5" />
+    <input name="in2" type="float" nodename="node238" />
+  </multiply>
+  <multiply name="node241" type="vector2">
+    <input name="in1" type="vector2" nodename="node239" />
+    <input name="in2" type="float" nodename="get_waves__weight5" />
+  </multiply>
+  <multiply name="node243" type="vector2">
+    <input name="in1" type="vector2" nodename="node241" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos6" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos5" />
+    <input name="in2" type="vector2" nodename="node243" />
+  </add>
+  <extract name="node246" type="float">
+    <input name="in" type="vector2" nodename="_loop___res5" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node248" type="float">
+    <input name="in1" type="float" nodename="node246" />
+    <input name="in2" type="float" nodename="get_waves__weight5" />
+  </multiply>
+  <add name="get_waves__sum_of_values6" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values5" />
+    <input name="in2" type="float" nodename="node248" />
+  </add>
+  <add name="get_waves__sum_of_weights6" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights5" />
+    <input name="in2" type="float" nodename="get_waves__weight5" />
+  </add>
+  <mix name="get_waves__weight6" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight5" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq6" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq5" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult6" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult5" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter6" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter5" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node260" type="float">
+    <input name="in" type="float" nodename="get_waves__iter6" />
+  </sin>
+  <cos name="node262" type="float">
+    <input name="in" type="float" nodename="get_waves__iter6" />
+  </cos>
+  <combine2 name="_loop___p6" type="vector2">
+    <input name="in1" type="float" nodename="node260" />
+    <input name="in2" type="float" nodename="node262" />
+  </combine2>
+  <time name="node267" type="float" />
+  <multiply name="node270" type="float">
+    <input name="in1" type="float" nodename="node267" />
+    <input name="in2" type="float" nodename="get_waves__time_mult6" />
+  </multiply>
+  <add name="wave_dx__time6" type="float">
+    <input name="in1" type="float" nodename="node270" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node264" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p6" />
+    <input name="in2" type="vector2" nodename="get_waves__pos6" />
+  </dotproduct>
+  <multiply name="node273" type="float">
+    <input name="in1" type="float" nodename="node264" />
+    <input name="in2" type="float" nodename="get_waves__freq6" />
+  </multiply>
+  <add name="wave_dx__x6" type="float">
+    <input name="in1" type="float" nodename="node273" />
+    <input name="in2" type="float" nodename="wave_dx__time6" />
+  </add>
+  <sin name="node275" type="float">
+    <input name="in" type="float" nodename="wave_dx__x6" />
+  </sin>
+  <subtract name="exp__in6" type="float">
+    <input name="in1" type="float" nodename="node275" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave6" type="float">
+    <input name="in" type="float" nodename="exp__in6" />
+  </exp>
+  <cos name="node280" type="float">
+    <input name="in" type="float" nodename="wave_dx__x6" />
+  </cos>
+  <multiply name="wave_dx__dx6" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave6" />
+    <input name="in2" type="float" nodename="node280" />
+  </multiply>
+  <subtract name="node284" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx6" />
+  </subtract>
+  <combine2 name="_loop___res6" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave6" />
+    <input name="in2" type="float" nodename="node284" />
+  </combine2>
+  <extract name="node288" type="float">
+    <input name="in" type="vector2" nodename="_loop___res6" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node289" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p6" />
+    <input name="in2" type="float" nodename="node288" />
+  </multiply>
+  <multiply name="node291" type="vector2">
+    <input name="in1" type="vector2" nodename="node289" />
+    <input name="in2" type="float" nodename="get_waves__weight6" />
+  </multiply>
+  <multiply name="node293" type="vector2">
+    <input name="in1" type="vector2" nodename="node291" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos7" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos6" />
+    <input name="in2" type="vector2" nodename="node293" />
+  </add>
+  <extract name="node296" type="float">
+    <input name="in" type="vector2" nodename="_loop___res6" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node298" type="float">
+    <input name="in1" type="float" nodename="node296" />
+    <input name="in2" type="float" nodename="get_waves__weight6" />
+  </multiply>
+  <add name="get_waves__sum_of_values7" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values6" />
+    <input name="in2" type="float" nodename="node298" />
+  </add>
+  <add name="get_waves__sum_of_weights7" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights6" />
+    <input name="in2" type="float" nodename="get_waves__weight6" />
+  </add>
+  <mix name="get_waves__weight7" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight6" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq7" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq6" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult7" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult6" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter7" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter6" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node310" type="float">
+    <input name="in" type="float" nodename="get_waves__iter7" />
+  </sin>
+  <cos name="node312" type="float">
+    <input name="in" type="float" nodename="get_waves__iter7" />
+  </cos>
+  <combine2 name="_loop___p7" type="vector2">
+    <input name="in1" type="float" nodename="node310" />
+    <input name="in2" type="float" nodename="node312" />
+  </combine2>
+  <time name="node317" type="float" />
+  <multiply name="node320" type="float">
+    <input name="in1" type="float" nodename="node317" />
+    <input name="in2" type="float" nodename="get_waves__time_mult7" />
+  </multiply>
+  <add name="wave_dx__time7" type="float">
+    <input name="in1" type="float" nodename="node320" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node314" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p7" />
+    <input name="in2" type="vector2" nodename="get_waves__pos7" />
+  </dotproduct>
+  <multiply name="node323" type="float">
+    <input name="in1" type="float" nodename="node314" />
+    <input name="in2" type="float" nodename="get_waves__freq7" />
+  </multiply>
+  <add name="wave_dx__x7" type="float">
+    <input name="in1" type="float" nodename="node323" />
+    <input name="in2" type="float" nodename="wave_dx__time7" />
+  </add>
+  <sin name="node325" type="float">
+    <input name="in" type="float" nodename="wave_dx__x7" />
+  </sin>
+  <subtract name="exp__in7" type="float">
+    <input name="in1" type="float" nodename="node325" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave7" type="float">
+    <input name="in" type="float" nodename="exp__in7" />
+  </exp>
+  <cos name="node330" type="float">
+    <input name="in" type="float" nodename="wave_dx__x7" />
+  </cos>
+  <multiply name="wave_dx__dx7" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave7" />
+    <input name="in2" type="float" nodename="node330" />
+  </multiply>
+  <subtract name="node334" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx7" />
+  </subtract>
+  <combine2 name="_loop___res7" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave7" />
+    <input name="in2" type="float" nodename="node334" />
+  </combine2>
+  <extract name="node338" type="float">
+    <input name="in" type="vector2" nodename="_loop___res7" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node339" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p7" />
+    <input name="in2" type="float" nodename="node338" />
+  </multiply>
+  <multiply name="node341" type="vector2">
+    <input name="in1" type="vector2" nodename="node339" />
+    <input name="in2" type="float" nodename="get_waves__weight7" />
+  </multiply>
+  <multiply name="node343" type="vector2">
+    <input name="in1" type="vector2" nodename="node341" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos8" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos7" />
+    <input name="in2" type="vector2" nodename="node343" />
+  </add>
+  <extract name="node346" type="float">
+    <input name="in" type="vector2" nodename="_loop___res7" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node348" type="float">
+    <input name="in1" type="float" nodename="node346" />
+    <input name="in2" type="float" nodename="get_waves__weight7" />
+  </multiply>
+  <add name="get_waves__sum_of_values8" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values7" />
+    <input name="in2" type="float" nodename="node348" />
+  </add>
+  <add name="get_waves__sum_of_weights8" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights7" />
+    <input name="in2" type="float" nodename="get_waves__weight7" />
+  </add>
+  <mix name="get_waves__weight8" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight7" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq8" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq7" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult8" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult7" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter8" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter7" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node360" type="float">
+    <input name="in" type="float" nodename="get_waves__iter8" />
+  </sin>
+  <cos name="node362" type="float">
+    <input name="in" type="float" nodename="get_waves__iter8" />
+  </cos>
+  <combine2 name="_loop___p8" type="vector2">
+    <input name="in1" type="float" nodename="node360" />
+    <input name="in2" type="float" nodename="node362" />
+  </combine2>
+  <time name="node367" type="float" />
+  <multiply name="node370" type="float">
+    <input name="in1" type="float" nodename="node367" />
+    <input name="in2" type="float" nodename="get_waves__time_mult8" />
+  </multiply>
+  <add name="wave_dx__time8" type="float">
+    <input name="in1" type="float" nodename="node370" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node364" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p8" />
+    <input name="in2" type="vector2" nodename="get_waves__pos8" />
+  </dotproduct>
+  <multiply name="node373" type="float">
+    <input name="in1" type="float" nodename="node364" />
+    <input name="in2" type="float" nodename="get_waves__freq8" />
+  </multiply>
+  <add name="wave_dx__x8" type="float">
+    <input name="in1" type="float" nodename="node373" />
+    <input name="in2" type="float" nodename="wave_dx__time8" />
+  </add>
+  <sin name="node375" type="float">
+    <input name="in" type="float" nodename="wave_dx__x8" />
+  </sin>
+  <subtract name="exp__in8" type="float">
+    <input name="in1" type="float" nodename="node375" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave8" type="float">
+    <input name="in" type="float" nodename="exp__in8" />
+  </exp>
+  <cos name="node380" type="float">
+    <input name="in" type="float" nodename="wave_dx__x8" />
+  </cos>
+  <multiply name="wave_dx__dx8" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave8" />
+    <input name="in2" type="float" nodename="node380" />
+  </multiply>
+  <subtract name="node384" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx8" />
+  </subtract>
+  <combine2 name="_loop___res8" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave8" />
+    <input name="in2" type="float" nodename="node384" />
+  </combine2>
+  <extract name="node388" type="float">
+    <input name="in" type="vector2" nodename="_loop___res8" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node389" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p8" />
+    <input name="in2" type="float" nodename="node388" />
+  </multiply>
+  <multiply name="node391" type="vector2">
+    <input name="in1" type="vector2" nodename="node389" />
+    <input name="in2" type="float" nodename="get_waves__weight8" />
+  </multiply>
+  <multiply name="node393" type="vector2">
+    <input name="in1" type="vector2" nodename="node391" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos9" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos8" />
+    <input name="in2" type="vector2" nodename="node393" />
+  </add>
+  <extract name="node396" type="float">
+    <input name="in" type="vector2" nodename="_loop___res8" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node398" type="float">
+    <input name="in1" type="float" nodename="node396" />
+    <input name="in2" type="float" nodename="get_waves__weight8" />
+  </multiply>
+  <add name="get_waves__sum_of_values9" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values8" />
+    <input name="in2" type="float" nodename="node398" />
+  </add>
+  <add name="get_waves__sum_of_weights9" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights8" />
+    <input name="in2" type="float" nodename="get_waves__weight8" />
+  </add>
+  <mix name="get_waves__weight9" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight8" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq9" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq8" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult9" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult8" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter9" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter8" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node410" type="float">
+    <input name="in" type="float" nodename="get_waves__iter9" />
+  </sin>
+  <cos name="node412" type="float">
+    <input name="in" type="float" nodename="get_waves__iter9" />
+  </cos>
+  <combine2 name="_loop___p9" type="vector2">
+    <input name="in1" type="float" nodename="node410" />
+    <input name="in2" type="float" nodename="node412" />
+  </combine2>
+  <time name="node417" type="float" />
+  <multiply name="node420" type="float">
+    <input name="in1" type="float" nodename="node417" />
+    <input name="in2" type="float" nodename="get_waves__time_mult9" />
+  </multiply>
+  <add name="wave_dx__time9" type="float">
+    <input name="in1" type="float" nodename="node420" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node414" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p9" />
+    <input name="in2" type="vector2" nodename="get_waves__pos9" />
+  </dotproduct>
+  <multiply name="node423" type="float">
+    <input name="in1" type="float" nodename="node414" />
+    <input name="in2" type="float" nodename="get_waves__freq9" />
+  </multiply>
+  <add name="wave_dx__x9" type="float">
+    <input name="in1" type="float" nodename="node423" />
+    <input name="in2" type="float" nodename="wave_dx__time9" />
+  </add>
+  <sin name="node425" type="float">
+    <input name="in" type="float" nodename="wave_dx__x9" />
+  </sin>
+  <subtract name="exp__in9" type="float">
+    <input name="in1" type="float" nodename="node425" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave9" type="float">
+    <input name="in" type="float" nodename="exp__in9" />
+  </exp>
+  <cos name="node430" type="float">
+    <input name="in" type="float" nodename="wave_dx__x9" />
+  </cos>
+  <multiply name="wave_dx__dx9" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave9" />
+    <input name="in2" type="float" nodename="node430" />
+  </multiply>
+  <subtract name="node434" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx9" />
+  </subtract>
+  <combine2 name="_loop___res9" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave9" />
+    <input name="in2" type="float" nodename="node434" />
+  </combine2>
+  <extract name="node438" type="float">
+    <input name="in" type="vector2" nodename="_loop___res9" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node439" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p9" />
+    <input name="in2" type="float" nodename="node438" />
+  </multiply>
+  <multiply name="node441" type="vector2">
+    <input name="in1" type="vector2" nodename="node439" />
+    <input name="in2" type="float" nodename="get_waves__weight9" />
+  </multiply>
+  <multiply name="node443" type="vector2">
+    <input name="in1" type="vector2" nodename="node441" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos10" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos9" />
+    <input name="in2" type="vector2" nodename="node443" />
+  </add>
+  <extract name="node446" type="float">
+    <input name="in" type="vector2" nodename="_loop___res9" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node448" type="float">
+    <input name="in1" type="float" nodename="node446" />
+    <input name="in2" type="float" nodename="get_waves__weight9" />
+  </multiply>
+  <add name="get_waves__sum_of_values10" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values9" />
+    <input name="in2" type="float" nodename="node448" />
+  </add>
+  <add name="get_waves__sum_of_weights10" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights9" />
+    <input name="in2" type="float" nodename="get_waves__weight9" />
+  </add>
+  <mix name="get_waves__weight10" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight9" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq10" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq9" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult10" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult9" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter10" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter9" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node460" type="float">
+    <input name="in" type="float" nodename="get_waves__iter10" />
+  </sin>
+  <cos name="node462" type="float">
+    <input name="in" type="float" nodename="get_waves__iter10" />
+  </cos>
+  <combine2 name="_loop___p10" type="vector2">
+    <input name="in1" type="float" nodename="node460" />
+    <input name="in2" type="float" nodename="node462" />
+  </combine2>
+  <time name="node467" type="float" />
+  <multiply name="node470" type="float">
+    <input name="in1" type="float" nodename="node467" />
+    <input name="in2" type="float" nodename="get_waves__time_mult10" />
+  </multiply>
+  <add name="wave_dx__time10" type="float">
+    <input name="in1" type="float" nodename="node470" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node464" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p10" />
+    <input name="in2" type="vector2" nodename="get_waves__pos10" />
+  </dotproduct>
+  <multiply name="node473" type="float">
+    <input name="in1" type="float" nodename="node464" />
+    <input name="in2" type="float" nodename="get_waves__freq10" />
+  </multiply>
+  <add name="wave_dx__x10" type="float">
+    <input name="in1" type="float" nodename="node473" />
+    <input name="in2" type="float" nodename="wave_dx__time10" />
+  </add>
+  <sin name="node475" type="float">
+    <input name="in" type="float" nodename="wave_dx__x10" />
+  </sin>
+  <subtract name="exp__in10" type="float">
+    <input name="in1" type="float" nodename="node475" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave10" type="float">
+    <input name="in" type="float" nodename="exp__in10" />
+  </exp>
+  <cos name="node480" type="float">
+    <input name="in" type="float" nodename="wave_dx__x10" />
+  </cos>
+  <multiply name="wave_dx__dx10" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave10" />
+    <input name="in2" type="float" nodename="node480" />
+  </multiply>
+  <subtract name="node484" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx10" />
+  </subtract>
+  <combine2 name="_loop___res10" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave10" />
+    <input name="in2" type="float" nodename="node484" />
+  </combine2>
+  <extract name="node488" type="float">
+    <input name="in" type="vector2" nodename="_loop___res10" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node489" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p10" />
+    <input name="in2" type="float" nodename="node488" />
+  </multiply>
+  <multiply name="node491" type="vector2">
+    <input name="in1" type="vector2" nodename="node489" />
+    <input name="in2" type="float" nodename="get_waves__weight10" />
+  </multiply>
+  <multiply name="node493" type="vector2">
+    <input name="in1" type="vector2" nodename="node491" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos11" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos10" />
+    <input name="in2" type="vector2" nodename="node493" />
+  </add>
+  <extract name="node496" type="float">
+    <input name="in" type="vector2" nodename="_loop___res10" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node498" type="float">
+    <input name="in1" type="float" nodename="node496" />
+    <input name="in2" type="float" nodename="get_waves__weight10" />
+  </multiply>
+  <add name="get_waves__sum_of_values11" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values10" />
+    <input name="in2" type="float" nodename="node498" />
+  </add>
+  <add name="get_waves__sum_of_weights11" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights10" />
+    <input name="in2" type="float" nodename="get_waves__weight10" />
+  </add>
+  <mix name="get_waves__weight11" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight10" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq11" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq10" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult11" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult10" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter11" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter10" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node510" type="float">
+    <input name="in" type="float" nodename="get_waves__iter11" />
+  </sin>
+  <cos name="node512" type="float">
+    <input name="in" type="float" nodename="get_waves__iter11" />
+  </cos>
+  <combine2 name="_loop___p11" type="vector2">
+    <input name="in1" type="float" nodename="node510" />
+    <input name="in2" type="float" nodename="node512" />
+  </combine2>
+  <time name="node517" type="float" />
+  <multiply name="node520" type="float">
+    <input name="in1" type="float" nodename="node517" />
+    <input name="in2" type="float" nodename="get_waves__time_mult11" />
+  </multiply>
+  <add name="wave_dx__time11" type="float">
+    <input name="in1" type="float" nodename="node520" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node514" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p11" />
+    <input name="in2" type="vector2" nodename="get_waves__pos11" />
+  </dotproduct>
+  <multiply name="node523" type="float">
+    <input name="in1" type="float" nodename="node514" />
+    <input name="in2" type="float" nodename="get_waves__freq11" />
+  </multiply>
+  <add name="wave_dx__x11" type="float">
+    <input name="in1" type="float" nodename="node523" />
+    <input name="in2" type="float" nodename="wave_dx__time11" />
+  </add>
+  <sin name="node525" type="float">
+    <input name="in" type="float" nodename="wave_dx__x11" />
+  </sin>
+  <subtract name="exp__in11" type="float">
+    <input name="in1" type="float" nodename="node525" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave11" type="float">
+    <input name="in" type="float" nodename="exp__in11" />
+  </exp>
+  <cos name="node530" type="float">
+    <input name="in" type="float" nodename="wave_dx__x11" />
+  </cos>
+  <multiply name="wave_dx__dx11" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave11" />
+    <input name="in2" type="float" nodename="node530" />
+  </multiply>
+  <subtract name="node534" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx11" />
+  </subtract>
+  <combine2 name="_loop___res11" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave11" />
+    <input name="in2" type="float" nodename="node534" />
+  </combine2>
+  <extract name="node538" type="float">
+    <input name="in" type="vector2" nodename="_loop___res11" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node539" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p11" />
+    <input name="in2" type="float" nodename="node538" />
+  </multiply>
+  <multiply name="node541" type="vector2">
+    <input name="in1" type="vector2" nodename="node539" />
+    <input name="in2" type="float" nodename="get_waves__weight11" />
+  </multiply>
+  <multiply name="node543" type="vector2">
+    <input name="in1" type="vector2" nodename="node541" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos12" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos11" />
+    <input name="in2" type="vector2" nodename="node543" />
+  </add>
+  <extract name="node546" type="float">
+    <input name="in" type="vector2" nodename="_loop___res11" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node548" type="float">
+    <input name="in1" type="float" nodename="node546" />
+    <input name="in2" type="float" nodename="get_waves__weight11" />
+  </multiply>
+  <add name="get_waves__sum_of_values12" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values11" />
+    <input name="in2" type="float" nodename="node548" />
+  </add>
+  <add name="get_waves__sum_of_weights12" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights11" />
+    <input name="in2" type="float" nodename="get_waves__weight11" />
+  </add>
+  <mix name="get_waves__weight12" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight11" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq12" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq11" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult12" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult11" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter12" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter11" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node560" type="float">
+    <input name="in" type="float" nodename="get_waves__iter12" />
+  </sin>
+  <cos name="node562" type="float">
+    <input name="in" type="float" nodename="get_waves__iter12" />
+  </cos>
+  <combine2 name="_loop___p12" type="vector2">
+    <input name="in1" type="float" nodename="node560" />
+    <input name="in2" type="float" nodename="node562" />
+  </combine2>
+  <time name="node567" type="float" />
+  <multiply name="node570" type="float">
+    <input name="in1" type="float" nodename="node567" />
+    <input name="in2" type="float" nodename="get_waves__time_mult12" />
+  </multiply>
+  <add name="wave_dx__time12" type="float">
+    <input name="in1" type="float" nodename="node570" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node564" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p12" />
+    <input name="in2" type="vector2" nodename="get_waves__pos12" />
+  </dotproduct>
+  <multiply name="node573" type="float">
+    <input name="in1" type="float" nodename="node564" />
+    <input name="in2" type="float" nodename="get_waves__freq12" />
+  </multiply>
+  <add name="wave_dx__x12" type="float">
+    <input name="in1" type="float" nodename="node573" />
+    <input name="in2" type="float" nodename="wave_dx__time12" />
+  </add>
+  <sin name="node575" type="float">
+    <input name="in" type="float" nodename="wave_dx__x12" />
+  </sin>
+  <subtract name="exp__in12" type="float">
+    <input name="in1" type="float" nodename="node575" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave12" type="float">
+    <input name="in" type="float" nodename="exp__in12" />
+  </exp>
+  <cos name="node580" type="float">
+    <input name="in" type="float" nodename="wave_dx__x12" />
+  </cos>
+  <multiply name="wave_dx__dx12" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave12" />
+    <input name="in2" type="float" nodename="node580" />
+  </multiply>
+  <subtract name="node584" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx12" />
+  </subtract>
+  <combine2 name="_loop___res12" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave12" />
+    <input name="in2" type="float" nodename="node584" />
+  </combine2>
+  <extract name="node588" type="float">
+    <input name="in" type="vector2" nodename="_loop___res12" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node589" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p12" />
+    <input name="in2" type="float" nodename="node588" />
+  </multiply>
+  <multiply name="node591" type="vector2">
+    <input name="in1" type="vector2" nodename="node589" />
+    <input name="in2" type="float" nodename="get_waves__weight12" />
+  </multiply>
+  <multiply name="node593" type="vector2">
+    <input name="in1" type="vector2" nodename="node591" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos13" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos12" />
+    <input name="in2" type="vector2" nodename="node593" />
+  </add>
+  <extract name="node596" type="float">
+    <input name="in" type="vector2" nodename="_loop___res12" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node598" type="float">
+    <input name="in1" type="float" nodename="node596" />
+    <input name="in2" type="float" nodename="get_waves__weight12" />
+  </multiply>
+  <add name="get_waves__sum_of_values13" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values12" />
+    <input name="in2" type="float" nodename="node598" />
+  </add>
+  <add name="get_waves__sum_of_weights13" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights12" />
+    <input name="in2" type="float" nodename="get_waves__weight12" />
+  </add>
+  <mix name="get_waves__weight13" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight12" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq13" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq12" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult13" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult12" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter13" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter12" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <sin name="node610" type="float">
+    <input name="in" type="float" nodename="get_waves__iter13" />
+  </sin>
+  <cos name="node612" type="float">
+    <input name="in" type="float" nodename="get_waves__iter13" />
+  </cos>
+  <combine2 name="_loop___p13" type="vector2">
+    <input name="in1" type="float" nodename="node610" />
+    <input name="in2" type="float" nodename="node612" />
+  </combine2>
+  <time name="node617" type="float" />
+  <multiply name="node620" type="float">
+    <input name="in1" type="float" nodename="node617" />
+    <input name="in2" type="float" nodename="get_waves__time_mult13" />
+  </multiply>
+  <add name="wave_dx__time13" type="float">
+    <input name="in1" type="float" nodename="node620" />
+    <input name="in2" type="float" nodename="get_waves__wave_phase_shift" />
+  </add>
+  <dotproduct name="node614" type="float">
+    <input name="in1" type="vector2" nodename="_loop___p13" />
+    <input name="in2" type="vector2" nodename="get_waves__pos13" />
+  </dotproduct>
+  <multiply name="node623" type="float">
+    <input name="in1" type="float" nodename="node614" />
+    <input name="in2" type="float" nodename="get_waves__freq13" />
+  </multiply>
+  <add name="wave_dx__x13" type="float">
+    <input name="in1" type="float" nodename="node623" />
+    <input name="in2" type="float" nodename="wave_dx__time13" />
+  </add>
+  <sin name="node625" type="float">
+    <input name="in" type="float" nodename="wave_dx__x13" />
+  </sin>
+  <subtract name="exp__in13" type="float">
+    <input name="in1" type="float" nodename="node625" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <exp name="wave_dx__wave13" type="float">
+    <input name="in" type="float" nodename="exp__in13" />
+  </exp>
+  <cos name="node630" type="float">
+    <input name="in" type="float" nodename="wave_dx__x13" />
+  </cos>
+  <multiply name="wave_dx__dx13" type="float">
+    <input name="in1" type="float" nodename="wave_dx__wave13" />
+    <input name="in2" type="float" nodename="node630" />
+  </multiply>
+  <subtract name="node634" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="wave_dx__dx13" />
+  </subtract>
+  <combine2 name="_loop___res13" type="vector2">
+    <input name="in1" type="float" nodename="wave_dx__wave13" />
+    <input name="in2" type="float" nodename="node634" />
+  </combine2>
+  <extract name="node638" type="float">
+    <input name="in" type="vector2" nodename="_loop___res13" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="node639" type="vector2">
+    <input name="in1" type="vector2" nodename="_loop___p13" />
+    <input name="in2" type="float" nodename="node638" />
+  </multiply>
+  <multiply name="node641" type="vector2">
+    <input name="in1" type="vector2" nodename="node639" />
+    <input name="in2" type="float" nodename="get_waves__weight13" />
+  </multiply>
+  <multiply name="node643" type="vector2">
+    <input name="in1" type="vector2" nodename="node641" />
+    <input name="in2" type="float" value="0.38" />
+  </multiply>
+  <add name="get_waves__pos14" type="vector2">
+    <input name="in1" type="vector2" nodename="get_waves__pos13" />
+    <input name="in2" type="vector2" nodename="node643" />
+  </add>
+  <extract name="node646" type="float">
+    <input name="in" type="vector2" nodename="_loop___res13" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node648" type="float">
+    <input name="in1" type="float" nodename="node646" />
+    <input name="in2" type="float" nodename="get_waves__weight13" />
+  </multiply>
+  <add name="get_waves__sum_of_values14" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values13" />
+    <input name="in2" type="float" nodename="node648" />
+  </add>
+  <add name="get_waves__sum_of_weights14" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_weights13" />
+    <input name="in2" type="float" nodename="get_waves__weight13" />
+  </add>
+  <mix name="get_waves__weight14" type="float">
+    <input name="fg" type="float" nodename="get_waves__weight13" />
+    <input name="bg" type="float" value="0" />
+    <input name="mix" type="float" value="0.2" />
+  </mix>
+  <multiply name="get_waves__freq14" type="float">
+    <input name="in1" type="float" nodename="get_waves__freq13" />
+    <input name="in2" type="float" value="1.18" />
+  </multiply>
+  <multiply name="get_waves__time_mult14" type="float">
+    <input name="in1" type="float" nodename="get_waves__time_mult13" />
+    <input name="in2" type="float" value="1.07" />
+  </multiply>
+  <add name="get_waves__iter14" type="float">
+    <input name="in1" type="float" nodename="get_waves__iter13" />
+    <input name="in2" type="float" value="1232.4" />
+  </add>
+  <divide name="main__wave_height" type="float">
+    <input name="in1" type="float" nodename="get_waves__sum_of_values14" />
+    <input name="in2" type="float" nodename="get_waves__sum_of_weights14" />
+  </divide>
+  <standard_surface name="main__surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node707" />
+    <input name="specular_roughness" type="float" value="0.2" />
+  </standard_surface>
+  <combine3 name="node707" type="color3">
+    <input name="in1" type="float" value="0.1" />
+    <input name="in2" type="float" value="0.25" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <combine3 name="displacement__displacement" type="vector3">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <divide name="displacement__scale" type="float">
+    <input name="in1" type="float" nodename="main__wave_height" />
+    <input name="in2" type="float" value="5" />
+  </divide>
+  <displacement name="node712" type="displacementshader">
+    <input name="displacement" type="vector3" nodename="displacement__displacement" />
+    <input name="scale" type="float" nodename="displacement__scale" />
+  </displacement>
+  <surfacematerial name="mxsl_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="main__surface" />
+    <input name="displacementshader" type="displacementshader" nodename="node712" />
+  </surfacematerial>
+</materialx>

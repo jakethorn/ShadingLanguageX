@@ -1,0 +1,10 @@
+vector3 global__v = viewdirection();
+vector3 global__n = normal();
+float node1 = dotproduct(in1=global__v, in2=global__n);
+float global__theta = 0.0 - node1;
+float global__outline = smoothstep(in=global__theta, low=0.2, high=0.25);
+vector3 node6 = position();
+vector3 node12 = node6 * global__outline;
+color3 global__c = color3(node12);
+surfaceshader global__surface = standard_surface(base_color=global__c, specular_roughness=1.0);
+//material mxsl_material = {"surfacematerial", material: surfaceshader=global__surface};

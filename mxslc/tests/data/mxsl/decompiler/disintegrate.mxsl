@@ -1,0 +1,17 @@
+vector3 main__p = position();
+vector3 node6 = vector3(1.0, 50.0, 0.0);
+vector3 main__p2 = main__p + node6;
+float node8 = main__p2[0];
+float node9 = main__p2[1];
+vector2 node10 = vector2(node8, node9);
+vector2 main__uv = node10 * 5.0;
+float main__noise = noise2d(amplitude=0.5, pivot=0.0, texcoord=main__uv);
+color3 main__fire = color3(1.0, 0.2, 0.0);
+float node20 = if (main__noise > 0.1) { 1.0 } else { 0.0 };
+color3 node24 = main__fire * main__noise;
+color3 main__color = if (node20 == 1.0) { main__fire } else { node24 };
+float node28 = main__noise * 4.0;
+float main__opacity = 0.9 - node28;
+color3 node73 = color3(main__opacity);
+surfaceshader main__surface = standard_surface(base_color=main__color, opacity=node73);
+//material mxsl_material = {"surfacematerial", material: surfaceshader=main__surface};
