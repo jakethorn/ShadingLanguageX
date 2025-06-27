@@ -1,8 +1,9 @@
 from . import Expression
 from .expression_utils import format_args
-from .. import mx_utils
+from .. import state_utils
 from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class ConstructorCall(Expression):
@@ -10,6 +11,13 @@ class ConstructorCall(Expression):
         super().__init__(data_type)
         self.__data_type = DataType(data_type)
         self.__args = args
+
+    def sub_expressions(self) -> list[Expression]:
+        exprs: list[Expression] = []
+        for arg in self.__args:
+            exprs.append(arg.expression)
+            exprs.extend(arg.expression.sub_expressions())
+        return exprs
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         data_type = self.__data_type.instantiate(template_type).as_token
@@ -27,7 +35,7 @@ class ConstructorCall(Expression):
     def _data_type(self) -> DataType:
         return self.__data_type
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         if len(self.__args) == 0:
             return self.__constant_node()
         elif len(self.__args) == 1:
@@ -35,25 +43,25 @@ class ConstructorCall(Expression):
         else:
             return self.__combine_node()
 
-    def __constant_node(self) -> mx_utils.Node:
-        return mx_utils.constant(self.data_type.zeros())
+    def __constant_node(self) -> Node:
+        return state_utils.constant(self.data_type.default())
 
-    def __convert_node(self) -> mx_utils.Node:
-        return mx_utils.convert(self.__args[0].evaluate(), self.data_type)
+    def __convert_node(self) -> Node:
+        return state_utils.convert(self.__args[0].evaluate(), self.data_type)
 
-    def __combine_node(self) -> mx_utils.Node:
+    def __combine_node(self) -> Node:
         channels = []
         # fill channels with args
         for arg in self.__args:
-            new_channels = mx_utils.extract_all(arg.evaluate())
+            new_channels = state_utils.extract_all(arg.evaluate())
             for new_channel in new_channels:
                 channels.append(new_channel)
                 if len(channels) == self.data_size:
-                    return mx_utils.combine(channels, self.data_type)
+                    return state_utils.combine(channels, self.data_type)
         # fill remaining channels (if any) with zeros
         while len(channels) < self.data_size:
-            channels.append(mx_utils.constant(0.0))
-        return mx_utils.combine(channels, self.data_type)
+            channels.append(state_utils.constant(0.0))
+        return state_utils.combine(channels, self.data_type)
 
     def __str__(self) -> str:
         return f"{self.__data_type}({format_args(self.__args, with_names=False)})"

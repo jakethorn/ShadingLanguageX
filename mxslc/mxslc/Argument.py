@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from . import mx_utils
 from .DataType import DataType
 from .Expressions import Expression
 from .Token import Token
+from .mx_classes import Node
 
 
 class Argument:
@@ -45,7 +45,7 @@ class Argument:
     def init(self, valid_types: DataType | set[DataType] = None) -> None:
         self.__expr.init(valid_types)
 
-    def evaluate(self) -> mx_utils.Node:
+    def evaluate(self) -> Node:
         return self.__expr.evaluate()
 
     def __str__(self):

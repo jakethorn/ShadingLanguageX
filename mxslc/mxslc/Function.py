@@ -1,11 +1,17 @@
+from __future__ import annotations
+
 from pathlib import Path
 
-from . import mx_utils, state
+from . import state
 from .Argument import Argument
 from .DataType import DataType
 from .Expressions import Expression
+from .Expressions.LiteralExpression import NullExpression
+from .Keyword import Keyword
 from .Parameter import ParameterList, Parameter
-from .Token import Token
+from .Token import Token, IdentifierToken
+from .document import get_document
+from .mx_classes import NodeDef, Node, Output
 
 
 class Function:
@@ -18,6 +24,9 @@ class Function:
         self.__return_expr = return_expr
         self.__file = identifier.file
         self.__line = identifier.line
+
+        self.__node_def: NodeDef | None = None
+        self.__implicit_outs: dict[str, Output] = {}
 
     @property
     def return_type(self) -> DataType:
@@ -34,6 +43,10 @@ class Function:
     @property
     def line(self) -> int:
         return self.__line
+
+    def initialise(self) -> None:
+        self.__create_node_def()
+        self.__create_node_graph()
 
     def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
         if self.__name != name:
@@ -58,27 +71,68 @@ class Function:
 
         return True
 
-    def invoke(self, args: list[Argument]) -> mx_utils.Node:
-        arg_nodes = [a.evaluate() for a in self.__sort_args(args)]
+    def invoke(self, args: list[Argument]) -> Node:
+        return self.__call_node_def(args)
 
-        state.enter_scope(self.__name)
+    @staticmethod
+    def from_node_def(node_def: NodeDef) -> Function:
+        return_type = node_def.output.data_type
+        identifier = IdentifierToken(node_def.node_string)
+        template_keyword = node_def.name.split("_")[-1]
+        if template_keyword in Keyword.DATA_TYPES():
+            template_type = DataType(template_keyword)
+        else:
+            template_type = None
+        params = ParameterList()
+        for input_ in node_def.inputs:
+            param_identifier = IdentifierToken(input_.name)
+            params += Parameter(param_identifier, input_.data_type, NullExpression())
+        params.init_default_values()
+        func = Function(return_type, identifier, template_type, params, None, None)
+        func.__node_def = node_def
+        return func
 
-        for param, arg_node in zip(self.__params, arg_nodes):
-            state.add_node(param.identifier, arg_node)
-
-        for statement in self.__body:
-            statement.execute()
-
-        retval = self.__return_expr.init_evaluate(self.__return_type)
-
-        state.exit_scope()
-
-        return retval
-
-    def __sort_args(self, args: list[Argument]) -> list[Expression]:
-        pairs: dict[Parameter, Expression] = {}
+    def __create_node_def(self) -> None:
+        self.__node_def = get_document().add_node_def(f"ND_{self.__name}", self.__return_type, self.__name)
         for param in self.__params:
-            pairs[param] = param.default_value
+            self.__node_def.add_input(param.name, param.data_type.default())
+
+    def __create_node_graph(self) -> None:
+        node_graph = get_document().add_node_graph_from_def(self.__node_def)
+        state.enter_node_graph(node_graph)
+        for stmt in self.__body:
+            stmt.execute()
+        retval = self.__return_expr.init_evaluate(self.__return_type)
+        node_graph.add_output("out", retval)
+        self.__implicit_outs = state.exit_node_graph()
+
+    def __call_node_def(self, args: list[Argument]) -> Node:
+        assert self.__node_def is not None
+        node = state.add_unnamed_node(self.__name, self.__return_type)
+        func_args = self.__combine_with_default_params(args)
+        for nd_input in self.__node_def.inputs:
+            if nd_input.name in func_args:
+                node.add_input(nd_input.name, func_args[nd_input.name])
+            else:
+                node.add_input(nd_input.name, state.get_node(nd_input.name))
+
+        if len(self.__implicit_outs) > 0:
+            node.source.setType("multioutput")
+
+            for name, output in self.__implicit_outs.items():
+                dot_node = state.add_unnamed_node("dot", output.data_type)
+                dot_node.add_input("in", output).value = node
+                state.set_node(name, dot_node)
+
+            dot_node = state.add_unnamed_node("dot", self.__node_def.output.data_type)
+            dot_node.add_input("in", self.__node_def.output).value = node
+
+            return dot_node
+        else:
+            return node
+
+    def __combine_with_default_params(self, args: list[Argument]) -> dict[str, Node]:
+        pairs: dict[str, Expression] = {p.name: p.default_value for p in self.__params}
         for arg in args:
-            pairs[self.__params[arg]] = arg.expression
-        return list(pairs.values())
+            pairs[self.__params[arg].name] = arg.expression
+        return {name: expr.evaluate() for name, expr in pairs.items()}

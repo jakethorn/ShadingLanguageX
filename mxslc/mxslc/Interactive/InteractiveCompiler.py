@@ -4,7 +4,7 @@ from typing import Sequence
 import MaterialX as mx
 
 from .ShaderInterface import ShaderInterface
-from .. import mx_utils, state
+from .. import state
 from ..Preprocessor.macros import undefine_all_macros
 from ..compile import compile_
 from ..file_utils import handle_input_path

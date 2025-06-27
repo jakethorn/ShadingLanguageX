@@ -1,9 +1,10 @@
 from . import Statement
-from .. import mx_utils, state
+from .. import state, state_utils
 from ..CompileError import CompileError
-from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN
+from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN, SURFACESHADER, DISPLACEMENTSHADER, SHADER_TYPES
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Token import Token
+from ..mx_classes import Node
 from ..utils import type_of_swizzle, string
 
 
@@ -12,6 +13,9 @@ class VariableAssignment(Statement):
         self.__identifier = identifier
         self.__property = string(property_)
         self.__right = right
+
+    def sub_expressions(self) -> list[Expression]:
+        return [self.__right, *self.__right.sub_expressions()]
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         right = self.__right.instantiate_templated_types(template_type)
@@ -25,49 +29,51 @@ class VariableAssignment(Statement):
             self.execute_as_surface_input(node)
         elif node.category == "displacement":
             self.execute_as_surface_input(node)
+        elif node.category == "dot" and node.data_type in SHADER_TYPES:
+            raise CompileError("You are modifying a copy of a shader variable, not the original shader variable.", self.__identifier)
         else:
             self.execute_as_swizzle(node)
 
-    def execute_as_identifier(self, old_node: mx_utils.Node) -> None:
+    def execute_as_identifier(self, old_node: Node) -> None:
         new_node = self.evaluate_right(old_node.data_type)
         state.set_node(self.__identifier, new_node)
 
-    def execute_as_surface_input(self, surface_node: mx_utils.Node) -> None:
+    def execute_as_surface_input(self, surface_node: Node) -> None:
         if self.__property in _standard_surface_inputs:
             input_type = _standard_surface_inputs[self.__property]
         else:
             raise CompileError(f"Input '{self.__property}' does not exist in the standard surface shader.", self.__identifier)
         surface_node.set_input(self.__property, self.evaluate_right(input_type))
 
-    def execute_as_displacement_input(self, displacement_node: mx_utils.Node) -> None:
+    def execute_as_displacement_input(self, displacement_node: Node) -> None:
         if self.__property in _standard_surface_inputs:
             input_types = _standard_surface_inputs[self.__property]
         else:
             raise CompileError(f"Input '{self.__property}' does not exist in the displacement shader.", self.__identifier)
         displacement_node.set_input(self.__property, self.evaluate_right(input_types))
 
-    def execute_as_swizzle(self, old_node: mx_utils.Node) -> None:
+    def execute_as_swizzle(self, old_node: Node) -> None:
         # evaluate right hand expression
         right_node = self.evaluate_right(type_of_swizzle(self.__property))
 
         # split into channels corresponding to swizzle
-        right_channels = mx_utils.extract_all(right_node)
+        right_channels = state_utils.extract_all(right_node)
         swizzle_channel_map = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3}
         swizzle_channels = [swizzle_channel_map[c] for c in self.__property]
         assert len(right_channels) == len(swizzle_channels)
 
         # get default channels of old variable
-        data = mx_utils.extract_all(old_node)
+        data = state_utils.extract_all(old_node)
 
         # override swizzle channels with right hand data
         for swizzle_channel, right_channel in zip(swizzle_channels, right_channels):
             data[swizzle_channel] = right_channel
 
         # combine into final node
-        node = mx_utils.combine(data, old_node.data_type)
+        node = state_utils.combine(data, old_node.data_type)
         state.set_node(self.__identifier, node)
 
-    def evaluate_right(self, valid_types: DataType | set[DataType]) -> mx_utils.Node:
+    def evaluate_right(self, valid_types: DataType | set[DataType]) -> Node:
         # TODO fix if expressions to work with surface/displacement shader properties
         if isinstance(self.__right, IfExpression) and self.__right.otherwise is None:
             self.__right.otherwise = IdentifierExpression(self.__identifier)

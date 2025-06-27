@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_my_color" node="my_color">
+    <output name="out" type="color3" default="0, 0, 0" />
+    <input name="input_color" type="color3" value="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_my_color" nodedef="ND_my_color">
+    <constant name="node1" type="multioutput">
+      <input name="value" type="color3" value="1, 0, 0" />
+    </constant>
+    <add name="node2" type="color3">
+      <input name="in1" type="color3" nodename="node1" output="my_output1" />
+    </add>
+    <output name="out" type="color3" nodename="node2" />
+  </nodegraph>
+  <my_color name="node3" type="color3">
+    <input name="input_color" type="color3" value="0, 1, 0" />
+  </my_color>
+  <standard_surface name="node4" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node3" />
+  </standard_surface>
+  <surfacematerial name="node5" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="node4" />
+  </surfacematerial>
+</materialx>

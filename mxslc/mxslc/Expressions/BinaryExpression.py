@@ -2,10 +2,11 @@ from abc import ABC
 
 from . import Expression
 from .expression_utils import init_linked_expressions
-from .. import mx_utils, utils
+from .. import utils, state, state_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, INTEGER, FLOAT, BOOLEAN, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
+from ..mx_classes import Node
 from ..Token import Token
 from ..utils import one
 
@@ -16,6 +17,9 @@ class BinaryExpression(Expression, ABC):
         self._left = left
         self._op = op
         self._right = right
+
+    def sub_expressions(self) -> list[Expression]:
+        return [self._left, self._right, *self._left.sub_expressions(), *self._right.sub_expressions()]
 
     def __str__(self) -> str:
         return f"{self._left} {self._op} {self._right}"
@@ -88,14 +92,14 @@ class ArithmeticExpression(BinaryExpression):
         else:
             return self._right.data_type
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         left_node = self._left.evaluate()
         right_node = self._right.evaluate()
 
         if left_node.data_size < right_node.data_size:
-            left_node = mx_utils.convert(left_node, right_node.data_type)
+            left_node = state_utils.convert(left_node, right_node.data_type)
 
-        node = mx_utils.create_node(self.node_type, self.data_type)
+        node = state.add_unnamed_node(self.node_type, self.data_type)
         node.set_input("in1", left_node)
         node.set_input("in2", right_node)
         return node
@@ -121,7 +125,7 @@ class ComparisonExpression(BinaryExpression):
     def _data_type(self) -> DataType:
         return BOOLEAN
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         node_type = {
             "!=": "ifequal",
             "==": "ifequal",
@@ -137,12 +141,12 @@ class ComparisonExpression(BinaryExpression):
         if self._op in ["<", "<="]:
             left_node, right_node = right_node, left_node
 
-        comp_node = mx_utils.create_node(node_type, BOOLEAN)
+        comp_node = state.add_unnamed_node(node_type, BOOLEAN)
         comp_node.set_input("value1", left_node)
         comp_node.set_input("value2", right_node)
 
         if node_type == "!=":
-            bang_node = mx_utils.create_node("not", BOOLEAN)
+            bang_node = state.add_unnamed_node("not", BOOLEAN)
             bang_node.set_input("in", comp_node)
             return bang_node
         else:
@@ -166,7 +170,7 @@ class LogicExpression(BinaryExpression):
     def _data_type(self) -> DataType:
         return BOOLEAN
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         node_type = {
             "&": "and",
             Keyword.AND: "and",
@@ -174,7 +178,7 @@ class LogicExpression(BinaryExpression):
             Keyword.OR: "or"
         }[self._op.type]
 
-        node = mx_utils.create_node(node_type, BOOLEAN)
+        node = state.add_unnamed_node(node_type, BOOLEAN)
         node.set_input("in1", self._left.evaluate())
         node.set_input("in2", self._right.evaluate())
         return node

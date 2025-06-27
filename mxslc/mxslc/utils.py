@@ -21,13 +21,6 @@ def one(values: Sequence[bool] | Generator[bool, None, None]) -> bool:
     return len([v for v in values if v]) == 1
 
 
-# TODO make this more robust
-def is_path(literal: Any) -> bool:
-    if not isinstance(literal, str):
-        return False
-    return literal.endswith(".tif") or literal.endswith(".png") or literal.endswith(".jpg")
-
-
 def string(value: Any) -> str | None:
     if value is None:
         return None

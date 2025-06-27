@@ -28,8 +28,12 @@ class Keyword(StrEnum):
     VECTOR4 = auto()
     COLOR3 = auto()
     COLOR4 = auto()
+    MATRIX33 = auto()
+    MATRIX44 = auto()
     SURFACESHADER = auto()
     DISPLACEMENTSHADER = auto()
+    VOLUMESHADER = auto()
+    LIGHTSHADER = auto()
     MATERIAL = auto()
     T = "T"
 
@@ -53,8 +57,12 @@ class Keyword(StrEnum):
             Keyword.VECTOR4,
             Keyword.COLOR3,
             Keyword.COLOR4,
+            Keyword.MATRIX33,
+            Keyword.MATRIX44,
             Keyword.SURFACESHADER,
             Keyword.DISPLACEMENTSHADER,
+            Keyword.VOLUMESHADER,
+            Keyword.LIGHTSHADER,
             Keyword.MATERIAL,
             Keyword.T
         }

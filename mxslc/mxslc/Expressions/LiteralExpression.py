@@ -1,9 +1,10 @@
 from . import Expression
-from .. import mx_utils
+from .. import state_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, STRING, FILENAME
 from ..Keyword import Keyword
 from ..Token import Token
+from ..mx_classes import Node
 from ..token_types import INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL, STRING_LITERAL
 
 
@@ -12,6 +13,9 @@ class LiteralExpression(Expression):
         super().__init__(literal)
         self.__literal = literal
         self.__null_type: DataType | None = None
+
+    def sub_expressions(self) -> list[Expression]:
+        return []
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return LiteralExpression(self.token)
@@ -33,11 +37,11 @@ class LiteralExpression(Expression):
             Keyword.NULL: self.__null_type
         }[self.__literal.type]
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         if self.__literal.type == Keyword.NULL:
-            return mx_utils.get_null_node(self.__null_type)
+            return state_utils.null_node(self.__null_type)
         else:
-            return mx_utils.constant(self.__literal.value)
+            return state_utils.constant(self.__literal.value)
 
     def __str__(self) -> str:
         return str(self.__literal)

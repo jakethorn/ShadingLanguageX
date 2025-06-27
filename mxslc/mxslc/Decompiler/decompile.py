@@ -155,10 +155,12 @@ def _get_expression(args: list[Argument], index: int | str) -> Expression:
 
 
 def _get_stdlib_functions() -> set[str]:
-    stdlib_defs_path = Path(__file__).parent.parent / "stdlib" / "stdlib_defs.mxsl"
-    with open(stdlib_defs_path) as f:
-        stdlib_defs = f.read()
-    return {f.replace('"', '') for f in re.findall('"[a-zA-Z0-9_]+"', stdlib_defs)}
+    # TODO load in the stdlib_defs.mtlx and use the node_defs instead
+    return set()
+    #stdlib_defs_path = Path(__file__).parent.parent / "stdlib" / "stdlib_defs.mxsl"
+    #with open(stdlib_defs_path) as f:
+    #    stdlib_defs = f.read()
+    #return {f.replace('"', '') for f in re.findall('"[a-zA-Z0-9_]+"', stdlib_defs)}
 
 
 _stdlib_functions = _get_stdlib_functions()

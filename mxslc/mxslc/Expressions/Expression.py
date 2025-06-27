@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from .. import mx_utils, utils
+from .. import utils
 from ..CompileError import CompileError
 from ..DataType import DataType, DATA_TYPES
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class Expression(ABC):
@@ -54,19 +55,23 @@ class Expression(ABC):
     def data_size(self) -> int:
         return self.data_type.size
 
-    def evaluate(self) -> mx_utils.Node:
+    def evaluate(self) -> Node:
         assert self.__initialized
         node = self._evaluate()
         assert node.data_type == self.data_type
         return node
 
     @abstractmethod
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         ...
 
-    def init_evaluate(self, valid_types: DataType | set[DataType] = None) -> mx_utils.Node:
+    def init_evaluate(self, valid_types: DataType | set[DataType] = None) -> Node:
         self.init(valid_types)
         return self.evaluate()
+
+    @abstractmethod
+    def sub_expressions(self) -> list[Expression]:
+        ...
 
 
 def _as_set(data_types: DataType | set[DataType]) -> set[DataType]:

@@ -7,16 +7,18 @@ import MaterialX as mx
 
 from .InteractiveExpression import InteractiveExpression
 from .InteractiveNode import InteractiveNode
-from .. import state, mx_utils
+from .. import state, state_utils
 from ..Argument import Argument
 from ..CompileError import CompileError
+from ..mx_classes import Node
+from ..mx_types import Value
 
 
 class ShaderInterface:
     def __getattr__(self, name: str) -> InteractiveNode | InteractiveFunction:
         return self[name]
 
-    def __setattr__(self, name: str, value: mx_utils.Value) -> None:
+    def __setattr__(self, name: str, value: Value) -> None:
         self[name] = value
 
     def __contains__(self, name: str) -> bool:
@@ -29,7 +31,7 @@ class ShaderInterface:
             return InteractiveFunction(name)
         raise CompileError(f"No variable or function named '{name}' found.")
 
-    def __setitem__(self, name: str, value: mx_utils.Value) -> None:
+    def __setitem__(self, name: str, value: Value) -> None:
         # TODO type checking
         if state.is_node(name):
             state.set_node(name, _to_mtlx_node(value))
@@ -48,7 +50,7 @@ class InteractiveFunction:
     def __init__(self, name: str):
         self.__function = state.get_function(name)
 
-    def __call__(self, *args: mx_utils.Value | InteractiveNode) -> InteractiveNode:
+    def __call__(self, *args: Value | InteractiveNode) -> InteractiveNode:
         node = self.__function.invoke(_to_arg_list(args))
         return InteractiveNode(node)
 
@@ -61,14 +63,14 @@ class InteractiveFunction:
         return self.__function.line
 
 
-def _to_mtlx_node(value: mx_utils.Value) -> mx_utils.Node:
+def _to_mtlx_node(value: Value) -> Node:
     if isinstance(value, mx.Node):
-        return mx_utils.Node(value)
+        return Node(value)
     else:
-        return mx_utils.constant(value)
+        return state_utils.constant(value)
 
 
-def _to_arg_list(args: Sequence[mx_utils.Value | InteractiveNode]) -> list[Argument]:
+def _to_arg_list(args: Sequence[Value | InteractiveNode]) -> list[Argument]:
     arg_list = []
     for i, arg in enumerate(args):
         if isinstance(arg, InteractiveNode):

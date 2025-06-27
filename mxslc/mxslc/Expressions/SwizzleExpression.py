@@ -1,10 +1,11 @@
 import re
 
 from . import Expression
-from .. import mx_utils
+from .. import state_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3
 from ..Token import Token
+from ..mx_classes import Node
 from ..utils import type_of_swizzle, string
 
 
@@ -17,6 +18,9 @@ class SwizzleExpression(Expression):
         if not re.fullmatch(r"([xyzw]{1,4}|[rgba]{1,4})", self.__swizzle):
             raise CompileError(f"'{self.__swizzle}' is not a valid swizzle.", self.token)
 
+    def sub_expressions(self) -> list[Expression]:
+        return [self.__left, *self.__left.sub_expressions()]
+
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         left = self.__left.instantiate_templated_types(template_type)
         return SwizzleExpression(left, self.token)
@@ -28,13 +32,13 @@ class SwizzleExpression(Expression):
     def _data_type(self) -> DataType:
         return type_of_swizzle(self.__swizzle)
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         left_node = self.__left.evaluate()
         if len(self.__swizzle) == 1:
-            return mx_utils.extract(left_node, self.__swizzle)
+            return state_utils.extract(left_node, self.__swizzle)
         else:
-            channels = [mx_utils.extract(left_node, c) for c in self.__swizzle]
-            return mx_utils.combine(channels, self.data_type)
+            channels = [state_utils.extract(left_node, c) for c in self.__swizzle]
+            return state_utils.combine(channels, self.data_type)
 
     def __valid_left_types(self) -> set[DataType]:
         if "x" in self.__swizzle:

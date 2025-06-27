@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import MaterialX as mx
 
-from . import mx_utils
 from .Keyword import Keyword
+from .mx_types import Constant
 from .Token import Token
 
 
@@ -45,9 +47,9 @@ class DataType:
             Keyword.VECTOR4: 4,
             Keyword.COLOR3: 3,
             Keyword.COLOR4: 4
-        }[Keyword(self.__data_type)]
+        }[self.__data_type]
 
-    def zeros(self) -> mx_utils.Constant:
+    def zeros(self) -> Constant:
         return {
             Keyword.BOOLEAN: False,
             Keyword.INTEGER: 0,
@@ -57,7 +59,19 @@ class DataType:
             Keyword.VECTOR4: mx.Vector4(),
             Keyword.COLOR3: mx.Color3(),
             Keyword.COLOR4: mx.Color4()
-        }[Keyword(self.__data_type)]
+        }[self.__data_type]
+
+    def default(self) -> Constant:
+        if self.__data_type == Keyword.STRING:
+            return ""
+        elif self.__data_type == Keyword.FILENAME:
+            return Path()
+        elif self.__data_type == Keyword.SURFACESHADER:
+            return ""
+        elif self.__data_type == Keyword.DISPLACEMENTSHADER:
+            return ""
+        else:
+            return self.zeros()
 
     @property
     def as_token(self) -> Token:

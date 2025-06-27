@@ -1,8 +1,8 @@
 from . import Expression, ComparisonExpression, LogicExpression
-from .. import mx_utils
 from ..DataType import DataType, BOOLEAN
 from ..Keyword import Keyword
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class TernaryRelationalExpression(Expression):
@@ -16,6 +16,9 @@ class TernaryRelationalExpression(Expression):
         comp2 = ComparisonExpression(middle, op2, right)
         self.__and = LogicExpression(comp1, Token(Keyword.AND), comp2)
 
+    def sub_expressions(self) -> list[Expression]:
+        return [self.__and, *self.__and.sub_expressions()]
+
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return self.__and.instantiate_templated_types(template_type)
 
@@ -26,7 +29,7 @@ class TernaryRelationalExpression(Expression):
     def _data_type(self) -> DataType:
         return BOOLEAN
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         return self.__and.evaluate()
 
     def __str__(self) -> str:

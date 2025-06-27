@@ -4,6 +4,7 @@ from . import Statement
 from .. import state
 from ..CompileError import CompileError
 from ..DataType import DataType
+from ..Expressions import Expression
 from ..Function import Function
 from ..Parameter import Parameter, ParameterList
 from ..Token import Token
@@ -38,6 +39,12 @@ class FunctionDeclaration(Statement):
                 func = Function(concrete_return_type, identifier, template_type, concrete_params, concrete_body, concrete_return_expr)
                 self.__funcs.append(func)
 
+    def sub_expressions(self) -> list[Expression]:
+        exprs: list[Expression] = []
+        for stmt in self.__body:
+            exprs.extend(stmt.sub_expressions())
+        return exprs
+
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         if self.__template_types:
             raise CompileError("Cannot declare nested templated functions.", self.__identifier)
@@ -46,6 +53,7 @@ class FunctionDeclaration(Statement):
     def execute(self) -> None:
         for func in self.__funcs:
             _init_parameter_default_values(func)
+            func.initialise()
             state.add_function(func)
 
 

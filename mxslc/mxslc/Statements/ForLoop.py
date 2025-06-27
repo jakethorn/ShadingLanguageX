@@ -1,42 +1,62 @@
 from . import Statement
-from .. import state, mx_utils
+from .. import state, state_utils
+from ..Argument import Argument
 from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT
-from ..Token import Token
-from ..token_types import FLOAT_LITERAL
+from ..Expressions import Expression, LiteralExpression
+from ..Function import Function
+from ..Keyword import Keyword
+from ..Parameter import ParameterList, Parameter
+from ..Token import Token, IdentifierToken
+from ..token_types import FLOAT_LITERAL, INT_LITERAL
 
 
 class ForLoop(Statement):
-    NAMESPACE = "<loop>"
+    __counter = 0
 
-    def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, statements: list[Statement]):
+    # TODO pass in values as expressions instead of tokens so they can be returned in sub_expressions()
+    def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, body: list[Statement]):
         self.__iter_var_type = DataType(iter_var_type)
         self.__identifier = identifier
         self.__start_value = start_value
         self.__value2 = value2
         self.__value3 = value3
-        self.__statements = statements
+        self.__body = body
 
         if self.__iter_var_type != FLOAT:
             raise CompileError("Loop iteration variable must be a float.", self.__identifier)
 
+        return_type = DataType(Keyword.INTEGER)
+        func_identifier = IdentifierToken(f"__loop__{ForLoop.__counter}")
+        parameters = ParameterList([Parameter(self.__identifier, FLOAT)])
+        return_expr = LiteralExpression(Token(INT_LITERAL, "0"))
+        self.__function = Function(return_type, func_identifier, None, parameters, self.__body, return_expr)
+
+        ForLoop.__counter += 1
+
+    def sub_expressions(self) -> list[Expression]:
+        exprs: list[Expression] = []
+        for stmt in self.__body:
+            exprs.extend(stmt.sub_expressions())
+        return exprs
+
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         iter_var_type = self.__iter_var_type.instantiate(template_type)
-        statements = [s.instantiate_templated_types(template_type) for s in self.__statements]
-        return ForLoop(iter_var_type, self.__identifier, self.__start_value, self.__value2, self.__value3, statements)
+        stmts = [s.instantiate_templated_types(template_type) for s in self.__body]
+        return ForLoop(iter_var_type, self.__identifier, self.__start_value, self.__value2, self.__value3, stmts)
 
     def execute(self) -> None:
+        self.__function.initialise()
+
         start_value = _get_loop_value(self.__start_value)
         incr_value = _get_loop_value(self.__value2) if self.__value3 else 1.0
         end_value = _get_loop_value(self.__value3 or self.__value2)
 
         i = start_value
         while i <= end_value:
-            state.enter_scope(self.NAMESPACE)
-            state.add_node(self.__identifier, mx_utils.constant(i))
-            for statement in self.__statements:
-                statement.execute()
-            state.exit_scope()
+            iter_arg = Argument(LiteralExpression(Token(FLOAT_LITERAL, i)), 0)
+            iter_arg.init(FLOAT)
+            self.__function.invoke([iter_arg])
             i += incr_value
 
 
@@ -46,6 +66,6 @@ def _get_loop_value(token: Token) -> float:
     else:
         node = state.get_node(token)
         if node.category == "constant":
-            return node.get_input("value")
+            return node.get_input("value").value
         else:
             raise CompileError("For loop variables can only be literals or constant values.", token)

@@ -1,9 +1,10 @@
 from . import Expression
 from .expression_utils import format_args
-from .. import state, mx_utils, utils
+from .. import state, utils
 from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class FunctionCall(Expression):
@@ -18,6 +19,9 @@ class FunctionCall(Expression):
         self.__func = None
 
         self.__assert_valid_argument_order()
+
+    def sub_expressions(self) -> list[Expression]:
+        raise NotImplementedError
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         if self.__template_type:
@@ -43,7 +47,7 @@ class FunctionCall(Expression):
     def _data_type(self) -> DataType:
         return self.__func.return_type
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         return self.__func.invoke(self.__args)
 
     def __assert_valid_argument_order(self):

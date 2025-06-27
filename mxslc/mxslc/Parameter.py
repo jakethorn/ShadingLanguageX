@@ -32,16 +32,28 @@ class Parameter:
     def default_value(self) -> Expression | None:
         return self.__default_value
 
+    def init_default_value(self) -> None:
+        if self.default_value:
+            self.default_value.init(self.data_type)
+
+    def __str__(self) -> str:
+        output = f"{self.data_type} {self.name}"
+        if self.default_value:
+            output += f" = {self.default_value}"
+        return output
+
 
 class ParameterList:
     """
     A list of parameters that can be accessed by their position or name.
     """
-    def __init__(self, params: ParameterList | list[Parameter]):
+    def __init__(self, params: ParameterList | list[Parameter] = None):
         if isinstance(params, ParameterList):
-            self.__params = params.__params
+            self.__params: list[Parameter] = params.__params
+        elif isinstance(params, list):
+            self.__params: list[Parameter] = params
         else:
-            self.__params = params
+            self.__params: list[Parameter] = []
 
     def instantiate_templated_parameters(self, template_type: DataType) -> ParameterList:
         return ParameterList([
@@ -49,6 +61,14 @@ class ParameterList:
             for p
             in self.__params
         ])
+
+    def init_default_values(self) -> None:
+        for param in self.__params:
+            param.init_default_value()
+
+    def __iadd__(self, param: Parameter) -> ParameterList:
+        self.__params.append(param)
+        return self
 
     def __getitem__(self, index: int | str | Argument) -> Parameter:
         if isinstance(index, int) and index < len(self.__params):

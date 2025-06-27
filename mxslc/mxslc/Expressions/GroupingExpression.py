@@ -1,6 +1,6 @@
 from . import Expression
-from .. import mx_utils
 from ..DataType import DataType
+from ..mx_classes import Node
 
 
 class GroupingExpression(Expression):
@@ -13,6 +13,9 @@ class GroupingExpression(Expression):
         super().__init__(expr.token)
         self.__expr = expr
 
+    def sub_expressions(self) -> list[Expression]:
+        return [self.__expr, *self.__expr.sub_expressions()]
+
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         expr = self.__expr.instantiate_templated_types(template_type)
         return GroupingExpression(expr)
@@ -24,7 +27,7 @@ class GroupingExpression(Expression):
     def _data_type(self) -> DataType:
         return self.__expr.data_type
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         return self.__expr.evaluate()
 
     def __str__(self) -> str:

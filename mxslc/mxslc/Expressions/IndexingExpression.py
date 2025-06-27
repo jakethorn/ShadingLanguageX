@@ -1,6 +1,7 @@
-from mxslc import mx_utils
-from mxslc.DataType import DataType, INTEGER, FLOAT, MULTI_ELEM_TYPES
-from mxslc.Expressions import Expression
+from .. import state_utils
+from ..DataType import DataType, INTEGER, FLOAT, MULTI_ELEM_TYPES
+from ..Expressions import Expression
+from ..mx_classes import Node
 
 
 class IndexingExpression(Expression):
@@ -8,6 +9,9 @@ class IndexingExpression(Expression):
         super().__init__(indexer.token)
         self.__expr = expr
         self.__indexer = indexer
+
+    def sub_expressions(self) -> list[Expression]:
+        return [self.__expr, self.__indexer, *self.__expr.sub_expressions(), *self.__indexer.sub_expressions()]
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         expr = self.__expr.instantiate_templated_types(template_type)
@@ -22,10 +26,10 @@ class IndexingExpression(Expression):
     def _data_type(self) -> DataType:
         return FLOAT
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         index = self.__indexer.evaluate()
         value = self.__expr.evaluate()
-        return mx_utils.extract(value, index)
+        return state_utils.extract(value, index)
 
     def __str__(self) -> str:
         return f"{self.__expr}[{self.__indexer}]"

@@ -1,9 +1,10 @@
 from . import Expression
-from .. import mx_utils, utils
+from .. import utils, state
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class UnaryExpression(Expression):
@@ -18,6 +19,9 @@ class UnaryExpression(Expression):
         super().__init__(op)
         self.__op = op
         self.__right = right
+
+    def sub_expressions(self) -> list[Expression]:
+        return [self.__right, *self.__right.sub_expressions()]
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         right = self.__right.instantiate_templated_types(template_type)
@@ -36,16 +40,16 @@ class UnaryExpression(Expression):
     def _data_type(self) -> DataType:
         return self.__right.data_type
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         if self.__op in ["!", Keyword.NOT]:
-            node = mx_utils.create_node("not", BOOLEAN)
-            node.set_input("in", self.__right.evaluate())
+            node = state.add_unnamed_node("not", BOOLEAN)
+            node.set_input_value("in", self.__right.evaluate())
             return node
         elif self.__op == "-":
             right_node = self.__right.evaluate()
-            node = mx_utils.create_node("subtract", right_node.data_type)
-            node.set_input("in1", right_node.data_type.zeros())
-            node.set_input("in2", right_node)
+            node = state.add_unnamed_node("subtract", right_node.data_type)
+            node.set_input_value("in1", right_node.data_type.zeros())
+            node.set_input_value("in2", right_node)
             return node
         else:
             return self.__right.evaluate()

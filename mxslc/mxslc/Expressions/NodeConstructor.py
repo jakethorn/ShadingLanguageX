@@ -1,9 +1,10 @@
 from . import Expression
 from .expression_utils import format_args
-from .. import mx_utils
+from .. import state
 from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class NodeConstructor(Expression):
@@ -12,6 +13,13 @@ class NodeConstructor(Expression):
         self.__category = category.value
         self.__data_type = DataType(data_type)
         self.__args = args
+
+    def sub_expressions(self) -> list[Expression]:
+        exprs: list[Expression] = []
+        for arg in self.__args:
+            exprs.append(arg.expression)
+            exprs.extend(arg.expression.sub_expressions())
+        return exprs
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         data_type = self.__data_type.instantiate(template_type)
@@ -32,10 +40,10 @@ class NodeConstructor(Expression):
     def _data_type(self) -> DataType:
         return self.__data_type
 
-    def _evaluate(self) -> mx_utils.Node:
-        node = mx_utils.create_node(self.__category, self.data_type)
+    def _evaluate(self) -> Node:
+        node = state.add_unnamed_node(self.__category, self.data_type)
         for arg in self.__args:
-            node.set_input(arg.name, arg.evaluate())
+            node.set_input_value(arg.name, arg.evaluate())
         return node
 
     def __str__(self) -> str:

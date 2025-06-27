@@ -1,13 +1,21 @@
 from . import Expression
-from .. import state, mx_utils
+from .. import state
 from ..DataType import DataType
 from ..Token import Token
+from ..mx_classes import Node
 
 
 class IdentifierExpression(Expression):
     def __init__(self, identifier: Token):
         super().__init__(identifier)
         self.__identifier = identifier
+
+    @property
+    def name(self) -> str:
+        return self.__identifier.lexeme
+
+    def sub_expressions(self) -> list[Expression]:
+        return []
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return IdentifierExpression(self.__identifier)
@@ -21,9 +29,9 @@ class IdentifierExpression(Expression):
         node = state.get_node(self.__identifier)
         return node.data_type
 
-    def _evaluate(self) -> mx_utils.Node:
+    def _evaluate(self) -> Node:
         old_node = state.get_node(self.__identifier)
-        new_node = mx_utils.create_node("dot", self.data_type)
+        new_node = state.add_unnamed_node("dot", self.data_type)
         new_node.set_input("in", old_node)
         return new_node
 
