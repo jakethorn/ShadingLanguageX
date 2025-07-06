@@ -10,6 +10,24 @@ from .document import is_document, get_document
 from .scan import as_token
 
 
+# TODO there is currently a bug, in the following scenario:
+"""
+float x = 3.0;
+
+float add_x(float in)
+{
+    return in + x;
+}
+
+void main()
+{
+    float x = 5.0;
+    float y = add_x(1.0);
+}
+"""
+# TODO cont.: y will evaluate to 6.0 instead of 4.0 because x is finding the 5.0 before 3.0 when ascending the state hierarchy.
+
+
 class State:
     def __init__(self, parent: State = None, node_graph: NodeGraph = None):
         self.__parent = parent
