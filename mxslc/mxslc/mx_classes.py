@@ -9,6 +9,10 @@ from .Keyword import Keyword
 from .mx_types import Constant
 
 
+"""
+Pythonic wrappers around the generated MaterialX Python API.
+"""
+
 #
 #   Element
 #
@@ -85,15 +89,15 @@ class InterfaceElement(TypedElement):
     def add_input(self, name: str, value: Node | Output | Constant = None, data_type: DataType = None) -> Input:
         assert not self.has_input(name)
         assert value is not None or data_type is not None
-        if value and data_type:
+        if value is not None and data_type is not None:
             assert type_of(value) == data_type
         name = self.create_valid_child_name(name)
         data_type_str = str(data_type or type_of(value))
         input_ = Input(self.source.addInput(name, data_type_str))
-        if data_type is not None:
-            input_.value = data_type.default()
         if value is not None:
             input_.value = value
+        else:
+            input_.value = data_type.default()
         return input_
 
     def get_input(self, name: str) -> Input:
@@ -127,15 +131,15 @@ class InterfaceElement(TypedElement):
     def add_output(self, name: str, value: Node | Output | Constant = None, data_type: DataType = None) -> Output:
         assert not self.has_output(name)
         assert value is not None or data_type is not None
-        if value and data_type:
+        if value is not None and data_type is not None:
             assert type_of(value) == data_type
         name = self.create_valid_child_name(name)
         data_type_str = str(data_type or type_of(value))
         output = Output(self.source.addOutput(name, data_type_str))
-        if data_type is not None:
-            output.value = data_type.default()
         if value is not None:
             output.value = value
+        else:
+            output.value = data_type.default()
         return output
 
     def get_output(self, name="out") -> Output:
