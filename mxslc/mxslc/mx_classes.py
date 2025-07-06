@@ -163,9 +163,6 @@ class InterfaceElement(TypedElement):
             output = self.add_output(name, value)
         return output
 
-    #def get_connected_output(self, name: str) -> Output:
-    #    return Output(self.source.getConnectedOutput(name))
-
 
 #
 #   Graph Element

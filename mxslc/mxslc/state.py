@@ -4,7 +4,7 @@ from . import utils
 from .CompileError import CompileError
 from .DataType import DataType
 from .Function import Function
-from .mx_classes import Node, NodeGraph, Output, NodeInfo
+from .mx_classes import Node, NodeGraph, Output
 from .Token import Token, IdentifierToken
 from .document import is_document, get_document
 from .scan import as_token

@@ -46,7 +46,6 @@ def compile_file(mxsl_path: str | Path,
         if not success:
             warn(message)
 
-
         with open(mtlx_filepath, "w") as file:
             file.write(get_document().xml)
 
