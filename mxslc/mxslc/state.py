@@ -6,7 +6,7 @@ from .DataType import DataType
 from .Function import Function
 from .mx_classes import Node, NodeGraph, Output
 from .Token import Token, IdentifierToken
-from .document import is_document, get_document
+from .document import get_document
 from .scan import as_token
 
 
@@ -75,7 +75,7 @@ class State:
         if self.__in_node_graph:
             assert node.parent == self.__node_graph
         else:
-            assert is_document(node.parent)
+            assert node.parent == get_document()
 
         # check node is not somehow already stored in state
         assert node not in self.__graph_nodes.values()

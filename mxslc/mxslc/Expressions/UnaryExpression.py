@@ -20,9 +20,6 @@ class UnaryExpression(Expression):
         self.__op = op
         self.__right = right
 
-    def sub_expressions(self) -> list[Expression]:
-        return [self.__right, *self.__right.sub_expressions()]
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         right = self.__right.instantiate_templated_types(template_type)
         return UnaryExpression(self.token, right)

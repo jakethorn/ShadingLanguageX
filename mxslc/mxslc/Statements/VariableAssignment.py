@@ -14,9 +14,6 @@ class VariableAssignment(Statement):
         self.__property = string(property_)
         self.__right = right
 
-    def sub_expressions(self) -> list[Expression]:
-        return [self.__right, *self.__right.sub_expressions()]
-
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         right = self.__right.instantiate_templated_types(template_type)
         return VariableAssignment(self.__identifier, self.__property, right)

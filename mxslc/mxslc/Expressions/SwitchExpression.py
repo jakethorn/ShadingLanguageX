@@ -14,13 +14,6 @@ class SwitchExpression(Expression):
         self.__which = which
         self.__values = values
 
-    def sub_expressions(self) -> list[Expression]:
-        exprs: list[Expression] = [self.__which, *self.__which.sub_expressions()]
-        for expr in self.__values:
-            exprs.append(expr)
-            exprs.extend(expr.sub_expressions())
-        return exprs
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         which = self.__which.instantiate_templated_types(template_type)
         values = [v.instantiate_templated_types(template_type) for v in self.__values]

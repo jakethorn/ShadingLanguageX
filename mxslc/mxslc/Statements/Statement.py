@@ -13,7 +13,3 @@ class Statement(ABC):
     @abstractmethod
     def execute(self) -> None:
         ...
-
-    @abstractmethod
-    def sub_expressions(self) -> list[Expression]:
-        ...

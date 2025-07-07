@@ -16,9 +16,6 @@ class TernaryRelationalExpression(Expression):
         comp2 = ComparisonExpression(middle, op2, right)
         self.__and = LogicExpression(comp1, Token(Keyword.AND), comp2)
 
-    def sub_expressions(self) -> list[Expression]:
-        return [self.__and, *self.__and.sub_expressions()]
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return self.__and.instantiate_templated_types(template_type)
 

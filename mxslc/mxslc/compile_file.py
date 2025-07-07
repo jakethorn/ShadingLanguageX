@@ -7,7 +7,7 @@ from .CompileError import CompileError
 from .Interactive.ShaderInterface import ShaderInterface
 from .Preprocessor.macros import undefine_all_macros, Macro, define_macro
 from .compile import compile_
-from .document import clear_document, get_document
+from .document import new_document, get_document
 from .file_utils import handle_input_path, handle_output_path
 from .mx_types import Value
 from .post_process import post_process
@@ -30,7 +30,7 @@ def compile_file(mxsl_path: str | Path,
         mtlx_filepath = handle_output_path(mtlx_path, mxsl_filepath)
 
         undefine_all_macros()
-        clear_document()
+        new_document()
         state.clear()
 
         include_dirs = add_include_dirs + [mxsl_filepath.parent, Path(".")]

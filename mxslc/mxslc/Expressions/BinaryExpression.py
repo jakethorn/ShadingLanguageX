@@ -18,9 +18,6 @@ class BinaryExpression(Expression, ABC):
         self._op = op
         self._right = right
 
-    def sub_expressions(self) -> list[Expression]:
-        return [self._left, self._right, *self._left.sub_expressions(), *self._right.sub_expressions()]
-
     def __str__(self) -> str:
         return f"{self._left} {self._op} {self._right}"
 

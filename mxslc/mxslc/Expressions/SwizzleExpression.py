@@ -18,9 +18,6 @@ class SwizzleExpression(Expression):
         if not re.fullmatch(r"([xyzw]{1,4}|[rgba]{1,4})", self.__swizzle):
             raise CompileError(f"'{self.__swizzle}' is not a valid swizzle.", self.token)
 
-    def sub_expressions(self) -> list[Expression]:
-        return [self.__left, *self.__left.sub_expressions()]
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         left = self.__left.instantiate_templated_types(template_type)
         return SwizzleExpression(left, self.token)

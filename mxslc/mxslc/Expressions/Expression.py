@@ -69,10 +69,6 @@ class Expression(ABC):
         self.init(valid_types)
         return self.evaluate()
 
-    @abstractmethod
-    def sub_expressions(self) -> list[Expression]:
-        ...
-
 
 def _as_set(data_types: DataType | set[DataType]) -> set[DataType]:
     if data_types is None:

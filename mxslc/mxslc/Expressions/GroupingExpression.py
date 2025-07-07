@@ -13,9 +13,6 @@ class GroupingExpression(Expression):
         super().__init__(expr.token)
         self.__expr = expr
 
-    def sub_expressions(self) -> list[Expression]:
-        return [self.__expr, *self.__expr.sub_expressions()]
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         expr = self.__expr.instantiate_templated_types(template_type)
         return GroupingExpression(expr)

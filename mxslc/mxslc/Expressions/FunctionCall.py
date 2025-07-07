@@ -20,9 +20,6 @@ class FunctionCall(Expression):
 
         self.__assert_valid_argument_order()
 
-    def sub_expressions(self) -> list[Expression]:
-        raise NotImplementedError
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         if self.__template_type:
             data_type = self.__template_type.instantiate(template_type)

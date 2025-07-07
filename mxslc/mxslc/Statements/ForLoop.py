@@ -34,12 +34,6 @@ class ForLoop(Statement):
 
         ForLoop.__counter += 1
 
-    def sub_expressions(self) -> list[Expression]:
-        exprs: list[Expression] = []
-        for stmt in self.__body:
-            exprs.extend(stmt.sub_expressions())
-        return exprs
-
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         iter_var_type = self.__iter_var_type.instantiate(template_type)
         stmts = [s.instantiate_templated_types(template_type) for s in self.__body]

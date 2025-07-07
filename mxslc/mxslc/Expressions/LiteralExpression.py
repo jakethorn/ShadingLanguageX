@@ -14,9 +14,6 @@ class LiteralExpression(Expression):
         self.__literal = literal
         self.__null_type: DataType | None = None
 
-    def sub_expressions(self) -> list[Expression]:
-        return []
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return LiteralExpression(self.token)
 

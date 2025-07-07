@@ -12,13 +12,6 @@ class ConstructorCall(Expression):
         self.__data_type = DataType(data_type)
         self.__args = args
 
-    def sub_expressions(self) -> list[Expression]:
-        exprs: list[Expression] = []
-        for arg in self.__args:
-            exprs.append(arg.expression)
-            exprs.extend(arg.expression.sub_expressions())
-        return exprs
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         data_type = self.__data_type.instantiate(template_type).as_token
         args = [a.instantiate_templated_types(template_type) for a in self.__args]

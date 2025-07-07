@@ -14,9 +14,6 @@ class IdentifierExpression(Expression):
     def name(self) -> str:
         return self.__identifier.lexeme
 
-    def sub_expressions(self) -> list[Expression]:
-        return []
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return IdentifierExpression(self.__identifier)
 

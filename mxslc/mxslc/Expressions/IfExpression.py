@@ -23,13 +23,6 @@ class IfExpression(Expression):
     def otherwise(self, expr: Expression) -> None:
         self.__otherwise = expr
 
-    def sub_expressions(self) -> list[Expression]:
-        return [
-            self.__clause, *self.__clause.sub_expressions(),
-            self.__then, *self.__then.sub_expressions(),
-            self.__otherwise, *self.__otherwise.sub_expressions()
-        ]
-
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         clause = self.__clause.instantiate_templated_types(template_type)
         then = self.__then.instantiate_templated_types(template_type)
