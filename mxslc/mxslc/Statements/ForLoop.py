@@ -1,9 +1,9 @@
 from . import Statement
-from .. import state, state_utils
+from .. import state
 from ..Argument import Argument
 from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT
-from ..Expressions import Expression, LiteralExpression
+from ..Expressions import LiteralExpression
 from ..Function import Function
 from ..Keyword import Keyword
 from ..Parameter import ParameterList, Parameter
@@ -14,7 +14,6 @@ from ..token_types import FLOAT_LITERAL, INT_LITERAL
 class ForLoop(Statement):
     __counter = 0
 
-    # TODO pass in values as expressions instead of tokens so they can be returned in sub_expressions()
     def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, body: list[Statement]):
         self.__iter_var_type = DataType(iter_var_type)
         self.__identifier = identifier
@@ -26,6 +25,7 @@ class ForLoop(Statement):
         if self.__iter_var_type != FLOAT:
             raise CompileError("Loop iteration variable must be a float.", self.__identifier)
 
+        # TODO cleanup
         return_type = DataType(Keyword.INTEGER)
         func_identifier = IdentifierToken(f"__loop__{ForLoop.__counter}")
         parameters = ParameterList([Parameter(self.__identifier, FLOAT)])

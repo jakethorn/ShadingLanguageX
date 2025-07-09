@@ -1,7 +1,7 @@
 from . import Statement
 from .. import state, state_utils
 from ..CompileError import CompileError
-from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN, SURFACESHADER, DISPLACEMENTSHADER, SHADER_TYPES
+from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN, SHADER_TYPES
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Token import Token
 from ..mx_classes import Node

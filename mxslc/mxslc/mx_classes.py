@@ -13,6 +13,7 @@ from .mx_types import Constant
 Pythonic wrappers around the generated MaterialX Python API.
 """
 
+
 #
 #   Element
 #
@@ -251,9 +252,18 @@ class PortElement(TypedElement):
 
 
 class Document(GraphElement):
-    def __init__(self, source: mx.Document = None):
+    def __init__(self, source: mx.Document | str | Path = None):
         if source is None:
             source = mx.createDocument()
+        elif isinstance(source, str):
+            doc = mx.createDocument()
+            mx.readFromXmlString(doc, source)
+            source = doc
+        elif isinstance(source, Path):
+            doc = mx.createDocument()
+            mx.readFromXmlFile(doc, str(source))
+            source = doc
+
         super().__init__(source)
 
     @property
@@ -285,8 +295,8 @@ class Document(GraphElement):
     def xml(self) -> str:
         return mx.writeToXmlString(self.source)
 
-    def from_xml(self, xml: str) -> None:
-        mx.readFromXmlString(self.source, xml)
+    def validate(self) -> tuple[bool, str]:
+        return self.source.validate()
 
 
 #

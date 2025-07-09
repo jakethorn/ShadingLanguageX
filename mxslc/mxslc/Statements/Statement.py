@@ -2,7 +2,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from ..DataType import DataType
-from ..Expressions import Expression
 
 
 class Statement(ABC):

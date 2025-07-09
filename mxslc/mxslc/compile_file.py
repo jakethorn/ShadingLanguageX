@@ -1,9 +1,7 @@
 from pathlib import Path
 from typing import Sequence
-from warnings import warn
 
 from . import state
-from .CompileError import CompileError
 from .Interactive.ShaderInterface import ShaderInterface
 from .Preprocessor.macros import undefine_all_macros, Macro, define_macro
 from .compile import compile_
@@ -42,9 +40,11 @@ def compile_file(mxsl_path: str | Path,
         _call_main(mxsl_filepath, main_func, main_args)
         post_process()
 
-        success, message = get_document().source.validate()
+        success, message = get_document().validate()
         if not success:
-            warn(message)
+            print("---- Validation Errors ----")
+            print(f"File: {mtlx_filepath}")
+            print(message)
 
         with open(mtlx_filepath, "w") as file:
             file.write(get_document().xml)

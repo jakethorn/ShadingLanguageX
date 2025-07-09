@@ -36,7 +36,7 @@ class NodeConstructor(Expression):
     def _evaluate(self) -> Node:
         node = state.add_unnamed_node(self.__category, self.data_type)
         for arg in self.__args:
-            node.set_input_value(arg.name, arg.evaluate())
+            node.set_input(arg.name, arg.evaluate())
         return node
 
     def __str__(self) -> str:

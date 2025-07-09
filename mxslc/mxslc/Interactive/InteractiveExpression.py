@@ -15,9 +15,6 @@ class InteractiveExpression(Expression):
         else:
             self.__node = state_utils.constant(value)
 
-    def sub_expressions(self) -> list[Expression]:
-        raise NotImplementedError
-
     def instantiate_templated_types(self, data_type: DataType) -> Expression:
         return self
 

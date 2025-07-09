@@ -40,13 +40,13 @@ class UnaryExpression(Expression):
     def _evaluate(self) -> Node:
         if self.__op in ["!", Keyword.NOT]:
             node = state.add_unnamed_node("not", BOOLEAN)
-            node.set_input_value("in", self.__right.evaluate())
+            node.set_input("in", self.__right.evaluate())
             return node
         elif self.__op == "-":
             right_node = self.__right.evaluate()
             node = state.add_unnamed_node("subtract", right_node.data_type)
-            node.set_input_value("in1", right_node.data_type.zeros())
-            node.set_input_value("in2", right_node)
+            node.set_input("in1", right_node.data_type.zeros())
+            node.set_input("in2", right_node)
             return node
         else:
             return self.__right.evaluate()

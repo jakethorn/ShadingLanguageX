@@ -18,8 +18,7 @@ def compile_(source: str | Path, include_dirs: list[Path], is_main: bool) -> Non
 
 
 def _load_standard_library() -> None:
-    document = Document()
-    document.from_xml(_stdlib_defs)
+    document = Document(_stdlib_defs)
     for nd in document.node_defs:
         # TODO add support for multiple return values
         if nd.node_string in ["separate2", "separate3", "separate4"]:

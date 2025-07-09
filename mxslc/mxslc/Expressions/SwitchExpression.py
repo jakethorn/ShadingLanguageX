@@ -36,7 +36,7 @@ class SwitchExpression(Expression):
 
     def _evaluate(self) -> Node:
         node = state.add_unnamed_node("switch", self.data_type)
-        node.set_input_value("which", self.__which.evaluate())
+        node.set_input("which", self.__which.evaluate())
         for i, value in enumerate(self.__values):
-            node.set_input_value(f"in{i + 1}", value.evaluate())
+            node.set_input(f"in{i + 1}", value.evaluate())
         return node

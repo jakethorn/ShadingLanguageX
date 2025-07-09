@@ -1,5 +1,11 @@
 from .mx_classes import Document
 
+
+"""
+The document being written to during compilation.
+"""
+
+
 _document = Document()
 
 

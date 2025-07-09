@@ -46,10 +46,10 @@ class IfExpression(Expression):
         otherwise_node = self.__otherwise.evaluate()
 
         node = state.add_unnamed_node("ifequal", self.data_type)
-        node.set_input_value("value1", clause_node)
-        node.set_input_value("value2", True)
-        node.set_input_value("in1", then_node)
-        node.set_input_value("in2", otherwise_node)
+        node.set_input("value1", clause_node)
+        node.set_input("value2", True)
+        node.set_input("in1", then_node)
+        node.set_input("in2", otherwise_node)
 
         return node
 

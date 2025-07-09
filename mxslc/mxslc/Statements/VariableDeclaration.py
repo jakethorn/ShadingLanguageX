@@ -11,10 +11,6 @@ class VariableDeclaration(Statement):
         self.__identifier = identifier
         self.__right = right
 
-    @property
-    def name(self) -> str:
-        return self.__identifier.lexeme
-
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         data_type = self.__data_type.instantiate(template_type)
         right = self.__right.instantiate_templated_types(template_type)
