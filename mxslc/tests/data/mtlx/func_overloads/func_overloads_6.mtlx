@@ -1,11 +1,43 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="global__f" type="float">
+  <nodedef name="ND_my_randomfloat" node="my_randomfloat">
+    <output name="out" type="float" default="0.0" />
+    <input name="in" type="float" value="0" />
+    <input name="min" type="float" value="0" />
+    <input name="max" type="float" value="0" />
+    <input name="seed" type="integer" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_randomfloat" nodedef="ND_my_randomfloat">
+    <randomfloat name="node1" type="float">
+      <input name="in" type="float" interfacename="in" />
+      <input name="min" type="float" interfacename="min" />
+      <input name="max" type="float" interfacename="max" />
+      <input name="seed" type="integer" interfacename="seed" />
+    </randomfloat>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_my_randomfloat2" node="my_randomfloat">
+    <output name="out" type="float" default="0.0" />
+    <input name="in" type="integer" value="0" />
+    <input name="min" type="float" value="0" />
+    <input name="max" type="float" value="0" />
+    <input name="seed" type="integer" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_randomfloat2" nodedef="ND_my_randomfloat2">
+    <randomfloat name="node1" type="float">
+      <input name="in" type="integer" interfacename="in" />
+      <input name="min" type="float" interfacename="min" />
+      <input name="max" type="float" interfacename="max" />
+      <input name="seed" type="integer" interfacename="seed" />
+    </randomfloat>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <my_randomfloat name="f" type="float">
     <input name="in" type="float" value="2" />
     <input name="max" type="float" value="10" />
-  </randomfloat>
-  <randomfloat name="global__g" type="float">
+  </my_randomfloat>
+  <my_randomfloat name="g" type="float">
     <input name="in" type="float" value="2" />
     <input name="max" type="float" value="10" />
-  </randomfloat>
+  </my_randomfloat>
 </materialx>

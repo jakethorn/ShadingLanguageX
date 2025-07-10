@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <ifgreatereq name="node3" type="float">
+  <ifgreatereq name="node3" type="boolean">
     <input name="value1" type="float" value="0.5" />
     <input name="value2" type="float" value="0" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreatereq>
-  <ifequal name="global__x2" type="float">
-    <input name="value1" type="float" nodename="node3" />
-    <input name="value2" type="float" value="1" />
+  <ifequal name="x2" type="float">
+    <input name="value1" type="boolean" nodename="node3" />
+    <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="3" />
   </ifequal>

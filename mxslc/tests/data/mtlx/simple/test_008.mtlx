@@ -1,23 +1,56 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="global__my_next_float" type="float">
-    <input name="in1" type="float" value="2" />
-    <input name="in2" type="float" value="3" />
+  <nodedef name="ND_my_func" node="my_func">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_my_func" nodedef="ND_my_func">
+    <output name="out" type="float" value="1" />
+  </nodegraph>
+  <my_func name="my_float" type="float" />
+  <nodedef name="ND_my_next_func" node="my_next_func">
+    <output name="out" type="float" default="0.0" />
+    <input name="my_arg" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_next_func" nodedef="ND_my_next_func">
+    <add name="node3" type="float">
+      <input name="in1" type="float" value="2" />
+      <input name="in2" type="float" interfacename="my_arg" />
+    </add>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <my_next_func name="my_next_float" type="float">
+    <input name="my_arg" type="float" value="3" />
+  </my_next_func>
+  <my_func name="node1" type="float" />
+  <my_func name="node3" type="float" />
+  <add name="node4" type="float">
+    <input name="in1" type="float" nodename="node1" />
+    <input name="in2" type="float" nodename="node3" />
   </add>
-  <add name="node5" type="float">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="1" />
+  <my_func name="node5" type="float" />
+  <add name="my_big_float" type="float">
+    <input name="in1" type="float" nodename="node4" />
+    <input name="in2" type="float" nodename="node5" />
   </add>
-  <add name="global__my_big_float" type="float">
-    <input name="in1" type="float" nodename="node5" />
-    <input name="in2" type="float" value="1" />
-  </add>
-  <add name="my_last_func__a" type="float">
-    <input name="in1" type="float" value="1" />
+  <nodedef name="ND_my_last_func" node="my_last_func">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+    <input name="b" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_last_func" nodedef="ND_my_last_func">
+    <divide name="c" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" interfacename="b" />
+    </divide>
+    <output name="out" type="float" nodename="c" />
+  </nodegraph>
+  <my_last_func name="d" type="float">
+    <input name="a" type="float" nodename="node9" />
+    <input name="b" type="float" value="5" />
+  </my_last_func>
+  <my_func name="node7" type="float" />
+  <add name="node9" type="float">
+    <input name="in1" type="float" nodename="node7" />
     <input name="in2" type="float" value="4" />
   </add>
-  <divide name="my_last_func__c" type="float">
-    <input name="in1" type="float" nodename="my_last_func__a" />
-    <input name="in2" type="float" value="5" />
-  </divide>
 </materialx>

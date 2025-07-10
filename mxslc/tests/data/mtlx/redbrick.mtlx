@@ -1,78 +1,78 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <texcoord name="node1" type="vector2" />
-  <divide name="global__uv" type="vector2">
+  <divide name="uv" type="vector2">
     <input name="in1" type="vector2" nodename="node1" />
     <input name="in2" type="float" value="10" />
   </divide>
-  <image name="global__albedo" type="color3">
+  <image name="albedo" type="color3">
     <input name="file" type="filename" value="textures\albedo.tif" />
-    <input name="texcoord" type="vector2" nodename="global__uv" />
+    <input name="texcoord" type="vector2" nodename="uv" />
   </image>
-  <image name="global__matao" type="float">
+  <image name="matao" type="float">
     <input name="file" type="filename" value="textures\matao.tif" />
-    <input name="texcoord" type="vector2" nodename="global__uv" />
+    <input name="texcoord" type="vector2" nodename="uv" />
   </image>
-  <image name="global__metal" type="float">
+  <image name="metal" type="float">
     <input name="file" type="filename" value="textures\metal.tif" />
-    <input name="texcoord" type="vector2" nodename="global__uv" />
+    <input name="texcoord" type="vector2" nodename="uv" />
   </image>
-  <image name="global__rough" type="float">
+  <image name="rough" type="float">
     <input name="file" type="filename" value="textures\rough.tif" />
-    <input name="texcoord" type="vector2" nodename="global__uv" />
+    <input name="texcoord" type="vector2" nodename="uv" />
   </image>
-  <image name="global__normal" type="vector3">
+  <image name="normal" type="vector3">
     <input name="file" type="filename" value="textures\normal.tif" />
-    <input name="texcoord" type="vector2" nodename="global__uv" />
+    <input name="texcoord" type="vector2" nodename="uv" />
   </image>
-  <extract name="node41" type="float">
-    <input name="in" type="vector3" nodename="global__normal" />
+  <extract name="node14" type="float">
+    <input name="in" type="vector3" nodename="normal" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <subtract name="node42" type="float">
+  <subtract name="node16" type="float">
     <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="node41" />
+    <input name="in2" type="float" nodename="node14" />
   </subtract>
-  <extract name="node43" type="float">
-    <input name="in" type="vector3" nodename="global__normal" />
+  <extract name="node17" type="float">
+    <input name="in" type="vector3" nodename="normal" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node44" type="float">
-    <input name="in" type="vector3" nodename="global__normal" />
+  <extract name="node18" type="float">
+    <input name="in" type="vector3" nodename="normal" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <extract name="node45" type="float">
-    <input name="in" type="vector3" nodename="global__normal" />
+  <extract name="node19" type="float">
+    <input name="in" type="vector3" nodename="normal" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <combine3 name="global__normal2" type="vector3">
-    <input name="in1" type="float" nodename="node43" />
-    <input name="in2" type="float" nodename="node42" />
-    <input name="in3" type="float" nodename="node45" />
+  <combine3 name="normal2" type="vector3">
+    <input name="in1" type="float" nodename="node17" />
+    <input name="in2" type="float" nodename="node16" />
+    <input name="in3" type="float" nodename="node19" />
   </combine3>
-  <standard_surface name="global__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node95" />
-    <input name="metalness" type="float" nodename="global__metal" />
-    <input name="specular_roughness" type="float" nodename="global__rough" />
-    <input name="normal" type="vector3" nodename="node98" />
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node27" />
+    <input name="metalness" type="float" nodename="metal" />
+    <input name="specular_roughness" type="float" nodename="rough" />
+    <input name="normal" type="vector3" nodename="node30" />
   </standard_surface>
-  <multiply name="node90" type="color3">
-    <input name="in1" type="color3" nodename="global__albedo" />
-    <input name="in2" type="float" nodename="global__matao" />
+  <multiply name="node22" type="color3">
+    <input name="in1" type="color3" nodename="albedo" />
+    <input name="in2" type="float" nodename="matao" />
   </multiply>
-  <combine3 name="node94" type="color3">
+  <combine3 name="node26" type="color3">
     <input name="in1" type="float" value="0.5" />
     <input name="in2" type="float" value="0.1" />
     <input name="in3" type="float" value="0.1" />
   </combine3>
-  <multiply name="node95" type="color3">
-    <input name="in1" type="color3" nodename="node90" />
-    <input name="in2" type="color3" nodename="node94" />
+  <multiply name="node27" type="color3">
+    <input name="in1" type="color3" nodename="node22" />
+    <input name="in2" type="color3" nodename="node26" />
   </multiply>
-  <normalmap name="node98" type="vector3">
-    <input name="in" type="vector3" nodename="global__normal2" />
+  <normalmap name="node30" type="vector3">
+    <input name="in" type="vector3" nodename="normal2" />
   </normalmap>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="global__surface" />
+  <surfacematerial name="node32" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

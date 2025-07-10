@@ -1,12 +1,12 @@
-float _randomfloat(float in = null, float min = null, float max = null, int seed = null)
+float my_randomfloat(float in = null, float min = null, float max = null, int seed = null)
 {
     return {"randomfloat", float: in=in, min=min, max=max, seed=seed};
 }
 
-float _randomfloat(int in, float min = null, float max = null, int seed = null)
+float my_randomfloat(int in, float min = null, float max = null, int seed = null)
 {
     return {"randomfloat", float: in=in, min=min, max=max, seed=seed};
 }
 
-float f = _randomfloat(2.0, null, 10.0, null);
-float g = _randomfloat(2.0, max=10.0);
+float f = my_randomfloat(2.0, null, 10.0, null);
+float g = my_randomfloat(2.0, max=10.0);

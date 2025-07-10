@@ -1,32 +1,72 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="global__f" type="float">
-    <input name="in1" type="float" value="5" />
-    <input name="in2" type="float" value="1" />
-  </add>
-  <divide name="node5" type="float">
-    <input name="in1" type="float" value="6" />
-    <input name="in2" type="float" value="2" />
-  </divide>
-  <convert name="global__v" type="vector3">
-    <input name="in" type="float" nodename="node5" />
-  </convert>
-  <convert name="foo__a3" type="vector3">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="node3" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <nodedef name="ND_foo2" node="foo">
+    <output name="out" type="vector3" default="0, 0, 0" />
+    <input name="a" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <divide name="node3" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" value="2" />
+    </divide>
+    <convert name="node4" type="vector3">
+      <input name="in" type="float" nodename="node3" />
+    </convert>
+    <output name="out" type="vector3" nodename="node4" />
+  </nodegraph>
+  <nodedef name="ND_foo3" node="foo">
+    <output name="out" type="vector3" default="0, 0, 0" />
+    <input name="a" type="vector3" value="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo3" nodedef="ND_foo3">
+    <multiply name="node3" type="vector3">
+      <input name="in1" type="vector3" interfacename="a" />
+      <input name="in2" type="float" value="3" />
+    </multiply>
+    <output name="out" type="vector3" nodename="node3" />
+  </nodegraph>
+  <nodedef name="ND_foo4" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="vector3" value="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo4" nodedef="ND_foo4">
+    <extract name="node2" type="float">
+      <input name="in" type="vector3" interfacename="a" />
+      <input name="index" type="integer" value="2" />
+    </extract>
+    <subtract name="node4" type="float">
+      <input name="in1" type="float" nodename="node2" />
+      <input name="in2" type="float" value="4" />
+    </subtract>
+    <output name="out" type="float" nodename="node4" />
+  </nodegraph>
+  <foo name="f" type="float">
+    <input name="a" type="float" value="5" />
+  </foo>
+  <foo name="v" type="vector3">
+    <input name="a" type="float" value="6" />
+  </foo>
+  <foo name="w" type="vector3">
+    <input name="a" type="vector3" nodename="node5" />
+  </foo>
+  <convert name="node5" type="vector3">
     <input name="in" type="float" value="7" />
   </convert>
-  <multiply name="global__w" type="vector3">
-    <input name="in1" type="vector3" nodename="foo__a3" />
-    <input name="in2" type="float" value="3" />
-  </multiply>
-  <convert name="foo__a4" type="vector3">
+  <foo name="g" type="float">
+    <input name="a" type="vector3" nodename="node7" />
+  </foo>
+  <convert name="node7" type="vector3">
     <input name="in" type="float" value="8" />
   </convert>
-  <extract name="node11" type="float">
-    <input name="in" type="vector3" nodename="foo__a4" />
-    <input name="index" type="integer" value="2" />
-  </extract>
-  <subtract name="global__g" type="float">
-    <input name="in1" type="float" nodename="node11" />
-    <input name="in2" type="float" value="4" />
-  </subtract>
 </materialx>

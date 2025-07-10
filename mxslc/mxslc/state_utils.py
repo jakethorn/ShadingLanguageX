@@ -5,7 +5,7 @@ from .DataType import MATERIAL, SHADER_TYPES, MULTI_ELEM_TYPES
 from .mx_classes import *
 
 
-def constant(value: Constant) -> Node:
+def constant(value: Uniform) -> Node:
     node = state.add_unnamed_node("constant", type_of(value))
     node.set_input("value", value)
     return node

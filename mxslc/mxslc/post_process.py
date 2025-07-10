@@ -34,6 +34,16 @@ def _add_material_node() -> None:
             material_node.set_input("displacementshader", displacementshader_nodes[-1])
 
 
+def _remove_redundant_convert_nodes(graph: GraphElement) -> None:
+    cvt_nodes = graph.get_nodes("convert")
+    for cvt_node in cvt_nodes:
+        if cvt_node.data_type == cvt_node.get_input("in").data_type:
+            input_node = cvt_node.get_input("in").value
+            for port in cvt_node.downstream_ports:
+                port.value = input_node
+            cvt_node.remove()
+
+
 def _remove_dot_nodes(graph: GraphElement) -> None:
     dot_nodes = graph.get_nodes("dot")
     for dot_node in dot_nodes:
@@ -60,13 +70,3 @@ def _remove_constant_nodes(graph: GraphElement) -> None:
         for port in const_node.downstream_ports:
             port.value = input_value
         const_node.remove()
-
-
-def _remove_redundant_convert_nodes(graph: GraphElement) -> None:
-    cvt_nodes = graph.get_nodes("convert")
-    for cvt_node in cvt_nodes:
-        if cvt_node.data_type == cvt_node.get_input("in").data_type:
-            input_node = cvt_node.get_input("in").value
-            for port in cvt_node.downstream_ports:
-                port.value = input_node
-            cvt_node.remove()

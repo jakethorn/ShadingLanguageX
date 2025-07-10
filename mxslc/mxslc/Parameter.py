@@ -103,3 +103,6 @@ class ParameterList:
 
     def __iter__(self) -> Iterator[Parameter]:
         yield from self.__params
+
+    def __str__(self) -> str:
+        return ", ".join([str(p) for p in self.__params])

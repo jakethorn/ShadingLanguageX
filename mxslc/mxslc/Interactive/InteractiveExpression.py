@@ -1,10 +1,10 @@
 import MaterialX as mx
 
+from .mx_interactive_types import Value
 from .. import state_utils
 from ..DataType import DataType
 from ..Expressions import Expression
 from ..mx_classes import Node
-from ..mx_types import Value
 
 
 class InteractiveExpression(Expression):

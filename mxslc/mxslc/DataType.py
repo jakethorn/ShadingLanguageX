@@ -5,7 +5,7 @@ from pathlib import Path
 import MaterialX as mx
 
 from .Keyword import Keyword
-from .mx_types import Constant
+from .mx_types import Uniform
 from .Token import Token
 
 
@@ -28,7 +28,7 @@ class DataType:
             self.__data_type = data_type
         else:
             raise TypeError
-        assert self.__data_type in Keyword.DATA_TYPES()
+        assert self.__data_type in Keyword.DATA_TYPES(), self.__data_type
 
     def instantiate(self, template_type: DataType | None) -> DataType:
         if self.__data_type == Keyword.T and template_type:
@@ -49,7 +49,7 @@ class DataType:
             Keyword.COLOR4: 4
         }[self.__data_type]
 
-    def zeros(self) -> Constant:
+    def zeros(self) -> Uniform:
         return {
             Keyword.BOOLEAN: False,
             Keyword.INTEGER: 0,
@@ -61,7 +61,7 @@ class DataType:
             Keyword.COLOR4: mx.Color4()
         }[self.__data_type]
 
-    def default(self) -> Constant:
+    def default(self) -> Uniform:
         if self.__data_type == Keyword.STRING:
             return ""
         elif self.__data_type == Keyword.FILENAME:
@@ -69,6 +69,8 @@ class DataType:
         elif self.__data_type == Keyword.SURFACESHADER:
             return ""
         elif self.__data_type == Keyword.DISPLACEMENTSHADER:
+            return ""
+        elif self.__data_type == Keyword.MATERIAL:
             return ""
         else:
             return self.zeros()

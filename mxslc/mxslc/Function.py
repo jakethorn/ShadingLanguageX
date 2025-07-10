@@ -14,6 +14,7 @@ from .document import get_document
 from .mx_classes import NodeDef, Node, Output
 
 
+# TODO cleanup
 class Function:
     def __init__(self, return_type: DataType, identifier: Token, template_type: DataType | None, params: ParameterList, body: list["Statement"], return_expr: Expression):
         self.__return_type = return_type
@@ -74,6 +75,15 @@ class Function:
     def invoke(self, args: list[Argument]) -> Node:
         return self.__call_node_def(args)
 
+    def __lt__(self, other: Function) -> bool:
+        return self.__node_def_name < other.__node_def_name
+
+    def __str__(self) -> str:
+        if self.__template_type:
+            return f"{self.__return_type} {self.__name}<{self.__template_type}>({self.__params})"
+        else:
+            return f"{self.__return_type} {self.__name}({self.__params})"
+
     @staticmethod
     def from_node_def(node_def: NodeDef) -> Function:
         return_type = node_def.output.data_type
@@ -92,8 +102,12 @@ class Function:
         func.__node_def = node_def
         return func
 
+    @property
+    def __node_def_name(self) -> str:
+        return f"ND_{self.__name}" if self.__template_type is None else f"ND_{self.__name}_{self.__template_type}"
+
     def __create_node_def(self) -> None:
-        self.__node_def = get_document().add_node_def(f"ND_{self.__name}", self.__return_type, self.__name)
+        self.__node_def = get_document().add_node_def(self.__node_def_name, self.__return_type, self.__name)
         for param in self.__params:
             self.__node_def.add_input(param.name, param.data_type.default())
 

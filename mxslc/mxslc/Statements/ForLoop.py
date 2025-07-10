@@ -12,8 +12,6 @@ from ..token_types import FLOAT_LITERAL, INT_LITERAL
 
 
 class ForLoop(Statement):
-    __counter = 0
-
     def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, body: list[Statement]):
         self.__iter_var_type = DataType(iter_var_type)
         self.__identifier = identifier
@@ -27,12 +25,10 @@ class ForLoop(Statement):
 
         # TODO cleanup
         return_type = DataType(Keyword.INTEGER)
-        func_identifier = IdentifierToken(f"__loop__{ForLoop.__counter}")
+        func_identifier = IdentifierToken(f"__loop__{state.get_loop_id()}")
         parameters = ParameterList([Parameter(self.__identifier, FLOAT)])
         return_expr = LiteralExpression(Token(INT_LITERAL, "0"))
         self.__function = Function(return_type, func_identifier, None, parameters, self.__body, return_expr)
-
-        ForLoop.__counter += 1
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         iter_var_type = self.__iter_var_type.instantiate(template_type)

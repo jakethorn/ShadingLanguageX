@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <clamp name="global__w" type="float">
+  <clamp name="w" type="float">
     <input name="in" type="float" value="1.5" />
     <input name="low" type="float" value="0" />
     <input name="high" type="float" value="1" />

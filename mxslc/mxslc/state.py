@@ -167,8 +167,15 @@ class State:
         elif len(matching_funcs) == 1:
             return matching_funcs[0]
         else:
+            # it doesn't matter which overload is chosen for the following functions, so just return the first one
+            # instead of requiring the user to type `normalmap<float>(...)` for example.
+            if identifier.lexeme in ["normalmap", "clamp"]:
+                return matching_funcs[0]
             return_types = {f.return_type for f in matching_funcs}
-            raise CompileError(f"Function signature '{utils.function_signature_string(return_types, identifier.lexeme, template_type, args)}' is ambiguous.", identifier)
+            message = f"Function signature '{utils.function_signature_string(return_types, identifier.lexeme, template_type, args)}' is ambiguous.\n"
+            message += "Matching functions:\n"
+            message += "\n".join([str(f) for f in matching_funcs])
+            raise CompileError(message, identifier)
 
     def get_function_parameter_types(self, valid_types: set[DataType], identifier: Token, template_type: DataType, param_index: int | str) -> set[DataType]:
         matching_funcs = self.__get_functions(identifier, template_type, valid_types)
@@ -206,6 +213,13 @@ class State:
 
 
 _state = State()
+_loop_counter = 0
+
+
+def get_loop_id() -> int:
+    global _loop_counter
+    _loop_counter += 1
+    return _loop_counter
 
 
 def enter_node_graph(node_graph: NodeGraph) -> None:
@@ -221,8 +235,9 @@ def exit_node_graph() -> dict[str, Output]:
 
 
 def clear() -> None:
-    global _state
+    global _state, _loop_counter
     _state = State()
+    _loop_counter = 0
 
 
 def add_node(identifier: str | Token, node: Node) -> None:

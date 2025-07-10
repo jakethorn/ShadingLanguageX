@@ -45,7 +45,7 @@ class FunctionDeclaration(Statement):
         return FunctionDeclaration(self.__return_type, self.__identifier, {template_type}, self.__params, self.__body, self.__return_expr)
 
     def execute(self) -> None:
-        for func in self.__funcs:
+        for func in sorted(self.__funcs):
             _init_parameter_default_values(func)
             func.initialise()
             state.add_function(func)

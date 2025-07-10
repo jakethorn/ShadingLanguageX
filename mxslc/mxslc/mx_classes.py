@@ -6,12 +6,15 @@ import MaterialX as mx
 
 from .DataType import DataType, BOOLEAN, INTEGER, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, STRING, FILENAME
 from .Keyword import Keyword
-from .mx_types import Constant
+from .mx_types import Uniform
 
 
 """
 Pythonic wrappers around the generated MaterialX Python API.
 """
+
+
+type Value = Node | Output | Uniform | None
 
 
 #
@@ -84,10 +87,27 @@ class InterfaceElement(TypedElement):
     def source(self) -> mx.InterfaceElement:
         return super().source
 
-    def has_input(self, name: str) -> bool:
-        return self.source.getInput(name) is not None
+    @property
+    def has_inherit_string(self) -> bool:
+        return self.source.hasInheritString()
 
-    def add_input(self, name: str, value: Node | Output | Constant = None, data_type: DataType = None) -> Input:
+    @property
+    def inherits_from(self) -> InterfaceElement:
+        return InterfaceElement(self.source.getInheritsFrom())
+
+    @property
+    def is_default_version(self) -> bool:
+        if not self.source.hasVersionString():
+            return True
+        return self.source.getDefaultVersion()
+
+    def has_input(self, name: str) -> bool:
+        has_input = self.source.getInput(name) is not None
+        if not has_input and self.has_inherit_string:
+            return self.inherits_from.has_input(name)
+        return has_input
+
+    def add_input(self, name: str, value: Value = None, data_type: DataType = None) -> Input:
         assert not self.has_input(name)
         assert value is not None or data_type is not None
         if value is not None and data_type is not None:
@@ -102,18 +122,26 @@ class InterfaceElement(TypedElement):
         return input_
 
     def get_input(self, name: str) -> Input:
-        assert self.has_input(name)
-        return Input(self.source.getInput(name))
+        assert self.has_input(name), self.name
+        input_ = Input(self.source.getInput(name))
+        if input_ is None and self.has_inherit_string:
+            return self.inherits_from.get_input(name)
+        return input_
 
     @property
     def inputs(self) -> list[Input]:
-        return [Input(i) for i in self.source.getInputs()]
+        inputs = [Input(i) for i in self.source.getInputs()]
+        inherited_inputs = self.inherits_from.inputs if self.has_inherit_string else []
+        for inherited_input in inherited_inputs:
+            if inherited_input.name not in [i.name for i in inputs]:
+                inputs.append(inherited_input)
+        return inputs
 
     @property
     def input_count(self) -> int:
-        return len(self.source.getInputs())
+        return len(self.inputs)
 
-    def set_input(self, name: str, value: Node | Output | Constant | None) -> Input:
+    def set_input(self, name: str, value: Value) -> Input:
         if self.has_input(name):
             input_ = self.get_input(name)
             input_.value = value
@@ -127,9 +155,12 @@ class InterfaceElement(TypedElement):
         self.source.removeInput(name)
 
     def has_output(self, name: str) -> bool:
-        return self.source.getOutput(name) is not None
+        has_output = self.source.getOutput(name) is not None
+        if not has_output and self.has_inherit_string:
+            return self.inherits_from.has_output(name)
+        return has_output
 
-    def add_output(self, name: str, value: Node | Output | Constant = None, data_type: DataType = None) -> Output:
+    def add_output(self, name: str, value: Value = None, data_type: DataType = None) -> Output:
         assert not self.has_output(name)
         assert value is not None or data_type is not None
         if value is not None and data_type is not None:
@@ -144,8 +175,11 @@ class InterfaceElement(TypedElement):
         return output
 
     def get_output(self, name="out") -> Output:
-        assert self.has_output(name)
-        return Output(self.source.getOutput(name))
+        assert self.has_output(name), self.name
+        output = Output(self.source.getOutput(name))
+        if output is None and self.has_inherit_string:
+            return self.inherits_from.get_output(name)
+        return output
 
     @property
     def output(self) -> Output:
@@ -153,13 +187,18 @@ class InterfaceElement(TypedElement):
 
     @property
     def outputs(self) -> list[Output]:
-        return [Output(o) for o in self.source.getOutputs()]
+        outputs = [Output(i) for i in self.source.getOutputs()]
+        inherited_outputs = self.inherits_from.outputs if self.has_inherit_string else []
+        for inherited_output in inherited_outputs:
+            if inherited_output.name not in [i.name for i in outputs]:
+                outputs.append(inherited_output)
+        return outputs
 
     @property
     def output_count(self) -> int:
-        return len(self.source.getOutputs())
+        return len(self.outputs)
 
-    def set_output(self, name: str, value: Node | Output | Constant | None) -> Output:
+    def set_output(self, name: str, value: Value) -> Output:
         if self.has_output(name):
             output = self.get_output(name)
             output.value = value
@@ -210,11 +249,11 @@ class PortElement(TypedElement):
         return InterfaceElement(self.source.getParent())
 
     @property
-    def value(self) -> Node | Output | Constant:
+    def value(self) -> Value:
         return Output(self.source.getConnectedOutput()) or Node(self.source.getConnectedNode()) or self.source.getValue()
 
     @value.setter
-    def value(self, value: Node | Output | Constant | None) -> None:
+    def value(self, value: Value) -> None:
         if value is None:
             self.parent.remove_input(self.name)
         elif isinstance(value, Node):
@@ -385,7 +424,7 @@ class Output(PortElement):
         return self.source.getAttribute("default")
 
     @default.setter
-    def default(self, value: Constant) -> None:
+    def default(self, value: Uniform) -> None:
         self.source.setAttribute("default", str(value))
 
 
@@ -403,6 +442,9 @@ class NodeDef(InterfaceElement):
 
     def __init__(self, source: mx.NodeDef):
         super().__init__(source)
+        # nodedefs become "orphaned" unless there is an active pointer to their document
+        # keep this pointer here stops it from becoming orphaned
+        self.__ptr2parent = self.parent
 
     @property
     def source(self) -> mx.NodeDef:
@@ -454,7 +496,7 @@ class NodeGraph(GraphElement):
 #
 
 
-def type_of(value: TypedElement | Constant) -> DataType:
+def type_of(value: Value) -> DataType:
     if isinstance(value, TypedElement):
         return value.data_type
     if isinstance(value, bool):

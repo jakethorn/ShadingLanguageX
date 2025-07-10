@@ -4,7 +4,7 @@
     <input name="in1" type="float" value="0.25" />
     <input name="in2" type="float" value="0.25" />
   </add>
-  <combine3 name="global__my_vec1" type="vector3">
+  <combine3 name="my_vec1" type="vector3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" nodename="node4" />
     <input name="in3" type="float" value="1" />
@@ -14,8 +14,8 @@
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <add name="global__my_vec2" type="vector3">
-    <input name="in1" type="vector3" nodename="global__my_vec1" />
+  <add name="my_vec2" type="vector3">
+    <input name="in1" type="vector3" nodename="my_vec1" />
     <input name="in2" type="vector3" nodename="node10" />
   </add>
 </materialx>

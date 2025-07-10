@@ -7,11 +7,11 @@ import MaterialX as mx
 
 from .InteractiveExpression import InteractiveExpression
 from .InteractiveNode import InteractiveNode
+from .mx_interactive_types import Value
 from .. import state, state_utils
 from ..Argument import Argument
 from ..CompileError import CompileError
 from ..mx_classes import Node
-from ..mx_types import Value
 
 
 class ShaderInterface:

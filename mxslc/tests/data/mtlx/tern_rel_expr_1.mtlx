@@ -1,24 +1,20 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <min name="node1" type="float">
-    <input name="in1" type="float" nodename="node4" />
-    <input name="in2" type="float" nodename="node7" />
-  </min>
-  <ifgreatereq name="node4" type="float">
+  <and name="node1" type="boolean">
+    <input name="in1" type="boolean" nodename="node4" />
+    <input name="in2" type="boolean" nodename="node7" />
+  </and>
+  <ifgreatereq name="node4" type="boolean">
     <input name="value1" type="float" value="0.5" />
     <input name="value2" type="float" value="0" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreatereq>
-  <ifgreatereq name="node7" type="float">
+  <ifgreatereq name="node7" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="0.5" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreatereq>
-  <ifequal name="global__g" type="float">
-    <input name="value1" type="float" nodename="node1" />
-    <input name="value2" type="float" value="1" />
+  <ifequal name="g" type="float">
+    <input name="value1" type="boolean" nodename="node1" />
+    <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="2" />
     <input name="in2" type="float" value="3" />
   </ifequal>

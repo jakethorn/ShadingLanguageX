@@ -1,115 +1,103 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="global__a" type="float">
+  <add name="a" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </add>
-  <subtract name="global__b" type="float">
+  <subtract name="b" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </subtract>
-  <multiply name="global__c" type="float">
+  <multiply name="c" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </multiply>
-  <divide name="global__d" type="float">
+  <divide name="d" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </divide>
-  <modulo name="global__e" type="float">
+  <modulo name="e" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </modulo>
-  <power name="global__f" type="float">
+  <power name="f" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </power>
   <add name="node15" type="float">
-    <input name="in1" type="float" nodename="global__a" />
-    <input name="in2" type="float" nodename="global__b" />
+    <input name="in1" type="float" nodename="a" />
+    <input name="in2" type="float" nodename="b" />
   </add>
   <multiply name="node18" type="float">
-    <input name="in1" type="float" nodename="global__c" />
-    <input name="in2" type="float" nodename="global__d" />
+    <input name="in1" type="float" nodename="c" />
+    <input name="in2" type="float" nodename="d" />
   </multiply>
   <divide name="node20" type="float">
     <input name="in1" type="float" nodename="node18" />
-    <input name="in2" type="float" nodename="global__e" />
+    <input name="in2" type="float" nodename="e" />
   </divide>
   <power name="node23" type="float">
-    <input name="in1" type="float" nodename="global__f" />
+    <input name="in1" type="float" nodename="f" />
     <input name="in2" type="float" value="3" />
   </power>
   <modulo name="node24" type="float">
     <input name="in1" type="float" nodename="node20" />
     <input name="in2" type="float" nodename="node23" />
   </modulo>
-  <subtract name="global__g" type="float">
+  <subtract name="g" type="float">
     <input name="in1" type="float" nodename="node15" />
     <input name="in2" type="float" nodename="node24" />
   </subtract>
-  <ifequal name="global__h" type="float">
+  <ifequal name="h" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifequal>
-  <ifequal name="global__i" type="float">
+  <ifequal name="i" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifequal>
-  <ifgreatereq name="global__j" type="float">
+  <ifgreatereq name="j" type="boolean">
     <input name="value1" type="float" value="2" />
     <input name="value2" type="float" value="1" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreatereq>
-  <ifgreater name="global__k" type="float">
+  <ifgreater name="k" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreater>
-  <ifgreater name="global__m" type="float">
+  <ifgreater name="m" type="boolean">
     <input name="value1" type="float" value="2" />
     <input name="value2" type="float" value="1" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreater>
-  <ifgreatereq name="global__n" type="float">
+  <ifgreatereq name="n" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
   </ifgreatereq>
-  <min name="global__o" type="float">
-    <input name="in1" type="float" nodename="node38" />
-    <input name="in2" type="float" nodename="global__n" />
-  </min>
-  <max name="node38" type="float">
-    <input name="in1" type="float" nodename="node39" />
-    <input name="in2" type="float" nodename="global__m" />
-  </max>
-  <min name="node39" type="float">
-    <input name="in1" type="float" nodename="node40" />
-    <input name="in2" type="float" nodename="global__k" />
-  </min>
-  <max name="node40" type="float">
-    <input name="in1" type="float" nodename="node41" />
-    <input name="in2" type="float" nodename="global__j" />
-  </max>
-  <min name="node41" type="float">
-    <input name="in1" type="float" nodename="global__h" />
-    <input name="in2" type="float" nodename="global__i" />
-  </min>
-  <add name="global__p" type="float">
+  <and name="o" type="boolean">
+    <input name="in1" type="boolean" nodename="node38" />
+    <input name="in2" type="boolean" nodename="n" />
+  </and>
+  <or name="node38" type="boolean">
+    <input name="in1" type="boolean" nodename="node39" />
+    <input name="in2" type="boolean" nodename="m" />
+  </or>
+  <and name="node39" type="boolean">
+    <input name="in1" type="boolean" nodename="node40" />
+    <input name="in2" type="boolean" nodename="k" />
+  </and>
+  <or name="node40" type="boolean">
+    <input name="in1" type="boolean" nodename="node41" />
+    <input name="in2" type="boolean" nodename="j" />
+  </or>
+  <and name="node41" type="boolean">
+    <input name="in1" type="boolean" nodename="h" />
+    <input name="in2" type="boolean" nodename="i" />
+  </and>
+  <add name="p" type="float">
     <input name="in1" type="float" value="3" />
-    <input name="in2" type="float" nodename="global__a" />
+    <input name="in2" type="float" nodename="a" />
   </add>
-  <subtract name="global__q" type="float">
-    <input name="in1" type="float" nodename="global__b" />
+  <subtract name="q" type="float">
+    <input name="in1" type="float" nodename="b" />
     <input name="in2" type="float" value="4" />
   </subtract>
 </materialx>

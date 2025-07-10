@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="global__a2" type="float">
+  <add name="a2" type="float">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
   </add>
-  <add name="global__a3" type="float">
-    <input name="in1" type="float" nodename="global__a2" />
+  <add name="a3" type="float">
+    <input name="in1" type="float" nodename="a2" />
     <input name="in2" type="float" value="2" />
   </add>
 </materialx>

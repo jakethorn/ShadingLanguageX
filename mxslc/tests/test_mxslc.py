@@ -9,11 +9,11 @@ _overwrite_all_expected = False
 
 
 @pytest.mark.parametrize("filename, overwrite_expected", [
-    ("interiormapping_room", False),
-    ("interiormapping_words", False),
+    ("interiormapping_room", True),
+    ("interiormapping_words", True),
     ("redbrick", False),
     ("shaderart", False),
-    ("condensation", False),
+    ("condensation", True),
     ("binary_expressions", False),
     ("for_loops/for_loops_1", False),
     ("for_loops/for_loops_2", False),

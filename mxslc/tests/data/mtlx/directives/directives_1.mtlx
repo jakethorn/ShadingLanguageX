@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine3 name="global__c" type="color3">
+  <combine3 name="c" type="color3">
     <input name="in1" type="float" value="0.5" />
     <input name="in2" type="float" value="1" />
     <input name="in3" type="float" value="0.5" />
@@ -9,7 +9,7 @@
     <input name="in1" type="float" value="3.14" />
     <input name="in2" type="float" value="2" />
   </multiply>
-  <multiply name="global__circum" type="float">
+  <multiply name="circum" type="float">
     <input name="in1" type="float" nodename="node6" />
     <input name="in2" type="float" value="10" />
   </multiply>
@@ -25,7 +25,7 @@
     <input name="in1" type="float" value="0.5" />
     <input name="in2" type="float" value="2.2" />
   </power>
-  <combine3 name="global__d" type="color3">
+  <combine3 name="d" type="color3">
     <input name="in1" type="float" nodename="node10" />
     <input name="in2" type="float" nodename="node13" />
     <input name="in3" type="float" nodename="node16" />
@@ -34,7 +34,7 @@
     <input name="in1" type="float" value="0.5" />
     <input name="in2" type="float" value="2.2" />
   </power>
-  <convert name="global__e" type="color3">
+  <convert name="e" type="color3">
     <input name="in" type="float" nodename="node19" />
   </convert>
   <power name="node23" type="float">
@@ -45,7 +45,7 @@
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" nodename="node23" />
   </subtract>
-  <convert name="global__f" type="color3">
+  <convert name="f" type="color3">
     <input name="in" type="float" nodename="node24" />
   </convert>
 </materialx>

@@ -1,6 +1,56 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <convert name="global__gray" type="color3">
-    <input name="in" type="float" value="0.8" />
-  </convert>
+  <nodedef name="ND_my_convert_color3" node="my_convert">
+    <output name="out" type="color3" default="0, 0, 0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_convert_color3" nodedef="ND_my_convert_color3">
+    <convert name="node2" type="color3">
+      <input name="in" type="float" interfacename="x" />
+    </convert>
+    <output name="out" type="color3" nodename="node2" />
+  </nodegraph>
+  <nodedef name="ND_my_convert_color4" node="my_convert">
+    <output name="out" type="color4" default="0, 0, 0, 0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_convert_color4" nodedef="ND_my_convert_color4">
+    <convert name="node2" type="color4">
+      <input name="in" type="float" interfacename="x" />
+    </convert>
+    <output name="out" type="color4" nodename="node2" />
+  </nodegraph>
+  <nodedef name="ND_my_convert_vector2" node="my_convert">
+    <output name="out" type="vector2" default="0, 0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_convert_vector2" nodedef="ND_my_convert_vector2">
+    <convert name="node2" type="vector2">
+      <input name="in" type="float" interfacename="x" />
+    </convert>
+    <output name="out" type="vector2" nodename="node2" />
+  </nodegraph>
+  <nodedef name="ND_my_convert_vector3" node="my_convert">
+    <output name="out" type="vector3" default="0, 0, 0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_convert_vector3" nodedef="ND_my_convert_vector3">
+    <convert name="node2" type="vector3">
+      <input name="in" type="float" interfacename="x" />
+    </convert>
+    <output name="out" type="vector3" nodename="node2" />
+  </nodegraph>
+  <nodedef name="ND_my_convert_vector4" node="my_convert">
+    <output name="out" type="vector4" default="0, 0, 0, 0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_my_convert_vector4" nodedef="ND_my_convert_vector4">
+    <convert name="node2" type="vector4">
+      <input name="in" type="float" interfacename="x" />
+    </convert>
+    <output name="out" type="vector4" nodename="node2" />
+  </nodegraph>
+  <my_convert name="gray" type="color3">
+    <input name="x" type="float" value="0.8" />
+  </my_convert>
 </materialx>

@@ -1,13 +1,60 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <ifequal name="node5" type="float">
-    <input name="value1" type="float" value="1" />
-    <input name="value2" type="float" value="1" />
-    <input name="in1" type="float" value="2" />
-    <input name="in2" type="float" value="3" />
-  </ifequal>
-  <multiply name="global__f" type="float">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="node5" />
-  </multiply>
+  <nodedef name="ND_my_func" node="my_func">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+    <input name="b" type="boolean" value="false" />
+  </nodedef>
+  <nodegraph name="NG_my_func" nodedef="ND_my_func">
+    <ifequal name="node5" type="float">
+      <input name="value1" type="boolean" interfacename="b" />
+      <input name="value2" type="boolean" value="true" />
+      <input name="in1" type="float" value="2" />
+      <input name="in2" type="float" value="3" />
+    </ifequal>
+    <multiply name="node6" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" nodename="node5" />
+    </multiply>
+    <output name="out" type="float" nodename="node6" />
+  </nodegraph>
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="float" value="1" />
+  </nodegraph>
+  <nodedef name="ND_foo2" node="foo">
+    <output name="out" type="vector2" default="0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <combine2 name="node3" type="vector2">
+      <input name="in1" type="float" value="4" />
+      <input name="in2" type="float" value="5" />
+    </combine2>
+    <output name="out" type="vector2" nodename="node3" />
+  </nodegraph>
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="color3" default="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <combine3 name="node4" type="color3">
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="0" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <output name="out" type="color3" nodename="node4" />
+  </nodegraph>
+  <nodedef name="ND_bar2" node="bar">
+    <output name="out" type="boolean" default="False" />
+  </nodedef>
+  <nodegraph name="NG_bar2" nodedef="ND_bar2">
+    <output name="out" type="boolean" value="true" />
+  </nodegraph>
+  <my_func name="f" type="float">
+    <input name="a" type="float" nodename="node2" />
+    <input name="b" type="boolean" nodename="node3" />
+  </my_func>
+  <foo name="node2" type="float" />
+  <bar name="node3" type="boolean" />
 </materialx>

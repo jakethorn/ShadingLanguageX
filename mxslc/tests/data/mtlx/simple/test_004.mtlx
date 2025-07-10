@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="global__b" type="float">
+  <add name="b" type="float">
     <input name="in1" type="float" value="2" />
     <input name="in2" type="float" value="0" />
   </add>
   <divide name="node6" type="float">
     <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="global__b" />
+    <input name="in2" type="float" nodename="b" />
   </divide>
-  <add name="global__a" type="float">
+  <add name="a" type="float">
     <input name="in1" type="float" value="3" />
     <input name="in2" type="float" nodename="node6" />
   </add>
@@ -16,7 +16,7 @@
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </add>
-  <add name="global__b2" type="float">
+  <add name="b2" type="float">
     <input name="in1" type="float" nodename="node9" />
     <input name="in2" type="float" value="1" />
   </add>

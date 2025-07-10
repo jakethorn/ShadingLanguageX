@@ -5,10 +5,10 @@ from typing import Type
 import MaterialX as mx
 
 from .InteractiveExpression import InteractiveExpression
+from .mx_interactive_types import Value
 from ..Expressions import ArithmeticExpression, LogicExpression, ComparisonExpression, UnaryExpression, IndexingExpression
 from ..Token import Token
 from ..mx_classes import Node
-from ..mx_types import Value
 
 
 class InteractiveNode:
@@ -88,7 +88,7 @@ class InteractiveNode:
         raise NotImplementedError()
 
 
-def _binary_expr(expr_type: Type, left: mx_utils.Value, op: str, right: mx_utils.Value) -> InteractiveNode:
+def _binary_expr(expr_type: Type, left: Value, op: str, right: Value) -> InteractiveNode:
     left = InteractiveExpression(left)
     right = InteractiveExpression(right)
     expr = expr_type(left, Token(op), right)

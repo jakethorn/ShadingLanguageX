@@ -36,6 +36,9 @@ class Keyword(StrEnum):
     LIGHTSHADER = auto()
     MATERIAL = auto()
     T = "T"
+    BSDF = "BSDF"
+    EDF = "EDF"
+    VDF = "VDF"
 
     # Data type aliases
     BOOL = auto()
@@ -64,5 +67,8 @@ class Keyword(StrEnum):
             Keyword.VOLUMESHADER,
             Keyword.LIGHTSHADER,
             Keyword.MATERIAL,
-            Keyword.T
+            Keyword.T,
+            Keyword.BSDF,
+            Keyword.EDF,
+            Keyword.VDF
         }

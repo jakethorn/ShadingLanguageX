@@ -1,21 +1,55 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="node3" type="float">
-    <input name="in1" type="float" value="4" />
-    <input name="in2" type="float" value="1" />
-  </add>
-  <divide name="node6" type="float">
-    <input name="in1" type="float" value="5" />
-    <input name="in2" type="float" value="6" />
-  </divide>
-  <ifequal name="node11" type="float">
-    <input name="value1" type="float" value="0" />
-    <input name="value2" type="float" value="1" />
-    <input name="in1" type="float" value="2" />
-    <input name="in2" type="float" value="3" />
-  </ifequal>
-  <multiply name="node12" type="float">
-    <input name="in1" type="float" value="7" />
-    <input name="in2" type="float" nodename="node11" />
-  </multiply>
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="node3" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <nodedef name="ND_foo2" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+    <input name="b" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <divide name="node3" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" interfacename="b" />
+    </divide>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <nodedef name="ND_foo3" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+    <input name="b" type="boolean" value="false" />
+  </nodedef>
+  <nodegraph name="NG_foo3" nodedef="ND_foo3">
+    <ifequal name="node5" type="float">
+      <input name="value1" type="boolean" interfacename="b" />
+      <input name="value2" type="boolean" value="true" />
+      <input name="in1" type="float" value="2" />
+      <input name="in2" type="float" value="3" />
+    </ifequal>
+    <multiply name="node6" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" nodename="node5" />
+    </multiply>
+    <output name="out" type="float" nodename="node6" />
+  </nodegraph>
+  <foo name="node1" type="float">
+    <input name="a" type="float" value="4" />
+  </foo>
+  <foo name="node3" type="float">
+    <input name="a" type="float" value="5" />
+    <input name="b" type="float" value="6" />
+  </foo>
+  <foo name="node6" type="float">
+    <input name="a" type="float" value="7" />
+    <input name="b" type="boolean" value="false" />
+  </foo>
 </materialx>

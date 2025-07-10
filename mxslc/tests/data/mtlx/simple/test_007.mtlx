@@ -8,7 +8,7 @@
   <convert name="node6" type="vector3">
     <input name="in" type="float" value="1" />
   </convert>
-  <multiply name="global__my_vec" type="vector3">
+  <multiply name="my_vec" type="vector3">
     <input name="in1" type="vector3" nodename="node6" />
     <input name="in2" type="vector3" nodename="node5" />
   </multiply>

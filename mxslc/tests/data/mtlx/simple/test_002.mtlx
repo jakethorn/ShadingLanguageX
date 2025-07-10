@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="global__dogs" type="float">
+  <add name="dogs" type="float">
     <input name="in1" type="float" value="10" />
     <input name="in2" type="float" value="4.7" />
   </add>
-  <power name="global__dont" type="float">
-    <input name="in1" type="float" nodename="global__dogs" />
+  <power name="dont" type="float">
+    <input name="in1" type="float" nodename="dogs" />
     <input name="in2" type="float" value="2" />
   </power>
   <subtract name="node6" type="float">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
   </subtract>
-  <divide name="global__wear" type="float">
+  <divide name="wear" type="float">
     <input name="in1" type="float" nodename="node6" />
     <input name="in2" type="float" value="0.5" />
   </divide>
   <multiply name="node11" type="float">
-    <input name="in1" type="float" nodename="global__dont" />
-    <input name="in2" type="float" nodename="global__wear" />
+    <input name="in1" type="float" nodename="dont" />
+    <input name="in2" type="float" nodename="wear" />
   </multiply>
-  <subtract name="global__hats" type="float">
-    <input name="in1" type="float" nodename="global__dogs" />
+  <subtract name="hats" type="float">
+    <input name="in1" type="float" nodename="dogs" />
     <input name="in2" type="float" nodename="node11" />
   </subtract>
 </materialx>

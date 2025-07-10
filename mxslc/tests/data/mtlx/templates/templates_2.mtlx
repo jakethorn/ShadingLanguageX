@@ -1,6 +1,22 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <image name="global__a" type="float">
-    <input name="file" type="filename" value="albedo.png" />
-  </image>
+  <nodedef name="ND_foo_float" node="foo">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo_float" nodedef="ND_foo_float">
+    <image name="node1" type="float">
+      <input name="file" type="filename" value="albedo.png" />
+    </image>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_foo_vector2" node="foo">
+    <output name="out" type="vector2" default="0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo_vector2" nodedef="ND_foo_vector2">
+    <image name="node1" type="vector2">
+      <input name="file" type="filename" value="albedo.png" />
+    </image>
+    <output name="out" type="vector2" nodename="node1" />
+  </nodegraph>
+  <foo name="a" type="float" />
 </materialx>

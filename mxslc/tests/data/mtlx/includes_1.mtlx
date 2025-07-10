@@ -1,33 +1,38 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <texcoord name="global__uv" type="vector2" />
-  <extract name="node3" type="float">
-    <input name="in" type="vector2" nodename="global__uv" />
+  <texcoord name="uv" type="vector2" />
+  <extract name="node2" type="float">
+    <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <ifgreatereq name="node5" type="float">
+  <ifgreatereq name="node4" type="boolean">
     <input name="value1" type="float" value="0.5" />
-    <input name="value2" type="float" nodename="node3" />
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
+    <input name="value2" type="float" nodename="node2" />
   </ifgreatereq>
-  <ifequal name="global__z" type="float">
-    <input name="value1" type="float" nodename="node5" />
-    <input name="value2" type="float" value="1" />
+  <ifequal name="z" type="float">
+    <input name="value1" type="boolean" nodename="node4" />
+    <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </ifequal>
-  <add name="node10" type="float">
+  <nodedef name="ND_red" node="red">
+    <output name="out" type="color3" default="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_red" nodedef="ND_red">
+    <combine3 name="node4" type="color3">
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="0" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <output name="out" type="color3" nodename="node4" />
+  </nodegraph>
+  <add name="node9" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </add>
-  <add name="global__f" type="float">
-    <input name="in1" type="float" nodename="node10" />
-    <input name="in2" type="float" nodename="global__z" />
+  <add name="f" type="float">
+    <input name="in1" type="float" nodename="node9" />
+    <input name="in2" type="float" nodename="z" />
   </add>
-  <combine3 name="global__r" type="color3">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
-    <input name="in3" type="float" value="0" />
-  </combine3>
+  <red name="r" type="color3" />
 </materialx>

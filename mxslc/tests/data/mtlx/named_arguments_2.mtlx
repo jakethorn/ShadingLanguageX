@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <image name="global__n" type="float">
+  <image name="n" type="float">
     <input name="file" type="filename" value="butterfly1.png" />
     <input name="default" type="float" value="0.5" />
     <input name="filtertype" type="string" value="cubic" />
