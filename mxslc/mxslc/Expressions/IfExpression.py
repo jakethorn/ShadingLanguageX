@@ -1,10 +1,10 @@
 from . import Expression
 from .expression_utils import init_linked_expressions
-from .. import state
+from .. import node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 # TODO implement if else
@@ -45,7 +45,7 @@ class IfExpression(Expression):
         then_node = self.__then.evaluate()
         otherwise_node = self.__otherwise.evaluate()
 
-        node = state.add_unnamed_node("ifequal", self.data_type)
+        node = node_utils.create("ifequal", self.data_type)
         node.set_input("value1", clause_node)
         node.set_input("value2", True)
         node.set_input("in1", then_node)

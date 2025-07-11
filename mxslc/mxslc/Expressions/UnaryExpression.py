@@ -1,10 +1,10 @@
 from . import Expression
-from .. import utils, state
+from .. import utils, node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class UnaryExpression(Expression):
@@ -39,12 +39,12 @@ class UnaryExpression(Expression):
 
     def _evaluate(self) -> Node:
         if self.__op in ["!", Keyword.NOT]:
-            node = state.add_unnamed_node("not", BOOLEAN)
+            node = node_utils.create("not", BOOLEAN)
             node.set_input("in", self.__right.evaluate())
             return node
         elif self.__op == "-":
             right_node = self.__right.evaluate()
-            node = state.add_unnamed_node("subtract", right_node.data_type)
+            node = node_utils.create("subtract", right_node.data_type)
             node.set_input("in1", right_node.data_type.zeros())
             node.set_input("in2", right_node)
             return node

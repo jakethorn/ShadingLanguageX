@@ -1,6 +1,6 @@
 from . import Expression
 from ..DataType import DataType
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class GroupingExpression(Expression):

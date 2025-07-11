@@ -7,6 +7,7 @@ from .ShaderInterface import ShaderInterface
 from .. import state
 from ..Preprocessor.macros import undefine_all_macros
 from ..compile import compile_
+from ..document import get_document, new_document
 from ..file_utils import handle_input_path
 from ..post_process import post_process
 
@@ -18,11 +19,11 @@ class InteractiveCompiler:
 
     @property
     def document(self) -> mx.Document:
-        return mx_utils.get_document()
+        return get_document()
 
     @property
     def xml(self) -> str:
-        return mx_utils.get_xml()
+        return self.document.xml
 
     def get_shader_interface(self) -> ShaderInterface:
         return ShaderInterface()
@@ -46,9 +47,9 @@ class InteractiveCompiler:
         elif not mtlx_filepath.parent.is_dir():
             raise FileNotFoundError(f"No such directory: '{mtlx_filepath.parent}'. Set mkdir=True to create it when saving the file.")
         with open(mtlx_filepath, "w") as file:
-            file.write(mx_utils.get_xml())
+            file.write(self.xml)
 
     def clear(self) -> None:
         undefine_all_macros()
-        mx_utils.clear()
+        new_document()
         state.clear()

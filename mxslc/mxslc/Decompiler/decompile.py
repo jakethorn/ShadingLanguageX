@@ -12,7 +12,7 @@ from ..Keyword import Keyword
 from ..Statements import VariableDeclaration, Statement
 from ..Token import IdentifierToken, Token
 from ..file_utils import handle_input_path, handle_output_path
-from ..mx_classes import Document
+from ..mx_wrapper import Document
 from ..token_types import STRING_LITERAL, INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL
 
 
@@ -155,7 +155,6 @@ def _get_stdlib_functions() -> set[str]:
     document = Document()
     document.load_standard_library()
     return {nd.node_string for nd in document.node_defs}
-
 
 
 _stdlib_functions = _get_stdlib_functions()

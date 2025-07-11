@@ -1,7 +1,7 @@
-from .. import state_utils
+from .. import node_utils
 from ..DataType import DataType, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from ..Expressions import Expression
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class IndexingExpression(Expression):
@@ -26,7 +26,7 @@ class IndexingExpression(Expression):
     def _evaluate(self) -> Node:
         index = self.__indexer.evaluate()
         value = self.__expr.evaluate()
-        return state_utils.extract(value, index)
+        return node_utils.extract(value, index)
 
     def __str__(self) -> str:
         return f"{self.__expr}[{self.__indexer}]"

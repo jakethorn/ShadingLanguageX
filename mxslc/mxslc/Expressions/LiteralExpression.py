@@ -1,10 +1,10 @@
 from . import Expression
-from .. import state_utils
+from .. import node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, STRING, FILENAME
 from ..Keyword import Keyword
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 from ..token_types import INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL, STRING_LITERAL
 
 
@@ -36,9 +36,9 @@ class LiteralExpression(Expression):
 
     def _evaluate(self) -> Node:
         if self.__literal.type == Keyword.NULL:
-            return state_utils.null_node(self.__null_type)
+            return node_utils.null(self.__null_type)
         else:
-            return state_utils.constant(self.__literal.value)
+            return node_utils.constant(self.__literal.value)
 
     def __str__(self) -> str:
         return str(self.__literal)

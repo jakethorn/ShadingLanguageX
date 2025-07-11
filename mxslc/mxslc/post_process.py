@@ -2,7 +2,7 @@ from pathlib import Path
 
 from .DataType import FILENAME
 from .document import get_document
-from .mx_classes import GraphElement
+from .mx_wrapper import GraphElement
 
 
 # TODO add postprocess to check remove unused inputs in nodegraphs

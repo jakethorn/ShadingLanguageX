@@ -1,10 +1,10 @@
 from . import Expression
 from .expression_utils import format_args
-from .. import state
+from .. import node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class NodeConstructor(Expression):
@@ -34,7 +34,7 @@ class NodeConstructor(Expression):
         return self.__data_type
 
     def _evaluate(self) -> Node:
-        node = state.add_unnamed_node(self.__category, self.data_type)
+        node = node_utils.create(self.__category, self.data_type)
         for arg in self.__args:
             node.set_input(arg.name, arg.evaluate())
         return node

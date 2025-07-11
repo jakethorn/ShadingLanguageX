@@ -3,8 +3,7 @@ from __future__ import annotations
 from . import utils
 from .CompileError import CompileError
 from .DataType import DataType
-from .Function import Function
-from .mx_classes import Node, NodeGraph, Output
+from .mx_wrapper import Node, NodeGraph, Output, GraphElement
 from .Token import Token, IdentifierToken
 from .document import get_document
 from .scan import as_token
@@ -36,11 +35,11 @@ class State:
         self.__graph_nodes: dict[str, Node] = {}
         self.__implicit_args: dict[str, Node] = {}
         self.__implicit_outs: dict[str, Output] = {}
-        self.__functions: list[Function] = []
+        self.__functions: list["Function"] = []
 
         if self.__in_node_graph:
             for input_ in self.__node_def.inputs:
-                dot_node = self.add_unnamed_node("dot", input_.data_type)
+                dot_node = self.graph.add_node("dot", input_.data_type)
                 dot_node.add_interface_input("in", input_.data_type, input_.name)
                 self.add_node(IdentifierToken(input_.name), dot_node)
 
@@ -59,6 +58,13 @@ class State:
         return self.__parent
 
     @property
+    def graph(self) -> GraphElement:
+        if self.__in_node_graph:
+            return self.__node_graph
+        else:
+            return get_document()
+
+    @property
     def implicit_outputs(self) -> dict[str, Output]:
         return self.__implicit_outs
 
@@ -67,7 +73,7 @@ class State:
         return self.__node_graph is not None
 
     #
-    # add/get/set nodes
+    # create/add/get/set nodes
     #
 
     def add_node(self, identifier: Token, node: Node) -> None:
@@ -117,7 +123,7 @@ class State:
             # create nodedef input based on global node
             nd_input = self.__node_def.add_input(name, data_type=input_node.data_type)
             # create dot node to make nodedef input accessible in the nodegraph
-            dot_node = self.add_unnamed_node("dot", nd_input.data_type)
+            dot_node = self.graph.add_node("dot", nd_input.data_type)
             dot_node.add_interface_input("in", nd_input.data_type, nd_input.name)
             self.__implicit_args[name] = dot_node
 
@@ -156,11 +162,11 @@ class State:
     # add/get functions
     #
 
-    def add_function(self, func: Function) -> None:
+    def add_function(self, func: "Function") -> None:
         assert func not in self.__functions
         self.__functions.append(func)
 
-    def get_function(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> Function:
+    def get_function(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> "Function":
         matching_funcs = self.__get_functions(identifier, template_type, valid_types, args)
         if len(matching_funcs) == 0:
             raise CompileError(f"Function signature '{utils.function_signature_string(valid_types, identifier.lexeme, template_type, args)}' does not exist.", identifier)
@@ -186,7 +192,7 @@ class State:
             if param_index in f.parameters
         }
 
-    def __get_functions(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> list[Function]:
+    def __get_functions(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> list["Function"]:
         matching_funcs = [
             f
             for f
@@ -201,19 +207,13 @@ class State:
         else:
             return matching_funcs
 
-    #
-    # add unnamed node
-    #
-
-    def add_unnamed_node(self, category: str, data_type: DataType) -> Node:
-        if self.__in_node_graph:
-            return self.__node_graph.add_node(category, data_type)
-        else:
-            return get_document().add_node(category, data_type)
-
 
 _state = State()
 _loop_counter = 0
+
+
+def get_state() -> State:
+    return _state
 
 
 def get_loop_id() -> int:
@@ -260,11 +260,11 @@ def is_node(identifier: str | Token) -> bool:
         return False
 
 
-def add_function(func: Function) -> None:
+def add_function(func: "Function") -> None:
     _state.add_function(func)
 
 
-def get_function(identifier: str | Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> Function:
+def get_function(identifier: str | Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> "Function":
     return _state.get_function(as_token(identifier), template_type, valid_types, args)
 
 
@@ -278,7 +278,3 @@ def is_function(identifier: str | Token) -> bool:
         return True
     except CompileError:
         return False
-
-
-def add_unnamed_node(category: str, data_type: DataType) -> Node:
-    return _state.add_unnamed_node(category, data_type)

@@ -1,7 +1,7 @@
 import re
 from typing import Sequence, Generator, Any
 
-from mxslc.DataType import DataType, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3, DATA_TYPES
+from .DataType import DataType, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3, DATA_TYPES
 
 
 def type_of_swizzle(swizzle: str) -> DataType:

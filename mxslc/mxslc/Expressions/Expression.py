@@ -6,7 +6,7 @@ from .. import utils
 from ..CompileError import CompileError
 from ..DataType import DataType, DATA_TYPES
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class Expression(ABC):

@@ -5,7 +5,6 @@ from pathlib import Path
 import MaterialX as mx
 
 from .Keyword import Keyword
-from .mx_types import Uniform
 from .Token import Token
 
 
@@ -47,9 +46,9 @@ class DataType:
             Keyword.VECTOR4: 4,
             Keyword.COLOR3: 3,
             Keyword.COLOR4: 4
-        }[self.__data_type]
+        }[Keyword(self.__data_type)]
 
-    def zeros(self) -> Uniform:
+    def zeros(self) -> "Uniform":
         return {
             Keyword.BOOLEAN: False,
             Keyword.INTEGER: 0,
@@ -59,9 +58,9 @@ class DataType:
             Keyword.VECTOR4: mx.Vector4(),
             Keyword.COLOR3: mx.Color3(),
             Keyword.COLOR4: mx.Color4()
-        }[self.__data_type]
+        }[Keyword(self.__data_type)]
 
-    def default(self) -> Uniform:
+    def default(self) -> "Uniform":
         if self.__data_type == Keyword.STRING:
             return ""
         elif self.__data_type == Keyword.FILENAME:

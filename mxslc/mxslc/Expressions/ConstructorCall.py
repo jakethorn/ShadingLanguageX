@@ -1,9 +1,9 @@
 from . import Expression
 from .expression_utils import format_args
-from .. import state_utils
+from .. import node_utils
 from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class ConstructorCall(Expression):
@@ -37,24 +37,24 @@ class ConstructorCall(Expression):
             return self.__combine_node()
 
     def __constant_node(self) -> Node:
-        return state_utils.constant(self.data_type.default())
+        return node_utils.constant(self.data_type.default())
 
     def __convert_node(self) -> Node:
-        return state_utils.convert(self.__args[0].evaluate(), self.data_type)
+        return node_utils.convert(self.__args[0].evaluate(), self.data_type)
 
     def __combine_node(self) -> Node:
         channels = []
         # fill channels with args
         for arg in self.__args:
-            new_channels = state_utils.extract_all(arg.evaluate())
+            new_channels = node_utils.extract_all(arg.evaluate())
             for new_channel in new_channels:
                 channels.append(new_channel)
                 if len(channels) == self.data_size:
-                    return state_utils.combine(channels, self.data_type)
+                    return node_utils.combine(channels, self.data_type)
         # fill remaining channels (if any) with zeros
         while len(channels) < self.data_size:
-            channels.append(state_utils.constant(0.0))
-        return state_utils.combine(channels, self.data_type)
+            channels.append(node_utils.constant(0.0))
+        return node_utils.combine(channels, self.data_type)
 
     def __str__(self) -> str:
         return f"{self.__data_type}({format_args(self.__args, with_names=False)})"

@@ -1,12 +1,15 @@
-from __future__ import annotations
+from .DataType import DataType, MULTI_ELEM_TYPES, INTEGER, FLOAT, STRING, FILENAME, SHADER_TYPES
+from .Keyword import Keyword
+from .state import get_state
+from .mx_wrapper import Node, Uniform, type_of
 
-from . import state
-from .DataType import MATERIAL, SHADER_TYPES, MULTI_ELEM_TYPES
-from .mx_classes import *
+
+def create(category: str, data_type: DataType) -> Node:
+    return get_state().graph.add_node(category, data_type)
 
 
 def constant(value: Uniform) -> Node:
-    node = state.add_unnamed_node("constant", type_of(value))
+    node = create("constant", type_of(value))
     node.set_input("value", value)
     return node
 
@@ -17,7 +20,7 @@ def extract(in_: Node, index: Node | int | str) -> Node:
         assert index.data_type == INTEGER
     if isinstance(index, str):
         index = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3}[index]
-    node = state.add_unnamed_node("extract", FLOAT)
+    node = create("extract", FLOAT)
     node.set_input("in", in_)
     node.set_input("index", index)
     return node
@@ -37,7 +40,7 @@ def extract_all(in_: Node) -> list[Node]:
 
 def combine(ins: list[Node], output_type: DataType) -> Node:
     assert 2 <= len(ins) <= 4
-    node = state.add_unnamed_node(f"combine{len(ins)}", output_type)
+    node = create(f"combine{len(ins)}", output_type)
     for i, in_ in enumerate(ins):
         node.set_input(f"in{i + 1}", in_)
     return node
@@ -48,14 +51,10 @@ def convert(in_: Node, output_type: DataType) -> Node:
     assert in_.data_type not in unconvertable_types
     assert output_type not in unconvertable_types
 
-    node = state.add_unnamed_node("convert", output_type)
+    node = create("convert", output_type)
     node.set_input("in", in_)
     return node
 
 
-def surfacematerial() -> Node:
-    return state.add_unnamed_node("surfacematerial", MATERIAL)
-
-
-def null_node(data_type: DataType) -> Node:
-    return state.add_unnamed_node(Keyword.NULL, data_type)
+def null(data_type: DataType) -> Node:
+    return create(Keyword.NULL, data_type)

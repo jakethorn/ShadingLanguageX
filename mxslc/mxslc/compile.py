@@ -3,7 +3,7 @@ from pathlib import Path
 from . import state
 from .Function import Function
 from .Preprocessor.process import process as preprocess
-from .mx_classes import Document
+from .mx_wrapper import Document
 from .parse import parse
 from .scan import scan
 

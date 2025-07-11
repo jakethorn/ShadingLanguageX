@@ -1,7 +1,6 @@
 from . import VariableAssignment
 from ..Expressions import Expression, IdentifierExpression, SwizzleExpression, ArithmeticExpression, LogicExpression
 from ..Token import Token
-from ..utils import string
 
 
 class CompoundAssignment(VariableAssignment):

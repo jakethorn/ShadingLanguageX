@@ -8,7 +8,7 @@ from .InteractiveExpression import InteractiveExpression
 from .mx_interactive_types import Value
 from ..Expressions import ArithmeticExpression, LogicExpression, ComparisonExpression, UnaryExpression, IndexingExpression
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class InteractiveNode:

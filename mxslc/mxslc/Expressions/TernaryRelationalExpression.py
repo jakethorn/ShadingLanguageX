@@ -2,7 +2,7 @@ from . import Expression, ComparisonExpression, LogicExpression
 from ..DataType import DataType, BOOLEAN
 from ..Keyword import Keyword
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class TernaryRelationalExpression(Expression):

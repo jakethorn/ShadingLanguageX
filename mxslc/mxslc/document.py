@@ -1,4 +1,4 @@
-from .mx_classes import Document
+from .mx_wrapper import Document
 
 
 """

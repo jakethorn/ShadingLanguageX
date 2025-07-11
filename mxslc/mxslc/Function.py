@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from . import state
+from . import state, node_utils
 from .Argument import Argument
 from .DataType import DataType
 from .Expressions import Expression
@@ -11,12 +11,18 @@ from .Keyword import Keyword
 from .Parameter import ParameterList, Parameter
 from .Token import Token, IdentifierToken
 from .document import get_document
-from .mx_classes import NodeDef, Node, Output
+from .mx_wrapper import Node, NodeDef, Output
 
 
 # TODO cleanup
 class Function:
-    def __init__(self, return_type: DataType, identifier: Token, template_type: DataType | None, params: ParameterList, body: list["Statement"], return_expr: Expression):
+    def __init__(self,
+                 return_type: DataType,
+                 identifier: Token,
+                 template_type: DataType | None,
+                 params: ParameterList,
+                 body: list["Statement"] | None,
+                 return_expr: Expression | None):
         self.__return_type = return_type
         self.__name = identifier.lexeme
         self.__template_type = template_type
@@ -122,7 +128,7 @@ class Function:
 
     def __call_node_def(self, args: list[Argument]) -> Node:
         assert self.__node_def is not None
-        node = state.add_unnamed_node(self.__name, self.__return_type)
+        node = node_utils.create(self.__name, self.__return_type)
         func_args = self.__combine_with_default_params(args)
         for nd_input in self.__node_def.inputs:
             if nd_input.name in func_args:
@@ -134,11 +140,11 @@ class Function:
             node.source.setType("multioutput")
 
             for name, output in self.__implicit_outs.items():
-                dot_node = state.add_unnamed_node("dot", output.data_type)
+                dot_node = node_utils.create("dot", output.data_type)
                 dot_node.add_input("in", output).value = node
                 state.set_node(name, dot_node)
 
-            dot_node = state.add_unnamed_node("dot", self.__node_def.output.data_type)
+            dot_node = node_utils.create("dot", self.__node_def.output.data_type)
             dot_node.add_input("in", self.__node_def.output).value = node
 
             return dot_node

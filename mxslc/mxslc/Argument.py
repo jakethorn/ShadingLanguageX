@@ -3,7 +3,7 @@ from __future__ import annotations
 from .DataType import DataType
 from .Expressions import Expression
 from .Token import Token
-from .mx_classes import Node
+from .mx_wrapper import Node
 
 
 class Argument:
@@ -40,15 +40,15 @@ class Argument:
         return self.__expr
 
     def instantiate_templated_types(self, template_type: DataType) -> Argument:
-        return Argument(self.__expr.instantiate_templated_types(template_type), self.position, self.__identifier)
+        return Argument(self.expression.instantiate_templated_types(template_type), self.position, self.__identifier)
 
     def init(self, valid_types: DataType | set[DataType] = None) -> None:
-        self.__expr.init(valid_types)
+        self.expression.init(valid_types)
 
     def evaluate(self) -> Node:
-        return self.__expr.evaluate()
+        return self.expression.evaluate()
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.name:
             return f"{self.name}={self.expression}"
         else:

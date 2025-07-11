@@ -6,14 +6,17 @@ import MaterialX as mx
 
 from .DataType import DataType, BOOLEAN, INTEGER, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, STRING, FILENAME
 from .Keyword import Keyword
-from .mx_types import Uniform
-
 
 """
 Pythonic wrappers around the generated MaterialX Python API.
 """
 
+#
+#   Type Definitions
+#
 
+
+type Uniform = bool | int | float | mx.Vector2 | mx.Vector3 | mx.Vector4 | mx.Color3 | mx.Color4 | str | Path
 type Value = Node | Output | Uniform | None
 
 

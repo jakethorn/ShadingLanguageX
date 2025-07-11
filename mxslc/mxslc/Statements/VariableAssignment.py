@@ -1,10 +1,10 @@
 from . import Statement
-from .. import state, state_utils
+from .. import state, node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT, COLOR3, VECTOR3, BOOLEAN, SHADER_TYPES
 from ..Expressions import Expression, IfExpression, IdentifierExpression
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 from ..utils import type_of_swizzle, string
 
 
@@ -54,20 +54,20 @@ class VariableAssignment(Statement):
         right_node = self.evaluate_right(type_of_swizzle(self.__property))
 
         # split into channels corresponding to swizzle
-        right_channels = state_utils.extract_all(right_node)
+        right_channels = node_utils.extract_all(right_node)
         swizzle_channel_map = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3}
         swizzle_channels = [swizzle_channel_map[c] for c in self.__property]
         assert len(right_channels) == len(swizzle_channels)
 
         # get default channels of old variable
-        data = state_utils.extract_all(old_node)
+        data = node_utils.extract_all(old_node)
 
         # override swizzle channels with right hand data
         for swizzle_channel, right_channel in zip(swizzle_channels, right_channels):
             data[swizzle_channel] = right_channel
 
         # combine into final node
-        node = state_utils.combine(data, old_node.data_type)
+        node = node_utils.combine(data, old_node.data_type)
         state.set_node(self.__identifier, node)
 
     def evaluate_right(self, valid_types: DataType | set[DataType]) -> Node:
@@ -77,6 +77,7 @@ class VariableAssignment(Statement):
         return self.__right.init_evaluate(valid_types)
 
 
+# TODO dont do this, load the standard library and get the input data from there
 _standard_surface_inputs: dict[str, DataType] = {
     "base": FLOAT,
     "base_color": COLOR3,

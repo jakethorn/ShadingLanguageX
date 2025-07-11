@@ -1,9 +1,9 @@
 from . import Expression
-from .. import state
+from .. import node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, INTEGER, FLOAT
 from ..Token import Token
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 # TODO implement nested switch expressions (to get 25 cases)
@@ -35,7 +35,7 @@ class SwitchExpression(Expression):
         return self.__values[0].data_type
 
     def _evaluate(self) -> Node:
-        node = state.add_unnamed_node("switch", self.data_type)
+        node = node_utils.create("switch", self.data_type)
         node.set_input("which", self.__which.evaluate())
         for i, value in enumerate(self.__values):
             node.set_input(f"in{i + 1}", value.evaluate())

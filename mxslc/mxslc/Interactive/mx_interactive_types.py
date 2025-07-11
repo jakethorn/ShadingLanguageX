@@ -1,4 +1,4 @@
 import MaterialX as mx
-from ..mx_types import Uniform
+from ..mx_wrapper import Uniform
 
 type Value = mx.Node | Uniform

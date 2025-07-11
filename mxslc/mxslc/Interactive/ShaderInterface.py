@@ -8,10 +8,10 @@ import MaterialX as mx
 from .InteractiveExpression import InteractiveExpression
 from .InteractiveNode import InteractiveNode
 from .mx_interactive_types import Value
-from .. import state, state_utils
+from .. import state, node_utils
 from ..Argument import Argument
 from ..CompileError import CompileError
-from ..mx_classes import Node
+from ..mx_wrapper import Node
 
 
 class ShaderInterface:
@@ -67,7 +67,7 @@ def _to_mtlx_node(value: Value) -> Node:
     if isinstance(value, mx.Node):
         return Node(value)
     else:
-        return state_utils.constant(value)
+        return node_utils.constant(value)
 
 
 def _to_arg_list(args: Sequence[Value | InteractiveNode]) -> list[Argument]:
