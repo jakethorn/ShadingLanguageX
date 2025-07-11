@@ -174,7 +174,13 @@ class InterfaceElement(TypedElement):
             output.value = data_type.default()
         return output
 
-    def get_output(self, name="out") -> Output:
+    def get_output(self, name: str = None) -> Output:
+        if name is None:
+            if self.output_count == 1:
+                return self.outputs[0]
+            if self.has_output("out"):
+                return self.get_output("out")
+            raise AssertionError(self.name)
         assert self.has_output(name), self.name
         output = Output(self.source.getOutput(name))
         if output is None and self.has_inherit_string:
@@ -249,6 +255,10 @@ class PortElement(TypedElement):
         return InterfaceElement(self.source.getParent())
 
     @property
+    def is_output(self) -> bool:
+        return isinstance(self.source, mx.Output)
+
+    @property
     def value(self) -> Value:
         return Output(self.source.getConnectedOutput()) or Node(self.source.getConnectedNode()) or self.source.getValue()
 
@@ -277,6 +287,7 @@ class PortElement(TypedElement):
 
     @interface_name.setter
     def interface_name(self, name: str) -> None:
+        assert not self.is_output
         self.source.removeAttribute("value")
         self.source.setConnectedNode(None)
         self.source.setInterfaceName(name)
@@ -336,6 +347,9 @@ class Document(GraphElement):
 
     def validate(self) -> tuple[bool, str]:
         return self.source.validate()
+
+    def load_standard_library(self) -> None:
+        mx.loadLibraries(mx.getDefaultDataLibraryFolders(), mx.getDefaultDataSearchPath(), self.source)
 
 
 #

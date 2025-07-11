@@ -145,4 +145,4 @@ vector3 global__node260 = global__update_finalColor__col4 * global__update_final
 vector3 global__main__finalColor5 = global__main__finalColor4 + global__node260;
 color3 global__node304 = color3(global__main__finalColor5);
 surfaceshader global__main__surface = standard_surface(base_color=global__node304);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=global__main__surface};
+material mxsl_material = surfacematerial(surfaceshader=global__main__surface);

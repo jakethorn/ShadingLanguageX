@@ -3,3 +3,5 @@ color3 c = color3(1.0, 0.0, 0.0) ^ GAMMA;
 
 surfaceshader surface = standard_surface();
 surface.base_color = c;
+
+surfacematerial(surface);

@@ -8,4 +8,4 @@ float node11 = node8 * 10.0;
 float main__seed = node5 + node11;
 color3 main__c = randomcolor(in=main__seed);
 surfaceshader node12 = standard_surface(base_color=main__c);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=node12};
+material mxsl_material = surfacematerial(surfaceshader=node12);

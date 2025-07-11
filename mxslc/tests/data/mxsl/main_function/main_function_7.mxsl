@@ -1,6 +1,8 @@
-void main(float r, filename img_path)
+material main(float r, filename img_path)
 {
     surfaceshader surface = standard_surface();
     color3 img_color = image(img_path);
     surface.base_color = img_color * color3(r, 0.0, 0.0);
+
+    return surfacematerial(surface);
 }

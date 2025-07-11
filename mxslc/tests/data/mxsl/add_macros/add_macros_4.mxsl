@@ -2,3 +2,5 @@ color4 c = image(IMAGE_PATH) ^ GAMMA;
 
 surfaceshader surface = standard_surface();
 surface.base_color = c.rgb;
+
+surfacematerial(surface);

@@ -1,4 +1,4 @@
 color3 global__node47 = color3(0.944, 0.776, 0.373);
 color3 standard_surface__specular_color = color3(0.944, 0.776, 0.373);
 surfaceshader global__main__goldsrf = standard_surface(base=1.0, base_color=global__node47, metalness=1.0, specular=1.0, specular_color=standard_surface__specular_color, specular_roughness=0.02);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=global__main__goldsrf};
+material mxsl_material = surfacematerial(surfaceshader=global__main__goldsrf);

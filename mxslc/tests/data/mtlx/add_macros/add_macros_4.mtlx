@@ -3,31 +3,31 @@
   <image name="node1" type="color4">
     <input name="file" type="filename" value="textures\butterfly1.png" />
   </image>
-  <power name="global__c" type="color4">
+  <power name="c" type="color4">
     <input name="in1" type="color4" nodename="node1" />
     <input name="in2" type="float" value="2.2" />
   </power>
-  <standard_surface name="global__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node56" />
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node8" />
   </standard_surface>
-  <extract name="node53" type="float">
-    <input name="in" type="color4" nodename="global__c" />
+  <extract name="node5" type="float">
+    <input name="in" type="color4" nodename="c" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node54" type="float">
-    <input name="in" type="color4" nodename="global__c" />
+  <extract name="node6" type="float">
+    <input name="in" type="color4" nodename="c" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <extract name="node55" type="float">
-    <input name="in" type="color4" nodename="global__c" />
+  <extract name="node7" type="float">
+    <input name="in" type="color4" nodename="c" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <combine3 name="node56" type="color3">
-    <input name="in1" type="float" nodename="node53" />
-    <input name="in2" type="float" nodename="node54" />
-    <input name="in3" type="float" nodename="node55" />
+  <combine3 name="node8" type="color3">
+    <input name="in1" type="float" nodename="node5" />
+    <input name="in2" type="float" nodename="node6" />
+    <input name="in3" type="float" nodename="node7" />
   </combine3>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="global__surface" />
+  <surfacematerial name="node9" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

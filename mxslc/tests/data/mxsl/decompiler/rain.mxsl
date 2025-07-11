@@ -319,4 +319,4 @@ float node740 = node739[0];
 float node741 = node739[1];
 vector3 node742 = vector3(node733, node740, node741);
 surfaceshader global__surface = standard_surface(base_color=global__base_color, specular_roughness=node727, normal=node742);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=global__surface};
+material mxsl_material = surfacematerial(surfaceshader=global__surface);

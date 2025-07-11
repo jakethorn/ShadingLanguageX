@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .DataType import FILENAME, MATERIAL
+from .DataType import FILENAME
 from .document import get_document
 from .mx_classes import GraphElement
 
@@ -8,30 +8,16 @@ from .mx_classes import GraphElement
 # TODO add postprocess to check remove unused inputs in nodegraphs
 # TODO add postprocess to convert combine nodes to constant nodes
 # TODO add postprocess to check ports only have one of value/node/output or interface_name
-# TODO add postprocess to run validate
 # TODO add Generated using ShadingLanguageX (github.com/jakethorn/ShadingLanguageX) at top of xml
 
 
 def post_process() -> None:
     document = get_document()
 
-    _add_material_node()
     for graph in [document, *document.node_graphs]:
         _remove_redundant_convert_nodes(graph)
         _remove_dot_nodes(graph)
         _remove_constant_nodes(graph)
-
-
-def _add_material_node() -> None:
-    document = get_document()
-    surfaceshader_nodes = document.get_nodes("standard_surface")
-    displacementshader_nodes = document.get_nodes("displacement")
-    if len(surfaceshader_nodes) > 0 or len(displacementshader_nodes) > 0:
-        material_node = document.add_node("surfacematerial", MATERIAL)
-        if len(surfaceshader_nodes) > 0:
-            material_node.set_input("surfaceshader", surfaceshader_nodes[-1])
-        if len(displacementshader_nodes) > 0:
-            material_node.set_input("displacementshader", displacementshader_nodes[-1])
 
 
 def _remove_redundant_convert_nodes(graph: GraphElement) -> None:
@@ -57,8 +43,10 @@ def _remove_dot_nodes(graph: GraphElement) -> None:
         input_interface = dot_node.get_input("in").interface_name
         if input_interface:
             for port in dot_node.downstream_ports:
-                port.interface_name = input_interface
-        dot_node.remove()
+                if not port.is_output:
+                    port.interface_name = input_interface
+        if len(dot_node.downstream_ports) == 0:
+            dot_node.remove()
 
 
 def _remove_constant_nodes(graph: GraphElement) -> None:

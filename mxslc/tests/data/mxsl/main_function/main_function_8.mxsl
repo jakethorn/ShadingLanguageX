@@ -1,6 +1,8 @@
-void my_function(vec2 uv, color3 c)
+material my_function(vec2 uv, color3 c)
 {
     surfaceshader surface = standard_surface();
     color3 butterfly_color = image("butterfly1.png", texcoord=uv);
     surface.base_color = butterfly_color * c;
+
+    return surfacematerial(surface);
 }

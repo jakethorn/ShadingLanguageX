@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine3 name="global__red" type="color3">
+  <combine3 name="red" type="color3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <combine3 name="global__green" type="color3">
+  <combine3 name="green" type="color3">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <combine3 name="global__blue" type="color3">
+  <combine3 name="blue" type="color3">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="1" />
   </combine3>
-  <standard_surface name="node10" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="global__red" />
-  </standard_surface>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="node10" />
+  <surfacematerial name="node10" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="node11" />
   </surfacematerial>
+  <standard_surface name="node11" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="red" />
+  </standard_surface>
 </materialx>

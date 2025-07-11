@@ -16,4 +16,4 @@ color3 node93 = color3(0.5, 0.1, 0.1);
 color3 node94 = node89 * node93;
 vector3 node97 = normalmap(in=global__normal2);
 surfaceshader global__surface = standard_surface(base_color=node94, metalness=global__metal, specular_roughness=global__rough, normal=node97);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=global__surface};
+material mxsl_material = surfacematerial(surfaceshader=global__surface);

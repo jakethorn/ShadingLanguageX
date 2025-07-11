@@ -58,4 +58,4 @@ surfaceshader global__surface = standard_surface(base_color=global__base_color2,
 vector3 displacement__displacement = tangent(space="object");
 float displacement__scale = global__height * 2.0;
 displacementshader global__displacement = displacement(displacement=displacement__displacement, scale=displacement__scale);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=global__surface, displacementshader=global__displacement};
+material mxsl_material = surfacematerial(surfaceshader=global__surface, displacementshader=global__displacement);

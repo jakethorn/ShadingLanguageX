@@ -1,4 +1,4 @@
-void my_function(float x, string space, filename image_path)
+material my_function(float x, string space, filename image_path)
 {
     vec3 i = viewdirection(space);
     i *= x;
@@ -12,4 +12,6 @@ void my_function(float x, string space, filename image_path)
     surfaceshader surface = standard_surface();
     surface.base_color = c;
     surface.normal = i;
+
+    return surfacematerial(surface);
 }

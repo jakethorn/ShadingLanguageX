@@ -4,7 +4,7 @@ from .Expressions import *
 from .Keyword import Keyword
 from .Parameter import Parameter
 from .Statements import *
-from .Token import Token
+from .Token import Token, IdentifierToken
 from .TokenReader import TokenReader
 from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
 
@@ -342,6 +342,10 @@ class Parser(TokenReader):
     def __argument(self, index: int) -> Argument:
         if self._peek() == IDENTIFIER and self._peek_next() == "=":
             name = self._match(IDENTIFIER)
+            self._match("=")
+        elif self._peek() in Keyword.DATA_TYPES() and self._peek_next() == "=":
+            keyword = self._match(Keyword.DATA_TYPES())
+            name = IdentifierToken(keyword.lexeme)
             self._match("=")
         else:
             name = None

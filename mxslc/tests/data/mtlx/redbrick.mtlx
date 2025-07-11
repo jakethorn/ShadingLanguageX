@@ -72,7 +72,4 @@
   <normalmap name="node30" type="vector3">
     <input name="in" type="vector3" nodename="normal2" />
   </normalmap>
-  <surfacematerial name="node32" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
-  </surfacematerial>
 </materialx>

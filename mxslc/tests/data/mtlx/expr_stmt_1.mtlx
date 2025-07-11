@@ -20,7 +20,4 @@
     <input name="in1" type="float" nodename="node5" />
     <input name="in2" type="float" nodename="node7" />
   </multiply>
-  <surfacematerial name="node9" type="material">
-    <input name="displacementshader" type="displacementshader" nodename="node1" />
-  </surfacematerial>
 </materialx>

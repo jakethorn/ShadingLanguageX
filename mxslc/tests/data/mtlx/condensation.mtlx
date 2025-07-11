@@ -758,7 +758,4 @@
     <input name="in2" type="float" nodename="node224" />
     <input name="in3" type="float" nodename="node225" />
   </combine3>
-  <surfacematerial name="node227" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
-  </surfacematerial>
 </materialx>

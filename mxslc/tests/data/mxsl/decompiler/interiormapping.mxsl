@@ -89,4 +89,4 @@ color3 clamp__in2 = node197 + node202;
 color3 node203 = clamp(in=clamp__in2);
 color3 node208 = node203 * main__ao;
 surfaceshader main__surface = standard_surface(base_color=node208, specular_roughness=1.0);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=main__surface};
+material mxsl_material = surfacematerial(surfaceshader=main__surface);

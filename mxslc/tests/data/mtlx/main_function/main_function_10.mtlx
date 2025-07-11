@@ -1,14 +1,21 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <standard_surface name="main__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node46" />
-  </standard_surface>
-  <combine3 name="node46" type="color3">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
-    <input name="in3" type="float" value="0" />
-  </combine3>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="main__surface" />
-  </surfacematerial>
+  <nodedef name="ND_main" node="main">
+    <output name="out" type="material" default="" />
+  </nodedef>
+  <nodegraph name="NG_main" nodedef="ND_main">
+    <standard_surface name="surface" type="surfaceshader">
+      <input name="base_color" type="color3" nodename="node4" />
+    </standard_surface>
+    <combine3 name="node4" type="color3">
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="0" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <surfacematerial name="node5" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="surface" />
+    </surfacematerial>
+    <output name="out" type="material" nodename="node5" />
+  </nodegraph>
+  <main name="node1" type="material" />
 </materialx>

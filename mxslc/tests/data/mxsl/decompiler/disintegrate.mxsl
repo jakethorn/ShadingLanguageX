@@ -14,4 +14,4 @@ float node28 = main__noise * 4.0;
 float main__opacity = 0.9 - node28;
 color3 node73 = color3(main__opacity);
 surfaceshader main__surface = standard_surface(base_color=main__color, opacity=node73);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=main__surface};
+material mxsl_material = surfacematerial(surfaceshader=main__surface);

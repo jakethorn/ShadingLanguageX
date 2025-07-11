@@ -237,8 +237,4 @@
     <input name="in1" type="float" nodename="height" />
     <input name="in2" type="float" value="2" />
   </multiply>
-  <surfacematerial name="node81" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
-    <input name="displacementshader" type="displacementshader" nodename="displacement" />
-  </surfacematerial>
 </materialx>

@@ -1,17 +1,29 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <standard_surface name="my_function__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node52" />
-  </standard_surface>
-  <image name="my_function__butterfly_color" type="color3">
-    <input name="file" type="filename" value="butterfly1.png" />
-    <input name="texcoord" type="vector2" value="0, 0" />
-  </image>
-  <multiply name="node52" type="color3">
-    <input name="in1" type="color3" nodename="my_function__butterfly_color" />
-    <input name="in2" type="color3" value="1, 0, 0" />
-  </multiply>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="my_function__surface" />
-  </surfacematerial>
+  <nodedef name="ND_my_function" node="my_function">
+    <output name="out" type="material" default="" />
+    <input name="uv" type="vector2" value="0, 0" />
+    <input name="c" type="color3" value="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_my_function" nodedef="ND_my_function">
+    <standard_surface name="surface" type="surfaceshader">
+      <input name="base_color" type="color3" nodename="node4" />
+    </standard_surface>
+    <image name="butterfly_color" type="color3">
+      <input name="file" type="filename" value="butterfly1.png" />
+      <input name="texcoord" type="vector2" interfacename="uv" />
+    </image>
+    <multiply name="node4" type="color3">
+      <input name="in1" type="color3" nodename="butterfly_color" />
+      <input name="in2" type="color3" interfacename="c" />
+    </multiply>
+    <surfacematerial name="node6" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="surface" />
+    </surfacematerial>
+    <output name="out" type="material" nodename="node6" />
+  </nodegraph>
+  <my_function name="node3" type="material">
+    <input name="uv" type="vector2" value="0, 0" />
+    <input name="c" type="color3" value="1, 0, 0" />
+  </my_function>
 </materialx>

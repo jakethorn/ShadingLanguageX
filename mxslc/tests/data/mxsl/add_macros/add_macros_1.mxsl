@@ -8,3 +8,5 @@ float x = 2.0;
 
 surfaceshader surface = standard_surface();
 surface.base_color = color3(x);
+
+surfacematerial(surface);

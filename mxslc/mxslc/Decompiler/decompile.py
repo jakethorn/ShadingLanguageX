@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import MaterialX as mx
@@ -13,6 +12,7 @@ from ..Keyword import Keyword
 from ..Statements import VariableDeclaration, Statement
 from ..Token import IdentifierToken, Token
 from ..file_utils import handle_input_path, handle_output_path
+from ..mx_classes import Document
 from ..token_types import STRING_LITERAL, INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL
 
 
@@ -49,9 +49,6 @@ class Decompiler:
             input_nodes: list[mx.Node] = [i.getConnectedNode() for i in inputs if i.getConnectedNode()]
             self.__decompile(input_nodes)
             line = f"{_deexecute(node)}\n"
-            # TODO remove this check when SLX supports material types
-            if line.startswith("material"):
-                line = f"//{line}"
             self.__mxsl += line
 
 
@@ -155,12 +152,10 @@ def _get_expression(args: list[Argument], index: int | str) -> Expression:
 
 
 def _get_stdlib_functions() -> set[str]:
-    # TODO load in the stdlib_defs.mtlx and use the node_defs instead
-    return set()
-    #stdlib_defs_path = Path(__file__).parent.parent / "stdlib" / "stdlib_defs.mxsl"
-    #with open(stdlib_defs_path) as f:
-    #    stdlib_defs = f.read()
-    #return {f.replace('"', '') for f in re.findall('"[a-zA-Z0-9_]+"', stdlib_defs)}
+    document = Document()
+    document.load_standard_library()
+    return {nd.node_string for nd in document.node_defs}
+
 
 
 _stdlib_functions = _get_stdlib_functions()

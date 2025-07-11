@@ -1,5 +1,7 @@
-void main(float r, float g, float b)
+material main(float r, float g, float b)
 {
     surfaceshader surface = standard_surface();
     surface.base_color = color3(r, g, b);
+
+    return surfacematerial(surface);
 }

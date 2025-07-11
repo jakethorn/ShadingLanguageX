@@ -388,4 +388,4 @@ surfaceshader main__surface = standard_surface(base_color=node707, specular_roug
 vector3 displacement__displacement = vector3(0.0, 0.0, 1.0);
 float displacement__scale = main__wave_height / 5.0;
 displacementshader node712 = displacement(displacement=displacement__displacement, scale=displacement__scale);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=main__surface, displacementshader=node712};
+material mxsl_material = surfacematerial(surfaceshader=main__surface, displacementshader=node712);

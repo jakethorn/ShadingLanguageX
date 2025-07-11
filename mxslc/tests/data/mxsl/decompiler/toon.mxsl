@@ -7,4 +7,4 @@ vector3 node6 = position();
 vector3 node12 = node6 * global__outline;
 color3 global__c = color3(node12);
 surfaceshader global__surface = standard_surface(base_color=global__c, specular_roughness=1.0);
-//material mxsl_material = {"surfacematerial", material: surfaceshader=global__surface};
+material mxsl_material = surfacematerial(surfaceshader=global__surface);

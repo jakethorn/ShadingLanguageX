@@ -5,14 +5,14 @@
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <power name="global__c" type="color3">
+  <power name="c" type="color3">
     <input name="in1" type="color3" nodename="node4" />
     <input name="in2" type="float" value="2.2" />
   </power>
-  <standard_surface name="global__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="global__c" />
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="c" />
   </standard_surface>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="global__surface" />
+  <surfacematerial name="node7" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

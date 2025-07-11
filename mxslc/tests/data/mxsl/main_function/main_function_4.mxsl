@@ -1,11 +1,15 @@
-void _main()
+material _main()
 {
     surfaceshader surface = standard_surface();
     surface.base_color = color3(1.0, 0.0, 0.0);
+
+    return surfacematerial(surface);
 }
 
-void main()
+material main()
 {
     surfaceshader surface = standard_surface();
     surface.base_color = color3(0.0, 1.0, 0.0);
+
+    return surfacematerial(surface);
 }

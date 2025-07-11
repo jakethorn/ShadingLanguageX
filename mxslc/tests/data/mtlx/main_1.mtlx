@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_my_function" node="my_function">
-    <output name="out" type="integer" default="0" />
+    <output name="out" type="material" default="" />
     <input name="x" type="float" value="0" />
     <input name="space" type="string" value="" />
     <input name="image_path" type="filename" value="." />
@@ -25,9 +25,12 @@
       <input name="base_color" type="color3" nodename="c2" />
       <input name="normal" type="vector3" nodename="i2" />
     </standard_surface>
-    <output name="out" type="integer" value="0" />
+    <surfacematerial name="node9" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="surface" />
+    </surfacematerial>
+    <output name="out" type="material" nodename="node9" />
   </nodegraph>
-  <my_function name="node4" type="integer">
+  <my_function name="node4" type="material">
     <input name="x" type="float" value="0.6" />
     <input name="space" type="string" value="tangent" />
     <input name="image_path" type="filename" value="some\fake\path\butterfly1.png" />

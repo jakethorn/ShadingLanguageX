@@ -1,21 +1,33 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <standard_surface name="main__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node55" />
-  </standard_surface>
-  <image name="main__img_color" type="color3">
-    <input name="file" type="filename" value="butterfly1.png" />
-  </image>
-  <combine3 name="node54" type="color3">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
-    <input name="in3" type="float" value="0" />
-  </combine3>
-  <multiply name="node55" type="color3">
-    <input name="in1" type="color3" nodename="main__img_color" />
-    <input name="in2" type="color3" nodename="node54" />
-  </multiply>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="main__surface" />
-  </surfacematerial>
+  <nodedef name="ND_main" node="main">
+    <output name="out" type="material" default="" />
+    <input name="r" type="float" value="0" />
+    <input name="img_path" type="filename" value="." />
+  </nodedef>
+  <nodegraph name="NG_main" nodedef="ND_main">
+    <standard_surface name="surface" type="surfaceshader">
+      <input name="base_color" type="color3" nodename="node7" />
+    </standard_surface>
+    <image name="img_color" type="color3">
+      <input name="file" type="filename" interfacename="img_path" />
+    </image>
+    <combine3 name="node6" type="color3">
+      <input name="in1" type="float" interfacename="r" />
+      <input name="in2" type="float" value="0" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <multiply name="node7" type="color3">
+      <input name="in1" type="color3" nodename="img_color" />
+      <input name="in2" type="color3" nodename="node6" />
+    </multiply>
+    <surfacematerial name="node8" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="surface" />
+    </surfacematerial>
+    <output name="out" type="material" nodename="node8" />
+  </nodegraph>
+  <main name="node3" type="material">
+    <input name="r" type="float" value="1" />
+    <input name="img_path" type="filename" value="butterfly1.png" />
+  </main>
 </materialx>
