@@ -46,12 +46,5 @@ class FunctionDeclaration(Statement):
 
     def execute(self) -> None:
         for func in sorted(self.__funcs):
-            _init_parameter_default_values(func)
             func.initialise()
             state.add_function(func)
-
-
-def _init_parameter_default_values(func: Function) -> None:
-    for param in func.parameters:
-        if param.default_value:
-            param.default_value.init(param.data_type)

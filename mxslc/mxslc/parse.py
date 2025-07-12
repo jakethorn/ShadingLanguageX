@@ -130,20 +130,20 @@ class Parser(TokenReader):
         data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
         self._match("=")
-        literal1 = self._match(FLOAT_LITERAL, IDENTIFIER)
+        start_value = self._match(FLOAT_LITERAL, IDENTIFIER)
         self._match(":")
-        literal2 = self._match(FLOAT_LITERAL, IDENTIFIER)
+        value2 = self._match(FLOAT_LITERAL, IDENTIFIER)
         if self._consume(":"):
-            literal3 = self._match(FLOAT_LITERAL, IDENTIFIER)
+            value3 = self._match(FLOAT_LITERAL, IDENTIFIER)
         else:
-            literal3 = None
+            value3 = None
         self._match(")")
         self._match("{")
         statements = []
         while self._peek() != "}":
             statements.append(self.__statement())
         self._match("}")
-        return ForLoop(data_type, identifier, literal1, literal2, literal3, statements)
+        return ForLoop(data_type, identifier, start_value, value2, value3, statements)
 
     def __expression(self) -> Expression:
         return self.__logic()

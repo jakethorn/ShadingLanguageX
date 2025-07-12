@@ -8,8 +8,8 @@ from ..Expressions.LiteralExpression import NullExpression
 from ..Function import Function
 from ..Keyword import Keyword
 from ..Parameter import ParameterList, Parameter
-from ..Token import Token, IdentifierToken
-from ..token_types import FLOAT_LITERAL, INT_LITERAL
+from ..Token import Token, IdentifierToken, LiteralToken
+from ..token_types import FLOAT_LITERAL
 
 
 class ForLoop(Statement):
@@ -21,13 +21,13 @@ class ForLoop(Statement):
         self.__value3 = value3
         self.__body = body
 
+        # TODO support other iter types
         if self.__iter_var_type != FLOAT:
             raise CompileError("Loop iteration variable must be a float.", self.__identifier)
 
-        # TODO cleanup
         return_type = DataType(Keyword.VOID)
         func_identifier = IdentifierToken(f"__loop__{state.get_loop_id()}")
-        parameters = ParameterList([Parameter(self.__identifier, FLOAT)])
+        parameters = ParameterList([Parameter(self.__identifier, self.__iter_var_type)])
         return_expr = NullExpression()
         self.__function = Function(return_type, func_identifier, None, parameters, self.__body, return_expr)
 
@@ -45,7 +45,7 @@ class ForLoop(Statement):
 
         i = start_value
         while i <= end_value:
-            iter_arg = Argument(LiteralExpression(Token(FLOAT_LITERAL, i)), 0)
+            iter_arg = Argument(LiteralExpression(LiteralToken(i)), 0)
             iter_arg.init(FLOAT)
             self.__function.invoke([iter_arg])
             i += incr_value

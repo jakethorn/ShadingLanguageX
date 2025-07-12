@@ -76,3 +76,25 @@ class Token:
 class IdentifierToken(Token):
     def __init__(self, lexeme: str, file: Path = None, line: int = None):
         super().__init__(IDENTIFIER, lexeme, file, line)
+
+
+class LiteralToken(Token):
+    def __init__(self, value: bool | int | float | str | Path, file: Path = None, line: int = None):
+        type_ = ""
+        lexeme = ""
+        if isinstance(value, bool):
+            type_ = Keyword.TRUE if value else Keyword.FALSE
+            lexeme = type_
+        if isinstance(value, int):
+            type_ = INT_LITERAL
+            lexeme = str(value)
+        if isinstance(value, float):
+            type_ = FLOAT_LITERAL
+            lexeme = str(float(f"{value:.4f}"))
+        if isinstance(value, str):
+            type_ = STRING_LITERAL
+            lexeme = '"' + value + '"'
+        if isinstance(value, Path):
+            type_ = FILENAME_LITERAL
+            lexeme = '"' + str(value) + '"'
+        super().__init__(type_, lexeme, file, line)

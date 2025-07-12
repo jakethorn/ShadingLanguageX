@@ -55,6 +55,7 @@ class Function:
         return self.__identifier.line
 
     def initialise(self) -> None:
+        self.parameters.init_default_values()
         self.__create_node_def()
         self.__create_node_graph()
 

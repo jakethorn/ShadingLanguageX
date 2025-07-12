@@ -7,7 +7,7 @@ from ..mx_wrapper import Node
 
 
 class ConstructorCall(Expression):
-    def __init__(self, data_type: Token, args: list["Argument"]):
+    def __init__(self, data_type: Token | DataType, args: list["Argument"]):
         super().__init__(data_type)
         self.__data_type = DataType(data_type)
         self.__args = args

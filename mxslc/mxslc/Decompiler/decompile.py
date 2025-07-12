@@ -8,7 +8,7 @@ from ..Expressions import IdentifierExpression, LiteralExpression, Expression, A
 from ..Expressions.LiteralExpression import NullExpression
 from ..Keyword import Keyword
 from ..Statements import VariableDeclaration, Statement
-from ..Token import IdentifierToken, Token
+from ..Token import IdentifierToken, Token, LiteralToken
 from ..file_utils import handle_input_path, handle_output_path
 from ..mx_wrapper import Document, Node, Input
 from ..token_types import STRING_LITERAL, INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL
@@ -98,37 +98,19 @@ def _input_to_expression(input_: Input) -> Expression:
     if node:
         node_identifier = IdentifierToken(node.name)
         return IdentifierExpression(node_identifier)
-    data_type = input_.data_type
-    if data_type == BOOLEAN:
-        token = Token(Keyword.TRUE if input_.literal else Keyword.FALSE)
+    if input_.data_type in [BOOLEAN, INTEGER, FLOAT, STRING, FILENAME]:
+        token = LiteralToken(input_.literal)
         return LiteralExpression(token)
-    if data_type == INTEGER:
-        token = Token(INT_LITERAL, input_.literal_string)
-        return LiteralExpression(token)
-    if data_type == FLOAT:
-        value_str = input_.literal_string
-        token = Token(FLOAT_LITERAL, _format_float(value_str))
-        return LiteralExpression(token)
-    if data_type in MULTI_ELEM_TYPES:
-        return ConstructorCall(data_type.as_token, _value_to_arguments(input_.literal_string))
-    if data_type == STRING:
-        token = Token(STRING_LITERAL, '"' + input_.literal_string + '"')
-        return LiteralExpression(token)
-    if data_type == FILENAME:
-        token = Token(FILENAME_LITERAL, '"' + input_.literal_string + '"')
-        return LiteralExpression(token)
-    raise AssertionError(f"Unknown input type: '{data_type}'.")
+    if input_.data_type in MULTI_ELEM_TYPES:
+        return ConstructorCall(input_.data_type, _value_to_arguments(input_.literal_string))
+    raise AssertionError(f"Unknown input type: '{input_.data_type}'.")
 
 
 def _value_to_arguments(vec_str: str) -> list[Argument]:
-    channels = [_format_float(c) for c in vec_str.split(",")]
-    exprs = [LiteralExpression(Token(FLOAT_LITERAL, c)) for c in channels]
+    channels = [float(c) for c in vec_str.split(",")]
+    exprs = [LiteralExpression(LiteralToken(c)) for c in channels]
     args = [Argument(e, i) for i, e in enumerate(exprs)]
     return args
-
-
-def _format_float(float_str: str) -> str:
-    return str(float(float_str))
 
 
 def _get_expression(args: list[Argument], index: int | str) -> Expression:
