@@ -141,7 +141,9 @@ class Function:
 
             for name, output in self.__implicit_outs.items():
                 dot_node = node_utils.create("dot", output.data_type)
-                dot_node.add_input("in", output).value = node
+                input_ = dot_node.add_input("in", data_type=output.data_type)
+                input_.value = node
+                input_.output_string = output.name
                 state.set_node(name, dot_node)
 
             dot_node = node_utils.create("dot", self.__node_def.output.data_type)

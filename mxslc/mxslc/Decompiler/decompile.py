@@ -1,9 +1,7 @@
 from pathlib import Path
 
-import MaterialX as mx
-
 from ..Argument import Argument
-from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES, STRING, FILENAME
+from ..DataType import BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES, STRING, FILENAME
 from ..Expressions import IdentifierExpression, LiteralExpression, Expression, ArithmeticExpression, \
     ComparisonExpression, IfExpression, LogicExpression, UnaryExpression, ConstructorCall, IndexingExpression, \
     SwitchExpression, FunctionCall, NodeConstructor
@@ -12,7 +10,7 @@ from ..Keyword import Keyword
 from ..Statements import VariableDeclaration, Statement
 from ..Token import IdentifierToken, Token
 from ..file_utils import handle_input_path, handle_output_path
-from ..mx_wrapper import Document
+from ..mx_wrapper import Document, Node, Input
 from ..token_types import STRING_LITERAL, INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL
 
 
@@ -30,40 +28,35 @@ def decompile_file(mtlx_path: str | Path, mxsl_path: str | Path = None) -> None:
 
 class Decompiler:
     def __init__(self, mtlx_filepath: Path):
-        self.__doc: mx.Document = mx.createDocument()
-        mx.readFromXmlFile(self.__doc, str(mtlx_filepath))
-        self.__nodes: list[mx.Node] = self.__doc.getNodes()
-        self.__decompiled_nodes: list[mx.Node] = []
+        self.__doc = Document(mtlx_filepath)
+        self.__nodes: list[Node] = self.__doc.get_nodes()
+        self.__decompiled_nodes: list[Node] = []
         self.__mxsl = ""
 
     def decompile(self) -> str:
         self.__decompile(self.__nodes)
         return self.__mxsl
 
-    def __decompile(self, nodes: list[mx.Node]) -> None:
+    def __decompile(self, nodes: list[Node]) -> None:
         for node in nodes:
             if node in self.__decompiled_nodes:
                 continue
             self.__decompiled_nodes.append(node)
-            inputs: list[mx.Input] = node.getInputs()
-            input_nodes: list[mx.Node] = [i.getConnectedNode() for i in inputs if i.getConnectedNode()]
+            input_nodes = [i.connected_node for i in node.inputs if i.connected_node]
             self.__decompile(input_nodes)
-            line = f"{_deexecute(node)}\n"
-            self.__mxsl += line
+            self.__mxsl += f"{_deexecute(node)}\n"
 
 
-def _deexecute(node: mx.Node) -> Statement:
-    data_type = DataType(node.getType())
-    identifier = IdentifierToken(node.getName())
+def _deexecute(node: Node) -> Statement:
+    identifier = IdentifierToken(node.name)
     expr = _node_to_expression(node)
-    return VariableDeclaration(data_type, identifier, expr)
+    return VariableDeclaration(node.data_type, identifier, expr)
 
 
-def _node_to_expression(node: mx.Node) -> Expression:
-    category = node.getCategory()
-    data_type = DataType(node.getType())
-    args = _inputs_to_arguments(node.getInputs())
-
+def _node_to_expression(node: Node) -> Expression:
+    category = node.category
+    data_type = node.data_type
+    args = _inputs_to_arguments(node.inputs)
     if category == "constant":
         return _get_expression(args, 0)
     if category in ["convert", "combine2", "combine3", "combine4"]:
@@ -90,39 +83,39 @@ def _node_to_expression(node: mx.Node) -> Expression:
     return NodeConstructor(category_token, data_type, args)
 
 
-def _inputs_to_arguments(inputs: list[mx.Input]) -> list[Argument]:
+def _inputs_to_arguments(inputs: list[Input]) -> list[Argument]:
     args: list[Argument] = []
     for i, input_ in enumerate(inputs):
         arg_expression = _input_to_expression(input_)
-        arg_identifier = IdentifierToken(input_.getName())
+        arg_identifier = IdentifierToken(input_.name)
         arg = Argument(arg_expression, i, arg_identifier)
         args.append(arg)
     return args
 
 
-def _input_to_expression(input_: mx.Input) -> Expression:
-    node: mx.Node = input_.getConnectedNode()
+def _input_to_expression(input_: Input) -> Expression:
+    node = input_.connected_node
     if node:
-        node_identifier = IdentifierToken(node.getName())
+        node_identifier = IdentifierToken(node.name)
         return IdentifierExpression(node_identifier)
-    data_type = DataType(input_.getType())
+    data_type = input_.data_type
     if data_type == BOOLEAN:
-        token = Token(Keyword.TRUE if input_.getValue() else Keyword.FALSE)
+        token = Token(Keyword.TRUE if input_.literal else Keyword.FALSE)
         return LiteralExpression(token)
     if data_type == INTEGER:
-        token = Token(INT_LITERAL, input_.getValueString())
+        token = Token(INT_LITERAL, input_.literal_string)
         return LiteralExpression(token)
     if data_type == FLOAT:
-        value_str = input_.getValueString()
+        value_str = input_.literal_string
         token = Token(FLOAT_LITERAL, _format_float(value_str))
         return LiteralExpression(token)
     if data_type in MULTI_ELEM_TYPES:
-        return ConstructorCall(data_type.as_token, _value_to_arguments(input_.getValueString()))
+        return ConstructorCall(data_type.as_token, _value_to_arguments(input_.literal_string))
     if data_type == STRING:
-        token = Token(STRING_LITERAL, '"' + input_.getValueString() + '"')
+        token = Token(STRING_LITERAL, '"' + input_.literal_string + '"')
         return LiteralExpression(token)
     if data_type == FILENAME:
-        token = Token(FILENAME_LITERAL, '"' + input_.getValueString() + '"')
+        token = Token(FILENAME_LITERAL, '"' + input_.literal_string + '"')
         return LiteralExpression(token)
     raise AssertionError(f"Unknown input type: '{data_type}'.")
 

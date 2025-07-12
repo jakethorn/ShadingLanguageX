@@ -262,13 +262,30 @@ class PortElement(TypedElement):
         return isinstance(self.source, mx.Output)
 
     @property
+    def connected_output(self) -> Output | None:
+        return Output(self.source.getConnectedOutput())
+
+    @property
+    def connected_node(self) -> Node | None:
+        return Node(self.source.getConnectedNode())
+
+    @property
+    def literal(self) -> Uniform | None:
+        return self.source.getValue()
+
+    @property
+    def literal_string(self) -> str:
+        return self.source.getValueString()
+
+    @property
     def value(self) -> Value:
-        return Output(self.source.getConnectedOutput()) or Node(self.source.getConnectedNode()) or self.source.getValue()
+        return self.connected_output or self.connected_node or self.literal
 
     @value.setter
     def value(self, value: Value) -> None:
+        self.clear_value()
         if value is None:
-            self.parent.remove_input(self.name)
+            self.remove()
         elif isinstance(value, Node):
             if value.is_null_node:
                 self.remove()
@@ -278,22 +295,50 @@ class PortElement(TypedElement):
         elif isinstance(value, Output):
             self.source.setConnectedOutput(value.source)
         else:
-            self.source.setConnectedNode(None)
             if isinstance(value, Path):
                 self.source.setValue(str(value), Keyword.FILENAME)
             else:
                 self.source.setValue(value)
 
     @property
+    def output_string(self) -> str | None:
+        output = self.source.getOutputString()
+        if output:
+            return output
+        else:
+            return None
+
+    @output_string.setter
+    def output_string(self, output: str | None) -> None:
+        if output is None:
+            self.source.removeAttribute("output")
+        else:
+            assert self.literal is None
+            assert self.interface_name is None
+            self.source.setOutputString(output)
+
+    @property
     def interface_name(self) -> str | None:
-        return self.source.getInterfaceName()
+        name = self.source.getInterfaceName()
+        if name:
+            return name
+        else:
+            return None
 
     @interface_name.setter
-    def interface_name(self, name: str) -> None:
-        assert not self.is_output
+    def interface_name(self, name: str | None) -> None:
+        if name is None:
+            self.source.removeAttribute("interfacename")
+        else:
+            assert not self.is_output
+            self.clear_value()
+            self.source.setInterfaceName(name)
+
+    def clear_value(self) -> None:
         self.source.removeAttribute("value")
-        self.source.setConnectedNode(None)
-        self.source.setInterfaceName(name)
+        self.source.removeAttribute("nodename")
+        self.source.removeAttribute("output")
+        self.source.removeAttribute("interfacename")
 
     def remove(self) -> None:
         self.parent.remove_input(self.name)
