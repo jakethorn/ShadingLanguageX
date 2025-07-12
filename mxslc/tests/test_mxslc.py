@@ -58,6 +58,18 @@ _overwrite_all_expected = False
     ("default_values_1", False),
     ("default_values_2", False),
     ("empty_file", False),
+    ("node_defs/multioutput_1", False),
+    ("node_defs/multioutput_2", False),
+    ("node_defs/multioutput_3", False),
+    ("node_defs/multioutput_4", False),
+    ("node_defs/multioutput_5", False),
+    ("node_defs/multioutput_6", False),
+    ("node_defs/localvars_1", False),
+    ("node_defs/localvars_2", False),
+    ("node_defs/complex_func_1", False),
+    ("node_defs/complex_func_2", False),
+    ("node_defs/complex_func_3", False),
+    ("node_defs/complex_func_4", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

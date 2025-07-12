@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_incr_vars" node="incr_vars">
+    <output name="out" type="float" default="0.0" />
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+    <input name="y" type="float" value="0" />
+    <output name="y2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_incr_vars" nodedef="ND_incr_vars">
+    <add name="node4" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="x2" type="float" nodename="node4" />
+    <add name="node8" type="float">
+      <input name="in1" type="float" interfacename="y" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="y2" type="float" nodename="node8" />
+    <output name="out" type="float" value="3" />
+  </nodegraph>
+  <incr_vars name="node1" type="multioutput">
+    <input name="x" type="float" value="0" />
+    <input name="y" type="float" value="1" />
+    <output name="out" type="float" />
+    <output name="x2" type="float" />
+    <output name="y2" type="float" />
+  </incr_vars>
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" output="x2" nodename="node1" />
+    <input name="in2" type="float" output="y2" nodename="node1" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+</materialx>

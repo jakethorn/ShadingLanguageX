@@ -1,0 +1,17 @@
+
+float x = 1.0 + 1.0;
+float y = 0.0;
+
+void foo()
+{
+    x = x + 1.0;
+}
+
+void bar()
+{
+    foo();
+    y = x + 1.0;
+}
+
+bar();
+color3 c = color3(x, y, 0.0);

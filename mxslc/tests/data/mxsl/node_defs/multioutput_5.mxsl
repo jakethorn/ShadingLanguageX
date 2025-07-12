@@ -1,0 +1,14 @@
+
+float x = 0.0;
+float y = 1.0;
+
+void incr_vars()
+{
+    x += 1.0;
+    y += 1.0;
+}
+
+incr_vars();
+incr_vars();
+
+color3 c = color3(x, y, 0.0);

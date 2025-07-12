@@ -1,0 +1,10 @@
+
+float x = 0.0;
+
+void foo()
+{
+    x = 1.0;
+}
+
+foo();
+color3 c = color3(x);

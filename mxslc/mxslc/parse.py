@@ -1,6 +1,7 @@
 from .Argument import Argument
 from .CompileError import CompileError
 from .Expressions import *
+from .Expressions.LiteralExpression import NullExpression
 from .Keyword import Keyword
 from .Parameter import Parameter
 from .Statements import *
@@ -31,10 +32,12 @@ class Parser(TokenReader):
         if token in Keyword.DATA_TYPES():
             return self.__declaration()
         if token == Keyword.VOID:
-            return self.__void_function_declaration()
+            void = self._match(Keyword.VOID)
+            identifier = self._match(IDENTIFIER)
+            return self.__function_declaration(void, identifier)
         if token == IDENTIFIER:
             if self._peek_next() in ["(", "<"]:
-                expr = self.__primary() # function
+                expr = self.__primary()
                 self._match(";")
                 return ExpressionStatement(expr)
             else:
@@ -59,7 +62,6 @@ class Parser(TokenReader):
         self._match(";")
         return VariableDeclaration(data_type, identifier, right)
 
-    # TODO combine `__function_declaration` and `__void_function_declaration`
     def __function_declaration(self, return_type: Token, identifier: Token) -> FunctionDeclaration:
         template_types = []
         if self._consume("<"):
@@ -77,38 +79,19 @@ class Parser(TokenReader):
             self._match(")")
         self._match("{")
         statements = []
-        while self._peek() != Keyword.RETURN:
-            statements.append(self.__statement())
-        self._match(Keyword.RETURN)
-        return_expr = self.__expression()
-        self._match(";")
-        self._match("}")
-        return FunctionDeclaration(return_type, identifier, template_types, params, statements, return_expr)
-
-    def __void_function_declaration(self) -> FunctionDeclaration:
-        self._match(Keyword.VOID)
-        identifier = self._match(IDENTIFIER)
-        template_types = []
-        if self._consume("<"):
-            template_types.append(self._match(Keyword.DATA_TYPES() - {Keyword.T}))
-            while self._consume(","):
-                template_types.append(self._match(Keyword.DATA_TYPES() - {Keyword.T}))
-            self._match(">")
-        self._match("(")
-        if self._consume(")"):
-            params = []
+        if return_type in Keyword.DATA_TYPES():
+            while self._peek() != Keyword.RETURN:
+                statements.append(self.__statement())
+            self._match(Keyword.RETURN)
+            return_expr = self.__expression()
+            self._match(";")
+            self._match("}")
         else:
-            params = [self.__parameter()]
-            while self._consume(","):
-                params.append(self.__parameter())
-            self._match(")")
-        self._match("{")
-        statements = []
-        while self._peek() != "}":
-            statements.append(self.__statement())
-        self._match("}")
-        return_expr = LiteralExpression(Token(INT_LITERAL, "0"))
-        return FunctionDeclaration(Token(Keyword.INTEGER), identifier, template_types, params, statements, return_expr)
+            while self._peek() != "}":
+                statements.append(self.__statement())
+            self._match("}")
+            return_expr = NullExpression()
+        return FunctionDeclaration(return_type, identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
         data_type = self._match(Keyword.DATA_TYPES())

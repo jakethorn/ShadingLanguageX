@@ -27,7 +27,7 @@ class DataType:
             self.__data_type = data_type
         else:
             raise TypeError
-        assert self.__data_type in Keyword.DATA_TYPES(), self.__data_type
+        assert self.__data_type in Keyword.DATA_TYPES() ^ {Keyword.VOID}, self.__data_type
 
     def instantiate(self, template_type: DataType | None) -> DataType:
         if self.__data_type == Keyword.T and template_type:
@@ -71,6 +71,8 @@ class DataType:
             return ""
         elif self.__data_type == Keyword.MATERIAL:
             return ""
+        elif self.__data_type == Keyword.VOID:
+            return ""
         else:
             return self.zeros()
 
@@ -107,6 +109,7 @@ FILENAME = DataType(Keyword.FILENAME)
 SURFACESHADER = DataType(Keyword.SURFACESHADER)
 DISPLACEMENTSHADER = DataType(Keyword.DISPLACEMENTSHADER)
 MATERIAL = DataType(Keyword.MATERIAL)
+VOID = DataType(Keyword.VOID)
 
 VECTOR_TYPES = {VECTOR2, VECTOR3, VECTOR4}
 COLOR_TYPES = {COLOR3, COLOR4}

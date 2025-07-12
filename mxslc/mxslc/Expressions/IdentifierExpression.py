@@ -24,8 +24,7 @@ class IdentifierExpression(Expression):
 
     def _evaluate(self) -> Node:
         old_node = state.get_node(self.__identifier)
-        new_node = node_utils.create("dot", self.data_type)
-        new_node.set_input("in", old_node)
+        new_node = node_utils.dot(old_node)
         return new_node
 
     def __str__(self) -> str:

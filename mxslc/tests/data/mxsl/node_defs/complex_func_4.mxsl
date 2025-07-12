@@ -1,0 +1,14 @@
+
+float foo()
+{
+    float x = 0.0;
+    for (float f = 0.0:2.0)
+    {
+        x += randomfloat(f, min=0.0, max=1.0);
+    }
+
+    return x;
+}
+
+float x = foo();
+color3 c = color3(x);

@@ -1,0 +1,11 @@
+
+float x = 0.0;
+float y = 1.0;
+
+float incr_vars()
+{
+    return 3.0;
+}
+
+float z = incr_vars();
+color3 c = color3(x, y, z);

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_incr_vars" node="incr_vars">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_incr_vars" nodedef="ND_incr_vars">
+    <output name="out" type="float" value="3" />
+  </nodegraph>
+  <incr_vars name="z" type="float" />
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" nodename="z" />
+  </combine3>
+</materialx>

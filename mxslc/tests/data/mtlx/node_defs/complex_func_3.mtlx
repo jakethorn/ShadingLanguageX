@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="x" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <nodedef name="ND_foo" node="foo">
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="node4" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="x2" type="float" nodename="node4" />
+  </nodegraph>
+  <nodedef name="ND_bar" node="bar">
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+    <input name="y" type="float" value="0" />
+    <output name="y2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <foo name="node1" type="float">
+      <input name="x" type="float" interfacename="x" />
+    </foo>
+    <output name="x2" type="float" nodename="node1" />
+    <add name="node6" type="float">
+      <input name="in1" type="float" nodename="node1" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="y2" type="float" nodename="node6" />
+  </nodegraph>
+  <bar name="node3" type="multioutput">
+    <input name="x" type="float" nodename="x" />
+    <input name="y" type="float" value="0" />
+    <output name="x2" type="float" />
+    <output name="y2" type="float" />
+  </bar>
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" output="x2" nodename="node3" />
+    <input name="in2" type="float" output="y2" nodename="node3" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+</materialx>

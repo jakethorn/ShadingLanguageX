@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="x" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="y" type="float">
+      <input name="in1" type="float" value="2" />
+      <input name="in2" type="float" value="2" />
+    </add>
+    <bar name="node4" type="float">
+      <input name="y" type="float" nodename="y" />
+      <input name="x" type="float" interfacename="x" />
+    </bar>
+    <output name="out" type="float" nodename="node4" />
+  </nodegraph>
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="float" default="0.0" />
+    <input name="y" type="float" value="0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <multiply name="node5" type="float">
+      <input name="in1" type="float" interfacename="y" />
+      <input name="in2" type="float" interfacename="x" />
+    </multiply>
+    <output name="out" type="float" nodename="node5" />
+  </nodegraph>
+  <foo name="node3" type="float">
+    <input name="x" type="float" nodename="x" />
+  </foo>
+  <convert name="c" type="color3">
+    <input name="in" type="float" nodename="node3" />
+  </convert>
+</materialx>

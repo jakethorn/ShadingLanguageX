@@ -5,29 +5,28 @@
     <input name="a" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_test_loop" nodedef="ND_test_loop">
-    <__loop__1 name="node2" type="multioutput">
+    <__loop__1 name="b2" type="float">
       <input name="i" type="float" value="2" />
       <input name="b" type="float" value="5" />
       <input name="a" type="float" interfacename="a" />
     </__loop__1>
-    <__loop__1 name="node5" type="multioutput">
+    <__loop__1 name="b3" type="float">
       <input name="i" type="float" value="3" />
-      <input name="b" type="float" nodename="node2" output="b2" />
+      <input name="b" type="float" nodename="b2" />
       <input name="a" type="float" interfacename="a" />
     </__loop__1>
-    <__loop__1 name="node8" type="multioutput">
+    <__loop__1 name="b4" type="float">
       <input name="i" type="float" value="4" />
-      <input name="b" type="float" nodename="node5" output="b2" />
+      <input name="b" type="float" nodename="b3" />
       <input name="a" type="float" interfacename="a" />
     </__loop__1>
-    <output name="out" type="float" nodename="node8" output="b2" />
+    <output name="out" type="float" nodename="b4" />
   </nodegraph>
   <nodedef name="ND___loop__1" node="__loop__1">
-    <output name="out" type="integer" default="0" />
     <input name="i" type="float" value="0" />
     <input name="b" type="float" value="0" />
     <input name="a" type="float" value="0" />
-    <output name="b2" type="float" value="0" />
+    <output name="b2" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG___loop__1" nodedef="ND___loop__1">
     <multiply name="x" type="float">
@@ -39,7 +38,6 @@
       <input name="in2" type="float" nodename="x" />
     </add>
     <output name="b2" type="float" nodename="node7" />
-    <output name="out" type="integer" value="0" />
   </nodegraph>
   <test_loop name="c" type="float">
     <input name="a" type="float" value="7" />

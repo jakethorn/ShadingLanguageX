@@ -4,6 +4,7 @@ from ..Argument import Argument
 from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT
 from ..Expressions import LiteralExpression
+from ..Expressions.LiteralExpression import NullExpression
 from ..Function import Function
 from ..Keyword import Keyword
 from ..Parameter import ParameterList, Parameter
@@ -24,10 +25,10 @@ class ForLoop(Statement):
             raise CompileError("Loop iteration variable must be a float.", self.__identifier)
 
         # TODO cleanup
-        return_type = DataType(Keyword.INTEGER)
+        return_type = DataType(Keyword.VOID)
         func_identifier = IdentifierToken(f"__loop__{state.get_loop_id()}")
         parameters = ParameterList([Parameter(self.__identifier, FLOAT)])
-        return_expr = LiteralExpression(Token(INT_LITERAL, "0"))
+        return_expr = NullExpression()
         self.__function = Function(return_type, func_identifier, None, parameters, self.__body, return_expr)
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:

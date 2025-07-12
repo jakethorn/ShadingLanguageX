@@ -4,7 +4,8 @@ from pathlib import Path
 
 import MaterialX as mx
 
-from .DataType import DataType, BOOLEAN, INTEGER, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, STRING, FILENAME
+from .DataType import DataType, BOOLEAN, INTEGER, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, STRING, FILENAME, \
+    VOID
 from .Keyword import Keyword
 
 """
@@ -33,9 +34,6 @@ class Element:
     def source(self) -> mx.Element:
         return self.__source
 
-    def create_valid_child_name(self, name: str) -> str:
-        return self.source.createValidChildName(name)
-
     @property
     def category(self) -> str:
         return self.source.getCategory()
@@ -47,6 +45,15 @@ class Element:
     @property
     def parent(self) -> Element:
         return Element(self.source.getParent())
+
+    def create_valid_child_name(self, name: str) -> str:
+        return self.source.createValidChildName(name)
+
+    def remove(self) -> None:
+        self.parent.source.removeChild(self.name)
+
+    def remove_attribute(self, name: str) -> None:
+        self.source.removeAttribute(name)
 
     def __str__(self) -> str:
         return str(self.source)
@@ -216,6 +223,10 @@ class InterfaceElement(TypedElement):
             output = self.add_output(name, value)
         return output
 
+    def remove_output(self, name: str) -> None:
+        assert self.has_output(name)
+        self.source.removeOutput(name)
+
 
 #
 #   Graph Element
@@ -230,7 +241,7 @@ class GraphElement(InterfaceElement):
     def source(self) -> mx.GraphElement:
         return super().source
 
-    def add_node(self, category: str, data_type: DataType) -> Node:
+    def add_node(self, category: str, data_type: DataType | str) -> Node:
         return Node(self.source.addNode(category, "", str(data_type)))
 
     def remove_node(self, name: str) -> None:
@@ -335,13 +346,12 @@ class PortElement(TypedElement):
             self.source.setInterfaceName(name)
 
     def clear_value(self) -> None:
-        self.source.removeAttribute("value")
-        self.source.removeAttribute("nodename")
-        self.source.removeAttribute("output")
-        self.source.removeAttribute("interfacename")
-
-    def remove(self) -> None:
-        self.parent.remove_input(self.name)
+        self.remove_attribute("value")
+        self.remove_attribute("nodename")
+        self.remove_attribute("output")
+        self.remove_attribute("interfacename")
+        self.remove_attribute("default")
+        self.remove_attribute("nodegraph")
 
 
 #
@@ -372,7 +382,10 @@ class Document(GraphElement):
         assert name.startswith("ND_")
         name = self.create_valid_child_name(name)
         node_def = NodeDef(self.source.addNodeDef(name, str(data_type), node_name))
-        node_def.output.default = data_type.default()
+        if data_type == VOID:
+            node_def.remove_output("out")
+        else:
+            node_def.output.default = data_type.default()
         return node_def
 
     def add_node_graph_from_def(self, node_def: NodeDef) -> NodeGraph:
@@ -434,6 +447,14 @@ class Node(InterfaceElement):
             self.source.setName(name)
 
     @property
+    def data_type(self) -> DataType:
+        return DataType(self.source.getType())
+
+    @data_type.setter
+    def data_type(self, data_type: DataType | str) -> None:
+        self.source.setType(str(data_type))
+
+    @property
     def is_null_node(self) -> bool:
         return self.category == Keyword.NULL
 
@@ -465,6 +486,9 @@ class Input(PortElement):
     def __init__(self, source: mx.Input):
         super().__init__(source)
 
+    def remove(self) -> None:
+        self.parent.remove_input(self.name)
+
 
 #
 #   Output
@@ -487,7 +511,11 @@ class Output(PortElement):
 
     @default.setter
     def default(self, value: Uniform) -> None:
+        self.clear_value()
         self.source.setAttribute("default", str(value))
+
+    def remove(self) -> None:
+        self.parent.remove_output(self.name)
 
 
 #
@@ -519,6 +547,11 @@ class NodeDef(InterfaceElement):
     @property
     def node_string(self) -> str:
         return self.source.getNodeString()
+
+    def add_output(self, name: str, value: Value = None, data_type: DataType = None) -> Output:
+        output = super().add_output(name, value, data_type)
+        output.default = data_type.default()
+        return output
 
 
 #

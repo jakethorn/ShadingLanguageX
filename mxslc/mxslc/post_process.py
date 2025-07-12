@@ -55,3 +55,27 @@ def _remove_constant_nodes(graph: GraphElement) -> None:
         for port in const_node.downstream_ports:
             port.value = input_value
         const_node.remove()
+
+
+#def _inline_function_args():
+#    document = get_document()
+#    for nd in document.node_defs:
+#        nodes = document.get_nodes(nd.node_string)
+#        if len(nodes) == 0:
+#            continue
+#        for input_ in nd.inputs:
+#            inputs = [n.get_input(input_.name) for n in nodes if n.has_input(input_.name)]
+#            if len(inputs) < len(nodes):
+#                continue
+#            if _inputs_are_equal(inputs):
+#                # replace 'interfacename' with literal
+#                # delete inputs from nodedef, nodegraph and node call
+#                ...
+#
+#
+#def _inputs_are_equal(inputs: list[Input]) -> bool:
+#    is_literal = all([i.literal is not None for i in inputs])
+#    if not is_literal:
+#        return False
+#    value = inputs[0].literal
+#    return all([i.literal == value for i in inputs])

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="x2" type="float" value="1" />
+  </nodegraph>
+  <foo name="x2" type="float">
+    <input name="x" type="float" value="0" />
+  </foo>
+  <convert name="c" type="color3">
+    <input name="in" type="float" nodename="x2" />
+  </convert>
+</materialx>

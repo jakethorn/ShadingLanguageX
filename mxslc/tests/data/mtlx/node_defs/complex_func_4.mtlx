@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <__loop__1 name="x2" type="float">
+      <input name="f" type="float" value="0" />
+      <input name="x" type="float" value="0" />
+    </__loop__1>
+    <__loop__1 name="x3" type="float">
+      <input name="f" type="float" value="1" />
+      <input name="x" type="float" nodename="x2" />
+    </__loop__1>
+    <__loop__1 name="x4" type="float">
+      <input name="f" type="float" value="2" />
+      <input name="x" type="float" nodename="x3" />
+    </__loop__1>
+    <output name="out" type="float" nodename="x4" />
+  </nodegraph>
+  <nodedef name="ND___loop__1" node="__loop__1">
+    <input name="f" type="float" value="0" />
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG___loop__1" nodedef="ND___loop__1">
+    <randomfloat name="node3" type="float">
+      <input name="in" type="float" interfacename="f" />
+      <input name="min" type="float" value="0" />
+      <input name="max" type="float" value="1" />
+    </randomfloat>
+    <add name="node7" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" nodename="node3" />
+    </add>
+    <output name="x2" type="float" nodename="node7" />
+  </nodegraph>
+  <foo name="x" type="float" />
+  <convert name="c" type="color3">
+    <input name="in" type="float" nodename="x" />
+  </convert>
+</materialx>

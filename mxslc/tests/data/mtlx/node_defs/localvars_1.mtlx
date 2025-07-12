@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="x2" type="float" value="1" />
+    <multiply name="node5" type="float">
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="2" />
+    </multiply>
+    <output name="out" type="float" nodename="node5" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <input name="x" type="float" value="0" />
+    <output name="out" type="float" />
+    <output name="x2" type="float" />
+  </foo>
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" output="x2" nodename="node1" />
+    <input name="in2" type="float" output="out" nodename="node1" />
+    <input name="in3" type="float" value="3" />
+  </combine3>
+</materialx>

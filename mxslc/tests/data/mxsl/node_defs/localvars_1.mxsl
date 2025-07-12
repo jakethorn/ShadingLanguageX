@@ -1,0 +1,12 @@
+
+float x = 0.0;
+
+float foo()
+{
+    x = 1.0;
+    return x * 2.0;
+}
+
+float y = foo();
+
+color3 c = color3(x, y, 3.0);

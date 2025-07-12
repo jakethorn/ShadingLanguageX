@@ -4,6 +4,7 @@ from pathlib import Path
 
 from . import state, node_utils
 from .Argument import Argument
+from .CompileError import CompileError
 from .DataType import DataType
 from .Expressions import Expression
 from .Expressions.LiteralExpression import NullExpression
@@ -24,13 +25,11 @@ class Function:
                  body: list["Statement"] | None,
                  return_expr: Expression | None):
         self.__return_type = return_type
-        self.__name = identifier.lexeme
+        self.__identifier = identifier
         self.__template_type = template_type
         self.__params = params
         self.__body = body
         self.__return_expr = return_expr
-        self.__file = identifier.file
-        self.__line = identifier.line
 
         self.__node_def: NodeDef | None = None
         self.__implicit_outs: dict[str, Output] = {}
@@ -44,19 +43,23 @@ class Function:
         return self.__params
 
     @property
+    def name(self) -> str:
+        return self.__identifier.lexeme
+
+    @property
     def file(self) -> Path:
-        return self.__file
+        return self.__identifier.file
 
     @property
     def line(self) -> int:
-        return self.__line
+        return self.__identifier.line
 
     def initialise(self) -> None:
         self.__create_node_def()
         self.__create_node_graph()
 
     def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
-        if self.__name != name:
+        if self.name != name:
             return False
 
         if template_type:
@@ -86,9 +89,9 @@ class Function:
 
     def __str__(self) -> str:
         if self.__template_type:
-            return f"{self.__return_type} {self.__name}<{self.__template_type}>({self.__params})"
+            return f"{self.__return_type} {self.name}<{self.__template_type}>({self.__params})"
         else:
-            return f"{self.__return_type} {self.__name}({self.__params})"
+            return f"{self.__return_type} {self.name}({self.__params})"
 
     @staticmethod
     def from_node_def(node_def: NodeDef) -> Function:
@@ -110,12 +113,12 @@ class Function:
 
     @property
     def __node_def_name(self) -> str:
-        return f"ND_{self.__name}" if self.__template_type is None else f"ND_{self.__name}_{self.__template_type}"
+        return f"ND_{self.name}" if self.__template_type is None else f"ND_{self.name}_{self.__template_type}"
 
     def __create_node_def(self) -> None:
-        self.__node_def = get_document().add_node_def(self.__node_def_name, self.__return_type, self.__name)
+        self.__node_def = get_document().add_node_def(self.__node_def_name, self.__return_type, self.name)
         for param in self.__params:
-            self.__node_def.add_input(param.name, param.data_type.default())
+            self.__node_def.add_input(param.name, data_type=param.data_type)
 
     def __create_node_graph(self) -> None:
         node_graph = get_document().add_node_graph_from_def(self.__node_def)
@@ -128,27 +131,38 @@ class Function:
 
     def __call_node_def(self, args: list[Argument]) -> Node:
         assert self.__node_def is not None
-        node = node_utils.create(self.__name, self.__return_type)
+        # create node
+        node = node_utils.create(self.name, self.__return_type)
+        # add inputs
         func_args = self.__combine_with_default_params(args)
         for nd_input in self.__node_def.inputs:
             if nd_input.name in func_args:
                 node.add_input(nd_input.name, func_args[nd_input.name])
             else:
                 node.add_input(nd_input.name, state.get_node(nd_input.name))
-
-        if len(self.__implicit_outs) > 0:
-            node.source.setType("multioutput")
-
-            for name, output in self.__implicit_outs.items():
-                dot_node = node_utils.create("dot", output.data_type)
-                input_ = dot_node.add_input("in", data_type=output.data_type)
-                input_.value = node
-                input_.output_string = output.name
-                state.set_node(name, dot_node)
-
-            dot_node = node_utils.create("dot", self.__node_def.output.data_type)
-            dot_node.add_input("in", self.__node_def.output).value = node
-
+        # add outputs
+        if self.__node_def.output_count == 0:
+            raise CompileError("Invalid function. Functions must return a value or update a variable from an outer scope.", self.__identifier)
+        if self.__node_def.output_count == 1:
+            node.data_type = self.__node_def.output.data_type
+        if self.__node_def.output_count > 1:
+            node.data_type = "multioutput"
+            for nd_output in self.__node_def.outputs:
+                node_output = node.add_output(nd_output.name, data_type=nd_output.data_type)
+                node_output.clear_value()
+        # update outer scope variables and return value
+        if self.__node_def.output_count == 1 and len(self.__implicit_outs) == 0:
+            return node
+        if self.__node_def.output_count == 1 and len(self.__implicit_outs) == 1:
+            name = list(self.__implicit_outs.keys())[0]
+            state.set_node(name, node)
+            return node
+        for name, ng_output in self.__implicit_outs.items():
+            node_output = node.get_output(ng_output.name)
+            dot_node = node_utils.dot(node_output)
+            state.set_node(name, dot_node)
+        if self.__node_def.output_count > len(self.__implicit_outs):
+            dot_node = node_utils.dot(node.output)
             return dot_node
         else:
             return node

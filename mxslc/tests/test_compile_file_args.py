@@ -7,7 +7,7 @@ import pytest
 import mxslc
 from mxslc import Macro
 
-_overwrite_all_expected = True
+_overwrite_all_expected = False
 
 
 @pytest.mark.parametrize("filename, main_function, main_args, overwrite_expected", [

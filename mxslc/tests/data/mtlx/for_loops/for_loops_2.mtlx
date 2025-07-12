@@ -1,36 +1,33 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND___loop__2" node="__loop__2">
-    <output name="out" type="integer" default="0" />
     <input name="i" type="float" value="0" />
     <input name="a" type="float" value="0" />
-    <output name="a2" type="float" value="0" />
+    <output name="a2" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG___loop__2" nodedef="ND___loop__2">
-    <__loop__1 name="node2" type="multioutput">
+    <__loop__1 name="node2" type="float">
       <input name="j" type="float" value="7" />
       <input name="a" type="float" interfacename="a" />
       <input name="i" type="float" interfacename="i" />
     </__loop__1>
-    <output name="a2" type="float" nodename="node10" output="a2" />
-    <__loop__1 name="node6" type="multioutput">
+    <output name="a2" type="float" nodename="node6" />
+    <__loop__1 name="node4" type="float">
       <input name="j" type="float" value="8" />
-      <input name="a" type="float" nodename="node2" output="a2" />
+      <input name="a" type="float" nodename="node2" />
       <input name="i" type="float" interfacename="i" />
     </__loop__1>
-    <__loop__1 name="node10" type="multioutput">
+    <__loop__1 name="node6" type="float">
       <input name="j" type="float" value="9" />
-      <input name="a" type="float" nodename="node6" output="a2" />
+      <input name="a" type="float" nodename="node4" />
       <input name="i" type="float" interfacename="i" />
     </__loop__1>
-    <output name="out" type="integer" value="0" />
   </nodegraph>
   <nodedef name="ND___loop__1" node="__loop__1">
-    <output name="out" type="integer" default="0" />
     <input name="j" type="float" value="0" />
     <input name="a" type="float" value="0" />
     <input name="i" type="float" value="0" />
-    <output name="a2" type="float" value="0" />
+    <output name="a2" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG___loop__1" nodedef="ND___loop__1">
     <multiply name="node5" type="float">
@@ -38,18 +35,17 @@
       <input name="in2" type="float" interfacename="j" />
     </multiply>
     <output name="a2" type="float" nodename="node5" />
-    <output name="out" type="integer" value="0" />
   </nodegraph>
-  <__loop__2 name="node1" type="multioutput">
+  <__loop__2 name="a2" type="float">
     <input name="i" type="float" value="0" />
     <input name="a" type="float" value="0" />
   </__loop__2>
-  <__loop__2 name="node4" type="multioutput">
+  <__loop__2 name="a3" type="float">
     <input name="i" type="float" value="1" />
-    <input name="a" type="float" nodename="node1" output="a2" />
+    <input name="a" type="float" nodename="a2" />
   </__loop__2>
-  <__loop__2 name="node7" type="multioutput">
+  <__loop__2 name="a4" type="float">
     <input name="i" type="float" value="2" />
-    <input name="a" type="float" nodename="node4" output="a2" />
+    <input name="a" type="float" nodename="a3" />
   </__loop__2>
 </materialx>
