@@ -1,6 +1,6 @@
+from . import state
 from .DataType import DataType, MULTI_ELEM_TYPES, INTEGER, FLOAT, STRING, FILENAME, SHADER_TYPES
 from .Keyword import Keyword
-from .state import get_state
 from .mx_wrapper import Node, Uniform, type_of, Output
 
 
@@ -8,7 +8,7 @@ def create(category: str, data_type: DataType | str) -> Node:
     """
     Add node to the current states graph element.
     """
-    return get_state().graph.add_node(category, data_type)
+    return state.get_graph().add_node(category, data_type)
 
 
 def constant(value: Uniform) -> Node:

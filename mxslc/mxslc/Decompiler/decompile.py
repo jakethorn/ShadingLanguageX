@@ -102,7 +102,7 @@ def _input_to_expression(input_: Input) -> Expression:
         token = LiteralToken(input_.literal)
         return LiteralExpression(token)
     if input_.data_type in MULTI_ELEM_TYPES:
-        return ConstructorCall(input_.data_type, _value_to_arguments(input_.literal_string))
+        return ConstructorCall(input_.data_type.as_token, _value_to_arguments(input_.literal_string))
     raise AssertionError(f"Unknown input type: '{input_.data_type}'.")
 
 

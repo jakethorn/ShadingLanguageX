@@ -27,7 +27,15 @@ void main()
 # TODO cont.: y will evaluate to 6.0 instead of 4.0 because x is finding the 5.0 before 3.0 when ascending the state hierarchy.
 
 
+#
+#   State Class Definition
+#
+
+
 class State:
+    """
+    Represents the current scoped state of the program.
+    """
     def __init__(self, parent: State = None, node_graph: NodeGraph = None):
         self.__parent = parent
         self.__node_def = node_graph.node_def if node_graph else None
@@ -73,7 +81,7 @@ class State:
         return self.__node_graph is not None
 
     #
-    # create/add/get/set nodes
+    #   add/get/set nodes
     #
 
     def add_node(self, identifier: Token, node: Node) -> None:
@@ -159,7 +167,7 @@ class State:
         self.__implicit_outs[name] = self.__node_graph.set_output(output_name, node)
 
     #
-    # add/get functions
+    #   add/get functions
     #
 
     def add_function(self, func: "Function") -> None:
@@ -208,18 +216,18 @@ class State:
             return matching_funcs
 
 
+#
+#   Live Variables
+#
+
+
 _state = State()
 _loop_counter = 0
 
 
-def get_state() -> State:
-    return _state
-
-
-def get_loop_id() -> int:
-    global _loop_counter
-    _loop_counter += 1
-    return _loop_counter
+#
+#   Convenience Functions
+#
 
 
 def enter_node_graph(node_graph: NodeGraph) -> None:
@@ -232,12 +240,6 @@ def exit_node_graph() -> dict[str, Output]:
     child_state = _state
     _state = _state.parent
     return child_state.implicit_outputs
-
-
-def clear() -> None:
-    global _state, _loop_counter
-    _state = State()
-    _loop_counter = 0
 
 
 def add_node(identifier: str | Token, node: Node) -> None:
@@ -278,3 +280,19 @@ def is_function(identifier: str | Token) -> bool:
         return True
     except CompileError:
         return False
+
+
+def get_graph() -> GraphElement:
+    return _state.graph
+
+
+def get_loop_id() -> int:
+    global _loop_counter
+    _loop_counter += 1
+    return _loop_counter
+
+
+def clear() -> None:
+    global _state, _loop_counter
+    _state = State()
+    _loop_counter = 0
