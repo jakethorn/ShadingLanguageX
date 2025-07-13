@@ -58,7 +58,7 @@ def _node_to_expression(node: Node) -> Expression:
     if category == "constant":
         return _get_expression(args, 0)
     if category in ["convert", "combine2", "combine3", "combine4"]:
-        return ConstructorCall(data_type.as_token, args)
+        return ConstructorCall(data_type, args)
     if category == "extract":
         return IndexingExpression(_get_expression(args, "in"), _get_expression(args, "index"))
     if category == "switch":
@@ -100,7 +100,7 @@ def _input_to_expression(input_: Input) -> Expression:
         token = LiteralToken(input_.literal)
         return LiteralExpression(token)
     if input_.data_type in MULTI_ELEM_TYPES:
-        return ConstructorCall(input_.data_type.as_token, _value_to_arguments(input_.literal_string))
+        return ConstructorCall(input_.data_type, _value_to_arguments(input_.literal_string))
     raise AssertionError(f"Unknown input type: '{input_.data_type}'.")
 
 

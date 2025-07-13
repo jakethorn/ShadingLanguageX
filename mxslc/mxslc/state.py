@@ -84,7 +84,9 @@ class State:
     #   add/get/set nodes
     #
 
-    def add_node(self, identifier: Token, node: Node) -> None:
+    def add_node(self, identifier: str | Token, node: Node) -> None:
+        identifier, name = _handle_identifier(identifier)
+
         # check node has the correct parent
         if self.__in_node_graph:
             assert node.parent == self.__node_graph
@@ -95,7 +97,6 @@ class State:
         assert node not in self.__graph_nodes.values()
 
         # fail if variable name already exists
-        name = identifier.lexeme
         if name in self.__graph_nodes:
             raise CompileError(f"Variable name '{name}' already exists.", identifier)
 
@@ -103,8 +104,8 @@ class State:
         self.__graph_nodes[name] = node
         node.name = name
 
-    def get_node(self, identifier: Token) -> Node:
-        name = identifier.lexeme
+    def get_node(self, identifier: str | Token) -> Node:
+        identifier, name = _handle_identifier(identifier)
 
         # -- in document
         if not self.__in_node_graph:
@@ -124,7 +125,7 @@ class State:
             return self.__implicit_outs[name].value
 
         # get node from parent (recursive)
-        input_node = self.parent.get_node(identifier)
+        input_node = self.parent.get_node(identifier or name)
 
         # create implicit argument
         if name not in self.__implicit_args:
@@ -137,8 +138,8 @@ class State:
 
         return self.__implicit_args[name]
 
-    def set_node(self, identifier: Token, node: Node) -> None:
-        name = identifier.lexeme
+    def set_node(self, identifier: str | Token, node: Node) -> None:
+        identifier, name = _handle_identifier(identifier)
 
         # -- in document
         if not self.__in_node_graph:
@@ -174,25 +175,27 @@ class State:
         assert func not in self.__functions
         self.__functions.append(func)
 
-    def get_function(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> "Function":
-        matching_funcs = self.__get_functions(identifier, template_type, valid_types, args)
+    def get_function(self, identifier: str | Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> "Function":
+        identifier, name = _handle_identifier(identifier)
+        matching_funcs = self.__get_functions(name, template_type, valid_types, args)
         if len(matching_funcs) == 0:
-            raise CompileError(f"Function signature '{utils.format_function(valid_types, identifier.lexeme, template_type, args)}' does not exist.", identifier)
+            raise CompileError(f"Function signature '{utils.format_function(valid_types, name, template_type, args)}' does not exist.", identifier)
         elif len(matching_funcs) == 1:
             return matching_funcs[0]
         else:
             # it doesn't matter which overload is chosen for the following functions, so just return the first one
             # instead of requiring the user to type `normalmap<float>(...)` for example.
-            if identifier.lexeme in ["normalmap", "clamp"]:
+            if name in ["normalmap", "clamp"]:
                 return matching_funcs[0]
             return_types = {f.return_type for f in matching_funcs}
-            message = f"Function signature '{utils.format_function(return_types, identifier.lexeme, template_type, args)}' is ambiguous.\n"
+            message = f"Function signature '{utils.format_function(return_types, name, template_type, args)}' is ambiguous.\n"
             message += "Matching functions:\n"
             message += "\n".join([str(f) for f in matching_funcs])
             raise CompileError(message, identifier)
 
-    def get_function_parameter_types(self, valid_types: set[DataType], identifier: Token, template_type: DataType, param_index: int | str) -> set[DataType]:
-        matching_funcs = self.__get_functions(identifier, template_type, valid_types)
+    def get_function_parameter_types(self, valid_types: set[DataType], identifier: str | Token, template_type: DataType, param_index: int | str) -> set[DataType]:
+        identifier, name = _handle_identifier(identifier)
+        matching_funcs = self.__get_functions(name, template_type, valid_types)
         return {
             f.parameters[param_index].data_type
             for f
@@ -200,16 +203,16 @@ class State:
             if param_index in f.parameters
         }
 
-    def __get_functions(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> list["Function"]:
+    def __get_functions(self, name: str, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> list["Function"]:
         matching_funcs = [
             f
             for f
             in self.__functions
-            if f.is_match(identifier.lexeme, template_type, valid_types, args)
+            if f.is_match(name, template_type, valid_types, args)
         ]
         if len(matching_funcs) == 0:
             if self.__in_node_graph:
-                return self.parent.__get_functions(identifier, template_type, valid_types, args)
+                return self.parent.__get_functions(name, template_type, valid_types, args)
             else:
                 return []
         else:
@@ -243,15 +246,15 @@ def exit_node_graph() -> dict[str, Output]:
 
 
 def add_node(identifier: str | Token, node: Node) -> None:
-    _state.add_node(as_token(identifier), node)
+    _state.add_node(identifier, node)
 
 
 def get_node(identifier: str | Token) -> Node:
-    return _state.get_node(as_token(identifier))
+    return _state.get_node(identifier)
 
 
 def set_node(identifier: str | Token, node: Node) -> None:
-    _state.set_node(as_token(identifier), node)
+    _state.set_node(identifier, node)
 
 
 def is_node(identifier: str | Token) -> bool:
@@ -267,11 +270,11 @@ def add_function(func: "Function") -> None:
 
 
 def get_function(identifier: str | Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> "Function":
-    return _state.get_function(as_token(identifier), template_type, valid_types, args)
+    return _state.get_function(identifier, template_type, valid_types, args)
 
 
 def get_function_parameter_types(valid_types: set[DataType], identifier: str | Token, template_type: DataType, param_index: int | str) -> set[DataType]:
-    return _state.get_function_parameter_types(valid_types, as_token(identifier), template_type, param_index)
+    return _state.get_function_parameter_types(valid_types, identifier, template_type, param_index)
 
 
 def is_function(identifier: str | Token) -> bool:
@@ -296,3 +299,14 @@ def clear() -> None:
     global _state, _loop_counter
     _state = State()
     _loop_counter = 0
+
+
+#
+#   Convenience Functions
+#
+
+def _handle_identifier(identifier: str | Token) -> tuple[Token | None, str]:
+    if isinstance(identifier, str):
+        return None, identifier
+    else:
+        return identifier, identifier.lexeme

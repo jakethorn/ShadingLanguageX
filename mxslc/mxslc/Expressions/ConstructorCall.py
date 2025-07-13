@@ -7,13 +7,13 @@ from ..mx_wrapper import Node
 
 
 class ConstructorCall(Expression):
-    def __init__(self, data_type: Token, args: list["Argument"]):
-        super().__init__(data_type)
+    def __init__(self, data_type: Token | DataType, args: list["Argument"]):
+        super().__init__(data_type if isinstance(data_type, Token) else data_type.as_token)
         self.__data_type = DataType(data_type)
         self.__args = args
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
-        data_type = self.__data_type.instantiate(template_type).as_token
+        data_type = self.__data_type.instantiate(template_type)
         args = [a.instantiate_templated_types(template_type) for a in self.__args]
         return ConstructorCall(data_type, args)
 
