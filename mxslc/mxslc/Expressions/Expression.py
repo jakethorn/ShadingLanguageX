@@ -30,7 +30,7 @@ class Expression(ABC):
             self._init_subexpr(valid_types)
             self._init(valid_types)
             if self._data_type not in valid_types:
-                raise CompileError(f"Invalid data type. Expected {utils.types_string(valid_types)}, but got {self._data_type}.", self.token)
+                raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
             self.__initialized = True
 
     #virtualmethod

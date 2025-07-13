@@ -30,7 +30,7 @@ class UnaryExpression(Expression):
         else:
             valid_sub_types = valid_types & ({INTEGER, FLOAT} | MULTI_ELEM_TYPES)
             if len(valid_sub_types) == 0:
-                raise CompileError(f"Invalid data type for unary expression: {utils.types_string(valid_types)}.", self.__op)
+                raise CompileError(f"Invalid data type for unary expression: {utils.format_types(valid_types)}.", self.__op)
         self.__right.init(valid_sub_types)
 
     @property

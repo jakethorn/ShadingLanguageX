@@ -177,7 +177,7 @@ class State:
     def get_function(self, identifier: Token, template_type: DataType = None, valid_types: set[DataType] = None, args: list["Argument"] = None) -> "Function":
         matching_funcs = self.__get_functions(identifier, template_type, valid_types, args)
         if len(matching_funcs) == 0:
-            raise CompileError(f"Function signature '{utils.function_signature_string(valid_types, identifier.lexeme, template_type, args)}' does not exist.", identifier)
+            raise CompileError(f"Function signature '{utils.format_function(valid_types, identifier.lexeme, template_type, args)}' does not exist.", identifier)
         elif len(matching_funcs) == 1:
             return matching_funcs[0]
         else:
@@ -186,7 +186,7 @@ class State:
             if identifier.lexeme in ["normalmap", "clamp"]:
                 return matching_funcs[0]
             return_types = {f.return_type for f in matching_funcs}
-            message = f"Function signature '{utils.function_signature_string(return_types, identifier.lexeme, template_type, args)}' is ambiguous.\n"
+            message = f"Function signature '{utils.format_function(return_types, identifier.lexeme, template_type, args)}' is ambiguous.\n"
             message += "Matching functions:\n"
             message += "\n".join([str(f) for f in matching_funcs])
             raise CompileError(message, identifier)

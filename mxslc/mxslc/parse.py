@@ -252,7 +252,7 @@ class Parser(TokenReader):
         raise CompileError(f"Unexpected token: '{token}'.", token)
 
     def __if_expression(self) -> Expression:
-        keyword = self._match(Keyword.IF)
+        self._match(Keyword.IF)
         self._match("(")
         clause = self.__expression()
         self._match(")")
@@ -265,10 +265,10 @@ class Parser(TokenReader):
             self._match("}")
         else:
             otherwise = None
-        return IfExpression(keyword, clause, then, otherwise)
+        return IfExpression(clause, then, otherwise)
 
     def __switch_expression(self) -> Expression:
-        keyword = self._match(Keyword.SWITCH)
+        self._match(Keyword.SWITCH)
         self._match("(")
         which = self.__expression()
         self._match(")")
@@ -277,7 +277,7 @@ class Parser(TokenReader):
         while self._consume(","):
             values.append(self.__expression())
         self._match("}")
-        return SwitchExpression(keyword, which, values)
+        return SwitchExpression(which, values)
 
     def __constructor_call(self) -> Expression:
         data_type = self._match(Keyword.DATA_TYPES())

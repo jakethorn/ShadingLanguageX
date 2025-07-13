@@ -6,12 +6,10 @@ from ..Expressions import IdentifierExpression, LiteralExpression, Expression, A
     ComparisonExpression, IfExpression, LogicExpression, UnaryExpression, ConstructorCall, IndexingExpression, \
     SwitchExpression, FunctionCall, NodeConstructor
 from ..Expressions.LiteralExpression import NullExpression
-from ..Keyword import Keyword
 from ..Statements import VariableDeclaration, Statement
 from ..Token import IdentifierToken, Token, LiteralToken
 from ..file_utils import handle_input_path, handle_output_path
 from ..mx_wrapper import Document, Node, Input
-from ..token_types import STRING_LITERAL, INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL
 
 
 def decompile_file(mtlx_path: str | Path, mxsl_path: str | Path = None) -> None:
@@ -65,21 +63,21 @@ def _node_to_expression(node: Node) -> Expression:
         return IndexingExpression(_get_expression(args, "in"), _get_expression(args, "index"))
     if category == "switch":
         values = [a.expression for a in args if "in" in a.name]
-        return SwitchExpression(Token(Keyword.SWITCH), _get_expression(args, "which"), values)
+        return SwitchExpression(_get_expression(args, "which"), values)
     if category in _arithmetic_ops:
         return ArithmeticExpression(_get_expression(args, 0), Token(_arithmetic_ops[category]), _get_expression(args, 1))
     if category in _comparison_ops:
         expr = ComparisonExpression(_get_expression(args, "value1"), Token(_comparison_ops[category]), _get_expression(args, "value2"))
         if data_type == BOOLEAN and len(args) <= 2:
             return expr
-        return IfExpression(Token(Keyword.IF), expr, _get_expression(args, "in1"), _get_expression(args, "in2"))
+        return IfExpression(expr, _get_expression(args, "in1"), _get_expression(args, "in2"))
     if category in _logic_ops:
         return LogicExpression(_get_expression(args, 0), Token(_logic_ops[category]), _get_expression(args, 1))
     if category in _unary_ops:
         return UnaryExpression(Token(_unary_ops[category]), _get_expression(args, "in"))
     if category in _stdlib_functions:
         return FunctionCall(IdentifierToken(category), None, args)
-    category_token = Token(STRING_LITERAL, category)
+    category_token = LiteralToken(category)
     return NodeConstructor(category_token, data_type, args)
 
 

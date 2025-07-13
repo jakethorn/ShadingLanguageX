@@ -3,14 +3,13 @@ from .expression_utils import init_linked_expressions
 from .. import node_utils
 from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN
-from ..Token import Token
 from ..mx_wrapper import Node
 
 
 # TODO implement if else
 class IfExpression(Expression):
-    def __init__(self, token: Token, clause: Expression, then: Expression, otherwise: Expression):
-        super().__init__(token)
+    def __init__(self, clause: Expression, then: Expression, otherwise: Expression):
+        super().__init__(clause.token)
         self.__clause = clause
         self.__then = then
         self.__otherwise = otherwise
@@ -27,7 +26,7 @@ class IfExpression(Expression):
         clause = self.__clause.instantiate_templated_types(template_type)
         then = self.__then.instantiate_templated_types(template_type)
         otherwise = self.__otherwise.instantiate_templated_types(template_type)
-        return IfExpression(self.token, clause, then, otherwise)
+        return IfExpression(clause, then, otherwise)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         if self.__otherwise is None:

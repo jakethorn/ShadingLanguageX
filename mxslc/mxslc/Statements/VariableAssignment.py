@@ -9,7 +9,7 @@ from ..utils import type_of_swizzle, string
 
 
 class VariableAssignment(Statement):
-    def __init__(self, identifier: Token, property_: Token | str | None, right: Expression):
+    def __init__(self, identifier: Token, property_: str | Token | None, right: Expression):
         self.__identifier = identifier
         self.__property = string(property_)
         self.__right = right

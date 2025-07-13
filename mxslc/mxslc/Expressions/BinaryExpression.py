@@ -74,7 +74,7 @@ class ArithmeticExpression(BinaryExpression):
             self._left.init({FLOAT} | valid_types)
             self._right.init({FLOAT} | valid_types)
         else:
-            raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.types_string(valid_types)}.", self.token)
+            raise CompileError(f"{self.node_type} operator cannot be evaluated to a {utils.format_types(valid_types)}.", self.token)
 
     def _init(self, valid_types: set[DataType]) -> None:
         if one(e.data_type == INTEGER for e in [self._left, self._right]):
