@@ -168,6 +168,30 @@ In this document we will typically use the aliased version for the sake of brevi
 `vector3` ➔ `vec3`  
 `vector4` ➔ `vec4`
 
+## Auto
+
+Variables and functions can also be declared using the `auto` keyword where the type can be inferred from the right-hand 
+expression in the case of a variable declaration or the return expression for functions.
+
+### Example
+
+```
+auto pi = 3.14;  
+auto red = color3(1.0, 0.0, 0.0);`auto add_one(float x)
+auto uv = texcoord<vec2>();
+
+auto add_one(float x)
+{
+    return x + 1.0;
+}
+
+auto randomvector<vec2, vec3, vec4>()
+{
+    float r = randomfloat();
+    return T(r);
+}
+```
+
 # Expressions
 
 Expressions are pieces of code that evaluate to a value, such as `1.0 + 1.0`. This document will cover each expression in detail
