@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="y" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" nodename="y" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <image name="z" type="vector2">
+    <input name="file" type="filename" value="some_image.png" />
+  </image>
+</materialx>

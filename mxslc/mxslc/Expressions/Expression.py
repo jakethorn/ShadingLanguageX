@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from .. import utils
 from ..CompileError import CompileError
 from ..DataType import DataType, DATA_TYPES, VOID
+from ..Keyword import Keyword
 from ..Token import Token
 from ..mx_wrapper import Node
 
@@ -24,7 +25,7 @@ class Expression(ABC):
 
     def init(self, valid_types: DataType | set[DataType] = None) -> None:
         if not self.__initialized:
-            valid_types = _as_set(valid_types)
+            valid_types = _handle_valid_types(valid_types)
             if len(valid_types) == 0:
                 raise CompileError("Incompatible data types.", self.token)
             self._init_subexpr(valid_types)
@@ -70,11 +71,14 @@ class Expression(ABC):
         return self.evaluate()
 
 
-def _as_set(data_types: DataType | set[DataType]) -> set[DataType]:
+def _handle_valid_types(data_types: DataType | set[DataType]) -> set[DataType]:
     if data_types is None:
         return DATA_TYPES ^ {VOID}
     if isinstance(data_types, DataType):
-        return {data_types}
+        if data_types == Keyword.AUTO:
+            return DATA_TYPES
+        else:
+            return {data_types}
     elif isinstance(data_types, set):
         return data_types
     raise TypeError

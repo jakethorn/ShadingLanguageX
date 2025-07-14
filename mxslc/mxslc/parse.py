@@ -29,12 +29,10 @@ class Parser(TokenReader):
 
     def __statement(self) -> Statement:
         token = self._peek()
-        if token in Keyword.DATA_TYPES():
-            return self.__declaration()
-        if token == Keyword.VOID:
-            void = self._match(Keyword.VOID)
-            identifier = self._match(IDENTIFIER)
-            return self.__function_declaration(void, identifier)
+        if token in Keyword.DATA_TYPES() ^ {Keyword.AUTO} and self._peek_next_next() == "=":
+            return self.__variable_declaration()
+        if token in Keyword.DATA_TYPES() ^ {Keyword.AUTO, Keyword.VOID} and self._peek_next_next() in ["(", "<"]:
+            return self.__function_declaration()
         if token == IDENTIFIER:
             if self._peek_next() in ["(", "<"]:
                 expr = self.__primary()
@@ -46,23 +44,17 @@ class Parser(TokenReader):
             return self.__for_loop()
         raise CompileError(f"Expected return statement, data type keyword, identifier or 'for', but found '{token.lexeme}'.", token)
 
-    def __declaration(self) -> Statement:
-        data_type = self._match(Keyword.DATA_TYPES())
+    def __variable_declaration(self) -> VariableDeclaration:
+        data_type = self._match(Keyword.DATA_TYPES(), Keyword.AUTO)
         identifier = self._match(IDENTIFIER)
-        token = self._peek()
-        if token == "=":
-            return self.__variable_declaration(data_type, identifier)
-        if token in ["(", "<"]:
-            return self.__function_declaration(data_type, identifier)
-        raise CompileError(f"Unexpected token: '{token.lexeme}'.", token)
-
-    def __variable_declaration(self, data_type: Token, identifier: Token) -> VariableDeclaration:
         self._match("=")
         right = self.__expression()
         self._match(";")
         return VariableDeclaration(data_type, identifier, right)
 
-    def __function_declaration(self, return_type: Token, identifier: Token) -> FunctionDeclaration:
+    def __function_declaration(self) -> FunctionDeclaration:
+        return_type = self._match(Keyword.DATA_TYPES(), Keyword.AUTO, Keyword.VOID)
+        identifier = self._match(IDENTIFIER)
         template_types = []
         if self._consume("<"):
             template_types.append(self._match(Keyword.DATA_TYPES() - {Keyword.T}))
@@ -79,7 +71,7 @@ class Parser(TokenReader):
             self._match(")")
         self._match("{")
         statements = []
-        if return_type in Keyword.DATA_TYPES():
+        if return_type in Keyword.DATA_TYPES() ^ {Keyword.AUTO}:
             while self._peek() != Keyword.RETURN:
                 statements.append(self.__statement())
             self._match(Keyword.RETURN)

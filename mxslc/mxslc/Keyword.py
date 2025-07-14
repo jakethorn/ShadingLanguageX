@@ -16,6 +16,7 @@ class Keyword(StrEnum):
     NOT = auto()
     VOID = auto()
     NULL = auto()
+    AUTO = auto()
 
     # Data types
     BOOLEAN = auto()

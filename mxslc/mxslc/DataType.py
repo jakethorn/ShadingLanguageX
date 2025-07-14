@@ -27,7 +27,7 @@ class DataType:
             self.__data_type = data_type
         else:
             raise TypeError
-        assert self.__data_type in Keyword.DATA_TYPES() ^ {Keyword.VOID}, self.__data_type
+        assert self.__data_type in Keyword.DATA_TYPES() ^ {Keyword.VOID, Keyword.AUTO}, self.__data_type
 
     def instantiate(self, template_type: DataType | None) -> DataType:
         if self.__data_type == Keyword.T and template_type:
@@ -72,6 +72,8 @@ class DataType:
         elif self.__data_type == Keyword.MATERIAL:
             return ""
         elif self.__data_type == Keyword.VOID:
+            return ""
+        elif self.__data_type == Keyword.AUTO:
             return ""
         else:
             return self.zeros()

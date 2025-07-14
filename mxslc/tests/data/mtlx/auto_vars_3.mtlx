@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo_vector2" node="foo">
+    <output name="out" type="vector2" default="0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo_vector2" nodedef="ND_foo_vector2">
+    <convert name="node2" type="vector2">
+      <input name="in" type="float" value="2" />
+    </convert>
+    <output name="out" type="vector2" nodename="node2" />
+  </nodegraph>
+  <nodedef name="ND_foo_vector3" node="foo">
+    <output name="out" type="vector3" default="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo_vector3" nodedef="ND_foo_vector3">
+    <convert name="node2" type="vector3">
+      <input name="in" type="float" value="2" />
+    </convert>
+    <output name="out" type="vector3" nodename="node2" />
+  </nodegraph>
+  <nodedef name="ND_foo_vector4" node="foo">
+    <output name="out" type="vector4" default="0, 0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo_vector4" nodedef="ND_foo_vector4">
+    <convert name="node2" type="vector4">
+      <input name="in" type="float" value="2" />
+    </convert>
+    <output name="out" type="vector4" nodename="node2" />
+  </nodegraph>
+  <foo name="f" type="vector2" />
+</materialx>

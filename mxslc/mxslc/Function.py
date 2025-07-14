@@ -5,17 +5,16 @@ from pathlib import Path
 from . import state, node_utils
 from .Argument import Argument
 from .CompileError import CompileError
-from .DataType import DataType
+from .DataType import DataType, VOID
 from .Expressions import Expression
 from .Expressions.LiteralExpression import NullExpression
 from .Keyword import Keyword
 from .Parameter import ParameterList, Parameter
 from .Token import Token, IdentifierToken
 from .document import get_document
-from .mx_wrapper import Node, NodeDef, Output
+from .mx_wrapper import Node, NodeDef, Output, NodeGraph
 
 
-# TODO cleanup
 class Function:
     def __init__(self,
                  return_type: DataType,
@@ -32,11 +31,19 @@ class Function:
         self.__return_expr = return_expr
 
         self.__node_def: NodeDef | None = None
+        self.__node_graph: NodeGraph | None = None
         self.__implicit_outs: dict[str, Output] = {}
 
     @property
     def return_type(self) -> DataType:
-        return self.__return_type
+        # stdlib funcs dont always have a nodegraph, but they always have a return type
+        if self.__node_graph is None:
+            return self.__return_type
+        # node graphs without an "out" output are void functions
+        if self.__node_graph.has_output("out"):
+            return self.__node_graph.get_output("out").data_type
+        else:
+            return VOID
 
     @property
     def parameters(self) -> ParameterList:
@@ -58,6 +65,12 @@ class Function:
         self.parameters.init_default_values()
         self.__create_node_def()
         self.__create_node_graph()
+        # update output data type if auto keyword was used
+        if self.__node_def.has_output("out"):
+            output = self.__node_def.get_output("out")
+            if output.data_type == Keyword.AUTO:
+                output.data_type = self.return_type
+                output.default = self.return_type.default()
 
     def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
         if self.name != name:
@@ -66,7 +79,7 @@ class Function:
             if template_type != self.__template_type:
                 return False
         if return_types:
-            if self.__return_type not in return_types:
+            if self.return_type not in return_types:
                 return False
         if args:
             try:
@@ -86,9 +99,9 @@ class Function:
 
     def __str__(self) -> str:
         if self.__template_type:
-            return f"{self.__return_type} {self.name}<{self.__template_type}>({self.__params})"
+            return f"{self.return_type} {self.name}<{self.__template_type}>({self.parameters})"
         else:
-            return f"{self.__return_type} {self.name}({self.__params})"
+            return f"{self.return_type} {self.name}({self.parameters})"
 
     @staticmethod
     def from_node_def(node_def: NodeDef) -> Function:
@@ -118,18 +131,18 @@ class Function:
             self.__node_def.add_input(param.name, data_type=param.data_type)
 
     def __create_node_graph(self) -> None:
-        node_graph = get_document().add_node_graph_from_def(self.__node_def)
-        state.enter_node_graph(node_graph)
+        self.__node_graph = get_document().add_node_graph_from_def(self.__node_def)
+        state.enter_node_graph(self.__node_graph)
         for stmt in self.__body:
             stmt.execute()
         retval = self.__return_expr.init_evaluate(self.__return_type)
-        node_graph.add_output("out", retval)
+        self.__node_graph.add_output("out", retval)
         self.__implicit_outs = state.exit_node_graph()
 
     def __call_node_def(self, args: list[Argument]) -> Node:
         assert self.__node_def is not None
         # create node
-        node = node_utils.create(self.name, self.__return_type)
+        node = node_utils.create(self.name, self.return_type)
         # add inputs
         func_args = self.__combine_with_default_params(args)
         for nd_input in self.__node_def.inputs:

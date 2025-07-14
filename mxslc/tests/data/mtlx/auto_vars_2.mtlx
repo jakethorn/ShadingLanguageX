@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <multiply name="node3" type="float">
+      <input name="in1" type="float" value="4" />
+      <input name="in2" type="float" value="2" />
+    </multiply>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <foo name="f" type="float" />
+</materialx>

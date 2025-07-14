@@ -70,6 +70,9 @@ _overwrite_all_expected = False
     ("node_defs/complex_func_2", False),
     ("node_defs/complex_func_3", False),
     ("node_defs/complex_func_4", False),
+    ("auto_vars_1", False),
+    ("auto_vars_2", False),
+    ("auto_vars_3", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

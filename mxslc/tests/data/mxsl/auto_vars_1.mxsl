@@ -1,0 +1,4 @@
+auto x = 3.0;
+auto y = x + 1.0;
+auto c = color3(x, y, 0.0);
+auto z = image<vec2>("some_image.png");

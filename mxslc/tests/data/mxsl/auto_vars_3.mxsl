@@ -1,0 +1,6 @@
+auto foo<vec2, vec3, vec4>()
+{
+    return T(2.0);
+}
+
+vec2 f = foo();

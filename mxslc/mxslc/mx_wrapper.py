@@ -79,6 +79,10 @@ class TypedElement(Element):
     def data_type(self) -> DataType:
         return DataType(self.source.getType())
 
+    @data_type.setter
+    def data_type(self, data_type: DataType | str) -> None:
+        self.source.setType(str(data_type))
+
     @property
     def data_size(self) -> int:
         return self.data_type.size
@@ -445,14 +449,6 @@ class Node(InterfaceElement):
         if name != self.name:
             name = self.parent.create_valid_child_name(name)
             self.source.setName(name)
-
-    @property
-    def data_type(self) -> DataType:
-        return DataType(self.source.getType())
-
-    @data_type.setter
-    def data_type(self, data_type: DataType | str) -> None:
-        self.source.setType(str(data_type))
 
     @property
     def is_null_node(self) -> bool:
