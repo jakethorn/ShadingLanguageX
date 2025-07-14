@@ -62,15 +62,12 @@ class Function:
     def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
         if self.name != name:
             return False
-
         if template_type:
             if template_type != self.__template_type:
                 return False
-
         if return_types:
             if self.__return_type not in return_types:
                 return False
-
         if args:
             try:
                 satisfied_params = [self.__params[a] for a in args]
@@ -79,7 +76,6 @@ class Function:
             for param in self.__params:
                 if param not in satisfied_params and param.default_value is None:
                     return False
-
         return True
 
     def invoke(self, args: list[Argument]) -> Node:
@@ -152,21 +148,21 @@ class Function:
                 node_output = node.add_output(nd_output.name, data_type=nd_output.data_type)
                 node_output.clear_value()
         # update outer scope variables and return value
-        if self.__node_def.output_count == 1 and len(self.__implicit_outs) == 0:
+        if self.__node_def.output_count == 1:
+            if len(self.__implicit_outs) == 1:
+                name = list(self.__implicit_outs.keys())[0]
+                state.set_node(name, node)
             return node
-        if self.__node_def.output_count == 1 and len(self.__implicit_outs) == 1:
-            name = list(self.__implicit_outs.keys())[0]
-            state.set_node(name, node)
-            return node
-        for name, ng_output in self.__implicit_outs.items():
-            node_output = node.get_output(ng_output.name)
-            dot_node = node_utils.dot(node_output)
-            state.set_node(name, dot_node)
-        if self.__node_def.output_count > len(self.__implicit_outs):
-            dot_node = node_utils.dot(node.output)
-            return dot_node
         else:
-            return node
+            for name, ng_output in self.__implicit_outs.items():
+                node_output = node.get_output(ng_output.name)
+                dot_node = node_utils.dot(node_output)
+                state.set_node(name, dot_node)
+            if self.__node_def.output_count == len(self.__implicit_outs):
+                return node
+            else:
+                dot_node = node_utils.dot(node.output)
+                return dot_node
 
     def __combine_with_default_params(self, args: list[Argument]) -> dict[str, Node]:
         pairs: dict[str, Expression] = {p.name: p.default_value for p in self.__params}

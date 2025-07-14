@@ -22,6 +22,7 @@ class VariableAssignment(Statement):
         node = state.get_node(self.__identifier)
         if self.__property is None:
             self.execute_as_identifier(node)
+        # TODO improve this so it doesnt specify functions but instead types
         elif node.category == "standard_surface":
             self.execute_as_surface_input(node)
         elif node.category == "displacement":
