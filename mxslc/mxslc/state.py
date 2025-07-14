@@ -185,7 +185,7 @@ class State:
         else:
             # it doesn't matter which overload is chosen for the following functions, so just return the first one
             # instead of requiring the user to type `normalmap<float>(...)` for example.
-            if name in ["normalmap", "clamp"]:
+            if name in ["normalmap", "clamp", "randomfloat", "randomcolor"]:
                 return matching_funcs[0]
             return_types = {f.return_type for f in matching_funcs}
             message = f"Function signature '{utils.format_function(return_types, name, template_type, args)}' is ambiguous.\n"

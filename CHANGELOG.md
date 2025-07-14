@@ -1,3 +1,187 @@
+# Version 0.5-beta
+## Changed
+* __Functions__  
+Functions now compile to a NodeDef/NodeGraph pair. Previously they were simply "inlined" into the main MaterialX document whenever the function was called.
+Functions otherwise operate exactly the same, e.g., variables from outer scopes can be accessed and updated inside of functions.
+Functions can also still be declared inside other functions.
+```
+float add_one(float f) { return f + 1.0; }
+
+float x = add_one(1.0);
+float y = add_one(x);
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one">
+    <output name="out" type="float" default="0.0" />
+    <input name="f" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <add name="node3" type="float">
+      <input name="in1" type="float" interfacename="f" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <add_one name="x" type="float">
+    <input name="f" type="float" value="1" />
+  </add_one>
+  <add_one name="y" type="float">
+    <input name="f" type="float" nodename="x" />
+  </add_one>
+</materialx>
+```
+Example 2 - Accessing variables from an outer scope.
+```
+int seed = 0;
+
+// return a different random float each time.
+float my_rand()
+{
+    seed += 1;
+    return randomfloat(seed=seed);
+}
+
+float x = my_rand();
+float y = my_rand();
+color3 c = color3(x, y, 0.0);
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_my_rand" node="my_rand">
+    <output name="out" type="float" default="0.0" />
+    <input name="seed" type="integer" value="0" />
+    <output name="seed2" type="integer" default="0" />
+  </nodedef>
+  <nodegraph name="NG_my_rand" nodedef="ND_my_rand">
+    <add name="node4" type="integer">
+      <input name="in1" type="integer" interfacename="seed" />
+      <input name="in2" type="integer" value="1" />
+    </add>
+    <output name="seed2" type="integer" nodename="node4" />
+    <randomfloat name="node5" type="float">
+      <input name="seed" type="integer" nodename="node4" />
+    </randomfloat>
+    <output name="out" type="float" nodename="node5" />
+  </nodegraph>
+  <my_rand name="node1" type="multioutput">
+    <input name="seed" type="integer" value="0" />
+    <output name="out" type="float" />
+    <output name="seed2" type="integer" />
+  </my_rand>
+  <my_rand name="node2" type="multioutput">
+    <input name="seed" type="integer" output="seed2" nodename="node1" />
+    <output name="out" type="float" />
+    <output name="seed2" type="integer" />
+  </my_rand>
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" output="out" nodename="node1" />
+    <input name="in2" type="float" output="out" nodename="node2" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+</materialx>
+```
+* __Loops__  
+Similar to functions, loops also now compile to a NodeDef/NodeGraph pair.
+```
+float x = 0.0;
+
+for (float i = 0.0:2.0)
+{
+    x += randomfloat(i);
+}
+
+color3 c = color3(x);
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND___loop__1" node="__loop__1">
+    <input name="i" type="float" value="0" />
+    <input name="x" type="float" value="0" />
+    <output name="x2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG___loop__1" nodedef="ND___loop__1">
+    <randomfloat name="node3" type="float">
+      <input name="in" type="float" interfacename="i" />
+    </randomfloat>
+    <add name="node5" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" nodename="node3" />
+    </add>
+    <output name="x2" type="float" nodename="node5" />
+  </nodegraph>
+  <__loop__1 name="x2" type="float">
+    <input name="i" type="float" value="0" />
+    <input name="x" type="float" value="0" />
+  </__loop__1>
+  <__loop__1 name="x3" type="float">
+    <input name="i" type="float" value="1" />
+    <input name="x" type="float" nodename="x2" />
+  </__loop__1>
+  <__loop__1 name="x4" type="float">
+    <input name="i" type="float" value="2" />
+    <input name="x" type="float" nodename="x3" />
+  </__loop__1>
+  <convert name="c" type="color3">
+    <input name="in" type="float" nodename="x4" />
+  </convert>
+</materialx>
+```
+## Added
+* __material Data Type__  
+Previously, users only needed to define a `surfaceshader` type and SLX would take this and implicitly create a `surfacematerial` node and pass in the `surfaceshader` variable.
+This removed some verbosity from SLX, but tunneled users into only this specific workflow. 
+Starting from this new update, users now have to create their own `material` nodes, for example by calling `surfacematerial(...)` function and pass in their shaders manually.
+```
+material main(float tiling)
+{
+    vec2 scaled_uv = texcoord() * tiling;
+    float seed = floor(scaled_uv.x) + floor(scaled_uv.y) * tiling;
+    color3 c = randomcolor(seed);
+    
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
+}
+```
+In addition, because functions now compile to NodeDef/NodeGraphs instead of being inlined in the main document, `material` variables need to be returned from the function to be accessible from the main document.
+While these changes mean the SLX language will become somewhat more verbose when creating `shader`/`material` variables, my hope is that it allows users to use more complex workflows that are not limited to just the `standard_surface` and `surfacematerial` nodes as well as to reduce the confusion from SLX performing implicit operations in the background.  
+_"One of the things I like about C++ is that I can predict the machine code it will generate." - Bjarne Stroustrup_
+
+* __Standard Library__  
+The SLX standard function library has been expanded to provide access to every NodeDef defined in the `libraries` directory of the MaterialX project.
+```
+BSDF gem = LamaDielectric();
+BSDF copper = LamaConductor();
+float mask = image("jewelry_mask.png");
+BSDF jewelry = LamaMix(gem, copper, mask);
+LamaSurface(jewelry, copper);
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <LamaDielectric name="gem" type="BSDF" />
+  <LamaConductor name="copper" type="BSDF" />
+  <image name="mask" type="float">
+    <input name="file" type="filename" value="jewelry_mask.png" />
+  </image>
+  <LamaMix name="jewelry" type="BSDF">
+    <input name="material1" type="BSDF" nodename="gem" />
+    <input name="material2" type="BSDF" nodename="copper" />
+    <input name="mix" type="float" nodename="mask" />
+  </LamaMix>
+  <LamaSurface name="node1" type="material">
+    <input name="materialFront" type="BSDF" nodename="jewelry" />
+    <input name="materialBack" type="BSDF" nodename="copper" />
+  </LamaSurface>
+</materialx>
+```
+* __More Data Types__  
+To support the new standard function library, SLX now additionally supports Matrices (`matrix33` and `matrix44`), `volumeshader`, `lightshader`, `material` (as mentioned above), `BSDF` (as seen in the above example), `EDF` and `VDF`.
+
 # Version 0.4.1-beta
 ## Added
 Finished implementing standard library functions to match the MaterialX Standard Nodes.
