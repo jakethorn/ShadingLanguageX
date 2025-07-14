@@ -14,7 +14,7 @@ __ShadingLanguageX__ is a high level programming language that can be used to cr
 ![](examples/screenshots/howitworks.jpg)  
 
 __ShadingLanguageX__ source files are compiled to MaterialX (.mtlx) files using the mxslc compiler. Internally, the source file is tokenized and parsed into a list of statements and expressions which in turn map to one or more MaterialX nodes. These nodes are then written to the MaterialX output file as shown in the diagram above.  
-For example, the `+` operator (e.g., `float x = 1.0 + 1.0;`) intuitively compiles to the `add` node, and the same for all other mathematical operators. `if` expressions compile to either of the `ifgreater`, `ifgreatereq` or `ifequal` nodes depending on the condition. `switch` expressions compile to the `switch` node. The swizzle operator (e.g., `some_vector.xy`) compiles to `extract` and `combine` nodes. Most MaterialX nodes are represented by a standard library function that is built into the language, such as `color3 c = image("albedo.png");` which compiles to the `image` node. Additionally, declaring a variable (e.g., `vec3 up = vec3(0, 1, 0);`) compiles to a `constant` node (or a `combine` node depending on the inputs to the expression).  
+For example, the `+` operator (e.g., `float x = 1.0 + 1.0;`) intuitively compiles to the `add` node, and the same for all other mathematical operators. `if` expressions compile to either of the `ifgreater`, `ifgreatereq` or `ifequal` nodes depending on the condition. `switch` expressions compile to the `switch` node. The swizzle operator (e.g., `some_vector.xy`) compiles to `extract` and `combine` nodes. Most MaterialX nodes are represented by a standard library function that is built into the language, such as `color3 c = image("albedo.png");` which compiles to the `image` node. Additionally, declaring a variable (e.g., `vec3 up = vec3(0.0, 1.0, 0.0);`) compiles to a `constant` node (or a `combine` node depending on the inputs to the expression).  
 
 
 # Why Use ShadingLanguageX?
@@ -58,18 +58,21 @@ For information regarding __ShadingLanguageX__ syntax and mxslc compiler options
 ```
 // squares.mxsl
 
-void main(float tiling)
+material main(float tiling)
 {
     vec2 scaled_uv = texcoord() * tiling;
     float seed = floor(scaled_uv.x) + floor(scaled_uv.y) * tiling;
     color3 c = randomcolor(seed);
-    standard_surface(base_color=c);
+    
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
 }
 ```
 Compile using python:
 ```python
 import mxslc
-mxslc.compile_file("squares.mxsl", main_args=[10.0]);
+mxslc.compile_file("squares.mxsl", main_args=[10.0])
 ```
 or executable:
 ```
@@ -91,9 +94,11 @@ color3 logic_2(color3 c)
     // some other logic here
 }
 
-void main(color3 c)
+material main(color3 c)
 {
-    standard_surface(base_color=c);
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
 }
 ```
 ```python
@@ -102,7 +107,7 @@ import MaterialX as mx
 import mxslc
 
 compiler = mxslc.InteractiveCompiler()
-compiler.include(Path("./my_shader.mxsl")
+compiler.include(Path("./my_shader.mxsl"))
 
 shader = compiler.get_shader_interface()
 texture_path = Path("../textures/my_texture.png")
