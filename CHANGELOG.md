@@ -1,3 +1,22 @@
+# Version 0.5.1-beta (in development)
+## Added
+* __Auto Keyword__
+```
+auto pi = 3.14;  
+auto red = color3(1.0, 0.0, 0.0);`auto add_one(float x)
+auto uv = texcoord<vec2>();
+
+auto add_one(float x)
+{
+    return x + 1.0;
+}
+
+auto randomvector<vec2, vec3, vec4>()
+{
+    float r = randomfloat();
+    return T(r);
+}
+```
 # Version 0.5-beta
 ## Changed
 * __Functions__  
