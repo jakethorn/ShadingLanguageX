@@ -25,9 +25,11 @@ def compile_file(mxsl_path: str | Path,
 ### Example
 
 ```
-void color_shader(float r, float g, float b)
+material color_shader(float r, float g, float b)
 {
-    standard_surface(base_color=color3(r, g, b));
+    return surfacematerial(
+        standard_surface(base_color=color3(r, g, b))
+    );
 }
 ```
 ```python
@@ -38,13 +40,15 @@ mxslc.compile_file("example.mxsl", "cyan.mtlx", main_func="color_shader", main_a
 ![]()
   
 ```
-void main()
+material main()
 {
     color3 c = image("albedo.png");
 #ifdef SRGB
     c ^= GAMMA;
 #endif
-    standard_surface(base_color=c);
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
 }
 ```
 ```python
@@ -141,7 +145,7 @@ void do_something(vec3 v)
 import MaterialX as mx
 import mxslc
 compiler = mxslc.InteractiveCompiler()
-compiler.include(Path("my_shader.mxsl")
+compiler.include(Path("my_shader.mxsl"))
 shader = compiler.get_shader_interface()
 ```
 `shader` would now be able to do the following:
@@ -169,9 +173,11 @@ color3 logic_2(color3 c)
     // some other logic here
 }
 
-void main(color3 c)
+material main(color3 c)
 {
-    standard_surface(base_color=c);
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
 }
 ```
 ```python

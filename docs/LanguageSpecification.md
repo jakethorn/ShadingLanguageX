@@ -41,8 +41,8 @@ ShadingLanguageX is a simple, yet powerful language for writing complex Material
 
 A core aim of ShadingLanguageX is to maximize portability. At the time of writing, many renderers and frameworks only support 
 a subset of the MaterialX specification. To ensure that ShaderLanguageX is compatible with as many platforms as possible, 
-it compiles only to standard node elements. More advanced elements like `<nodedef>` or `<nodegraph>` are not used in ShadingLanguageX
-despite being the best choice for statements like function declarations or for loops. As support for MaterialX becomes more
+it compiles only to standard node elements. As of _version 0.5-beta_, functions and for loops compile to NodeDef/NodeGraphs
+for better cohesion with the main MaterialX specification. As support for MaterialX becomes more
 mature and as we continue to work on ShadingLanguageX more features will become utilised.
 
 At the end of the day, ShadingLanguageX is based on the MaterialX specification and we've striven for equavilency as much
@@ -64,6 +64,7 @@ color3 c = color3(position() * outline);
 surfaceshader surface = standard_surface();
 surface.base_color = c;
 surface.specular_roughness = 1.0;
+material toon_material = surfacematerial(surface);
 ```
 `> ./mxslc.exe my_shader.mxsl`  
   
@@ -71,35 +72,35 @@ compiles to:
 ```
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <viewdirection name="main__v" type="vector3" />
-  <normal name="main__n" type="vector3" />
+  <viewdirection name="v" type="vector3" />
+  <normal name="n" type="vector3" />
   <dotproduct name="node1" type="float">
-    <input name="in1" type="vector3" nodename="main__v" />
-    <input name="in2" type="vector3" nodename="main__n" />
+    <input name="in1" type="vector3" nodename="v" />
+    <input name="in2" type="vector3" nodename="n" />
   </dotproduct>
-  <subtract name="main__theta" type="float">
+  <subtract name="theta" type="float">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" nodename="node1" />
   </subtract>
-  <smoothstep name="main__outline" type="float">
-    <input name="in" type="float" nodename="main__theta" />
+  <smoothstep name="outline" type="float">
+    <input name="in" type="float" nodename="theta" />
     <input name="low" type="float" value="0.2" />
     <input name="high" type="float" value="0.25" />
   </smoothstep>
-  <position name="node6" type="vector3" />
-  <multiply name="node12" type="vector3">
-    <input name="in1" type="vector3" nodename="node6" />
-    <input name="in2" type="float" nodename="main__outline" />
+  <position name="node4" type="vector3" />
+  <multiply name="node9" type="vector3">
+    <input name="in1" type="vector3" nodename="node4" />
+    <input name="in2" type="float" nodename="outline" />
   </multiply>
-  <convert name="main__c" type="color3">
-    <input name="in" type="vector3" nodename="node12" />
+  <convert name="c" type="color3">
+    <input name="in" type="vector3" nodename="node9" />
   </convert>
-  <standard_surface name="main__surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="main__c" />
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="c" />
     <input name="specular_roughness" type="float" value="1" />
   </standard_surface>
-  <surfacematerial name="mxsl_material" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="main__surface" />
+  <surfacematerial name="toon_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>
 ```
@@ -110,12 +111,15 @@ a function called `main`, this function will be the entry into the shader. Other
 to the compiler as an additional argument (see [mxslc](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#mxslc) section below for more information). If the entry function accepts any arguments, these can also
 be passed to the compiler. For example:
 ```
-void my_function(float r, float g, float b, float roughness, float metalness)
+material my_function(float r, float g, float b, float roughness, float metalness)
 {
-    surfaceshader surface = standard_surface();
-    surface.base_color = color3(r, g, b);
-    surface.specular_roughness = roughness;
-    surface.metalness = metalness;
+    return surfacematerial(
+        standard_surface(
+            base_color = color3(r, g, b),
+            specular_roughness = roughness,
+            metalness = metalness
+        )
+    );
 }
 ```
 `> ./mxslc.exe my_shader.mxsl -m my_function -a 1.0 0.72 0.315 0.02 1.0`  
@@ -126,7 +130,7 @@ When executing a shader in this manner, all global variables and functions will 
 
 # Data Types
 
-Supported data types match the ones found in the MaterialX specification, with the exception of arrays, matrices, volumeshader and lightshader.  
+Supported data types match the ones found in the MaterialX specification, with the exception of arrays.  
   
 ## Supported Data Types
 
@@ -140,10 +144,18 @@ Supported data types match the ones found in the MaterialX specification, with t
 | `vector4`            | `vector4(0.0, 1.0, 2.0, 3.0)` |
 | `color3`             | `color3(1.0, 0.0, 0.0)`       |
 | `color4`             | `color4(1.0, 0.0, 0.0, 1.0)`  |
+| `matrix33`           | `creatematrix(...)`           |
+| `matrix44`           | `creatematrix(...)`           |
 | `string`             | `"tangent"`                   |
 | `filename`           | `"../textures/albedo.png"`    |
-| `surfaceshader`      | `standard_surface()`          |
-| `displacementshader` | `displacement()`              |
+| `surfaceshader`      | `standard_surface(...)`       |
+| `displacementshader` | `displacement(...)`           |
+| `volumeshader`       | `volume(...)`                 |
+| `lightshader`        | `light(...)`                  |
+| `material`           | `surfacematerial(...)`        |
+| `BSDF`               | `chiang_hair_bsdf(...)`       |
+| `EDF`                | `uniform_edf(...)`            |
+| `VDF`                | `absorption_vdf(...)`         |
 
 ## Type Aliases
 
@@ -225,7 +237,7 @@ languages (e.g., `const` `struct` `typeof`) or a term that is prominantly used i
 
 # Whitespace
 
-All whitespace is treated equally in ShaderLanguageX. A single space character is the same as 10 new line characters. For example:  
+All whitespace is treated equally in ShadingLanguageX. A single space character is the same as 10 new line characters. For example:  
   
 `float a = 1.0;`  
   
@@ -520,7 +532,8 @@ type name(param1_type param1_name, param2_type param2_name...)
 In this case, the return statement should also be omitted.  
 `name` can be any valid identifier.  
 `paramN_type` can be any supported data type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.  
-There is no concept of pointers or out parameters in ShadingLanguageX. Arguments are purely used to pass data into the function and the only way to get data out of a function is using the return value.
+There is no concept of pointers or out parameters in ShadingLanguageX. Arguments are purely used to pass data into the function.
+Functions can also read and update variables from enclosing scopes.
 
 ## Calling Functions
 
@@ -539,15 +552,27 @@ float mad(float m, float a, float b)
 float f = mad(1.0, 2.0, 3.0);
 ```
 ```
-void main(color3 c, float intensity, vec3 n)
+material main(color3 c, float intensity, vec3 n)
 {
-    surfaceshader surface = standard_surface();
-    surface.base_color = c * intensity;
-    surface.normal = n;
+    return surfacematerial(
+       standard_surface(
+            base_color = c * intensity,
+            normal = n
+        )
+    );
 }
 
 vec3 n = image("normals.png");
-main(color3(3.0, 7.0, 5.0), 0.8, n);
+material m = main(color3(3.0, 7.0, 5.0), 0.8, n);
+```
+```
+float i = 0.0;
+void incr_i()
+{
+    i += 1.0;
+}
+incr_i(); // i == 1.0
+incr_i(); // i == 2.0
 ```
 
 ## Overloading Functions
@@ -730,92 +755,16 @@ float randomfloat<float, int>(T in=null, float min=null, float max=null, int see
 
 # Standard Library 
 
-ShadingLanguageX provides the MaterialX standard nodes as a library of functions. They are included automatically by the compiler and don't need to be manually included with the `#include` directive.
-Functions have the same signature (name, input types and output type) as is specified in the MaterialX standard node document. Most of them are templated where appropriate and use the `null` expression
-to fall back to the default MaterialX behaviour when a parameter is not set. To see the implementation of the ShadingLanguageX standard library, see [stdlib_defs.mxsl](https://github.com/jakethorn/ShadingLanguageX/blob/main/mxslc/mxslc/stdlib/stdlib_defs.mxsl).
-
-# Shader Types
-
-ShadingLanguageX currently supports two shader types: `surfaceshader` and `displacementshader`. They form the final output
-of the programmed shader. At this time, ShadingLanguageX does not directly support the `material` type or creating the `surfacematerial`
-node, instead the compiler (mxslc) will create the `surfacematerial` node for you and assign your surface shader and displacement 
-shader (if you've created one) to the `surfacematerial` inputs.
-
-## Surface Shaders
-
-Surface shaders can be created by calling `standard_surface()`. Shader inputs can either be set by using the period character
-as in the example below or using named arguments inside the function call, e.g., `standard_surface(base_color=color3(0.8), metalness=1.0);`.
-
-### Example
-
-```
-void main()
-{
-    surfaceshader goldsrf = standard_surface();
-    goldsrf.base = 1.0;
-    goldsrf.base_color = color3(0.944, 0.776, 0.373);
-    goldsrf.specular = 1.0;
-    goldsrf.specular_color = color3(0.998, 0.981, 0.751);
-    goldsrf.specular_roughness = 0.02;
-    goldsrf.metalness = 1.0;
-}
-```
-compiles to:
-```
-<standard_surface name="main__goldsrf" type="surfaceshader">
-  <input name="base" type="float" value="1"/>
-  <input name="base_color" type="color3" value="0.944, 0.776, 0.373"/>
-  <input name="specular" type="float" value="1"/>
-  <input name="specular_color" type="color3" value="0.998, 0.981, 0.751"/>
-  <input name="specular_roughness" type="float" value="0.02"/>
-  <input name="metalness" type="float" value="1"/>
-</standard_surface>
-<surfacematerial name="mxsl_material" type="material">
-  <input name="surfaceshader" type="surfaceshader" nodename="main__goldsrf"/>
-</surfacematerial>
-```
-
-## Displacement Shaders
-
-Displacement shaders can be created by calling `displacement()`. Like surface shaders, inputs can either be set by using 
-the period character or using named arguments in the function call.
-
-### Example
-
-```
-void main()
-{
-    float height = image("heightmap.png");
-    displacement(displacement=height, scale=1.0);
-    
-    standard_surface(base_color=color3(height));
-}
-```
-compiles to:
-```
-<image name="main__height" type="float">
-  <input name="file" type="filename" value="heightmap.png" />
-</image>
-<displacement name="node1" type="displacementshader">
-  <input name="displacement" type="float" nodename="main__height" />
-  <input name="scale" type="float" value="1" />
-</displacement>
-<standard_surface name="node5" type="surfaceshader">
-  <input name="base_color" type="color3" nodename="node7" />
-</standard_surface>
-<convert name="node7" type="color3">
-  <input name="in" type="float" nodename="main__height" />
-</convert>
-<surfacematerial name="mxsl_material" type="material">
-  <input name="surfaceshader" type="surfaceshader" nodename="node5" />
-  <input name="displacementshader" type="displacementshader" nodename="node1" />
-</surfacematerial>
-```
+ShadingLanguageX provides access to the nodes specified in the [MaterialX Data Library](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/libraries) as a standard library of functions.
+More information about these nodes can be found the in the MaterialX StandardNodes, PBRSpec and NPRSpec [documents](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/documents/Specification).
+They are included automatically by the compiler and don't need to be manually included with the `#include` directive.
+Functions have the same signature (name, input types and output type) as their respective nodes in the MaterialX specification. Most of them are templated where appropriate and use the `null` expression
+to fall back to the default MaterialX behaviour when a parameter is not set.
 
 # Scope
 
 ShadingLanguageX follows the same scoping rules as most C-based languages. Scopes are denoted by a pair of curly braces `{` `}` like in function declarations or for loops. 
-Variables are only accessible inside their own scope as well as any sub-scopes. 
+Variables are only accessible inside their own scope as well as any nested scopes. 
 ```
 float a = 0.0;
 void do_something()
@@ -828,7 +777,8 @@ void do_something()
     }
 }
 ```
-In the previous example, `a` is part of the global scope and is accessible everywhere, `b` is accessible inside the `do_something` function and the for loop, but it would be a compile error to try to access it outside of the function, and `c` is accessible only within the for loop.
+In the previous example, `a` is part of the global scope and is accessible everywhere, `b` is accessible only inside the `do_something` 
+function and the for loop, and `c` is accessible only within the for loop.
 
 # Preprocessor Directives
 
@@ -900,7 +850,7 @@ It can be run either using the compiled executable or with the Python API.
 
 ## Executable
 
-The executable is a compiled version of the Python API (compiled using the pyinstaller package) with some added argument parsing functionality.
+The executable is a compiled version of the Python API with some added argument parsing functionality.
 
 ### Command Line Options
 
@@ -920,9 +870,11 @@ options:
 ### Example
 
 ```
-void color_shader(float r, float g, float b)
+material color_shader(float r, float g, float b)
 {
-    standard_surface(base_color=color3(r, g, b));
+    return surfacematerial(
+        standard_surface(base_color=color3(r, g, b))
+    );
 }
 ```
 `> ./mxslc.exe example.mxsl -o cyan.mtlx -m color_shader -a 0.0 1.0, 1.0`  
@@ -930,13 +882,15 @@ void color_shader(float r, float g, float b)
 ![]()
   
 ```
-void main()
+material main()
 {
     color3 c = image("albedo.png");
 #ifdef SRGB
     c ^= GAMMA;
 #endif
-    standard_surface(base_color=c);
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
 }
 ```
 `> ./mxslc.exe example.mxsl -d SRGB -d GAMMA 2.2`
