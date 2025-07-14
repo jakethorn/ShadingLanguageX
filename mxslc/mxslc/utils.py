@@ -20,8 +20,6 @@ def type_of_swizzle(swizzle: str) -> DataType:
 def one(values: Sequence[bool] | Generator[bool, None, None]) -> bool:
     """
     Similar to any(values) or all(values), but returns true if exactly one element is True.
-    :param values:
-    :return:
     """
     return len([v for v in values if v]) == 1
 

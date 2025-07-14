@@ -134,7 +134,7 @@ color3 c = color3(x);
 * __material Data Type__  
 Previously, users only needed to define a `surfaceshader` type and SLX would take this and implicitly create a `surfacematerial` node and pass in the `surfaceshader` variable.
 This removed some verbosity from SLX, but tunneled users into only this specific workflow. 
-Starting from this new update, users now have to create their own `material` nodes, for example by calling `surfacematerial(...)` function and pass in their shaders manually.
+Starting from this new update, users now have to create their own `material` nodes, for example by calling the `surfacematerial(...)` function and pass in their shaders manually.
 ```
 material main(float tiling)
 {
@@ -148,11 +148,14 @@ material main(float tiling)
 }
 ```
 In addition, because functions now compile to NodeDef/NodeGraphs instead of being inlined in the main document, `material` variables need to be returned from the function to be accessible from the main document.
-While these changes mean the SLX language will become somewhat more verbose when creating `shader`/`material` variables, my hope is that it allows users to use more complex workflows that are not limited to just the `standard_surface` and `surfacematerial` nodes as well as to reduce the confusion from SLX performing implicit operations in the background.  
+While these changes mean the SLX language will become somewhat more verbose when creating `shader`/`material` variables, 
+my hope is that it allows users to use more complex workflows that are not limited to just the `standard_surface` and `surfacematerial` nodes. 
+Another benefit is to reduce the confusion from SLX performing implicit operations in the background. It's easy for me to know what SLX is doing in the background because I wrote the compiler,
+but developers just started to use the language might be surprised by the sudden `surfacematerial` node in their MaterialX shader.  
 _"One of the things I like about C++ is that I can predict the machine code it will generate." - Bjarne Stroustrup_
 
 * __Standard Library__  
-The SLX standard function library has been expanded to provide access to every NodeDef defined in the `libraries` directory of the MaterialX project.
+The SLX standard function library has been expanded to provide access to every NodeDef defined in the `libraries` directory of the MaterialX project, including `stdlib`, `pbrlib`, `nprlib`, `bxdf`, etc...
 ```
 BSDF gem = LamaDielectric();
 BSDF copper = LamaConductor();
