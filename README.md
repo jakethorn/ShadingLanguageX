@@ -2,7 +2,7 @@
 <h1 align="center">ShadingLanguageX</h1>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/jakethorn/ShadingLanguageX/blob/main/LICENSE)
-![version](https://img.shields.io/badge/version-0.5_beta-blue)
+![version](https://img.shields.io/badge/version-0.5.1_beta-blue)
 [![Automated Tests](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/automated-tests.yml)
 
 __ShadingLanguageX__ is a high level programming language that can be used to create complex [MaterialX](https://materialx.org/) shaders.  

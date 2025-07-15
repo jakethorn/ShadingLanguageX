@@ -1,4 +1,4 @@
-# Version 0.5.1-beta (in development)
+# Version 0.5.1-beta
 ## Added
 * __Auto Keyword__
 ```
