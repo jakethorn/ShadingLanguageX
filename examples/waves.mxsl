@@ -36,12 +36,16 @@ float get_waves(vec2 pos)
     return sum_of_values / sum_of_weights;
 }
 
-void main()
+material main()
 {
     float wave_height = get_waves(position("world").xz * 10.0);
     surfaceshader surface = standard_surface();
     surface.base_color = color3(0.1, 0.25, 0.5);
     surface.specular_roughness = 0.2;
 
-    displacement(vec3(0.0, 0.0, 1.0), wave_height / 5.0);
+    return surfacematerial(
+        surface,
+        null,
+        displacement(vec3(0.0, 0.0, 1.0), wave_height / 5.0)
+    );
 }

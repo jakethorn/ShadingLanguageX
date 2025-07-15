@@ -123,3 +123,5 @@ surfaceshader surface = standard_surface();
 surface.base_color = base_color;
 surface.specular_roughness = clamp(0.2 + roughness);
 surface.normal = vec3(normal("world").x, drop_and_tail_norm.yx / 2.0);
+
+surfacematerial(surface);

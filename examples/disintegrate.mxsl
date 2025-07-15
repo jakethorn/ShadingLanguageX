@@ -1,4 +1,4 @@
-void main()
+material main()
 {
     vec3 p = position();
     p += vec3(1.0, 50.0, 0.0);
@@ -11,4 +11,6 @@ void main()
     surfaceshader surface = standard_surface();
     surface.base_color = color;
     surface.opacity = color3(opacity);
+
+    return surfacematerial(surface);
 }

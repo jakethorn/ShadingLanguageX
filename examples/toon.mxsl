@@ -6,3 +6,5 @@ color3 c = color3(position() * outline);
 surfaceshader surface = standard_surface();
 surface.base_color = c;
 surface.specular_roughness = 1.0;
+
+surfacematerial(surface);

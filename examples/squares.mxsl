@@ -1,7 +1,10 @@
-void main()
+material main()
 {
     vec2 scaled_uv = texcoord() * 10.0;
     float seed = floor(scaled_uv.x) + floor(scaled_uv.y) * 10.0;
     color3 c = randomcolor(seed);
-    standard_surface(base_color=c);
+
+    return surfacematerial(
+        standard_surface(base_color=c)
+    );
 }

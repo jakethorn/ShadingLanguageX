@@ -14,10 +14,10 @@ float raycast(vec3 origin, vec3 view_dir)
     vec3 dp = (-origin + 1.0) / view_dir;
     vec3 d_min = max(dn, dp);
     float d_min_z = if (dp.z > 0.0) { dp.z } else { 1000000.0 };
-    return min(d_min.x, d_min.y, d_min_z);
+    return min(d_min.x, min(d_min.y, d_min_z));
 }
 
-surfaceshader main()
+material main()
 {
     // initialize data
     vec2 uv = texcoord();
@@ -48,5 +48,5 @@ surfaceshader main()
     surface.base_color = clamp(color3(wall_uvs) + words.rgb) * ao;
     surface.specular_roughness = 1.0;
 
-    return surface;
+    return surfacematerial(surface);
 }

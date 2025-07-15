@@ -1,4 +1,4 @@
-void main()
+material main()
 {
     surfaceshader goldsrf = standard_surface();
     goldsrf.base = 1.0;
@@ -7,4 +7,6 @@ void main()
     goldsrf.specular_color = color3(0.998, 0.981, 0.751);
     goldsrf.specular_roughness = 0.02;
     goldsrf.metalness = 1.0;
+
+    return surfacematerial(goldsrf);
 }

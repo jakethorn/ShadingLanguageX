@@ -15,3 +15,5 @@ surface.base_color = albedo * matao * color3(0.5, 0.1, 0.1);
 surface.metalness = metal;
 surface.specular_roughness = rough;
 surface.normal = normalmap(normal);
+
+surfacematerial(surface);

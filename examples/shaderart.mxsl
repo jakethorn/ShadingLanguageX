@@ -37,7 +37,7 @@ vec3 update_finalColor(vec2 uv, vec2 uv0, float i, vec3 finalColor)
     return finalColor + col * d;
 }
 
-surfaceshader main()
+material main()
 {
     vec2 uv = texcoord();
     vec2 uv0 = uv;
@@ -65,5 +65,6 @@ surfaceshader main()
 
     surfaceshader surface = standard_surface();
     surface.base_color = color3(finalColor);
-    return surface;
+
+    return surfacematerial(surface);
 }
