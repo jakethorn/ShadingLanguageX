@@ -34,11 +34,11 @@
     <output name="f2" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG___loop__2" nodedef="ND___loop__2">
-    <min name="node2" type="float">
+    <min name="node4" type="float">
       <input name="in1" type="float" interfacename="i" />
       <input name="in2" type="float" interfacename="f1" />
     </min>
-    <output name="f2" type="float" nodename="node2" />
+    <output name="f2" type="float" nodename="node4" />
   </nodegraph>
   <__loop__2 name="f2" type="float">
     <input name="i" type="float" value="8" />

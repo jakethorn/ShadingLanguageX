@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <image name="node1" type="color4">
+  <texcoord name="node5" type="vector2" />
+  <image name="node11" type="color4">
     <input name="file" type="filename" value="albedo.png" />
     <input name="texcoord" type="vector2" nodename="node5" />
   </image>
-  <texcoord name="node5" type="vector2" />
 </materialx>

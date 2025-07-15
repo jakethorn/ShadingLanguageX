@@ -7,10 +7,10 @@
     <standard_surface name="surface" type="surfaceshader">
       <input name="base_color" type="color3" value="1, 0, 0" />
     </standard_surface>
-    <surfacematerial name="node5" type="material">
+    <surfacematerial name="node8" type="material">
       <input name="surfaceshader" type="surfaceshader" nodename="surface" />
     </surfacematerial>
-    <output name="out" type="material" nodename="node5" />
+    <output name="out" type="material" nodename="node8" />
   </nodegraph>
   <_main name="node1" type="material" />
 </materialx>

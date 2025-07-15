@@ -1,19 +1,25 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <and name="node1" type="boolean">
-    <input name="in1" type="boolean" nodename="node4" />
-    <input name="in2" type="boolean" nodename="node7" />
-  </and>
-  <ifgreatereq name="node4" type="boolean">
-    <input name="value1" type="float" value="0.5" />
-    <input name="value2" type="float" value="0" />
-  </ifgreatereq>
-  <ifgreatereq name="node7" type="boolean">
-    <input name="value1" type="float" value="1" />
+  <ifgreatereq name="node3" type="boolean">
+    <input name="value1" type="float" value="0" />
     <input name="value2" type="float" value="0.5" />
   </ifgreatereq>
+  <not name="node4" type="boolean">
+    <input name="in" type="boolean" nodename="node3" />
+  </not>
+  <ifgreatereq name="node7" type="boolean">
+    <input name="value1" type="float" value="0.5" />
+    <input name="value2" type="float" value="1" />
+  </ifgreatereq>
+  <not name="node8" type="boolean">
+    <input name="in" type="boolean" nodename="node7" />
+  </not>
+  <and name="node9" type="boolean">
+    <input name="in1" type="boolean" nodename="node4" />
+    <input name="in2" type="boolean" nodename="node8" />
+  </and>
   <ifequal name="g" type="float">
-    <input name="value1" type="boolean" nodename="node1" />
+    <input name="value1" type="boolean" nodename="node9" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="2" />
     <input name="in2" type="float" value="3" />

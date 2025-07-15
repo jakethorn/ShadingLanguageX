@@ -7,20 +7,20 @@
   </nodedef>
   <nodegraph name="NG_my_function" nodedef="ND_my_function">
     <standard_surface name="surface" type="surfaceshader">
-      <input name="base_color" type="color3" nodename="node4" />
+      <input name="base_color" type="color3" nodename="node5" />
     </standard_surface>
     <image name="butterfly_color" type="color3">
       <input name="file" type="filename" value="butterfly1.png" />
       <input name="texcoord" type="vector2" interfacename="uv" />
     </image>
-    <multiply name="node4" type="color3">
+    <multiply name="node5" type="color3">
       <input name="in1" type="color3" nodename="butterfly_color" />
       <input name="in2" type="color3" interfacename="c" />
     </multiply>
-    <surfacematerial name="node6" type="material">
+    <surfacematerial name="node9" type="material">
       <input name="surfaceshader" type="surfaceshader" nodename="surface" />
     </surfacematerial>
-    <output name="out" type="material" nodename="node6" />
+    <output name="out" type="material" nodename="node9" />
   </nodegraph>
   <my_function name="node3" type="material">
     <input name="uv" type="vector2" value="0, 0" />

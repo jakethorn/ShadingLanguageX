@@ -42,10 +42,10 @@
   <nodegraph name="NG_bar2" nodedef="ND_bar2">
     <output name="out" type="boolean" value="true" />
   </nodegraph>
+  <foo name="node1" type="float" />
+  <bar name="node2" type="boolean" />
   <my_func name="f" type="float">
-    <input name="a" type="float" nodename="node2" />
-    <input name="b" type="boolean" nodename="node3" />
+    <input name="a" type="float" nodename="node1" />
+    <input name="b" type="boolean" nodename="node2" />
   </my_func>
-  <foo name="node2" type="float" />
-  <bar name="node3" type="boolean" />
 </materialx>

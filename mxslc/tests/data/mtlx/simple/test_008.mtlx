@@ -21,10 +21,10 @@
   <my_next_func name="my_next_float" type="float">
     <input name="my_arg" type="float" value="3" />
   </my_next_func>
-  <my_func name="node1" type="float" />
+  <my_func name="node2" type="float" />
   <my_func name="node3" type="float" />
   <add name="node4" type="float">
-    <input name="in1" type="float" nodename="node1" />
+    <input name="in1" type="float" nodename="node2" />
     <input name="in2" type="float" nodename="node3" />
   </add>
   <my_func name="node5" type="float" />
@@ -44,13 +44,13 @@
     </divide>
     <output name="out" type="float" nodename="c" />
   </nodegraph>
-  <my_last_func name="d" type="float">
-    <input name="a" type="float" nodename="node9" />
-    <input name="b" type="float" value="5" />
-  </my_last_func>
-  <my_func name="node7" type="float" />
-  <add name="node9" type="float">
-    <input name="in1" type="float" nodename="node7" />
+  <my_func name="node6" type="float" />
+  <add name="node8" type="float">
+    <input name="in1" type="float" nodename="node6" />
     <input name="in2" type="float" value="4" />
   </add>
+  <my_last_func name="d" type="float">
+    <input name="a" type="float" nodename="node8" />
+    <input name="b" type="float" value="5" />
+  </my_last_func>
 </materialx>

@@ -1,5 +1,5 @@
 from .Expression import Expression
-from .BinaryExpression import BinaryExpression, ArithmeticExpression, ComparisonExpression, LogicExpression
+from .BinaryExpression import BinaryExpression
 from .ConstructorCall import ConstructorCall
 from .FunctionCall import FunctionCall
 from .GroupingExpression import GroupingExpression

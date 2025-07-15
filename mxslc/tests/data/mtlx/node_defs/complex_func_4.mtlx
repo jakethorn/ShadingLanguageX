@@ -24,16 +24,16 @@
     <output name="x2" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG___loop__1" nodedef="ND___loop__1">
-    <randomfloat name="node3" type="float">
+    <randomfloat name="node7" type="float">
       <input name="in" type="float" interfacename="f" />
       <input name="min" type="float" value="0" />
       <input name="max" type="float" value="1" />
     </randomfloat>
-    <add name="node7" type="float">
+    <add name="node6" type="float">
       <input name="in1" type="float" interfacename="x" />
-      <input name="in2" type="float" nodename="node3" />
+      <input name="in2" type="float" nodename="node7" />
     </add>
-    <output name="x2" type="float" nodename="node7" />
+    <output name="x2" type="float" nodename="node6" />
   </nodegraph>
   <foo name="x" type="float" />
   <convert name="c" type="color3">

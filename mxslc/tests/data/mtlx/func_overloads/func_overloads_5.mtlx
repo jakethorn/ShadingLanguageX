@@ -11,10 +11,10 @@
     </multiply>
     <output name="out" type="float" nodename="node3" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="node2" type="float">
     <input name="a" type="float" value="1" />
   </foo>
-  <foo name="node3" type="float">
+  <foo name="node4" type="float">
     <input name="a" type="float" value="3" />
   </foo>
 </materialx>

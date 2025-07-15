@@ -5,7 +5,7 @@ from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES
 from ..Token import Token
 from ..mx_wrapper import Node
 
-
+# TODO type checking. Maybe do the same as binary expression.
 class ConstructorCall(Expression):
     def __init__(self, data_type: Token | DataType, args: list["Argument"]):
         super().__init__(data_type if isinstance(data_type, Token) else data_type.as_token)

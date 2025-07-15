@@ -6,11 +6,14 @@
     <input name="index" type="integer" value="0" />
   </extract>
   <ifgreatereq name="node4" type="boolean">
-    <input name="value1" type="float" value="0.5" />
-    <input name="value2" type="float" nodename="node2" />
+    <input name="value1" type="float" nodename="node2" />
+    <input name="value2" type="float" value="0.5" />
   </ifgreatereq>
+  <not name="node5" type="boolean">
+    <input name="in" type="boolean" nodename="node4" />
+  </not>
   <ifequal name="z" type="float">
-    <input name="value1" type="boolean" nodename="node4" />
+    <input name="value1" type="boolean" nodename="node5" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
@@ -21,12 +24,12 @@
   <nodegraph name="NG_red" nodedef="ND_red">
     <output name="out" type="color3" value="1, 0, 0" />
   </nodegraph>
-  <add name="node9" type="float">
+  <add name="node10" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </add>
   <add name="f" type="float">
-    <input name="in1" type="float" nodename="node9" />
+    <input name="in1" type="float" nodename="node10" />
     <input name="in2" type="float" nodename="z" />
   </add>
   <red name="r" type="color3" />

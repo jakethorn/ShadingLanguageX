@@ -4,19 +4,19 @@
     <output name="out" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG_foo_float" nodedef="ND_foo_float">
-    <image name="node1" type="float">
+    <image name="node11" type="float">
       <input name="file" type="filename" value="albedo.png" />
     </image>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="node11" />
   </nodegraph>
   <nodedef name="ND_foo_vector2" node="foo">
     <output name="out" type="vector2" default="0, 0" />
   </nodedef>
   <nodegraph name="NG_foo_vector2" nodedef="ND_foo_vector2">
-    <image name="node1" type="vector2">
+    <image name="node11" type="vector2">
       <input name="file" type="filename" value="albedo.png" />
     </image>
-    <output name="out" type="vector2" nodename="node1" />
+    <output name="out" type="vector2" nodename="node11" />
   </nodegraph>
   <foo name="a" type="float" />
 </materialx>

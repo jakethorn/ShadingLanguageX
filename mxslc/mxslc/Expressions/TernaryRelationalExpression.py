@@ -1,4 +1,4 @@
-from . import Expression, ComparisonExpression, LogicExpression
+from . import Expression, BinaryExpression
 from ..DataType import DataType, BOOLEAN
 from ..Keyword import Keyword
 from ..Token import Token
@@ -12,9 +12,9 @@ class TernaryRelationalExpression(Expression):
     """
     def __init__(self, left: Expression, op1: Token, middle: Expression, op2: Token, right: Expression):
         super().__init__(op2)
-        comp1 = ComparisonExpression(left, op1, middle)
-        comp2 = ComparisonExpression(middle, op2, right)
-        self.__and = LogicExpression(comp1, Token(Keyword.AND), comp2)
+        comp1 = BinaryExpression(left, op1, middle)
+        comp2 = BinaryExpression(middle, op2, right)
+        self.__and = BinaryExpression(comp1, Token(Keyword.AND), comp2)
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return self.__and.instantiate_templated_types(template_type)

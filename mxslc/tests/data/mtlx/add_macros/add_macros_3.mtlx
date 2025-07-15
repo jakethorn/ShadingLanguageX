@@ -7,7 +7,7 @@
   <standard_surface name="surface" type="surfaceshader">
     <input name="base_color" type="color3" nodename="c" />
   </standard_surface>
-  <surfacematerial name="node7" type="material">
+  <surfacematerial name="node10" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

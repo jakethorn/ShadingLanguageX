@@ -57,16 +57,16 @@
   <foo name="v" type="vector3">
     <input name="a" type="float" value="6" />
   </foo>
-  <foo name="w" type="vector3">
-    <input name="a" type="vector3" nodename="node5" />
-  </foo>
-  <convert name="node5" type="vector3">
+  <convert name="node4" type="vector3">
     <input name="in" type="float" value="7" />
   </convert>
-  <foo name="g" type="float">
-    <input name="a" type="vector3" nodename="node7" />
+  <foo name="w" type="vector3">
+    <input name="a" type="vector3" nodename="node4" />
   </foo>
-  <convert name="node7" type="vector3">
+  <convert name="node6" type="vector3">
     <input name="in" type="float" value="8" />
   </convert>
+  <foo name="g" type="float">
+    <input name="a" type="vector3" nodename="node6" />
+  </foo>
 </materialx>

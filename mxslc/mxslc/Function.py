@@ -141,16 +141,15 @@ class Function:
 
     def __call_node_def(self, args: list[Argument]) -> Node:
         assert self.__node_def is not None
-        # create node
+        func_args = self.__initialise_arguments(args)
         node = node_utils.create(self.name, self.return_type)
-        # add inputs
-        func_args = self.__combine_with_default_params(args)
+        # add inputs to node
         for nd_input in self.__node_def.inputs:
             if nd_input.name in func_args:
                 node.add_input(nd_input.name, func_args[nd_input.name])
             else:
                 node.add_input(nd_input.name, state.get_node(nd_input.name))
-        # add outputs
+        # add outputs to node
         if self.__node_def.output_count == 0:
             raise CompileError("Invalid function. Functions must return a value or update a variable from an outer scope.", self.__identifier)
         if self.__node_def.output_count == 1:
@@ -177,7 +176,7 @@ class Function:
                 dot_node = node_utils.dot(node.output)
                 return dot_node
 
-    def __combine_with_default_params(self, args: list[Argument]) -> dict[str, Node]:
+    def __initialise_arguments(self, args: list[Argument]) -> dict[str, Node]:
         pairs: dict[str, Expression] = {p.name: p.default_value for p in self.__params}
         for arg in args:
             pairs[self.__params[arg].name] = arg.expression

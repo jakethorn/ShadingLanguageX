@@ -144,14 +144,14 @@ class Parser(TokenReader):
         expr = self.__equality()
         while op := self._consume("&", Keyword.AND, "|", Keyword.OR):
             right = self.__equality()
-            expr = LogicExpression(expr, op, right)
+            expr = BinaryExpression(expr, op, right)
         return expr
 
     def __equality(self) -> Expression:
         expr = self.__relational()
         while op := self._consume("!=", "=="):
             right = self.__relational()
-            expr = ComparisonExpression(expr, op, right)
+            expr = BinaryExpression(expr, op, right)
         return expr
 
     def __relational(self) -> Expression:
@@ -168,7 +168,7 @@ class Parser(TokenReader):
         if middle is None:
             return left
         elif right is None:
-            return ComparisonExpression(left, op1, middle)
+            return BinaryExpression(left, op1, middle)
         else:
             return TernaryRelationalExpression(left, op1, middle, op2, right)
 
@@ -176,21 +176,21 @@ class Parser(TokenReader):
         expr = self.__factor()
         while op := self._consume("+", "-"):
             right = self.__factor()
-            expr = ArithmeticExpression(expr, op, right)
+            expr = BinaryExpression(expr, op, right)
         return expr
 
     def __factor(self) -> Expression:
         expr = self.__exponent()
         while op := self._consume("*", "/", "%"):
             right = self.__exponent()
-            expr = ArithmeticExpression(expr, op, right)
+            expr = BinaryExpression(expr, op, right)
         return expr
 
     def __exponent(self) -> Expression:
         expr = self.__unary()
         while op := self._consume("^"):
             right = self.__unary()
-            expr = ArithmeticExpression(expr, op, right)
+            expr = BinaryExpression(expr, op, right)
         return expr
 
     def __unary(self) -> Expression:

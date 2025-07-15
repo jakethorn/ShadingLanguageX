@@ -23,11 +23,11 @@
   <convert name="node2" type="color3">
     <input name="in" type="float" value="1" />
   </convert>
-  <foo name="node3" type="float">
+  <foo name="node4" type="float">
     <input name="x" type="float" value="0.8" />
   </foo>
   <multiply name="gray" type="color3">
     <input name="in1" type="color3" nodename="node2" />
-    <input name="in2" type="float" nodename="node3" />
+    <input name="in2" type="float" nodename="node4" />
   </multiply>
 </materialx>

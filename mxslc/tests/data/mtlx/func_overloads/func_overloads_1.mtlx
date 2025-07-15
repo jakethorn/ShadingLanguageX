@@ -39,16 +39,16 @@
     </ifequal>
     <output name="out" type="float" nodename="node4" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="node2" type="float">
     <input name="a" type="float" value="5" />
   </foo>
-  <foo name="node3" type="float">
-    <input name="a" type="vector3" nodename="node5" />
-  </foo>
-  <convert name="node5" type="vector3">
+  <convert name="node4" type="vector3">
     <input name="in" type="float" value="6" />
   </convert>
-  <foo name="node6" type="float">
+  <foo name="node5" type="float">
+    <input name="a" type="vector3" nodename="node4" />
+  </foo>
+  <foo name="node7" type="float">
     <input name="a" type="boolean" value="true" />
   </foo>
 </materialx>

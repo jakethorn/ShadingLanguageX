@@ -25,11 +25,11 @@
       <input name="in1" type="float" value="2" />
       <input name="in2" type="float" value="2" />
     </add>
-    <bar name="node3" type="float">
+    <bar name="node4" type="float">
       <input name="y" type="float" nodename="y" />
       <input name="x" type="float" interfacename="x" />
     </bar>
-    <output name="out" type="float" nodename="node3" />
+    <output name="out" type="float" nodename="node4" />
   </nodegraph>
   <foo name="node3" type="float">
     <input name="x" type="float" nodename="x" />
@@ -37,11 +37,11 @@
   <convert name="c" type="color3">
     <input name="in" type="float" nodename="node3" />
   </convert>
-  <bar name="node4" type="float">
+  <bar name="node5" type="float">
     <input name="y" type="float" value="3" />
     <input name="x" type="float" nodename="x" />
   </bar>
   <convert name="d" type="color3">
-    <input name="in" type="float" nodename="node4" />
+    <input name="in" type="float" nodename="node5" />
   </convert>
 </materialx>

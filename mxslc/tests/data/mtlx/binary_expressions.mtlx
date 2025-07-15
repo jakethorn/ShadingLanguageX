@@ -52,45 +52,54 @@
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
   </ifequal>
-  <ifequal name="i" type="boolean">
+  <ifequal name="node29" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
   </ifequal>
-  <ifgreatereq name="j" type="boolean">
-    <input name="value1" type="float" value="2" />
-    <input name="value2" type="float" value="1" />
+  <not name="i" type="boolean">
+    <input name="in" type="boolean" nodename="node29" />
+  </not>
+  <ifgreatereq name="node32" type="boolean">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" value="2" />
   </ifgreatereq>
+  <not name="j" type="boolean">
+    <input name="in" type="boolean" nodename="node32" />
+  </not>
   <ifgreater name="k" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
   </ifgreater>
-  <ifgreater name="m" type="boolean">
-    <input name="value1" type="float" value="2" />
-    <input name="value2" type="float" value="1" />
+  <ifgreater name="node37" type="boolean">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" value="2" />
   </ifgreater>
+  <not name="m" type="boolean">
+    <input name="in" type="boolean" nodename="node37" />
+  </not>
   <ifgreatereq name="n" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="2" />
   </ifgreatereq>
-  <and name="o" type="boolean">
-    <input name="in1" type="boolean" nodename="node38" />
-    <input name="in2" type="boolean" nodename="n" />
-  </and>
-  <or name="node38" type="boolean">
-    <input name="in1" type="boolean" nodename="node39" />
-    <input name="in2" type="boolean" nodename="m" />
-  </or>
-  <and name="node39" type="boolean">
-    <input name="in1" type="boolean" nodename="node40" />
-    <input name="in2" type="boolean" nodename="k" />
-  </and>
-  <or name="node40" type="boolean">
-    <input name="in1" type="boolean" nodename="node41" />
-    <input name="in2" type="boolean" nodename="j" />
-  </or>
-  <and name="node41" type="boolean">
+  <and name="node42" type="boolean">
     <input name="in1" type="boolean" nodename="h" />
     <input name="in2" type="boolean" nodename="i" />
+  </and>
+  <or name="node44" type="boolean">
+    <input name="in1" type="boolean" nodename="node42" />
+    <input name="in2" type="boolean" nodename="j" />
+  </or>
+  <and name="node46" type="boolean">
+    <input name="in1" type="boolean" nodename="node44" />
+    <input name="in2" type="boolean" nodename="k" />
+  </and>
+  <or name="node48" type="boolean">
+    <input name="in1" type="boolean" nodename="node46" />
+    <input name="in2" type="boolean" nodename="m" />
+  </or>
+  <and name="o" type="boolean">
+    <input name="in1" type="boolean" nodename="node48" />
+    <input name="in2" type="boolean" nodename="n" />
   </and>
   <add name="p" type="float">
     <input name="in1" type="float" value="3" />

@@ -1,33 +1,33 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <image name="node1" type="color4">
+  <image name="node11" type="color4">
     <input name="file" type="filename" value="textures\butterfly1.png" />
   </image>
   <power name="c" type="color4">
-    <input name="in1" type="color4" nodename="node1" />
+    <input name="in1" type="color4" nodename="node11" />
     <input name="in2" type="float" value="2.2" />
   </power>
   <standard_surface name="surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node8" />
+    <input name="base_color" type="color3" nodename="node7" />
   </standard_surface>
-  <extract name="node5" type="float">
+  <extract name="node4" type="float">
     <input name="in" type="color4" nodename="c" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node6" type="float">
+  <extract name="node5" type="float">
     <input name="in" type="color4" nodename="c" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <extract name="node7" type="float">
+  <extract name="node6" type="float">
     <input name="in" type="color4" nodename="c" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <combine3 name="node8" type="color3">
-    <input name="in1" type="float" nodename="node5" />
-    <input name="in2" type="float" nodename="node6" />
-    <input name="in3" type="float" nodename="node7" />
+  <combine3 name="node7" type="color3">
+    <input name="in1" type="float" nodename="node4" />
+    <input name="in2" type="float" nodename="node5" />
+    <input name="in3" type="float" nodename="node6" />
   </combine3>
-  <surfacematerial name="node9" type="material">
+  <surfacematerial name="node12" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

@@ -17,12 +17,12 @@
     </add>
     <output name="out" type="float" nodename="node3" />
   </nodegraph>
-  <foo name="node1" type="float">
-    <input name="a" type="float" nodename="node4" />
-  </foo>
-  <bar name="node2" type="float" />
-  <subtract name="node4" type="float">
-    <input name="in1" type="float" nodename="node2" />
+  <bar name="node1" type="float" />
+  <subtract name="node3" type="float">
+    <input name="in1" type="float" nodename="node1" />
     <input name="in2" type="float" value="5" />
   </subtract>
+  <foo name="node4" type="float">
+    <input name="a" type="float" nodename="node3" />
+  </foo>
 </materialx>

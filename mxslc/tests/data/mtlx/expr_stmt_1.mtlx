@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <texcoord name="uv" type="vector2" />
-  <displacement name="node1" type="displacementshader">
-    <input name="displacement" type="vector3" nodename="node2" />
-    <input name="scale" type="float" nodename="node8" />
-  </displacement>
-  <tangent name="node2" type="vector3">
+  <tangent name="node3" type="vector3">
     <input name="space" type="string" value="object" />
   </tangent>
-  <extract name="node5" type="float">
+  <extract name="node4" type="float">
     <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node7" type="float">
+  <extract name="node6" type="float">
     <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <multiply name="node8" type="float">
-    <input name="in1" type="float" nodename="node5" />
-    <input name="in2" type="float" nodename="node7" />
+  <multiply name="node7" type="float">
+    <input name="in1" type="float" nodename="node4" />
+    <input name="in2" type="float" nodename="node6" />
   </multiply>
+  <displacement name="node8" type="displacementshader">
+    <input name="displacement" type="vector3" nodename="node3" />
+    <input name="scale" type="float" nodename="node7" />
+  </displacement>
 </materialx>

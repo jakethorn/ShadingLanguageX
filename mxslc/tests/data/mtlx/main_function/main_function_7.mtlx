@@ -21,10 +21,10 @@
       <input name="in1" type="color3" nodename="img_color" />
       <input name="in2" type="color3" nodename="node6" />
     </multiply>
-    <surfacematerial name="node8" type="material">
+    <surfacematerial name="node11" type="material">
       <input name="surfaceshader" type="surfaceshader" nodename="surface" />
     </surfacematerial>
-    <output name="out" type="material" nodename="node8" />
+    <output name="out" type="material" nodename="node11" />
   </nodegraph>
   <main name="node3" type="material">
     <input name="r" type="float" value="1" />

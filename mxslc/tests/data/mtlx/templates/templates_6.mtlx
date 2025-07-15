@@ -40,12 +40,12 @@
     </multiply>
     <output name="out" type="vector3" nodename="node3" />
   </nodegraph>
-  <bar name="v" type="vector2">
-    <input name="x" type="vector2" nodename="node3" />
-  </bar>
-  <foo name="node2" type="vector2" />
-  <subtract name="node3" type="vector2">
+  <foo name="node1" type="vector2" />
+  <subtract name="node2" type="vector2">
     <input name="in1" type="vector2" value="0, 0" />
-    <input name="in2" type="vector2" nodename="node2" />
+    <input name="in2" type="vector2" nodename="node1" />
   </subtract>
+  <bar name="v" type="vector2">
+    <input name="x" type="vector2" nodename="node2" />
+  </bar>
 </materialx>

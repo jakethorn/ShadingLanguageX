@@ -41,14 +41,14 @@
     </multiply>
     <output name="out" type="float" nodename="node6" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="node2" type="float">
     <input name="a" type="float" value="4" />
   </foo>
-  <foo name="node3" type="float">
+  <foo name="node5" type="float">
     <input name="a" type="float" value="5" />
     <input name="b" type="float" value="6" />
   </foo>
-  <foo name="node6" type="float">
+  <foo name="node8" type="float">
     <input name="a" type="float" value="7" />
     <input name="b" type="boolean" value="false" />
   </foo>

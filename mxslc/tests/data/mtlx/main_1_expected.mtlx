@@ -25,10 +25,10 @@
       <input name="base_color" type="color3" nodename="c2" />
       <input name="normal" type="vector3" nodename="i2" />
     </standard_surface>
-    <surfacematerial name="node9" type="material">
+    <surfacematerial name="node12" type="material">
       <input name="surfaceshader" type="surfaceshader" nodename="surface" />
     </surfacematerial>
-    <output name="out" type="material" nodename="node9" />
+    <output name="out" type="material" nodename="node12" />
   </nodegraph>
   <my_function name="node4" type="material">
     <input name="x" type="float" value="0.6" />

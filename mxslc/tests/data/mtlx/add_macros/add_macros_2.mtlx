@@ -6,7 +6,7 @@
   <convert name="node2" type="color3">
     <input name="in" type="float" value="2" />
   </convert>
-  <surfacematerial name="node3" type="material">
+  <surfacematerial name="node6" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

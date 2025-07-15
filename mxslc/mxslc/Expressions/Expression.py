@@ -19,6 +19,10 @@ class Expression(ABC):
     def token(self) -> Token:
         return self.__token
 
+    @property
+    def is_initialized(self) -> bool:
+        return self.__initialized
+
     @abstractmethod
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         ...
@@ -33,6 +37,13 @@ class Expression(ABC):
             if self._data_type not in valid_types:
                 raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
             self.__initialized = True
+
+    def try_init(self, valid_types: DataType | set[DataType] = None) -> CompileError | None:
+        try:
+            self.init(valid_types)
+            return None
+        except CompileError as e:
+            return e
 
     #virtualmethod
     def _init_subexpr(self, valid_types: set[DataType]) -> None:

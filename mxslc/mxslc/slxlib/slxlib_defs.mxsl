@@ -1,0 +1,52 @@
+#ifndef SLXLIB_DEFS
+#define SLXLIB_DEFS
+
+//
+//  More arithmetic overloads
+//
+
+inline T add<vec2, vec3, vec4, color3, color4>(float in1, T in2)
+{
+    return T(in1) + in2;
+}
+
+inline T subtract<vec2, vec3, vec4, color3, color4>(float in1, T in2)
+{
+    return T(in1) - in2;
+}
+
+inline T multiply<vec2, vec3, vec4, color3, color4>(float in1, T in2)
+{
+    return T(in1) * in2;
+}
+
+inline T divide<vec2, vec3, vec4, color3, color4>(float in1, T in2)
+{
+    return T(in1) / in2;
+}
+
+inline T modulo<vec2, vec3, vec4, color3, color4>(float in1, T in2)
+{
+    return T(in1) % in2;
+}
+
+inline T power<vec2, vec3, vec4, color3, color4>(float in1, T in2)
+{
+    return T(in1) ^ in2;
+}
+
+//
+//  More min/max overloads
+//
+
+inline float min(float in1, float in2, float in3)
+{
+    return min(in1, min(in2, in3));
+}
+
+inline float max(float in1, float in2, float in3)
+{
+    return max(in1, max(in2, in3));
+}
+
+#endif // SLXLIB_DEFS

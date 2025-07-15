@@ -2,9 +2,8 @@ from pathlib import Path
 
 from ..Argument import Argument
 from ..DataType import BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES, STRING, FILENAME
-from ..Expressions import IdentifierExpression, LiteralExpression, Expression, ArithmeticExpression, \
-    ComparisonExpression, IfExpression, LogicExpression, UnaryExpression, ConstructorCall, IndexingExpression, \
-    SwitchExpression, FunctionCall, NodeConstructor
+from ..Expressions import IdentifierExpression, LiteralExpression, Expression, IfExpression, UnaryExpression, \
+    ConstructorCall, IndexingExpression, SwitchExpression, FunctionCall, NodeConstructor, BinaryExpression
 from ..Expressions.LiteralExpression import NullExpression
 from ..Statements import VariableDeclaration, Statement
 from ..Token import IdentifierToken, Token, LiteralToken
@@ -65,14 +64,14 @@ def _node_to_expression(node: Node) -> Expression:
         values = [a.expression for a in args if "in" in a.name]
         return SwitchExpression(_get_expression(args, "which"), values)
     if category in _arithmetic_ops:
-        return ArithmeticExpression(_get_expression(args, 0), Token(_arithmetic_ops[category]), _get_expression(args, 1))
+        return BinaryExpression(_get_expression(args, 0), Token(_arithmetic_ops[category]), _get_expression(args, 1))
     if category in _comparison_ops:
-        expr = ComparisonExpression(_get_expression(args, "value1"), Token(_comparison_ops[category]), _get_expression(args, "value2"))
+        expr = BinaryExpression(_get_expression(args, "value1"), Token(_comparison_ops[category]), _get_expression(args, "value2"))
         if data_type == BOOLEAN and len(args) <= 2:
             return expr
         return IfExpression(expr, _get_expression(args, "in1"), _get_expression(args, "in2"))
     if category in _logic_ops:
-        return LogicExpression(_get_expression(args, 0), Token(_logic_ops[category]), _get_expression(args, 1))
+        return BinaryExpression(_get_expression(args, 0), Token(_logic_ops[category]), _get_expression(args, 1))
     if category in _unary_ops:
         return UnaryExpression(Token(_unary_ops[category]), _get_expression(args, "in"))
     if category in _stdlib_functions:

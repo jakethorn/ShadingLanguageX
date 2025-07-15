@@ -9,23 +9,21 @@
     <input name="t" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_clerp" nodedef="ND_clerp">
-    <and name="node1" type="boolean">
-      <input name="in1" type="boolean" nodename="node4" />
-      <input name="in2" type="boolean" nodename="node7" />
-    </and>
-    <ifgreater name="node4" type="boolean">
+    <ifgreater name="node3" type="boolean">
       <input name="value1" type="float" interfacename="t" />
       <input name="value2" type="float" interfacename="lower" />
     </ifgreater>
-    <ifgreatereq name="node7" type="boolean">
-      <input name="value1" type="float" interfacename="upper" />
-      <input name="value2" type="float" interfacename="t" />
+    <ifgreatereq name="node6" type="boolean">
+      <input name="value1" type="float" interfacename="t" />
+      <input name="value2" type="float" interfacename="upper" />
     </ifgreatereq>
-    <mix name="node8" type="color3">
-      <input name="fg" type="color3" interfacename="a" />
-      <input name="bg" type="color3" interfacename="b" />
-      <input name="mix" type="float" nodename="node17" />
-    </mix>
+    <not name="node7" type="boolean">
+      <input name="in" type="boolean" nodename="node6" />
+    </not>
+    <and name="node8" type="boolean">
+      <input name="in1" type="boolean" nodename="node3" />
+      <input name="in2" type="boolean" nodename="node7" />
+    </and>
     <subtract name="node13" type="float">
       <input name="in1" type="float" interfacename="t" />
       <input name="in2" type="float" interfacename="lower" />
@@ -38,35 +36,40 @@
       <input name="in1" type="float" nodename="node13" />
       <input name="in2" type="float" nodename="node16" />
     </divide>
+    <mix name="node18" type="color3">
+      <input name="fg" type="color3" interfacename="a" />
+      <input name="bg" type="color3" interfacename="b" />
+      <input name="mix" type="float" nodename="node17" />
+    </mix>
     <ifequal name="retval2" type="color3">
-      <input name="value1" type="boolean" nodename="node1" />
+      <input name="value1" type="boolean" nodename="node8" />
       <input name="value2" type="boolean" value="true" />
-      <input name="in1" type="color3" nodename="node8" />
+      <input name="in1" type="color3" nodename="node18" />
       <input name="in2" type="color3" interfacename="a" />
     </ifequal>
-    <ifgreater name="node21" type="boolean">
+    <ifgreater name="node22" type="boolean">
       <input name="value1" type="float" interfacename="t" />
       <input name="value2" type="float" interfacename="upper" />
     </ifgreater>
     <ifequal name="retval3" type="color3">
-      <input name="value1" type="boolean" nodename="node21" />
+      <input name="value1" type="boolean" nodename="node22" />
       <input name="value2" type="boolean" value="true" />
       <input name="in1" type="color3" interfacename="b" />
       <input name="in2" type="color3" nodename="retval2" />
     </ifequal>
     <output name="out" type="color3" nodename="retval3" />
   </nodegraph>
-  <position name="node1" type="vector3" />
-  <extract name="node2" type="float">
-    <input name="in" type="vector3" nodename="node1" />
+  <position name="node2" type="vector3" />
+  <extract name="node1" type="float">
+    <input name="in" type="vector3" nodename="node2" />
     <input name="index" type="integer" value="0" />
   </extract>
   <extract name="node3" type="float">
-    <input name="in" type="vector3" nodename="node1" />
+    <input name="in" type="vector3" nodename="node2" />
     <input name="index" type="integer" value="2" />
   </extract>
   <combine2 name="node4" type="vector2">
-    <input name="in1" type="float" nodename="node2" />
+    <input name="in1" type="float" nodename="node1" />
     <input name="in2" type="float" nodename="node3" />
   </combine2>
   <divide name="node6" type="vector2">
@@ -81,16 +84,16 @@
     <input name="file" type="filename" value="textures\mountain1.png" />
     <input name="texcoord" type="vector2" nodename="uv" />
   </image>
-  <noise2d name="node8" type="float">
-    <input name="amplitude" type="float" value="1" />
-    <input name="texcoord" type="vector2" nodename="node15" />
-  </noise2d>
-  <multiply name="node15" type="vector2">
+  <multiply name="node14" type="vector2">
     <input name="in1" type="vector2" nodename="uv" />
     <input name="in2" type="float" value="500" />
   </multiply>
+  <noise2d name="node15" type="float">
+    <input name="amplitude" type="float" value="1" />
+    <input name="texcoord" type="vector2" nodename="node14" />
+  </noise2d>
   <multiply name="node16" type="float">
-    <input name="in1" type="float" nodename="node8" />
+    <input name="in1" type="float" nodename="node15" />
     <input name="in2" type="float" value="0.5" />
   </multiply>
   <add name="tree_noise" type="float">
@@ -112,7 +115,7 @@
     <input name="value1" type="float" nodename="height" />
     <input name="value2" type="float" value="0.0158" />
   </ifgreater>
-  <clerp name="node40" type="color3">
+  <clerp name="node45" type="color3">
     <input name="a" type="color3" nodename="trees" />
     <input name="b" type="color3" value="0.5, 0.5, 0.5" />
     <input name="lower" type="float" value="0.5" />
@@ -122,7 +125,7 @@
   <ifequal name="c2" type="color3">
     <input name="value1" type="boolean" nodename="node39" />
     <input name="value2" type="boolean" value="true" />
-    <input name="in1" type="color3" nodename="node40" />
+    <input name="in1" type="color3" nodename="node45" />
     <input name="in2" type="color3" nodename="c1" />
   </ifequal>
   <extract name="node48" type="float">
@@ -142,62 +145,77 @@
     <input name="in2" type="float" nodename="node49" />
     <input name="in3" type="float" nodename="node52" />
   </combine3>
-  <and name="node53" type="boolean">
-    <input name="in1" type="boolean" nodename="node57" />
-    <input name="in2" type="boolean" nodename="node61" />
-  </and>
-  <extract name="node55" type="float">
+  <extract name="node54" type="float">
     <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <ifgreatereq name="node57" type="boolean">
-    <input name="value1" type="float" value="1" />
-    <input name="value2" type="float" nodename="node55" />
+  <ifgreatereq name="node56" type="boolean">
+    <input name="value1" type="float" nodename="node54" />
+    <input name="value2" type="float" value="1" />
   </ifgreatereq>
+  <not name="node57" type="boolean">
+    <input name="in" type="boolean" nodename="node56" />
+  </not>
   <extract name="node59" type="float">
     <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="1" />
   </extract>
   <ifgreatereq name="node61" type="boolean">
-    <input name="value1" type="float" value="1" />
-    <input name="value2" type="float" nodename="node59" />
+    <input name="value1" type="float" nodename="node59" />
+    <input name="value2" type="float" value="1" />
   </ifgreatereq>
+  <not name="node62" type="boolean">
+    <input name="in" type="boolean" nodename="node61" />
+  </not>
+  <and name="node63" type="boolean">
+    <input name="in1" type="boolean" nodename="node57" />
+    <input name="in2" type="boolean" nodename="node62" />
+  </and>
   <ifequal name="base_color2" type="color3">
-    <input name="value1" type="boolean" nodename="node53" />
+    <input name="value1" type="boolean" nodename="node63" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="color3" nodename="c2" />
     <input name="in2" type="color3" nodename="base_color" />
   </ifequal>
-  <and name="node64" type="boolean">
-    <input name="in1" type="boolean" nodename="node65" />
-    <input name="in2" type="boolean" nodename="node76" />
-  </and>
-  <and name="node65" type="boolean">
-    <input name="in1" type="boolean" nodename="node69" />
-    <input name="in2" type="boolean" nodename="node73" />
-  </and>
   <extract name="node67" type="float">
     <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="0" />
   </extract>
   <ifgreatereq name="node69" type="boolean">
-    <input name="value1" type="float" value="1" />
-    <input name="value2" type="float" nodename="node67" />
+    <input name="value1" type="float" nodename="node67" />
+    <input name="value2" type="float" value="1" />
   </ifgreatereq>
-  <extract name="node71" type="float">
+  <not name="node70" type="boolean">
+    <input name="in" type="boolean" nodename="node69" />
+  </not>
+  <extract name="node72" type="float">
     <input name="in" type="vector2" nodename="uv" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <ifgreatereq name="node73" type="boolean">
-    <input name="value1" type="float" value="1" />
-    <input name="value2" type="float" nodename="node71" />
+  <ifgreatereq name="node74" type="boolean">
+    <input name="value1" type="float" nodename="node72" />
+    <input name="value2" type="float" value="1" />
   </ifgreatereq>
-  <ifgreater name="node76" type="boolean">
-    <input name="value1" type="float" value="0.0132" />
-    <input name="value2" type="float" nodename="height" />
+  <not name="node75" type="boolean">
+    <input name="in" type="boolean" nodename="node74" />
+  </not>
+  <and name="node76" type="boolean">
+    <input name="in1" type="boolean" nodename="node70" />
+    <input name="in2" type="boolean" nodename="node75" />
+  </and>
+  <ifgreater name="node79" type="boolean">
+    <input name="value1" type="float" nodename="height" />
+    <input name="value2" type="float" value="0.0132" />
   </ifgreater>
+  <not name="node80" type="boolean">
+    <input name="in" type="boolean" nodename="node79" />
+  </not>
+  <and name="node81" type="boolean">
+    <input name="in1" type="boolean" nodename="node76" />
+    <input name="in2" type="boolean" nodename="node80" />
+  </and>
   <ifequal name="rough" type="float">
-    <input name="value1" type="boolean" nodename="node64" />
+    <input name="value1" type="boolean" nodename="node81" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
@@ -206,15 +224,15 @@
     <input name="base_color" type="color3" nodename="base_color2" />
     <input name="specular_roughness" type="float" nodename="rough" />
   </standard_surface>
-  <displacement name="displacement" type="displacementshader">
-    <input name="displacement" type="vector3" nodename="node82" />
-    <input name="scale" type="float" nodename="node86" />
-  </displacement>
-  <tangent name="node82" type="vector3">
+  <tangent name="node88" type="vector3">
     <input name="space" type="string" value="object" />
   </tangent>
-  <multiply name="node86" type="float">
+  <multiply name="node90" type="float">
     <input name="in1" type="float" nodename="height" />
     <input name="in2" type="float" value="2" />
   </multiply>
+  <displacement name="displacement" type="displacementshader">
+    <input name="displacement" type="vector3" nodename="node88" />
+    <input name="scale" type="float" nodename="node90" />
+  </displacement>
 </materialx>

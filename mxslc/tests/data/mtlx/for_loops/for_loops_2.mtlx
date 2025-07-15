@@ -6,20 +6,20 @@
     <output name="a2" type="float" default="0.0" />
   </nodedef>
   <nodegraph name="NG___loop__2" nodedef="ND___loop__2">
-    <__loop__1 name="node2" type="float">
+    <__loop__1 name="node3" type="float">
       <input name="j" type="float" value="7" />
       <input name="a" type="float" interfacename="a" />
       <input name="i" type="float" interfacename="i" />
     </__loop__1>
-    <output name="a2" type="float" nodename="node6" />
-    <__loop__1 name="node4" type="float">
+    <output name="a2" type="float" nodename="node7" />
+    <__loop__1 name="node5" type="float">
       <input name="j" type="float" value="8" />
-      <input name="a" type="float" nodename="node2" />
+      <input name="a" type="float" nodename="node3" />
       <input name="i" type="float" interfacename="i" />
     </__loop__1>
-    <__loop__1 name="node6" type="float">
+    <__loop__1 name="node7" type="float">
       <input name="j" type="float" value="9" />
-      <input name="a" type="float" nodename="node4" />
+      <input name="a" type="float" nodename="node5" />
       <input name="i" type="float" interfacename="i" />
     </__loop__1>
   </nodegraph>

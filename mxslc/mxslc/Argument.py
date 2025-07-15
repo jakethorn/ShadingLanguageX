@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .CompileError import CompileError
 from .DataType import DataType
 from .Expressions import Expression
 from .Token import Token
@@ -44,6 +45,9 @@ class Argument:
 
     def init(self, valid_types: DataType | set[DataType] = None) -> None:
         self.expression.init(valid_types)
+
+    def try_init(self, valid_types: DataType | set[DataType] = None) -> CompileError | None:
+        return self.expression.try_init(valid_types)
 
     def evaluate(self) -> Node:
         return self.expression.evaluate()

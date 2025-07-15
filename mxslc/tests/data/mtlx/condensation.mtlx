@@ -5,42 +5,42 @@
     <input name="BG_IMG" type="filename" value="." />
   </nodedef>
   <nodegraph name="NG_background" nodedef="ND_background">
-    <texcoord name="node2" type="vector2" />
-    <convert name="node3" type="vector2">
+    <convert name="node2" type="vector2">
       <input name="in" type="float" value="1" />
     </convert>
+    <texcoord name="node4" type="vector2" />
     <subtract name="uv" type="vector2">
-      <input name="in1" type="vector2" nodename="node3" />
-      <input name="in2" type="vector2" nodename="node2" />
+      <input name="in1" type="vector2" nodename="node2" />
+      <input name="in2" type="vector2" nodename="node4" />
     </subtract>
-    <randomfloat name="rx" type="float">
-      <input name="in" type="float" nodename="node6" />
-      <input name="min" type="float" nodename="node8" />
-      <input name="max" type="float" value="0.01" />
-      <input name="seed" type="integer" value="0" />
-    </randomfloat>
-    <extract name="node6" type="float">
+    <extract name="node5" type="float">
       <input name="in" type="vector2" nodename="uv" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <subtract name="node8" type="float">
+    <subtract name="node7" type="float">
+      <input name="in1" type="float" value="0" />
+      <input name="in2" type="float" value="0.01" />
+    </subtract>
+    <randomfloat name="rx" type="float">
+      <input name="in" type="float" nodename="node5" />
+      <input name="min" type="float" nodename="node7" />
+      <input name="max" type="float" value="0.01" />
+      <input name="seed" type="integer" value="0" />
+    </randomfloat>
+    <extract name="node11" type="float">
+      <input name="in" type="vector2" nodename="uv" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <subtract name="node13" type="float">
       <input name="in1" type="float" value="0" />
       <input name="in2" type="float" value="0.01" />
     </subtract>
     <randomfloat name="ry" type="float">
-      <input name="in" type="float" nodename="node12" />
-      <input name="min" type="float" nodename="node14" />
+      <input name="in" type="float" nodename="node11" />
+      <input name="min" type="float" nodename="node13" />
       <input name="max" type="float" value="0.01" />
       <input name="seed" type="integer" value="1" />
     </randomfloat>
-    <extract name="node12" type="float">
-      <input name="in" type="vector2" nodename="uv" />
-      <input name="index" type="integer" value="1" />
-    </extract>
-    <subtract name="node14" type="float">
-      <input name="in1" type="float" value="0" />
-      <input name="in2" type="float" value="0.01" />
-    </subtract>
     <combine2 name="r" type="vector2">
       <input name="in1" type="float" nodename="rx" />
       <input name="in2" type="float" nodename="ry" />
@@ -49,27 +49,27 @@
       <input name="in1" type="vector2" nodename="uv" />
       <input name="in2" type="vector2" nodename="r" />
     </add>
-    <noise2d name="n" type="float">
-      <input name="amplitude" type="float" value="5" />
-      <input name="pivot" type="float" value="0" />
-      <input name="texcoord" type="vector2" nodename="node25" />
-    </noise2d>
-    <multiply name="node25" type="vector2">
+    <multiply name="node24" type="vector2">
       <input name="in1" type="vector2" nodename="uv" />
       <input name="in2" type="float" value="100" />
     </multiply>
+    <noise2d name="n" type="float">
+      <input name="amplitude" type="float" value="5" />
+      <input name="pivot" type="float" value="0" />
+      <input name="texcoord" type="vector2" nodename="node24" />
+    </noise2d>
     <mix name="m" type="vector2">
       <input name="fg" type="vector2" nodename="ruv" />
       <input name="bg" type="vector2" nodename="uv" />
       <input name="mix" type="float" nodename="n" />
     </mix>
-    <image name="c" type="color3">
-      <input name="file" type="filename" interfacename="BG_IMG" />
-      <input name="texcoord" type="vector2" nodename="node33" />
-    </image>
-    <clamp name="node33" type="vector2">
+    <clamp name="node35" type="vector2">
       <input name="in" type="vector2" nodename="m" />
     </clamp>
+    <image name="c" type="color3">
+      <input name="file" type="filename" interfacename="BG_IMG" />
+      <input name="texcoord" type="vector2" nodename="node35" />
+    </image>
     <output name="out" type="color3" nodename="c" />
   </nodegraph>
   <background name="blurred" type="color3">
@@ -120,20 +120,20 @@
     <input name="in1" type="float" nodename="HALF_CHANNEL" />
     <input name="in2" type="float" value="0.015" />
   </subtract>
-  <randomfloat name="node21" type="float">
+  <randomfloat name="node25" type="float">
     <input name="in" type="float" nodename="CHANNEL" />
   </randomfloat>
-  <multiply name="node24" type="float">
-    <input name="in1" type="float" nodename="node21" />
+  <multiply name="node23" type="float">
+    <input name="in1" type="float" nodename="node25" />
     <input name="in2" type="float" value="2" />
   </multiply>
   <add name="progress2" type="float">
     <input name="in1" type="float" nodename="CHANNEL" />
-    <input name="in2" type="float" nodename="node24" />
+    <input name="in2" type="float" nodename="node23" />
   </add>
-  <time name="node26" type="float" />
+  <time name="node27" type="float" />
   <divide name="node28" type="float">
-    <input name="in1" type="float" nodename="node26" />
+    <input name="in1" type="float" nodename="node27" />
     <input name="in2" type="float" value="5" />
   </divide>
   <add name="progress3" type="float">
@@ -165,27 +165,27 @@
       <input name="in1" type="float" interfacename="f" />
       <input name="in2" type="float" value="100" />
     </divide>
-    <randomfloat name="s" type="float">
-      <input name="in" type="float" nodename="node11" />
-      <input name="min" type="float" nodename="node13" />
-      <input name="max" type="float" value="0.01" />
-    </randomfloat>
-    <modulo name="node8" type="float">
+    <modulo name="node7" type="float">
       <input name="in1" type="float" interfacename="f" />
       <input name="in2" type="float" value="3" />
     </modulo>
-    <subtract name="node9" type="float">
+    <subtract name="node8" type="float">
       <input name="in1" type="float" interfacename="f" />
-      <input name="in2" type="float" nodename="node8" />
+      <input name="in2" type="float" nodename="node7" />
     </subtract>
-    <add name="node11" type="float">
-      <input name="in1" type="float" nodename="node9" />
+    <add name="node10" type="float">
+      <input name="in1" type="float" nodename="node8" />
       <input name="in2" type="float" interfacename="CHANNEL" />
     </add>
-    <subtract name="node13" type="float">
+    <subtract name="node12" type="float">
       <input name="in1" type="float" value="0" />
       <input name="in2" type="float" value="0.01" />
     </subtract>
+    <randomfloat name="s" type="float">
+      <input name="in" type="float" nodename="node10" />
+      <input name="min" type="float" nodename="node12" />
+      <input name="max" type="float" value="0.01" />
+    </randomfloat>
     <ifgreater name="node18" type="boolean">
       <input name="value1" type="float" interfacename="progress" />
       <input name="value2" type="float" nodename="fn" />
@@ -200,15 +200,15 @@
       <input name="in1" type="float" nodename="node21" />
       <input name="in2" type="float" interfacename="sway" />
     </ifequal>
-    <output name="sway2" type="float" nodename="node26" />
-    <clamp name="node26" type="float">
+    <output name="sway2" type="float" nodename="node29" />
+    <clamp name="node29" type="float">
       <input name="in" type="float" nodename="node23" />
       <input name="low" type="float" interfacename="CHANNEL_LEFT" />
       <input name="high" type="float" interfacename="CHANNEL_RGHT" />
     </clamp>
     <add name="node33" type="float">
       <input name="in1" type="float" interfacename="CHANNEL_MIDDLE" />
-      <input name="in2" type="float" nodename="node26" />
+      <input name="in2" type="float" nodename="node29" />
     </add>
     <combine2 name="tail_pos1" type="vector2">
       <input name="in1" type="float" nodename="node33" />
@@ -219,33 +219,39 @@
       <input name="in2" type="vector2" interfacename="UV" />
     </distance>
     <ifgreatereq name="node43" type="boolean">
-      <input name="value1" type="float" interfacename="TAIL_SIZE" />
-      <input name="value2" type="float" nodename="to_tail" />
+      <input name="value1" type="float" nodename="to_tail" />
+      <input name="value2" type="float" interfacename="TAIL_SIZE" />
     </ifgreatereq>
-    <ifequal name="node46" type="float">
-      <input name="value1" type="boolean" nodename="node43" />
+    <not name="node44" type="boolean">
+      <input name="in" type="boolean" nodename="node43" />
+    </not>
+    <ifequal name="node47" type="float">
+      <input name="value1" type="boolean" nodename="node44" />
       <input name="value2" type="boolean" value="true" />
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" value="0" />
     </ifequal>
-    <add name="node47" type="float">
+    <add name="node48" type="float">
       <input name="in1" type="float" interfacename="tail" />
-      <input name="in2" type="float" nodename="node46" />
+      <input name="in2" type="float" nodename="node47" />
     </add>
-    <output name="tail2" type="float" nodename="node47" />
-    <ifgreatereq name="node51" type="boolean">
-      <input name="value1" type="float" interfacename="TAIL_SIZE" />
-      <input name="value2" type="float" nodename="to_tail" />
+    <output name="tail2" type="float" nodename="node48" />
+    <ifgreatereq name="node52" type="boolean">
+      <input name="value1" type="float" nodename="to_tail" />
+      <input name="value2" type="float" interfacename="TAIL_SIZE" />
     </ifgreatereq>
-    <ifequal name="node54" type="vector2">
-      <input name="value1" type="boolean" nodename="node51" />
+    <not name="node53" type="boolean">
+      <input name="in" type="boolean" nodename="node52" />
+    </not>
+    <ifequal name="node56" type="vector2">
+      <input name="value1" type="boolean" nodename="node53" />
       <input name="value2" type="boolean" value="true" />
       <input name="in1" type="vector2" nodename="tail_pos1" />
       <input name="in2" type="vector2" interfacename="tail_pos" />
     </ifequal>
-    <output name="tail_pos2" type="vector2" nodename="node54" />
+    <output name="tail_pos2" type="vector2" nodename="node56" />
   </nodegraph>
-  <__loop__1 name="node33" type="multioutput">
+  <__loop__1 name="node34" type="multioutput">
     <input name="f" type="float" value="0" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
     <input name="sway" type="float" value="0" />
@@ -261,169 +267,169 @@
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node35" type="multioutput">
+  <__loop__1 name="node36" type="multioutput">
     <input name="f" type="float" value="1" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node33" />
+    <input name="sway" type="float" output="sway2" nodename="node34" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node33" />
+    <input name="tail" type="float" output="tail2" nodename="node34" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node33" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node34" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node37" type="multioutput">
+  <__loop__1 name="node38" type="multioutput">
     <input name="f" type="float" value="2" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node35" />
+    <input name="sway" type="float" output="sway2" nodename="node36" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node35" />
+    <input name="tail" type="float" output="tail2" nodename="node36" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node35" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node36" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node39" type="multioutput">
+  <__loop__1 name="node40" type="multioutput">
     <input name="f" type="float" value="3" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node37" />
+    <input name="sway" type="float" output="sway2" nodename="node38" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node37" />
+    <input name="tail" type="float" output="tail2" nodename="node38" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node37" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node38" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node41" type="multioutput">
+  <__loop__1 name="node42" type="multioutput">
     <input name="f" type="float" value="4" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node39" />
+    <input name="sway" type="float" output="sway2" nodename="node40" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node39" />
+    <input name="tail" type="float" output="tail2" nodename="node40" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node39" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node40" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node43" type="multioutput">
+  <__loop__1 name="node44" type="multioutput">
     <input name="f" type="float" value="5" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node41" />
+    <input name="sway" type="float" output="sway2" nodename="node42" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node41" />
+    <input name="tail" type="float" output="tail2" nodename="node42" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node41" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node42" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node45" type="multioutput">
+  <__loop__1 name="node46" type="multioutput">
     <input name="f" type="float" value="6" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node43" />
+    <input name="sway" type="float" output="sway2" nodename="node44" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node43" />
+    <input name="tail" type="float" output="tail2" nodename="node44" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node43" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node44" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node47" type="multioutput">
+  <__loop__1 name="node48" type="multioutput">
     <input name="f" type="float" value="7" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node45" />
+    <input name="sway" type="float" output="sway2" nodename="node46" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node45" />
+    <input name="tail" type="float" output="tail2" nodename="node46" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node45" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node46" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node49" type="multioutput">
+  <__loop__1 name="node50" type="multioutput">
     <input name="f" type="float" value="8" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node47" />
+    <input name="sway" type="float" output="sway2" nodename="node48" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node47" />
+    <input name="tail" type="float" output="tail2" nodename="node48" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node47" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node48" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node51" type="multioutput">
+  <__loop__1 name="node52" type="multioutput">
     <input name="f" type="float" value="9" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node49" />
+    <input name="sway" type="float" output="sway2" nodename="node50" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node49" />
+    <input name="tail" type="float" output="tail2" nodename="node50" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node49" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node50" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
-  <__loop__1 name="node53" type="multioutput">
+  <__loop__1 name="node54" type="multioutput">
     <input name="f" type="float" value="10" />
     <input name="CHANNEL" type="float" nodename="CHANNEL" />
-    <input name="sway" type="float" output="sway2" nodename="node51" />
+    <input name="sway" type="float" output="sway2" nodename="node52" />
     <input name="progress" type="float" nodename="progress4" />
     <input name="CHANNEL_LEFT" type="float" nodename="CHANNEL_LEFT" />
     <input name="CHANNEL_RGHT" type="float" nodename="CHANNEL_RGHT" />
     <input name="CHANNEL_MIDDLE" type="float" nodename="CHANNEL_MIDDLE" />
     <input name="UV" type="vector2" nodename="UV" />
-    <input name="tail" type="float" output="tail2" nodename="node51" />
+    <input name="tail" type="float" output="tail2" nodename="node52" />
     <input name="TAIL_SIZE" type="float" nodename="TAIL_SIZE" />
-    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node51" />
+    <input name="tail_pos" type="vector2" output="tail_pos2" nodename="node52" />
     <output name="sway2" type="float" />
     <output name="tail2" type="float" />
     <output name="tail_pos2" type="vector2" />
   </__loop__1>
   <add name="node57" type="float">
     <input name="in1" type="float" nodename="CHANNEL_MIDDLE" />
-    <input name="in2" type="float" output="sway2" nodename="node53" />
+    <input name="in2" type="float" output="sway2" nodename="node54" />
   </add>
   <combine2 name="drop_pos" type="vector2">
     <input name="in1" type="float" nodename="node57" />
@@ -434,97 +440,103 @@
     <input name="in2" type="vector2" nodename="UV" />
   </distance>
   <ifgreatereq name="node63" type="boolean">
-    <input name="value1" type="float" value="0.015" />
-    <input name="value2" type="float" nodename="to_drop" />
+    <input name="value1" type="float" nodename="to_drop" />
+    <input name="value2" type="float" value="0.015" />
   </ifgreatereq>
+  <not name="node64" type="boolean">
+    <input name="in" type="boolean" nodename="node63" />
+  </not>
   <ifequal name="drop" type="float">
-    <input name="value1" type="boolean" nodename="node63" />
+    <input name="value1" type="boolean" nodename="node64" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
   </ifequal>
-  <extract name="node67" type="float">
-    <input name="in" type="vector2" output="tail_pos2" nodename="node53" />
+  <extract name="node68" type="float">
+    <input name="in" type="vector2" output="tail_pos2" nodename="node54" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <ifgreatereq name="node69" type="boolean">
-    <input name="value1" type="float" nodename="progress4" />
-    <input name="value2" type="float" nodename="node67" />
+  <ifgreatereq name="node70" type="boolean">
+    <input name="value1" type="float" nodename="node68" />
+    <input name="value2" type="float" nodename="progress4" />
   </ifgreatereq>
-  <clamp name="node70" type="float">
-    <input name="in" type="float" output="tail2" nodename="node53" />
+  <not name="node71" type="boolean">
+    <input name="in" type="boolean" nodename="node70" />
+  </not>
+  <clamp name="node75" type="float">
+    <input name="in" type="float" output="tail2" nodename="node54" />
   </clamp>
-  <ifequal name="node73" type="float">
-    <input name="value1" type="boolean" nodename="node69" />
+  <ifequal name="node74" type="float">
+    <input name="value1" type="boolean" nodename="node71" />
     <input name="value2" type="boolean" value="true" />
-    <input name="in1" type="float" nodename="node70" />
+    <input name="in1" type="float" nodename="node75" />
     <input name="in2" type="float" value="0" />
   </ifequal>
-  <subtract name="node76" type="float">
+  <subtract name="node78" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" nodename="drop" />
   </subtract>
   <multiply name="in_tail" type="float">
-    <input name="in1" type="float" nodename="node73" />
-    <input name="in2" type="float" nodename="node76" />
+    <input name="in1" type="float" nodename="node74" />
+    <input name="in2" type="float" nodename="node78" />
   </multiply>
-  <extract name="node80" type="float">
+  <extract name="node82" type="float">
     <input name="in" type="vector2" nodename="UV" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <subtract name="node81" type="float">
+  <subtract name="node83" type="float">
     <input name="in1" type="float" nodename="progress4" />
-    <input name="in2" type="float" nodename="node80" />
+    <input name="in2" type="float" nodename="node82" />
   </subtract>
-  <divide name="node84" type="float">
+  <divide name="node86" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="1.25" />
   </divide>
-  <multiply name="node85" type="float">
-    <input name="in1" type="float" nodename="node81" />
-    <input name="in2" type="float" nodename="node84" />
-  </multiply>
   <multiply name="node87" type="float">
-    <input name="in1" type="float" nodename="node85" />
+    <input name="in1" type="float" nodename="node83" />
+    <input name="in2" type="float" nodename="node86" />
+  </multiply>
+  <multiply name="node89" type="float">
+    <input name="in1" type="float" nodename="node87" />
     <input name="in2" type="float" nodename="in_tail" />
   </multiply>
   <subtract name="tail14" type="float">
     <input name="in1" type="float" nodename="in_tail" />
-    <input name="in2" type="float" nodename="node87" />
+    <input name="in2" type="float" nodename="node89" />
   </subtract>
   <clamp name="tail15" type="float">
     <input name="in" type="float" nodename="tail14" />
   </clamp>
   <distance name="to_tail" type="float">
-    <input name="in1" type="vector2" output="tail_pos2" nodename="node53" />
+    <input name="in1" type="vector2" output="tail_pos2" nodename="node54" />
     <input name="in2" type="vector2" nodename="UV" />
   </distance>
-  <extract name="node92" type="float">
-    <input name="in" type="vector2" output="tail_pos2" nodename="node53" />
+  <extract name="node94" type="float">
+    <input name="in" type="vector2" output="tail_pos2" nodename="node54" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node94" type="float">
+  <extract name="node96" type="float">
     <input name="in" type="vector2" nodename="UV" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <subtract name="node95" type="float">
-    <input name="in1" type="float" nodename="node92" />
-    <input name="in2" type="float" nodename="node94" />
+  <subtract name="node97" type="float">
+    <input name="in1" type="float" nodename="node94" />
+    <input name="in2" type="float" nodename="node96" />
   </subtract>
-  <divide name="node97" type="float">
-    <input name="in1" type="float" nodename="node95" />
+  <divide name="node99" type="float">
+    <input name="in1" type="float" nodename="node97" />
     <input name="in2" type="float" nodename="TAIL_SIZE" />
   </divide>
   <combine2 name="tail_norm" type="vector2">
-    <input name="in1" type="float" nodename="node97" />
+    <input name="in1" type="float" nodename="node99" />
     <input name="in2" type="float" value="0" />
   </combine2>
-  <ifgreater name="node101" type="boolean">
+  <ifgreater name="node103" type="boolean">
     <input name="value1" type="float" nodename="in_tail" />
     <input name="value2" type="float" value="0.5" />
   </ifgreater>
   <ifequal name="tail_norm2" type="vector2">
-    <input name="value1" type="boolean" nodename="node101" />
+    <input name="value1" type="boolean" nodename="node103" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="vector2" nodename="tail_norm" />
     <input name="in2" type="vector2" value="0, 0" />
@@ -534,145 +546,157 @@
     <input name="bg" type="vector2" nodename="tail_norm2" />
     <input name="mix" type="float" nodename="tail15" />
   </mix>
-  <subtract name="node113" type="vector2">
+  <subtract name="node115" type="vector2">
     <input name="in1" type="vector2" nodename="drop_pos" />
     <input name="in2" type="vector2" nodename="UV" />
   </subtract>
   <divide name="drop_norm" type="vector2">
-    <input name="in1" type="vector2" nodename="node113" />
+    <input name="in1" type="vector2" nodename="node115" />
     <input name="in2" type="float" value="0.015" />
   </divide>
-  <ifgreatereq name="node117" type="boolean">
-    <input name="value1" type="float" value="0.015" />
-    <input name="value2" type="float" nodename="to_drop" />
+  <ifgreatereq name="node119" type="boolean">
+    <input name="value1" type="float" nodename="to_drop" />
+    <input name="value2" type="float" value="0.015" />
   </ifgreatereq>
+  <not name="node120" type="boolean">
+    <input name="in" type="boolean" nodename="node119" />
+  </not>
   <ifequal name="drop_norm2" type="vector2">
-    <input name="value1" type="boolean" nodename="node117" />
+    <input name="value1" type="boolean" nodename="node120" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="vector2" nodename="drop_norm" />
     <input name="in2" type="vector2" value="0, 0" />
   </ifequal>
-  <convert name="node124" type="vector2">
+  <convert name="node126" type="vector2">
     <input name="in" type="float" value="1" />
   </convert>
   <subtract name="inv_uv" type="vector2">
-    <input name="in1" type="vector2" nodename="node124" />
+    <input name="in1" type="vector2" nodename="node126" />
     <input name="in2" type="vector2" nodename="UV" />
   </subtract>
-  <extract name="node126" type="float">
+  <extract name="node129" type="float">
     <input name="in" type="vector2" nodename="inv_uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node128" type="float">
+  <extract name="node131" type="float">
     <input name="in" type="vector2" nodename="UV" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node130" type="float">
-    <input name="in" type="vector2" output="tail_pos2" nodename="node53" />
+  <extract name="node133" type="float">
+    <input name="in" type="vector2" output="tail_pos2" nodename="node54" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <subtract name="node131" type="float">
-    <input name="in1" type="float" nodename="node128" />
-    <input name="in2" type="float" nodename="node130" />
-  </subtract>
-  <multiply name="node133" type="float">
+  <subtract name="node134" type="float">
     <input name="in1" type="float" nodename="node131" />
+    <input name="in2" type="float" nodename="node133" />
+  </subtract>
+  <multiply name="node136" type="float">
+    <input name="in1" type="float" nodename="node134" />
     <input name="in2" type="float" value="5" />
   </multiply>
-  <add name="node134" type="float">
-    <input name="in1" type="float" nodename="node126" />
-    <input name="in2" type="float" nodename="node133" />
+  <add name="node137" type="float">
+    <input name="in1" type="float" nodename="node129" />
+    <input name="in2" type="float" nodename="node136" />
   </add>
-  <extract name="node136" type="float">
+  <extract name="node139" type="float">
     <input name="in" type="vector2" nodename="inv_uv" />
     <input name="index" type="integer" value="1" />
   </extract>
   <combine2 name="tail_uv" type="vector2">
-    <input name="in1" type="float" nodename="node134" />
-    <input name="in2" type="float" nodename="node136" />
+    <input name="in1" type="float" nodename="node137" />
+    <input name="in2" type="float" nodename="node139" />
   </combine2>
-  <extract name="node138" type="float">
+  <extract name="node141" type="float">
     <input name="in" type="vector2" nodename="tail_uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <randomfloat name="node139" type="float">
-    <input name="in" type="float" nodename="node141" />
-    <input name="min" type="float" nodename="node143" />
-    <input name="max" type="float" value="0.01" />
-    <input name="seed" type="integer" value="2" />
-  </randomfloat>
-  <extract name="node141" type="float">
+  <extract name="node143" type="float">
     <input name="in" type="vector2" nodename="UV" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <subtract name="node143" type="float">
+  <subtract name="node145" type="float">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="0.01" />
   </subtract>
-  <add name="node146" type="float">
-    <input name="in1" type="float" nodename="node138" />
-    <input name="in2" type="float" nodename="node139" />
+  <randomfloat name="node148" type="float">
+    <input name="in" type="float" nodename="node143" />
+    <input name="min" type="float" nodename="node145" />
+    <input name="max" type="float" value="0.01" />
+    <input name="seed" type="integer" value="2" />
+  </randomfloat>
+  <add name="node149" type="float">
+    <input name="in1" type="float" nodename="node141" />
+    <input name="in2" type="float" nodename="node148" />
   </add>
-  <extract name="node147" type="float">
+  <extract name="node150" type="float">
     <input name="in" type="vector2" nodename="tail_uv" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node148" type="float">
+  <extract name="node151" type="float">
     <input name="in" type="vector2" nodename="tail_uv" />
     <input name="index" type="integer" value="1" />
   </extract>
   <combine2 name="tail_uv2" type="vector2">
-    <input name="in1" type="float" nodename="node146" />
-    <input name="in2" type="float" nodename="node148" />
+    <input name="in1" type="float" nodename="node149" />
+    <input name="in2" type="float" nodename="node151" />
   </combine2>
-  <ifgreater name="node151" type="boolean">
+  <ifgreater name="node154" type="boolean">
     <input name="value1" type="float" nodename="in_tail" />
     <input name="value2" type="float" value="0.5" />
   </ifgreater>
   <ifequal name="tail_uv3" type="vector2">
-    <input name="value1" type="boolean" nodename="node151" />
+    <input name="value1" type="boolean" nodename="node154" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="vector2" nodename="tail_uv2" />
     <input name="in2" type="vector2" nodename="inv_uv" />
   </ifequal>
-  <subtract name="node157" type="vector2">
+  <subtract name="node160" type="vector2">
     <input name="in1" type="vector2" nodename="UV" />
     <input name="in2" type="vector2" nodename="drop_pos" />
   </subtract>
-  <multiply name="node159" type="vector2">
-    <input name="in1" type="vector2" nodename="node157" />
+  <multiply name="node162" type="vector2">
+    <input name="in1" type="vector2" nodename="node160" />
     <input name="in2" type="float" value="10" />
   </multiply>
   <add name="drop_uv" type="vector2">
     <input name="in1" type="vector2" nodename="inv_uv" />
-    <input name="in2" type="vector2" nodename="node159" />
+    <input name="in2" type="vector2" nodename="node162" />
   </add>
-  <ifgreatereq name="node162" type="boolean">
-    <input name="value1" type="float" value="0.015" />
-    <input name="value2" type="float" nodename="to_drop" />
+  <ifgreatereq name="node165" type="boolean">
+    <input name="value1" type="float" nodename="to_drop" />
+    <input name="value2" type="float" value="0.015" />
   </ifgreatereq>
+  <not name="node166" type="boolean">
+    <input name="in" type="boolean" nodename="node165" />
+  </not>
   <ifequal name="drop_uv2" type="vector2">
-    <input name="value1" type="boolean" nodename="node162" />
+    <input name="value1" type="boolean" nodename="node166" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="vector2" nodename="drop_uv" />
     <input name="in2" type="vector2" nodename="inv_uv" />
   </ifequal>
-  <ifgreatereq name="node167" type="boolean">
-    <input name="value1" type="float" value="0.015" />
-    <input name="value2" type="float" nodename="to_drop" />
+  <ifgreatereq name="node171" type="boolean">
+    <input name="value1" type="float" nodename="to_drop" />
+    <input name="value2" type="float" value="0.015" />
   </ifgreatereq>
+  <not name="node172" type="boolean">
+    <input name="in" type="boolean" nodename="node171" />
+  </not>
   <ifequal name="drop_and_tail_norm" type="vector2">
-    <input name="value1" type="boolean" nodename="node167" />
+    <input name="value1" type="boolean" nodename="node172" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="vector2" nodename="drop_norm2" />
     <input name="in2" type="vector2" nodename="tail_norm3" />
   </ifequal>
-  <ifgreatereq name="node172" type="boolean">
-    <input name="value1" type="float" value="0.015" />
-    <input name="value2" type="float" nodename="to_drop" />
+  <ifgreatereq name="node177" type="boolean">
+    <input name="value1" type="float" nodename="to_drop" />
+    <input name="value2" type="float" value="0.015" />
   </ifgreatereq>
+  <not name="node178" type="boolean">
+    <input name="in" type="boolean" nodename="node177" />
+  </not>
   <ifequal name="clear_uv2" type="vector2">
-    <input name="value1" type="boolean" nodename="node172" />
+    <input name="value1" type="boolean" nodename="node178" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="vector2" nodename="drop_uv2" />
     <input name="in2" type="vector2" nodename="inv_uv" />
@@ -689,36 +713,36 @@
     <input name="in1" type="color3" nodename="clear" />
     <input name="in2" type="float" value="1.2" />
   </multiply>
-  <clamp name="clarity" type="float">
-    <input name="in" type="float" nodename="node188" />
-  </clamp>
-  <multiply name="node184" type="float">
+  <multiply name="node189" type="float">
     <input name="in1" type="float" nodename="drop" />
     <input name="in2" type="float" value="1" />
   </multiply>
-  <multiply name="node187" type="float">
+  <multiply name="node192" type="float">
     <input name="in1" type="float" nodename="tail15" />
     <input name="in2" type="float" value="0.8" />
   </multiply>
-  <add name="node188" type="float">
-    <input name="in1" type="float" nodename="node184" />
-    <input name="in2" type="float" nodename="node187" />
+  <add name="node193" type="float">
+    <input name="in1" type="float" nodename="node189" />
+    <input name="in2" type="float" nodename="node192" />
   </add>
-  <multiply name="node191" type="float">
+  <clamp name="clarity" type="float">
+    <input name="in" type="float" nodename="node193" />
+  </clamp>
+  <multiply name="node197" type="float">
     <input name="in1" type="float" nodename="drop" />
     <input name="in2" type="float" value="1" />
   </multiply>
-  <multiply name="node194" type="float">
+  <multiply name="node200" type="float">
     <input name="in1" type="float" nodename="tail15" />
     <input name="in2" type="float" value="0.5" />
   </multiply>
-  <add name="node195" type="float">
-    <input name="in1" type="float" nodename="node191" />
-    <input name="in2" type="float" nodename="node194" />
+  <add name="node201" type="float">
+    <input name="in1" type="float" nodename="node197" />
+    <input name="in2" type="float" nodename="node200" />
   </add>
   <subtract name="roughness" type="float">
     <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="node195" />
+    <input name="in2" type="float" nodename="node201" />
   </subtract>
   <mix name="base_color" type="color3">
     <input name="fg" type="color3" nodename="blurred2" />
@@ -727,50 +751,50 @@
   </mix>
   <standard_surface name="surface" type="surfaceshader">
     <input name="base_color" type="color3" nodename="base_color" />
-    <input name="specular_roughness" type="float" nodename="node200" />
-    <input name="normal" type="vector3" nodename="node215" />
+    <input name="specular_roughness" type="float" nodename="node211" />
+    <input name="normal" type="vector3" nodename="node221" />
   </standard_surface>
-  <clamp name="node200" type="float">
-    <input name="in" type="float" nodename="node203" />
-  </clamp>
-  <add name="node203" type="float">
+  <add name="node208" type="float">
     <input name="in1" type="float" value="0.2" />
     <input name="in2" type="float" nodename="roughness" />
   </add>
-  <normal name="node204" type="vector3">
+  <clamp name="node211" type="float">
+    <input name="in" type="float" nodename="node208" />
+  </clamp>
+  <normal name="node210" type="vector3">
     <input name="space" type="string" value="world" />
   </normal>
-  <extract name="node206" type="float">
-    <input name="in" type="vector3" nodename="node204" />
-    <input name="index" type="integer" value="0" />
-  </extract>
-  <extract name="node208" type="float">
-    <input name="in" type="vector2" nodename="drop_and_tail_norm" />
-    <input name="index" type="integer" value="1" />
-  </extract>
-  <extract name="node209" type="float">
-    <input name="in" type="vector2" nodename="drop_and_tail_norm" />
-    <input name="index" type="integer" value="0" />
-  </extract>
-  <combine2 name="node210" type="vector2">
-    <input name="in1" type="float" nodename="node208" />
-    <input name="in2" type="float" nodename="node209" />
-  </combine2>
-  <divide name="node212" type="vector2">
-    <input name="in1" type="vector2" nodename="node210" />
-    <input name="in2" type="float" value="2" />
-  </divide>
-  <extract name="node213" type="float">
-    <input name="in" type="vector2" nodename="node212" />
+  <extract name="node212" type="float">
+    <input name="in" type="vector3" nodename="node210" />
     <input name="index" type="integer" value="0" />
   </extract>
   <extract name="node214" type="float">
-    <input name="in" type="vector2" nodename="node212" />
+    <input name="in" type="vector2" nodename="drop_and_tail_norm" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <combine3 name="node215" type="vector3">
-    <input name="in1" type="float" nodename="node206" />
-    <input name="in2" type="float" nodename="node213" />
-    <input name="in3" type="float" nodename="node214" />
+  <extract name="node215" type="float">
+    <input name="in" type="vector2" nodename="drop_and_tail_norm" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <combine2 name="node216" type="vector2">
+    <input name="in1" type="float" nodename="node214" />
+    <input name="in2" type="float" nodename="node215" />
+  </combine2>
+  <divide name="node218" type="vector2">
+    <input name="in1" type="vector2" nodename="node216" />
+    <input name="in2" type="float" value="2" />
+  </divide>
+  <extract name="node219" type="float">
+    <input name="in" type="vector2" nodename="node218" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="node220" type="float">
+    <input name="in" type="vector2" nodename="node218" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <combine3 name="node221" type="vector3">
+    <input name="in1" type="float" nodename="node212" />
+    <input name="in2" type="float" nodename="node219" />
+    <input name="in3" type="float" nodename="node220" />
   </combine3>
 </materialx>

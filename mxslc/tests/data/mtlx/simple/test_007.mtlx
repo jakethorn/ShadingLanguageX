@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <convert name="node6" type="vector3">
+  <convert name="node2" type="vector3">
     <input name="in" type="float" value="1" />
   </convert>
   <multiply name="my_vec" type="vector3">
-    <input name="in1" type="vector3" nodename="node6" />
+    <input name="in1" type="vector3" nodename="node2" />
     <input name="in2" type="vector3" value="2, 3, 4" />
   </multiply>
 </materialx>

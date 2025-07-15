@@ -5,9 +5,9 @@
     <input name="t" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_palette" nodedef="ND_palette">
-    <cos name="node15" type="vector3">
-      <input name="in" type="vector3" nodename="node23" />
-    </cos>
+    <convert name="node16" type="vector3">
+      <input name="in" type="float" value="6.28318" />
+    </convert>
     <multiply name="node19" type="vector3">
       <input name="in1" type="vector3" value="1, 1, 1" />
       <input name="in2" type="float" interfacename="t" />
@@ -16,16 +16,16 @@
       <input name="in1" type="vector3" nodename="node19" />
       <input name="in2" type="vector3" value="0.263, 0.416, 0.557" />
     </add>
-    <convert name="node22" type="vector3">
-      <input name="in" type="float" value="6.28318" />
-    </convert>
-    <multiply name="node23" type="vector3">
-      <input name="in1" type="vector3" nodename="node22" />
+    <multiply name="node22" type="vector3">
+      <input name="in1" type="vector3" nodename="node16" />
       <input name="in2" type="vector3" nodename="node21" />
     </multiply>
+    <cos name="node23" type="vector3">
+      <input name="in" type="vector3" nodename="node22" />
+    </cos>
     <multiply name="node24" type="vector3">
       <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
-      <input name="in2" type="vector3" nodename="node15" />
+      <input name="in2" type="vector3" nodename="node23" />
     </multiply>
     <add name="node25" type="vector3">
       <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
@@ -49,15 +49,15 @@
     <input name="uv" type="vector2" value="0, 0" />
   </nodedef>
   <nodegraph name="NG_update_uv" nodedef="ND_update_uv">
-    <fract_v2 name="node1" type="vector2">
-      <input name="v2" type="vector2" nodename="node4" />
-    </fract_v2>
-    <multiply name="node4" type="vector2">
+    <multiply name="node3" type="vector2">
       <input name="in1" type="vector2" interfacename="uv" />
       <input name="in2" type="float" value="1.5" />
     </multiply>
+    <fract_v2 name="node4" type="vector2">
+      <input name="v2" type="vector2" nodename="node3" />
+    </fract_v2>
     <subtract name="node6" type="vector2">
-      <input name="in1" type="vector2" nodename="node1" />
+      <input name="in1" type="vector2" nodename="node4" />
       <input name="in2" type="float" value="0.5" />
     </subtract>
     <output name="out" type="vector2" nodename="node6" />
@@ -70,60 +70,60 @@
     <input name="finalColor" type="vector3" value="0, 0, 0" />
   </nodedef>
   <nodegraph name="NG_update_finalColor" nodedef="ND_update_finalColor">
-    <magnitude name="node1" type="float">
+    <magnitude name="node2" type="float">
       <input name="in" type="vector2" interfacename="uv" />
     </magnitude>
-    <exp name="node3" type="float">
-      <input name="in" type="float" nodename="node6" />
-    </exp>
     <magnitude name="node4" type="float">
       <input name="in" type="vector2" interfacename="uv0" />
     </magnitude>
-    <subtract name="node6" type="float">
+    <subtract name="node5" type="float">
       <input name="in1" type="float" value="0" />
       <input name="in2" type="float" nodename="node4" />
     </subtract>
+    <exp name="node6" type="float">
+      <input name="in" type="float" nodename="node5" />
+    </exp>
     <multiply name="d" type="float">
-      <input name="in1" type="float" nodename="node1" />
-      <input name="in2" type="float" nodename="node3" />
+      <input name="in1" type="float" nodename="node2" />
+      <input name="in2" type="float" nodename="node6" />
     </multiply>
-    <palette name="col" type="vector3">
-      <input name="t" type="float" nodename="node17" />
-    </palette>
     <magnitude name="node8" type="float">
       <input name="in" type="vector2" interfacename="uv0" />
     </magnitude>
-    <multiply name="node12" type="float">
+    <multiply name="node11" type="float">
       <input name="in1" type="float" interfacename="i" />
       <input name="in2" type="float" value="0.4" />
     </multiply>
-    <add name="node13" type="float">
+    <add name="node12" type="float">
       <input name="in1" type="float" nodename="node8" />
-      <input name="in2" type="float" nodename="node12" />
+      <input name="in2" type="float" nodename="node11" />
     </add>
     <time name="node14" type="float" />
-    <multiply name="node16" type="float">
+    <multiply name="node15" type="float">
       <input name="in1" type="float" nodename="node14" />
       <input name="in2" type="float" value="0.4" />
     </multiply>
-    <add name="node17" type="float">
-      <input name="in1" type="float" nodename="node13" />
-      <input name="in2" type="float" nodename="node16" />
+    <add name="node16" type="float">
+      <input name="in1" type="float" nodename="node12" />
+      <input name="in2" type="float" nodename="node15" />
     </add>
-    <sin name="node7" type="float">
-      <input name="in" type="float" nodename="node22" />
-    </sin>
-    <multiply name="node20" type="float">
+    <palette name="col" type="vector3">
+      <input name="t" type="float" nodename="node16" />
+    </palette>
+    <multiply name="node19" type="float">
       <input name="in1" type="float" nodename="d" />
       <input name="in2" type="float" value="8" />
     </multiply>
     <time name="node21" type="float" />
-    <add name="node22" type="float">
-      <input name="in1" type="float" nodename="node20" />
+    <add name="node20" type="float">
+      <input name="in1" type="float" nodename="node19" />
       <input name="in2" type="float" nodename="node21" />
     </add>
+    <sin name="node22" type="float">
+      <input name="in" type="float" nodename="node20" />
+    </sin>
     <divide name="d2" type="float">
-      <input name="in1" type="float" nodename="node7" />
+      <input name="in1" type="float" nodename="node22" />
       <input name="in2" type="float" value="8" />
     </divide>
     <absval name="d3" type="float">

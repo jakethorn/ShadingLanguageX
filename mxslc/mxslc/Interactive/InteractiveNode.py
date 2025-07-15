@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import Type
-
 import MaterialX as mx
 
 from .InteractiveExpression import InteractiveExpression
 from .mx_interactive_types import Value
-from ..Expressions import ArithmeticExpression, LogicExpression, ComparisonExpression, UnaryExpression, IndexingExpression
+from ..Expressions import UnaryExpression, IndexingExpression, BinaryExpression
 from ..Token import Token
 from ..mx_wrapper import Node
 
@@ -23,49 +21,49 @@ class InteractiveNode:
         return self.__node
 
     def __add__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ArithmeticExpression, self.__node, "+", other)
+        return _binary_expr(self.__node, "+", other)
 
     def __sub__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ArithmeticExpression, self.__node, "-", other)
+        return _binary_expr(self.__node, "-", other)
 
     def __mul__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ArithmeticExpression, self.__node, "*", other)
+        return _binary_expr(self.__node, "*", other)
 
     def __truediv__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ArithmeticExpression, self.__node, "/", other)
+        return _binary_expr(self.__node, "/", other)
 
     def __pow__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ArithmeticExpression, self.__node, "^", other)
+        return _binary_expr(self.__node, "^", other)
 
     def __mod__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ArithmeticExpression, self.__node, "%", other)
+        return _binary_expr(self.__node, "%", other)
 
     def __and__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(LogicExpression, self.__node, "&", other)
+        return _binary_expr(self.__node, "&", other)
 
     def __or__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(LogicExpression, self.__node, "|", other)
+        return _binary_expr(self.__node, "|", other)
 
     def __xor__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(LogicExpression, self.__node, "^", other)
+        return _binary_expr(self.__node, "^", other)
 
     def __eq__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ComparisonExpression, self.__node, "==", other)
+        return _binary_expr(self.__node, "==", other)
 
     def __ne__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ComparisonExpression, self.__node, "!=", other)
+        return _binary_expr(self.__node, "!=", other)
 
     def __lt__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ComparisonExpression, self.__node, "<", other)
+        return _binary_expr(self.__node, "<", other)
 
     def __le__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ComparisonExpression, self.__node, "<=", other)
+        return _binary_expr(self.__node, "<=", other)
 
     def __gt__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ComparisonExpression, self.__node, ">", other)
+        return _binary_expr(self.__node, ">", other)
 
     def __ge__(self, other: Value) -> InteractiveNode:
-        return _binary_expr(ComparisonExpression, self.__node, ">=", other)
+        return _binary_expr(self.__node, ">=", other)
 
     def __neg__(self) -> InteractiveNode:
         right = InteractiveExpression(self.__node)
@@ -88,8 +86,8 @@ class InteractiveNode:
         raise NotImplementedError()
 
 
-def _binary_expr(expr_type: Type, left: Value, op: str, right: Value) -> InteractiveNode:
+def _binary_expr(left: Value, op: str, right: Value) -> InteractiveNode:
     left = InteractiveExpression(left)
     right = InteractiveExpression(right)
-    expr = expr_type(left, Token(op), right)
+    expr = BinaryExpression(left, Token(op), right)
     return InteractiveNode(expr.evaluate())
