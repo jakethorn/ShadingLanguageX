@@ -37,6 +37,7 @@ class BinaryExpression(FunctionCall):
         self.__right = right
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
+        # TODO this allows the following: float * vec3 (for example)
         try:
             super()._init_subexpr(valid_types)
         except CompileError as e:
@@ -49,6 +50,7 @@ class BinaryExpression(FunctionCall):
                 raise e
 
     def _init(self, valid_types: set[DataType]) -> None:
+        # TODO this allows the following: float * vec3 (for example)
         try:
             super()._init(valid_types)
         except CompileError as e:

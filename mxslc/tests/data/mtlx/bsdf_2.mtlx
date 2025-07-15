@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <burley_diffuse_bsdf name="bsdf1" type="BSDF" />
+  <multiply name="bsdf2" type="BSDF">
+    <input name="in1" type="BSDF" nodename="bsdf1" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <translucent_bsdf name="bsdf3" type="BSDF" />
+  <add name="bsdf4" type="BSDF">
+    <input name="in1" type="BSDF" nodename="bsdf2" />
+    <input name="in2" type="BSDF" nodename="bsdf3" />
+  </add>
+</materialx>

@@ -1,0 +1,5 @@
+BSDF bsdf1 = burley_diffuse_bsdf();
+bsdf1 *= 0.5;
+
+BSDF bsdf2 = translucent_bsdf();
+BSDF bsdf3 = bsdf1 + bsdf2;

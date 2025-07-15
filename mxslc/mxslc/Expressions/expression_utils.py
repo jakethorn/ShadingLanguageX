@@ -3,18 +3,9 @@ from ..CompileError import CompileError
 from ..DataType import DataType
 
 
-def try_init(expr: Expression, valid_types: set[DataType]) -> Exception:
-    error = None
-    try:
-        expr.init(valid_types)
-    except CompileError as e:
-        error = e
-    return error
-
-
 def init_linked_expressions(expr1: Expression, expr2: Expression, valid_types: set[DataType]) -> None:
-    error1 = try_init(expr1, valid_types)
-    error2 = try_init(expr2, valid_types)
+    error1 = expr1.try_init(valid_types)
+    error2 = expr2.try_init(valid_types)
     if error1 and error2:
         raise error1
     elif error1:

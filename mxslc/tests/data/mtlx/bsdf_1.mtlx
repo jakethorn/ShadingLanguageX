@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <oren_nayar_diffuse_bsdf name="diff_bsdf" type="BSDF">
+    <input name="weight" type="float" value="1" />
+    <input name="color" type="color3" value="0.5, 0.5, 0.5" />
+    <input name="roughness" type="float" value="0" />
+  </oren_nayar_diffuse_bsdf>
+  <multiply name="diff_bsdf_tint" type="BSDF">
+    <input name="in1" type="BSDF" nodename="diff_bsdf" />
+    <input name="in2" type="color3" value="0.5, 0.3, 0.2" />
+  </multiply>
+</materialx>

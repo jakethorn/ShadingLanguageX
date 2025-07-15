@@ -29,7 +29,7 @@ class FunctionCall(Expression):
         return FunctionCall(self.__identifier, data_type, args)
 
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
-        # TODO this can be improved by trying to all initialise args and then filtering the function based on the initiliased ones
+        # TODO this can be improved by trying to all initialise args and then filtering the function based on the initialised ones
         error = None
         for arg in self.__args:
             param_index = arg.position if arg.is_positional else arg.name

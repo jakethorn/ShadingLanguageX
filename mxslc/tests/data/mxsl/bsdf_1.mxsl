@@ -1,0 +1,7 @@
+BSDF diff_bsdf = oren_nayar_diffuse_bsdf(
+	color=color3(0.5, 0.5, 0.5),
+	weight=1.0,
+	roughness=0.0
+);
+
+BSDF diff_bsdf_tint = diff_bsdf * color3(0.5, 0.3, 0.2);
