@@ -7,6 +7,7 @@ from ..Token import Token
 
 class VariableDeclaration(Statement):
     def __init__(self, data_type: Token | DataType, identifier: Token, right: Expression):
+        super().__init__()
         self.__data_type = DataType(data_type)
         self.__identifier = identifier
         self.__right = right
@@ -19,6 +20,7 @@ class VariableDeclaration(Statement):
     def execute(self) -> None:
         node = self.__right.init_evaluate(self.__data_type)
         state.add_node(self.__identifier, node)
+        self._add_attributes_to_node(node)
 
     def __str__(self) -> str:
         return f"{self.__data_type} {self.__identifier} = {self.__right};"

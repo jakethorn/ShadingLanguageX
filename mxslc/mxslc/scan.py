@@ -57,7 +57,7 @@ class Scanner:
         if comment := self.__get_line_comment():
             return self.__token(COMMENT, comment)
         char = self.__peek()
-        if char in ["(", ")", "{", "}", "[", "]", ".", ",", ":", ";", EOL]:
+        if char in ["(", ")", "{", "}", "[", "]", ".", ",", ":", ";", "@", EOL]:
             return self.__token(char)
         if char in ["!", "=", ">", "<", "+", "-", "*", "/", "%", "^", "&", "|"]:
             if self.__peek_next() == "=":

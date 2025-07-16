@@ -5,6 +5,7 @@ from ..Expressions import Expression
 
 class ExpressionStatement(Statement):
     def __init__(self, expr: Expression):
+        super().__init__()
         self.__expr = expr
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
@@ -12,4 +13,5 @@ class ExpressionStatement(Statement):
         return ExpressionStatement(expr)
 
     def execute(self) -> None:
-        self.__expr.init_evaluate()
+        node = self.__expr.init_evaluate()
+        self._add_attributes_to_node(node)

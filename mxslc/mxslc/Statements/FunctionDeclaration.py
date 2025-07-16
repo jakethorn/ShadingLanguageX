@@ -18,6 +18,7 @@ class FunctionDeclaration(Statement):
                  params: ParameterList | list[Parameter],
                  body: list[Statement],
                  return_expr: "Expression"):
+        super().__init__()
         self.__return_type = DataType(return_type)
         self.__identifier = identifier
         self.__template_types = {DataType(t) for t in template_types}
@@ -47,4 +48,5 @@ class FunctionDeclaration(Statement):
     def execute(self) -> None:
         for func in sorted(self.__funcs):
             func.initialise()
+            func.add_attributes(self._attribs)
             state.add_function(func)

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from . import state, node_utils
 from .Argument import Argument
+from .Attribute import Attribute
 from .CompileError import CompileError
 from .DataType import DataType, VOID
 from .Expressions import Expression
@@ -71,6 +72,14 @@ class Function:
             if output.data_type == Keyword.AUTO:
                 output.data_type = self.return_type
                 output.default = self.return_type.default()
+
+    def add_attributes(self, attribs: list[Attribute]) -> None:
+        for attrib in attribs:
+            if attrib.child is None:
+                self.__node_def.set_attribute(attrib.name, attrib.value)
+            else:
+                child = self.__node_def.get_child(attrib.child)
+                child.set_attribute(attrib.name, attrib.value)
 
     def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
         if self.name != name:

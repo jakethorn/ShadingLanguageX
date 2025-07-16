@@ -49,8 +49,17 @@ class Element:
     def create_valid_child_name(self, name: str) -> str:
         return self.source.createValidChildName(name)
 
+    def get_child(self, name: str) -> Element:
+        return Element(self.source.getChild(name))
+
     def remove(self) -> None:
         self.parent.source.removeChild(self.name)
+
+    def get_attribute(self, name: str) -> str:
+        return self.source.getAttribute(name)
+
+    def set_attribute(self, name: str, value: str) -> None:
+        self.source.setAttribute(name, value)
 
     def remove_attribute(self, name: str) -> None:
         self.source.removeAttribute(name)
@@ -330,7 +339,7 @@ class PortElement(TypedElement):
     @output_string.setter
     def output_string(self, output: str | None) -> None:
         if output is None:
-            self.source.removeAttribute("output")
+            self.remove_attribute("output")
         else:
             assert self.literal is None
             assert self.interface_name is None
@@ -347,7 +356,7 @@ class PortElement(TypedElement):
     @interface_name.setter
     def interface_name(self, name: str | None) -> None:
         if name is None:
-            self.source.removeAttribute("interfacename")
+            self.remove_attribute("interfacename")
         else:
             assert not self.is_output
             self.clear_value()
@@ -507,12 +516,12 @@ class Output(PortElement):
 
     @property
     def default(self) -> str:
-        return self.source.getAttribute("default")
+        return self.get_attribute("default")
 
     @default.setter
     def default(self, value: Uniform) -> None:
         self.clear_value()
-        self.source.setAttribute("default", str(value))
+        self.set_attribute("default", str(value))
 
     def remove(self) -> None:
         self.parent.remove_output(self.name)

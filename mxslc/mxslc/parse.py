@@ -1,4 +1,5 @@
 from .Argument import Argument
+from .Attribute import Attribute
 from .CompileError import CompileError
 from .Expressions import *
 from .Expressions.LiteralExpression import NullExpression
@@ -28,21 +29,40 @@ class Parser(TokenReader):
         return statements
 
     def __statement(self) -> Statement:
+        attribs = self.__attributes()
+        stmt = None
         token = self._peek()
         if token in Keyword.DATA_TYPES() ^ {Keyword.AUTO} and self._peek_next_next() == "=":
-            return self.__variable_declaration()
-        if token in Keyword.DATA_TYPES() ^ {Keyword.AUTO, Keyword.VOID} and self._peek_next_next() in ["(", "<"]:
-            return self.__function_declaration()
-        if token == IDENTIFIER:
+            stmt = self.__variable_declaration()
+        elif token in Keyword.DATA_TYPES() ^ {Keyword.AUTO, Keyword.VOID} and self._peek_next_next() in ["(", "<"]:
+            stmt = self.__function_declaration()
+        elif token == IDENTIFIER:
             if self._peek_next() in ["(", "<"]:
                 expr = self.__primary()
                 self._match(";")
-                return ExpressionStatement(expr)
+                stmt = ExpressionStatement(expr)
             else:
-                return self.__assignment()
-        if token == Keyword.FOR:
-            return self.__for_loop()
-        raise CompileError(f"Expected return statement, data type keyword, identifier or 'for', but found '{token.lexeme}'.", token)
+                stmt = self.__assignment()
+        elif token == Keyword.FOR:
+            stmt = self.__for_loop()
+        if stmt:
+            stmt.add_attributes(attribs)
+            return stmt
+        else:
+            raise CompileError(f"Expected return statement, data type keyword, identifier or 'for', but found '{token.lexeme}'.", token)
+
+    def __attributes(self) -> list[Attribute]:
+        attribs: list[Attribute] = []
+        while self._consume("@"):
+            if self._peek_next() == ".":
+                child = self._match(IDENTIFIER)
+                self._match(".")
+            else:
+                child = None
+            name = self._match(IDENTIFIER)
+            value = self._match(STRING_LITERAL)
+            attribs.append(Attribute(child, name, value))
+        return attribs
 
     def __variable_declaration(self) -> VariableDeclaration:
         data_type = self._match(Keyword.DATA_TYPES(), Keyword.AUTO)

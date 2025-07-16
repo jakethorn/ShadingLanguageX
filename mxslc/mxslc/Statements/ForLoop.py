@@ -14,6 +14,7 @@ from ..token_types import FLOAT_LITERAL
 
 class ForLoop(Statement):
     def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, body: list[Statement]):
+        super().__init__()
         self.__iter_var_type = DataType(iter_var_type)
         self.__identifier = identifier
         self.__start_value = start_value

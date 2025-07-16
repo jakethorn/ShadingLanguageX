@@ -10,6 +10,7 @@ from ..utils import type_of_swizzle, string
 
 class VariableAssignment(Statement):
     def __init__(self, identifier: Token, property_: str | Token | None, right: Expression):
+        super().__init__()
         self.__identifier = identifier
         self.__property = string(property_)
         self.__right = right
@@ -35,6 +36,7 @@ class VariableAssignment(Statement):
     def execute_as_identifier(self, old_node: Node) -> None:
         new_node = self.evaluate_right(old_node.data_type)
         state.set_node(self.__identifier, new_node)
+        self._add_attributes_to_node(new_node)
 
     def execute_as_surface_input(self, surface_node: Node) -> None:
         if self.__property in _standard_surface_inputs:
@@ -70,6 +72,7 @@ class VariableAssignment(Statement):
         # combine into final node
         node = node_utils.combine(data, old_node.data_type)
         state.set_node(self.__identifier, node)
+        self._add_attributes_to_node(node)
 
     def evaluate_right(self, valid_types: DataType | set[DataType]) -> Node:
         # TODO fix if expressions to work with surface/displacement shader properties
