@@ -75,6 +75,10 @@ _overwrite_all_expected = False
     ("auto_vars_3", False),
     ("bsdf_1", False),
     ("bsdf_2", False),
+    ("attributes/attributes_1", False),
+    ("attributes/attributes_2", False),
+    ("attributes/attributes_3", False),
+    ("attributes/attributes_4", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

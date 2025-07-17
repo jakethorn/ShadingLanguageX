@@ -2,7 +2,9 @@ from abc import ABC
 from collections.abc import Collection
 
 from .CompileError import CompileError
+from .Keyword import Keyword
 from .Token import Token
+from .token_types import IDENTIFIER
 
 
 class TokenReader(ABC):
@@ -52,8 +54,16 @@ class TokenReader(ABC):
         token_types = _flatten(token_types)
         if token := self._consume(token_types):
             return token
+        # raise compile error if not a match
         token = self._peek()
-        raise CompileError(f"Expected {[str(t) for t in token_types]}, but found '{token.lexeme}'.", token)
+        if token in Keyword:
+            if token_types[0] == IDENTIFIER:
+                msg = f"'{token.lexeme}' is a protected keyword and cannot be used as an identifier."
+            else:
+                msg = f"The keyword '{token.lexeme}' is used in an invalid context."
+        else:
+            msg = f"Expected {[str(t) for t in token_types]}, but found '{token.lexeme}'."
+        raise CompileError(msg, token)
 
     def __peek(self, future: int) -> Token:
         if self.__index + future >= len(self.__tokens):

@@ -64,6 +64,9 @@ class Element:
     def remove_attribute(self, name: str) -> None:
         self.source.removeAttribute(name)
 
+    def validate(self) -> tuple[bool, str]:
+        return self.source.validate()
+
     def __str__(self) -> str:
         return str(self.source)
 
@@ -422,9 +425,6 @@ class Document(GraphElement):
     @property
     def xml(self) -> str:
         return mx.writeToXmlString(self.source)
-
-    def validate(self) -> tuple[bool, str]:
-        return self.source.validate()
 
     def load_standard_library(self) -> None:
         mx.loadLibraries(mx.getDefaultDataLibraryFolders(), mx.getDefaultDataSearchPath(), self.source)

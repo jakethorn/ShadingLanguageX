@@ -1,0 +1,12 @@
+@nodegroup "math"
+@doc "adds one to in"
+@in.doc "the value to be incremented"
+@out.doc "the incremented value"
+float add_one(float in)
+{
+    return in + 1.0;
+}
+
+@_"hello world"
+@in._"alright see ya"
+float x = add_one(1.0);

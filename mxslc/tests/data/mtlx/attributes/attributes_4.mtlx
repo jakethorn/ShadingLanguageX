@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one">
+    <output name="out" type="string" default="" uniform="true" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <output name="out" type="string" value="world" />
+  </nodegraph>
+</materialx>

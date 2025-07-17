@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one">
+    <output name="out" type="float" default="0.0" />
+    <input name="in" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <add name="retval" type="float" doc="dogs dont wear hats">
+      <input name="in1" type="float" interfacename="in" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="retval" />
+  </nodegraph>
+</materialx>

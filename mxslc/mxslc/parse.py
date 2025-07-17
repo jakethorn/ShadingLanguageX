@@ -55,11 +55,11 @@ class Parser(TokenReader):
         attribs: list[Attribute] = []
         while self._consume("@"):
             if self._peek_next() == ".":
-                child = self._match(IDENTIFIER)
+                child = self._match([k for k in Keyword], IDENTIFIER)
                 self._match(".")
             else:
                 child = None
-            name = self._match(IDENTIFIER)
+            name = self._match([k for k in Keyword], IDENTIFIER)
             value = self._match(STRING_LITERAL)
             attribs.append(Attribute(child, name, value))
         return attribs

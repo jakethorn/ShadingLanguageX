@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
+    <output name="out" type="float" default="0.0" doc="the incremented value" />
+    <input name="in" type="float" value="0" doc="the value to be incremented" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <add name="node3" type="float">
+      <input name="in1" type="float" interfacename="in" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <add_one name="x" type="float" _="hello world">
+    <input name="in" type="float" _="alright see ya" value="1" />
+  </add_one>
+</materialx>

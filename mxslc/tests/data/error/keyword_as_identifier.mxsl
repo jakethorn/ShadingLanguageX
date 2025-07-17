@@ -1,0 +1,6 @@
+
+float add_one(float in)
+{
+    float out = in + 1.0;
+    return out;
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <image name="x" type="float" doc="an image of a butterfly">
+    <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
+  </image>
+</materialx>

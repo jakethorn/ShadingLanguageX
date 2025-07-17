@@ -18,6 +18,17 @@ class Keyword(StrEnum):
     NULL = auto()
     AUTO = auto()
 
+    # MaterialX keywords
+    OUT = auto()
+
+    # Protected keywords for potential future use
+    UNIFORM = auto()
+    VARYING = auto()
+    INLINE = auto()
+    ATTRIBUTE = auto()
+    INPUT = auto()
+    OUTPUT = auto()
+
     # Data types
     BOOLEAN = auto()
     INTEGER = auto()
