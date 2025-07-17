@@ -5,10 +5,10 @@ Custom attributes can be added to nodes:
 ```
 @doc "an image of a butterfly"
 @file.colorspace "srgb_texture"
-float x = image("butterfly1.png");
+color3 c = image("butterfly1.png");
 ```
 ```xml
-<image name="x" type="float" doc="an image of a butterfly">
+<image name="c" type="color3" doc="an image of a butterfly">
   <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
 </image>
 ```

@@ -7,7 +7,7 @@
 # Table of Contents
 
 1. [Introduction](#introduction)
-2. [Shader Anatomy]() 
+2. [Shader Anatomy](#shader-anatomy) 
 3. [Data Types](#data-types)
 4. [Expressions](#expressions)
 5. [Statements](#statements)
@@ -23,10 +23,10 @@
 15. [Switch Expressions](#switch-expressions)
 16. [For Loops](#for-loops)
 17. [User Functions](#user-functions)
-18. [Node Constructors](#node-constructors)
-19. [Null Expressions](#null-expression)
-20. [Standard Library](#standard-library)
-21. [Shader Types](#shader-types)
+18. [Attributes](#attributes)
+19. [Node Constructors](#node-constructors)
+20. [Null Expressions](#null-expression)
+21. [Standard Library](#standard-library)
 22. [Scope](#scope) 
 23. [Preprocessor Directives](#preprocessor-directives)
 24. [mxslc](#mxslc)
@@ -710,7 +710,70 @@ vec2 inv_uv = one_minus<vec2>(uv);
 
 * Functions can be declared inside other functions.
 * Functions must be declared prior to being called.  
-* Recursion is not possible in ShadingLanguageX. 
+* Recursion is not possible in ShadingLanguageX.
+
+# Attributes
+
+Attributes can be defined above statements and are added to the element that the statement compiles into. For example,
+attributes defined above a function declaration will be added to the compiled NodeDef.
+```
+@nodegroup "math"
+@doc "adds one to in"
+float add_one(float in)
+{
+    return in + 1.0;
+}
+```
+```xml
+<nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
+  <output name="out" type="float" default="0.0" />
+  <input name="in" type="float" value="0" />
+</nodedef>
+<nodegraph name="NG_add_one" nodedef="ND_add_one">
+  <add name="node3" type="float">
+    <input name="in1" type="float" interfacename="in" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
+</nodegraph>
+```
+Attributes can also be added to the input/output elements of a NodeDef by specifying the name of the port before the attribute
+name. Outputs are called `out` by default in MaterialX.
+```
+@nodegroup "math"
+@doc "adds one to in"
+@in.doc "the value to be incremented"
+@out.doc "the incremented value"
+float add_one(float in)
+{
+    return in + 1.0;
+}
+```
+```xml
+<nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
+  <output name="out" type="float" default="0.0" doc="the incremented value" />
+  <input name="in" type="float" value="0" doc="the value to be incremented" />
+</nodedef>
+<nodegraph name="NG_add_one" nodedef="ND_add_one">
+  <add name="node3" type="float">
+    <input name="in1" type="float" interfacename="in" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
+</nodegraph>
+```
+Finally, attributes can also be defined above variable declarations, variable assignments and expression statements. These
+attributes will be added to the node that these statements compile into.
+```
+@doc "an image of a butterfly"
+@file.colorspace "srgb_texture"
+color3 c = image("butterfly1.png");
+```
+```xml
+<image name="c" type="color3" doc="an image of a butterfly">
+  <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
+</image>
+```
 
 # Node Constructors
 
