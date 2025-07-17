@@ -60,7 +60,8 @@ class Parser(TokenReader):
             else:
                 child = None
             name = self._match([k for k in Keyword], IDENTIFIER)
-            value = self._match(STRING_LITERAL)
+            self._consume("=")
+            value = self._match(STRING_LITERAL, on_fail=f"Invalid syntax for attribute '@{name.lexeme}'.", fail_token=name)
             attribs.append(Attribute(child, name, value))
         return attribs
 

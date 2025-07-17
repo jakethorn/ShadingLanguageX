@@ -4,7 +4,7 @@ from collections.abc import Collection
 from .CompileError import CompileError
 from .Keyword import Keyword
 from .Token import Token
-from .token_types import IDENTIFIER
+from .token_types import IDENTIFIER, STRING_LITERAL, FLOAT_LITERAL
 
 
 class TokenReader(ABC):
@@ -47,7 +47,7 @@ class TokenReader(ABC):
             return token
         return None
 
-    def _match(self, *token_types: str | Collection[str]) -> Token:
+    def _match(self, *token_types: str | Collection[str], on_fail: str = None, fail_token: Token = None) -> Token:
         """
         Same as consume, but raise a compile error if no match was found.
         """
@@ -56,14 +56,11 @@ class TokenReader(ABC):
             return token
         # raise compile error if not a match
         token = self._peek()
-        if token in Keyword:
-            if token_types[0] == IDENTIFIER:
-                msg = f"'{token.lexeme}' is a protected keyword and cannot be used as an identifier."
-            else:
-                msg = f"The keyword '{token.lexeme}' is used in an invalid context."
+        if token in Keyword and token_types == [IDENTIFIER]:
+            msg = f"'{token.lexeme}' is a protected keyword and cannot be used as an identifier."
         else:
-            msg = f"Expected {[str(t) for t in token_types]}, but found '{token.lexeme}'."
-        raise CompileError(msg, token)
+            msg = f"Expected {_format_tokens(token_types)}, but found '{token.lexeme}'."
+        raise CompileError(on_fail or msg, fail_token or token)
 
     def __peek(self, future: int) -> Token:
         if self.__index + future >= len(self.__tokens):
@@ -79,3 +76,27 @@ def _flatten(token_types: tuple[str | Collection[str], ...]) -> list[str]:
         elif isinstance(t, Collection):
             result.extend(t)
     return result
+
+
+def _format_tokens(token_types: list[str]) -> str:
+    if all(k in token_types for k in Keyword):
+        for keyword in Keyword:
+            token_types.remove(keyword)
+        token_types.insert(0, "a keyword")
+
+    if len(token_types) == 1:
+        return _format_token(token_types[0])
+    else:
+        msg = ", ".join([_format_token(t) for t in token_types[:-1]])
+        msg += f" or {_format_token(token_types[-1])}"
+        return msg
+
+
+def _format_token(token_type: str) -> str:
+    if token_type == IDENTIFIER:
+        return "an identifier"
+    if token_type == STRING_LITERAL:
+        return "a string literal"
+    if token_type == FLOAT_LITERAL:
+        return "a float literal"
+    return token_type
