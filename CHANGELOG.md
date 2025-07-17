@@ -1,3 +1,41 @@
+# Version 0.5.2-beta
+## Added
+* __Attributes__  
+Custom attributes can be added to nodes:
+```
+@doc "an image of a butterfly"
+@file.colorspace "srgb_texture"
+float x = image("butterfly1.png");
+```
+```xml
+<image name="x" type="float" doc="an image of a butterfly">
+  <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
+</image>
+```
+Or NodeDefs:
+```
+@nodegroup "math"
+@doc "adds one to in"
+@in.doc "the value to be incremented"
+@out.doc "the incremented value"
+float add_one(float in)
+{
+    return in + 1.0;
+}
+```
+```xml
+<nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
+  <output name="out" type="float" default="0.0" doc="the incremented value" />
+  <input name="in" type="float" value="0" doc="the value to be incremented" />
+</nodedef>
+<nodegraph name="NG_add_one" nodedef="ND_add_one">
+  <add name="node3" type="float">
+    <input name="in1" type="float" interfacename="in" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
+</nodegraph>
+```
 # Version 0.5.1-beta
 ## Added
 * __Auto Keyword__

@@ -1,7 +1,8 @@
 ```  
 program     → statement* EOF ;  
   
-statement   → declaration | assignment | for_loop ;  
+statement   → ( attribute* ) ( declaration | assignment | for_loop ) ;
+  attribute → "@" IDENTIFIER STRING_LITERAL
 declaration → var_decl | func_decl;  
 var_decl    → TYPE IDENTIFIER "=" expression ";" ;  
 func_decl   → TYPE IDENTIFIER ( "<" TYPE ( "," TYPE )* ">" )? "(" ( parameter ( "," parameter )* )? ")" "{" statement* return "}" ;  
@@ -24,15 +25,14 @@ term        → factor ( ( "+" | "-" ) factor )* ;
 factor      → exponent ( ( "*" | "/" | "%" ) exponent )* ;  
 exponent    → unary ( "^" unary )* ;  
 unary       → ( "!" | "not" | "+" | "-" )? property ;    
-property    → primary ( swizzle | indexer )* ;   
+property    → primary swizzle* indexer? ;   
   swizzle   → "." ( [xyzw]{1,4} | [rgba]{1,4} ) ;  
   indexer   → "[" expression "]" ;  
-primary     → LITERAL | IDENTIFIER | "(" expression ")" | cond_expr | func_call | stdlib_call | ctor_call | node_ctor;  
+primary     → LITERAL | IDENTIFIER | "(" expression ")" | cond_expr | func_call | ctor_call | node_ctor;  
 cond_expr   → if_expr | switch_expr ;  
 if_expr     → "if" "(" expression ")" "{" expression "}" ( "else" "{" expression "}" )? ;  
 switch_expr → "switch" "(" expression ")" "{" expression ( "," expression )* "}" ;  
 func_call   → IDENTIFIER ( "<" TYPE ">" )? "(" ( argument ( "," argument )* )? ")" ;  
-stdlib_call → STDLIB_FUNC "(" ( argument ( "," argument )* )? ")" ;  
 ctor_call   → TYPE "(" ( argument ( "," argument )* )? ")" ;  
 node_ctor   → "{" STRING_LITERAL "," TYPE ( ":" argument ( "," argument )* )? "}" ;
   argument  → ( IDENTIFIER "=" )? expression ;  
