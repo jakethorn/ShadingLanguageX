@@ -45,6 +45,11 @@ class Parser(TokenReader):
                 stmt = self.__assignment()
         elif token == Keyword.FOR:
             stmt = self.__for_loop()
+        elif token == Keyword.INLINE:
+            if self._peek_next() == Keyword.FOR:
+                stmt = self.__for_loop()
+            else:
+                stmt = self.__function_declaration()
         if stmt:
             stmt.add_attributes(attribs)
             return stmt
@@ -74,6 +79,7 @@ class Parser(TokenReader):
         return VariableDeclaration(data_type, identifier, right)
 
     def __function_declaration(self) -> FunctionDeclaration:
+        is_inline = self._consume(Keyword.INLINE) is not None
         return_type = self._match(Keyword.DATA_TYPES(), Keyword.AUTO, Keyword.VOID)
         identifier = self._match(IDENTIFIER)
         template_types = []
@@ -104,7 +110,7 @@ class Parser(TokenReader):
                 statements.append(self.__statement())
             self._match("}")
             return_expr = NullExpression()
-        return FunctionDeclaration(return_type, identifier, template_types, params, statements, return_expr)
+        return FunctionDeclaration(is_inline, return_type, identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
         data_type = self._match(Keyword.DATA_TYPES())
@@ -138,6 +144,7 @@ class Parser(TokenReader):
         return CompoundAssignment(identifier, property_, operator, right)
 
     def __for_loop(self) -> ForLoop:
+        is_inline = self._consume(Keyword.INLINE) is not None
         self._match(Keyword.FOR)
         self._match("(")
         data_type = self._match(Keyword.DATA_TYPES())

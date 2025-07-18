@@ -471,7 +471,7 @@ class Node(InterfaceElement):
     def downstream_ports(self) -> list[PortElement]:
         return [PortElement(p) for p in self.source.getDownstreamPorts()]
 
-    def add_interface_input(self, input_name: str, data_type: DataType, interface_name: str) -> Input:
+    def add_interface_name(self, input_name: str, data_type: DataType, interface_name: str) -> Input:
         input_ = self.add_input(input_name, data_type=data_type)
         input_.interface_name = interface_name
         return input_

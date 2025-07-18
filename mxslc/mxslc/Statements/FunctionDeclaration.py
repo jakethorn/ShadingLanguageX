@@ -12,13 +12,15 @@ from ..Token import Token
 
 class FunctionDeclaration(Statement):
     def __init__(self,
+                 is_inline: bool,
                  return_type: Token | DataType,
                  identifier: Token,
                  template_types: Collection[Token] | Collection[DataType],
                  params: ParameterList | list[Parameter],
                  body: list[Statement],
-                 return_expr: "Expression"):
+                 return_expr: Expression):
         super().__init__()
+        self.__is_inline = is_inline
         self.__return_type = DataType(return_type)
         self.__identifier = identifier
         self.__template_types = {DataType(t) for t in template_types}
@@ -43,7 +45,7 @@ class FunctionDeclaration(Statement):
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         if self.__template_types:
             raise CompileError("Cannot declare nested templated functions.", self.__identifier)
-        return FunctionDeclaration(self.__return_type, self.__identifier, {template_type}, self.__params, self.__body, self.__return_expr)
+        return FunctionDeclaration(self.__is_inline, self.__return_type, self.__identifier, {template_type}, self.__params, self.__body, self.__return_expr)
 
     def execute(self) -> None:
         for func in sorted(self.__funcs):
