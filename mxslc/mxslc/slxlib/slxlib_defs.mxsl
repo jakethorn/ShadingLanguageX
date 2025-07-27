@@ -2,12 +2,12 @@
 #define SLXLIB_DEFS
 
 //
-//  More arithmetic overloads
+//  Arithmetic overloads that allow floats to be the first input
 //
 
 inline T add<vec2, vec3, vec4, color3, color4>(float in1, T in2)
 {
-    return T(in1) + in2;
+    return in2 + in1;
 }
 
 inline T subtract<vec2, vec3, vec4, color3, color4>(float in1, T in2)
@@ -17,7 +17,7 @@ inline T subtract<vec2, vec3, vec4, color3, color4>(float in1, T in2)
 
 inline T multiply<vec2, vec3, vec4, color3, color4>(float in1, T in2)
 {
-    return T(in1) * in2;
+    return in2 * in1;
 }
 
 inline T divide<vec2, vec3, vec4, color3, color4>(float in1, T in2)

@@ -75,6 +75,7 @@ class State(ABC):
     #
 
     def add_function(self, func: Function) -> None:
+        # TODO add a check that there isn't already a function with the same signature already defined
         assert func not in self.__functions
         self.__functions.append(func)
 
@@ -96,9 +97,9 @@ class State(ABC):
             message += "\n".join([str(f) for f in matching_funcs])
             raise CompileError(message, identifier)
 
-    def get_function_parameter_types(self, valid_types: set[DataType], identifier: str | Token, template_type: DataType, param_index: int | str) -> set[DataType]:
+    def get_function_parameter_types(self, valid_types: set[DataType], identifier: str | Token, template_type: DataType, args: list[Argument], param_index: int | str) -> set[DataType]:
         identifier, name = _handle_identifier(identifier)
-        matching_funcs = self.__get_functions(name, template_type, valid_types)
+        matching_funcs = self.__get_functions(name, template_type, valid_types, args, strict_args=False)
         return {
             f.parameters[param_index].data_type
             for f
@@ -106,16 +107,16 @@ class State(ABC):
             if param_index in f.parameters
         }
 
-    def __get_functions(self, name: str, template_type: DataType = None, valid_types: set[DataType] = None, args: list[Argument] = None) -> list[Function]:
+    def __get_functions(self, name: str, template_type: DataType = None, valid_types: set[DataType] = None, args: list[Argument] = None, strict_args=True) -> list[Function]:
         matching_funcs = [
             f
             for f
             in self.__functions
-            if f.is_match(name, template_type, valid_types, args)
+            if f.is_match(name, template_type, valid_types, args, strict_args)
         ]
         if len(matching_funcs) == 0:
             if self.parent:
-                return self.parent.__get_functions(name, template_type, valid_types, args)
+                return self.parent.__get_functions(name, template_type, valid_types, args, strict_args)
             else:
                 return []
         else:
@@ -333,8 +334,8 @@ def get_function(identifier: str | Token, template_type: DataType = None, valid_
     return _state.get_function(identifier, template_type, valid_types, args)
 
 
-def get_function_parameter_types(valid_types: set[DataType], identifier: str | Token, template_type: DataType, param_index: int | str) -> set[DataType]:
-    return _state.get_function_parameter_types(valid_types, identifier, template_type, param_index)
+def get_function_parameter_types(valid_types: set[DataType], identifier: str | Token, template_type: DataType, args: list[Argument], param_index: int | str) -> set[DataType]:
+    return _state.get_function_parameter_types(valid_types, identifier, template_type, args, param_index)
 
 
 def is_function(identifier: str | Token) -> bool:

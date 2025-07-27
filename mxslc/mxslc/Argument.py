@@ -25,6 +25,10 @@ class Argument:
         return self.__identifier.lexeme if self.__identifier else None
 
     @property
+    def is_initialized(self) -> bool:
+        return self.__expr.is_initialized
+
+    @property
     def data_type(self) -> DataType:
         return self.__expr.data_type
 

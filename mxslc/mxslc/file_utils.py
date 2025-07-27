@@ -33,3 +33,7 @@ def handle_output_path(output_path: str | Path | None, input_filepath: Path, ext
         output_path /= (input_filepath.stem + extension)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     return output_path
+
+
+def pkg_path(relative_path: str) -> Path:
+    return Path(__file__).parent / relative_path

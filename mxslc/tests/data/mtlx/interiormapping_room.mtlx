@@ -52,20 +52,20 @@
       <input name="in1" type="float" nodename="node18" />
       <input name="in2" type="float" value="1e+06" />
     </ifequal>
-    <extract name="node21" type="float">
+    <extract name="in1" type="float">
       <input name="in" type="vector3" nodename="d_min" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <extract name="node23" type="float">
+    <extract name="in2" type="float">
       <input name="in" type="vector3" nodename="d_min" />
       <input name="index" type="integer" value="1" />
     </extract>
     <min name="node25" type="float">
-      <input name="in1" type="float" nodename="node23" />
+      <input name="in1" type="float" nodename="in2" />
       <input name="in2" type="float" nodename="d_min_z" />
     </min>
     <min name="node26" type="float">
-      <input name="in1" type="float" nodename="node21" />
+      <input name="in1" type="float" nodename="in1" />
       <input name="in2" type="float" nodename="node25" />
     </min>
     <output name="out" type="float" nodename="node26" />
@@ -193,20 +193,20 @@
       <input name="in2" type="float" nodename="node24" />
       <input name="in3" type="float" nodename="node22" />
     </combine3>
-    <convert name="node27" type="vector3">
-      <input name="in" type="float" value="1" />
-    </convert>
-    <add name="node30" type="vector3">
+    <add name="node29" type="vector3">
       <input name="in1" type="vector3" nodename="room_pos2" />
       <input name="in2" type="float" value="1" />
     </add>
-    <divide name="node32" type="vector3">
-      <input name="in1" type="vector3" nodename="node30" />
+    <divide name="in2" type="vector3">
+      <input name="in1" type="vector3" nodename="node29" />
       <input name="in2" type="float" value="2" />
     </divide>
+    <convert name="node31" type="vector3">
+      <input name="in" type="float" value="1" />
+    </convert>
     <subtract name="wall_uvs" type="vector3">
-      <input name="in1" type="vector3" nodename="node27" />
-      <input name="in2" type="vector3" nodename="node32" />
+      <input name="in1" type="vector3" nodename="node31" />
+      <input name="in2" type="vector3" nodename="in2" />
     </subtract>
     <extract name="node35" type="float">
       <input name="in" type="vector3" nodename="room_pos2" />

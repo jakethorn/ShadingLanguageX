@@ -5,33 +5,30 @@
     <input name="t" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_palette" nodedef="ND_palette">
-    <convert name="node16" type="vector3">
-      <input name="in" type="float" value="6.28318" />
-    </convert>
-    <multiply name="node19" type="vector3">
+    <multiply name="node18" type="vector3">
       <input name="in1" type="vector3" value="1, 1, 1" />
       <input name="in2" type="float" interfacename="t" />
     </multiply>
-    <add name="node21" type="vector3">
-      <input name="in1" type="vector3" nodename="node19" />
+    <add name="in2" type="vector3">
+      <input name="in1" type="vector3" nodename="node18" />
       <input name="in2" type="vector3" value="0.263, 0.416, 0.557" />
     </add>
-    <multiply name="node22" type="vector3">
-      <input name="in1" type="vector3" nodename="node16" />
-      <input name="in2" type="vector3" nodename="node21" />
+    <multiply name="node21" type="vector3">
+      <input name="in1" type="vector3" nodename="in2" />
+      <input name="in2" type="float" value="6.28318" />
     </multiply>
-    <cos name="node23" type="vector3">
-      <input name="in" type="vector3" nodename="node22" />
+    <cos name="node22" type="vector3">
+      <input name="in" type="vector3" nodename="node21" />
     </cos>
-    <multiply name="node24" type="vector3">
+    <multiply name="node23" type="vector3">
+      <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
+      <input name="in2" type="vector3" nodename="node22" />
+    </multiply>
+    <add name="node24" type="vector3">
       <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
       <input name="in2" type="vector3" nodename="node23" />
-    </multiply>
-    <add name="node25" type="vector3">
-      <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
-      <input name="in2" type="vector3" nodename="node24" />
     </add>
-    <output name="out" type="vector3" nodename="node25" />
+    <output name="out" type="vector3" nodename="node24" />
   </nodegraph>
   <nodedef name="ND_fract_v2" node="fract_v2">
     <output name="out" type="vector2" default="0, 0" />

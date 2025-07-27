@@ -5,13 +5,13 @@
     <input name="BG_IMG" type="filename" value="." />
   </nodedef>
   <nodegraph name="NG_background" nodedef="ND_background">
+    <texcoord name="in2" type="vector2" />
     <convert name="node2" type="vector2">
       <input name="in" type="float" value="1" />
     </convert>
-    <texcoord name="node4" type="vector2" />
     <subtract name="uv" type="vector2">
       <input name="in1" type="vector2" nodename="node2" />
-      <input name="in2" type="vector2" nodename="node4" />
+      <input name="in2" type="vector2" nodename="in2" />
     </subtract>
     <extract name="node5" type="float">
       <input name="in" type="vector2" nodename="uv" />

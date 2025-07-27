@@ -80,7 +80,7 @@ class Function(ABC):
     def invoke(self, args: list[Argument]) -> Node:
         ...
 
-    def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None) -> bool:
+    def is_match(self, name: str, template_type: DataType = None, return_types: set[DataType] = None, args: list[Argument] = None, strict_args=True) -> bool:
         if self.name != name:
             return False
         if template_type:
@@ -94,9 +94,10 @@ class Function(ABC):
                 satisfied_params = [self._params[a] for a in args]
             except IndexError:
                 return False
-            for param in self._params:
-                if param not in satisfied_params and param.default_value is None:
-                    return False
+            if strict_args:
+                for param in self._params:
+                    if param not in satisfied_params and param.default_value is None:
+                        return False
         return True
 
     def __lt__(self, other: Function) -> bool:
