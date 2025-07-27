@@ -5,7 +5,7 @@ from ..CompileError import CompileError
 from ..DataType import DataType, FLOAT
 from ..Expressions import LiteralExpression
 from ..Expressions.LiteralExpression import NullExpression
-from ..Function import Function
+from ..Function import create_function
 from ..Keyword import Keyword
 from ..Parameter import ParameterList, Parameter
 from ..Token import Token, IdentifierToken, LiteralToken
@@ -13,8 +13,16 @@ from ..token_types import FLOAT_LITERAL
 
 
 class ForLoop(Statement):
-    def __init__(self, iter_var_type: Token | DataType, identifier: Token, start_value: Token, value2: Token, value3: Token | None, body: list[Statement]):
+    def __init__(self,
+                 is_inline: bool,
+                 iter_var_type: Token | DataType,
+                 identifier: Token,
+                 start_value: Token,
+                 value2: Token,
+                 value3: Token | None,
+                 body: list[Statement]):
         super().__init__()
+        self.__is_inline = is_inline
         self.__iter_var_type = DataType(iter_var_type)
         self.__identifier = identifier
         self.__start_value = start_value
@@ -30,12 +38,12 @@ class ForLoop(Statement):
         func_identifier = IdentifierToken(f"__loop__{state.get_loop_id()}")
         parameters = ParameterList([Parameter(self.__identifier, self.__iter_var_type)])
         return_expr = NullExpression()
-        self.__function = Function(return_type, func_identifier, None, parameters, self.__body, return_expr)
+        self.__function = create_function(is_inline, return_type, func_identifier, None, parameters, self.__body, return_expr)
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         iter_var_type = self.__iter_var_type.instantiate(template_type)
         stmts = [s.instantiate_templated_types(template_type) for s in self.__body]
-        return ForLoop(iter_var_type, self.__identifier, self.__start_value, self.__value2, self.__value3, stmts)
+        return ForLoop(self.__is_inline, iter_var_type, self.__identifier, self.__start_value, self.__value2, self.__value3, stmts)
 
     def execute(self) -> None:
         self.__function.initialise()

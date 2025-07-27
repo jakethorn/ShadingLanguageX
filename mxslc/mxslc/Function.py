@@ -20,6 +20,13 @@ from .mx_wrapper import Node, NodeDef, Output, NodeGraph
 type Statement = Any
 
 
+def create_function(is_inline: bool, *args) -> Function:
+    if is_inline:
+        return InlineFunction(*args)
+    else:
+        return NodeGraphFunction(*args)
+
+
 class Function(ABC):
     def __init__(self,
                  return_type: DataType,
@@ -124,7 +131,8 @@ class InlineFunction(Function):
         self.parameters.init_default_values()
 
     def add_attributes(self, attribs: list[Attribute]) -> None:
-        raise CompileError("Attributes cannot be defined above an inline function.", self._identifier)
+        if len(attribs) > 0:
+            raise CompileError("Attributes cannot be defined above an inline function.", self._identifier)
 
     def invoke(self, args: list[Argument]) -> Node:
         func_args = self._initialise_arguments(args)

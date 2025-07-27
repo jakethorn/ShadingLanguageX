@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from . import state
-from .Function import Function
+from .Function import NodeGraphFunction
 from .Preprocessor.process import process as preprocess
 from .mx_wrapper import Document
 from .parse import parse
@@ -26,5 +26,5 @@ def _load_standard_library() -> None:
             continue
         if not nd.is_default_version:
             continue
-        function = Function.from_node_def(nd)
+        function = NodeGraphFunction.from_node_def(nd)
         state.add_function(function)

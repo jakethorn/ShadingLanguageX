@@ -1,0 +1,13 @@
+float defval = 4.0;
+
+inline float add_one(float b = defval)
+{
+    return b + 1.0;
+}
+
+float foo(float a)
+{
+    return a * add_one();
+}
+
+float x = foo(3.0);

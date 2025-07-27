@@ -1,0 +1,8 @@
+float k = 3.0;
+
+inline float add_k(float a)
+{
+    return a + k;
+}
+
+float x = add_k(2.0);

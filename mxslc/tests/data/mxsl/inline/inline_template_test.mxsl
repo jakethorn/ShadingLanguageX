@@ -1,0 +1,8 @@
+inline float foo<vec2, vec3, vec4>(T v)
+{
+    return v[0] * 2.0;
+}
+
+vec2 v2 = vec2(randomfloat(1), randomfloat(2));
+float x = foo(v2);
+float y = foo(position());

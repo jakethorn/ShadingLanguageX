@@ -1,0 +1,6 @@
+inline float add_one(float a)
+{
+    return a + 1.0;
+}
+
+float x = add_one(2.0);

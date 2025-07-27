@@ -5,7 +5,7 @@ from .. import state
 from ..CompileError import CompileError
 from ..DataType import DataType
 from ..Expressions import Expression
-from ..Function import Function
+from ..Function import Function, create_function
 from ..Parameter import Parameter, ParameterList
 from ..Token import Token
 
@@ -30,7 +30,7 @@ class FunctionDeclaration(Statement):
 
         self.__funcs: list[Function] = []
         if len(template_types) == 0:
-            func = Function(self.__return_type, identifier, None, self.__params, body, return_expr)
+            func = create_function(is_inline, self.__return_type, identifier, None, self.__params, body, return_expr)
             self.__funcs.append(func)
         else:
             # duplicate function definition for each template type
@@ -39,7 +39,7 @@ class FunctionDeclaration(Statement):
                 concrete_params = self.__params.instantiate_templated_parameters(template_type)
                 concrete_body = [s.instantiate_templated_types(template_type) for s in body]
                 concrete_return_expr = return_expr.instantiate_templated_types(template_type)
-                func = Function(concrete_return_type, identifier, template_type, concrete_params, concrete_body, concrete_return_expr)
+                func = create_function(is_inline, concrete_return_type, identifier, template_type, concrete_params, concrete_body, concrete_return_expr)
                 self.__funcs.append(func)
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:

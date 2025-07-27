@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="node5" type="float">
+    <input name="in" type="integer" value="1" />
+  </randomfloat>
+  <randomfloat name="node7" type="float">
+    <input name="in" type="integer" value="2" />
+  </randomfloat>
+  <combine2 name="v2" type="vector2">
+    <input name="in1" type="float" nodename="node5" />
+    <input name="in2" type="float" nodename="node7" />
+  </combine2>
+  <extract name="node6" type="float">
+    <input name="in" type="vector2" nodename="v2" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="x" type="float">
+    <input name="in1" type="float" nodename="node6" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <position name="v3" type="vector3" />
+  <extract name="node11" type="float">
+    <input name="in" type="vector3" nodename="v3" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="y" type="float">
+    <input name="in1" type="float" nodename="node11" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+</materialx>

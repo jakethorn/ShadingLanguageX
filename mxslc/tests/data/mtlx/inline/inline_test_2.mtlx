@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="x" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <nodedef name="ND_sub_two" node="sub_two">
+    <output name="out" type="float" default="0.0" />
+    <input name="a" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_sub_two" nodedef="ND_sub_two">
+    <subtract name="node3" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" value="2" />
+    </subtract>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <sub_two name="y" type="float">
+    <input name="a" type="float" nodename="x" />
+  </sub_two>
+</materialx>

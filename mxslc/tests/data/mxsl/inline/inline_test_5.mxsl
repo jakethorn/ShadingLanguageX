@@ -1,0 +1,14 @@
+float k = 3.0;
+
+inline float add_k(float a)
+{
+    return a + k;
+}
+
+void foo()
+{
+    k = add_k(2.0) - 1.0;
+}
+
+foo();
+float x = k * 4.0;

@@ -140,7 +140,7 @@ class InlineState(State):
     #
 
     def add_node(self, identifier: str | Token, node: Node) -> None:
-        assert node.parent == get_document()
+        assert node.parent == self.graph
         identifier, name = _handle_identifier(identifier)
         if name in self.__nodes:
             raise CompileError(f"Variable name '{name}' already exists.", identifier)
@@ -158,7 +158,7 @@ class InlineState(State):
                 raise CompileError(f"Variable '{name}' does not exist.", identifier)
 
     def set_node(self, identifier: str | Token, node: Node) -> None:
-        assert node.parent == get_document()
+        assert node.parent == self.graph
         identifier, name = _handle_identifier(identifier)
 
         if name in self.__nodes:

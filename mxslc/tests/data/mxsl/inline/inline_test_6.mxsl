@@ -1,0 +1,11 @@
+float add_one(float a)
+{
+    return a + 1.0;
+}
+
+inline float foo(float a)
+{
+    return add_one(a - 2.0);
+}
+
+float x = foo(3.0);

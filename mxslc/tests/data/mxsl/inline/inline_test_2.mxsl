@@ -1,0 +1,13 @@
+inline float add_one(float a)
+{
+    return a + 1.0;
+}
+
+float x = add_one(2.0);
+
+float sub_two(float a)
+{
+    return a - 2.0;
+}
+
+float y = sub_two(x);

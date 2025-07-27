@@ -163,7 +163,7 @@ class Parser(TokenReader):
         while self._peek() != "}":
             statements.append(self.__statement())
         self._match("}")
-        return ForLoop(data_type, identifier, start_value, value2, value3, statements)
+        return ForLoop(is_inline, data_type, identifier, start_value, value2, value3, statements)
 
     def __expression(self) -> Expression:
         return self.__logic()
