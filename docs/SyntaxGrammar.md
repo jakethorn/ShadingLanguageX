@@ -5,14 +5,14 @@ statement   → ( attribute* ) ( declaration | assignment | for_loop ) ;
   attribute → "@" IDENTIFIER STRING_LITERAL
 declaration → var_decl | func_decl;  
 var_decl    → TYPE IDENTIFIER "=" expression ";" ;  
-func_decl   → TYPE IDENTIFIER ( "<" TYPE ( "," TYPE )* ">" )? "(" ( parameter ( "," parameter )* )? ")" "{" statement* return "}" ;  
+func_decl   → "inline"? TYPE IDENTIFIER ( "<" TYPE ( "," TYPE )* ">" )? "(" ( parameter ( "," parameter )* )? ")" "{" statement* return "}" ;  
   parameter → TYPE IDENTIFIER ( "=" expression )? ;  
   return    → "return" expression ";" ;  
 assignment  → var_assign | cmp_assign ;  
 var_assign  → variable "=" expression ";" ;  
 cmp_assign  → variable ( "+=" | "-=" | "*=" | "/=" | "%=" | "^=" | "&=" | "|=" ) expression ";" ;  
   variable  → IDENTIFIER ( "." IDENTIFIER )?  
-for_loop    → "for" "(" TYPE IDENTIFIER "=" constant ":" constant ( ":" constant )? ")" "{" statement* "}" ;  
+for_loop    → "inline"? "for" "(" TYPE IDENTIFIER "=" constant ":" constant ( ":" constant )? ")" "{" statement* "}" ;  
   constant  → FLOAT_LITERAL | IDENTIFIER ; 
 expr_stmt   → func_call | stdlib_call ";" ;
   

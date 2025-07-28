@@ -1,3 +1,9 @@
+# Version 0.5.3-beta (in development)
+## Added
+* __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#statement-modifiers))__  
+The `inline` keyword forces the statements in a function to be created directly in the enclosing
+scope at each point that the function is called instead of compiling into a `NodeDef`+`NodeGraph`.
+
 # Version 0.5.2-beta
 ## Added
 * __Attributes__  

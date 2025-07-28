@@ -23,13 +23,14 @@
 15. [Switch Expressions](#switch-expressions)
 16. [For Loops](#for-loops)
 17. [User Functions](#user-functions)
-18. [Attributes](#attributes)
-19. [Node Constructors](#node-constructors)
-20. [Null Expressions](#null-expression)
-21. [Standard Library](#standard-library)
-22. [Scope](#scope) 
-23. [Preprocessor Directives](#preprocessor-directives)
-24. [mxslc](#mxslc)
+18. [Statement Modifiers](#statement-modifiers)
+19. [Attributes](#attributes)
+20. [Node Constructors](#node-constructors)
+21. [Null Expression](#null-expression)
+22. [Standard Library](#standard-library)
+23. [Scope](#scope) 
+24. [Preprocessor Directives](#preprocessor-directives)
+25. [mxslc](#mxslc)
 
 # Introduction
 
@@ -556,8 +557,8 @@ type name(param1_type param1_name, param2_type param2_name...)
 In this case, the return statement should also be omitted.  
 `name` can be any valid identifier.  
 `paramN_type` can be any supported data type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.  
-There is no concept of pointers or out parameters in ShadingLanguageX. Arguments are purely used to pass data into the function.
-Functions can also read and update variables from enclosing scopes.
+There is no concept of pointers or out parameters in ShadingLanguageX. Arguments are purely used to pass variables into the function.
+Functions can also access and update variables from enclosing scopes.
 
 ## Calling Functions
 
@@ -656,7 +657,7 @@ color3 albedo = image("albedo.png", texcoord=geompropvalue("uv4"));
 
 ## Templated Functions
 
-It's common for functions to use the same logic on different data types.
+It's common for functions to use the same logic on different data types. For example:
 ```
 float one_minus(float v)
 {
@@ -711,6 +712,66 @@ vec2 inv_uv = one_minus<vec2>(uv);
 * Functions can be declared inside other functions.
 * Functions must be declared prior to being called.  
 * Recursion is not possible in ShadingLanguageX.
+
+# Statement Modifiers
+
+## Inline
+
+Functions and loops in ShadingLanguageX will normally compile to a `NodeDef`/`NodeGraph` pair. For example:
+```
+float add_one(float in)
+{
+    return in + 1.0;
+}
+
+float x = add_one(2.0);
+float y = add_one(5.0);
+```
+Compiles to the following: 
+```xml
+<nodedef name="ND_add_one" node="add_one">
+  <output name="out" type="float" default="0.0" />
+  <input name="in" type="float" value="0" />
+</nodedef>
+<nodegraph name="NG_add_one" nodedef="ND_add_one">
+  <add name="node3" type="float">
+    <input name="in1" type="float" interfacename="in" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
+</nodegraph>
+<add_one name="x" type="float">
+  <input name="in" type="float" value="2" />
+</add_one>
+<add_one name="y" type="float">
+  <input name="in" type="float" value="5" />
+</add_one>
+```
+This can create a lot of overhead for small functions or functions you only plan to call once, or might be incompatible
+with certain applications. The `inline` keyword instead forces the statements in a function to be created directly in the enclosing
+scope at each point that the function is called. For example, inlining the function from earlier, like so:
+```
+inline float add_one(float in)
+{
+    return in + 1.0;
+}
+
+float x = add_one(2.0);
+float y = add_one(5.0);
+```
+Instead directly compiles to:
+```xml
+<add name="x" type="float">
+  <input name="in1" type="float" value="2" />
+  <input name="in2" type="float" value="1" />
+</add>
+<add name="y" type="float">
+  <input name="in1" type="float" value="5" />
+  <input name="in2" type="float" value="1" />
+</add>
+```
+
+`inline` can also be added to the for loop statement and has the same effect as with functions.
 
 # Attributes
 
