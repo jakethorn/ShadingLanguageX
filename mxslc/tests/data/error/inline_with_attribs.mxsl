@@ -1,0 +1,7 @@
+@doc "adds one to in"
+inline float add_one(float in)
+{
+    return in + 1.0;
+}
+
+float x = add_one(2.0);

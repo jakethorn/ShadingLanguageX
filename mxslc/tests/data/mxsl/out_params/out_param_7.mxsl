@@ -1,0 +1,13 @@
+float r = 3.14;
+float c = 0.0;
+
+inline color3 sincos(float g, out float s)
+{
+    s = sin(r - g);
+    c = cos(r / g);
+    return color3(1.0, randomfloat(1), 0.0);
+}
+
+float s = 0.0;
+auto my_color = sincos(4.2, s);
+float x = s + c * my_color.r;

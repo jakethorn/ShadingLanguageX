@@ -54,6 +54,7 @@ class Parser(TokenReader):
             stmt.add_attributes(attribs)
             return stmt
         else:
+            assert isinstance(token, Token)
             raise CompileError(f"Expected return statement, data type keyword, identifier or 'for', but found '{token.lexeme}'.", token)
 
     def __attributes(self) -> list[Attribute]:
@@ -113,13 +114,16 @@ class Parser(TokenReader):
         return FunctionDeclaration(is_inline, return_type, identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
+        is_out = self._consume(Keyword.OUT) is not None
         data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
         if self._consume("="):
+            if is_out:
+                raise CompileError(f"Out parameter '{identifier}' cannot have a default value.", identifier)
             default_value = self.__expression()
         else:
             default_value = None
-        return Parameter(identifier, data_type, default_value)
+        return Parameter(identifier, data_type, default_value, is_out)
 
     def __assignment(self) -> Statement:
         identifier = self._match(IDENTIFIER)

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_sincos" node="sincos">
+    <input name="r" type="float" value="0" />
+    <output name="s" type="float" default="0.0" />
+    <output name="c" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_sincos" nodedef="ND_sincos">
+    <output name="s" type="float" nodename="s3" />
+    <output name="c" type="float" nodename="c3" />
+    <sin name="s3" type="float">
+      <input name="in" type="float" interfacename="r" />
+    </sin>
+    <cos name="c3" type="float">
+      <input name="in" type="float" interfacename="r" />
+    </cos>
+  </nodegraph>
+  <sincos name="node4" type="multioutput">
+    <input name="r" type="float" value="3.14" />
+    <output name="s" type="float" />
+    <output name="c" type="float" />
+  </sincos>
+  <add name="x" type="float">
+    <input name="in1" type="float" output="s" nodename="node4" />
+    <input name="in2" type="float" output="c" nodename="node4" />
+  </add>
+</materialx>

@@ -10,6 +10,10 @@ class IdentifierExpression(Expression):
         super().__init__(identifier)
         self.__identifier = identifier
 
+    @property
+    def identifier(self) -> Token:
+        return self.__identifier
+
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return IdentifierExpression(self.__identifier)
 

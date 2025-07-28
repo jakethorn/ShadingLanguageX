@@ -9,7 +9,7 @@ from .Argument import Argument
 from .Attribute import Attribute
 from .CompileError import CompileError
 from .DataType import DataType, VOID
-from .Expressions import Expression
+from .Expressions import Expression, IdentifierExpression
 from .Expressions.LiteralExpression import NullExpression
 from .Keyword import Keyword
 from .Parameter import ParameterList, Parameter
@@ -68,6 +68,14 @@ class Function(ABC):
     def line(self) -> int:
         return self._identifier.line
 
+    @property
+    def _in_params(self) -> ParameterList:
+        return self._params.ins
+
+    @property
+    def _out_params(self) -> ParameterList:
+        return self._params.outs
+
     @abstractmethod
     def initialise(self) -> None:
         ...
@@ -109,11 +117,14 @@ class Function(ABC):
         else:
             return f"{self.return_type} {self.name}({self.parameters})"
 
-    def _initialise_arguments(self, args: list[Argument]) -> dict[str, Node]:
+    def _sort_arguments(self, args: list[Argument]) -> dict[str, Expression]:
         pairs: dict[str, Expression] = {p.name: p.default_value for p in self._params}
         for arg in args:
             pairs[self._params[arg].name] = arg.expression
-        return {name: expr.evaluate() for name, expr in pairs.items()}
+        return pairs
+
+    def _evaluate_arguments(self, args: dict[str, Expression]) -> dict[str, Node]:
+        return {name: expr.evaluate() for name, expr in args.items()}
 
 
 class InlineFunction(Function):
@@ -136,14 +147,18 @@ class InlineFunction(Function):
             raise CompileError("Attributes cannot be defined above an inline function.", self._identifier)
 
     def invoke(self, args: list[Argument]) -> Node:
-        func_args = self._initialise_arguments(args)
+        func_args = self._sort_arguments(args)
+        func_arg_nodes = self._evaluate_arguments(func_args)
         state.enter_inline()
-        for name, node in func_args.items():
+        for name, node in func_arg_nodes.items():
             state.add_node(name, node)
         for stmt in self._body:
             stmt.execute()
+        out_nodes = {p.name: state.get_node(p.name) for p in self._out_params}
         retval = self._return_expr.init_evaluate(self._return_type)
         state.exit_inline()
+        for name, node in out_nodes.items():
+            state.set_node(name, node)
         return retval
 
 
@@ -197,12 +212,6 @@ class NodeGraphFunction(Function):
     def invoke(self, args: list[Argument]) -> Node:
         return self.__call_node_def(args)
 
-    def __str__(self) -> str:
-        if self._template_type:
-            return f"{self.return_type} {self.name}<{self._template_type}>({self.parameters})"
-        else:
-            return f"{self.return_type} {self.name}({self.parameters})"
-
     @staticmethod
     def from_node_def(node_def: NodeDef) -> Function:
         return_type = node_def.output.data_type
@@ -223,26 +232,35 @@ class NodeGraphFunction(Function):
 
     def __create_node_def(self) -> None:
         self.__node_def = get_document().add_node_def(self.fullname, self._return_type, self.name)
-        for param in self._params:
+        for param in self._in_params:
             self.__node_def.add_input(param.name, data_type=param.data_type)
+        for param in self._out_params:
+            self.__node_def.add_output(param.name, data_type=param.data_type)
 
     def __create_node_graph(self) -> None:
         self.__node_graph = get_document().add_node_graph_from_def(self.__node_def)
+        for param in self._out_params:
+            self.__node_graph.add_output(param.name, data_type=param.data_type)
         state.enter_node_graph(self.__node_graph)
+        for param in self._out_params:
+            state.add_node(param.name, node_utils.constant(param.data_type.default()))
         for stmt in self._body:
             stmt.execute()
         retval = self._return_expr.init_evaluate(self._return_type)
         self.__node_graph.add_output("out", retval)
+        for param in self._out_params:
+            self.__node_graph.set_output(param.name, state.get_node(param.name))
         self.__implicit_outs = state.exit_node_graph()
 
     def __call_node_def(self, args: list[Argument]) -> Node:
         assert self.__node_def is not None
-        func_args = self._initialise_arguments(args)
+        func_args = self._sort_arguments(args)
+        func_arg_nodes = self._evaluate_arguments(func_args)
         node = node_utils.create(self.name, self.return_type)
         # add inputs to node
         for nd_input in self.__node_def.inputs:
-            if nd_input.name in func_args:
-                node.add_input(nd_input.name, func_args[nd_input.name])
+            if nd_input.name in func_arg_nodes:
+                node.add_input(nd_input.name, func_arg_nodes[nd_input.name])
             else:
                 node.add_input(nd_input.name, state.get_node(nd_input.name))
         # add outputs to node
@@ -260,13 +278,25 @@ class NodeGraphFunction(Function):
             if len(self.__implicit_outs) == 1:
                 name = list(self.__implicit_outs.keys())[0]
                 state.set_node(name, node)
+            if len(self._out_params) == 1:
+                arg_expr = func_args[self._out_params[0].name]
+                if not isinstance(arg_expr, IdentifierExpression):
+                    raise CompileError(f"Invalid argument being passed to out parameter: {arg_expr}.", arg_expr.token)
+                state.set_node(arg_expr.identifier, node)
             return node
         else:
             for name, ng_output in self.__implicit_outs.items():
                 node_output = node.get_output(ng_output.name)
                 dot_node = node_utils.dot(node_output)
                 state.set_node(name, dot_node)
-            if self.__node_def.output_count == len(self.__implicit_outs):
+            for param in self._out_params:
+                arg_expr = func_args[param.name]
+                if not isinstance(arg_expr, IdentifierExpression):
+                    raise CompileError(f"Invalid argument being passed to out parameter: {arg_expr}.", arg_expr.token)
+                node_output = node.get_output(param.name)
+                dot_node = node_utils.dot(node_output)
+                state.set_node(arg_expr.identifier, dot_node)
+            if self.__node_def.output_count == len(self.__implicit_outs) + len(self._out_params):
                 return node
             else:
                 dot_node = node_utils.dot(node.output)

@@ -1,0 +1,12 @@
+float s = 9.0;
+
+void sincos(float r, out float s, out float c)
+{
+    s = sin(r);
+    c = cos(r);
+}
+
+float u = 0.0;
+float v = 0.0;
+sincos(3.14, u, v);
+float x = u + v + s;

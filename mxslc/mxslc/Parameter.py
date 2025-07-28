@@ -11,10 +11,11 @@ class Parameter:
     """
     Represents a parameter to a function or constructor call.
     """
-    def __init__(self, identifier: Token, data_type: Token | DataType, default_value: Expression = None):
+    def __init__(self, identifier: Token, data_type: Token | DataType, default_value: Expression = None, is_out=False):
         self.__identifier = identifier
         self.__data_type = DataType(data_type)
         self.__default_value = default_value
+        self.__is_out = is_out
 
     @property
     def name(self) -> str:
@@ -31,6 +32,14 @@ class Parameter:
     @property
     def default_value(self) -> Expression | None:
         return self.__default_value
+
+    @property
+    def is_in(self) -> bool:
+        return not self.__is_out
+
+    @property
+    def is_out(self) -> bool:
+        return self.__is_out
 
     def init_default_value(self) -> None:
         if self.default_value:
@@ -54,6 +63,14 @@ class ParameterList:
             self.__params: list[Parameter] = params
         else:
             self.__params: list[Parameter] = []
+
+    @property
+    def ins(self) -> ParameterList:
+        return ParameterList([p for p in self if p.is_in])
+
+    @property
+    def outs(self) -> ParameterList:
+        return ParameterList([p for p in self if p.is_out])
 
     def instantiate_templated_parameters(self, template_type: DataType) -> ParameterList:
         return ParameterList([

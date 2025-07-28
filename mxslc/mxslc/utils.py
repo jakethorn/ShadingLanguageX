@@ -3,6 +3,8 @@ from typing import Sequence, Generator, Any
 
 from .DataType import DataType, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR4, COLOR3, DATA_TYPES
 
+type Argument = Any
+
 
 def type_of_swizzle(swizzle: str) -> DataType:
     is_vector_swizzle = re.match(r"[xyzw]", swizzle)
@@ -37,13 +39,13 @@ def string(value: Any) -> str | None:
 def format_types(types: set[DataType]) -> str:
     if len(types) == 1:
         return str(list(types)[0])
-    elif types == DATA_TYPES:
+    elif DATA_TYPES.issubset(types):
         return "any"
     else:
         return f"<{', '.join([str(t) for t in types])}>"
 
 
-def format_function(return_types: set[DataType] | None, name: str, template_type: DataType | None, args: list["Argument"] | None) -> str:
+def format_function(return_types: set[DataType] | None, name: str, template_type: DataType | None, args: list[Argument] | None) -> str:
     output = ""
     if return_types:
         output += format_types(return_types) + " "

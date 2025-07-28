@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <subtract name="node3" type="float">
+    <input name="in1" type="float" value="3.14" />
+    <input name="in2" type="float" value="4.2" />
+  </subtract>
+  <sin name="s4" type="float">
+    <input name="in" type="float" nodename="node3" />
+  </sin>
+  <divide name="node6" type="float">
+    <input name="in1" type="float" value="3.14" />
+    <input name="in2" type="float" value="4.2" />
+  </divide>
+  <cos name="c2" type="float">
+    <input name="in" type="float" nodename="node6" />
+  </cos>
+  <randomfloat name="node12" type="float">
+    <input name="in" type="integer" value="1" />
+  </randomfloat>
+  <combine3 name="my_color" type="color3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="node12" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <extract name="node14" type="float">
+    <input name="in" type="color3" nodename="my_color" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="node15" type="float">
+    <input name="in1" type="float" nodename="c2" />
+    <input name="in2" type="float" nodename="node14" />
+  </multiply>
+  <add name="x" type="float">
+    <input name="in1" type="float" nodename="s4" />
+    <input name="in2" type="float" nodename="node15" />
+  </add>
+</materialx>

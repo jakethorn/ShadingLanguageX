@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <sin name="s4" type="float">
+    <input name="in" type="float" value="3.14" />
+  </sin>
+  <cos name="c4" type="float">
+    <input name="in" type="float" value="3.14" />
+  </cos>
+  <add name="x" type="float">
+    <input name="in1" type="float" nodename="s4" />
+    <input name="in2" type="float" nodename="c4" />
+  </add>
+</materialx>

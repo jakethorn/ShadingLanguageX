@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_sincos" node="sincos" nodegroup="math">
+    <output name="out" type="color3" default="0, 0, 0" />
+    <input name="g" type="float" value="0" />
+    <output name="s" type="float" default="0.0" doc="sin wave" />
+    <input name="r" type="float" value="0" />
+    <input name="c" type="float" value="0" />
+    <output name="c2" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_sincos" nodedef="ND_sincos">
+    <output name="s" type="float" nodename="s3" />
+    <subtract name="node4" type="float">
+      <input name="in1" type="float" interfacename="r" />
+      <input name="in2" type="float" interfacename="g" />
+    </subtract>
+    <sin name="s3" type="float">
+      <input name="in" type="float" nodename="node4" />
+    </sin>
+    <divide name="node8" type="float">
+      <input name="in1" type="float" interfacename="r" />
+      <input name="in2" type="float" interfacename="g" />
+    </divide>
+    <cos name="node9" type="float">
+      <input name="in" type="float" nodename="node8" />
+    </cos>
+    <output name="c2" type="float" nodename="node9" />
+    <output name="out" type="color3" value="1, 0, 0" />
+  </nodegraph>
+  <sincos name="node3" type="multioutput">
+    <input name="g" type="float" value="4.2" />
+    <input name="r" type="float" value="3.14" />
+    <input name="c" type="float" value="0" />
+    <output name="out" type="color3" />
+    <output name="s" type="float" />
+    <output name="c2" type="float" />
+  </sincos>
+  <add name="x" type="float">
+    <input name="in1" type="float" output="s" nodename="node3" />
+    <input name="in2" type="float" output="c2" nodename="node3" />
+  </add>
+</materialx>

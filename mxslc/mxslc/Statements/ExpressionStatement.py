@@ -15,3 +15,5 @@ class ExpressionStatement(Statement):
     def execute(self) -> None:
         node = self.__expr.init_evaluate()
         self._add_attributes_to_node(node)
+        if node.is_null_node:
+            node.remove()
