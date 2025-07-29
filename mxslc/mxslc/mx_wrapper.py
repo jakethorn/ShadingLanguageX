@@ -484,6 +484,9 @@ class Node(InterfaceElement):
     def remove(self) -> None:
         self.parent.remove_node(self.name)
 
+    def get_node_def(self) -> NodeDef:
+        return NodeDef(self.source.getNodeDef())
+
 
 #
 #   Input
