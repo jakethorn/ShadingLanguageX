@@ -1,0 +1,7 @@
+
+vec2 uv = texcoord();
+
+float u = 0.0;
+float v = 0.0;
+separate2(u, v, uv);
+float x = u + v;

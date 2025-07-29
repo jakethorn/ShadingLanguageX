@@ -1,8 +1,8 @@
 vec2 uv2 = {"geompropvalue", vec2: geomprop="uv2"};
 vec3 fractal = {"fractal3d", vec3:
-    amplitude = 2.0,
+    amplitude = vec3(2.0),
     octaves = 3,
-    dimish = 0.6
+    diminish = 0.6
 };
 
 fractal += {"position", vec3} * {"normal", vec3} / 2.0;

@@ -31,7 +31,7 @@ def test_main_function(filename: str, main_function: str | None, main_args: list
         warn(f"Expected data for {filename} is being overwritten.")
         actual_path = expected_path
 
-    mxslc.compile_file(mxsl_path, actual_path, main_func=main_function, main_args=main_args)
+    mxslc.compile_file(mxsl_path, actual_path, main_func=main_function, main_args=main_args, validate=True)
 
     with open(actual_path, "r") as f:
         actual = f.read()

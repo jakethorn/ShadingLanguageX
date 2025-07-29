@@ -24,6 +24,7 @@ def _main(raw_args: list[str] = None):
     parser.add_argument("-a", "--main-args", nargs="+", default=[], help="Arguments to be passed to the main function")
     parser.add_argument("-i", "--include-dirs", nargs="+", default=[], type=Path, help="Additional directories to search when including files")
     parser.add_argument("-d", "--define", dest="macros", nargs="+", action="append", default=[], type=str, help="Additional macro definitions")
+    parser.add_argument("-v", "--validate", action="store_true", help="Validate the output MaterialX file")
     args = parser.parse_args(raw_args)
 
     try:
@@ -33,7 +34,8 @@ def _main(raw_args: list[str] = None):
             main_func=args.main_func,
             main_args=_parse_main_args(args.main_args),
             add_include_dirs=args.include_dirs,
-            add_macros=[Macro(*m) for m in args.macros]
+            add_macros=[Macro(*m) for m in args.macros],
+            validate=args.validate
         )
     except Exception as e:
         print(e)

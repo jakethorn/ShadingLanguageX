@@ -43,16 +43,25 @@ class FunctionCall(Expression):
     def _init_subexpr(self, valid_types: set[DataType]) -> None:
         while len(self.__uninitialized_args) > 0:
             is_progress = False
-            error = None
+            errors: dict[Argument, CompileError] = {}
             for arg in self.__uninitialized_args:
                 param_index = arg.position if arg.is_positional else arg.name
                 valid_arg_types = state.get_function_parameter_types(valid_types, self.__identifier, self.__template_type, self.__initialized_args, param_index)
                 if len(valid_arg_types) == 0:
                     raise CompileError(f"Function signature '{utils.format_function(valid_types, self.__identifier.lexeme, self.__template_type, None)}' does not exist.", self.__identifier)
-                error = arg.try_init(valid_arg_types) or error
+                errors[arg] = arg.try_init(valid_arg_types)
                 is_progress |= arg.is_initialized
             if not is_progress:
-                raise error
+                self.__raise_subexpr_error(valid_types, errors)
+
+    def __raise_subexpr_error(self, valid_types: set[DataType], errors: dict[Argument, CompileError]) -> str:
+        msg = f"Invalid call to '{self.__identifier}':\n"
+        for arg, error in errors.items():
+            if error is not None:
+                msg += f"Argument {arg.position+1}: {error}\n"
+        msg += "Possible function signatures:\n"
+        msg += "\n".join([str(f) for f in state.get_functions(self.__identifier.lexeme, self.__template_type, valid_types, self.__initialized_args, strict_args=False)])
+        raise CompileError(msg)
 
     def _init(self, valid_types: set[DataType]) -> None:
         self.__func = state.get_function(self.__identifier, self.__template_type, valid_types, self.__args)

@@ -18,7 +18,8 @@ def compile_file(mxsl_path: str | Path,
                  main_func: str = None,
                  main_args: Sequence[Value] = None,
                  add_include_dirs: Sequence[Path] = None,
-                 add_macros: Sequence[str | Macro] = None) -> None:
+                 add_macros: Sequence[str | Macro] = None,
+                 validate=False) -> None:
     main_args = main_args or []
     add_include_dirs = add_include_dirs or []
     add_macros = add_macros or []
@@ -41,9 +42,11 @@ def compile_file(mxsl_path: str | Path,
         _call_main(mxsl_filepath, main_func, main_args)
         post_process()
 
-        success, message = get_document().validate()
-        if not success:
-            raise CompileError(message)
+        if validate:
+            success, message = get_document().validate()
+            if not success:
+                message += "\n" + get_document().xml
+                raise CompileError(message)
 
         with open(mtlx_filepath, "w") as file:
             file.write(get_document().xml)

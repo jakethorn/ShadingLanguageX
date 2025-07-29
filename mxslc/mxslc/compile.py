@@ -22,9 +22,6 @@ def _load_standard_library() -> None:
     document = Document()
     document.load_standard_library()
     for nd in document.node_defs:
-        # TODO add support for multiple return values
-        if nd.output_count > 1:
-            continue
         if not nd.is_default_version:
             continue
         function = NodeGraphFunction.from_node_def(nd)

@@ -46,7 +46,10 @@ class Parameter:
             self.default_value.init(self.data_type)
 
     def __str__(self) -> str:
-        output = f"{self.data_type} {self.name}"
+        output = ""
+        if self.is_out:
+            output += "out "
+        output += f"{self.data_type} {self.name}"
         if self.default_value:
             output += f" = {self.default_value}"
         return output

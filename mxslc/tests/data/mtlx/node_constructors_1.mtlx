@@ -4,23 +4,26 @@
     <input name="geomprop" type="string" value="uv2" />
   </geompropvalue>
   <fractal3d name="fractal" type="vector3">
-    <input name="amplitude" type="float" value="2" />
+    <input name="amplitude" type="vector3" nodename="node4" />
     <input name="octaves" type="integer" value="3" />
-    <input name="dimish" type="float" value="0.6" />
+    <input name="diminish" type="float" value="0.6" />
   </fractal3d>
-  <position name="node6" type="vector3" />
-  <normal name="node7" type="vector3" />
-  <multiply name="node8" type="vector3">
-    <input name="in1" type="vector3" nodename="node6" />
-    <input name="in2" type="vector3" nodename="node7" />
+  <convert name="node4" type="vector3">
+    <input name="in" type="float" value="2" />
+  </convert>
+  <position name="node7" type="vector3" />
+  <normal name="node8" type="vector3" />
+  <multiply name="node9" type="vector3">
+    <input name="in1" type="vector3" nodename="node7" />
+    <input name="in2" type="vector3" nodename="node8" />
   </multiply>
-  <divide name="node10" type="vector3">
-    <input name="in1" type="vector3" nodename="node8" />
+  <divide name="node11" type="vector3">
+    <input name="in1" type="vector3" nodename="node9" />
     <input name="in2" type="float" value="2" />
   </divide>
   <add name="fractal2" type="vector3">
     <input name="in1" type="vector3" nodename="fractal" />
-    <input name="in2" type="vector3" nodename="node10" />
+    <input name="in2" type="vector3" nodename="node11" />
   </add>
   <convert name="out_color" type="color3">
     <input name="in" type="vector3" nodename="fractal2" />

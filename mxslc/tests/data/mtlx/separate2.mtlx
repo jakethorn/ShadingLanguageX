@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="uv" type="vector2" />
+  <separate2 name="node4" type="multioutput">
+    <input name="in" type="vector2" nodename="uv" />
+    <output name="outx" type="float" />
+    <output name="outy" type="float" />
+  </separate2>
+  <add name="x" type="float">
+    <input name="in1" type="float" output="outx" nodename="node4" />
+    <input name="in2" type="float" output="outy" nodename="node4" />
+  </add>
+</materialx>

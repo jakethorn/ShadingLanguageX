@@ -214,7 +214,10 @@ class NodeGraphFunction(Function):
 
     @staticmethod
     def from_node_def(node_def: NodeDef) -> Function:
-        return_type = node_def.output.data_type
+        if node_def.output_count == 1:
+            return_type = node_def.output.data_type
+        else:
+            return_type = VOID
         identifier = IdentifierToken(node_def.node_string)
         template_keyword = node_def.name.split("_")[-1]
         if template_keyword in Keyword.DATA_TYPES():
@@ -222,6 +225,10 @@ class NodeGraphFunction(Function):
         else:
             template_type = None
         params = ParameterList()
+        if node_def.output_count > 1:
+            for output in node_def.outputs:
+                param_identifier = IdentifierToken(output.name)
+                params += Parameter(param_identifier, output.data_type, is_out=True)
         for input_ in node_def.inputs:
             param_identifier = IdentifierToken(input_.name)
             params += Parameter(param_identifier, input_.data_type, NullExpression())

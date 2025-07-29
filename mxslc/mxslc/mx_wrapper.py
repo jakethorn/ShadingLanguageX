@@ -398,6 +398,11 @@ class Document(GraphElement):
     def source(self) -> mx.Document:
         return super().source
 
+    def validate(self) -> tuple[bool, str]:
+        tmp = Document(self.xml)
+        tmp.load_standard_library()
+        return tmp.source.validate()
+
     def add_node_def(self, name: str, data_type: DataType, node_name: str) -> NodeDef:
         assert name.startswith("ND_")
         name = self.create_valid_child_name(name)

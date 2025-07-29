@@ -96,6 +96,7 @@ _overwrite_all_expected = False
     ("out_params/out_param_5", False),
     ("out_params/out_param_6", False),
     ("out_params/out_param_7", False),
+    ("separate2", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")
@@ -106,7 +107,7 @@ def test_mxslc(filename: str, overwrite_expected: bool) -> None:
         warn(f"Expected data for {filename} is being overwritten.")
         actual_path = expected_path
 
-    mxslc.compile_file(mxsl_path, actual_path)
+    mxslc.compile_file(mxsl_path, actual_path, validate=True)
 
     with open(actual_path, "r") as f:
         actual = f.read()

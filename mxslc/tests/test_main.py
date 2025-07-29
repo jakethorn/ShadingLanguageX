@@ -14,7 +14,7 @@ def test_main_with_args():
     main_args = ["0.6", "tangent", "some/fake/path/butterfly1.png"]
     macro1 = ["SRGB"]
     macro2 = ["GAMMA", "2.2"]
-    main._main([mxsl_path, "-o", output_path, "-m", main_func, "-a", *main_args, "-d", *macro1, "-d", *macro2])
+    main._main([mxsl_path, "-o", output_path, "-m", main_func, "-a", *main_args, "-d", *macro1, "-d", *macro2, "-v"])
 
     actual_path = Path(__file__).parent / "data" / "mtlx" / "main_1.mtlx"
     with open(actual_path, "r") as f:
