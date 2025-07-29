@@ -3,6 +3,7 @@ from .Attribute import Attribute
 from .CompileError import CompileError
 from .Expressions import *
 from .Expressions.LiteralExpression import NullExpression
+from .Expressions.VariableDeclarationExpression import VariableDeclarationExpression
 from .Keyword import Keyword
 from .Parameter import Parameter
 from .Statements import *
@@ -356,4 +357,10 @@ class Parser(TokenReader):
             self._match("=")
         else:
             name = None
-        return Argument(self.__expression(), index, name)
+        return Argument(self.__argument_expression(), index, name)
+
+    def __argument_expression(self) -> Expression:
+        if self._peek() in Keyword.DATA_TYPES() and self._peek_next() == IDENTIFIER:
+            return VariableDeclarationExpression(self._consume(), self._consume())
+        else:
+            return self.__expression()

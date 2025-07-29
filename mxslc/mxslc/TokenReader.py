@@ -52,6 +52,7 @@ class TokenReader(ABC):
         Same as consume, but raise a compile error if no match was found.
         """
         token_types = _flatten(token_types)
+        assert len(token_types) > 0, "No token to match against."
         if token := self._consume(token_types):
             return token
         # raise compile error if not a match
