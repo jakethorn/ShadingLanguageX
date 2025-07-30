@@ -6,7 +6,7 @@ statement   → ( attribute* ) ( declaration | assignment | for_loop ) ;
 declaration → var_decl | func_decl;  
 var_decl    → TYPE IDENTIFIER "=" expression ";" ;  
 func_decl   → "inline"? TYPE IDENTIFIER ( "<" TYPE ( "," TYPE )* ">" )? "(" ( parameter ( "," parameter )* )? ")" "{" statement* return "}" ;  
-  parameter → TYPE IDENTIFIER ( "=" expression )? ;  
+  parameter → "out"? TYPE IDENTIFIER ( "=" expression )? ;  
   return    → "return" expression ";" ;  
 assignment  → var_assign | cmp_assign ;  
 var_assign  → variable "=" expression ";" ;  

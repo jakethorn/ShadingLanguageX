@@ -1,8 +1,17 @@
 # Version 0.5.3-beta (in development)
 ## Added
-* __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#statement-modifiers))__  
+* __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#inline))__  
 The `inline` keyword forces the statements in a function to be created directly in the enclosing
 scope at each point that the function is called instead of compiling into a `NodeDef`+`NodeGraph`.
+
+
+* __Out Parameters ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#out-parameters))__  
+Including the `out` keyword before a parameter turns it into an out parameter. These parameters can then be set inside the function
+and the value will be accessible when the function is called, similar to a return value.
+
+
+* __Variable Declaration Expressions__  
+To compliment out parameters, variables can now be declared as part of the function call, e.g.: `separate2(float x, float y, texcoord());`
 
 # Version 0.5.2-beta
 ## Added

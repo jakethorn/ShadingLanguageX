@@ -198,21 +198,22 @@ auto randomvector<vec2, vec3, vec4>()
 Expressions are pieces of code that evaluate to a value, such as `1.0 + 1.0`. This document will cover each expression in detail
 in its own section. The following table gives a quick overview of all the expressions supported by ShadingLanguageX.
 
-| Expression                  | Example                              |
-|-----------------------------|--------------------------------------|
-| Binary Operator             | `a + b`                              |
-| Unary Operator              | `-a`                                 |
-| Ternary Relational Operator | `x < a < y`                          |
-| Swizzle Operator            | `a.xy`                               |
-| Indexing Operator           | `a[0]`                               |
-| Literal                     | `3.14`                               |
-| Identifier                  | `a`                                  |
-| Grouping Expression         | `(a + b)`                            |
-| If Expression               | `if (a < b) { x } else { y }`        |
-| Switch Expression           | `switch (a) { x, y, z }`             |
-| Function Call               | `my_function(a, b)`                  |
-| Constructor Call            | `vec3()`                             |
-| Node Constructor            | `{"mix", color3: bg=a, fg=b, mix=c}` |
+| Expression                      | Example                              |
+|---------------------------------|--------------------------------------|
+| Binary Operator                 | `a + b`                              |
+| Unary Operator                  | `-a`                                 |
+| Ternary Relational Operator     | `x < a < y`                          |
+| Swizzle Operator                | `a.xy`                               |
+| Indexing Operator               | `a[0]`                               |
+| Literal                         | `3.14`                               |
+| Identifier                      | `a`                                  |
+| Grouping Expression             | `(a + b)`                            |
+| If Expression                   | `if (a < b) { x } else { y }`        |
+| Switch Expression               | `switch (a) { x, y, z }`             |
+| Function Call                   | `my_function(a, b)`                  |
+| Constructor Call                | `vec3()`                             |
+| Node Constructor                | `{"mix", color3: bg=a, fg=b, mix=c}` |
+| Variable Declaration Expression | `separate2(float x, float y, uv)`    |
 
 # Statements
 
@@ -547,7 +548,7 @@ standard_surface(base_color=c);
 
 Users can declare there own functions in ShadingLanguageX using the following syntax:
 ```
-type name(param1_type param1_name, param2_type param2_name...)
+type name(out? param1_type param1_name, out? param2_type param2_name...)
 {
     statement*
     return value;
@@ -557,8 +558,8 @@ type name(param1_type param1_name, param2_type param2_name...)
 In this case, the return statement should also be omitted.  
 `name` can be any valid identifier.  
 `paramN_type` can be any supported data type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.  
-There is no concept of pointers or out parameters in ShadingLanguageX. Arguments are purely used to pass variables into the function.
-Functions can also access and update variables from enclosing scopes.
+Including the `out` keyword before a parameter turns it into an out parameter. See below for more information.  
+In addition to return values and out parameters, functions can also access and update variables from enclosing scopes.
 
 ## Calling Functions
 
@@ -707,11 +708,44 @@ vec2 uv = texcoord();
 vec2 inv_uv = one_minus<vec2>(uv);
 ```
 
+## Out Parameters
+
+Including the `out` keyword before a parameter turns it into an out parameter. These parameters can then be set inside the function
+and the value will be accessible when the function is called, similar to a return value. For example:
+```
+void sincos(float r, out float s, out float c)
+{
+    s = sin(r);
+    c = cos(r);
+}
+
+float s = 0.0;
+float c = 0.0;
+sincos(3.14, s, c);
+float x = min(s, c);
+```
+To compliment out parameters, variables can be declared as part of the function call (these are called variable declaration
+expressions). This means we don't need to separately declare the variables above the function. For example, the above shader
+can be rewritten as:
+```
+void sincos(float r, out float s, out float c)
+{
+    s = sin(r);
+    c = cos(r);
+}
+
+sincos(3.14, float s, float c);
+float x = min(s, c);
+```
+
+
 ### Notes
 
 * Functions can be declared inside other functions.
 * Functions must be declared prior to being called.  
 * Recursion is not possible in ShadingLanguageX.
+* MaterialX standard library nodes with multiple outputs (such as the separate nodes) use out parameters to return their
+values. The out parameters always come first in the function signature, e.g.: `void separate2(out float outx, out float outy, vec2 in)`
 
 # Statement Modifiers
 
@@ -1013,6 +1047,7 @@ options:
   -a, --main-args MAIN_ARGS        Arguments to be passed to the main function
   -i, --include-dirs INCLUDE_DIRS  Additional directories to search when including files
   -d, --define MACROS              Additional macro definitions
+  -v, --validate                   Validate the output MaterialX file
 ```
 
 ### Example

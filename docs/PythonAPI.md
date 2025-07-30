@@ -19,7 +19,8 @@ def compile_file(mxsl_path: str | Path,
                  main_func: str | None = None,
                  main_args: Sequence[mxslc.Value] | None = None,
                  add_include_dirs: Sequence[Path] | None = None,
-                 add_macros: Sequence[str | mxslc.Macro] | None = None) -> None
+                 add_macros: Sequence[str | mxslc.Macro] | None = None
+                 validate: bool = False) -> None
 ```
 
 ### Example
