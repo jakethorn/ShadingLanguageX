@@ -1,0 +1,10 @@
+inline void foo(out float a, out float b)
+{
+    a = 1.0;
+    b = 1.0;
+}
+
+float c = 0.0;
+float d = 0.0;
+foo(c, d);
+float x = c + d;

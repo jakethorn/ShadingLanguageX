@@ -469,6 +469,18 @@ class Node(InterfaceElement):
             self.source.setName(name)
 
     @property
+    def data_type(self) -> DataType:
+        type_string = self.source.getType()
+        if type_string == "multioutput":
+            return VOID
+        else:
+            return DataType(type_string)
+
+    @data_type.setter
+    def data_type(self, data_type: DataType | str) -> None:
+        self.source.setType(str(data_type))
+
+    @property
     def is_null_node(self) -> bool:
         return self.category == Keyword.NULL
 

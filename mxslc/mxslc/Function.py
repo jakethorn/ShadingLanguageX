@@ -158,7 +158,10 @@ class InlineFunction(Function):
         retval = self._return_expr.init_evaluate(self._return_type)
         state.exit_inline()
         for name, node in out_nodes.items():
-            state.set_node(name, node)
+            arg_expr = func_args[name]
+            if not isinstance(arg_expr, IdentifierExpression):
+                raise CompileError(f"Invalid argument being passed to out parameter: {arg_expr}.", arg_expr.token)
+            state.set_node(arg_expr.identifier, node)
         return retval
 
 

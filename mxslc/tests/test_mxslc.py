@@ -97,6 +97,7 @@ _overwrite_all_expected = False
     ("out_params/out_param_6", False),
     ("out_params/out_param_7", False),
     ("separate2", False),
+    ("inline_out_param_1", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

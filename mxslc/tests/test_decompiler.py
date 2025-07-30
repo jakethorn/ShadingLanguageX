@@ -19,6 +19,7 @@ _overwrite_all_expected = False
     ("decompiler/squares", False),
     ("decompiler/toon", False),
     ("decompiler/waves", False),
+    ("decompiler/boombox", False),
 ])
 def test_decompiler(filename: str, overwrite_expected: bool) -> None:
     mtlx_path     = (Path(__file__).parent / "data" / "mtlx" / filename).with_suffix(".mtlx")

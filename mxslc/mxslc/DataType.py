@@ -4,7 +4,6 @@ from pathlib import Path
 
 import MaterialX as mx
 
-from .CompileError import CompileError
 from .Keyword import Keyword
 from .Token import Token
 
@@ -28,9 +27,6 @@ class DataType:
             self.__data_type = data_type
         else:
             raise TypeError
-        # TODO remove once SLX supports multioutput nodes
-        if self.__data_type == "multioutput":
-            raise CompileError("SLX does not currently support multioutput nodes.")
         assert self.__data_type in Keyword.DATA_TYPES() ^ {Keyword.VOID, Keyword.AUTO}, self.__data_type
 
     def instantiate(self, template_type: DataType | None) -> DataType:

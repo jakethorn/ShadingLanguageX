@@ -17,3 +17,6 @@ class ExpressionStatement(Statement):
         self._add_attributes_to_node(node)
         if node.is_null_node:
             node.remove()
+
+    def __str__(self) -> str:
+        return f"{self.__expr};"

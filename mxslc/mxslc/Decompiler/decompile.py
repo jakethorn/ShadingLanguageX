@@ -2,11 +2,12 @@ from pathlib import Path
 
 from .DecompileError import DecompileError
 from ..Argument import Argument
-from ..DataType import BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES, STRING, FILENAME
+from ..DataType import BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES, STRING, FILENAME, VOID
 from ..Expressions import IdentifierExpression, LiteralExpression, Expression, IfExpression, UnaryExpression, \
     ConstructorCall, IndexingExpression, SwitchExpression, FunctionCall, NodeConstructor, BinaryExpression
 from ..Expressions.LiteralExpression import NullExpression
-from ..Statements import VariableDeclaration, Statement
+from ..Expressions.VariableDeclarationExpression import VariableDeclarationExpression
+from ..Statements import VariableDeclaration, ExpressionStatement, Statement
 from ..Token import IdentifierToken, Token, LiteralToken
 from ..file_utils import handle_input_path, handle_output_path
 from ..mx_wrapper import Document, Node, Input, Output
@@ -34,22 +35,25 @@ class Decompiler:
         self.__mxsl = ""
 
     def decompile(self) -> str:
-        self.__decompile(self.__nodes)
+        self.__decompile_nodes(self.__nodes)
         return self.__mxsl
 
-    def __decompile(self, nodes: list[Node]) -> None:
+    def __decompile_nodes(self, nodes: list[Node]) -> None:
         for node in nodes:
             if node in self.__decompiled_nodes:
                 continue
             self.__decompiled_nodes.append(node)
             input_nodes = [i.connected_node for i in node.inputs if i.connected_node]
-            self.__decompile(input_nodes)
+            self.__decompile_nodes(input_nodes)
             self.__mxsl += f"{self.__deexecute(node)}\n"
 
-    def __deexecute(self, node: Node) -> VariableDeclaration:
+    def __deexecute(self, node: Node) -> Statement:
         identifier = IdentifierToken(node.name)
         expr = self.__node_to_expression(node)
-        return VariableDeclaration(node.data_type, identifier, expr)
+        if node.data_type == VOID:
+            return ExpressionStatement(expr)
+        else:
+            return VariableDeclaration(node.data_type, identifier, expr)
 
     def __node_to_expression(self, node: Node) -> Expression:
         category = node.category
@@ -75,7 +79,9 @@ class Decompiler:
         if category in _unary_ops:
             return UnaryExpression(Token(_unary_ops[category]), _get_expression(args, "in"))
         if category in self.__func_names:
-            return FunctionCall(IdentifierToken(category), None, args)
+            outputs = node.get_node_def().outputs
+            func_args = _outputs_to_arguments(node, outputs) + args
+            return FunctionCall(IdentifierToken(category), None, func_args)
         category_token = LiteralToken(category)
         return NodeConstructor(category_token, node.data_type, args)
 
@@ -83,9 +89,9 @@ class Decompiler:
 def _inputs_to_arguments(inputs: list[Input]) -> list[Argument]:
     args: list[Argument] = []
     for i, input_ in enumerate(inputs):
-        arg_expression = _input_to_expression(input_)
-        arg_identifier = IdentifierToken(input_.name)
-        arg = Argument(arg_expression, i, arg_identifier)
+        expr = _input_to_expression(input_)
+        identifier = IdentifierToken(input_.name)
+        arg = Argument(expr, i, identifier)
         args.append(arg)
     return args
 
@@ -93,7 +99,8 @@ def _inputs_to_arguments(inputs: list[Input]) -> list[Argument]:
 def _input_to_expression(input_: Input) -> Expression:
     node = input_.connected_node
     if node:
-        node_identifier = IdentifierToken(node.name)
+        name = node.name + (f"_{input_.output_string}" if input_.output_string else "")
+        node_identifier = IdentifierToken(name)
         return IdentifierExpression(node_identifier)
     if input_.data_type in [BOOLEAN, INTEGER, FLOAT, STRING, FILENAME]:
         token = LiteralToken(input_.literal)
@@ -107,6 +114,19 @@ def _value_to_arguments(vec_str: str) -> list[Argument]:
     channels = [float(c) for c in vec_str.split(",")]
     exprs = [LiteralExpression(LiteralToken(c)) for c in channels]
     args = [Argument(e, i) for i, e in enumerate(exprs)]
+    return args
+
+
+def _outputs_to_arguments(node: Node, outputs: list[Output]) -> list[Argument]:
+    if len(outputs) < 2:
+        return []
+    args: list[Argument] = []
+    for i, output in enumerate(outputs):
+        expr_identifier = IdentifierToken(f"{node.name}_{output.name}")
+        expr = VariableDeclarationExpression(output.data_type, expr_identifier)
+        arg_identifier = IdentifierToken(output.name)
+        arg = Argument(expr, i, arg_identifier)
+        args.append(arg)
     return args
 
 

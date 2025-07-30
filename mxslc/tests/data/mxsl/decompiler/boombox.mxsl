@@ -1,0 +1,7 @@
+gltf_colorimage(outcolor=color3 image_basecolor_outcolor, outa=float image_basecolor_outa, file="BoomBox_baseColor.png");
+vector3 image_orm = gltf_image(file="BoomBox_occlusionRoughnessMetallic.png");
+vector3 image_normal = gltf_normalmap(file="BoomBox_normal.png");
+color3 image_emission = gltf_image(file="BoomBox_emissive.png");
+separate3(outx=float image_orm_channels_outx, outy=float image_orm_channels_outy, outz=float image_orm_channels_outz, in=image_orm);
+surfaceshader SR_boombox = gltf_pbr(base_color=image_basecolor_outcolor, alpha=image_basecolor_outa, metallic=image_orm_channels_outz, roughness=image_orm_channels_outy, occlusion=image_orm_channels_outx, normal=image_normal, emissive=image_emission);
+material Material_boombox = surfacematerial(surfaceshader=SR_boombox);
