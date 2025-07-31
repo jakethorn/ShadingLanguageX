@@ -2,6 +2,7 @@ from .Argument import Argument
 from .Attribute import Attribute
 from .CompileError import CompileError
 from .Expressions import *
+from .Expressions.IfExpression import IfElseExpression
 from .Expressions.LiteralExpression import NullExpression
 from .Expressions.VariableDeclarationExpression import VariableDeclarationExpression
 from .Keyword import Keyword
@@ -276,7 +277,19 @@ class Parser(TokenReader):
             return self.__node_constructor()
         raise CompileError(f"Unexpected token: '{token}'.", token)
 
-    def __if_expression(self) -> Expression:
+    def __if_expression(self) -> IfExpression:
+        branches = [self.__if_branch()]
+        otherwise = None
+        while self._consume(Keyword.ELSE):
+            if self._peek() == Keyword.IF:
+                branches.append(self.__if_branch())
+            else:
+                self._match("{")
+                otherwise = self.__expression()
+                self._match("}")
+        return IfElseExpression(branches, otherwise)
+
+    def __if_branch(self) -> tuple[Expression, Expression]:
         self._match(Keyword.IF)
         self._match("(")
         clause = self.__expression()
@@ -284,15 +297,9 @@ class Parser(TokenReader):
         self._match("{")
         then = self.__expression()
         self._match("}")
-        if self._consume(Keyword.ELSE):
-            self._match("{")
-            otherwise = self.__expression()
-            self._match("}")
-        else:
-            otherwise = None
-        return IfExpression(clause, then, otherwise)
+        return clause, then
 
-    def __switch_expression(self) -> Expression:
+    def __switch_expression(self) -> SwitchExpression:
         self._match(Keyword.SWITCH)
         self._match("(")
         which = self.__expression()
@@ -304,7 +311,7 @@ class Parser(TokenReader):
         self._match("}")
         return SwitchExpression(which, values)
 
-    def __constructor_call(self) -> Expression:
+    def __constructor_call(self) -> ConstructorCall:
         data_type = self._match(Keyword.DATA_TYPES())
         self._match("(")
         if self._consume(")"):
@@ -314,7 +321,7 @@ class Parser(TokenReader):
             self._match(")")
         return ConstructorCall(data_type, args)
 
-    def __function_call(self, identifier: Token) -> Expression:
+    def __function_call(self, identifier: Token) -> FunctionCall:
         template_type = None
         if self._consume("<"):
             template_type = self._match(Keyword.DATA_TYPES() - {Keyword.T})

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <ifgreatereq name="node7" type="boolean">
+    <input name="value1" type="float" value="6" />
+    <input name="value2" type="float" value="9" />
+  </ifgreatereq>
+  <not name="node8" type="boolean">
+    <input name="in" type="boolean" nodename="node7" />
+  </not>
+  <ifequal name="node11" type="float">
+    <input name="value1" type="boolean" nodename="node8" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </ifequal>
+  <ifequal name="node12" type="float">
+    <input name="value1" type="boolean" value="false" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="node11" />
+  </ifequal>
+  <ifequal name="x2" type="float">
+    <input name="value1" type="boolean" value="true" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="node12" />
+  </ifequal>
+</materialx>

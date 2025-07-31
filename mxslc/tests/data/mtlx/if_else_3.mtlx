@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <ifequal name="x2" type="float">
+    <input name="value1" type="boolean" value="true" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="3" />
+  </ifequal>
+</materialx>
