@@ -30,7 +30,7 @@ property    → primary swizzle* indexer? ;
   indexer   → "[" expression "]" ;  
 primary     → LITERAL | IDENTIFIER | "(" expression ")" | cond_expr | func_call | ctor_call | node_ctor;  
 cond_expr   → if_expr | switch_expr ;  
-if_expr     → "if" "(" expression ")" "{" expression "}" ( "else" "{" expression "}" )? ;  
+if_expr     → "if" "(" expression ")" "{" expression "}" ( "if else" "(" expression ")" {" expression "}" )* ( "else" "{" expression "}" )? ;  
 switch_expr → "switch" "(" expression ")" "{" expression ( "," expression )* "}" ;  
 func_call   → IDENTIFIER ( "<" TYPE ">" )? "(" ( argument ( "," argument )* )? ")" ;  
 ctor_call   → TYPE "(" ( argument ( "," argument )* )? ")" ;  

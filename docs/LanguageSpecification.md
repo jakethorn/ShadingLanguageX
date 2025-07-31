@@ -487,6 +487,18 @@ else
 };
 ```
 
+## If-Else Expressions
+
+If else expressions are also possible. You can include any number of `if else` clauses in the expression.
+```
+float x = if (cond1) { val1 } else if (cond2) { val2 } else { val3 };
+```
+You again do not need include the final `else` branch during a variable assignment:
+```
+float x = 0.0;
+x = if (cond1) { val1 } else if (cond2) { val2 };
+```
+
 # Switch Expressions
 
 ShaderLanguageX also does not support switch statements, but instead uses switch expressions, for the same reasons as if 

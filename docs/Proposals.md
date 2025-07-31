@@ -1,6 +1,4 @@
 ```  
-# TODO add a test to check a node doesnt have a value and a nodename
-# TODO add more tests
 # TODO add eval(xml)
 # TODO trailing commas are fine
 # TODO structs
@@ -13,7 +11,6 @@
 # TODO my_var[0] = 1.0;
 # TODO #if defined(X)
 # TODO -l --log argument that outputs a logfile with the error and stacktrace
-# TODO use pathlike instead of specific Path/str types
 # TODO allow loop iteration variables to be ints/vecs/colors as well as floats
 # TODO namespaces (syntax: public/private? namespace <name>? {})
 ```  
