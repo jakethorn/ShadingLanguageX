@@ -38,11 +38,53 @@ Currently, MaterialX shaders can be made either using the MaterialX C++ or Pytho
 # Getting Started
 
 ## Installation
-__ShadingLanguageX__ source files are compiled to MaterialX (.mtlx) files using its open source compiler (mxslc). The compiler is written in python and can be downloaded from this repo or PyPI using `pip install mxslc`. It has been tested with Python 3.12 and 3.13. 
+
+### From PyPI
+__ShadingLanguageX__ source files are compiled to MaterialX (.mtlx) files using its open source compiler (mxslc). The compiler is written in python and can be downloaded from PyPI using `pip install mxslc`. It has been tested with Python 3.12 and 3.13.
+
+```bash
+pip install mxslc
+```
+
+### Local Development
+
+For development or to use the latest features:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/jakethorn/ShadingLanguageX.git
+   cd ShadingLanguageX
+   ```
+
+2. Run the installation script:
+   
+   ```bash
+   source install.sh
+   ```
+
+3. Or install manually:
+   ```bash
+   cd mxslc
+   pip install -r requirements.txt
+   pip install -e .
+   ```
+
+4. Unit tests can be run using:
+   ```bash
+   cd mxslc
+   python -m pytest
+   ```
+
+## Usage
+
+### Python API
+
 ```python
 import mxslc
 mxslc.compile_file("my_shader.mxsl")
 ```
+
+## Executable
 Alternatively, you can download the compiler executable from the most recent release and call it from the command line.
 ```
 > ./mxslc.exe my_shader.mxsl
