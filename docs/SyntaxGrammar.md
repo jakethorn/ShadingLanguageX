@@ -4,7 +4,7 @@ program     → statement* EOF ;
 statement   → ( attribute* ) ( declaration | assignment | for_loop ) ;
   attribute → "@" IDENTIFIER STRING_LITERAL
 declaration → var_decl | func_decl;  
-var_decl    → TYPE IDENTIFIER "=" expression ";" ;  
+var_decl    → "const"? "global"? TYPE IDENTIFIER "=" expression ";" ;  
 func_decl   → "inline"? TYPE IDENTIFIER ( "<" TYPE ( "," TYPE )* ">" )? "(" ( parameter ( "," parameter )* )? ")" "{" statement* return "}" ;  
   parameter → "out"? TYPE IDENTIFIER ( "=" expression )? ;  
   return    → "return" expression ";" ;  

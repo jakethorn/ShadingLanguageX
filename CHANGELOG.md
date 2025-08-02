@@ -3,6 +3,14 @@
 * __If-Else Expressions ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#if-else-expressions))__  
 If else expressions are now possible. You can include any number of `if else` clauses in the expression.
 
+
+* __Const Variables ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#const))__  
+A variable declared with the `const` keyword cannot be assigned to after its initial declaration.
+
+
+* __Global Variables ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#global))__  
+The global keyword operates similarly to `uniform` from GLSL. Global variables do not require an initial value and are instead initialized by user-defined values passed to the compiler.
+
 # Version 0.5.3-beta
 ## Added
 * __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#inline))__  

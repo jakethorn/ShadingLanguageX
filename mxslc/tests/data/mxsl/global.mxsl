@@ -1,0 +1,9 @@
+global vec2 x;
+vec2 y = x - 2.0;
+
+global string s;
+global color3 c;
+global float f;
+
+vec3 p = position(s);
+color3 base_color = color3(p) + c + f;

@@ -1,8 +1,9 @@
 from pathlib import Path
+from typing import Any
 from warnings import warn
 
 import pytest
-
+import MaterialX as mx
 import mxslc
 
 _overwrite_all_expected = False
@@ -101,6 +102,7 @@ _overwrite_all_expected = False
     ("if_else_1", False),
     ("if_else_2", False),
     ("if_else_3", False),
+    ("const", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")
@@ -112,6 +114,37 @@ def test_mxslc(filename: str, overwrite_expected: bool) -> None:
         actual_path = expected_path
 
     mxslc.compile_file(mxsl_path, actual_path, validate=True)
+
+    with open(actual_path, "r") as f:
+        actual = f.read()
+
+    with open(expected_path, "r") as f:
+        expected = f.read()
+
+    if not (overwrite_expected or _overwrite_all_expected):
+        actual_path.unlink()
+
+    assert actual.replace("\\", "/") == expected.replace("\\", "/")
+
+
+@pytest.mark.parametrize("filename, globals_, overwrite_expected", [
+    ("global", {
+        "x": mx.Vector2(0.0, 1.0),
+        "s": "world",
+        "c": mx.Color3(0.0, 0.5, 0.5),
+        "f": 0.78
+    }, False),
+])
+def test_mxslc_globals(filename: str, globals_: dict[str, Any], overwrite_expected: bool) -> None:
+    mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")
+    actual_path   = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mtlx")
+    expected_path = (Path(__file__).parent / "data" / "mtlx" / filename).with_suffix(".mtlx")
+
+    if overwrite_expected or _overwrite_all_expected:
+        warn(f"Expected data for {filename} is being overwritten.")
+        actual_path = expected_path
+
+    mxslc.compile_file(mxsl_path, actual_path, globals=globals_, validate=True)
 
     with open(actual_path, "r") as f:
         actual = f.read()

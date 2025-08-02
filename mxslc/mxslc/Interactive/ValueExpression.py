@@ -7,7 +7,7 @@ from ..Expressions import Expression
 from ..mx_wrapper import Node
 
 
-class InteractiveExpression(Expression):
+class ValueExpression(Expression):
     def __init__(self, value: Value):
         super().__init__(None)
         if isinstance(value, mx.Node):

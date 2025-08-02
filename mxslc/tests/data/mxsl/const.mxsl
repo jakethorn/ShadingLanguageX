@@ -1,0 +1,11 @@
+const float x = 1.0;
+float y = 2.0 + x;
+
+float foo(float x)
+{
+    x = 3.0;
+    return x;
+}
+
+float z = foo(4.0);
+float w = foo(x);

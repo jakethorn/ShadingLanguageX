@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="y" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="float" value="3" />
+  </nodegraph>
+  <foo name="z" type="float">
+    <input name="x" type="float" value="4" />
+  </foo>
+  <foo name="w" type="float">
+    <input name="x" type="float" value="1" />
+  </foo>
+</materialx>

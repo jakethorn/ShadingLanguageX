@@ -251,7 +251,7 @@ float pi2 = 3.14 * 2.0;
 
 The following identifiers have a special meaning in ShadingLanguageX and cannot be used for user-defined variables or functions.
 
-`if` `else` `switch` `for` `return` `true` `false` `and` `or` `not` `void` `null` `T`
+`if` `else` `switch` `for` `return` `true` `false` `and` `or` `not` `void` `null` `T` `auto` `out` `inline` `const` `global`
 
 All data types and alias types are also reserved keywords.
 
@@ -259,7 +259,7 @@ All data types and alias types are also reserved keywords.
 
 ShadingLanguageX is an evolving language. Keywords might be added in each update which might cause shaders to break which 
 were previously working correctly. In general, try not to use identifiers that are popular keywords in other
-languages (e.g., `const` `struct` `typeof`) or a term that is prominantly used in the MaterialX specification (e.g., `node` `uniform` `varying`). 
+languages (e.g., `namespace` `struct` `typeof`) or a term that is prominantly used in the MaterialX specification (e.g., `node` `uniform` `varying`). 
 
 # Whitespace
 
@@ -360,14 +360,58 @@ As shown in the table above, precendence can be controlled using the Grouping Op
 
 # Variable Declarations
 
-`type name = initial-value;`  
+`type name = initial-value;`   
 `type` can be any supported data type as listed earlier.  
 `name` can be any valid identifier.  
 `initial-value` can be any valid expression that evaluates to `type`.   
 
+## Modifiers
+
+ShadingLanguageX supports two modifiers for variable declarations: `const` and `global`.
+
+### Const
+
+A variable declared with the `const` keyword cannot be assigned to after its initial declaration. For example:
+```
+const float x = 1.0;
+x = 2.0; // compile error
+```
+
+### Global
+
+The global keyword operates similarly to `uniform` from GLSL. Global variables do not require an initial value and are instead initialized by user-defined values passed to the compiler. For example:  
+```
+global filename albedo_path;
+global color3 tint;
+auto c = image<color3>(albedo_path) * tint;
+```
+```python
+from pathlib import Path
+import MaterialX as mx
+import mxslc
+globals = {
+    "albedo_path": Path(r"../brick.png"),
+    "tint": mx.Color3(1.0, 0.0, 0.0)
+}
+mxslc.compile_file("globals_example.mxsl", globals=globals)
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <image name="node11" type="color3">
+    <input name="file" type="filename" value="..\brick.png" />
+  </image>
+  <multiply name="c" type="color3">
+    <input name="in1" type="color3" nodename="node11" />
+    <input name="in2" type="color3" value="1, 0, 0" />
+  </multiply>
+</materialx>
+```
+
+
 ### Notes
 
-* The `initial-value` is not optional as in most other languages.
+* The `initial-value` is not optional, except for global variables.
 
 ### Example
 
@@ -377,7 +421,9 @@ As shown in the table above, precendence can be controlled using the Grouping Op
 `int uv_channel = 3;`  
 `vec2 uv = 1.0 - texcoord(uv_channel);`  
 `string space = "world";`  
-`surfaceshader surface = standard_surface();`
+`surfaceshader surface = standard_surface();`  
+`const float PI = 3.14;`  
+`global float loop_n = 500.0;`
 
 # Variable Assignments
 

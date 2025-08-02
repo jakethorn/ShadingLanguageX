@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <subtract name="y" type="vector2">
+    <input name="in1" type="vector2" value="0, 1" />
+    <input name="in2" type="float" value="2" />
+  </subtract>
+  <position name="p" type="vector3">
+    <input name="space" type="string" value="world" />
+  </position>
+  <convert name="node5" type="color3">
+    <input name="in" type="vector3" nodename="p" />
+  </convert>
+  <add name="node7" type="color3">
+    <input name="in1" type="color3" nodename="node5" />
+    <input name="in2" type="color3" value="0, 0.5, 0.5" />
+  </add>
+  <add name="base_color" type="color3">
+    <input name="in1" type="color3" nodename="node7" />
+    <input name="in2" type="float" value="0.78" />
+  </add>
+</materialx>

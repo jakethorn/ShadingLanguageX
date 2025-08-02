@@ -53,7 +53,7 @@ class Decompiler:
         if node.data_type == VOID:
             return ExpressionStatement(expr)
         else:
-            return VariableDeclaration(node.data_type, identifier, expr)
+            return VariableDeclaration([], node.data_type, identifier, expr)
 
     def __node_to_expression(self, node: Node) -> Expression:
         category = node.category

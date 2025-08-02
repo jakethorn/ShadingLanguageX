@@ -1,0 +1,8 @@
+const float x = 1.0;
+
+void foo()
+{
+    x = 3.0;
+}
+
+foo();

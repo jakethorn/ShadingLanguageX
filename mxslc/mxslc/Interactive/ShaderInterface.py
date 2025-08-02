@@ -5,7 +5,7 @@ from typing import Sequence
 
 import MaterialX as mx
 
-from .InteractiveExpression import InteractiveExpression
+from .ValueExpression import ValueExpression
 from .InteractiveNode import InteractiveNode
 from .mx_interactive_types import Value
 from .. import state, node_utils
@@ -75,7 +75,7 @@ def _to_arg_list(args: Sequence[Value | InteractiveNode]) -> list[Argument]:
     for i, arg in enumerate(args):
         if isinstance(arg, InteractiveNode):
             arg = arg.node
-        expr_arg = Argument(InteractiveExpression(arg), i)
+        expr_arg = Argument(ValueExpression(arg), i)
         expr_arg.init()
         arg_list.append(expr_arg)
     return arg_list

@@ -34,7 +34,7 @@ class Parser(TokenReader):
         attribs = self.__attributes()
         stmt = None
         token = self._peek()
-        if token in Keyword.DATA_TYPES() ^ {Keyword.AUTO} and self._peek_next_next() == "=":
+        if (token in [Keyword.CONST, Keyword.GLOBAL]) or (token in Keyword.DATA_TYPES() ^ {Keyword.AUTO} and self._peek_next_next() == "="):
             stmt = self.__variable_declaration()
         elif token in Keyword.DATA_TYPES() ^ {Keyword.AUTO, Keyword.VOID} and self._peek_next_next() in ["(", "<"]:
             stmt = self.__function_declaration()
@@ -74,15 +74,19 @@ class Parser(TokenReader):
         return attribs
 
     def __variable_declaration(self) -> VariableDeclaration:
+        modifiers = self.__modifiers(Keyword.CONST, Keyword.GLOBAL)
         data_type = self._match(Keyword.DATA_TYPES(), Keyword.AUTO)
         identifier = self._match(IDENTIFIER)
-        self._match("=")
-        right = self.__expression()
+        if Keyword.GLOBAL in modifiers:
+            right = None
+        else:
+            self._match("=")
+            right = self.__expression()
         self._match(";")
-        return VariableDeclaration(data_type, identifier, right)
+        return VariableDeclaration(modifiers, data_type, identifier, right)
 
     def __function_declaration(self) -> FunctionDeclaration:
-        is_inline = self._consume(Keyword.INLINE) is not None
+        is_inline = Keyword.INLINE in self.__modifiers(Keyword.INLINE)
         return_type = self._match(Keyword.DATA_TYPES(), Keyword.AUTO, Keyword.VOID)
         identifier = self._match(IDENTIFIER)
         template_types = []
@@ -116,7 +120,7 @@ class Parser(TokenReader):
         return FunctionDeclaration(is_inline, return_type, identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
-        is_out = self._consume(Keyword.OUT) is not None
+        is_out = Keyword.OUT in self.__modifiers(Keyword.OUT)
         data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
         if self._consume("="):
@@ -150,7 +154,7 @@ class Parser(TokenReader):
         return CompoundAssignment(identifier, property_, operator, right)
 
     def __for_loop(self) -> ForLoop:
-        is_inline = self._consume(Keyword.INLINE) is not None
+        is_inline = Keyword.INLINE in self.__modifiers(Keyword.INLINE)
         self._match(Keyword.FOR)
         self._match("(")
         data_type = self._match(Keyword.DATA_TYPES())
@@ -170,6 +174,15 @@ class Parser(TokenReader):
             statements.append(self.__statement())
         self._match("}")
         return ForLoop(is_inline, data_type, identifier, start_value, value2, value3, statements)
+
+    def __modifiers(self, *modifiers: str) -> list[Token]:
+        modifiers_list = list(modifiers)
+        tokens: list[Token] = []
+        while token := self._consume(modifiers_list):
+            if token in tokens:
+                raise CompileError(f"Too many instances of modifier '{token}'.", token)
+            tokens.append(token)
+        return tokens
 
     def __expression(self) -> Expression:
         return self.__logic()
