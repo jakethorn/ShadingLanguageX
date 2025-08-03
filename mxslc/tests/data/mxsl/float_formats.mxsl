@@ -1,0 +1,13 @@
+float a = 2.5;
+float b = 2.;
+float c = .5;
+float d = 10.0e-3;
+float e = 10.0e7;
+float f = .3e4;
+float g = .3e-4;
+float h = 3.e4;
+float i = 3.e-4;
+auto v1 = vec4(a, b, c, d);
+auto v2 = vec4(e, f, g, h);
+auto v3 = vec4(i, 0.0, 0.0, 0.0);
+auto v4 = v1 + v2 + v3;

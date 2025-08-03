@@ -103,6 +103,7 @@ _overwrite_all_expected = False
     ("if_else_2", False),
     ("if_else_3", False),
     ("const", False),
+    ("float_formats", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

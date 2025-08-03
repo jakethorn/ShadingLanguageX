@@ -56,6 +56,8 @@ class Scanner:
     def __identify_token(self) -> Token | None:
         if comment := self.__get_line_comment():
             return self.__token(COMMENT, comment)
+        if float_lit := self.__get_float_literal():
+            return self.__token(FLOAT_LITERAL, float_lit)
         char = self.__peek()
         if char in ["(", ")", "{", "}", "[", "]", ".", ",", ":", ";", "@", EOL]:
             return self.__token(char)
@@ -71,8 +73,6 @@ class Scanner:
                 return self.__token(word)
             else:
                 return self.__token(IDENTIFIER, word)
-        if float_lit := self.__get_float_literal():
-            return self.__token(FLOAT_LITERAL, float_lit)
         if int_lit := self.__get_int_literal():
             return self.__token(INT_LITERAL, int_lit)
         if filename_lit := self.__get_filename_literal():
@@ -104,7 +104,7 @@ class Scanner:
         return match.group() if match else None
 
     def __get_float_literal(self) -> str | None:
-        match = re.match(r"[0-9]+\.[0-9]+", self.__peek_all())
+        match = re.match(r"(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))+(e-?[0-9]+)?", self.__peek_all())
         return match.group() if match else None
 
     def __get_int_literal(self) -> str | None:
