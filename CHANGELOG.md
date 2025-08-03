@@ -11,6 +11,10 @@ A variable declared with the `const` keyword cannot be assigned to after its ini
 * __Global Variables ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#global))__  
 The global keyword operates similarly to `uniform` from GLSL. Global variables do not require an initial value and are instead initialized by user-defined values passed to the compiler.
 
+
+* __Improved Float Parsing__  
+Floating-point values can now be written in the scientific format and/or with zeros before or after the decimal point omitted.
+
 # Version 0.5.3-beta
 ## Added
 * __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#inline))__  

@@ -11,26 +11,27 @@
 3. [Data Types](#data-types)
 4. [Expressions](#expressions)
 5. [Statements](#statements)
-6. [Identifiers](#identifiers)
-7. [Reserved Keywords](#reserved-keywords)
-8. [Whitespace](#whitespace)
-9. [Comments](#comments)
-10. [Operators](#operators)
-11. [Variable Declarations](#variable-declarations)
-12. [Variable Assignments](#variable-assignments)
-13. [Constructors](#constructors)
-14. [If Expressions](#if-expressions)
-15. [Switch Expressions](#switch-expressions)
-16. [For Loops](#for-loops)
-17. [User Functions](#user-functions)
-18. [Statement Modifiers](#statement-modifiers)
-19. [Attributes](#attributes)
-20. [Node Constructors](#node-constructors)
-21. [Null Expression](#null-expression)
-22. [Standard Library](#standard-library)
-23. [Scope](#scope) 
-24. [Preprocessor Directives](#preprocessor-directives)
-25. [mxslc](#mxslc)
+6. [Literals](#literals)
+7. [Identifiers](#identifiers)
+8. [Reserved Keywords](#reserved-keywords)
+9. [Whitespace](#whitespace)
+10. [Comments](#comments)
+11. [Operators](#operators)
+12. [Variable Declarations](#variable-declarations)
+13. [Variable Assignments](#variable-assignments)
+14. [Constructors](#constructors)
+15. [If Expressions](#if-expressions)
+16. [Switch Expressions](#switch-expressions)
+17. [For Loops](#for-loops)
+18. [User Functions](#user-functions)
+19. [Statement Modifiers](#statement-modifiers)
+20. [Attributes](#attributes)
+21. [Node Constructors](#node-constructors)
+22. [Null Expression](#null-expression)
+23. [Standard Library](#standard-library)
+24. [Scope](#scope) 
+25. [Preprocessor Directives](#preprocessor-directives)
+26. [mxslc](#mxslc)
 
 # Introduction
 
@@ -230,6 +231,20 @@ the statements supported by ShadingLanguageX.
 | Function Declaration  | `float add_one(float a) { return a + 1.0; }` |
 | For Loop              | `for (int i = 0:10) { a = add_one(a); }`     |
 | Expression Statement  | `standard_surface(base_color=color3(a));`    |
+
+# Literals
+
+Literals represent the fundamental data used by the system.
+
+| Data Type  | Formatting Examples                    |
+|------------|----------------------------------------|
+| `boolean`  | `true` `false`                         |
+| `integer`  | `79`                                   |
+| `float`    | `0.5` `2.` `.9` `2.5e6` `2.e3` `.9e-3` |
+| `string`   | `"tangent"`                            |
+| `filename` | `"../textures/brick.png"`              |
+
+See [Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors) for information on how to initialise vectors and colors.
 
 # Identifiers
 
