@@ -1,5 +1,6 @@
-from __future__ import annotations
 
+from __future__ import annotations
+from typing import Union
 from abc import ABC, abstractmethod
 
 from .. import utils
@@ -11,7 +12,7 @@ from ..mx_wrapper import Node
 
 
 class Expression(ABC):
-    def __init__(self, token: Token | None):
+    def __init__(self, token: Union[Token, None]):
         self.__token = token
         self.__initialized = False
 
@@ -27,7 +28,7 @@ class Expression(ABC):
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         ...
 
-    def init(self, valid_types: DataType | set[DataType] = None) -> None:
+    def init(self, valid_types: Union[DataType, set[DataType]] = None) -> None:
         if not self.__initialized:
             valid_types = _handle_valid_types(valid_types)
             if len(valid_types) == 0:
@@ -38,7 +39,7 @@ class Expression(ABC):
                 raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
             self.__initialized = True
 
-    def try_init(self, valid_types: DataType | set[DataType] = None) -> CompileError | None:
+    def try_init(self, valid_types: Union[DataType, set[DataType]] = None) -> Union[CompileError, None]:
         try:
             self.init(valid_types)
             return None
@@ -77,12 +78,12 @@ class Expression(ABC):
     def _evaluate(self) -> Node:
         ...
 
-    def init_evaluate(self, valid_types: DataType | set[DataType] = None) -> Node:
+    def init_evaluate(self, valid_types: Union[DataType, set[DataType]] = None) -> Node:
         self.init(valid_types)
         return self.evaluate()
 
 
-def _handle_valid_types(data_types: DataType | set[DataType]) -> set[DataType]:
+def _handle_valid_types(data_types: Union[DataType, set[DataType]]) -> set[DataType]:
     if data_types is None:
         return DATA_TYPES ^ {VOID}
     if isinstance(data_types, DataType):

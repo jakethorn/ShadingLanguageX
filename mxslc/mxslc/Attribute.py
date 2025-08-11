@@ -1,14 +1,16 @@
+
+from typing import Union
 from .Token import Token
 
 
 class Attribute:
-    def __init__(self, child: Token | None, name: Token, value: Token):
+    def __init__(self, child: 'Token' = None, name: 'Token' = None, value: 'Token' = None):
         self.__child = child
         self.__name = name
         self.__value = value
 
     @property
-    def child(self) -> str | None:
+    def child(self) -> Union[str, None]:
         return self.__child.lexeme if self.__child is not None else None
 
     @property

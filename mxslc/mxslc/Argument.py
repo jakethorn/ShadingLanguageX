@@ -1,5 +1,6 @@
-from __future__ import annotations
 
+from __future__ import annotations
+from typing import Union
 from .CompileError import CompileError
 from .DataType import DataType
 from .Expressions import Expression
@@ -21,7 +22,7 @@ class Argument:
         return self.__position
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> Union[str, None]:
         return self.__identifier.lexeme if self.__identifier else None
 
     @property
@@ -47,10 +48,10 @@ class Argument:
     def instantiate_templated_types(self, template_type: DataType) -> Argument:
         return Argument(self.expression.instantiate_templated_types(template_type), self.position, self.__identifier)
 
-    def init(self, valid_types: DataType | set[DataType] = None) -> None:
+    def init(self, valid_types: Union[DataType, set[DataType]] = None) -> None:
         self.expression.init(valid_types)
 
-    def try_init(self, valid_types: DataType | set[DataType] = None) -> CompileError | None:
+    def try_init(self, valid_types: Union[DataType, set[DataType]] = None) -> Union[CompileError, None]:
         return self.expression.try_init(valid_types)
 
     def evaluate(self) -> Node:

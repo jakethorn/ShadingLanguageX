@@ -17,7 +17,7 @@ from .Token import Token, IdentifierToken
 from .document import get_document
 from .mx_wrapper import Node, NodeDef, Output, NodeGraph
 
-type Statement = Any
+Statement = Any
 
 
 def create_function(is_inline: bool, *args) -> Function:

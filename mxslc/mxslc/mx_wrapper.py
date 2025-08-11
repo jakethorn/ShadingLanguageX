@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+
+from typing import Union
 from pathlib import Path
 
 import MaterialX as mx
@@ -17,8 +19,8 @@ Pythonic wrappers around the generated MaterialX Python API.
 #
 
 
-type Uniform = bool | int | float | mx.Vector2 | mx.Vector3 | mx.Vector4 | mx.Color3 | mx.Color4 | str | Path
-type Value = Node | Output | Uniform | None
+Uniform = Union[bool, int, float, mx.Vector2, mx.Vector3, mx.Vector4, mx.Color3, mx.Color4, str, Path]
+Value = Union['Node', 'Output', Uniform, None]
 
 
 #

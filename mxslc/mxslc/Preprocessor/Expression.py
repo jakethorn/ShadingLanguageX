@@ -5,7 +5,7 @@ from ..CompileError import CompileError
 from ..Keyword import Keyword
 from ..Token import Token
 
-type Primitive = bool | int | float | str
+Primitive = bool | int | float | str
 
 
 class Expression(ABC):

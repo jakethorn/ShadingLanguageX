@@ -69,9 +69,10 @@ class Scanner:
         if directive := self.__get_directive():
             return self.__token(directive)
         if word := self.__get_word():
-            if word in Keyword:
-                return self.__token(word)
-            else:
+            try:
+                kw = Keyword(word)
+                return self.__token(kw)
+            except ValueError:
                 return self.__token(IDENTIFIER, word)
         if int_lit := self.__get_int_literal():
             return self.__token(INT_LITERAL, int_lit)

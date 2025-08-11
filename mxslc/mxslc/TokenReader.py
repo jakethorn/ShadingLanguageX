@@ -56,12 +56,18 @@ class TokenReader(ABC):
         if token := self._consume(token_types):
             return token
         # raise compile error if not a match
+
         token = self._peek()
-        if token in Keyword and token_types == [IDENTIFIER]:
-            msg = f"'{token.lexeme}' is a protected keyword and cannot be used as an identifier."
-        else:
+        try:
+            kw = Keyword(token.lexeme)
+            if token_types == [IDENTIFIER]:
+                msg = f"'{token.lexeme}' is a protected keyword and cannot be used as an identifier."
+            else:
+                msg = f"Expected {_format_tokens(token_types)}, but found '{token.lexeme}'."
+            raise CompileError(on_fail or msg, fail_token or token)
+        except ValueError:
             msg = f"Expected {_format_tokens(token_types)}, but found '{token.lexeme}'."
-        raise CompileError(on_fail or msg, fail_token or token)
+            raise CompileError(on_fail or msg, fail_token or token)
 
     def __peek(self, future: int) -> Token:
         if self.__index + future >= len(self.__tokens):

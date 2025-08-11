@@ -8,7 +8,7 @@ from ..DataType import DataType
 from ..Token import Token
 from ..mx_wrapper import Node
 
-type Argument = Any
+Argument = Any
 
 
 class FunctionCall(Expression):

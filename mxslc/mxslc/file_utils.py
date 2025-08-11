@@ -1,10 +1,12 @@
+
+from typing import Union
 from pathlib import Path
 
 
-def handle_input_path(input_path: str | Path, extension=".mxsl") -> list[Path]:
+def handle_input_path(input_path: Union[str, Path], extension=".mxsl") -> list[Path]:
     if input_path is None:
         raise TypeError(f"Path to {extension} file was empty.")
-    if not isinstance(input_path, str | Path):
+    if not isinstance(input_path, (str, Path)):
         raise TypeError(f"Path to {extension} file was an invalid type: '{type(input_path)}'.")
     input_path = Path(input_path).resolve()
     if not input_path.exists():
@@ -19,10 +21,10 @@ def handle_input_path(input_path: str | Path, extension=".mxsl") -> list[Path]:
     raise ValueError(f"Invalid input path: '{input_path}'.")
 
 
-def handle_output_path(output_path: str | Path | None, input_filepath: Path, extension=".mtlx") -> Path:
+def handle_output_path(output_path: Union[str, Path, None], input_filepath: Path, extension=".mtlx") -> Path:
     if output_path is None:
         return input_filepath.with_suffix(extension)
-    if not isinstance(output_path, str | Path):
+    if not isinstance(output_path, (str, Path)):
         raise TypeError(f"Path to {extension} file was an invalid type: '{type(output_path)}'.")
     output_path = Path(output_path).resolve()
     if output_path.is_file():

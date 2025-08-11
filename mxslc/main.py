@@ -6,7 +6,9 @@ from mxslc.CompileError import CompileError
 from mxslc.scan import as_token
 
 
-def _parse_main_args(args: list[str]) -> list[bool | int | float | str | Path]:
+from typing import Union
+
+def _parse_main_args(args: list[str]) -> list[Union[bool, int, float, str, Path]]:
     parsed_args = []
     for arg in args:
         try:

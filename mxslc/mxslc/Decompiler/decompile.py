@@ -1,3 +1,5 @@
+
+from typing import Union
 from pathlib import Path
 
 from .DecompileError import DecompileError
@@ -13,7 +15,7 @@ from ..file_utils import handle_input_path, handle_output_path
 from ..mx_wrapper import Document, Node, Input, Output
 
 
-def decompile_file(mtlx_path: str | Path, mxsl_path: str | Path = None) -> None:
+def decompile_file(mtlx_path: Union[str, Path], mxsl_path: Union[str, Path, None] = None) -> None:
     mtlx_filepaths = handle_input_path(mtlx_path, extension=".mtlx")
     for mtlx_filepath in mtlx_filepaths:
         mxsl_filepath = handle_output_path(mxsl_path, mtlx_filepath, extension=".mxsl")
@@ -24,9 +26,12 @@ def decompile_file(mtlx_path: str | Path, mxsl_path: str | Path = None) -> None:
 
         print(f"{mtlx_filepath.name} decompiled successfully.")
 
+def decompile_string(mtlx_content: str) -> str:    
+    decompiler = Decompiler(mtlx_content)
+    return decompiler.decompile()
 
 class Decompiler:
-    def __init__(self, mtlx_filepath: Path):
+    def __init__(self, mtlx_filepath: Union[str, Path]):
         self.__doc = Document(mtlx_filepath)
         self.__doc.load_standard_library()
         self.__func_names = {nd.node_string for nd in self.__doc.node_defs}

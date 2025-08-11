@@ -10,8 +10,8 @@ from .mx_wrapper import Node, NodeGraph, Output, GraphElement, Uniform
 from .Token import Token, IdentifierToken
 from .document import get_document
 
-type Argument = Any
-type Function = Any
+Argument = Any
+Function = Any
 
 # TODO there is currently a bug, in the following scenario:
 """

@@ -1,5 +1,6 @@
+
 from __future__ import annotations
-from typing import Iterator
+from typing import Iterator, Union
 
 from .Argument import Argument
 from .DataType import DataType
@@ -11,7 +12,7 @@ class Parameter:
     """
     Represents a parameter to a function or constructor call.
     """
-    def __init__(self, identifier: Token, data_type: Token | DataType, default_value: Expression = None, is_out=False):
+    def __init__(self, identifier: Token, data_type: Union[Token, DataType], default_value: Expression = None, is_out=False):
         self.__identifier = identifier
         self.__data_type = DataType(data_type)
         self.__default_value = default_value
@@ -30,7 +31,7 @@ class Parameter:
         return self.__data_type
 
     @property
-    def default_value(self) -> Expression | None:
+    def default_value(self) -> Union[Expression, None]:
         return self.__default_value
 
     @property
@@ -59,7 +60,7 @@ class ParameterList:
     """
     A list of parameters that can be accessed by their position or name.
     """
-    def __init__(self, params: ParameterList | list[Parameter] = None):
+    def __init__(self, params: Union['ParameterList', list['Parameter']] = None):
         if isinstance(params, ParameterList):
             self.__params: list[Parameter] = params.__params
         elif isinstance(params, list):

@@ -1,5 +1,6 @@
+
+from typing import Sequence, Union
 from pathlib import Path
-from typing import Sequence
 
 from . import state
 from .CompileError import CompileError
@@ -13,14 +14,14 @@ from .mx_wrapper import Uniform
 from .post_process import post_process
 
 
-def compile_file(mxsl_path: str | Path,
-                 mtlx_path: str | Path = None,
+def compile_file(mxsl_path: Union[str, Path],
+                 mtlx_path: Union[str, Path, None] = None,
                  *,
                  globals: dict[str, Uniform] = None,
                  main_func: str = None,
                  main_args: Sequence[Uniform] = None,
                  add_include_dirs: Sequence[Path] = None,
-                 add_macros: Sequence[str | Macro] = None,
+                 add_macros: Sequence[Union[str, Macro]] = None,
                  validate=False) -> None:
     globals = globals or {}
     main_args = main_args or []
@@ -58,7 +59,7 @@ def compile_file(mxsl_path: str | Path,
         print(f"{mxsl_filepath.name} compiled successfully.")
 
 
-def _call_main(file: Path, name: str | None, args: Sequence[Value]) -> None:
+def _call_main(file: Path, name: Union[str, None], args: Sequence[Value]) -> None:
     shader = ShaderInterface()
     if name is None:
         if "main" in shader and shader.main.file == file:
