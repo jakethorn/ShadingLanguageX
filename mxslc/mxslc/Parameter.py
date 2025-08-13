@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Iterator
 
 from .Argument import Argument
+from .Attribute import Attribute
 from .DataType import DataType
 from .Expressions import Expression
 from .Token import Token
@@ -11,11 +12,20 @@ class Parameter:
     """
     Represents a parameter to a function or constructor call.
     """
-    def __init__(self, identifier: Token, data_type: Token | DataType, default_value: Expression = None, is_out=False):
+    def __init__(self,
+                 identifier: Token,
+                 data_type: Token | DataType,
+                 default_value: Expression = None,
+                 is_out=False,
+                 attribs: list[Attribute] = None):
         self.__identifier = identifier
         self.__data_type = DataType(data_type)
         self.__default_value = default_value
         self.__is_out = is_out
+        self.__attribs = attribs or []
+
+        for attrib in self.__attribs:
+            attrib.child = identifier
 
     @property
     def name(self) -> str:
@@ -40,6 +50,10 @@ class Parameter:
     @property
     def is_out(self) -> bool:
         return self.__is_out
+
+    @property
+    def attributes(self) -> list[Attribute]:
+        return self.__attribs
 
     def init_default_value(self) -> None:
         if self.default_value:

@@ -120,6 +120,7 @@ class Parser(TokenReader):
         return FunctionDeclaration(is_inline, return_type, identifier, template_types, params, statements, return_expr)
 
     def __parameter(self) -> Parameter:
+        attribs = self.__attributes()
         is_out = Keyword.OUT in self.__modifiers(Keyword.OUT)
         data_type = self._match(Keyword.DATA_TYPES())
         identifier = self._match(IDENTIFIER)
@@ -129,7 +130,7 @@ class Parser(TokenReader):
             default_value = self.__expression()
         else:
             default_value = None
-        return Parameter(identifier, data_type, default_value, is_out)
+        return Parameter(identifier, data_type, default_value, is_out, attribs)
 
     def __assignment(self) -> Statement:
         identifier = self._match(IDENTIFIER)

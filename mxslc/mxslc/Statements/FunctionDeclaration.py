@@ -51,4 +51,6 @@ class FunctionDeclaration(Statement):
         for func in sorted(self.__funcs):
             func.initialise()
             func.add_attributes(self._attribs)
+            for param in self.__params:
+                func.add_attributes(param.attributes)
             state.add_function(func)
