@@ -10,6 +10,7 @@ from .Token import Token
 
 type Uniform = Any
 
+
 class DataType:
     """
     Represents a data type (e.g., float, vector3, string, etc...).
@@ -50,40 +51,46 @@ class DataType:
             Keyword.COLOR4: 4
         }[Keyword(self.__data_type)]
 
-    def zeros(self) -> Uniform:
-        return {
-            Keyword.BOOLEAN: False,
-            Keyword.INTEGER: 0,
-            Keyword.FLOAT: 0.0,
-            Keyword.VECTOR2: mx.Vector2(),
-            Keyword.VECTOR3: mx.Vector3(),
-            Keyword.VECTOR4: mx.Vector4(),
-            Keyword.COLOR3: mx.Color3(),
-            Keyword.COLOR4: mx.Color4()
-        }[Keyword(self.__data_type)]
-
-    def default(self) -> Uniform:
-        if self.__data_type in [
-            Keyword.BOOLEAN,
-            Keyword.INTEGER,
-            Keyword.FLOAT,
-            Keyword.VECTOR2,
-            Keyword.VECTOR3,
-            Keyword.VECTOR4,
-            Keyword.COLOR3,
-            Keyword.COLOR4
-        ]:
-            return self.zeros()
-        if self.__data_type == Keyword.STRING:
-            return ""
-        elif self.__data_type == Keyword.FILENAME:
-            return Path()
-        else:
-            return ""
-
     @property
     def as_token(self) -> Token:
         return Token(self.__data_type)
+
+    def from_value(self, value: bool | int | float) -> Uniform:
+        value = float(value)
+        if self.__data_type == Keyword.BOOLEAN: return bool(value)
+        if self.__data_type == Keyword.INTEGER: return int(value)
+        if self.__data_type == Keyword.FLOAT:   return value
+        if self.__data_type == Keyword.VECTOR2: return mx.Vector2(value)
+        if self.__data_type == Keyword.VECTOR3: return mx.Vector3(value)
+        if self.__data_type == Keyword.VECTOR4: return mx.Vector4(value)
+        if self.__data_type == Keyword.COLOR3:  return mx.Color3(value)
+        if self.__data_type == Keyword.COLOR4:  return mx.Color4(value)
+        raise AssertionError
+
+    def from_channels(self, channels: list[float]) -> mx.VectorBase:
+        channels = channels[:self.size]
+        if self.__data_type == Keyword.VECTOR2: return mx.Vector2(channels)
+        if self.__data_type == Keyword.VECTOR3: return mx.Vector3(channels)
+        if self.__data_type == Keyword.VECTOR4: return mx.Vector4(channels)
+        if self.__data_type == Keyword.COLOR3:  return mx.Color3(channels)
+        if self.__data_type == Keyword.COLOR4:  return mx.Color4(channels)
+        raise AssertionError
+
+    def zeros(self) -> Uniform:
+        return self.from_value(0)
+
+    def default(self) -> Uniform:
+        if self.__data_type == Keyword.BOOLEAN:  return False
+        if self.__data_type == Keyword.INTEGER:  return 0
+        if self.__data_type == Keyword.FLOAT:    return 0.0
+        if self.__data_type == Keyword.VECTOR2:  return mx.Vector2()
+        if self.__data_type == Keyword.VECTOR3:  return mx.Vector3()
+        if self.__data_type == Keyword.VECTOR4:  return mx.Vector4()
+        if self.__data_type == Keyword.COLOR3:   return mx.Color3()
+        if self.__data_type == Keyword.COLOR4:   return mx.Color4()
+        if self.__data_type == Keyword.STRING:   return ""
+        if self.__data_type == Keyword.FILENAME: return Path()
+        return ""
 
     def __eq__(self, other: Token | DataType | str) -> bool:
         if isinstance(other, Token):

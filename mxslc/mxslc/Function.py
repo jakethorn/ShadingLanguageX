@@ -243,7 +243,11 @@ class NodeGraphFunction(Function):
     def __create_node_def(self) -> None:
         self.__node_def = get_document().add_node_def(self.fullname, self._return_type, self.name)
         for param in self._in_params:
-            self.__node_def.add_input(param.name, data_type=param.data_type)
+            if param.default_value and param.default_value.has_value:
+                self.__node_def.add_input(param.name, param.default_value.value)
+                param.set_null()
+            else:
+                self.__node_def.add_input(param.name, data_type=param.data_type)
         for param in self._out_params:
             self.__node_def.add_output(param.name, data_type=param.data_type)
 

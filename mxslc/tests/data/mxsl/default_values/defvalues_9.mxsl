@@ -1,0 +1,10 @@
+float foo(float in = randomfloat())
+{
+    return in;
+}
+
+auto x = foo();
+auto y = foo();
+auto z = foo(randomfloat());
+auto w = foo(2.0);
+auto k = foo();

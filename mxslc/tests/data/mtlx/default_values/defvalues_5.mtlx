@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="my_vec" type="vector3" value="-0, 1, -2" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <extract name="node3" type="float">
+      <input name="in" type="vector3" interfacename="my_vec" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <add name="node5" type="float">
+      <input name="in1" type="float" nodename="node3" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node5" />
+  </nodegraph>
+  <foo name="x" type="float" />
+</materialx>

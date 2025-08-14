@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import MaterialX as mx
 
@@ -17,7 +18,7 @@ Pythonic wrappers around the generated MaterialX Python API.
 #
 
 
-type Uniform = bool | int | float | mx.Vector2 | mx.Vector3 | mx.Vector4 | mx.Color3 | mx.Color4 | str | Path
+type Uniform = bool | int | float | mx.VectorBase | str | Path
 type Value = Node | Output | Uniform | None
 
 
@@ -613,6 +614,37 @@ class NodeGraph(GraphElement):
     @node_def.setter
     def node_def(self, node_def: NodeDef) -> None:
         self.source.setNodeDef(node_def.source)
+
+
+#
+#   VectorBase Monkey Patch
+#
+
+
+def vector_mul(self: mx.VectorBase, other: Any) -> mx.VectorBase:
+    if isinstance(other, float):
+        other = self.__class__(other)
+    assert isinstance(other, self.__class__)
+    return self.__class__([
+        a * b
+        for a, b
+        in zip(self.asTuple(), other.asTuple())
+    ])
+
+
+def vector_rmul(self: mx.VectorBase, other: Any) -> mx.VectorBase:
+    return self * other
+
+
+def vector_neg(self: mx.VectorBase) -> mx.VectorBase:
+    return self.__class__(
+        [-c for c in self.asTuple()]
+    )
+
+
+mx.VectorBase.__mul__ = vector_mul
+mx.VectorBase.__rmul__ = vector_rmul
+mx.VectorBase.__neg__ = vector_neg
 
 
 #
