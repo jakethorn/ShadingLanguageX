@@ -158,14 +158,16 @@ class Parser(TokenReader):
         is_inline = Keyword.INLINE in self.__modifiers(Keyword.INLINE)
         self._match(Keyword.FOR)
         self._match("(")
-        data_type = self._match(Keyword.DATA_TYPES())
+        valid_data_types = [Keyword.FLOAT, Keyword.INT]
+        valid_expressions = [FLOAT_LITERAL, INT_LITERAL, IDENTIFIER]
+        data_type = self._match(valid_data_types)
         identifier = self._match(IDENTIFIER)
         self._match("=")
-        start_value = self._match(FLOAT_LITERAL, IDENTIFIER)
+        start_value = self._match(valid_expressions)
         self._match(":")
-        value2 = self._match(FLOAT_LITERAL, IDENTIFIER)
+        value2 = self._match(valid_expressions)
         if self._consume(":"):
-            value3 = self._match(FLOAT_LITERAL, IDENTIFIER)
+            value3 = self._match(valid_expressions)
         else:
             value3 = None
         self._match(")")
