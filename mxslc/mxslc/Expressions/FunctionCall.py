@@ -73,9 +73,6 @@ class FunctionCall(Expression):
     def _evaluate(self) -> Node:
         return self.__func.invoke(self.__args)
 
-    def _set_argument(self, arg: Argument) -> None:
-        self.__args[arg.position] = arg
-
     def __assert_valid_argument_order(self):
         found_named = False
         for arg in self.__args:

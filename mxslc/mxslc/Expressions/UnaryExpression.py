@@ -4,9 +4,10 @@ from ..CompileError import CompileError
 from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, MULTI_ELEM_TYPES
 from ..Keyword import Keyword
 from ..Token import Token
-from ..mx_wrapper import Node
+from ..mx_wrapper import Node, Uniform
 
 
+# TODO type checking. Maybe do the same as binary expression.
 class UnaryExpression(Expression):
     """
     Examples:
@@ -19,6 +20,17 @@ class UnaryExpression(Expression):
         super().__init__(op)
         self.__op = op
         self.__right = right
+
+    @property
+    def value(self) -> Uniform | None:
+        if self.__right.has_value:
+            if self.__op in ["!", Keyword.NOT]:
+                return not self.__right.value
+            elif self.__op == "-":
+                return -self.__right.value
+            else:
+                return self.__right.value
+        return None
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         right = self.__right.instantiate_templated_types(template_type)

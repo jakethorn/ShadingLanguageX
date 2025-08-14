@@ -1,16 +1,40 @@
+from typing import Any
+
 from . import Expression
 from .expression_utils import format_args
 from .. import node_utils
-from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES
+from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES, BOOLEAN, INTEGER
 from ..Token import Token
-from ..mx_wrapper import Node
+from ..mx_wrapper import Node, Uniform
+
+type Argument = Any
+
 
 # TODO type checking. Maybe do the same as binary expression.
 class ConstructorCall(Expression):
-    def __init__(self, data_type: Token | DataType, args: list["Argument"]):
+    def __init__(self, data_type: Token | DataType, args: list[Argument]):
         super().__init__(data_type if isinstance(data_type, Token) else data_type.as_token)
         self.__data_type = DataType(data_type)
         self.__args = args
+
+    @property
+    def value(self) -> Uniform | None:
+        arg_exprs = [a.expression for a in self.__args]
+        if any(not e.has_value for e in arg_exprs):
+            return None
+        arg_channels: list[Uniform] = []
+        for arg_expr in arg_exprs:
+            if arg_expr.data_type in [BOOLEAN, INTEGER, FLOAT]:
+                arg_channels.append(arg_expr.value)
+            else:
+                for c in arg_expr.value:
+                    arg_channels.append(c)
+        if len(arg_channels) == 0:
+            return self.data_type.default()
+        elif len(arg_channels) == 1:
+            return self.data_type.from_value(arg_channels[0])
+        else:
+            return self.data_type.from_channels(arg_channels)
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         data_type = self.__data_type.instantiate(template_type)

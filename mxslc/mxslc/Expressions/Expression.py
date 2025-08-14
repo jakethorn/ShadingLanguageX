@@ -7,7 +7,7 @@ from ..CompileError import CompileError
 from ..DataType import DataType, DATA_TYPES, VOID
 from ..Keyword import Keyword
 from ..Token import Token
-from ..mx_wrapper import Node
+from ..mx_wrapper import Node, Uniform
 
 
 class Expression(ABC):
@@ -16,7 +16,7 @@ class Expression(ABC):
         self.__initialized = False
 
     @property
-    def token(self) -> Token:
+    def token(self) -> Token | None:
         return self.__token
 
     @property
@@ -66,6 +66,15 @@ class Expression(ABC):
     @property
     def data_size(self) -> int:
         return self.data_type.size
+
+    @property
+    #virtualmethod
+    def value(self) -> Uniform | None:
+        return None
+
+    @property
+    def has_value(self) -> bool:
+        return self.value is not None
 
     def evaluate(self) -> Node:
         assert self.__initialized

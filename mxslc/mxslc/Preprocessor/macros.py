@@ -52,7 +52,7 @@ def replace_macro(identifier: str | Token) -> list[Token]:
     for macro in _macros:
         if macro.identifier == identifier:
             return macro.value
-    raise AssertionError()
+    raise AssertionError
 
 
 def undefine_all_macros() -> None:

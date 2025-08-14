@@ -52,7 +52,7 @@ class Processor(TokenReader):
             return self.__process_pragma()
         if directive == PRINT:
             return self.__process_print()
-        raise AssertionError()
+        raise AssertionError
 
     def __process_define(self) -> list[Token]:
         self._match(DEFINE)

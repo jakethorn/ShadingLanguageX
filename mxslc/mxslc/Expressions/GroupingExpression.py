@@ -1,6 +1,6 @@
 from . import Expression
 from ..DataType import DataType
-from ..mx_wrapper import Node
+from ..mx_wrapper import Node, Uniform
 
 
 class GroupingExpression(Expression):
@@ -12,6 +12,10 @@ class GroupingExpression(Expression):
     def __init__(self, expr: Expression):
         super().__init__(expr.token)
         self.__expr = expr
+
+    @property
+    def value(self) -> Uniform:
+        return self.__expr.value
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         expr = self.__expr.instantiate_templated_types(template_type)

@@ -5,6 +5,7 @@ from .Argument import Argument
 from .Attribute import Attribute
 from .DataType import DataType
 from .Expressions import Expression
+from .Expressions.LiteralExpression import NullExpression
 from .Token import Token
 
 
@@ -58,6 +59,10 @@ class Parameter:
     def init_default_value(self) -> None:
         if self.default_value:
             self.default_value.init(self.data_type)
+
+    def set_null(self) -> None:
+        self.__default_value = NullExpression()
+        self.init_default_value()
 
     def __str__(self) -> str:
         output = ""

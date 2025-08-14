@@ -1,0 +1,6 @@
+float foo(float in = -(3.0))
+{
+    return in + 1.0;
+}
+
+auto x = foo();

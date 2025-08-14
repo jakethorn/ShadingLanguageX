@@ -1,0 +1,6 @@
+float foo(vec3 my_vec = -vec3(0.0, -1.0, 2.0))
+{
+    return my_vec[1] + 1.0;
+}
+
+auto x = foo();

@@ -1,0 +1,11 @@
+float foo(
+    float in,
+    color4 c = color4(),
+    int i = -100,
+    float f = 2.0
+)
+{
+    return in;
+}
+
+auto x = foo(3.0);

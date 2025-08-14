@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+    <input name="in" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <dot name="node1" type="float">
+      <input name="in" type="float" interfacename="in" />
+    </dot>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <randomfloat name="node5" type="float" />
+  <foo name="x" type="float">
+    <input name="in" type="float" nodename="node5" />
+  </foo>
+  <randomfloat name="node6" type="float" />
+  <foo name="y" type="float">
+    <input name="in" type="float" nodename="node6" />
+  </foo>
+  <randomfloat name="node7" type="float" />
+  <foo name="z" type="float">
+    <input name="in" type="float" nodename="node7" />
+  </foo>
+  <foo name="w" type="float">
+    <input name="in" type="float" value="2" />
+  </foo>
+  <randomfloat name="node9" type="float" />
+  <foo name="k" type="float">
+    <input name="in" type="float" nodename="node9" />
+  </foo>
+</materialx>
