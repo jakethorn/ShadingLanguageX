@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import MaterialX as mx
 
 from .Keyword import Keyword
 from .Token import Token
 
+type Uniform = Any
 
 class DataType:
     """
@@ -48,7 +50,7 @@ class DataType:
             Keyword.COLOR4: 4
         }[Keyword(self.__data_type)]
 
-    def zeros(self) -> "Uniform":
+    def zeros(self) -> Uniform:
         return {
             Keyword.BOOLEAN: False,
             Keyword.INTEGER: 0,
@@ -60,23 +62,24 @@ class DataType:
             Keyword.COLOR4: mx.Color4()
         }[Keyword(self.__data_type)]
 
-    def default(self) -> "Uniform":
+    def default(self) -> Uniform:
+        if self.__data_type in [
+            Keyword.BOOLEAN,
+            Keyword.INTEGER,
+            Keyword.FLOAT,
+            Keyword.VECTOR2,
+            Keyword.VECTOR3,
+            Keyword.VECTOR4,
+            Keyword.COLOR3,
+            Keyword.COLOR4
+        ]:
+            return self.zeros()
         if self.__data_type == Keyword.STRING:
             return ""
         elif self.__data_type == Keyword.FILENAME:
             return Path()
-        elif self.__data_type == Keyword.SURFACESHADER:
-            return ""
-        elif self.__data_type == Keyword.DISPLACEMENTSHADER:
-            return ""
-        elif self.__data_type == Keyword.MATERIAL:
-            return ""
-        elif self.__data_type == Keyword.VOID:
-            return ""
-        elif self.__data_type == Keyword.AUTO:
-            return ""
         else:
-            return self.zeros()
+            return ""
 
     @property
     def as_token(self) -> Token:

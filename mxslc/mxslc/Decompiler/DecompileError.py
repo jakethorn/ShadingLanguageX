@@ -1,4 +1,4 @@
-from mxslc.mx_wrapper import Element
+from ..mx_wrapper import Element
 
 
 # TODO add line numbers to decompilation errors

@@ -329,7 +329,7 @@ class PortElement(TypedElement):
             if isinstance(value, Path):
                 self.source.setValue(str(value), Keyword.FILENAME)
             else:
-                self.source.setValue(value)
+                self.source.setValue(value, str(self.data_type))
 
     @property
     def output_string(self) -> str | None:

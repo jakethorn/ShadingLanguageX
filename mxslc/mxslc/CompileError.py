@@ -1,4 +1,4 @@
-from mxslc.Token import Token
+from .Token import Token
 
 
 class CompileError(Exception):
