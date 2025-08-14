@@ -1,0 +1,11 @@
+void sum_channels(
+    @doc "input vector"
+    vec3 v,
+    @doc "output sum"
+    @attrib2 "dogs dont wear hats"
+    @attrib3 "but cats might"
+    out float f
+)
+{
+    f = v.x + v.y + v.z;
+}

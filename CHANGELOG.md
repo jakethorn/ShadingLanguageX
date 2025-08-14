@@ -15,6 +15,11 @@ The global keyword operates similarly to `uniform` from GLSL. Global variables d
 * __Improved Float Parsing__  
 Floating-point values can now be written in the scientific format and/or with zeros before or after the decimal point omitted.
 
+
+* __Attribute Syntax__  
+Attributes can now also be defined above parameters as well as statements.
+
+
 # Version 0.5.3-beta
 ## Added
 * __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#inline))__  

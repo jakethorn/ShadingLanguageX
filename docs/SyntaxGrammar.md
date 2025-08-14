@@ -2,11 +2,11 @@
 program     → statement* EOF ;  
   
 statement   → ( attribute* ) ( declaration | assignment | for_loop ) ;
-  attribute → "@" IDENTIFIER STRING_LITERAL
 declaration → var_decl | func_decl;  
 var_decl    → "const"? "global"? TYPE IDENTIFIER "=" expression ";" ;  
 func_decl   → "inline"? TYPE IDENTIFIER ( "<" TYPE ( "," TYPE )* ">" )? "(" ( parameter ( "," parameter )* )? ")" "{" statement* return "}" ;  
-  parameter → "out"? TYPE IDENTIFIER ( "=" expression )? ;  
+  parameter → ( attribute* ) "out"? TYPE IDENTIFIER ( "=" expression )? ;  
+  attribute → "@" ( IDENTIFIER "." )? IDENTIFIER STRING_LITERAL ;  
   return    → "return" expression ";" ;  
 assignment  → var_assign | cmp_assign ;  
 var_assign  → variable "=" expression ";" ;  

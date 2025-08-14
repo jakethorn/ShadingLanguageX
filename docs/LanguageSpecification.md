@@ -346,7 +346,7 @@ a color type variable. The opposite is then true for `r` `g` `b` `a`.
 Swizzles can be made from any combination of valid characters, with a maximum number of 4 characters. However, a character cannot
 be used that goes beyond the length of original vector, for example, `a.xyz` is an invalid swizzle for a variable of type 
 `vec2` because it does not have a z component.
-Finally, vector swizzles will always return a vector or `float` type variable, the specific type is dependant on the swizzle, for example 
+Finally, vector swizzles will always return a vector or `float` type variable, the specific type is dependent on the swizzle, for example 
 `a.xy` return a `vec2`, while `a.zyzy` returns a `vec4`. Appropriately, color swizzles only return color or `float` type variables.
 
 ### Example
@@ -519,7 +519,7 @@ components have been filled and then discard the rest. If not enough components 
 
 # If Expressions
 
-Unlike most languages, ShaderLanguageX does not support if statements, but instead uses if expressions. The reason for this is because conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
+Unlike most languages, ShaderLanguageX does not support if statements, but instead uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
 ternary operators (`cond ? then : else`) than true if statements that control the logic of the program. This makes if expressions better suited for compiling to MaterialX nodes than if statements.
 
 `if (condition) { value_if_true } else { value_if_false }`  
@@ -554,7 +554,7 @@ If else expressions are also possible. You can include any number of `if else` c
 ```
 float x = if (cond1) { val1 } else if (cond2) { val2 } else { val3 };
 ```
-You again do not need include the final `else` branch during a variable assignment:
+Once again you do not need to include the final `else` branch during a variable assignment:
 ```
 float x = 0.0;
 x = if (cond1) { val1 } else if (cond2) { val2 };
@@ -619,7 +619,7 @@ standard_surface(base_color=c);
 
 # User Functions
 
-Users can declare there own functions in ShadingLanguageX using the following syntax:
+Users can declare their own functions in ShadingLanguageX using the following syntax:
 ```
 type name(out? param1_type param1_name, out? param2_type param2_name...)
 {
@@ -744,7 +744,7 @@ vec2 one_minus(vec2 v)
 }
 ```
 
-This type of code is time consuming to both write and read. As such, ShadingLanguageX offers templated functions to streamline these types of functions.
+This type of code is time-consuming to both write and read. As such, ShadingLanguageX offers templated functions to streamline these types of functions.
 ```
 T one_minus<float, vec2>(T v)
 {
@@ -882,7 +882,7 @@ Instead directly compiles to:
 
 # Attributes
 
-Attributes can be defined above statements and are added to the element that the statement compiles into. For example,
+Attributes can be defined above statements or parameters and are added to the element that the statement compiles into. For example,
 attributes defined above a function declaration will be added to the compiled NodeDef.
 ```
 @nodegroup "math"
@@ -929,6 +929,20 @@ float add_one(float in)
   </add>
   <output name="out" type="float" nodename="node3" />
 </nodegraph>
+```
+An alternative syntax is to place the attributes directly above parameters. This can be useful for functions with a large
+number of parameters to keep attribute close to their associated parameter.
+```
+@nodegroup "math"
+@doc "adds one to in"
+@out.doc "the incremented value"
+float add_one(
+    @doc "the value to be incremented"
+    float in
+)
+{
+    return in + 1.0;
+}
 ```
 Finally, attributes can also be defined above variable declarations, variable assignments and expression statements. These
 attributes will be added to the node that these statements compile into.
@@ -1046,7 +1060,7 @@ ShadingLanguageX supports many of the C preprocessor directives:
 
 The `#include` directive works as it does in C, but also allows inclusion of directories as well as specific files. All files
 with the extension `.mxsl` inside the directory will be included. The search is not recursive, i.e., it does not include `.mxsl`
-files from sub-directories and files are not included in any particular order. If the order of included files is important, 
+files from subdirectories and files are not included in any particular order. If the order of included files is important, 
 then you should include each file individually in the necessary order.
 
 When including a file, paths may be absolute or relative. If the path is relative, ShadingLanguageX will look for the file in
@@ -1100,7 +1114,7 @@ Conditional compilations directives operate as they do in C with no notable chan
 
 # mxslc
 
-mxslc is the open-source compiler for ShadingLanguageX. It can downloaded from the github repository [releases](https://github.com/jakethorn/ShadingLanguageX/releases) section.
+mxslc is the open-source compiler for ShadingLanguageX. It can be downloaded from the GitHub repository [releases](https://github.com/jakethorn/ShadingLanguageX/releases) section.
 It can be run either using the compiled executable or with the Python API.  
 
 ## Executable

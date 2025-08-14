@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_sum_channels" node="sum_channels">
+    <input name="v" type="vector3" value="0, 0, 0" doc="input vector" />
+    <output name="f" type="float" default="0.0" doc="output sum" attrib2="dogs dont wear hats" attrib3="but cats might" />
+  </nodedef>
+  <nodegraph name="NG_sum_channels" nodedef="ND_sum_channels">
+    <output name="f" type="float" nodename="f3" />
+    <extract name="node2" type="float">
+      <input name="in" type="vector3" interfacename="v" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <extract name="node4" type="float">
+      <input name="in" type="vector3" interfacename="v" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <add name="node5" type="float">
+      <input name="in1" type="float" nodename="node2" />
+      <input name="in2" type="float" nodename="node4" />
+    </add>
+    <extract name="node7" type="float">
+      <input name="in" type="vector3" interfacename="v" />
+      <input name="index" type="integer" value="2" />
+    </extract>
+    <add name="f3" type="float">
+      <input name="in1" type="float" nodename="node5" />
+      <input name="in2" type="float" nodename="node7" />
+    </add>
+  </nodegraph>
+</materialx>

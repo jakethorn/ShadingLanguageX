@@ -80,6 +80,7 @@ _overwrite_all_expected = False
     ("attributes/attributes_2", False),
     ("attributes/attributes_3", False),
     ("attributes/attributes_4", False),
+    ("attributes/attributes_5", False),
     ("inline/inline_test_1", False),
     ("inline/inline_test_2", False),
     ("inline/inline_test_3", False),
