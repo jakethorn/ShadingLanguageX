@@ -28,9 +28,9 @@ For loops can now have int type iterators.
 * __Version Directive ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#version))__  
 A version directive can now be added to the top of the source file to specify the version of MaterialX the compiler should target.
 ```
-#version 1.39.2
+#version 1.38.10
 
-// only available in 1.39.2
+// deprecated signature of normalmap node
 vec3 n = normalmap(image("normals.png"), space="tangent")
 ```
 

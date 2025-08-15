@@ -1121,9 +1121,9 @@ the directive, in which case the compiler will use the most recent version of Ma
 ### Example
 
 ```
-#version 1.39.2
+#version 1.38.10
 
-// only available in 1.39.2
+// deprecated signature of normalmap node
 vec3 n = normalmap(image("normals.png"), space="tangent")
 ```
 
