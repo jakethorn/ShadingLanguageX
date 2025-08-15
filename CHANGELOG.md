@@ -20,6 +20,10 @@ Floating-point values can now be written in the scientific format and/or with ze
 Attributes can now also be defined above parameters as well as statements.
 
 
+* __Improved For Loops__
+For loops can now have int type iterators.
+
+
 # Version 0.5.3-beta
 ## Added
 * __Inline Keyword ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#inline))__  
