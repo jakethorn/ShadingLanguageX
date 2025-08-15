@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import MaterialX as mx
-
 from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF, VERSION
 from .macros import Macro, define_macro, undefine_macro, is_macro_defined, replace_macro
 from .parse import parse
@@ -28,7 +26,7 @@ class Processor(TokenReader):
         super().__init__(tokens)
         self.__include_dirs = include_dirs
         self.__is_main = is_main
-        self.__mtlx_version = mx.getVersionString()
+        self.__mtlx_version: str | None = None
 
     @property
     def mtlx_version(self) -> str:

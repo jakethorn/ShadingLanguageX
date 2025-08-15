@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
 import MaterialX as mx
 
+from .CompileError import CompileError
 from .DataType import DataType, BOOLEAN, INTEGER, FLOAT, VECTOR2, VECTOR3, VECTOR4, COLOR3, COLOR4, STRING, FILENAME, \
     VOID
 from .Keyword import Keyword
+from .file_utils import pkg_path
 
 """
 Pythonic wrappers around the generated MaterialX Python API.
@@ -64,9 +67,6 @@ class Element:
 
     def remove_attribute(self, name: str) -> None:
         self.source.removeAttribute(name)
-
-    def validate(self) -> tuple[bool, str]:
-        return self.source.validate()
 
     def __str__(self) -> str:
         return str(self.source)
@@ -400,12 +400,19 @@ class Document(GraphElement):
         return super().source
 
     def set_version_string(self, version: str) -> None:
+        version = full_version(version)
+        version = ".".join(version.split(".")[:2])
         self.source.setVersionString(version)
 
-    def validate(self) -> tuple[bool, str]:
-        tmp = Document(self.xml)
-        tmp.load_standard_library()
-        return tmp.source.validate()
+    def validate(self, version: str = None) -> tuple[bool, str]:
+        version = full_version(version)
+        if version == mx.getVersionString():
+            tmp = Document(self.xml)
+            tmp.set_version_string(version)
+            tmp.load_standard_library(version)
+            return tmp.source.validate()
+        else:
+            return True, ""
 
     def add_node_def(self, name: str, data_type: DataType, node_name: str) -> NodeDef:
         assert name.startswith("ND_")
@@ -435,8 +442,12 @@ class Document(GraphElement):
     def xml(self) -> str:
         return mx.writeToXmlString(self.source)
 
-    def load_standard_library(self, version: str) -> None:
-        mx.loadLibraries(mx.getDefaultDataLibraryFolders(), mx.getDefaultDataSearchPath(), self.source)
+    def load_standard_library(self, version: str = None) -> None:
+        version = full_version(version)
+        libraries_dir = pkg_path(r"libraries")
+        loaded = mx.loadLibraries([version], mx.FileSearchPath(str(libraries_dir)), self.source)
+        if not loaded:
+            raise CompileError(f"Unsupported MaterialX version: {version}.")
 
 
 #
@@ -679,3 +690,19 @@ def type_of(value: Value) -> DataType:
     if isinstance(value, Path):
         return FILENAME
     raise AssertionError
+
+
+def full_version(version: str = None) -> str:
+    if version is None:
+        return mx.getVersionString()
+    if re.match(r"^[0-9]+\.[0-9]+\.[0-9]+$", version):
+        return version
+    if re.match(r"^[0-9]+\.[0-9]+$", version):
+        if version == "1.38":
+            return "1.38.10"
+        if version == "1.39":
+            return "1.39.3"
+        else:
+            return version + ".0"
+    else:
+        raise CompileError(f"Unsupported MaterialX version: {version}.")

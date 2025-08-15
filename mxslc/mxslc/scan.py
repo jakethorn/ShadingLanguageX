@@ -104,7 +104,7 @@ class Scanner:
         return match.group() if match else None
 
     def __get_float_literal(self) -> str | None:
-        match = re.match(r"(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))+(e-?[0-9]+)?", self.__peek_all())
+        match = re.match(r"(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))(e-?[0-9]+)?", self.__peek_all())
         return match.group() if match else None
 
     def __get_int_literal(self) -> str | None:

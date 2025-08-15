@@ -20,17 +20,19 @@ def _main(raw_args: list[str] = None):
     parser = ArgumentParser()
     parser.add_argument("mxsl_path", type=Path, help="Input path to mxsl file or containing folder")
     parser.add_argument("-o", "--output-path", type=Path, help="Output path of generated mtlx file or containing folder")
+    parser.add_argument("-v", "--version", type=str, help="Target MaterialX version")
     parser.add_argument("-m", "--main-func", type=str, help="Name of main entry function into the program")
     parser.add_argument("-a", "--main-args", nargs="+", default=[], help="Arguments to be passed to the main function")
     parser.add_argument("-i", "--include-dirs", nargs="+", default=[], type=Path, help="Additional directories to search when including files")
     parser.add_argument("-d", "--define", dest="macros", nargs="+", action="append", default=[], type=str, help="Additional macro definitions")
-    parser.add_argument("-v", "--validate", action="store_true", help="Validate the output MaterialX file")
+    parser.add_argument("--validate", action="store_true", help="Validate the output MaterialX file")
     args = parser.parse_args(raw_args)
 
     try:
         compile_file(
             args.mxsl_path,
             args.output_path,
+            mtlx_version=args.version,
             main_func=args.main_func,
             main_args=_parse_main_args(args.main_args),
             add_include_dirs=args.include_dirs,

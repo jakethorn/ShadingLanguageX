@@ -45,10 +45,18 @@ class Keyword(StrEnum):
     VOLUMESHADER = auto()
     LIGHTSHADER = auto()
     MATERIAL = auto()
-    T = "T"
     BSDF = "BSDF"
     EDF = "EDF"
     VDF = "VDF"
+    INTEGERARRAY = auto()
+    FLOATARRAY = auto()
+    STRINGARRAY = auto()
+    VECTOR2ARRAY = auto()
+    VECTOR3ARRAY = auto()
+    VECTOR4ARRAY = auto()
+    COLOR3ARRAY = auto()
+    COLOR4ARRAY = auto()
+    T = "T"
 
     # Data type aliases
     BOOL = auto()
@@ -77,8 +85,16 @@ class Keyword(StrEnum):
             Keyword.VOLUMESHADER,
             Keyword.LIGHTSHADER,
             Keyword.MATERIAL,
-            Keyword.T,
             Keyword.BSDF,
             Keyword.EDF,
-            Keyword.VDF
+            Keyword.VDF,
+            Keyword.INTEGERARRAY,
+            Keyword.FLOATARRAY,
+            Keyword.STRINGARRAY,
+            Keyword.VECTOR2ARRAY,
+            Keyword.VECTOR3ARRAY,
+            Keyword.VECTOR4ARRAY,
+            Keyword.COLOR3ARRAY,
+            Keyword.COLOR4ARRAY,
+            Keyword.T
         }
