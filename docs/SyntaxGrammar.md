@@ -12,7 +12,7 @@ assignment  → var_assign | cmp_assign ;
 var_assign  → variable "=" expression ";" ;  
 cmp_assign  → variable ( "+=" | "-=" | "*=" | "/=" | "%=" | "^=" | "&=" | "|=" ) expression ";" ;  
   variable  → IDENTIFIER ( "." IDENTIFIER )?  
-for_loop    → "inline"? "for" "(" TYPE IDENTIFIER "=" constant ":" constant ( ":" constant )? ")" "{" statement* "}" ;  
+for_loop    → "inline"? "for" "(" TYPE IDENTIFIER "=" expression ":" expression ( ":" expression )? ")" "{" statement* "}" ;  
   constant  → FLOAT_LITERAL | IDENTIFIER ; 
 expr_stmt   → func_call | stdlib_call ";" ;
   
