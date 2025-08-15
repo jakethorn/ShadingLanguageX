@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="x" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+</materialx>

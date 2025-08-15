@@ -33,6 +33,11 @@ from mxslc.CompileError import CompileError
     "out_param_2",
     "const_1",
     "const_2",
+    "version_1",
+    "version_2",
+    "version_3",
+    "version_4",
+    "version_5",
 ])
 def test_mxslc_compile_error(filename: str) -> None:
     mxsl_path = (Path(__file__).parent / "data" / "error" / filename).with_suffix(".mxsl")
