@@ -399,6 +399,9 @@ class Document(GraphElement):
     def source(self) -> mx.Document:
         return super().source
 
+    def set_version_string(self, version: str) -> None:
+        self.source.setVersionString(version)
+
     def validate(self) -> tuple[bool, str]:
         tmp = Document(self.xml)
         tmp.load_standard_library()
@@ -432,7 +435,7 @@ class Document(GraphElement):
     def xml(self) -> str:
         return mx.writeToXmlString(self.source)
 
-    def load_standard_library(self) -> None:
+    def load_standard_library(self, version: str) -> None:
         mx.loadLibraries(mx.getDefaultDataLibraryFolders(), mx.getDefaultDataSearchPath(), self.source)
 
 
