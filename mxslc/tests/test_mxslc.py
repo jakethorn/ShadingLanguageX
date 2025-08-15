@@ -57,7 +57,7 @@ _overwrite_all_expected = False
     ("templates/templates_4", False),
     ("templates/templates_5", False),
     ("templates/templates_6", False),
-    ("default_values_1", True),
+    ("default_values_1", False),
     ("default_values_2", False),
     ("empty_file", False),
     ("node_defs/multioutput_1", False),
