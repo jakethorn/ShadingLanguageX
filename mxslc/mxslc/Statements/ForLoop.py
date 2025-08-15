@@ -2,14 +2,13 @@ from . import Statement
 from .. import state
 from ..Argument import Argument
 from ..CompileError import CompileError
-from ..DataType import DataType, FLOAT
-from ..Expressions import LiteralExpression
+from ..DataType import DataType
+from ..Expressions import Expression, ValueExpression
 from ..Expressions.LiteralExpression import NullExpression
 from ..Function import create_function
 from ..Keyword import Keyword
 from ..Parameter import ParameterList, Parameter
-from ..Token import Token, IdentifierToken, LiteralToken
-from ..token_types import FLOAT_LITERAL
+from ..Token import Token, IdentifierToken
 
 
 class ForLoop(Statement):
@@ -17,9 +16,9 @@ class ForLoop(Statement):
                  is_inline: bool,
                  iter_var_type: Token | DataType,
                  identifier: Token,
-                 start_value: Token,
-                 value2: Token,
-                 value3: Token | None,
+                 start_value: Expression,
+                 value2: Expression,
+                 value3: Expression | None,
                  body: list[Statement]):
         super().__init__()
         self.__is_inline = is_inline
@@ -29,10 +28,6 @@ class ForLoop(Statement):
         self.__value2 = value2
         self.__value3 = value3
         self.__body = body
-
-        # TODO support other iter types
-        if self.__iter_var_type != FLOAT:
-            raise CompileError("Loop iteration variable must be a float.", self.__identifier)
 
         return_type = DataType(Keyword.VOID)
         func_identifier = IdentifierToken(f"__loop__{state.get_loop_id()}")
@@ -48,24 +43,21 @@ class ForLoop(Statement):
     def execute(self) -> None:
         self.__function.initialise()
 
-        start_value = _get_loop_value(self.__start_value)
-        incr_value = _get_loop_value(self.__value2) if self.__value3 else 1.0
-        end_value = _get_loop_value(self.__value3 or self.__value2)
+        self.__start_value.init(self.__iter_var_type)
+        self.__value2.init(self.__iter_var_type)
+        if self.__value3:
+            self.__value3.init(self.__iter_var_type)
+
+        if not (self.__start_value.has_value and self.__value2.has_value and (self.__value3 is None or self.__value3.has_value)):
+            raise CompileError("Invalid loop constraint expression.", self.__identifier)
+
+        start_value = self.__start_value.value
+        incr_value = self.__value2.value if self.__value3 else self.__iter_var_type.from_value(1)
+        end_value = self.__value3.value if self.__value3 else self.__value2.value
 
         i = start_value
         while i <= end_value:
-            iter_arg = Argument(LiteralExpression(LiteralToken(i)), 0)
-            iter_arg.init(FLOAT)
+            iter_arg = Argument(ValueExpression(i), 0)
+            iter_arg.init(self.__iter_var_type)
             self.__function.invoke([iter_arg])
             i += incr_value
-
-
-def _get_loop_value(token: Token) -> float:
-    if token == FLOAT_LITERAL:
-        return token.value
-    else:
-        node = state.get_node(token)
-        if node.category == "constant":
-            return node.get_input("value").value
-        else:
-            raise CompileError("For loop variables can only be literals or constant values.", token)

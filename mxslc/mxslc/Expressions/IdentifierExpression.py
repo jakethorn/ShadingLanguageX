@@ -2,7 +2,7 @@ from . import Expression
 from .. import state, node_utils
 from ..DataType import DataType
 from ..Token import Token
-from ..mx_wrapper import Node
+from ..mx_wrapper import Node, Uniform
 
 
 class IdentifierExpression(Expression):
@@ -13,6 +13,15 @@ class IdentifierExpression(Expression):
     @property
     def identifier(self) -> Token:
         return self.__identifier
+
+    @property
+    def value(self) -> Uniform | None:
+        node = state.get_node(self.__identifier)
+        while node.category == "dot":
+            node = node.get_input("in").connected_node
+        if node.category == "constant":
+            return node.get_input("value").literal
+        return None
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
         return IdentifierExpression(self.__identifier)
