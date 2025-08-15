@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND___loop__1" node="__loop__1">
+    <input name="i" type="integer" value="0" />
+    <input name="x" type="integer" value="0" />
+    <output name="x2" type="integer" default="0" />
+  </nodedef>
+  <nodegraph name="NG___loop__1" nodedef="ND___loop__1">
+    <add name="node4" type="integer">
+      <input name="in1" type="integer" interfacename="x" />
+      <input name="in2" type="integer" interfacename="i" />
+    </add>
+    <output name="x2" type="integer" nodename="node4" />
+  </nodegraph>
+  <__loop__1 name="x2" type="integer">
+    <input name="i" type="integer" value="0" />
+    <input name="x" type="integer" value="0" />
+  </__loop__1>
+  <__loop__1 name="x3" type="integer">
+    <input name="i" type="integer" value="1" />
+    <input name="x" type="integer" nodename="x2" />
+  </__loop__1>
+  <__loop__1 name="x4" type="integer">
+    <input name="i" type="integer" value="2" />
+    <input name="x" type="integer" nodename="x3" />
+  </__loop__1>
+  <randomfloat name="y" type="float">
+    <input name="seed" type="integer" nodename="x4" />
+  </randomfloat>
+</materialx>

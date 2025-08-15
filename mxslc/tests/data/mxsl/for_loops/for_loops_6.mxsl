@@ -1,0 +1,8 @@
+int x = 0;
+
+for (int i = 0:2)
+{
+    x += i;
+}
+
+float y = randomfloat(seed=x);

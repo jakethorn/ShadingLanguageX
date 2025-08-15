@@ -2,7 +2,7 @@
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
     <output name="out" type="float" default="0.0" />
-    <input name="a" type="float" value="0" />
+    <input name="a" type="float" value="0.8" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <add name="node3" type="float">
@@ -11,10 +11,6 @@
     </add>
     <output name="out" type="float" nodename="node3" />
   </nodegraph>
-  <foo name="node2" type="float">
-    <input name="a" type="float" value="0.8" />
-  </foo>
-  <foo name="node4" type="float">
-    <input name="a" type="float" value="3" />
-  </foo>
+  <foo name="node2" type="float" />
+  <foo name="node3" type="float" />
 </materialx>

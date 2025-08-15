@@ -21,6 +21,7 @@ _overwrite_all_expected = False
     ("for_loops/for_loops_3", False),
     ("for_loops/for_loops_4", False),
     ("for_loops/for_loops_5", False),
+    ("for_loops/for_loops_6", False),
     ("named_arguments_1", False),
     ("named_arguments_2", False),
     ("node_constructors_1", False),

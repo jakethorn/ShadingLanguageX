@@ -12,4 +12,5 @@ from .UnaryExpression import UnaryExpression
 from .NodeConstructor import NodeConstructor
 from .IndexingExpression import IndexingExpression
 from .TernaryRelationalExpression import TernaryRelationalExpression
+from .ValueExpression import ValueExpression
 from .VariableDeclarationExpression import VariableDeclarationExpression

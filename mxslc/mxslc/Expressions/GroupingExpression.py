@@ -14,7 +14,7 @@ class GroupingExpression(Expression):
         self.__expr = expr
 
     @property
-    def value(self) -> Uniform:
+    def value(self) -> Uniform | None:
         return self.__expr.value
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:

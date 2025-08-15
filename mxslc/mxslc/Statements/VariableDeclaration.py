@@ -1,8 +1,7 @@
 from . import Statement
 from .. import state
 from ..DataType import DataType
-from ..Expressions import Expression
-from ..Interactive.ValueExpression import ValueExpression
+from ..Expressions import Expression, ValueExpression
 from ..Keyword import Keyword
 from ..Token import Token
 
@@ -16,7 +15,6 @@ class VariableDeclaration(Statement):
         self.__data_type = DataType(data_type)
         self.__identifier = identifier
         self.__right = right
-        assert self.__is_global == (self.__right is None)
 
     def instantiate_templated_types(self, template_type: DataType) -> Statement:
         data_type = self.__data_type.instantiate(template_type)

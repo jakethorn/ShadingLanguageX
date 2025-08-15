@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import MaterialX as mx
 
-from .ValueExpression import ValueExpression
+from .InteractiveExpression import InteractiveExpression
 from .mx_interactive_types import Value
 from ..Expressions import UnaryExpression, IndexingExpression, BinaryExpression
 from ..Token import Token
@@ -66,18 +66,18 @@ class InteractiveNode:
         return _binary_expr(self.__node, ">=", other)
 
     def __neg__(self) -> InteractiveNode:
-        right = ValueExpression(self.__node)
+        right = InteractiveExpression(self.__node)
         expr = UnaryExpression(Token("-"), right)
         return InteractiveNode(expr.evaluate())
 
     def __invert__(self) -> InteractiveNode:
-        right = ValueExpression(self.__node)
+        right = InteractiveExpression(self.__node)
         expr = UnaryExpression(Token("!"), right)
         return InteractiveNode(expr.evaluate())
 
     def __getitem__(self, index: int) -> InteractiveNode:
-        left = ValueExpression(self.__node)
-        indexer = ValueExpression(index)
+        left = InteractiveExpression(self.__node)
+        indexer = InteractiveExpression(index)
         expr = IndexingExpression(left, indexer)
         return InteractiveNode(expr.evaluate())
 
@@ -87,7 +87,7 @@ class InteractiveNode:
 
 
 def _binary_expr(left: Value, op: str, right: Value) -> InteractiveNode:
-    left = ValueExpression(left)
-    right = ValueExpression(right)
+    left = InteractiveExpression(left)
+    right = InteractiveExpression(right)
     expr = BinaryExpression(left, Token(op), right)
     return InteractiveNode(expr.evaluate())
