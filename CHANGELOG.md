@@ -25,7 +25,7 @@ Attributes can now also be defined above parameters as well as statements.
 For loops can now have int type iterators.
 
 
-* __Version Directive__  
+* __Version Directive ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#version))__  
 A version directive can now be added to the top of the source file to specify the version of MaterialX the compiler should target.
 ```
 #version 1.39.2
