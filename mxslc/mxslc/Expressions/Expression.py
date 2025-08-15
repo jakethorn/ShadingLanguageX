@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from . import ValueExpression
 from .. import utils
 from ..CompileError import CompileError
 from ..DataType import DataType, DATA_TYPES, VOID
@@ -78,7 +79,10 @@ class Expression(ABC):
 
     def evaluate(self) -> Node:
         assert self.__initialized
-        node = self._evaluate()
+        if self.has_value:
+            node = ValueExpression(self.value).init_evaluate()
+        else:
+            node = self._evaluate()
         assert (self.data_type == VOID) or (node.data_type == self.data_type)
         return node
 

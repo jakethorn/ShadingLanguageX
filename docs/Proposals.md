@@ -11,7 +11,6 @@
 # TODO my_var[0] = 1.0;
 # TODO #if defined(X)
 # TODO -l --log argument that outputs a logfile with the error and stacktrace
-# TODO allow loop iteration variables to be ints/vecs/colors as well as floats
 # TODO namespaces (syntax: public/private? namespace <name>? {})
 # TODO global blocks
 # TODO finish interactive compiler
