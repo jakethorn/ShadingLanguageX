@@ -13,15 +13,26 @@ The global keyword operates similarly to `uniform` from GLSL. Global variables d
 
 
 * __Improved Float Parsing__  
-Floating-point values can now be written in the scientific format and/or with zeros before or after the decimal point omitted.
+Floating-point values can now be written in the scientific format (e.g., `2.5e3`) and/or with zeros before or after the decimal point omitted
+  (e.g., `.5` → `0.5` and `2.` → `2.0`).
 
 
-* __Attribute Syntax__  
+* __Improved Attribute Syntax__  
 Attributes can now also be defined above parameters as well as statements.
 
 
 * __Improved For Loops__  
 For loops can now have int type iterators.
+
+
+* __Version Directive__  
+A version directive can now be added to the top of the source file to specify the version of MaterialX the compiler should target.
+```
+#version 1.39.2
+
+// only available in 1.39.2
+vec3 n = normalmap(image("normals.png"), space="tangent")
+```
 
 
 # Version 0.5.3-beta

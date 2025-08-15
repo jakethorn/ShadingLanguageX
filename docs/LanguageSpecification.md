@@ -1112,6 +1112,21 @@ There is currently one macro pre-defined during shader compilation:
 
 Conditional compilations directives operate as they do in C with no notable changes.
 
+## Version
+
+The version macro can be used to tell the compiler which version of MaterialX it should use when loading the standard
+library and when validating the compiled .mtlx file. It also sets the version string of the compiled .mtlx file. You can omit
+the directive, in which case the compiler will use the most recent version of MaterialX (currently 1.39.3).
+
+### Example
+
+```
+#version 1.39.2
+
+// only available in 1.39.2
+vec3 n = normalmap(image("normals.png"), space="tangent")
+```
+
 # mxslc
 
 mxslc is the open-source compiler for ShadingLanguageX. It can be downloaded from the GitHub repository [releases](https://github.com/jakethorn/ShadingLanguageX/releases) section.
