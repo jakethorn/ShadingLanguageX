@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF
+from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF, VERSION
 from .macros import Macro, define_macro, undefine_macro, is_macro_defined, replace_macro
 from .parse import parse
 from ..CompileError import CompileError
@@ -16,8 +16,9 @@ from ..token_types import IDENTIFIER, EOL
 # this can lead to differences in behaviour
 
 
-def process(tokens: list[Token], include_dirs: list[Path], is_main: bool) -> list[Token]:
-    return Processor(tokens, include_dirs, is_main).process()
+def process(tokens: list[Token], include_dirs: list[Path], is_main: bool) -> tuple[list[Token], str]:
+    p = Processor(tokens, include_dirs, is_main)
+    return p.process(), p.mtlx_version
 
 
 class Processor(TokenReader):
@@ -25,6 +26,11 @@ class Processor(TokenReader):
         super().__init__(tokens)
         self.__include_dirs = include_dirs
         self.__is_main = is_main
+        self.__mtlx_version: str | None = None
+
+    @property
+    def mtlx_version(self) -> str:
+        return self.__mtlx_version
 
     def process(self) -> list[Token]:
         processed_tokens = []
@@ -52,12 +58,14 @@ class Processor(TokenReader):
             return self.__process_pragma()
         if directive == PRINT:
             return self.__process_print()
+        if directive == VERSION:
+            return self.__process_version()
         raise AssertionError
 
     def __process_define(self) -> list[Token]:
         self._match(DEFINE)
         identifier = self._match(IDENTIFIER)
-        value = []
+        value: list[Token] = []
         while self._peek() != EOL:
             value.extend(self.__process_next())
         self._match(EOL)
@@ -98,7 +106,7 @@ class Processor(TokenReader):
         else:
             condition = True
             self._match(EOL)
-        tokens = []
+        tokens: list[Token] = []
         while self._peek() not in [ELIF, ELSE, ENDIF]:
             tokens.extend(self.__process_next())
         return condition, tokens
@@ -113,7 +121,8 @@ class Processor(TokenReader):
         included_files = self.__search_in_include_dirs(directive, path)
         included_tokens = []
         for included_file in included_files:
-            included_tokens.extend(process(scan(included_file), self.__new_include_dirs(included_file.parent), is_main=False))
+            processed_tokens, _ = process(scan(included_file), self.__new_include_dirs(included_file.parent), is_main=False)
+            included_tokens.extend(processed_tokens)
         self.__define_main()
         return included_tokens
 
@@ -123,6 +132,15 @@ class Processor(TokenReader):
 
     def __process_print(self) -> list[Token]:
         # TODO implement print directive
+        return []
+
+    def __process_version(self) -> list[Token]:
+        self._match(VERSION)
+        tokens: list[Token] = []
+        while self._peek() != EOL:
+            tokens.extend(self.__process_next())
+        self._match(EOL)
+        self.__mtlx_version = f"{''.join(str(t) for t in tokens)}"
         return []
 
     def __process_non_directive(self) -> list[Token]:

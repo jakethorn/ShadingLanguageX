@@ -16,6 +16,7 @@ from .post_process import post_process
 def compile_file(mxsl_path: str | Path,
                  mtlx_path: str | Path = None,
                  *,
+                 mtlx_version: str = None,
                  globals: dict[str, Uniform] = None,
                  main_func: str = None,
                  main_args: Sequence[Uniform] = None,
@@ -42,12 +43,12 @@ def compile_file(mxsl_path: str | Path,
         for macro in add_macros:
             define_macro(macro)
 
-        compile_(mxsl_filepath, include_dirs, is_main=True)
+        mtlx_version = compile_(mxsl_filepath, mtlx_version, include_dirs, is_main=True)
         _call_main(mxsl_filepath, main_func, main_args)
         post_process()
 
         if validate:
-            success, message = get_document().validate()
+            success, message = get_document().validate(mtlx_version)
             if not success:
                 message += "\n" + get_document().xml
                 raise CompileError(message)

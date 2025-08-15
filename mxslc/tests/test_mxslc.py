@@ -115,6 +115,10 @@ _overwrite_all_expected = False
     ("default_values/defvalues_7", False),
     ("default_values/defvalues_8", False),
     ("default_values/defvalues_9", False),
+    ("version/version_1", False),
+    ("version/version_2", False),
+    ("version/version_3", False),
+    ("version/version_4", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

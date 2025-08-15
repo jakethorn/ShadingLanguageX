@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <fract name="x" type="float">
+    <input name="in" type="float" value="2.5" />
+  </fract>
+</materialx>

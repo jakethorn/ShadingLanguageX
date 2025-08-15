@@ -13,6 +13,7 @@ class Directive(StrEnum):
     INCLUDE = "#include"
     PRAGMA = "#pragma"
     PRINT = "#print"
+    VERSION = "#version"
 
 
 # access directives without qualifier
@@ -27,5 +28,5 @@ ENDIF = Directive.ENDIF
 INCLUDE = Directive.INCLUDE
 PRAGMA = Directive.PRAGMA
 PRINT = Directive.PRINT
-
+VERSION = Directive.VERSION
 DIRECTIVES = [d for d in Directive]

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<materialx version="1.38">
+  <texcoord name="uv" type="vector2" />
+  <swizzle name="vu" type="vector2">
+    <input name="in" type="vector2" nodename="uv" />
+    <input name="channels" type="string" value="yx" />
+  </swizzle>
+</materialx>

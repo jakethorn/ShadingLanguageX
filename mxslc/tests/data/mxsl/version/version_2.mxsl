@@ -1,0 +1,3 @@
+#version 1.39
+
+float x = fract(2.5);
