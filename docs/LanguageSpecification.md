@@ -1114,17 +1114,25 @@ Conditional compilations directives operate as they do in C with no notable chan
 
 ## Version
 
-The version macro can be used to tell the compiler which version of MaterialX it should use when loading the standard
-library and when validating the compiled .mtlx file. It also sets the version string of the compiled .mtlx file. You can omit
-the directive, in which case the compiler will use the most recent version of MaterialX (currently 1.39.3).
+The `#version` directive can be used to tell the compiler which version of MaterialX it should target when loading the standard
+library and validating the compiled .mtlx file. It also sets the version string of the compiled .mtlx file. You can 
+specify the full version number, e.g., `#version 1.38.10`, or simply specify the major and minor version numbers, 
+e.g., `#version 1.38`, in which case the most recent patch number will be added.
+
+### Notes
+
+* You can omit the `#version` directive, in which case the compiler will use the most recent version of MaterialX (currently 1.39.3).
+* The `#version` directive is ignored if the file is being imported using the `#include` directive.
+* The version can also be specified as a compiler option. The compiler option overrides the `#version` directive if the two
+versions do not match.
 
 ### Example
 
 ```
-#version 1.38.10
+#version 1.38
 
-// deprecated signature of normalmap node
-vec3 n = normalmap(image("normals.png"), space="tangent")
+// deprecated swizzle node
+vec2 vu = swizzle(texcoord<vec2>(), "yx");
 ```
 
 # mxslc
@@ -1145,11 +1153,12 @@ positional arguments:
 options:
   -h, --help                       show this help message and exit
   -o, --output-path OUTPUT_PATH    Output path of generated mtlx file or containing folder
+  -v, --version VERSION            Target MaterialX version
   -m, --main-func MAIN_FUNC        Name of main entry function into the program
   -a, --main-args MAIN_ARGS        Arguments to be passed to the main function
   -i, --include-dirs INCLUDE_DIRS  Additional directories to search when including files
   -d, --define MACROS              Additional macro definitions
-  -v, --validate                   Validate the output MaterialX file
+  --validate                       Validate the output MaterialX file
 ```
 
 ### Example

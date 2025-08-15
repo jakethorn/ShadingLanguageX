@@ -16,6 +16,7 @@ mxslc consists of a large Python codebase, but only a small subset is needed to 
 def compile_file(mxsl_path: str | Path,
                  mtlx_path: str | Path | None = None,
                  *,
+                 mtlx_version: str | None = None,
                  globals: dict[str, mxslc.Uniform] | None = None,
                  main_func: str | None = None,
                  main_args: Sequence[mxslc.Uniform] | None = None,
