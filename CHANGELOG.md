@@ -20,7 +20,7 @@ Floating-point values can now be written in the scientific format and/or with ze
 Attributes can now also be defined above parameters as well as statements.
 
 
-* __Improved For Loops__
+* __Improved For Loops__  
 For loops can now have int type iterators.
 
 
