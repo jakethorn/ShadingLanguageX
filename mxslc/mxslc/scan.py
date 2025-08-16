@@ -4,7 +4,7 @@ from pathlib import Path
 from .CompileError import CompileError
 from .Keyword import Keyword
 from .Token import Token
-from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, FILENAME_LITERAL, STRING_LITERAL, EOL, COMMENT
+from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, EOL, COMMENT
 
 
 def scan(source: str | Path) -> list[Token]:
@@ -75,8 +75,6 @@ class Scanner:
                 return self.__token(IDENTIFIER, word)
         if int_lit := self.__get_int_literal():
             return self.__token(INT_LITERAL, int_lit)
-        if filename_lit := self.__get_filename_literal():
-            return self.__token(FILENAME_LITERAL, filename_lit)
         if string_lit := self.__get_string_literal():
             return self.__token(STRING_LITERAL, string_lit)
         return None
@@ -109,10 +107,6 @@ class Scanner:
 
     def __get_int_literal(self) -> str | None:
         match = re.match(r"[0-9]+", self.__peek_all())
-        return match.group() if match else None
-
-    def __get_filename_literal(self) -> str | None:
-        match = re.match(r'"[^"]*\.(mxsl|mtlx|tif|png|jpg)"', self.__peek_all())
         return match.group() if match else None
 
     def __get_string_literal(self) -> str | None:
