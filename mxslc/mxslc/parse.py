@@ -10,7 +10,7 @@ from .Parameter import Parameter
 from .Statements import *
 from .Token import Token, IdentifierToken
 from .TokenReader import TokenReader
-from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
+from .token_types import IDENTIFIER, FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL
 
 
 def parse(tokens: list[Token]) -> list[Statement]:
@@ -261,7 +261,7 @@ class Parser(TokenReader):
 
     def __primary(self) -> Expression:
         # literal
-        if literal := self._consume(Keyword.TRUE, Keyword.FALSE, INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL, Keyword.NULL):
+        if literal := self._consume(Keyword.TRUE, Keyword.FALSE, INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, Keyword.NULL):
             return LiteralExpression(literal)
         # grouping
         if self._consume("("):

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 
-from . import ValueExpression
-from .. import utils
+from .. import utils, node_utils
 from ..CompileError import CompileError
-from ..DataType import DataType, DATA_TYPES, VOID
+from ..DataType import DataType, DATA_TYPES, VOID, STRING, FILENAME, FLOAT, INTEGER
 from ..Keyword import Keyword
 from ..Token import Token
 from ..mx_wrapper import Node, Uniform
@@ -15,6 +15,7 @@ class Expression(ABC):
     def __init__(self, token: Token | None):
         self.__token = token
         self.__initialized = False
+        self.__converted_type: DataType | None = None
 
     @property
     def token(self) -> Token | None:
@@ -36,7 +37,14 @@ class Expression(ABC):
             self._init_subexpr(valid_types)
             self._init(valid_types)
             if self._data_type not in valid_types:
-                raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
+                implicit_conversions = {
+                    STRING: FILENAME,
+                    INTEGER: FLOAT
+                }
+                if self.has_value and self._data_type in implicit_conversions and implicit_conversions[self._data_type] in valid_types:
+                    self.__converted_type = implicit_conversions[self._data_type]
+                else:
+                    raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
             self.__initialized = True
 
     def try_init(self, valid_types: DataType | set[DataType] = None) -> CompileError | None:
@@ -57,7 +65,7 @@ class Expression(ABC):
     @property
     def data_type(self) -> DataType:
         assert self.__initialized
-        return self._data_type
+        return self.__converted_type or self._data_type
 
     @property
     @abstractmethod
@@ -79,8 +87,12 @@ class Expression(ABC):
 
     def evaluate(self) -> Node:
         assert self.__initialized
-        if self.has_value:
-            node = ValueExpression(self.value).init_evaluate()
+        implicit_conversions = {
+            FILENAME: lambda s: Path(s),
+            FLOAT: lambda i: float(i)
+        }
+        if self.has_value and self.__converted_type in implicit_conversions:
+            node = node_utils.constant(implicit_conversions[self.__converted_type](self.value))
         else:
             node = self._evaluate()
         assert (self.data_type == VOID) or (node.data_type == self.data_type)
