@@ -1,11 +1,16 @@
 from pathlib import Path
 
-from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF, VERSION
+from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF, VERSION, \
+    LOADLIB
 from .macros import Macro, define_macro, undefine_macro, is_macro_defined, replace_macro
 from .parse import parse
 from ..CompileError import CompileError
 from ..Token import Token
 from ..TokenReader import TokenReader
+from ..compile import compile_
+from ..document import new_document
+from ..file_utils import handle_input_path
+from ..mx_wrapper import Document
 from ..scan import scan
 from ..token_types import IDENTIFIER, EOL
 
@@ -60,6 +65,8 @@ class Processor(TokenReader):
             return self.__process_print()
         if directive == VERSION:
             return self.__process_version()
+        if directive == LOADLIB:
+            return self.__process_loadlib()
         raise AssertionError
 
     def __process_define(self) -> list[Token]:
@@ -113,7 +120,7 @@ class Processor(TokenReader):
 
     def __process_include(self) -> list[Token]:
         directive = self._match(INCLUDE)
-        path_tokens = []
+        path_tokens: list[Token] = []
         while self._peek() != EOL:
             path_tokens.extend(self.__process_next())
         path_tokens.append(self._match(EOL))
@@ -141,6 +148,22 @@ class Processor(TokenReader):
             tokens.extend(self.__process_next())
         self._match(EOL)
         self.__mtlx_version = f"{''.join(str(t) for t in tokens)}"
+        return []
+
+    def __process_loadlib(self) -> list[Token]:
+        self._match(LOADLIB)
+        path_tokens: list[Token] = []
+        while self._peek() not in ["[", EOL]:
+            path_tokens.extend(self.__process_next())
+        path = parse(path_tokens)
+        nodedef_tokens: list[Token] | None = None
+        if self._consume("["):
+            nodedef_tokens = []
+            while identifier := self._consume(IDENTIFIER):
+                nodedef_tokens.append(identifier)
+                self._consume(",", "]")
+        self._match(EOL)
+        _load_library(path, nodedef_tokens)
         return []
 
     def __process_non_directive(self) -> list[Token]:
@@ -183,3 +206,17 @@ class Processor(TokenReader):
         copy = self.__include_dirs[:]
         copy[-2] = local_dir
         return copy
+
+
+def _load_library(lib_path: Path, nodedef_tokens: list[Token]) -> None:
+    lib_filepaths = handle_input_path(lib_path, [".mxsl", ".mtlx"])
+    for lib_filepath in lib_filepaths:
+        if lib_filepath.suffix == ".mxsl":
+            # TODO this should not be None
+            mtlx_version = None
+            compile_(lib_filepath, mtlx_version, [], False)
+            new_document()
+        else:
+            document = Document(lib_filepath)
+            load_library(document)
+            
