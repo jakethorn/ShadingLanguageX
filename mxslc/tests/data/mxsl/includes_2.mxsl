@@ -1,0 +1,8 @@
+#include "../add_include_dir/a.mtlx"
+#include "../add_include_dir/b.mtlx"
+#include "../add_include_dir/c.mxsl"
+
+float z = x + 1.0;
+float w = y ^ foo();
+auto c = color3(y, w, bar());
+auto d = mix(shift(c), BLUE, 0.5);

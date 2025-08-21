@@ -36,6 +36,7 @@ _overwrite_all_expected = False
     ("simple/test_009", False),
     ("simple/test_010", False),
     ("includes_1", False),
+    ("includes_2", False),
     ("properties_1", False),
     ("mountain", False),
     ("expr_stmt_1", False),

@@ -6,10 +6,12 @@ from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PR
 from .Expression import Primitive
 from .macros import Macro, define_macro, undefine_macro, is_macro_defined, run_macro
 from .parse import parse as preparse
+from .. import state
 from ..CompileError import CompileError
+from ..Function import NodeGraphFunction
 from ..Token import Token
 from ..TokenReader import TokenReader
-from ..document import end_temporary_document, use_temporary_document
+from ..document import end_temporary_document, use_temporary_document, get_document
 from ..file_utils import pkg_path
 from ..load_library import load_library, load_standard_library
 from ..mx_wrapper import Document
@@ -131,13 +133,25 @@ class Processor(TokenReader):
         included_files = self.__search_in_include_dirs(directive, path)
         included_tokens = []
         for included_file in included_files:
-            # TODO include .mtlx files (probably decompile them and then include the result).
             if included_file.suffix == ".mtlx":
-                raise CompileError(".mtlx cannot currently be used with the include directive, but I'm working on it.")
-            processed_tokens, _ = process(scan(included_file), self.__mtlx_version, self.__new_include_dirs(included_file.parent), is_main=False)
-            included_tokens.extend(processed_tokens)
+                self.__include_mtlx_file(included_file)
+            else: # included_file.suffix == ".mxsl":
+                processed_tokens, _ = process(scan(included_file), self.__mtlx_version, self.__new_include_dirs(included_file.parent), is_main=False)
+                included_tokens.extend(processed_tokens)
         self.__define_main()
         return included_tokens
+
+    def __include_mtlx_file(self, mtlx_filepath: Path) -> None:
+        document = get_document()
+        document.read_from_xml_file(mtlx_filepath)
+        temp_doc = Document(mtlx_filepath)
+        for temp_node in temp_doc.get_nodes():
+            node = document.get_node(temp_node.name)
+            state.add_node(temp_node.name, node)
+        for temp_node_def in temp_doc.node_defs:
+            node_def = document.get_node_def(temp_node_def.name)
+            function = NodeGraphFunction.from_node_def(node_def)
+            state.add_function(function)
 
     def __process_pragma(self) -> list[Token]:
         # TODO implement pragma directives
@@ -173,7 +187,7 @@ class Processor(TokenReader):
             if lib_filepath.suffix == ".mxsl":
                 library = self.__compile_library(lib_filepath)
                 load_library(library, nodedef_filter)
-            else:
+            else: # lib_filepath.suffix == ".mtlx":
                 load_library(lib_filepath, nodedef_filter)
 
     def __compile_library(self, lib_filepath: Path) -> Document:

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="node3" type="float">
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <foo name="x" type="float" />
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <divide name="node3" type="float">
+      <input name="in1" type="float" value="2" />
+      <input name="in2" type="float" value="2" />
+    </divide>
+    <output name="out" type="float" nodename="node3" />
+  </nodegraph>
+  <bar name="y" type="float" />
+  <nodedef name="ND_shift" node="shift">
+    <output name="out" type="color3" default="0, 0, 0" />
+    <input name="c" type="color3" value="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_shift" nodedef="ND_shift">
+    <extract name="node2" type="float">
+      <input name="in" type="color3" interfacename="c" />
+      <input name="index" type="integer" value="2" />
+    </extract>
+    <extract name="node3" type="float">
+      <input name="in" type="color3" interfacename="c" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <extract name="node4" type="float">
+      <input name="in" type="color3" interfacename="c" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <combine3 name="node5" type="color3">
+      <input name="in1" type="float" nodename="node2" />
+      <input name="in2" type="float" nodename="node3" />
+      <input name="in3" type="float" nodename="node4" />
+    </combine3>
+    <output name="out" type="color3" nodename="node5" />
+  </nodegraph>
+  <add name="z" type="float">
+    <input name="in1" type="float" nodename="x" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <foo name="node7" type="float" />
+  <power name="w" type="float">
+    <input name="in1" type="float" nodename="y" />
+    <input name="in2" type="float" nodename="node7" />
+  </power>
+  <bar name="node10" type="float" />
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" nodename="y" />
+    <input name="in2" type="float" nodename="w" />
+    <input name="in3" type="float" nodename="node10" />
+  </combine3>
+  <shift name="node12" type="color3">
+    <input name="c" type="color3" nodename="c" />
+  </shift>
+  <mix name="d" type="color3">
+    <input name="fg" type="color3" nodename="node12" />
+    <input name="bg" type="color3" value="0, 0, 1" />
+    <input name="mix" type="float" value="0.5" />
+  </mix>
+</materialx>
