@@ -33,11 +33,11 @@ class InteractiveCompiler:
 
         for mxsl_filepath in mxsl_filepaths:
             include_dirs = [*self.__add_include_dirs, mxsl_filepath.parent, Path(".")]
-            compile_(mxsl_filepath, include_dirs, is_main=False)
+            compile_(mxsl_filepath, None, include_dirs, is_main=False)
 
     def eval(self, code_snippet: str) -> None:
         include_dirs = [*self.__add_include_dirs, Path(".")]
-        compile_(code_snippet, include_dirs, is_main=True)
+        compile_(code_snippet, None, include_dirs, is_main=True)
 
     def save(self, mtlx_filepath: Path, mkdir=False) -> None:
         post_process()

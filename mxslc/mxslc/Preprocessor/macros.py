@@ -47,7 +47,7 @@ def is_macro_defined(identifier: str | Token) -> bool:
     return identifier in [m.identifier for m in _macros]
 
 
-def replace_macro(identifier: str | Token) -> list[Token]:
+def run_macro(identifier: str | Token) -> list[Token]:
     identifier = as_token(identifier)
     for macro in _macros:
         if macro.identifier == identifier:

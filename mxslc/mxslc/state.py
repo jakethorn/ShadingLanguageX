@@ -306,9 +306,10 @@ _loop_counter = 0
 
 
 #
-#   Convenience Functions
+#   Interface Functions
 #
 
+### enter/exit functions
 
 def enter_node_graph(node_graph: NodeGraph) -> None:
     global _state
@@ -332,6 +333,7 @@ def exit_inline() -> None:
     global _state
     _state = _state.parent
 
+### node functions
 
 def add_node(identifier: str | Token, node: Node, is_const=False) -> None:
     _state.add_node(identifier, node, is_const)
@@ -352,6 +354,7 @@ def is_node(identifier: str | Token) -> bool:
     except CompileError:
         return False
 
+### function functions
 
 def add_function(func: Function) -> None:
     _state.add_function(func)
@@ -376,6 +379,7 @@ def is_function(identifier: str | Token) -> bool:
     except CompileError:
         return False
 
+### global functions
 
 def add_global(name: str, value: Uniform) -> None:
     _state.add_global(name, value)
@@ -389,6 +393,7 @@ def add_globals(globals_: dict[str, Uniform]) -> None:
 def get_global(identifier: str | Token) -> Uniform:
     return _state.get_global(identifier)
 
+### accessor functions
 
 def get_graph() -> GraphElement:
     return _state.graph
@@ -405,10 +410,26 @@ def clear() -> None:
     _state = InlineState()
     _loop_counter = 0
 
+### temporary state functions
+
+def use_temporary_state() -> State:
+    global _state
+    prev_state = _state
+    _state = InlineState()
+    return prev_state
+
+
+def end_temporary_state(state: State) -> State:
+    global _state
+    temp_state = _state
+    _state = state
+    return temp_state
+
 
 #
 #   Convenience Functions
 #
+
 
 def _handle_identifier(identifier: str | Token) -> tuple[Token | None, str]:
     if isinstance(identifier, str):
