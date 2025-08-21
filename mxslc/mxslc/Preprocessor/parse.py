@@ -4,7 +4,7 @@ from ..CompileError import CompileError
 from ..Keyword import Keyword
 from ..Token import Token
 from ..TokenReader import TokenReader
-from ..token_types import INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL
+from ..token_types import INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL, WHITESPACE
 
 
 def parse(tokens: list[Token]) -> Primitive:
@@ -13,6 +13,7 @@ def parse(tokens: list[Token]) -> Primitive:
 
 class Parser(TokenReader):
     def __init__(self, tokens: list[Token]):
+        tokens.append(Token(WHITESPACE, file=tokens[-1].file, line=tokens[-1].line))
         super().__init__(tokens)
 
     def parse(self) -> Primitive:

@@ -1,0 +1,3 @@
+#loadlib "../add_include_dir/math.mxsl" ()
+
+float x = mad(pi(), 3.0, 4.0);

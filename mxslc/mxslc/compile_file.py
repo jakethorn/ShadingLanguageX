@@ -33,13 +33,14 @@ def compile_file(mxsl_path: str | Path,
     for mxsl_filepath in mxsl_filepaths:
         mtlx_filepath = handle_output_path(mtlx_path, mxsl_filepath)
 
-        undefine_all_macros()
         new_document()
+
         state.clear()
         state.add_globals(globals)
 
         include_dirs = add_include_dirs + [mxsl_filepath.parent, Path(".")]
 
+        undefine_all_macros()
         for macro in add_macros:
             define_macro(macro)
 

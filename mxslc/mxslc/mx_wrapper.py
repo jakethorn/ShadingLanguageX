@@ -267,6 +267,9 @@ class GraphElement(InterfaceElement):
     def get_nodes(self, category="") -> list[Node]:
         return [Node(n) for n in self.source.getNodes(category)]
 
+    def get_node(self, name: str) -> Node:
+        return Node(self.source.getNode(name))
+
 
 #
 #   Port Element
@@ -430,6 +433,9 @@ class Document(GraphElement):
         node_graph.node_def = node_def
         return node_graph
 
+    def get_node_def(self, name: str) -> NodeDef:
+        return NodeDef(self.source.getNodeDef(name))
+
     @property
     def node_defs(self) -> list[NodeDef]:
         return [NodeDef(nd) for nd in self.source.getNodeDefs()]
@@ -448,6 +454,9 @@ class Document(GraphElement):
         loaded = mx.loadLibraries([version], mx.FileSearchPath(str(libraries_dir)), self.source)
         if not loaded:
             raise CompileError(f"Unsupported MaterialX version: {version}.")
+
+    def read_from_xml_file(self, xml_filepath: Path) -> None:
+        mx.readFromXmlFile(self.source, str(xml_filepath))
 
 
 #

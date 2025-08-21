@@ -36,6 +36,7 @@ _overwrite_all_expected = False
     ("simple/test_009", False),
     ("simple/test_010", False),
     ("includes_1", False),
+    ("includes_2", False),
     ("properties_1", False),
     ("mountain", False),
     ("expr_stmt_1", False),
@@ -119,6 +120,10 @@ _overwrite_all_expected = False
     ("version/version_2", False),
     ("version/version_3", False),
     ("version/version_4", False),
+    ("loadlib/loadlib_test_1", False),
+    ("loadlib/loadlib_test_2", False),
+    ("loadlib/loadlib_test_3", False),
+    ("loadlib/loadlib_test_4", False),
 ])
 def test_mxslc(filename: str, overwrite_expected: bool) -> None:
     mxsl_path     = (Path(__file__).parent / "data" / "mxsl" / filename).with_suffix(".mxsl")

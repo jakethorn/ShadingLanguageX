@@ -1,0 +1,3 @@
+#loadlib "../add_include_dir/noexist.mxsl"
+
+float x = mad(pi(), 3.0, 4.0);

@@ -1,0 +1,6 @@
+color3 shift(color3 c)
+{
+    return c.brg;
+}
+
+const color3 BLUE = color3(0.0, 0.0, 1.0);
