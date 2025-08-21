@@ -1,7 +1,7 @@
 ```
 from SynaxGrammar import statement ; 
 
-directive   → "#" include | define | if | ifdef | ifndef | pragma | print | version EOL ;
+directive   → "#" include | define | if | ifdef | ifndef | pragma | print | version | loadlib EOL ;
 include     → "include" macro ;
 define      → ( "define" IDENTIFIER macro ) | ( "undef" IDENTIFIER ) ;
 if          → "if" macro EOL statement* EOL elses ;
@@ -10,6 +10,7 @@ ifndef      → "ifndef" IDENTIFIER EOL statement* EOL elses ;
   elses     → ( ( ( "elif" macro ) | "else" ) EOL statement* EOL )* "endif" ;
 print       → "print" IDENTIFIER? ;
 version     → "version" macro
+loadlib     → "loadlib" macro ( "(" ( IDENTIFIER "," )* ")" )?
   macro     → expression ;
 
 expression  → logic ;  

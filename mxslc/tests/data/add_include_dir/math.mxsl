@@ -1,0 +1,14 @@
+float mad(float in, float m, float a)
+{
+    return in * m + a;
+}
+
+float pi()
+{
+    return 3.14;
+}
+
+float foo()
+{
+    return 1.0;
+}

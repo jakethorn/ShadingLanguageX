@@ -1086,6 +1086,25 @@ color3 c = mix(mix(RED, GREEN, uv.x), BLUE, uv.y);
 standard_surface(base_color=c);
 ```
 
+## Loadlib
+
+The `#loadlib` directive looks for NodeDef elements in specified `.mtlx` or `.mxsl` files and allows users to call them
+from the source file being compiled. The NodeDefs are __not__ included in the compiled file, similar
+to how the MaterialX Standard Nodes are not included in compiled SLX files.
+
+The `#loadlib` directive follows the same rules as the `#include` directive when searching for files (see above).
+
+The directive takes an optional list of function names after the specified path. When included, the compiler will only
+load functions with the specified names.
+
+```
+// loads all functions from colors.mxsl
+#loadlib "colors.mxsl"
+
+// loads only mad and pi from math.mtlx
+#loadlib "math.mtlx" (mad, pi)
+```
+
 ## Macro Definition
 
 Macros are more limited in ShadingLanguageX than in C. Only flag- and object-like macros are supported, e.g., 

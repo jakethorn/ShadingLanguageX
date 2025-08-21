@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <pi name="node1" type="float" />
+  <mad name="x" type="float">
+    <input name="in" type="float" nodename="node1" />
+    <input name="m" type="float" value="3" />
+    <input name="a" type="float" value="4" />
+  </mad>
+</materialx>

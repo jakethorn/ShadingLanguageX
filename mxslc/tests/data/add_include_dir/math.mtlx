@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_mad" node="mad">
+    <output name="out" type="float" default="0.0" />
+    <input name="in" type="float" value="0" />
+    <input name="m" type="float" value="0" />
+    <input name="a" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_mad" nodedef="ND_mad">
+    <multiply name="node3" type="float">
+      <input name="in1" type="float" interfacename="in" />
+      <input name="in2" type="float" interfacename="m" />
+    </multiply>
+    <add name="node5" type="float">
+      <input name="in1" type="float" nodename="node3" />
+      <input name="in2" type="float" interfacename="a" />
+    </add>
+    <output name="out" type="float" nodename="node5" />
+  </nodegraph>
+  <nodedef name="ND_pi" node="pi">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_pi" nodedef="ND_pi">
+    <output name="out" type="float" value="3.14" />
+  </nodegraph>
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" default="0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="float" value="1" />
+  </nodegraph>
+</materialx>
