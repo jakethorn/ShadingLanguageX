@@ -35,7 +35,7 @@ vec2 vu = swizzle(texcoord<vec2>(), "yx");
 ```
 
 
-* __Loadlib Directive (docs)__  
+* __Loadlib Directive ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#loadlib))__  
 The `#loadlib` directive looks for NodeDef elements in specified `.mtlx` or `.mxsl` files and allows users to call them
 from the source file being compiled. The NodeDefs are __not__ included in the compiled file, similar
 to how the MaterialX Standard Nodes are not included in compiled SLX files.
@@ -46,6 +46,10 @@ to how the MaterialX Standard Nodes are not included in compiled SLX files.
 // loads only mad and pi from math.mtlx
 #loadlib "math.mtlx" (mad, pi)
 ```
+
+
+* __Improved Include Directive__  
+The `#include` directive now supports `.mtlx` files in addition to `.mxsl` files.
 
 
 # Version 0.5.3-beta

@@ -1058,10 +1058,11 @@ ShadingLanguageX supports many of the C preprocessor directives:
 
 ## File Inclusion
 
-The `#include` directive works as it does in C, but also allows inclusion of directories as well as specific files. All files
-with the extension `.mxsl` inside the directory will be included. The search is not recursive, i.e., it does not include `.mxsl`
-files from subdirectories and files are not included in any particular order. If the order of included files is important, 
-then you should include each file individually in the necessary order.
+The `#include` directive allows users to include other `.mxsl` or `.mtlx` files in the current compilation, allowing them to
+use any nodes or nodedefs defined in those files. The directive also allows inclusion of directories as well as specific files. All files
+with the extension `.mxsl` or `.mtlx` inside the directory will be included. The search is not recursive, i.e., it does not include 
+files from subdirectories. Files are not included in any particular order; if the order of included files is important, 
+then the user should include each file individually in the necessary order.
 
 When including a file, paths may be absolute or relative. If the path is relative, ShadingLanguageX will look for the file in
 the following directories in order:
@@ -1073,9 +1074,9 @@ the following directories in order:
 
 _color_enums.mxsl_:
 ```
-#define RED color3(1.0, 0.0, 0.0)
-#define GREEN color3(0.0, 1.0, 0.0)
-#define BLUE color3(0.0, 0.0, 1.0)
+const color3 RED = color3(1.0, 0.0, 0.0)
+const color3 GREEN = color3(0.0, 1.0, 0.0)
+const color3 BLUE = color3(0.0, 0.0, 1.0)
 ```
 
 _file_incl_example.mxsl_:
