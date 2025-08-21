@@ -1058,8 +1058,8 @@ ShadingLanguageX supports many of the C preprocessor directives:
 
 ## File Inclusion
 
-The `#include` directive allows users to include other `.mxsl` or `.mtlx` files in the current compilation, allowing them to
-use any nodes or nodedefs defined in those files. The directive also allows inclusion of directories as well as specific files. All files
+The `#include` directive allows users to include other `.mxsl` or `.mtlx` files in the current compilation, giving them access to 
+any Nodes or NodeDefs defined in those files. The directive also supports inclusion of directories as well as specific files. All files
 with the extension `.mxsl` or `.mtlx` inside the directory will be included. The search is not recursive, i.e., it does not include 
 files from subdirectories. Files are not included in any particular order; if the order of included files is important, 
 then the user should include each file individually in the necessary order.
