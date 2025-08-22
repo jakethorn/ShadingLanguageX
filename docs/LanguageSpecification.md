@@ -1163,7 +1163,7 @@ vec2 vu = swizzle(texcoord<vec2>(), "yx");
 
 # mxslc
 
-mxslc is the open-source compiler for ShadingLanguageX. It can be downloaded from the GitHub repository [releases](https://github.com/jakethorn/ShadingLanguageX/releases) section.
+mxslc is the open-source compiler for ShadingLanguageX. It can be downloaded from the GitHub repository [releases](https://github.com/jakethorn/ShadingLanguageX/releases) section or installed using `pip install mxslc`.
 It can be run either using the compiled executable or with the Python API.  
 
 ## Executable
