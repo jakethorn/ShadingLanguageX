@@ -6,7 +6,7 @@ import pytest
 import MaterialX as mx
 import mxslc
 
-_overwrite_all_expected = True
+_overwrite_all_expected = False
 
 
 @pytest.mark.parametrize("filename, overwrite_expected", [
