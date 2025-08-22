@@ -36,16 +36,19 @@ class Expression(ABC):
                 raise CompileError("Incompatible data types.", self.token)
             self._init_subexpr(valid_types)
             self._init(valid_types)
-            if self._data_type not in valid_types:
-                implicit_conversions = {
-                    STRING: FILENAME,
-                    INTEGER: FLOAT
-                }
-                if self.has_value and self._data_type in implicit_conversions and implicit_conversions[self._data_type] in valid_types:
-                    self.__converted_type = implicit_conversions[self._data_type]
-                else:
-                    raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
             self.__initialized = True
+            if self._data_type not in valid_types and not self.__try_convert(valid_types):
+                raise CompileError(f"Invalid data type. Expected {utils.format_types(valid_types)}, but got {self._data_type}.", self.token)
+
+    def __try_convert(self, valid_types: set[DataType]) -> bool:
+        implicit_conversions = {
+            STRING: FILENAME,
+            INTEGER: FLOAT
+        }
+        if self.has_value and self._data_type in implicit_conversions and implicit_conversions[self._data_type] in valid_types:
+            self.__converted_type = implicit_conversions[self._data_type]
+            return True
+        return False
 
     def try_init(self, valid_types: DataType | set[DataType] = None) -> CompileError | None:
         try:
@@ -77,22 +80,32 @@ class Expression(ABC):
         return self.data_type.size
 
     @property
-    #virtualmethod
     def value(self) -> Uniform | None:
+        assert self.__initialized
+        if self.__converted_type is None:
+            return self._value
+        else:
+            implicit_conversions = {
+                FILENAME: lambda s: Path(s),
+                FLOAT: lambda i: float(i)
+            }
+            conversion = implicit_conversions[self.__converted_type]
+            converted_value = conversion(self._value)
+            return converted_value
+
+    @property
+    #virtualmethod
+    def _value(self) -> Uniform | None:
         return None
 
     @property
     def has_value(self) -> bool:
-        return self.value is not None
+        return self._value is not None
 
     def evaluate(self) -> Node:
         assert self.__initialized
-        implicit_conversions = {
-            FILENAME: lambda s: Path(s),
-            FLOAT: lambda i: float(i)
-        }
-        if self.has_value and self.__converted_type in implicit_conversions:
-            node = node_utils.constant(implicit_conversions[self.__converted_type](self.value))
+        if self.has_value:
+            node = node_utils.constant(self.value)
         else:
             node = self._evaluate()
         assert (self.data_type == VOID) or (node.data_type == self.data_type)

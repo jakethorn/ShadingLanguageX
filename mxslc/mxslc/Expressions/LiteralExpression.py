@@ -15,7 +15,7 @@ class LiteralExpression(Expression):
         self.__null_type: DataType | None = None
 
     @property
-    def value(self) -> Uniform | None:
+    def _value(self) -> Uniform | None:
         return self.__literal.value
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:

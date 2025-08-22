@@ -92,4 +92,7 @@ class LiteralToken(Token):
         if isinstance(value, str):
             type_ = STRING_LITERAL
             lexeme = '"' + value + '"'
+        if isinstance(value, Path):
+            type_ = STRING_LITERAL
+            lexeme = '"' + str(value) + '"'
         super().__init__(type_, lexeme, file, line)

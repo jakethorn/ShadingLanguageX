@@ -4,19 +4,13 @@
     <output name="out" type="vector2" default="0, 0" />
   </nodedef>
   <nodegraph name="NG_foo_vector2" nodedef="ND_foo_vector2">
-    <convert name="v" type="vector2">
-      <input name="in" type="float" value="2.3" />
-    </convert>
-    <output name="out" type="vector2" nodename="v" />
+    <output name="out" type="vector2" value="2.3, 2.3" />
   </nodegraph>
   <nodedef name="ND_foo_vector3" node="foo">
     <output name="out" type="vector3" default="0, 0, 0" />
   </nodedef>
   <nodegraph name="NG_foo_vector3" nodedef="ND_foo_vector3">
-    <convert name="v" type="vector3">
-      <input name="in" type="float" value="2.3" />
-    </convert>
-    <output name="out" type="vector3" nodename="v" />
+    <output name="out" type="vector3" value="2.3, 2.3, 2.3" />
   </nodegraph>
   <nodedef name="ND_bar_vector2" node="bar">
     <output name="out" type="vector2" default="0, 0" />

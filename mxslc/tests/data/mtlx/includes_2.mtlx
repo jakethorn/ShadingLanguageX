@@ -50,22 +50,22 @@
     <input name="in1" type="float" nodename="x" />
     <input name="in2" type="float" value="1" />
   </add>
-  <foo name="node7" type="float" />
+  <foo name="node4" type="float" />
   <power name="w" type="float">
     <input name="in1" type="float" nodename="y" />
-    <input name="in2" type="float" nodename="node7" />
+    <input name="in2" type="float" nodename="node4" />
   </power>
-  <bar name="node10" type="float" />
+  <bar name="node7" type="float" />
   <combine3 name="c" type="color3">
     <input name="in1" type="float" nodename="y" />
     <input name="in2" type="float" nodename="w" />
-    <input name="in3" type="float" nodename="node10" />
+    <input name="in3" type="float" nodename="node7" />
   </combine3>
-  <shift name="node12" type="color3">
+  <shift name="node9" type="color3">
     <input name="c" type="color3" nodename="c" />
   </shift>
   <mix name="d" type="color3">
-    <input name="fg" type="color3" nodename="node12" />
+    <input name="fg" type="color3" nodename="node9" />
     <input name="bg" type="color3" value="0, 0, 1" />
     <input name="mix" type="float" value="0.5" />
   </mix>

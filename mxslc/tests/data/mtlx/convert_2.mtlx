@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <image name="c" type="color3">
+    <input name="file" type="filename" value="" />
+  </image>
+</materialx>

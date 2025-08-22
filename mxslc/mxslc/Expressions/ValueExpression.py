@@ -10,7 +10,7 @@ class ValueExpression(Expression):
         self.__value = value
 
     @property
-    def value(self) -> Uniform | None:
+    def _value(self) -> Uniform | None:
         return self.__value
 
     def instantiate_templated_types(self, data_type: DataType) -> Expression:

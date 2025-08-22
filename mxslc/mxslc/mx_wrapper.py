@@ -302,7 +302,11 @@ class PortElement(TypedElement):
 
     @property
     def literal(self) -> Uniform | None:
-        return self.source.getValue()
+        value = self.source.getValue()
+        if self.data_type == FILENAME:
+            return Path(value) if value is not None else None
+        else:
+            return value
 
     @property
     def has_literal(self) -> bool:
@@ -331,7 +335,10 @@ class PortElement(TypedElement):
             self.source.setConnectedOutput(value.source)
         else:
             if isinstance(value, Path):
-                self.source.setValue(str(value), Keyword.FILENAME)
+                value = str(value)
+                if value == ".":
+                    value = ""
+                self.source.setValue(value, Keyword.FILENAME)
             else:
                 self.source.setValue(value, str(self.data_type))
 

@@ -42,13 +42,10 @@
   <foo name="node2" type="float">
     <input name="a" type="float" value="5" />
   </foo>
-  <convert name="node4" type="vector3">
-    <input name="in" type="float" value="6" />
-  </convert>
-  <foo name="node5" type="float">
-    <input name="a" type="vector3" nodename="node4" />
+  <foo name="node4" type="float">
+    <input name="a" type="vector3" value="6, 6, 6" />
   </foo>
-  <foo name="node7" type="float">
+  <foo name="node6" type="float">
     <input name="a" type="boolean" value="true" />
   </foo>
 </materialx>

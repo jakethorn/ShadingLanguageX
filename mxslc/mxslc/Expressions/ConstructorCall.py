@@ -18,7 +18,7 @@ class ConstructorCall(Expression):
         self.__args = args
 
     @property
-    def value(self) -> Uniform | None:
+    def _value(self) -> Uniform | None:
         arg_exprs = [a.expression for a in self.__args]
         if any(not e.has_value for e in arg_exprs):
             return None
