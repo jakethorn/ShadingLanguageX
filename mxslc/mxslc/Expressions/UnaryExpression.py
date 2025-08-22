@@ -22,7 +22,7 @@ class UnaryExpression(Expression):
         self.__right = right
 
     @property
-    def value(self) -> Uniform | None:
+    def _value(self) -> Uniform | None:
         if self.__right.has_value:
             if self.__op in ["!", Keyword.NOT]:
                 return not self.__right.value

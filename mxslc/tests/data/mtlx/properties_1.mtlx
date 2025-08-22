@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="node14" type="vector2">
+  <add name="node10" type="vector2">
     <input name="in1" type="vector2" value="1, 2" />
     <input name="in2" type="float" value="1" />
   </add>
-  <extract name="node15" type="float">
-    <input name="in" type="vector2" nodename="node14" />
+  <extract name="node11" type="float">
+    <input name="in" type="vector2" nodename="node10" />
     <input name="index" type="integer" value="0" />
   </extract>
   <add name="x1" type="float">
-    <input name="in1" type="float" nodename="node15" />
+    <input name="in1" type="float" nodename="node11" />
     <input name="in2" type="float" value="1" />
   </add>
   <add name="x2" type="float">

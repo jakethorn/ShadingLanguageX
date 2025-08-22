@@ -5,7 +5,7 @@ from ..DataType import DataType, BOOLEAN, INTEGER, FLOAT, STRING, FILENAME
 from ..Keyword import Keyword
 from ..Token import Token
 from ..mx_wrapper import Node, Uniform
-from ..token_types import INT_LITERAL, FLOAT_LITERAL, FILENAME_LITERAL, STRING_LITERAL
+from ..token_types import INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL
 
 
 class LiteralExpression(Expression):
@@ -15,7 +15,7 @@ class LiteralExpression(Expression):
         self.__null_type: DataType | None = None
 
     @property
-    def value(self) -> Uniform | None:
+    def _value(self) -> Uniform | None:
         return self.__literal.value
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:
@@ -34,7 +34,6 @@ class LiteralExpression(Expression):
             INT_LITERAL: INTEGER,
             FLOAT_LITERAL: FLOAT,
             STRING_LITERAL: STRING,
-            FILENAME_LITERAL: FILENAME,
             Keyword.NULL: self.__null_type
         }[self.__literal]
 

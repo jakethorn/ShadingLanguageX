@@ -15,12 +15,16 @@ class IdentifierExpression(Expression):
         return self.__identifier
 
     @property
-    def value(self) -> Uniform | None:
+    def _value(self) -> Uniform | None:
         node = state.get_node(self.__identifier)
-        while node.category == "dot":
-            node = node.get_input("in").connected_node
-        if node.category == "constant":
-            return node.get_input("value").literal
+        while node.category in ["dot", "constant"]:
+            input_name = "in" if node.category == "dot" else "value"
+            input_ = node.get_input(input_name)
+            if input_.has_literal:
+                return input_.literal
+            node = input_.connected_node
+            if node is None:
+                return None
         return None
 
     def instantiate_templated_types(self, template_type: DataType) -> Expression:

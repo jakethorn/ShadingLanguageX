@@ -5,30 +5,30 @@
     <input name="t" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_palette" nodedef="ND_palette">
-    <multiply name="node18" type="vector3">
+    <multiply name="node6" type="vector3">
       <input name="in1" type="vector3" value="1, 1, 1" />
       <input name="in2" type="float" interfacename="t" />
     </multiply>
     <add name="in2" type="vector3">
-      <input name="in1" type="vector3" nodename="node18" />
+      <input name="in1" type="vector3" nodename="node6" />
       <input name="in2" type="vector3" value="0.263, 0.416, 0.557" />
     </add>
-    <multiply name="node21" type="vector3">
+    <multiply name="node9" type="vector3">
       <input name="in1" type="vector3" nodename="in2" />
       <input name="in2" type="float" value="6.28318" />
     </multiply>
-    <cos name="node22" type="vector3">
-      <input name="in" type="vector3" nodename="node21" />
+    <cos name="node10" type="vector3">
+      <input name="in" type="vector3" nodename="node9" />
     </cos>
-    <multiply name="node23" type="vector3">
+    <multiply name="node11" type="vector3">
       <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
-      <input name="in2" type="vector3" nodename="node22" />
+      <input name="in2" type="vector3" nodename="node10" />
     </multiply>
-    <add name="node24" type="vector3">
+    <add name="node12" type="vector3">
       <input name="in1" type="vector3" value="0.5, 0.5, 0.5" />
-      <input name="in2" type="vector3" nodename="node23" />
+      <input name="in2" type="vector3" nodename="node11" />
     </add>
-    <output name="out" type="vector3" nodename="node24" />
+    <output name="out" type="vector3" nodename="node12" />
   </nodegraph>
   <nodedef name="ND_fract_v2" node="fract_v2">
     <output name="out" type="vector2" default="0, 0" />
@@ -149,9 +149,6 @@
   </nodedef>
   <nodegraph name="NG_main" nodedef="ND_main">
     <texcoord name="uv" type="vector2" />
-    <convert name="finalColor" type="vector3">
-      <input name="in" type="float" value="0" />
-    </convert>
     <update_uv name="uv2" type="vector2">
       <input name="uv" type="vector2" nodename="uv" />
     </update_uv>
@@ -159,7 +156,7 @@
       <input name="uv" type="vector2" nodename="uv2" />
       <input name="uv0" type="vector2" nodename="uv" />
       <input name="i" type="float" value="0" />
-      <input name="finalColor" type="vector3" nodename="finalColor" />
+      <input name="finalColor" type="vector3" value="0, 0, 0" />
     </update_finalColor>
     <add name="i2" type="float">
       <input name="in1" type="float" value="0" />
@@ -201,9 +198,9 @@
       <input name="finalColor" type="vector3" nodename="finalColor4" />
     </update_finalColor>
     <standard_surface name="surface" type="surfaceshader">
-      <input name="base_color" type="color3" nodename="node29" />
+      <input name="base_color" type="color3" nodename="node28" />
     </standard_surface>
-    <convert name="node29" type="color3">
+    <convert name="node28" type="color3">
       <input name="in" type="vector3" nodename="finalColor5" />
     </convert>
     <output name="out" type="surfaceshader" nodename="surface" />

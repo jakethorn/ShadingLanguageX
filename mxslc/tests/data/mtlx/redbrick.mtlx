@@ -51,20 +51,20 @@
     <input name="in3" type="float" nodename="node19" />
   </combine3>
   <standard_surface name="surface" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node27" />
+    <input name="base_color" type="color3" nodename="node24" />
     <input name="metalness" type="float" nodename="metal" />
     <input name="specular_roughness" type="float" nodename="rough" />
-    <input name="normal" type="vector3" nodename="node35" />
+    <input name="normal" type="vector3" nodename="node32" />
   </standard_surface>
   <multiply name="node22" type="color3">
     <input name="in1" type="color3" nodename="albedo" />
     <input name="in2" type="float" nodename="matao" />
   </multiply>
-  <multiply name="node27" type="color3">
+  <multiply name="node24" type="color3">
     <input name="in1" type="color3" nodename="node22" />
     <input name="in2" type="color3" value="0.5, 0.1, 0.1" />
   </multiply>
-  <normalmap name="node35" type="vector3">
+  <normalmap name="node32" type="vector3">
     <input name="in" type="vector3" nodename="normal2" />
   </normalmap>
 </materialx>

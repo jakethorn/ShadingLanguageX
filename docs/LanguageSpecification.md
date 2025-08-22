@@ -172,8 +172,19 @@ In this document we will typically use the aliased version for the sake of brevi
 
 ## Auto
 
-Variables and functions can also be declared using the `auto` keyword where the type can be inferred from the right-hand 
-expression in the case of a variable declaration or the return expression for functions.
+Variables and functions can also be declared using the `auto` keyword when the type can be inferred from the right-hand 
+expression, or return expression in the case of function declarations.
+
+## Type Conversions
+
+ShadingLanguageX supports a limited number of implicit conversions. Integers are implicitly converted to floats and 
+strings to filenames. Otherwise variables will need to be explicitly converted using a [Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors).
+
+```
+float x = 0;                 // implicit int ➔ float
+filename p = "my_image.exr"; // implicit string ➔ filename
+color3 c = color3(1.0);      // explicit float ➔ color3
+```
 
 ### Example
 
@@ -241,8 +252,7 @@ Literals represent the fundamental data used by the system.
 | `boolean`  | `true` `false`                         |
 | `integer`  | `79`                                   |
 | `float`    | `0.5` `2.` `.9` `2.5e6` `2.e3` `.9e-3` |
-| `string`   | `"tangent"`                            |
-| `filename` | `"../textures/brick.png"`              |
+| `string`   | `"tangent"` `"my_image.png"`           |
 
 See [Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors) for information on how to initialise vectors and colors.
 
@@ -495,10 +505,6 @@ In the case that no arguments are passed to the constructor a default value will
 With a single argument, the constructor will convert the argument to the type of the constructor.
 Currently, this simply compiles to the `convert` node. For information regarding supported conversions, 
 see the MaterialX Standard Node document.
-
-### Notes
-
-ShadingLanguageX does not support implicit conversions. Explicit conversions can be achieved using constructors with a single argument.
 
 ### Example
 

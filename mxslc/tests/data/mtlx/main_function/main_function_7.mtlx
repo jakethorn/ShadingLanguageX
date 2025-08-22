@@ -3,7 +3,7 @@
   <nodedef name="ND_main" node="main">
     <output name="out" type="material" default="" />
     <input name="r" type="float" value="0" />
-    <input name="img_path" type="filename" value="." />
+    <input name="img_path" type="filename" value="" />
   </nodedef>
   <nodegraph name="NG_main" nodedef="ND_main">
     <standard_surface name="surface" type="surfaceshader">

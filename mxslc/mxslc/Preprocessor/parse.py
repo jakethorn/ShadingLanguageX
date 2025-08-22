@@ -4,7 +4,7 @@ from ..CompileError import CompileError
 from ..Keyword import Keyword
 from ..Token import Token
 from ..TokenReader import TokenReader
-from ..token_types import INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL, WHITESPACE
+from ..token_types import INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, WHITESPACE
 
 
 def parse(tokens: list[Token]) -> Primitive:
@@ -83,7 +83,7 @@ class Parser(TokenReader):
             return self.__primary()
 
     def __primary(self) -> Expression:
-        if literal := self._consume(Keyword.TRUE, Keyword.FALSE, INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL, FILENAME_LITERAL):
+        if literal := self._consume(Keyword.TRUE, Keyword.FALSE, INT_LITERAL, FLOAT_LITERAL, STRING_LITERAL):
             return LiteralExpression(literal)
         if self._consume("("):
             expr = self.__expression()

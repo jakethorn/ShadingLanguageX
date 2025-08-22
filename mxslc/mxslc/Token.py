@@ -2,7 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .Keyword import Keyword
-from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, FILENAME_LITERAL, IDENTIFIER
+from .token_types import FLOAT_LITERAL, INT_LITERAL, STRING_LITERAL, IDENTIFIER
 
 
 class Token:
@@ -36,8 +36,6 @@ class Token:
             self.__value = int(lexeme)
         if self.__type == STRING_LITERAL:
             self.__value = lexeme.strip('"')
-        if self.__type == FILENAME_LITERAL:
-            self.__value = Path(lexeme.strip('"'))
 
     @property
     def type(self) -> str:
@@ -95,6 +93,6 @@ class LiteralToken(Token):
             type_ = STRING_LITERAL
             lexeme = '"' + value + '"'
         if isinstance(value, Path):
-            type_ = FILENAME_LITERAL
+            type_ = STRING_LITERAL
             lexeme = '"' + str(value) + '"'
         super().__init__(type_, lexeme, file, line)

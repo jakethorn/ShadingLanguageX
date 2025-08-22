@@ -13,7 +13,7 @@ The global keyword operates similarly to `uniform` from GLSL. Global variables d
 
 
 * __Improved Float Parsing__  
-Floating-point values can now be written in the scientific format (e.g., `2.5e3`) and/or with zeros before or after the decimal point omitted
+Floating-point values can now be written in the scientific format (e.g., `2.5e3`) and/or with zeros omitted before or after the decimal point
   (e.g., `.5` → `0.5` and `2.` → `2.0`).
 
 
@@ -50,6 +50,11 @@ to how the MaterialX Standard Nodes are not included in compiled SLX files.
 
 * __Improved Include Directive__  
 The `#include` directive now supports `.mtlx` files in addition to `.mxsl` files.
+
+
+* __Improved Type Handling__  
+The filename type now serializes correctly. In addition, support for implicit conversions has been added. Currently, 
+integers can be implicitly converted to floats and strings to filenames.
 
 
 # Version 0.5.3-beta
