@@ -16,7 +16,6 @@
 # TODO finish interactive compiler
 # TODO improve decompiler
 # TODO add attributes to document
-# TODO #include can also include .mtlx files (decompile them during import process)
 # TODO most expressions can inherit from FunctionCall (or something like that)
 # ...  there is no need to do any manual type check like that
 # TODO matrix constructor calls
