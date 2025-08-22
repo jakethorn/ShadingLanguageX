@@ -97,7 +97,7 @@ class Function(ABC):
         if return_types:
             if self.return_type not in return_types:
                 return False
-        if args:
+        if args is not None:
             try:
                 satisfied_params = [self._params[a] for a in args]
             except IndexError:
