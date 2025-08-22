@@ -1,4 +1,4 @@
-# Version 0.5.4-beta (In development)
+# Version 0.6-beta
 ## Added
 * __If-Else Expressions ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#if-else-expressions))__  
 If else expressions are now possible. You can include any number of `if else` clauses in the expression.
