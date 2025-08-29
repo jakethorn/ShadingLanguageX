@@ -100,7 +100,7 @@ class State(ABC):
             message += "\n".join([str(f) for f in matching_funcs])
             raise CompileError(message, identifier)
 
-    def get_function_parameter_types(self, valid_types: set[DataType], identifier: str | Token, template_type: DataType, args: list[Argument], param_index: int | str) -> set[DataType]:
+    def get_function_parameter_types(self, valid_types: set[DataType], identifier: str | Token, template_type: DataType | None, args: list[Argument], param_index: int | str) -> set[DataType]:
         identifier, name = _handle_identifier(identifier)
         matching_funcs = self.get_functions(name, template_type, valid_types, args, strict_args=False)
         return {
@@ -364,7 +364,7 @@ def get_function(identifier: str | Token, template_type: DataType = None, valid_
     return _state.get_function(identifier, template_type, valid_types, args)
 
 
-def get_function_parameter_types(valid_types: set[DataType], identifier: str | Token, template_type: DataType, args: list[Argument], param_index: int | str) -> set[DataType]:
+def get_function_parameter_types(valid_types: set[DataType], identifier: str | Token, template_type: DataType | None, args: list[Argument], param_index: int | str) -> set[DataType]:
     return _state.get_function_parameter_types(valid_types, identifier, template_type, args, param_index)
 
 

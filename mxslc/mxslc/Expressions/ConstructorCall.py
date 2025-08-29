@@ -1,25 +1,43 @@
-from typing import Any
-
-from . import Expression
+from . import Expression, ExpressionFacade
+from .NodeExpression import NodeExpression
 from .expression_utils import format_args
 from .. import node_utils
 from ..DataType import DataType, FLOAT, MULTI_ELEM_TYPES, BOOLEAN, INTEGER
 from ..Token import Token
 from ..mx_wrapper import Node, Uniform
 
-type Argument = Any
+
+class ConstructorCall(ExpressionFacade):
+    def __init__(self, data_type: Token | DataType, args: list[Expression]):
+        data_type = DataType(data_type)
+        token = data_type if isinstance(data_type, Token) else data_type.as_token
+        if len(args) == 0:
+            expr = NodeExpression(token, "constant", data_type.default())
+        elif len(args) == 1:
+            expr = NodeExpression(token, "convert", args)
+        elif len(args) > 1:
 
 
-# TODO type checking. Maybe do the same as binary expression.
-class ConstructorCall(Expression):
-    def __init__(self, data_type: Token | DataType, args: list[Argument]):
-        super().__init__(data_type if isinstance(data_type, Token) else data_type.as_token)
+            channels = []
+            # fill channels with args
+            for arg in self.__args:
+                new_channels = node_utils.extract_all(arg.evaluate())
+                for new_channel in new_channels:
+                    channels.append(new_channel)
+                    if len(channels) == self.data_size:
+                        return node_utils.combine(channels, self.data_type)
+            # fill remaining channels (if any) with zeros
+            while len(channels) < self.data_size:
+                channels.append(node_utils.constant(0.0))
+            return node_utils.combine(channels, self.data_type)
+
+        super().__init__(expr, "")
         self.__data_type = DataType(data_type)
         self.__args = args
 
     @property
     def _value(self) -> Uniform | None:
-        arg_exprs = [a.expression for a in self.__args]
+        arg_exprs = self.__args
         if any(not e.has_value for e in arg_exprs):
             return None
         arg_channels: list[Uniform] = []

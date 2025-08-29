@@ -14,3 +14,5 @@ from .IndexingExpression import IndexingExpression
 from .TernaryRelationalExpression import TernaryRelationalExpression
 from .ValueExpression import ValueExpression
 from .VariableDeclarationExpression import VariableDeclarationExpression
+from .ExpressionFacade import ExpressionFacade
+from .NodeExpression import NodeExpression

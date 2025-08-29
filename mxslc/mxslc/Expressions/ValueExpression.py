@@ -22,3 +22,13 @@ class ValueExpression(Expression):
 
     def _evaluate(self) -> Node:
         return node_utils.constant(self.__value)
+
+
+class ZeroExpression(Expression):
+    def __init__(self):
+        super().__init__(None)
+
+    def instantiate_templated_types(self, data_type: DataType) -> Expression:
+        return self
+
+    def _init(self, valid_types: set[DataType]) -> None:

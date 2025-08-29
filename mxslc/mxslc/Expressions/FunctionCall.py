@@ -1,14 +1,13 @@
-from typing import Any
+from __future__ import annotations
 
 from . import Expression
 from .expression_utils import format_args
 from .. import state, utils
+from ..Argument import Argument
 from ..CompileError import CompileError
 from ..DataType import DataType
-from ..Token import Token
-from ..mx_wrapper import Node
-
-type Argument = Any
+from ..Token import Token, IdentifierToken
+from ..mx_wrapper import Node, Uniform
 
 
 class FunctionCall(Expression):
@@ -69,6 +68,18 @@ class FunctionCall(Expression):
     @property
     def _data_type(self) -> DataType:
         return self.__func.return_type
+
+    @property
+    def _value(self) -> Uniform | None:
+        if any(not a.has_value for a in self.__args):
+            return None
+        name = self.__identifier.lexeme
+        if name == "not":      return not self.__args[0].value
+        if name == "add":      return self.__args[0].value + self.__args[1].value
+        if name == "subtract": return self.__args[0].value - self.__args[1].value
+        if name == "multiply": return self.__args[0].value * self.__args[1].value
+        if name == "divide":   return self.__args[0].value / self.__args[1].value
+        return None
 
     def _evaluate(self) -> Node:
         return self.__func.invoke(self.__args)
