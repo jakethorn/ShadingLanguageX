@@ -94,7 +94,7 @@ class Scanner:
         return match.group() if match else None
 
     def __get_directive(self) -> str | None:
-        match = re.match(r"#[a-z]*", self.__peek_all())
+        match = re.match(r"#\S*", self.__peek_all())
         return match.group() if match else None
 
     def __get_word(self) -> str | None:

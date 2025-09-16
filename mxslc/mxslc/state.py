@@ -62,7 +62,7 @@ class State(ABC):
     #
 
     @abstractmethod
-    def add_node(self, identifier: str | Token, node: Node, is_const=False) -> None:
+    def add_node(self, identifier: str | Token, node: Node, is_const=False, is_ref=False) -> None:
         ...
 
     @abstractmethod
@@ -160,8 +160,8 @@ class InlineState(State):
     #   add/get/set nodes
     #
 
-    def add_node(self, identifier: str | Token, node: Node, is_const=False) -> None:
-        assert node.parent == self.graph
+    def add_node(self, identifier: str | Token, node: Node, is_const=False, is_ref=False) -> None:
+        assert is_ref or node.parent == self.graph
         identifier, name = _handle_identifier(identifier)
         if name in self._nodes:
             raise CompileError(f"Variable name '{name}' already exists.", identifier)
@@ -230,9 +230,9 @@ class NodeGraphState(State):
     #   add/get/set nodes
     #
 
-    def add_node(self, identifier: str | Token, node: Node, is_const=False) -> None:
+    def add_node(self, identifier: str | Token, node: Node, is_const=False, is_ref=False) -> None:
         # check node was created in this node graph
-        assert node.parent == self.graph
+        assert is_ref or node.parent == self.graph
 
         # check node is not somehow already stored in state
         assert node not in self._nodes.values()
@@ -335,8 +335,8 @@ def exit_inline() -> None:
 
 ### node functions
 
-def add_node(identifier: str | Token, node: Node, is_const=False) -> None:
-    _state.add_node(identifier, node, is_const)
+def add_node(identifier: str | Token, node: Node, is_const=False, is_ref=False) -> None:
+    _state.add_node(identifier, node, is_const, is_ref)
 
 
 def get_node(identifier: str | Token) -> Node:

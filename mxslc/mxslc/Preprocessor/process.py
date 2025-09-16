@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Type
 
 from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF, VERSION, \
-    LOADLIB
+    LOADLIB, XIINCLUDE
 from .Expression import Primitive
 from .macros import Macro, define_macro, undefine_macro, is_macro_defined, run_macro
 from .parse import parse as preparse
@@ -81,6 +81,8 @@ class Processor(TokenReader):
             return self.__process_version()
         if directive == LOADLIB:
             return self.__process_loadlib()
+        if directive == XIINCLUDE:
+            return self.__process_xiinclude()
         raise AssertionError
 
     def __process_non_directive(self) -> list[Token]:
@@ -206,12 +208,32 @@ class Processor(TokenReader):
         end_temporary_state(prev_state)
         return temp_doc
 
+    def __process_xiinclude(self) -> list[Token]:
+        directive = self._match(XIINCLUDE)
+        path = self.__parse_until(EOL, expected_type=str)
+        included_files = self.__search_in_include_dirs(directive, path)
+        for included_file in included_files:
+            self.__xiinclude_mtlx_file(included_file)
+        return []
+
+    def __xiinclude_mtlx_file(self, mtlx_filepath: Path) -> None:
+        document = get_document()
+        document.prepend_xinclude(mtlx_filepath)
+        incl_doc = Document(mtlx_filepath)
+        for incl_node in incl_doc.get_nodes():
+            state.add_node(incl_node.name, incl_node, is_ref=True)
+        for incl_node_def in incl_doc.node_defs:
+            node_def = document.get_node_def(incl_node_def.name)
+            function = NodeGraphFunction.from_node_def(node_def)
+            state.add_function(function)
+
     def __define_main(self) -> None:
         if self.__is_main:
             define_macro("__MAIN__")
         else:
             undefine_macro("__MAIN__")
 
+    # TODO make sure this only returns .mtlx or .mxsl files
     def __search_in_include_dirs(self, token: Token, path: str | Path) -> list[Path]:
         path = Path(path)
         if path.is_absolute():

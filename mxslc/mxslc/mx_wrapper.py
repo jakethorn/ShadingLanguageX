@@ -465,6 +465,8 @@ class Document(GraphElement):
     def read_from_xml_file(self, xml_filepath: Path) -> None:
         mx.readFromXmlFile(self.source, str(xml_filepath))
 
+    def prepend_xinclude(self, xml_filepath: Path) -> None:
+        mx.prependXInclude(self.source, str(xml_filepath))
 
 #
 #   Node
