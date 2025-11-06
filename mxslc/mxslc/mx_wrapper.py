@@ -376,6 +376,23 @@ class PortElement(TypedElement):
             self.clear_value()
             self.source.setInterfaceName(name)
 
+    @property
+    def node_name(self) -> str | None:
+        name = self.source.getNodeName()
+        if name:
+            return name
+        else:
+            return None
+
+    @node_name.setter
+    def node_name(self, name: str | None) -> None:
+        if name is None:
+            self.remove_attribute("nodename")
+        else:
+            assert not self.is_output
+            self.clear_value()
+            self.source.setNodeName(name)
+
     def clear_value(self) -> None:
         self.remove_attribute("value")
         self.remove_attribute("nodename")

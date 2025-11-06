@@ -41,6 +41,10 @@ def _remove_dot_nodes(graph: GraphElement) -> None:
                 port.value = dot_input.value
                 port.output_string = dot_input.output_string
             dot_node.remove()
+        elif dot_input.node_name is not None:
+            for port in dot_node.downstream_ports:
+                port.node_name = dot_input.node_name
+            dot_node.remove()
         elif dot_input.interface_name is not None:
             for port in dot_node.downstream_ports:
                 if not port.is_output:

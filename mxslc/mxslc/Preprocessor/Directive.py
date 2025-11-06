@@ -15,7 +15,7 @@ class Directive(StrEnum):
     PRINT = "#print"
     VERSION = "#version"
     LOADLIB = "#loadlib"
-    XIINCLUDE = "#xi:include"
+    XINCLUDE = "#xinclude"
 
 
 # access directives without qualifier
@@ -32,5 +32,5 @@ PRAGMA = Directive.PRAGMA
 PRINT = Directive.PRINT
 VERSION = Directive.VERSION
 LOADLIB = Directive.LOADLIB
-XIINCLUDE = Directive.XIINCLUDE
+XINCLUDE = Directive.XINCLUDE
 DIRECTIVES = [d for d in Directive]

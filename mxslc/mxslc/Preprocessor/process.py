@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Type
 
 from .Directive import DIRECTIVES, DEFINE, UNDEF, IF, IFDEF, IFNDEF, INCLUDE, PRAGMA, PRINT, ELIF, ELSE, ENDIF, VERSION, \
-    LOADLIB, XIINCLUDE
+    LOADLIB, XINCLUDE
 from .Expression import Primitive
 from .macros import Macro, define_macro, undefine_macro, is_macro_defined, run_macro
 from .parse import parse as preparse
@@ -81,8 +81,8 @@ class Processor(TokenReader):
             return self.__process_version()
         if directive == LOADLIB:
             return self.__process_loadlib()
-        if directive == XIINCLUDE:
-            return self.__process_xiinclude()
+        if directive == XINCLUDE:
+            return self.__process_xinclude()
         raise AssertionError
 
     def __process_non_directive(self) -> list[Token]:
@@ -208,15 +208,15 @@ class Processor(TokenReader):
         end_temporary_state(prev_state)
         return temp_doc
 
-    def __process_xiinclude(self) -> list[Token]:
-        directive = self._match(XIINCLUDE)
+    def __process_xinclude(self) -> list[Token]:
+        directive = self._match(XINCLUDE)
         path = self.__parse_until(EOL, expected_type=str)
         included_files = self.__search_in_include_dirs(directive, path)
         for included_file in included_files:
-            self.__xiinclude_mtlx_file(included_file)
+            self.__xinclude_mtlx_file(included_file)
         return []
 
-    def __xiinclude_mtlx_file(self, mtlx_filepath: Path) -> None:
+    def __xinclude_mtlx_file(self, mtlx_filepath: Path) -> None:
         document = get_document()
         document.prepend_xinclude(mtlx_filepath)
         incl_doc = Document(mtlx_filepath)
