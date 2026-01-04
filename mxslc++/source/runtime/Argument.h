@@ -1,0 +1,39 @@
+//
+// Created by jaket on 07/11/2025.
+//
+
+#ifndef FENNEC_ARGUMENT_H
+#define FENNEC_ARGUMENT_H
+
+#include "utils/common.h"
+
+#include "Token.h"
+
+class Argument
+{
+public:
+    Argument(ExprPtr expr, size_t index);
+    Argument(optional<string> name, ExprPtr expr, size_t index);
+
+    Argument(Argument&& other) noexcept;
+
+    ~Argument();
+
+    [[nodiscard]] bool has_name() const { return name_.has_value(); }
+    [[nodiscard]] const string& name() const { return name_.value(); }
+    [[nodiscard]] size_t index() const { return index_; }
+
+    [[nodiscard]] Argument instantiate_templated_types(const Type& template_type) const;
+    void init(const vector<Type>& types) const;
+    [[nodiscard]] bool try_init(const vector<Type>& types) const;
+    [[nodiscard]] bool is_initialized() const;
+    [[nodiscard]] Type type() const;
+    [[nodiscard]] ValuePtr evaluate() const;
+
+private:
+    optional<string> name_;
+    ExprPtr expr_;
+    size_t index_;
+};
+
+#endif //FENNEC_ARGUMENT_H

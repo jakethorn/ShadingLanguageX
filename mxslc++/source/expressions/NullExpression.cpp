@@ -1,0 +1,30 @@
+//
+// Created by jaket on 31/12/2025.
+//
+
+#include "NullExpression.h"
+
+#include "CompileError.h"
+#include "runtime/values/NullValue.h"
+
+ExprPtr NullExpression::instantiate_templated_types(const Type& template_type) const
+{
+    return std::make_unique<NullExpression>(runtime_, token_);
+}
+
+void NullExpression::init_impl(const vector<Type>& types)
+{
+    if (types.size() != 1)
+        throw CompileError{token_, "Ambiguous null expression"};
+    type_ = types.at(0);
+}
+
+const Type& NullExpression::type_impl() const
+{
+    return type_;
+}
+
+ValuePtr NullExpression::evaluate_impl() const
+{
+    return std::make_shared<NullValue>(type_);
+}

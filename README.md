@@ -7,6 +7,12 @@
 
 __ShadingLanguageX__ is a high level programming language that can be used to create complex [MaterialX](https://materialx.org/) shaders.  
   
+
+## Status of mxslc
+A new C++ version of mxslc is under development, progress can be found in [mxslc++](https://github.com/jakethorn/ShadingLanguageX/blob/main/mxslc++). 
+Please stay tuned for future updates. In the meantime, the python version can still be used, but no more updates are planned. All documentation is still
+based on the python version, I'll update it when time permits.
+
 ![](examples/screenshots/readme_example.png)
 
 

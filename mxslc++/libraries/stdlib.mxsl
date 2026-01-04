@@ -1,0 +1,14 @@
+#ifndef STDLIB
+#define STDLIB
+
+//inline T __add__<int, float, vec2, vec3, vec4, color3, color4>(T in1, T in2)
+//{
+//    return add(in1, in2);
+//}
+
+inline float __add__(float in1, float in2)
+{
+    return add(in1, in2);
+}
+
+#endif // STDLIB
