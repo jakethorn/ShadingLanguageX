@@ -32,10 +32,21 @@ Parser::Parser(const Runtime& runtime, vector<Token> tokens_) : TokenReader{std:
 vector<StmtPtr> Parser::parse()
 {
     vector<StmtPtr> statements;
+    string errors = "";
     while (not empty())
     {
-        statements.push_back(statement());
+        try
+        {
+            statements.push_back(statement());
+        }
+        catch (const CompileError& error)
+        {
+            errors += "\n"s + error.what();
+        }
     }
+
+    if (errors)
+        throw CompileError(errors);
 
     return statements;
 }

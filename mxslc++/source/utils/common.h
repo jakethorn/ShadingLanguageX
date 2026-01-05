@@ -19,6 +19,7 @@
 // namespaces
 namespace fs = std::filesystem;
 namespace mx = MaterialX;
+using namespace mxslc;
 
 using namespace std::string_literals;
 
