@@ -20,7 +20,7 @@ public:
                             name_{std::move(name)}, template_types_{std::move(template_types)},
                             params_{std::move(params)}, body_{std::move(body)} { }
 
-    StmtPtr instantiate_templated_types(const Type& template_type) const override;
+    [[nodiscard]] StmtPtr instantiate_templated_types(const Type& template_type) const override;
     void init() override;
     void execute() override;
 

@@ -98,6 +98,47 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
     return std::make_shared<NodeValue>(node);
 }
 
+void MtlXSerializer::write_function(const Function& func) const
+{
+    write_node_def(func);
+    write_node_graph(func);
+}
+
+void MtlXSerializer::write_return(const ValuePtr& value) const
+{
+    if (graph()->getOutput("out"s) != nullptr)
+    {
+        throw CompileError{"Multiple return statements"s};
+    }
+
+    mx::OutputPtr output = graph()->addOutput("out"s, value->type().name());
+
+    if (const auto* basic_value = dynamic_cast<const BasicValue*>(value.get()))
+    {
+        const string& output_type = basic_value->type().name();
+        std::visit(
+            [&output, &output_type](const auto& v) {
+                output->setValue(v, output_type);
+            },
+            basic_value->get()
+        );
+    }
+    else if (const auto* node_value = dynamic_cast<const NodeValue*>(value.get()))
+    {
+        output->setConnectedNode(node_value->node());
+    }
+    else if (const auto* null_value = dynamic_cast<const NullValue*>(value.get()))
+    {
+        throw CompileError{"Cannot return null value"s};
+    }
+}
+
+void MtlXSerializer::save(const fs::path& filepath) const
+{
+    const string& xml = mx::writeToXmlString(doc_);
+    save_file(filepath, xml);
+}
+
 namespace
 {
     string node_def_name(const Function& func)
@@ -112,7 +153,6 @@ namespace
         return "NG_" + name;
     }
 }
-
 
 void MtlXSerializer::write_node_def(const Function& func) const
 {
@@ -144,18 +184,6 @@ void MtlXSerializer::write_node_graph(const Function &func) const
     exit_node_graph();
 }
 
-void MtlXSerializer::write_function(const Function& func) const
-{
-    write_node_def(func);
-    write_node_graph(func);
-}
-
-void MtlXSerializer::save(const fs::path& filepath) const
-{
-    const string& xml = mx::writeToXmlString(doc_);
-    save_file(filepath, xml);
-}
-
 void MtlXSerializer::enter_node_graph(const mx::NodeGraphPtr& node_graph) const
 {
     graphs_.push_back(node_graph);
@@ -164,6 +192,10 @@ void MtlXSerializer::enter_node_graph(const mx::NodeGraphPtr& node_graph) const
 void MtlXSerializer::exit_node_graph() const
 {
     assert(graphs_.size() > 1);
+
+    if (graph()->getOutputCount() == 0)
+        throw CompileError{"Function does not return a value or access globals."s};
+
     graphs_.pop_back();
 }
 

@@ -6,17 +6,19 @@
 #define FENNEC_RETURNSTATEMENT_H
 
 #include "Statement.h"
+#include "runtime/Type.h"
 
 class ReturnStatement final : public Statement
 {
 public:
-    ReturnStatement(const Runtime& runtime, ExprPtr expr);
+    ReturnStatement(const Runtime& runtime, Type type, ExprPtr expr);
 
-    StmtPtr instantiate_templated_types(const Type& template_type) const override;
+    [[nodiscard]] StmtPtr instantiate_templated_types(const Type& template_type) const override;
     void init() override;
     void execute() override;
 
 private:
+    Type type_;
     ExprPtr expr_;
 };
 

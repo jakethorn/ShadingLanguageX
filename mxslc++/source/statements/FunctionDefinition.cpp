@@ -35,13 +35,19 @@ void FunctionDefinition::init()
             vector<StmtPtr> body;
             body.reserve(body_.size());
             for (const StmtPtr& stmt : body_)
-                body.push_back(stmt->instantiate_templated_types(template_type));
+            {
+                StmtPtr stmt_inst = stmt->instantiate_templated_types(template_type);
+                stmt_inst->init();
+                body.push_back(std::move(stmt_inst));
+            }
 
             funcs_.emplace_back(modifiers_, std::move(type), name_, template_type, std::move(params), std::move(body));
         }
     }
     else
     {
+        for (const StmtPtr& stmt : body_)
+            stmt->init();
         funcs_.emplace_back(std::move(modifiers_), std::move(type_), std::move(name_), std::nullopt, std::move(params_), std::move(body_));
     }
 }
@@ -50,6 +56,7 @@ void FunctionDefinition::execute()
 {
     for (Function& func : funcs_)
     {
+        runtime_.serializer().write_function(func);
         runtime_.scope().add_function(std::move(func));
     }
 }

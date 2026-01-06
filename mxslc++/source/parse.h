@@ -10,6 +10,7 @@
 #include "utils/common.h"
 #include "Token.h"
 #include "TokenReader.h"
+#include "runtime/Type.h"
 
 class Attribute;
 class Parameter;
@@ -73,6 +74,7 @@ private:
     bool is_templated_function() const;
 
     const Runtime& runtime_;
+    Type current_function_type_;
 };
 
 #endif //FENNEC_PARSE_H

@@ -128,8 +128,9 @@ StmtPtr Parser::variable_definition(vector<Token> modifiers)
 StmtPtr Parser::function_definition(vector<Token> modifiers)
 {
     Type type = match(TokenType::Identifier);
+    current_function_type_ = type;
     Token name = match(TokenType::Identifier);
-    vector template_types = list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); });
+    vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
     ParameterList params = list<Parameter>('(', ')', [this](const size_t){ return parameter(); });
     vector body = list<StmtPtr>('{', '}', [this](const size_t){ return statement(); });
     return std::make_unique<FunctionDefinition>(
@@ -141,10 +142,11 @@ StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
 {
     match(TokenType::Function);
     Token name = match(TokenType::Identifier);
-    vector template_types = list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); });
+    vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
     ParameterList params = list<Parameter>('(', ')', [this](const size_t){ return parameter(); });
     match(TokenType::Arrow);
     Type type = match(TokenType::Identifier);
+    current_function_type_ = type; // doesnt work because of nested functions, either return statements needs to be handled specially or they grab the type from runtime.
     vector body = list<StmtPtr>('{', '}', [this](const size_t){ return statement(); });
     return std::make_unique<FunctionDefinition>(
         runtime_, Token::as_strings(modifiers), std::move(type), std::move(name), std::move(template_types), std::move(params), std::move(body)
@@ -165,7 +167,7 @@ StmtPtr Parser::return_statement()
     match(TokenType::Return);
     ExprPtr expr = expression();
     match(';');
-    return std::make_unique<ReturnStatement>(runtime_, std::move(expr));
+    return std::make_unique<ReturnStatement>(runtime_, std::move(current_function_type_), std::move(expr));
 }
 
 ExprPtr Parser::expression()

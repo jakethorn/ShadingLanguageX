@@ -2,8 +2,8 @@
 // Created by jaket on 01/01/2026.
 //
 
-#ifndef FENNEC_EVALUATOR_H
-#define FENNEC_EVALUATOR_H
+#ifndef FENNEC_SERIALIZER_H
+#define FENNEC_SERIALIZER_H
 
 #include "utils/common.h"
 
@@ -17,7 +17,8 @@ public:
 
     [[nodiscard]] virtual ValuePtr write_function_call(const Function& func, const ArgumentList& args) const = 0;
     virtual void write_function(const Function& func) const = 0;
+    virtual void write_return(const ValuePtr& value) const = 0;
     virtual void save(const fs::path& filepath) const = 0;
 };
 
-#endif //FENNEC_EVALUATOR_H
+#endif //FENNEC_SERIALIZER_H
