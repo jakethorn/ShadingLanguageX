@@ -3,6 +3,12 @@ mxslc/examples/
 mxslc/LICENSE
 mxslc/pyproject.toml
 mxslc/notes.txt
+mxslc++/examples/
+mxslc++/.gdbinit
+mxslc++/main.rsp
+mxslc++/mxslc_gdb.py
+mxslc++/todo.txt
+mxslc++/notes.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

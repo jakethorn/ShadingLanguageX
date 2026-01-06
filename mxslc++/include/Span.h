@@ -7,7 +7,8 @@
 
 #include <stdexcept>
 #include <vector>
-#include "utils/str_utils.h"
+
+#define STR(x) std::to_string(x)
 
 namespace mxslc
 {
@@ -20,9 +21,9 @@ namespace mxslc
         Span(const std::vector<T>& data, const size_t start, const size_t size) : ptr_{data.data() + start}, size_{size}
         {
             if (start > data.size())
-                throw std::out_of_range{"Start index (" + str(start) + ") is out of bounds for vector of size (" + str(data.size()) + ")"};
+                throw std::out_of_range{"Start index (" + STR(start) + ") is out of bounds for vector of size (" + STR(data.size()) + ")"};
             if (start + size > data.size())
-                throw std::out_of_range{"End index (" + str(start + size) + ") is out of bounds for vector of size (" + str(data.size()) + ")"};
+                throw std::out_of_range{"End index (" + STR(start + size) + ") is out of bounds for vector of size (" + STR(data.size()) + ")"};
         }
 
         Span(const T* data, const size_t size) : Span{data, 0, size} { }
@@ -34,7 +35,7 @@ namespace mxslc
                 i = size_ + i;
             if (i >= 0 and i < size_)
                 return *(ptr_ + i);
-            throw std::out_of_range{"Index (" + str(i) + ") is out of bounds for span of size (" + str(size_) + ")"};
+            throw std::out_of_range{"Index (" + STR(i) + ") is out of bounds for span of size (" + STR(size_) + ")"};
         }
 
         const T* begin() const
@@ -78,5 +79,7 @@ namespace mxslc
         size_t size_;
     };
 }
+
+#undef str
 
 #endif //MXSLC_SPAN_H

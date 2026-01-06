@@ -32,7 +32,7 @@ add_library(mxslc_lib
 )
 
 target_include_directories(mxslc_lib
-        PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+        PUBLIC  "${CMAKE_SOURCE_DIR}/include"
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 

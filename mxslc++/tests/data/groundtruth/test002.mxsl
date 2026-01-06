@@ -1,0 +1,7 @@
+float x = 1.0;
+float y = 2.0;
+float z = add(x, y);
+vector2 uv = texcoord();
+vector2 st = combine2(z, 4.0);
+
+print z, uv, st;

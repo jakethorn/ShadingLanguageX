@@ -144,8 +144,9 @@ options:
 Args mxslc::parse_args(const int argc, char* argv[])
 {
     vector<string> args;
+    args.reserve(argc);
     for (int i = 0; i < argc; ++i)
-        args.push_back(argv[i]);
+        args.emplace_back(argv[i]);
     return parse_args(args);
 }
 

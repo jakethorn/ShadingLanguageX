@@ -1,0 +1,6 @@
+float x = 1.0;
+float y = 2.0;
+float z = add(x, y);
+print "---- z ----", z;
+vector2 st = combine2(z, 4.0);
+print "---- st ----", st;
