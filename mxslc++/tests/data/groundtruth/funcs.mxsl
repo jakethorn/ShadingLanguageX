@@ -1,0 +1,12 @@
+float foo()
+{
+    return 1.0;
+}
+
+float bar()
+{
+    return add(2.0, 3.0);
+}
+
+float f = foo();
+float b = bar();

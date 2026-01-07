@@ -6,6 +6,7 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
+#include "runtime/values/InterfaceValue.h"
 
 StmtPtr FunctionDefinition::instantiate_templated_types(const Type& template_type) const
 {
@@ -56,7 +57,16 @@ void FunctionDefinition::execute()
 {
     for (Function& func : funcs_)
     {
+        runtime_.enter_scope(); // init and execute need to be merged together
+        for (const Parameter& param : func.parameters())
+        {
+            ValuePtr val = std::make_unique<InterfaceValue>(param.name(), param.type());
+            Variable var{{}, param.type(), param.name(), std::move(val)};
+            runtime_.scope().add_variable(std::move(var));
+        }
         runtime_.serializer().write_function(func);
+        runtime_.exit_scope();
+
         runtime_.scope().add_function(std::move(func));
     }
 }

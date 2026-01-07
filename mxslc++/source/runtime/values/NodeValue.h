@@ -14,7 +14,7 @@
 class NodeValue final : public Value
 {
 public:
-    NodeValue(const mx::NodePtr& node) : node_{node}, type_{node_->getType()} { }
+    explicit NodeValue(const mx::NodePtr& node) : node_{node}, type_{node_->getType()} { }
 
     [[nodiscard]] const Type& type() const override { return type_; }
     [[nodiscard]] string str() const override { return as_string(node_); }

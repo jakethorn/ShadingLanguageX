@@ -175,7 +175,7 @@ void MtlXSerializer::write_node_def(const Function& func) const
     }
 }
 
-void MtlXSerializer::write_node_graph(const Function &func) const
+void MtlXSerializer::write_node_graph(const Function& func) const
 {
     const mx::NodeGraphPtr node_graph = doc_->addNodeGraph(node_graph_name(func));
     enter_node_graph(node_graph);
