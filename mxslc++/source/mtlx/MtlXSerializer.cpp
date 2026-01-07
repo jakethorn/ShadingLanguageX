@@ -10,11 +10,9 @@
 #include "CompileError.h"
 #include "runtime/values/BasicValue.h"
 #include "runtime/values/NodeValue.h"
-#include "runtime/values/NullValue.h"
 #include "runtime/values/Value.h"
 #include "runtime/Function.h"
 #include "runtime/ArgumentList.h"
-#include "runtime/values/InterfaceValue.h"
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "utils/template_utils.h"
@@ -54,9 +52,12 @@ namespace
         return true;
     }
 
-    ValuePtr evaluate_constexpr(const Function& func, const BasicValues& values)
+    ValuePtr evaluate_constexpr(const Function& func, const vector<ValuePtr>& args)
     {
-        return constexpr_funcs.at(func.name())(values);
+        if (BasicValues basic_values; is_constexpr(func, args, basic_values))
+            if (ValuePtr value = constexpr_funcs.at(func.name())(basic_values))
+                return value;
+        return nullptr;
     }
 }
 
@@ -64,10 +65,9 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
 {
     const vector<ValuePtr> values = args.evaluate();
 
-    // check if the expression can be evaluated at compile-time
-    if (BasicValues basic_values; is_constexpr(func, values, basic_values))
-        if (ValuePtr value = evaluate_constexpr(func, basic_values))
-            return value;
+    // evaluate as constexpr if possible
+    if (ValuePtr value = evaluate_constexpr(func, values))
+        return value;
 
     mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, func.type().name());
 
@@ -114,7 +114,9 @@ namespace
 
 void MtlXSerializer::write_node_def(const Function& func) const
 {
-    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), func.type().name(), func.name());
+    const string type = func.type() == "void"s ? "int"s : func.type().name();
+
+    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), type, func.name());
     for (const Parameter& param : func.parameters())
     {
         if (param.has_default_value())
@@ -136,6 +138,12 @@ void MtlXSerializer::write_node_graph(const Function& func) const
     for (const StmtPtr& stmt : func.body())
         stmt->execute();
     exit_node_graph();
+
+    if (func.type() == "void"s)
+    {
+        const mx::OutputPtr output = node_graph->addOutput("out"s, "int"s);
+        output->setValue(0, "int"s);
+    }
 }
 
 void MtlXSerializer::enter_node_graph(const mx::NodeGraphPtr& node_graph) const
@@ -146,10 +154,6 @@ void MtlXSerializer::enter_node_graph(const mx::NodeGraphPtr& node_graph) const
 void MtlXSerializer::exit_node_graph() const
 {
     assert(graphs_.size() > 1);
-
-    if (graph()->getOutputCount() == 0)
-        throw CompileError{"Function does not return a value or access globals."s};
-
     graphs_.pop_back();
 }
 
