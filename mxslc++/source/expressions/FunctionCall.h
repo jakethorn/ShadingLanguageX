@@ -35,7 +35,7 @@ public:
     [[nodiscard]] const Function& function() const
     {
         assert(is_initialized_);
-        return *function_;
+        return *func_;
     }
 
 protected:
@@ -51,7 +51,7 @@ private:
     ArgumentList args_;
 
     size_t initialised_args_count_ = 0;
-    const Function* function_ = nullptr;
+    const Function* func_ = nullptr;
 };
 
 #endif //FENNEC_FUNCTIONCALL_H

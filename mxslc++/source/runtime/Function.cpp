@@ -7,19 +7,31 @@
 #include "CompileError.h"
 #include "statements/Statement.h"
 #include "utils/template_utils.h"
+#include "expressions/Expression.h"
 
-Function::Function(vector<string> modifiers, Type type, Token name, optional<Type> template_type, ParameterList params, vector<StmtPtr> body)
-    : modifiers_{std::move(modifiers)},
+Function::Function(
+    vector<string> modifiers,
+    Type type,
+    Token name,
+    optional<Type> template_type,
+    ParameterList params,
+    vector<StmtPtr> body,
+    ExprPtr return_expr
+) : modifiers_{std::move(modifiers)},
     type_{std::move(type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
     params_{std::move(params)},
-    body_{std::move(body)}
+    body_{std::move(body)},
+    return_expr_{std::move(return_expr)}
 {
     static const vector valid_modifiers{"inline"s};
     for (const string& modifier : modifiers_)
         if (not contains(valid_modifiers, modifier))
             throw CompileError{name_, "'" + modifier + "' is not a valid function modifier"};
+
+    if (type_ == "void"s and return_expr_ != nullptr)
+        throw CompileError{name_, "Cannot return a value from a void function"s};
 }
 
 Function::Function(Function&& other) noexcept

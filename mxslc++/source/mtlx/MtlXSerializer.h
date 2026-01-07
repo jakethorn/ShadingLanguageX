@@ -20,8 +20,8 @@ public:
     }
 
     [[nodiscard]] ValuePtr write_function_call(const Function& func, const ArgumentList& args) const override;
+    [[nodiscard]] ValuePtr write_inline_function_call(const Function& func, const ArgumentList& args) const override;
     void write_function(const Function& func) const override;
-    void write_return(const ValuePtr& value) const override;
     void save(const fs::path& filepath) const override;
 
 private:

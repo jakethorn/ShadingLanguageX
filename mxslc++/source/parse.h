@@ -36,7 +36,7 @@ private:
     StmtPtr function_definition(vector<Token> modifiers);
     StmtPtr function_definition_modern(vector<Token> modifiers);
     Parameter parameter();
-    StmtPtr return_statement();
+    tuple<vector<StmtPtr>, ExprPtr> function_body();
 
     ExprPtr expression();
     ExprPtr logical();

@@ -16,8 +16,8 @@ public:
     virtual ~Serializer() = default;
 
     [[nodiscard]] virtual ValuePtr write_function_call(const Function& func, const ArgumentList& args) const = 0;
+    [[nodiscard]] virtual ValuePtr write_inline_function_call(const Function& func, const ArgumentList& args) const = 0;
     virtual void write_function(const Function& func) const = 0;
-    virtual void write_return(const ValuePtr& value) const = 0;
     virtual void save(const fs::path& filepath) const = 0;
 };
 

@@ -8,6 +8,7 @@
 #include <functional>
 #include <MaterialXFormat/XmlIo.h>
 #include "CompileError.h"
+#include "expressions/Expression.h"
 #include "runtime/values/BasicValue.h"
 #include "runtime/values/NodeValue.h"
 #include "runtime/values/Value.h"
@@ -69,7 +70,8 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
     if (ValuePtr value = evaluate_constexpr(func, values))
         return value;
 
-    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, func.type().name());
+    const string type = func.type() == "void"s ? "int"s : func.type().name();
+    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, type);
 
     for (size_t i = 0; i < args.size(); ++i)
     {
@@ -80,15 +82,17 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
     return std::make_shared<NodeValue>(node);
 }
 
+ValuePtr MtlXSerializer::write_inline_function_call(const Function& func, const ArgumentList& args) const
+{
+    for (const StmtPtr& stmt : func.body())
+        stmt->execute();
+    return nullptr;
+}
+
 void MtlXSerializer::write_function(const Function& func) const
 {
     write_node_def(func);
     write_node_graph(func);
-}
-
-void MtlXSerializer::write_return(const ValuePtr& value) const
-{
-    value->set_as_node_graph_output(graph(), "out"s);
 }
 
 void MtlXSerializer::save(const fs::path& filepath) const
@@ -137,6 +141,12 @@ void MtlXSerializer::write_node_graph(const Function& func) const
     enter_node_graph(node_graph);
     for (const StmtPtr& stmt : func.body())
         stmt->execute();
+    if (func.return_expr() != nullptr)
+    {
+        func.return_expr()->init(func.type());
+        const ValuePtr return_value = func.return_expr()->evaluate();
+        return_value->set_as_node_graph_output(graph(), "out"s);
+    }
     exit_node_graph();
 
     if (func.type() == "void"s)

@@ -14,7 +14,7 @@
 class Function
 {
 public:
-    Function(vector<string> modifiers, Type type, Token name, optional<Type> template_type, ParameterList params, vector<StmtPtr> body);
+    Function(vector<string> modifiers, Type type, Token name, optional<Type> template_type, ParameterList params, vector<StmtPtr> body, ExprPtr return_expr);
 
     Function(Function&& other) noexcept;
     Function& operator=(Function&& other) noexcept;
@@ -32,6 +32,7 @@ public:
     [[nodiscard]] size_t arity() const { return params_.size(); }
     [[nodiscard]] const ParameterList& parameters() const { return params_; }
     [[nodiscard]] const vector<StmtPtr>& body() const { return body_; }
+    [[nodiscard]] const ExprPtr& return_expr() const { return return_expr_; }
     [[nodiscard]] const Token& token() const { return name_; }
 
 private:
@@ -41,6 +42,7 @@ private:
     optional<Type> template_type_;
     ParameterList params_;
     vector<StmtPtr> body_;
+    ExprPtr return_expr_;
 };
 
 #endif //FENNEC_FUNCTION_H

@@ -14,11 +14,7 @@
 class FunctionDefinition final : public Statement
 {
 public:
-    FunctionDefinition(const Runtime& runtime, vector<string> modifiers, Type type, Token name,
-                        vector<Type> template_types, ParameterList params, vector<StmtPtr> body)
-                            : Statement{runtime}, modifiers_{std::move(modifiers)}, type_{std::move(type)},
-                            name_{std::move(name)}, template_types_{std::move(template_types)},
-                            params_{std::move(params)}, body_{std::move(body)} { }
+    FunctionDefinition(const Runtime& runtime, vector<string> modifiers, Type type, Token name, vector<Type> template_types, ParameterList params, vector<StmtPtr> body, ExprPtr return_expr);
 
     [[nodiscard]] StmtPtr instantiate_templated_types(const Type& template_type) const override;
     void execute() override;
@@ -26,6 +22,7 @@ public:
 private:
     [[nodiscard]] bool is_templated() const { return not template_types_.empty(); }
     [[nodiscard]] vector<Function> functions();
+    void write_node_graphs(const Function& func) const;
 
     vector<string> modifiers_;
     Type type_;
@@ -33,6 +30,7 @@ private:
     vector<Type> template_types_;
     ParameterList params_;
     vector<StmtPtr> body_;
+    ExprPtr return_expr_;
 };
 
 #endif //FENNEC_FUNCTIONDEFINITION_H

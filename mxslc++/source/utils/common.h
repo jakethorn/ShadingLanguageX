@@ -11,6 +11,7 @@
 #include <variant>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
@@ -28,6 +29,7 @@ using std::optional;
 using std::string;
 using std::string_view;
 using std::vector;
+using std::tuple;
 using std::unordered_map;
 using std::unordered_set;
 

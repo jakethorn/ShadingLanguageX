@@ -64,8 +64,7 @@ namespace
             template_type = std::nullopt;
         }
         ParameterList params = get_parameters(runtime, nd);
-        vector<StmtPtr> body;
-        return Function{{}, std::move(type), std::move(name), template_type, std::move(params), std::move(body)};
+        return Function{{}, std::move(type), std::move(name), template_type, std::move(params), {}, nullptr};
     }
 }
 

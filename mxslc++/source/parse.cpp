@@ -16,7 +16,6 @@
 #include "runtime/ParameterList.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/PrintStatement.h"
-#include "statements/ReturnStatement.h"
 #include "statements/VariableDefinition.h"
 
 vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens)
@@ -66,11 +65,6 @@ StmtPtr Parser::statement()
     if (peek() == TokenType::Function)
     {
         return function_definition_modern(std::move(mods));
-    }
-
-    if (peek() == TokenType::Return)
-    {
-        return return_statement();
     }
 
     if (peek() == TokenType::Identifier and peek(1) == TokenType::Identifier)
@@ -128,13 +122,19 @@ StmtPtr Parser::variable_definition(vector<Token> modifiers)
 StmtPtr Parser::function_definition(vector<Token> modifiers)
 {
     Type type = match(TokenType::Identifier);
-    current_function_type_ = type;
     Token name = match(TokenType::Identifier);
     vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
     ParameterList params = list<Parameter>('(', ')', [this](const size_t){ return parameter(); });
-    vector body = list<StmtPtr>('{', '}', [this](const size_t){ return statement(); });
+    auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
-        runtime_, Token::as_strings(modifiers), std::move(type), std::move(name), std::move(template_types), std::move(params), std::move(body)
+        runtime_,
+        Token::as_strings(modifiers),
+        std::move(type),
+        std::move(name),
+        std::move(template_types),
+        std::move(params),
+        std::move(body),
+        std::move(return_expr)
     );
 }
 
@@ -146,10 +146,16 @@ StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
     ParameterList params = list<Parameter>('(', ')', [this](const size_t){ return parameter(); });
     match(TokenType::Arrow);
     Type type = match(TokenType::Identifier);
-    current_function_type_ = type; // doesnt work because of nested functions, either return statements needs to be handled specially or they grab the type from runtime.
-    vector body = list<StmtPtr>('{', '}', [this](const size_t){ return statement(); });
+    auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
-        runtime_, Token::as_strings(modifiers), std::move(type), std::move(name), std::move(template_types), std::move(params), std::move(body)
+        runtime_,
+        Token::as_strings(modifiers),
+        std::move(type),
+        std::move(name),
+        std::move(template_types),
+        std::move(params),
+        std::move(body),
+        std::move(return_expr)
     );
 }
 
@@ -162,12 +168,26 @@ Parameter Parser::parameter()
     return Parameter{Token::as_strings(modifiers), std::move(type), std::move(name), std::move(expr)};
 }
 
-StmtPtr Parser::return_statement()
+tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
 {
-    match(TokenType::Return);
-    ExprPtr expr = expression();
-    match(';');
-    return std::make_unique<ReturnStatement>(runtime_, std::move(current_function_type_), std::move(expr));
+    vector<StmtPtr> body;
+    ExprPtr return_expr;
+    
+    match('{');
+    while (peek() != '}' and peek() != "return"s)
+        body.push_back(statement());
+    
+    if (consume("return"s))
+    {
+        return_expr = expression();
+        match(';');
+    }
+    
+    while (peek() != '}')
+        statement();
+    match('}');
+
+    return {std::move(body), std::move(return_expr)};
 }
 
 ExprPtr Parser::expression()

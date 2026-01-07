@@ -22,7 +22,6 @@ add_library(mxslc_lib
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
         statements/FunctionDefinition.cpp
-        statements/ReturnStatement.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp

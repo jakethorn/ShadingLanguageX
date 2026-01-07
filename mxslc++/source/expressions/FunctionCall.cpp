@@ -39,17 +39,27 @@ void FunctionCall::init_child_expressions(const vector<Type>& types)
 void FunctionCall::init_impl(const vector<Type>& types)
 {
     const Scope& scope = runtime_.scope();
-    function_ = &scope.get_function(types, token_.lexeme(), template_type_, args_);
+    func_ = &scope.get_function(types, token_.lexeme(), template_type_, args_);
 }
 
 const Type& FunctionCall::type_impl() const
 {
-    return function_->type();
+    return func_->type();
 }
 
 ValuePtr FunctionCall::evaluate_impl() const
 {
-    return runtime_.serializer().write_function_call(*function_, args_);
+    if (func_->is_inline())
+    {
+        runtime_.enter_scope();
+        ValuePtr value = runtime_.serializer().write_inline_function_call(*func_, args_);
+        runtime_.exit_scope();
+        return value;
+    }
+    else
+    {
+        return runtime_.serializer().write_function_call(*func_, args_);
+    }
 }
 
 namespace
