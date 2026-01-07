@@ -14,17 +14,11 @@
 void mxslc::compile(const fs::path& src_path, const fs::path& dst_path)
 {
     vector<Token> tokens = fscan(src_path);
-
     const Runtime runtime;
     load_materialx_library(runtime, "1.39.4"s);
     const vector<StmtPtr> stmts = parse(runtime, std::move(tokens));
-
     for (const StmtPtr& stmt : stmts)
-    {
-        stmt->init();
         stmt->execute();
-    }
-
     runtime.serializer().save(dst_path);
 }
 

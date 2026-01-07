@@ -105,6 +105,10 @@ vector<const Function*> Scope::get_functions(
         if (is_match(func, return_types, name, template_type, args))
             funcs.push_back(&func);
     }
+
+    if (funcs.empty() and parent_)
+        return parent_->get_functions(return_types, name, template_type, args);
+
     return funcs;
 }
 

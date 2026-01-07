@@ -21,11 +21,11 @@ public:
                             params_{std::move(params)}, body_{std::move(body)} { }
 
     [[nodiscard]] StmtPtr instantiate_templated_types(const Type& template_type) const override;
-    void init() override;
     void execute() override;
 
 private:
     [[nodiscard]] bool is_templated() const { return not template_types_.empty(); }
+    [[nodiscard]] vector<Function> functions();
 
     vector<string> modifiers_;
     Type type_;
@@ -33,8 +33,6 @@ private:
     vector<Type> template_types_;
     ParameterList params_;
     vector<StmtPtr> body_;
-
-    vector<Function> funcs_;
 };
 
 #endif //FENNEC_FUNCTIONDEFINITION_H

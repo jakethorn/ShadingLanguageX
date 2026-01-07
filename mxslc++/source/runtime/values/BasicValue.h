@@ -12,7 +12,39 @@
 class BasicValue final : public Value
 {
 public:
-    BasicValue(basic_t val) : val_{std::move(val)}, type_{val_} { }
+    explicit BasicValue(basic_t val) : val_{std::move(val)}, type_{val_} { }
+
+    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
+    {
+        std::visit(
+            [this, &node, &input_name](const auto& v) {
+                node->setInputValue(input_name, v, type_.name());
+            },
+            val_
+        );
+    }
+
+    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    {
+        mx::OutputPtr output = node_graph->addOutput(output_name, type_.name());
+        std::visit(
+            [this, &output](const auto& v) {
+                output->setValue(v, type_.name());
+            },
+            val_
+        );
+    }
+
+    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override
+    {
+        mx::InputPtr input = node_def->addInput(input_name, type_.name());
+        std::visit(
+            [this, &input](const auto& v) {
+                input->setValue(v, type_.name());
+            },
+            val_
+        );
+    }
 
     [[nodiscard]] const Type& type() const override { return type_; }
     [[nodiscard]] string str() const override
@@ -38,8 +70,6 @@ public:
     {
         return std::get<T>(val_);
     }
-
-    [[nodiscard]] basic_t get() const { return val_; }
 
 private:
     basic_t val_;

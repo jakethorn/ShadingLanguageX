@@ -24,13 +24,9 @@ StmtPtr VariableDefinition::instantiate_templated_types(const Type& template_typ
     return std::make_unique<VariableDefinition>(runtime_, modifiers_, std::move(type), name_, std::move(expr));
 }
 
-void VariableDefinition::init()
-{
-    expr_->init(type_);
-}
-
 void VariableDefinition::execute()
 {
+    expr_->init(type_);
     ValuePtr val = expr_->evaluate();
     Variable var{std::move(modifiers_), std::move(type_), std::move(name_), std::move(val)};
     runtime_.scope().add_variable(std::move(var));

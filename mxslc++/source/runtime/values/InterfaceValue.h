@@ -12,7 +12,24 @@
 class InterfaceValue final : public Value
 {
 public:
-    explicit InterfaceValue(string name, Type type) : name_{std::move(name)}, type_{std::move(type)} { }
+    InterfaceValue(string name, Type type) : name_{std::move(name)}, type_{std::move(type)} { }
+
+    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
+    {
+        const mx::InputPtr input = node->addInput(input_name, type_.name());
+        input->setInterfaceName(name_);
+    }
+
+    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    {
+        const mx::OutputPtr output = node_graph->addOutput(output_name, type_.name());
+        output->setInterfaceName(name_);
+    }
+
+    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override
+    {
+
+    }
 
     [[nodiscard]] const Type& type() const override { return type_; }
     [[nodiscard]] string str() const override { return name_; }

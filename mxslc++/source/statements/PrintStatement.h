@@ -13,7 +13,6 @@ public:
     PrintStatement(const Runtime& runtime, vector<ExprPtr> exprs);
 
     [[nodiscard]] StmtPtr instantiate_templated_types(const Type& template_type) const override;
-    void init() override;
     void execute() override;
 
 private:

@@ -14,6 +14,7 @@
 #include "runtime/values/Value.h"
 #include "runtime/Function.h"
 #include "runtime/ArgumentList.h"
+#include "runtime/values/InterfaceValue.h"
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "utils/template_utils.h"
@@ -72,27 +73,8 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        const Value* value = values[i].get();
         const string& input_name = func.parameters()[args[i]].name();
-
-        if (const auto* basic_value = dynamic_cast<const BasicValue*>(value))
-        {
-            const string& input_type = basic_value->type().name();
-            std::visit(
-                [&node, &input_name, &input_type](const auto& v) {
-                    node->setInputValue(input_name, v, input_type);
-                },
-                basic_value->get()
-            );
-        }
-        else if (const auto* node_value = dynamic_cast<const NodeValue*>(value))
-        {
-            node->setConnectedNode(input_name, node_value->node());
-        }
-        else if (const auto* null_value = dynamic_cast<const NullValue*>(value))
-        {
-            node->removeInput(input_name);
-        }
+        values[i]->set_as_node_input(node, input_name);
     }
 
     return std::make_shared<NodeValue>(node);
@@ -106,31 +88,7 @@ void MtlXSerializer::write_function(const Function& func) const
 
 void MtlXSerializer::write_return(const ValuePtr& value) const
 {
-    if (graph()->getOutput("out"s) != nullptr)
-    {
-        throw CompileError{"Multiple return statements"s};
-    }
-
-    mx::OutputPtr output = graph()->addOutput("out"s, value->type().name());
-
-    if (const auto* basic_value = dynamic_cast<const BasicValue*>(value.get()))
-    {
-        const string& output_type = basic_value->type().name();
-        std::visit(
-            [&output, &output_type](const auto& v) {
-                output->setValue(v, output_type);
-            },
-            basic_value->get()
-        );
-    }
-    else if (const auto* node_value = dynamic_cast<const NodeValue*>(value.get()))
-    {
-        output->setConnectedNode(node_value->node());
-    }
-    else if (const auto* null_value = dynamic_cast<const NullValue*>(value.get()))
-    {
-        throw CompileError{"Cannot return null value"s};
-    }
+    value->set_as_node_graph_output(graph(), "out"s);
 }
 
 void MtlXSerializer::save(const fs::path& filepath) const
@@ -159,18 +117,14 @@ void MtlXSerializer::write_node_def(const Function& func) const
     const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), func.type().name(), func.name());
     for (const Parameter& param : func.parameters())
     {
-        mx::InputPtr input = node_def->addInput(param.name(), param.type().name());
-
         if (param.has_default_value())
         {
-            const Value* value = param.evaluate().get();
-            if (const auto* basic_value = dynamic_cast<const BasicValue*>(value))
-            {
-                std::visit([&input](const auto& v) {
-                    input->setValue(v, input->getType());
-                },
-                basic_value->get());
-            }
+            const ValuePtr value = param.evaluate();
+            value->set_as_node_def_input(node_def, param.name());
+        }
+        else
+        {
+            node_def->addInput(param.name(), param.type().name());
         }
     }
 }

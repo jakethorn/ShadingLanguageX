@@ -16,10 +16,24 @@ class NodeValue final : public Value
 public:
     explicit NodeValue(const mx::NodePtr& node) : node_{node}, type_{node_->getType()} { }
 
+    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
+    {
+        node->setConnectedNode(input_name, node_);
+    }
+
+    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    {
+        const mx::OutputPtr output = node_graph->addOutput(output_name, type_.name());
+        output->setConnectedNode(node_);
+    }
+
+    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override
+    {
+
+    }
+
     [[nodiscard]] const Type& type() const override { return type_; }
     [[nodiscard]] string str() const override { return as_string(node_); }
-
-    [[nodiscard]] const mx::NodePtr& node() const { return node_; }
 
 private:
     mx::NodePtr node_;

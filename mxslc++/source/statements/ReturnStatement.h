@@ -14,7 +14,6 @@ public:
     ReturnStatement(const Runtime& runtime, Type type, ExprPtr expr);
 
     [[nodiscard]] StmtPtr instantiate_templated_types(const Type& template_type) const override;
-    void init() override;
     void execute() override;
 
 private:

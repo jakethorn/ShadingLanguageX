@@ -18,13 +18,9 @@ StmtPtr ReturnStatement::instantiate_templated_types(const Type& template_type) 
     return std::make_unique<ReturnStatement>(runtime_, type, std::move(expr));
 }
 
-void ReturnStatement::init()
-{
-    expr_->init(type_);
-}
-
 void ReturnStatement::execute()
 {
+    expr_->init(type_);
     const ValuePtr value = expr_->evaluate();
     runtime_.serializer().write_return(value);
 }
