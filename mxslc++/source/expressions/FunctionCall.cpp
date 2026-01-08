@@ -8,6 +8,7 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
+#include "statements/Statement.h"
 
 ExprPtr FunctionCall::instantiate_templated_types(const Type& template_type) const
 {
@@ -39,7 +40,7 @@ void FunctionCall::init_child_expressions(const vector<Type>& types)
 void FunctionCall::init_impl(const vector<Type>& types)
 {
     const Scope& scope = runtime_.scope();
-    func_ = &scope.get_function(types, token_.lexeme(), template_type_, args_);
+    func_ = &scope.get_function(types, token_, template_type_, args_);
 }
 
 const Type& FunctionCall::type_impl() const
@@ -52,9 +53,12 @@ ValuePtr FunctionCall::evaluate_impl() const
     if (func_->is_inline())
     {
         runtime_.enter_scope();
-        ValuePtr value = runtime_.serializer().write_inline_function_call(*func_, args_);
+        evaluate_arguments();
+        for (const StmtPtr& stmt : func_->body())
+            stmt->execute();
+        ValuePtr return_value = evaluate_return();
         runtime_.exit_scope();
-        return value;
+        return return_value;
     }
     else
     {
@@ -94,4 +98,34 @@ void FunctionCall::try_init_arguments(const vector<const Function*>& funcs)
             }
         }
     }
+}
+
+void FunctionCall::evaluate_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        ValuePtr val;
+        if (const Argument* arg = args_[param])
+        {
+            val = arg->evaluate();
+        }
+        else if (param.has_default_value())
+        {
+            param.init();
+            val = param.evaluate();
+        }
+        else
+        {
+            throw CompileError(token_, "Missing argument"s);
+        }
+
+        Variable var{{}, param.type(), param.name(), std::move(val)};
+        runtime_.scope().add_variable(std::move(var));
+    }
+}
+
+ValuePtr FunctionCall::evaluate_return() const
+{
+    func_->return_expr()->init(func_->type());
+    return func_->return_expr()->evaluate();
 }

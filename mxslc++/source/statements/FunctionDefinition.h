@@ -22,7 +22,7 @@ public:
 private:
     [[nodiscard]] bool is_templated() const { return not template_types_.empty(); }
     [[nodiscard]] vector<Function> functions();
-    void write_node_graphs(const Function& func) const;
+    void write_function_definition(const Function& func) const;
 
     vector<string> modifiers_;
     Type type_;

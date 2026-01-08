@@ -72,7 +72,7 @@ vector<Function> FunctionDefinition::functions()
     return funcs;
 }
 
-void FunctionDefinition::write_node_graphs(const Function& func) const
+void FunctionDefinition::write_function_definition(const Function& func) const
 {
     runtime_.enter_scope();
     for (const Parameter& param : func.parameters())
@@ -90,7 +90,7 @@ void FunctionDefinition::execute()
     for (Function& func : functions())
     {
         if (not func.is_inline())
-            write_node_graphs(func);
+            write_function_definition(func);
         runtime_.scope().add_function(std::move(func));
     }
 }

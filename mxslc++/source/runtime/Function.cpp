@@ -40,7 +40,8 @@ Function::Function(Function&& other) noexcept
     name_(std::move(other.name_)),
     template_type_(std::move(other.template_type_)),
     params_(std::move(other.params_)),
-    body_(std::move(other.body_))
+    body_(std::move(other.body_)),
+    return_expr_(std::move(other.return_expr_))
 {
 
 }

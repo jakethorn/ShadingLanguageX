@@ -23,8 +23,6 @@ public:
         return ParameterList{std::move(args)};
     }
 
-    void init() const;
-
     [[nodiscard]] size_t size() const { return params_.size(); }
     [[nodiscard]] bool empty() const { return params_.empty(); }
 

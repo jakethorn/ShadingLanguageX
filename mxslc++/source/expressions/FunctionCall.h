@@ -46,6 +46,8 @@ protected:
 
 private:
     void try_init_arguments(const vector<const Function*>& funcs);
+    void evaluate_arguments() const;
+    [[nodiscard]] ValuePtr evaluate_return() const;
 
     optional<Type> template_type_;
     ArgumentList args_;

@@ -20,12 +20,12 @@ namespace
         return Type{td->getName()};
     }
 
-    Parameter to_parameter(const Runtime& runtime, const mx::InputPtr& i)
+    Parameter to_parameter(const Runtime& runtime, const mx::InputPtr& i, const size_t index)
     {
         const string& type = i->getType();
         const string& name = i->getName();
         ExprPtr expr = std::make_unique<NullExpression>(runtime);
-        return Parameter{{}, type, name, std::move(expr)};
+        return Parameter{{}, type, name, std::move(expr), index};
     }
 
     ParameterList get_parameters(const Runtime& runtime, const mx::NodeDefPtr& nd)
@@ -33,9 +33,7 @@ namespace
         vector<Parameter> params;
         params.reserve(nd->getInputCount());
         for (mx::InputPtr i : nd->getInputs())
-        {
-            params.push_back(to_parameter(runtime, i));
-        }
+            params.push_back(to_parameter(runtime, i, params.size()));
 
         return ParameterList{std::move(params)};
     }
@@ -43,13 +41,9 @@ namespace
     string get_type_name(const mx::NodeDefPtr& nd)
     {
         if (nd->getType() == "multioutput")
-        {
             return "__"s + nd->getName() + "_return_type__"s;
-        }
         else
-        {
             return nd->getType();
-        }
     }
 
     Function to_function(const Runtime& runtime, const mx::NodeDefPtr& nd)
@@ -60,9 +54,7 @@ namespace
         string name = nd->getNodeString();
         optional<string> template_type = get_postfix(name, '_');
         if (not scope.has_type(template_type.value()))
-        {
             template_type = std::nullopt;
-        }
         ParameterList params = get_parameters(runtime, nd);
         return Function{{}, std::move(type), std::move(name), template_type, std::move(params), {}, nullptr};
     }

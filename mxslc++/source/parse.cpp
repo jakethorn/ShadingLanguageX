@@ -124,7 +124,7 @@ StmtPtr Parser::function_definition(vector<Token> modifiers)
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
-    ParameterList params = list<Parameter>('(', ')', [this](const size_t){ return parameter(); });
+    ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
     auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
         runtime_,
@@ -143,7 +143,7 @@ StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
     match(TokenType::Function);
     Token name = match(TokenType::Identifier);
     vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
-    ParameterList params = list<Parameter>('(', ')', [this](const size_t){ return parameter(); });
+    ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
     match(TokenType::Arrow);
     Type type = match(TokenType::Identifier);
     auto [body, return_expr] = function_body();
@@ -159,13 +159,13 @@ StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
     );
 }
 
-Parameter Parser::parameter()
+Parameter Parser::parameter(const size_t index)
 {
     vector modifiers = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Out);
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     ExprPtr expr = consume('=') ? expression() : nullptr;
-    return Parameter{Token::as_strings(modifiers), std::move(type), std::move(name), std::move(expr)};
+    return Parameter{Token::as_strings(modifiers), std::move(type), std::move(name), std::move(expr), index};
 }
 
 tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()

@@ -12,9 +12,3 @@ const Parameter& ParameterList::operator[](const Argument& a) const
         return (*this)[a.name()];
     return (*this)[a.index()];
 }
-
-void ParameterList::init() const
-{
-    for (const Parameter& param : params_)
-        param.init();
-}

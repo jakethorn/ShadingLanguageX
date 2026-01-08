@@ -8,6 +8,8 @@
 #include "utils/common.h"
 #include "Argument.h"
 
+class Parameter;
+
 class ArgumentList
 {
 public:
@@ -44,6 +46,7 @@ public:
     [[nodiscard]] bool empty() const { return args_.empty(); }
 
     const Argument& operator[](const size_t i) const { return args_.at(i); }
+    const Argument* operator[](const Parameter& param) const;
 
     auto begin() { return args_.begin(); }
     auto begin() const { return args_.begin(); }
