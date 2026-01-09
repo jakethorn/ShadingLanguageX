@@ -25,7 +25,7 @@ public:
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] size_t index() const { return index_; }
 
-    [[nodiscard]] Parameter instantiate_templated_types(const Type& template_type) const;
+    [[nodiscard]] Parameter instantiate_template_types(const Type& template_type) const;
     void init() const;
 
     [[nodiscard]] bool has_default_value() const { return expr_ != nullptr; }

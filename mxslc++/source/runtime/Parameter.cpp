@@ -37,10 +37,10 @@ Parameter::Parameter(Parameter&& other) noexcept
 
 Parameter::~Parameter() = default;
 
-Parameter Parameter::instantiate_templated_types(const Type& template_type) const
+Parameter Parameter::instantiate_template_types(const Type& template_type) const
 {
-    Type type = type_.instantiate_template_type(template_type);
-    ExprPtr expr = expr_ ? expr_->instantiate_templated_types(template_type) : nullptr;
+    Type type = type_.instantiate_template_types(template_type);
+    ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
     return Parameter{modifiers_, std::move(type), name_, std::move(expr), index_};
 }
 

@@ -32,7 +32,7 @@ basic_t Token::literal() const
     return lexeme_.substr(1, lexeme_.size() - 2);
 }
 
-Token Token::instantiate_template_type(const Type& type) const
+Token Token::instantiate_template_types(const Type& type) const
 {
     Token t{type_, lexeme_ == "T" ? type.str() : lexeme_};
     t.set_line(line_);

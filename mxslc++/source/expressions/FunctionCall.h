@@ -26,7 +26,7 @@ public:
         template_type_{std::move(template_type)},
         args_{std::move(args)} { }
 
-    [[nodiscard]] ExprPtr instantiate_templated_types(const Type& template_type) const override;
+    [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
 
     [[nodiscard]] const string& name() const { return token_.lexeme(); }
     [[nodiscard]] bool has_template_type() const { return template_type_.has_value(); }

@@ -8,7 +8,7 @@
 using std::vector;
 using mxslc::Span;
 
-TEST(span_tests, span_01)
+TEST(span_tests, span_001)
 {
     const vector is{10, 20, 30, 40, 50};
 
@@ -24,7 +24,7 @@ TEST(span_tests, span_01)
     ASSERT_THROW(span[-2], std::out_of_range);
 }
 
-TEST(span_tests, span_01_array)
+TEST(span_tests, span_001_array)
 {
     int is[]{10, 20, 30, 40, 50};
 
@@ -40,7 +40,7 @@ TEST(span_tests, span_01_array)
     ASSERT_THROW(span[-2], std::out_of_range);
 }
 
-TEST(span_tests, span_02)
+TEST(span_tests, span_002)
 {
     const vector is{10, 20, 30, 40, 50};
 
@@ -63,7 +63,7 @@ TEST(span_tests, span_02)
     ASSERT_THROW(span[-4], std::out_of_range);
 }
 
-TEST(span_tests, span_02_array)
+TEST(span_tests, span_002_array)
 {
     int is[]{10, 20, 30, 40, 50};
 
@@ -86,7 +86,7 @@ TEST(span_tests, span_02_array)
     ASSERT_THROW(span[-4], std::out_of_range);
 }
 
-TEST(span_tests, span_03)
+TEST(span_tests, span_003)
 {
     const vector is{10, 20, 30, 40, 50};
 
@@ -102,7 +102,7 @@ TEST(span_tests, span_03)
     ASSERT_THROW(span.pop_back(), std::out_of_range);
 }
 
-TEST(span_tests, span_03_array)
+TEST(span_tests, span_003_array)
 {
     int is[]{10, 20, 30, 40, 50};
 
@@ -118,7 +118,7 @@ TEST(span_tests, span_03_array)
     ASSERT_THROW(span.pop_back(), std::out_of_range);
 }
 
-TEST(span_tests, span_04)
+TEST(span_tests, span_004)
 {
     const vector is{10, 20, 30, 40, 50};
 
@@ -126,7 +126,7 @@ TEST(span_tests, span_04)
     ASSERT_THROW(Span(is, 6, 1), std::out_of_range);
 }
 
-TEST(span_tests, span_04_array)
+TEST(span_tests, span_004_array)
 {
     int is[]{10, 20, 30, 40, 50};
 

@@ -73,7 +73,11 @@ StmtPtr Parser::statement()
         {
             return variable_definition(std::move(mods));
         }
-        else
+        if (peek(2) == ',')
+        {
+            return multi_variable_definition(std::move(mods));
+        }
+        if (peek(2) == '<' or peek(2) == '(')
         {
             return function_definition(std::move(mods));
         }
@@ -117,6 +121,11 @@ StmtPtr Parser::variable_definition(vector<Token> modifiers)
         std::move(name),
         std::move(expr)
     );
+}
+
+StmtPtr Parser::multi_variable_definition(vector<Token> modifiers)
+{
+
 }
 
 StmtPtr Parser::function_definition(vector<Token> modifiers)

@@ -7,7 +7,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Variable.h"
 
-ExprPtr Identifier::instantiate_templated_types(const Type& template_type) const
+ExprPtr Identifier::instantiate_template_types(const Type& template_type) const
 {
     return std::make_unique<Identifier>(runtime_, token_);
 }

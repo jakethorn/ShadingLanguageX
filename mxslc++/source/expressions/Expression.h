@@ -27,7 +27,7 @@ public:
     [[nodiscard]] const Type& type() const;
     [[nodiscard]] ValuePtr evaluate() const;
 
-    [[nodiscard]] virtual ExprPtr instantiate_templated_types(const Type& template_type) const = 0;
+    [[nodiscard]] virtual ExprPtr instantiate_template_types(const Type& template_type) const = 0;
 
 protected:
     virtual void init_child_expressions(const vector<Type>& types) { }

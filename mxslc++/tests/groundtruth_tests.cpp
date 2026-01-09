@@ -14,9 +14,9 @@ using namespace std::string_literals;
 using std::string;
 using std::vector;
 
-using GroundTruthTest = testing::TestWithParam<fs::path>;
+using groundtruth_tests = testing::TestWithParam<fs::path>;
 
-TEST_P(GroundTruthTest, CompilesToMatchGroundTruth)
+TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
 {
     fs::path path = GetParam();
     const fs::path input_path = path;
@@ -35,7 +35,7 @@ TEST_P(GroundTruthTest, CompilesToMatchGroundTruth)
     fs::remove(actual_path);
 }
 
-vector<fs::path> get_test_files()
+vector<fs::path> get_mxsl_files()
 {
     vector<fs::path> files;
     const fs::path test_dir = get_test_data("groundtruth"s);
@@ -48,12 +48,10 @@ vector<fs::path> get_test_files()
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    AllFiles,
-    GroundTruthTest,
-    testing::ValuesIn(get_test_files()),
+    compiler,
+    groundtruth_tests,
+    testing::ValuesIn(get_mxsl_files()),
     [](const testing::TestParamInfo<fs::path>& info) {
-        string name = info.param.stem().string();
-        std::replace(name.begin(), name.end(), '-', '_');
-        return name;
+        return info.param.stem().string();
     }
 );

@@ -27,7 +27,7 @@ public:
     void set_filename(const string& filename) { filename_ = filename; }
     void set_lexeme(const string& lexeme) { lexeme_ = lexeme; }
 
-    [[nodiscard]] Token instantiate_template_type(const Type& type) const;
+    [[nodiscard]] Token instantiate_template_types(const Type& type) const;
 
     bool operator==(const char c) const { return type_ == c; }
     bool operator==(const string& s) const { return type_ == s; }

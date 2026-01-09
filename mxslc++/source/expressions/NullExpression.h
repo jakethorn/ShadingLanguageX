@@ -13,7 +13,7 @@ public:
     NullExpression(const Runtime& runtime) : Expression{runtime} { }
     NullExpression(const Runtime& runtime, Token token) : Expression{runtime, std::move(token)} { }
 
-    [[nodiscard]] ExprPtr instantiate_templated_types(const Type& template_type) const override;
+    [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
 
 protected:
     void init_impl(const vector<Type>& types) override;

@@ -17,10 +17,10 @@ VariableDefinition::VariableDefinition(const Runtime& runtime, vector<string> mo
 
 VariableDefinition::~VariableDefinition() = default;
 
-StmtPtr VariableDefinition::instantiate_templated_types(const Type& template_type) const
+StmtPtr VariableDefinition::instantiate_template_types(const Type& template_type) const
 {
-    Type type = type_.instantiate_template_type(template_type);
-    ExprPtr expr = expr_->instantiate_templated_types(template_type);
+    Type type = type_.instantiate_template_types(template_type);
+    ExprPtr expr = expr_->instantiate_template_types(template_type);
     return std::make_unique<VariableDefinition>(runtime_, modifiers_, std::move(type), name_, std::move(expr));
 }
 

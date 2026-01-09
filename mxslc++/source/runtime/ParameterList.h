@@ -14,13 +14,9 @@ class ParameterList
 public:
     ParameterList(vector<Parameter> params) : params_{std::move(params)} { }
 
-    [[nodiscard]] ParameterList instantiate_templated_types(const Type& template_type) const
+    [[nodiscard]] ParameterList instantiate_template_types(const Type& template_type) const
     {
-        vector<Parameter> args;
-        args.reserve(params_.size());
-        for (const Parameter& param : params_)
-            args.push_back(param.instantiate_templated_types(template_type));
-        return ParameterList{std::move(args)};
+        return Type::instantiate_template_types(params_, template_type);
     }
 
     [[nodiscard]] size_t size() const { return params_.size(); }

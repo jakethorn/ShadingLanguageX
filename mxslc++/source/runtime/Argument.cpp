@@ -11,9 +11,9 @@ Argument::Argument(Argument&& other) noexcept : name_{std::move(other.name_)}, e
 
 Argument::~Argument() = default;
 
-Argument Argument::instantiate_templated_types(const Type& template_type) const
+Argument Argument::instantiate_template_types(const Type& template_type) const
 {
-    return Argument{name_, expr_->instantiate_templated_types(template_type), index_};
+    return Argument{name_, expr_->instantiate_template_types(template_type), index_};
 }
 
 void Argument::init(const vector<Type>& types) const

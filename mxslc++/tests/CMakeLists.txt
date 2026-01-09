@@ -6,6 +6,7 @@ add_executable(mxslc_tests
         span_tests.cpp
         parse_args_tests.cpp
         groundtruth_tests.cpp
+        type_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE
@@ -16,6 +17,7 @@ target_link_libraries(mxslc_tests PRIVATE
 
 target_include_directories(mxslc_tests PRIVATE
         ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/source
 )
 
 target_compile_definitions(mxslc_tests PRIVATE

@@ -13,7 +13,7 @@ public:
     Literal(const Runtime& runtime, basic_t value) : Expression{runtime}, value_{std::move(value)}, type_{value_} { }
     Literal(const Runtime& runtime, Token token) : Expression{runtime, std::move(token)}, value_{token_.literal()}, type_{value_} { }
 
-    [[nodiscard]] ExprPtr instantiate_templated_types(const Type& template_type) const override;
+    [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
 
     [[nodiscard]] const basic_t& value() const { return value_; }
 

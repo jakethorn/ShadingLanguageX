@@ -10,11 +10,11 @@
 #include "runtime/Scope.h"
 #include "statements/Statement.h"
 
-ExprPtr FunctionCall::instantiate_templated_types(const Type& template_type) const
+ExprPtr FunctionCall::instantiate_template_types(const Type& template_type) const
 {
-    Token name = token_.instantiate_template_type(template_type);
-    optional<Type> _template_type = Type::instantiate_template_type(template_type_, template_type);
-    ArgumentList args = args_.instantiate_templated_types(template_type);
+    Token name = token_.instantiate_template_types(template_type);
+    optional<Type> _template_type = Type::instantiate_template_types(template_type_, template_type);
+    ArgumentList args = args_.instantiate_template_types(template_type);
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(_template_type), std::move(args));
 }
 

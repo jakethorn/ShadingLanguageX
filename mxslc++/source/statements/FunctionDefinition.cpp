@@ -30,21 +30,15 @@ FunctionDefinition::FunctionDefinition(
 
 }
 
-StmtPtr FunctionDefinition::instantiate_templated_types(const Type& template_type) const
+StmtPtr FunctionDefinition::instantiate_template_types(const Type& template_type) const
 {
     if (is_templated())
         throw CompileError{name_, "Nested templated functions is not supported"s};
 
-    Type type = type_.instantiate_template_type(template_type);
-    ParameterList params = params_.instantiate_templated_types(template_type);
-
-    vector<StmtPtr> body;
-    body.reserve(body_.size());
-    for (const StmtPtr& stmt : body_)
-        body.push_back(stmt->instantiate_templated_types(template_type));
-
-    ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_templated_types(template_type) : nullptr;
-
+    Type type = type_.instantiate_template_types(template_type);
+    ParameterList params = params_.instantiate_template_types(template_type);
+    vector body = Type::instantiate_template_types(body_, template_type);
+    ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
     return std::make_unique<FunctionDefinition>(runtime_, modifiers_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
 }
 
@@ -55,13 +49,10 @@ vector<Function> FunctionDefinition::functions()
     {
         for (const Type& template_type : template_types_)
         {
-            Type type = type_.instantiate_template_type(template_type);
-            ParameterList params = params_.instantiate_templated_types(template_type);
-            vector<StmtPtr> body;
-            body.reserve(body_.size());
-            for (const StmtPtr& stmt : body_)
-                body.push_back(stmt->instantiate_templated_types(template_type));
-            ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_templated_types(template_type) : nullptr;
+            Type type = type_.instantiate_template_types(template_type);
+            ParameterList params = params_.instantiate_template_types(template_type);
+            vector body = Type::instantiate_template_types(body_, template_type);
+            ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
             funcs.emplace_back(modifiers_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr));
         }
     }
