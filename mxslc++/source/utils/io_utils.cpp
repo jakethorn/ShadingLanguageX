@@ -25,7 +25,7 @@ string read_file(const fs::path& filepath)
     return buffer.str();
 }
 
-void save_file(const fs::path &filepath, const string &text)
+void save_file(const fs::path& filepath, const string& text)
 {
     ofstream file{filepath};
 

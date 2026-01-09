@@ -3,9 +3,9 @@
 
 int main(const int argc, char* argv[])
 {
-    if (const mxslc::Args args = mxslc::parse_args(argc, argv); args.is_valid)
+    if (const mxslc::CompileOptions opts = mxslc::parse_args(argc, argv); opts.is_valid)
     {
-        mxslc::compile(args.input_file);
+        mxslc::compile(opts.input_file);
     }
 
     return 0;

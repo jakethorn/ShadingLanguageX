@@ -23,7 +23,7 @@ public:
 
     void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
     {
-        const mx::OutputPtr output = node_graph->addOutput(output_name, type_.name());
+        const mx::OutputPtr output = node_graph->addOutput(output_name, type_.str());
         output->setConnectedNode(node_);
     }
 

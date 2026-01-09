@@ -129,15 +129,15 @@ const Function& Scope::get_function(
 
 void Scope::add_type(Type&& type)
 {
-    if (contains(types_, type.name()))
-        throw CompileError{"Type already defined: " + type.name()};
+    if (contains(types_, type.str()))
+        throw CompileError{"Type already defined: " + type.str()};
 
-    types_.emplace(type.name(), std::move(type));
+    types_.emplace(type.str(), std::move(type));
 }
 
 bool Scope::has_type(const Type& type) const
 {
-    return has_type(type.name());
+    return has_type(type.str());
 }
 
 bool Scope::has_type(const string& name) const

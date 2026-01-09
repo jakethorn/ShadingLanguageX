@@ -59,9 +59,6 @@ public:
         Switch,
         For,
         Return,
-        And,
-        Or,
-        Not,
         Auto,
         Null,
         Out,
@@ -102,7 +99,7 @@ public:
     };
 
     inline static const unordered_set Keywords {
-        If, Else, Switch, For, Return, And, Or, Not, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline,
+        If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline,
         Function, Struct, Uniform, Varying, Namespace, Print
     };
 
@@ -126,9 +123,6 @@ private:
         {"switch", Switch},
         {"for", For},
         {"return", Return},
-        {"and", And},
-        {"or", Or},
-        {"not", Not},
         {"auto", Auto},
         {"null", Null},
         {"out", Out},

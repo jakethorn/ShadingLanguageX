@@ -18,7 +18,7 @@ public:
     {
         std::visit(
             [this, &node, &input_name](const auto& v) {
-                node->setInputValue(input_name, v, type_.name());
+                node->setInputValue(input_name, v, type_.str());
             },
             val_
         );
@@ -26,10 +26,10 @@ public:
 
     void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
     {
-        mx::OutputPtr output = node_graph->addOutput(output_name, type_.name());
+        mx::OutputPtr output = node_graph->addOutput(output_name, type_.str());
         std::visit(
             [this, &output](const auto& v) {
-                output->setValue(v, type_.name());
+                output->setValue(v, type_.str());
             },
             val_
         );
@@ -37,10 +37,10 @@ public:
 
     void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override
     {
-        mx::InputPtr input = node_def->addInput(input_name, type_.name());
+        mx::InputPtr input = node_def->addInput(input_name, type_.str());
         std::visit(
             [this, &input](const auto& v) {
-                input->setValue(v, type_.name());
+                input->setValue(v, type_.str());
             },
             val_
         );

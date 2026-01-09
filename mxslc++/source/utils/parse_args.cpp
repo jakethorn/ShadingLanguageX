@@ -49,19 +49,19 @@ options:
         std::cerr << "Warning: " << message << std::endl;
     }
 
-    Args parse_response_file(const fs::path& response_file)
+    CompileOptions parse_response_file(const fs::path& response_file)
     {
         if (not fs::is_regular_file(response_file))
         {
             print_error("Invalid response file path: " + response_file.string());
-            return Args{.is_valid = false};
+            return CompileOptions{.is_valid = false};
         }
 
         ifstream file{response_file};
         if (not file.is_open())
         {
             print_error("Failed to open response file: " + response_file.string());
-            return Args{.is_valid = false};
+            return CompileOptions{.is_valid = false};
         }
 
         vector argv{"mxslc"s};
@@ -74,53 +74,53 @@ options:
         return parse_args(argv);
     }
 
-    void parse_input_file(Span<string>& argv, Args& args)
+    void parse_input_file(Span<string>& argv, CompileOptions& opts)
     {
-        args.input_file = fs::absolute(argv.pop_front());
-        args.is_valid = fs::is_regular_file(args.input_file);
-        if (not args.is_valid)
-            print_error("Invalid input file path: " + args.input_file.string());
+        opts.input_file = fs::absolute(argv.pop_front());
+        opts.is_valid = fs::is_regular_file(opts.input_file);
+        if (not opts.is_valid)
+            print_error("Invalid input file path: " + opts.input_file.string());
     }
 
-    void parse_output_file(Span<string>& argv, Args& args)
+    void parse_output_file(Span<string>& argv, CompileOptions& opts)
     {
         if (argv.empty())
         {
-            args.is_valid = false;
-            print_error("Empty -o/--output-file option");
+            opts.is_valid = false;
+            print_error("Empty -o/--output-file option"s);
             return;
         }
 
-        args.output_file = fs::absolute(argv.pop_front());
+        opts.output_file = fs::absolute(argv.pop_front());
     }
 
-    void parse_help(Span<string>& argv, Args& args)
+    void parse_help(Span<string>&, CompileOptions& opts)
     {
         print_help();
-        args.is_valid = false;
+        opts.is_valid = false;
     }
 
-    void parse_version(Span<string>& argv, Args& args)
+    void parse_version(Span<string>& argv, CompileOptions& opts)
     {
         if (argv.empty())
         {
-            args.is_valid = false;
-            print_error("Empty -v/--version option");
+            opts.is_valid = false;
+            print_error("Empty -v/--version option"s);
             return;
         }
 
-        args.version = argv.pop_front();
+        opts.version = argv.pop_front();
         const vector supported_versions = {"1.39.4"s};
-        args.is_valid = contains(supported_versions, *args.version);
-        if (not args.is_valid)
-            print_error("Unsupported MaterialX version: " + *args.version + "\nSupported versions are: 1.39.4");
+        opts.is_valid = contains(supported_versions, *opts.version);
+        if (not opts.is_valid)
+            print_error("Unsupported MaterialX version: " + *opts.version + "\nSupported versions are: 1.39.4");
     }
 
-    void parse_arg(Span<string>& argv, Args& args)
+    void parse_arg(Span<string>& argv, CompileOptions& opts)
     {
         const string& arg0 = argv.pop_front();
 
-        unordered_map<string, function<void(Span<string>&, Args&)>> parse_map{
+        unordered_map<string, function<void(Span<string>&, CompileOptions&)>> parse_map {
             {"-h", parse_help},
             {"--help", parse_help},
             {"-o", parse_output_file},
@@ -131,17 +131,17 @@ options:
 
         if (contains(parse_map, arg0))
         {
-            parse_map[arg0](argv, args);
+            parse_map[arg0](argv, opts);
         }
         else
         {
-            args.is_valid = false;
+            opts.is_valid = false;
             print_error("Invalid option: " + arg0);
         }
     }
 }
 
-Args mxslc::parse_args(const int argc, char* argv[])
+CompileOptions mxslc::parse_args(const int argc, char* argv[])
 {
     vector<string> args;
     args.reserve(argc);
@@ -150,36 +150,36 @@ Args mxslc::parse_args(const int argc, char* argv[])
     return parse_args(args);
 }
 
-Args mxslc::parse_args(const vector<string>& argv)
+CompileOptions mxslc::parse_args(const vector<string>& argv)
 {
-    Span span{argv, 1};
+    Span args{argv, 1};
 
-    if (span.empty())
+    if (args.empty())
     {
-        print_error("Input file path not specified");
+        print_error("Input file path not specified"s);
         print_help();
-        return Args{.is_valid = false};
+        return CompileOptions{.is_valid = false};
     }
 
-    if (span[0][0] == '@')
+    if (args[0][0] == '@')
     {
-        if (span.size() > 2)
-            print_warning("Ignoring arguments after response file");
-        return parse_response_file(span[0].substr(1));
+        if (args.size() > 2)
+            print_warning("Ignoring arguments after response file"s);
+        return parse_response_file(args[0].substr(1));
     }
 
-    Args args;
+    CompileOptions opts;
 
-    if (span.front() == "-h" or span.front() == "--help")
+    if (args.front() == "-h" or args.front() == "--help")
     {
-        parse_help(span, args);
-        if (span.empty())
-            return args;
+        parse_help(args, opts);
+        if (args.empty())
+            return opts;
     }
 
-    parse_input_file(span, args);
-    while (args.is_valid and not span.empty())
-        parse_arg(span, args);
+    parse_input_file(args, opts);
+    while (opts.is_valid and not args.empty())
+        parse_arg(args, opts);
 
-    return args;
+    return opts;
 }

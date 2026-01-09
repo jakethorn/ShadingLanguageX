@@ -34,7 +34,7 @@ basic_t Token::literal() const
 
 Token Token::instantiate_template_type(const Type& type) const
 {
-    Token t{type_, lexeme_ == "T" ? type.name() : lexeme_};
+    Token t{type_, lexeme_ == "T" ? type.str() : lexeme_};
     t.set_line(line_);
     t.set_filename(filename_);
     return t;

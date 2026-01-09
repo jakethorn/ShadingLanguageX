@@ -30,6 +30,7 @@ using std::string;
 using std::string_view;
 using std::vector;
 using std::tuple;
+using std::variant;
 using std::unordered_map;
 using std::unordered_set;
 
@@ -50,6 +51,6 @@ class Serializer;
 using SerializerPtr = unique_ptr<Serializer>;
 
 // type aliases
-using basic_t = std::variant<bool, int, float, string>;
+using basic_t = variant<bool, int, float, string>;
 
 #endif //FENNEC_COMMON_H

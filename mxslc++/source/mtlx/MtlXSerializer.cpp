@@ -70,7 +70,7 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
     if (ValuePtr value = evaluate_constexpr(func, values))
         return value;
 
-    const string type = func.type() == "void"s ? "int"s : func.type().name();
+    const string type = func.type() == "void"s ? "int"s : func.type().str();
     mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, type);
 
     for (size_t i = 0; i < args.size(); ++i)
@@ -105,20 +105,20 @@ namespace
 {
     string node_def_name(const Function& func)
     {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().name() : func.name();
+        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().str() : func.name();
         return "ND_" + name;
     }
 
     string node_graph_name(const Function& func)
     {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().name() : func.name();
+        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().str() : func.name();
         return "NG_" + name;
     }
 }
 
 void MtlXSerializer::write_node_def(const Function& func) const
 {
-    const string type = func.type() == "void"s ? "int"s : func.type().name();
+    const string type = func.type() == "void"s ? "int"s : func.type().str();
 
     const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), type, func.name());
     for (const Parameter& param : func.parameters())
@@ -130,7 +130,7 @@ void MtlXSerializer::write_node_def(const Function& func) const
         }
         else
         {
-            node_def->addInput(param.name(), param.type().name());
+            node_def->addInput(param.name(), param.type().str());
         }
     }
 }
