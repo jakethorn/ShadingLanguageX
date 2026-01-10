@@ -4,11 +4,9 @@
 
 #include "MultiVariableDefinition.h"
 #include "expressions/Expression.h"
-
-VariableDeclaration VariableDeclaration::instantiate_template_types(const Type& template_type) const
-{
-    return {modifiers, type.instantiate_template_types(template_type), name};
-}
+#include "runtime/Runtime.h"
+#include "runtime/Variable.h"
+#include "runtime/values/Value.h"
 
 MultiVariableDefinition::MultiVariableDefinition(const Runtime& runtime, vector<VariableDeclaration> decls, ExprPtr expr)
     : Statement{runtime}, decls_{std::move(decls)}, expr_{std::move(expr)}
@@ -25,5 +23,19 @@ StmtPtr MultiVariableDefinition::instantiate_template_types(const Type& template
 
 void MultiVariableDefinition::execute()
 {
-    
+    vector<Type> types;
+    types.reserve(decls_.size());
+    for (const VariableDeclaration& decl : decls_)
+        types.push_back(decl.type);
+
+    const Type type{std::move(types)};
+    expr_->init(type);
+
+    const ValuePtr value = expr_->evaluate();
+    for (size_t i = 0; i < decls_.size(); i++)
+    {
+        ValuePtr subvalue = value->subvalue(i);
+        Variable var{decls_[i], std::move(subvalue)};
+        runtime_.scope().add_variable(std::move(var));
+    }
 }

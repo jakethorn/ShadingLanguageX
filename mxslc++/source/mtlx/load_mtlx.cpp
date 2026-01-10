@@ -37,9 +37,18 @@ namespace
     {
         vector<Type> subtypes;
         subtypes.reserve(nd->getOutputCount());
-        for (const mx::OutputPtr& o : nd->getOutputs())
+        for (const mx::OutputPtr& o : nd->getActiveOutputs())
             subtypes.emplace_back(o->getType());
         return Type{std::move(subtypes)};
+    }
+
+    vector<string> get_output_names(const mx::NodeDefPtr& nd)
+    {
+        vector<string> names;
+        names.reserve(nd->getOutputCount());
+        for (const mx::OutputPtr& o : nd->getActiveOutputs())
+            names.push_back(o->getName());
+        return names;
     }
 
     Function to_function(const Runtime& runtime, const mx::NodeDefPtr& nd)
@@ -47,12 +56,13 @@ namespace
         const Scope& scope = runtime.scope();
 
         Type type = get_type_name(nd);
-        string name = nd->getNodeString();
+        const string name = nd->getNodeString();
         optional<string> template_type = get_postfix(name, '_');
         if (not scope.has_type(template_type.value()))
             template_type = std::nullopt;
         ParameterList params = get_parameters(runtime, nd);
-        return Function{{}, std::move(type), std::move(name), template_type, std::move(params), {}, nullptr};
+        vector<string> output_names = get_output_names(nd);
+        return Function{std::move(type), name, std::move(template_type), std::move(params), std::move(output_names)};
     }
 }
 

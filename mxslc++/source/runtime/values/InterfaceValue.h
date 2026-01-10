@@ -26,11 +26,6 @@ public:
         output->setInterfaceName(name_);
     }
 
-    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override
-    {
-
-    }
-
     [[nodiscard]] const Type& type() const override { return type_; }
     [[nodiscard]] string str() const override { return name_; }
 

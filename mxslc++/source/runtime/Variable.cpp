@@ -8,6 +8,11 @@
 #include "values/Value.h"
 #include "utils/template_utils.h"
 
+VariableDeclaration VariableDeclaration::instantiate_template_types(const Type& template_type) const
+{
+    return {modifiers, type.instantiate_template_types(template_type), name};
+}
+
 Variable::Variable(vector<string> modifiers, Type type, Token name)
     : Variable{std::move(modifiers), std::move(type), std::move(name), nullptr}
 {
@@ -27,4 +32,16 @@ Variable::Variable(vector<string> modifiers, Type type, Token name, ValuePtr val
 
     if (is_const() and is_mutable())
         throw CompileError{name_, "Variables cannot be both const and mutable"s};
+}
+
+Variable::Variable(VariableDeclaration decl)
+    : Variable{std::move(decl.modifiers), std::move(decl.type), std::move(decl.name)}
+{
+
+}
+
+Variable::Variable(VariableDeclaration decl, ValuePtr value)
+    : Variable{std::move(decl.modifiers), std::move(decl.type), std::move(decl.name), std::move(value)}
+{
+
 }

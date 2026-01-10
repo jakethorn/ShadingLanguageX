@@ -28,6 +28,6 @@ void VariableDefinition::execute()
 {
     expr_->init(type_);
     ValuePtr val = expr_->evaluate();
-    Variable var{std::move(modifiers_), std::move(type_), std::move(name_), std::move(val)};
+    Variable var{modifiers_, type_, name_, std::move(val)};
     runtime_.scope().add_variable(std::move(var));
 }

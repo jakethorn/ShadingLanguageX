@@ -14,7 +14,9 @@
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
 #include "runtime/ParameterList.h"
+#include "runtime/Variable.h"
 #include "statements/FunctionDefinition.h"
+#include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
 #include "statements/VariableDefinition.h"
 
@@ -86,9 +88,10 @@ StmtPtr Parser::statement()
     throw CompileError{peek(), "Invalid statement"};
 }
 
-vector<Token> Parser::modifiers()
+vector<string> Parser::modifiers()
 {
-    return consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline);
+    vector<Token> mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline);
+    return Token::as_strings(mods);
 }
 
 StmtPtr Parser::print_statement()
@@ -106,7 +109,7 @@ StmtPtr Parser::print_statement()
     return std::make_unique<PrintStatement>(runtime_, std::move(exprs));
 }
 
-StmtPtr Parser::variable_definition(vector<Token> modifiers)
+StmtPtr Parser::variable_definition(vector<string> mods)
 {
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
@@ -116,19 +119,45 @@ StmtPtr Parser::variable_definition(vector<Token> modifiers)
 
     return std::make_unique<VariableDefinition>(
         runtime_,
-        Token::as_strings(modifiers),
+        std::move(mods),
         std::move(type),
         std::move(name),
         std::move(expr)
     );
 }
 
-StmtPtr Parser::multi_variable_definition(vector<Token> modifiers)
+StmtPtr Parser::multi_variable_definition(vector<string> mods)
 {
+    vector<VariableDeclaration> decls;
+    Type type = match(TokenType::Identifier);
+    Token name = match(TokenType::Identifier);
+    decls.emplace_back(std::move(mods), std::move(type), std::move(name));
+    while (consume(','))
+    {
+        if (peek(1) == TokenType::Identifier)
+        {
+            type = match(TokenType::Identifier);
+            name = match(TokenType::Identifier);
+            decls.emplace_back(modifiers(), std::move(type), std::move(name));
+        }
+        else
+        {
+            name = match(TokenType::Identifier);
+            decls.emplace_back(decls.back().modifiers, decls.back().type, std::move(name));
+        }
+    }
+    match('=');
+    ExprPtr expr = expression();
+    match(';');
 
+    return std::make_unique<MultiVariableDefinition>(
+        runtime_,
+        std::move(decls),
+        std::move(expr)
+    );
 }
 
-StmtPtr Parser::function_definition(vector<Token> modifiers)
+StmtPtr Parser::function_definition(vector<string> mods)
 {
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
@@ -137,7 +166,7 @@ StmtPtr Parser::function_definition(vector<Token> modifiers)
     auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
         runtime_,
-        Token::as_strings(modifiers),
+        std::move(mods),
         std::move(type),
         std::move(name),
         std::move(template_types),
@@ -147,7 +176,7 @@ StmtPtr Parser::function_definition(vector<Token> modifiers)
     );
 }
 
-StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
+StmtPtr Parser::function_definition_modern(vector<string> mods)
 {
     match(TokenType::Function);
     Token name = match(TokenType::Identifier);
@@ -158,7 +187,7 @@ StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
     auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
         runtime_,
-        Token::as_strings(modifiers),
+        std::move(mods),
         std::move(type),
         std::move(name),
         std::move(template_types),
@@ -170,11 +199,11 @@ StmtPtr Parser::function_definition_modern(vector<Token> modifiers)
 
 Parameter Parser::parameter(const size_t index)
 {
-    vector modifiers = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Out);
+    vector mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Out);
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     ExprPtr expr = consume('=') ? expression() : nullptr;
-    return Parameter{Token::as_strings(modifiers), std::move(type), std::move(name), std::move(expr), index};
+    return Parameter{Token::as_strings(mods), std::move(type), std::move(name), std::move(expr), index};
 }
 
 tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()

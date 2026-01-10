@@ -27,9 +27,9 @@ void FunctionCall::init_child_expressions(const vector<Type>& types)
         vector<const Function*> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
 
         if (matching_funcs.empty())
-            throw CompileError{"No matching functions"s};
+            throw CompileError{token_, "No matching functions: "s + token_.lexeme()};
 
-        size_t prev_initialised_args_count = initialised_args_count_;
+        const size_t prev_initialised_args_count = initialised_args_count_;
         try_init_arguments(matching_funcs);
 
         if (initialised_args_count_ == prev_initialised_args_count)

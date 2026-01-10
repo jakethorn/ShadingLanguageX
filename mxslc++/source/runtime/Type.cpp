@@ -56,7 +56,7 @@ Type::Type(const vector<string>& subtypes) : Type{cast_vector<Type>(subtypes)}
 
 }
 
-[[nodiscard]] Type Type::instantiate_template_types(const Type& template_type) const
+Type Type::instantiate_template_types(const Type& template_type) const
 {
     if (is_complex())
     {

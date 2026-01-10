@@ -60,6 +60,15 @@ namespace
                 return value;
         return nullptr;
     }
+
+    string serialize_type(const Type& type)
+    {
+        if (type.is_complex())
+            return "multioutput"s;
+        if (type == "void"s)
+            return "integer"s;
+        return type.str();
+    }
 }
 
 ValuePtr MtlXSerializer::write_function_call(const Function& func, const ArgumentList& args) const
@@ -70,13 +79,21 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
     if (ValuePtr value = evaluate_constexpr(func, values))
         return value;
 
-    const string type = func.type() == "void"s ? "int"s : func.type().str();
-    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, type);
+    // node
+    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, serialize_type(func.type()));
 
+    // inputs
     for (size_t i = 0; i < args.size(); ++i)
     {
         const string& input_name = func.parameters()[args[i]].name();
         values[i]->set_as_node_input(node, input_name);
+    }
+
+    // outputs
+    if (func.type().is_complex())
+    {
+        for (size_t i = 0; i < func.type().subtype_count(); ++i)
+            node->addOutput(func.output_name(i), func.type().subtype(i).str());
     }
 
     return std::make_shared<NodeValue>(node);
@@ -118,9 +135,7 @@ namespace
 
 void MtlXSerializer::write_node_def(const Function& func) const
 {
-    const string type = func.type() == "void"s ? "int"s : func.type().str();
-
-    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), type, func.name());
+    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func.type()), func.name());
     for (const Parameter& param : func.parameters())
     {
         if (param.has_default_value())
@@ -151,8 +166,8 @@ void MtlXSerializer::write_node_graph(const Function& func) const
 
     if (func.type() == "void"s)
     {
-        const mx::OutputPtr output = node_graph->addOutput("out"s, "int"s);
-        output->setValue(0, "int"s);
+        const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
+        output->setValue(0, "integer"s);
     }
 }
 

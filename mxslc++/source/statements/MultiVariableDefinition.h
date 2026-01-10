@@ -8,15 +8,7 @@
 #include "Statement.h"
 #include "Token.h"
 #include "runtime/Type.h"
-
-struct VariableDeclaration
-{
-    vector<string> modifiers;
-    Type type;
-    Token name;
-
-    VariableDeclaration instantiate_template_types(const Type& template_type) const;
-};
+#include "runtime/Variable.h"
 
 class MultiVariableDefinition final : public Statement
 {

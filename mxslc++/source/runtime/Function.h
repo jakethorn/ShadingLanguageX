@@ -5,6 +5,7 @@
 #ifndef FENNEC_FUNCTION_H
 #define FENNEC_FUNCTION_H
 
+#include <MaterialXCore/Node.h>
 #include "utils/common.h"
 #include "utils/template_utils.h"
 #include "Type.h"
@@ -14,7 +15,23 @@
 class Function
 {
 public:
-    Function(vector<string> modifiers, Type type, Token name, optional<Type> template_type, ParameterList params, vector<StmtPtr> body, ExprPtr return_expr);
+    Function(
+        Type type,
+        Token name,
+        optional<Type> template_type,
+        ParameterList params,
+        vector<string> output_names
+    );
+
+    Function(
+        vector<string> modifiers,
+        Type type,
+        Token name,
+        optional<Type> template_type,
+        ParameterList params,
+        vector<StmtPtr> body,
+        ExprPtr return_expr
+    );
 
     Function(Function&& other) noexcept;
     Function& operator=(Function&& other) noexcept;
@@ -35,6 +52,9 @@ public:
     [[nodiscard]] const ExprPtr& return_expr() const { return return_expr_; }
     [[nodiscard]] const Token& token() const { return name_; }
 
+    [[nodiscard]] const vector<string>& output_names() const { return output_names_; }
+    [[nodiscard]] const string& output_name(const size_t i) const { return output_names_.at(i); }
+
 private:
     vector<string> modifiers_;
     Type type_;
@@ -43,6 +63,7 @@ private:
     ParameterList params_;
     vector<StmtPtr> body_;
     ExprPtr return_expr_;
+    vector<string> output_names_;
 };
 
 #endif //FENNEC_FUNCTION_H

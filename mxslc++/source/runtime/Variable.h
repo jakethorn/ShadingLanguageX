@@ -10,11 +10,25 @@
 #include "Token.h"
 #include "Type.h"
 
+struct VariableDeclaration
+{
+    vector<string> modifiers;
+    Type type;
+    Token name;
+
+    VariableDeclaration(vector<string> modifiers, Type type, Token name)
+        : modifiers{std::move(modifiers)}, type{std::move(type)}, name{std::move(name)} { }
+
+    VariableDeclaration instantiate_template_types(const Type& template_type) const;
+};
+
 class Variable
 {
 public:
     Variable(vector<string> modifiers, Type type, Token name);
     Variable(vector<string> modifiers, Type type, Token name, ValuePtr value);
+    Variable(VariableDeclaration decl);
+    Variable(VariableDeclaration decl, ValuePtr value);
 
     [[nodiscard]] bool is_const() const { return contains(modifiers_, "const"s); }
     [[nodiscard]] bool is_mutable() const { return contains(modifiers_, "mutable"s); }

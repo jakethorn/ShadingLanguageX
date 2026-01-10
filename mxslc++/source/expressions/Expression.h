@@ -28,6 +28,7 @@ public:
     [[nodiscard]] ValuePtr evaluate() const;
 
     [[nodiscard]] virtual ExprPtr instantiate_template_types(const Type& template_type) const = 0;
+    [[nodiscard]] virtual ExprPtr copy() const { return instantiate_template_types(Type{"T"s}); }
 
 protected:
     virtual void init_child_expressions(const vector<Type>& types) { }

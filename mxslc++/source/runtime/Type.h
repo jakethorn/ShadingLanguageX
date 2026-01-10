@@ -25,6 +25,7 @@ public:
     [[nodiscard]] Type instantiate_template_types(const Type& template_type) const;
 
     [[nodiscard]] bool is_complex() const { return not subtypes_.empty(); }
+    [[nodiscard]] size_t subtype_count() const { return subtypes_.size(); }
     [[nodiscard]] const Type& subtype(const size_t i) const { return subtypes_.at(i); }
     [[nodiscard]] const string& str() const { return name_; }
 
