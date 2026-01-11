@@ -5,7 +5,7 @@
 #include "NullExpression.h"
 
 #include "CompileError.h"
-#include "runtime/values/NullValue.h"
+#include "values/NullValue.h"
 
 ExprPtr NullExpression::instantiate_template_types(const Type& template_type) const
 {

@@ -9,9 +9,9 @@
 #include <MaterialXFormat/XmlIo.h>
 #include "CompileError.h"
 #include "expressions/Expression.h"
-#include "runtime/values/BasicValue.h"
-#include "runtime/values/NodeValue.h"
-#include "runtime/values/Value.h"
+#include "values/BasicValue.h"
+#include "values/NodeValue.h"
+#include "values/Value.h"
 #include "runtime/Function.h"
 #include "runtime/ArgumentList.h"
 #include "statements/Statement.h"
@@ -71,7 +71,7 @@ namespace
     }
 }
 
-ValuePtr MtlXSerializer::write_function_call(const Function& func, const ArgumentList& args) const
+ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& args) const
 {
     const vector<ValuePtr> values = args.evaluate();
 
@@ -99,14 +99,7 @@ ValuePtr MtlXSerializer::write_function_call(const Function& func, const Argumen
     return std::make_shared<NodeValue>(node);
 }
 
-ValuePtr MtlXSerializer::write_inline_function_call(const Function& func, const ArgumentList& args) const
-{
-    for (const StmtPtr& stmt : func.body())
-        stmt->execute();
-    return nullptr;
-}
-
-void MtlXSerializer::write_function(const Function& func) const
+void MtlXSerializer::write_node_def_graph(const Function& func) const
 {
     write_node_def(func);
     write_node_graph(func);

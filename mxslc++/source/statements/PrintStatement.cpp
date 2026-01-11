@@ -5,7 +5,7 @@
 #include <iostream>
 #include "PrintStatement.h"
 #include "expressions/Expression.h"
-#include "runtime/values/Value.h"
+#include "values/Value.h"
 
 PrintStatement::PrintStatement(const Runtime& runtime, vector<ExprPtr> exprs) : Statement{runtime}, exprs_{std::move(exprs)}
 {

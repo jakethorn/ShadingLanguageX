@@ -62,7 +62,7 @@ ValuePtr FunctionCall::evaluate_impl() const
     }
     else
     {
-        return runtime_.serializer().write_function_call(*func_, args_);
+        return runtime_.serializer().write_node(*func_, args_);
     }
 }
 

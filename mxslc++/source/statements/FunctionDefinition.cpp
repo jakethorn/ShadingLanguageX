@@ -6,7 +6,7 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
-#include "runtime/values/InterfaceValue.h"
+#include "values/InterfaceValue.h"
 #include "expressions/Expression.h"
 
 FunctionDefinition::FunctionDefinition(
@@ -79,6 +79,6 @@ void FunctionDefinition::write_function_definition(const Function& func) const
         Variable var{{}, param.type(), param.name(), std::move(val)};
         runtime_.scope().add_variable(std::move(var));
     }
-    runtime_.serializer().write_function(func);
+    runtime_.serializer().write_node_def_graph(func);
     runtime_.exit_scope();
 }

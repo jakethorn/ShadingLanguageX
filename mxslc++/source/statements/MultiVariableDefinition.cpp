@@ -5,7 +5,7 @@
 #include "MultiVariableDefinition.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
-#include "runtime/values/Value.h"
+#include "values/Value.h"
 
 MultiVariableDefinition::MultiVariableDefinition(const Runtime& runtime, vector<VariableDeclaration> decls, ExprPtr expr)
     : Statement{runtime}, decls_{std::move(decls)}, expr_{std::move(expr)}
