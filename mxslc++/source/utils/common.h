@@ -11,6 +11,7 @@
 #include <variant>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
@@ -28,6 +29,8 @@ using std::optional;
 using std::string;
 using std::string_view;
 using std::vector;
+using std::tuple;
+using std::variant;
 using std::unordered_map;
 using std::unordered_set;
 
@@ -47,7 +50,10 @@ using ScopePtr = unique_ptr<Scope>;
 class Serializer;
 using SerializerPtr = unique_ptr<Serializer>;
 
+class Function;
+using FuncPtr = shared_ptr<Function>;
+
 // type aliases
-using basic_t = std::variant<bool, int, float, string>;
+using basic_t = variant<bool, int, float, string>;
 
 #endif //FENNEC_COMMON_H

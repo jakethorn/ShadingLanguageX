@@ -8,20 +8,22 @@
 #include <MaterialXCore/Document.h>
 
 #include "utils/common.h"
-#include "runtime/Serializer.h"
 
-class MtlXSerializer final : public Serializer
+class ArgumentList;
+class Function;
+
+class MtlXSerializer
 {
 public:
     MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
-    MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)}
+    explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)}
     {
         graphs_.push_back(doc_);
     }
 
-    [[nodiscard]] ValuePtr write_function_call(const Function& func, const ArgumentList& args) const override;
-    void write_function(const Function& func) const override;
-    void save(const fs::path& filepath) const override;
+    [[nodiscard]] ValuePtr write_node(const Function& func, const ArgumentList& args) const;
+    void write_node_def_graph(const Function& func) const;
+    void save(const fs::path& filepath) const;
 
 private:
     void write_node_def(const Function& func) const;

@@ -1,0 +1,6 @@
+float foo(float a)
+{
+    return add(1.0, a);
+}
+
+float f = foo(2.0);

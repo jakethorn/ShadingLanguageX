@@ -1,14 +1,468 @@
-#ifndef STDLIB
-#define STDLIB
 
-//inline T __add__<int, float, vec2, vec3, vec4, color3, color4>(T in1, T in2)
-//{
-//    return add(in1, in2);
-//}
+//
+// arithmetic operators
+//
 
-inline float __add__(float in1, float in2)
+//
+// __add__
+//
+
+inline T __add__<integer, float, vector2, vector3, vector4, color3, color4, matrix33, matrix44>(T in1, T in2)
 {
     return add(in1, in2);
 }
 
-#endif // STDLIB
+inline T __add__<vector2, vector3, vector4, color3, color4, matrix33, matrix44>(T in1, float in2)
+{
+    return add(in1, in2);
+}
+
+inline T __add__<vector2, vector3, vector4, color3, color4, matrix33, matrix44>(float in1, T in2)
+{
+    return add(in2, in1);
+}
+
+//
+// __sub__
+//
+
+inline T __sub__<integer, float, vector2, vector3, vector4, color3, color4, matrix33, matrix44>(T in1, T in2)
+{
+    return subtract(in1, in2);
+}
+
+inline T __sub__<vector2, vector3, vector4, color3, color4, matrix33, matrix44>(T in1, float in2)
+{
+    return subtract(in1, in2);
+}
+
+inline T __sub__<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    T t_in1 = convert(in1);
+    return subtract(t_in1, in2);
+}
+
+inline matrix33 __sub__(float in1, matrix33 in2)
+{
+    vector3 v3_in1 = convert(in1);
+    matrix33 m33_in1 = creatematrix(v3_in1, v3_in1, v3_in1);
+    return subtract(m33_in1, in2);
+}
+
+inline matrix33 __sub__(float in1, matrix44 in2)
+{
+    vector4 v4_in1 = convert(in1);
+    matrix44 m44_in1 = creatematrix(v4_in1, v4_in1, v4_in1, v4_in1);
+    return subtract(m44_in1, in2);
+}
+
+//
+// __mul__
+//
+
+inline T __mul__<float, vector2, vector3, vector4, color3, color4>(T in1, T in2)
+{
+    return multiply(in1, in2);
+}
+
+inline T __mul__<vector2, vector3, vector4, color3, color4>(T in1, float in2)
+{
+    return multiply(in1, in2);
+}
+
+inline T __mul__<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    return multiply(in2, in1);
+}
+
+inline T __mul__<matrix33, matrix44>(T in1, T in2)
+{
+    return multiply(in1, in2);
+}
+
+inline integer __mul__(integer in1, integer in2)
+{
+    float f_in1 = convert(in1);
+    float f_in2 = convert(in2);
+    return round(multiply(f_in1, f_in2));
+}
+
+//
+// __div__
+//
+
+inline T __div__<float, vector2, vector3, vector4, color3, color4>(T in1, T in2)
+{
+    return divide(in1, in2);
+}
+
+inline T __div__<vector2, vector3, vector4, color3, color4>(T in1, float in2)
+{
+    return divide(in1, in2);
+}
+
+inline T __div__<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    T t_in1 = convert(in1);
+    return divide(t_in1, in2);
+}
+
+inline T __div__<matrix33, matrix44>(T in1, T in2)
+{
+    return divide(in1, in2);
+}
+
+inline integer __div__(integer in1, integer in2)
+{
+    float f_in1 = convert(in1);
+    float f_in2 = convert(in2);
+    return floor(divide(f_in1, f_in2));
+}
+
+//
+// __mod__
+//
+
+inline T __mod__<float, vector2, vector3, vector4, color3, color4>(T in1, T in2)
+{
+    return modulo(in1, in2);
+}
+
+inline T __mod__<vector2, vector3, vector4, color3, color4>(T in1, float in2)
+{
+    return modulo(in1, in2);
+}
+
+inline T __mod__<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    T t_in1 = convert(in1);
+    return modulo(t_in1, in2);
+}
+
+//
+// __pow__
+//
+
+inline T __pow__<float, vector2, vector3, vector4, color3, color4>(T in1, T in2)
+{
+    return power(in1, in2);
+}
+
+inline T __pow__<vector2, vector3, vector4, color3, color4>(T in1, float in2)
+{
+    return power(in1, in2);
+}
+
+inline T __pow__<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    T t_in1 = convert(in1);
+    return power(t_in1, in2);
+}
+
+inline integer __pow__(integer in1, integer in2)
+{
+    float f_in1 = convert(in1);
+    float f_in2 = convert(in2);
+    return round(power(f_in1, f_in2));
+}
+
+//
+// logical operators
+//
+
+inline boolean __eq__<boolean, integer, float>(T value1, T value2)
+{
+    return ifequal(value1, value2);
+}
+
+inline boolean __ne__<boolean, integer, float>(T value1, T value2)
+{
+    return not(ifequal(value1, value2));
+}
+
+inline boolean __gt__<integer, float>(T value1, T value2)
+{
+    return ifgreater(value1, value2);
+}
+
+inline boolean __lt__<integer, float>(T value1, T value2)
+{
+    return ifgreater(value2, value1);
+}
+
+inline boolean __ge__<integer, float>(T value1, T value2)
+{
+    return ifgreatereq(value1, value2);
+}
+
+inline boolean __le__<integer, float>(T value1, T value2)
+{
+    return ifgreatereq(value2, value1);
+}
+
+inline boolean __and__(boolean in1, boolean in2)
+{
+    return and(in1, in2);
+}
+
+inline boolean __or__(boolean in1, boolean in2)
+{
+    return or(in1, in2);
+}
+
+// pow and xor use the same symbol '^'
+inline boolean __pow__(boolean in1, boolean in2)
+{
+    return xor(in1, in2);
+}
+
+//
+// unary operators
+//
+
+inline T __pos__<integer, float, vector2, vector3, vector4>(T in)
+{
+    return in;
+}
+
+inline T __neg__<float, vector2, vector3, vector4>(T in)
+{
+    return invert(in);
+}
+
+inline integer __neg__(integer in)
+{
+    return subtract(0, in);
+}
+
+inline boolean __not__(boolean in)
+{
+    return not(in);
+}
+
+//
+// cast functions
+//
+
+//
+// bool/int/float
+//
+
+inline boolean __bool__(bool in)
+{
+    return in;
+}
+
+inline boolean __bool__(integer in)
+{
+    return convert(in);
+}
+
+inline boolean __bool__(float in)
+{
+    return ifequal(in, 0.0);
+}
+
+inline integer __int__(integer in)
+{
+    return in;
+}
+
+inline integer __int__(boolean in)
+{
+    return convert(in);
+}
+
+inline integer __int__(float in)
+{
+    return round(in);
+}
+
+inline float __float__(float in)
+{
+    return in;
+}
+
+inline float __float__<boolean, integer>(T in)
+{
+    return convert(in);
+}
+
+//
+// vec2
+//
+
+inline vector2 __vec2__<boolean, integer, float, vector3, vector4, color3, color4>(T in)
+{
+    return convert(in);
+}
+
+inline vector2 __vec2__(float x, float y)
+{
+    return combine2(x, y);
+}
+
+inline vector2 __vec2__(vector2 in)
+{
+    return in;
+}
+
+//
+// vec3
+//
+
+inline vector3 __vec3__<boolean, integer, float, vector2, vector4, color3, color4>(T in)
+{
+    return convert(in);
+}
+
+inline vector3 __vec3__(float x, float y, float z)
+{
+    return combine3(x, y, z);
+}
+
+inline vector3 __vec3__(float x, vector2 yz)
+{
+    float y, z = separate2(yz);
+    return combine3(x, y, z);
+}
+
+inline vector3 __vec3__(vector2 xy, float z)
+{
+    float x, y = separate2(xy);
+    return combine3(x, y, z);
+}
+
+inline vector3 __vec3__(vector3 in)
+{
+    return in;
+}
+
+//
+// vec4
+//
+
+inline vector4 __vec4__<boolean, integer, float, vector2, vector3, color3, color4>(T in)
+{
+    return convert(in);
+}
+
+inline vector4 __vec4__(float x, float y, float z, float w)
+{
+    return combine4(x, y, z, w);
+}
+
+inline vector4 __vec4__(float x, float y, vector2 zw)
+{
+    float z, w = separate2(zw);
+    return combine4(x, y, z, w);
+}
+
+inline vector4 __vec4__(float x, vector2 yz, float w)
+{
+    float y, z = separate2(yz);
+    return combine4(x, y, z, w);
+}
+
+inline vector4 __vec4__(vector2 xy, float z, float w)
+{
+    float x, y = separate2(xy);
+    return combine4(x, y, z, w);
+}
+
+inline vector4 __vec4__<vector3, color3>(float x, T yzw)
+{
+    float y, z, w = separate3(yzw);
+    return combine4(x, y, z, w);
+}
+
+inline vector4 __vec4__<vector3, color3>(T xyz, float w)
+{
+    float x, y, z = separate3(xyz);
+    return combine4(x, y, z, w);
+}
+
+inline vector4 __vec4__(vector4 in)
+{
+    return in;
+}
+
+//
+// color3
+//
+
+inline color3 __color3__<boolean, integer, float, vector2, vector3, vector4, color4>(T in)
+{
+    return convert(in);
+}
+
+inline color3 __color3__(float x, float y, float z)
+{
+    return combine3(x, y, z);
+}
+
+inline color3 __color3__(float x, vector2 yz)
+{
+    float y, z = separate2(yz);
+    return combine3(x, y, z);
+}
+
+inline color3 __color3__(vector2 xy, float z)
+{
+    float x, y = separate2(xy);
+    return combine3(x, y, z);
+}
+
+inline color3 __color3__(color3 in)
+{
+    return in;
+}
+
+//
+// color4
+//
+
+inline color4 __color4__<boolean, integer, float, vector2, vector3, vector4, color3>(T in)
+{
+    return convert(in);
+}
+
+inline color4 __color4__(float x, float y, float z, float w)
+{
+    return combine4(x, y, z, w);
+}
+
+inline color4 __color4__(float x, float y, vector2 zw)
+{
+    float z, w = separate2(zw);
+    return combine4(x, y, z, w);
+}
+
+inline color4 __color4__(float x, vector2 yz, float w)
+{
+    float y, z = separate2(yz);
+    return combine4(x, y, z, w);
+}
+
+inline color4 __color4__(vector2 xy, float z, float w)
+{
+    float x, y = separate2(xy);
+    return combine4(x, y, z, w);
+}
+
+inline color4 __color4__<vector3, color3>(float x, T yzw)
+{
+    float y, z, w = separate3(yzw);
+    return combine4(x, y, z, w);
+}
+
+inline color4 __color4__<vector3, color3>(T xyz, float w)
+{
+    float x, y, z = separate3(xyz);
+    return combine4(x, y, z, w);
+}
+
+inline color4 __color4__(color4 in)
+{
+    return in;
+}

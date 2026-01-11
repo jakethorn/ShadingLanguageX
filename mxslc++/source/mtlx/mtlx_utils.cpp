@@ -3,6 +3,7 @@
 //
 
 #include "mtlx_utils.h"
+#include "utils/str_utils.h"
 
 string as_string(const mx::NodePtr& node)
 {
@@ -12,4 +13,9 @@ string as_string(const mx::NodePtr& node)
     for (const mx::OutputPtr& i : node->getOutputs())
         str += "\n    "s + i->asString();
     return str;
+}
+
+string get_output_name(const size_t i)
+{
+    return "out" + str(i+1);
 }

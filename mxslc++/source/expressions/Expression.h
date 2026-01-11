@@ -18,6 +18,8 @@ public:
     Expression(const Runtime& runtime, Token token);
     virtual ~Expression() = default;
 
+    [[nodiscard]] const Token& token() const { return token_; }
+
     void init();
     void init(const Type& type);
     void init(const vector<Type>& types);
@@ -27,10 +29,11 @@ public:
     [[nodiscard]] const Type& type() const;
     [[nodiscard]] ValuePtr evaluate() const;
 
-    [[nodiscard]] virtual ExprPtr instantiate_templated_types(const Type& template_type) const = 0;
+    [[nodiscard]] virtual ExprPtr instantiate_template_types(const Type& template_type) const = 0;
+    [[nodiscard]] virtual ExprPtr copy() const { return instantiate_template_types(Type{"T"s}); }
 
 protected:
-    virtual void init_child_expressions(const vector<Type>& types) { }
+    virtual void init_subexpressions(const vector<Type>& types) { }
     virtual void init_impl(const vector<Type>& types) { }
     [[nodiscard]] virtual const Type& type_impl() const = 0;
     [[nodiscard]] virtual ValuePtr evaluate_impl() const = 0;

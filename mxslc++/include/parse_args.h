@@ -12,7 +12,7 @@
 
 namespace mxslc
 {
-    struct Args
+    struct CompileOptions
     {
         std::filesystem::path input_file;
         std::optional<std::filesystem::path> output_file = std::nullopt;
@@ -20,8 +20,8 @@ namespace mxslc
         bool is_valid = false;
     };
 
-    Args parse_args(int argc, char* argv[]);
-    Args parse_args(const std::vector<std::string>& argv);
+    CompileOptions parse_args(int argc, char* argv[]);
+    CompileOptions parse_args(const std::vector<std::string>& argv);
 }
 
 #endif //MXSLC_PARSE_ARGS_H

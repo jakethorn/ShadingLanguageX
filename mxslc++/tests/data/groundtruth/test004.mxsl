@@ -1,0 +1,4 @@
+float r = power(multiply(3.14, 1.0), 2.0);
+vector2 v = combine2(r, 7.0);
+float x, y = separate2(v);
+float z = divide(x, y);

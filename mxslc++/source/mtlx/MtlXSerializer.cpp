@@ -8,10 +8,10 @@
 #include <functional>
 #include <MaterialXFormat/XmlIo.h>
 #include "CompileError.h"
-#include "runtime/values/BasicValue.h"
-#include "runtime/values/NodeValue.h"
-#include "runtime/values/NullValue.h"
-#include "runtime/values/Value.h"
+#include "expressions/Expression.h"
+#include "values/BasicValue.h"
+#include "values/NodeValue.h"
+#include "values/Value.h"
 #include "runtime/Function.h"
 #include "runtime/ArgumentList.h"
 #include "statements/Statement.h"
@@ -53,98 +53,53 @@ namespace
         return true;
     }
 
-    ValuePtr evaluate_constexpr(const Function& func, const BasicValues& values)
+    ValuePtr evaluate_constexpr(const Function& func, const vector<ValuePtr>& args)
     {
-        return constexpr_funcs.at(func.name())(values);
+        if (BasicValues basic_values; is_constexpr(func, args, basic_values))
+            if (ValuePtr value = constexpr_funcs.at(func.name())(basic_values))
+                return value;
+        return nullptr;
+    }
+
+    string serialize_type(const Type& type)
+    {
+        if (type.is_complex())
+            return "multioutput"s;
+        if (type == "void"s)
+            return "integer"s;
+        return type.str();
     }
 }
 
-ValuePtr MtlXSerializer::write_function_call(const Function& func, const ArgumentList& args) const
+ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& args) const
 {
     const vector<ValuePtr> values = args.evaluate();
 
-    // check if the expression can be evaluated at compile-time
-    if (BasicValues basic_values; is_constexpr(func, values, basic_values))
-        if (ValuePtr value = evaluate_constexpr(func, basic_values))
-            return value;
+    // evaluate as constexpr if possible
+    if (ValuePtr value = evaluate_constexpr(func, values))
+        return value;
 
-    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, func.type().name());
+    // node
+    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, serialize_type(func.type()));
 
+    // inputs
     for (size_t i = 0; i < args.size(); ++i)
     {
-        const Value* value = values[i].get();
         const string& input_name = func.parameters()[args[i]].name();
+        values[i]->set_as_node_input(node, input_name);
+    }
 
-        if (const auto* basic_value = dynamic_cast<const BasicValue*>(value))
-        {
-            const string& input_type = basic_value->type().name();
-            std::visit(
-                [&node, &input_name, &input_type](const auto& v) {
-                    node->setInputValue(input_name, v, input_type);
-                },
-                basic_value->get()
-            );
-        }
-        else if (const auto* node_value = dynamic_cast<const NodeValue*>(value))
-        {
-            node->setConnectedNode(input_name, node_value->node());
-        }
-        else if (const auto* null_value = dynamic_cast<const NullValue*>(value))
-        {
-            node->removeInput(input_name);
-        }
+    // outputs
+    if (func.type().is_complex())
+    {
+        for (size_t i = 0; i < func.type().subtype_count(); ++i)
+            node->addOutput(func.output_name(i), func.type().subtype(i).str());
     }
 
     return std::make_shared<NodeValue>(node);
 }
 
-namespace
-{
-    string node_def_name(const Function& func)
-    {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().name() : func.name();
-        return "ND_" + name;
-    }
-
-    string node_graph_name(const Function& func)
-    {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().name() : func.name();
-        return "NG_" + name;
-    }
-}
-
-
-void MtlXSerializer::write_node_def(const Function& func) const
-{
-    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), func.type().name(), func.name());
-    for (const Parameter& param : func.parameters())
-    {
-        mx::InputPtr input = node_def->addInput(param.name(), param.type().name());
-
-        if (param.has_default_value())
-        {
-            const Value* value = param.evaluate().get();
-            if (const auto* basic_value = dynamic_cast<const BasicValue*>(value))
-            {
-                std::visit([&input](const auto& v) {
-                    input->setValue(v, input->getType());
-                },
-                basic_value->get());
-            }
-        }
-    }
-}
-
-void MtlXSerializer::write_node_graph(const Function &func) const
-{
-    const mx::NodeGraphPtr node_graph = doc_->addNodeGraph(node_graph_name(func));
-    enter_node_graph(node_graph);
-    for (const StmtPtr& stmt : func.body())
-        stmt->execute();
-    exit_node_graph();
-}
-
-void MtlXSerializer::write_function(const Function& func) const
+void MtlXSerializer::write_node_def_graph(const Function& func) const
 {
     write_node_def(func);
     write_node_graph(func);
@@ -154,6 +109,59 @@ void MtlXSerializer::save(const fs::path& filepath) const
 {
     const string& xml = mx::writeToXmlString(doc_);
     save_file(filepath, xml);
+}
+
+namespace
+{
+    string node_def_name(const Function& func)
+    {
+        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().str() : func.name();
+        return "ND_" + name;
+    }
+
+    string node_graph_name(const Function& func)
+    {
+        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().str() : func.name();
+        return "NG_" + name;
+    }
+}
+
+void MtlXSerializer::write_node_def(const Function& func) const
+{
+    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func.type()), func.name());
+    for (const Parameter& param : func.parameters())
+    {
+        if (param.has_default_value())
+        {
+            const ValuePtr value = param.evaluate();
+            value->set_as_node_def_input(node_def, param.name());
+        }
+        else
+        {
+            node_def->addInput(param.name(), param.type().str());
+        }
+    }
+}
+
+void MtlXSerializer::write_node_graph(const Function& func) const
+{
+    const mx::NodeGraphPtr node_graph = doc_->addNodeGraph(node_graph_name(func));
+    enter_node_graph(node_graph);
+    for (const StmtPtr& stmt : func.body())
+        stmt->execute();
+    if (func.return_expr() != nullptr)
+    {
+        func.return_expr()->init(func.type());
+        const ValuePtr return_value = func.return_expr()->evaluate();
+        return_value->set_as_node_graph_output(graph(), "out"s);
+    }
+    exit_node_graph();
+
+    if (func.type() == "void"s)
+    {
+        const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
+        output->setValue(0, "integer"s);
+    }
 }
 
 void MtlXSerializer::enter_node_graph(const mx::NodeGraphPtr& node_graph) const

@@ -6,50 +6,79 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
+#include "values/InterfaceValue.h"
+#include "expressions/Expression.h"
 
-StmtPtr FunctionDefinition::instantiate_templated_types(const Type& template_type) const
-{
-    if (is_templated())
-        throw CompileError{name_, "Nested templated functions is not supported"};
-
-    Type type = type_.instantiate_template_type(template_type);
-    ParameterList params = params_.instantiate_templated_types(template_type);
-
-    vector<StmtPtr> body;
-    body.reserve(body_.size());
-    for (const StmtPtr& stmt : body_)
-        body.push_back(stmt->instantiate_templated_types(template_type));
-
-    return std::make_unique<FunctionDefinition>(runtime_, modifiers_, std::move(type), name_, template_types_, std::move(params), std::move(body));
-}
-
-void FunctionDefinition::init()
+FunctionDefinition::FunctionDefinition(
+    const Runtime& runtime,
+    vector<string> mods,
+    Type type,
+    Token name,
+    vector<Type> template_types,
+    ParameterList params,
+    vector<StmtPtr> body,
+    ExprPtr return_expr
+) : Statement{runtime},
+    mods_{std::move(mods)},
+    type_{std::move(type)},
+    name_{std::move(name)},
+    template_types_{std::move(template_types)},
+    params_{std::move(params)},
+    body_{std::move(body)},
+    return_expr_{std::move(return_expr)}
 {
     if (is_templated())
     {
         for (const Type& template_type : template_types_)
         {
-            Type type = type_.instantiate_template_type(template_type);
-            ParameterList params = params_.instantiate_templated_types(template_type);
-
-            vector<StmtPtr> body;
-            body.reserve(body_.size());
-            for (const StmtPtr& stmt : body_)
-                body.push_back(stmt->instantiate_templated_types(template_type));
-
-            funcs_.emplace_back(modifiers_, std::move(type), name_, template_type, std::move(params), std::move(body));
+            type = type_.instantiate_template_types(template_type);
+            params = params_.instantiate_template_types(template_type);
+            body = Type::instantiate_template_types(body_, template_type);
+            return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
+            funcs_.push_back(std::make_shared<Function>(
+                mods_, std::move(type), name_, std::move(template_type), std::move(params), std::move(body), std::move(return_expr)
+            ));
         }
     }
     else
     {
-        funcs_.emplace_back(std::move(modifiers_), std::move(type_), std::move(name_), std::nullopt, std::move(params_), std::move(body_));
+        funcs_.push_back(std::make_shared<Function>(
+            std::move(mods_), std::move(type_), std::move(name_), std::nullopt, std::move(params_), std::move(body_), std::move(return_expr_)
+        ));
     }
 }
 
-void FunctionDefinition::execute()
+StmtPtr FunctionDefinition::instantiate_template_types(const Type& template_type) const
 {
-    for (Function& func : funcs_)
+    if (is_templated())
+        throw CompileError{name_, "Nested templated functions is not supported"s};
+
+    Type type = type_.instantiate_template_types(template_type);
+    ParameterList params = params_.instantiate_template_types(template_type);
+    vector body = Type::instantiate_template_types(body_, template_type);
+    ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
+    return std::make_unique<FunctionDefinition>(runtime_, mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
+}
+
+void FunctionDefinition::execute() const
+{
+    for (const FuncPtr& func : funcs_)
     {
-        runtime_.scope().add_function(std::move(func));
+        if (not func->is_inline())
+            write_function_definition(*func);
+        runtime_.scope().add_function(func);
     }
+}
+
+void FunctionDefinition::write_function_definition(const Function& func) const
+{
+    runtime_.enter_scope();
+    for (const Parameter& param : func.parameters())
+    {
+        ValuePtr val = std::make_unique<InterfaceValue>(param.name(), param.type());
+        Variable var{{}, param.type(), param.name(), std::move(val)};
+        runtime_.scope().add_variable(std::move(var));
+    }
+    runtime_.serializer().write_node_def_graph(func);
+    runtime_.exit_scope();
 }

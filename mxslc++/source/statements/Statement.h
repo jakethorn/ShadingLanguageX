@@ -13,12 +13,11 @@ class Type;
 class Statement
 {
 public:
-    Statement(const Runtime& runtime) : runtime_{runtime} { }
+    explicit Statement(const Runtime& runtime) : runtime_{runtime} { }
     virtual ~Statement() = default;
 
-    virtual StmtPtr instantiate_templated_types(const Type& template_type) const = 0;
-    virtual void init() = 0;
-    virtual void execute() = 0;
+    [[nodiscard]] virtual StmtPtr instantiate_template_types(const Type& template_type) const = 0;
+    virtual void execute() const = 0;
 
 protected:
     const Runtime& runtime_;

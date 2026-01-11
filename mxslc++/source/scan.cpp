@@ -150,7 +150,7 @@ vector<Token> sscan(string_view text)
 
         if (token == TokenType::Newline)
         {
-            line++;
+            ++line;
             continue;
         }
 

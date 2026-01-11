@@ -19,10 +19,12 @@ add_library(mxslc_lib
         expressions/Literal.cpp
         expressions/ExpressionFactory.cpp
         expressions/NullExpression.cpp
+        expressions/Constructor.cpp
+        expressions/IndexingExpression.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
         statements/FunctionDefinition.cpp
-        statements/ReturnStatement.cpp
+        statements/MultiVariableDefinition.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp

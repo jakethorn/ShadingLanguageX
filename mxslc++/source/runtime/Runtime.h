@@ -12,25 +12,25 @@
 class Runtime
 {
 public:
-    Runtime() : Runtime{std::make_unique<Scope>(), std::make_unique<MtlXSerializer>()} { }
-    Runtime(ScopePtr scope, SerializerPtr serializer) : scope_{std::move(scope)}, serializer_{std::move(serializer)} { }
+    Runtime() : Runtime{std::make_unique<Scope>(), MtlXSerializer{}} { }
+    Runtime(ScopePtr scope, MtlXSerializer serializer) : scope_{std::move(scope)}, serializer_{std::move(serializer)} { }
 
     [[nodiscard]] Scope& scope() const { return *scope_; }
-    [[nodiscard]] const Serializer& serializer() const { return *serializer_; }
+    [[nodiscard]] const MtlXSerializer& serializer() const { return serializer_; }
 
-    void enter_scope()
+    void enter_scope() const
     {
         scope_ = std::make_unique<Scope>(std::move(scope_));
     }
 
-    void exit_scope()
+    void exit_scope() const
     {
         scope_ = scope_->parent();
     }
 
 private:
-    ScopePtr scope_;
-    SerializerPtr serializer_;
+    mutable ScopePtr scope_;
+    MtlXSerializer serializer_;
 };
 
 #endif //FENNEC_RUNTIME_H

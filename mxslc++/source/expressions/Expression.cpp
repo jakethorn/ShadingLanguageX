@@ -34,7 +34,7 @@ bool Expression::try_init(const vector<Type>& types)
 {
     if (not is_initialized_)
     {
-        init_child_expressions(types);
+        init_subexpressions(types);
         init_impl(types);
         if (types.empty())
             is_initialized_ = runtime_.scope().has_type(type_impl());

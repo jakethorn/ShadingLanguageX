@@ -59,9 +59,6 @@ public:
         Switch,
         For,
         Return,
-        And,
-        Or,
-        Not,
         Auto,
         Null,
         Out,
@@ -76,6 +73,7 @@ public:
         Varying,
         Namespace,
         Print,
+        Break,
 
         // Dynamic
         Identifier,
@@ -102,8 +100,8 @@ public:
     };
 
     inline static const unordered_set Keywords {
-        If, Else, Switch, For, Return, And, Or, Not, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline,
-        Function, Struct, Uniform, Varying, Namespace, Print
+        If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline,
+        Function, Struct, Uniform, Varying, Namespace, Print, Break
     };
 
 private:
@@ -126,9 +124,6 @@ private:
         {"switch", Switch},
         {"for", For},
         {"return", Return},
-        {"and", And},
-        {"or", Or},
-        {"not", Not},
         {"auto", Auto},
         {"null", Null},
         {"out", Out},
@@ -143,6 +138,7 @@ private:
         {"varying", Varying},
         {"namespace", Namespace},
         {"print", Print},
+        {"break", Break},
         {"<identifier>", Identifier},
         {"<bool>", Bool},
         {"<int>", Int},

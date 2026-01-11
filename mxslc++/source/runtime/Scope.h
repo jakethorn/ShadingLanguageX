@@ -27,7 +27,7 @@ public:
     void set_variable(Variable&& var);
     [[nodiscard]] const Variable& get_variable(const Token& name) const;
 
-    void add_function(Function&& func);
+    void add_function(FuncPtr func);
     [[nodiscard]] vector<const Function*> get_functions(
         const vector<Type>& return_types,
         const Token& name,
@@ -49,7 +49,7 @@ private:
     ScopePtr parent_;
 
     unordered_map<string, Variable> variables_;
-    vector<Function> functions_;
+    vector<FuncPtr> functions_;
     unordered_map<string, Type> types_;
 };
 

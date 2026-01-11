@@ -28,8 +28,8 @@ ExprPtr ExpressionFactory::binary(ExprPtr left, Token op, ExprPtr right)
         {'<', "__lt__"},
         {">="s, "__ge__"},
         {"<="s, "__le__"},
-        {"and"s, "__and__"},
-        {"or"s, "__or__"},
+        {"&"s, "__and__"},
+        {"|"s, "__or__"},
     };
 
     op.set_lexeme(op_names.at(op.type()));
@@ -62,7 +62,6 @@ ExprPtr ExpressionFactory::unary(Token op, ExprPtr right)
         {'+', "__pos__"},
         {'-', "__neg__"},
         {'!', "__not__"},
-        {"not"s, "__not__"},
     };
 
     op.set_lexeme(op_names.at(op.type()));

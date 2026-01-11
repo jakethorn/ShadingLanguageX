@@ -15,57 +15,54 @@
 
 namespace
 {
-    Type to_type(const mx::TypeDefPtr& td)
-    {
-        return Type{td->getName()};
-    }
-
-    Parameter to_parameter(const Runtime& runtime, const mx::InputPtr& i)
+    Parameter to_parameter(const Runtime& runtime, const mx::InputPtr& i, const size_t index)
     {
         const string& type = i->getType();
         const string& name = i->getName();
         ExprPtr expr = std::make_unique<NullExpression>(runtime);
-        return Parameter{{}, type, name, std::move(expr)};
+        return Parameter{{}, type, name, std::move(expr), index};
     }
 
     ParameterList get_parameters(const Runtime& runtime, const mx::NodeDefPtr& nd)
     {
         vector<Parameter> params;
         params.reserve(nd->getInputCount());
-        for (mx::InputPtr i : nd->getInputs())
-        {
-            params.push_back(to_parameter(runtime, i));
-        }
+        for (const mx::InputPtr& i : nd->getInputs())
+            params.push_back(to_parameter(runtime, i, params.size()));
 
         return ParameterList{std::move(params)};
     }
 
-    string get_type_name(const mx::NodeDefPtr& nd)
+    Type get_type_name(const mx::NodeDefPtr& nd)
     {
-        if (nd->getType() == "multioutput")
-        {
-            return "__"s + nd->getName() + "_return_type__"s;
-        }
-        else
-        {
-            return nd->getType();
-        }
+        vector<Type> subtypes;
+        subtypes.reserve(nd->getOutputCount());
+        for (const mx::OutputPtr& o : nd->getActiveOutputs())
+            subtypes.emplace_back(o->getType());
+        return Type{std::move(subtypes)};
     }
 
-    Function to_function(const Runtime& runtime, const mx::NodeDefPtr& nd)
+    vector<string> get_output_names(const mx::NodeDefPtr& nd)
+    {
+        vector<string> names;
+        names.reserve(nd->getOutputCount());
+        for (const mx::OutputPtr& o : nd->getActiveOutputs())
+            names.push_back(o->getName());
+        return names;
+    }
+
+    FuncPtr to_function(const Runtime& runtime, const mx::NodeDefPtr& nd)
     {
         const Scope& scope = runtime.scope();
 
-        string type = get_type_name(nd);
-        string name = nd->getNodeString();
+        Type type = get_type_name(nd);
+        const string name = nd->getNodeString();
         optional<string> template_type = get_postfix(name, '_');
         if (not scope.has_type(template_type.value()))
-        {
             template_type = std::nullopt;
-        }
         ParameterList params = get_parameters(runtime, nd);
-        vector<StmtPtr> body;
-        return Function{{}, std::move(type), std::move(name), template_type, std::move(params), std::move(body)};
+        vector<string> output_names = get_output_names(nd);
+        return std::make_shared<Function>(std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
     }
 }
 
@@ -73,12 +70,12 @@ void load_library(const Runtime& runtime, const mx::DocumentPtr& doc)
 {
     Scope& scope = runtime.scope();
 
-    for (const mx::TypeDefPtr td : doc->getTypeDefs())
+    for (const mx::TypeDefPtr& td : doc->getTypeDefs())
     {
-        scope.add_type(to_type(td));
+        scope.add_type(td->getName());
     }
 
-    for (const mx::NodeDefPtr nd : doc->getNodeDefs())
+    for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
     {
         if (nd->hasVersionString() and not nd->getDefaultVersion())
             continue;

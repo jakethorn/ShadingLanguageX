@@ -12,9 +12,8 @@ class PrintStatement final : public Statement
 public:
     PrintStatement(const Runtime& runtime, vector<ExprPtr> exprs);
 
-    StmtPtr instantiate_templated_types(const Type& template_type) const override;
-    void init() override;
-    void execute() override;
+    [[nodiscard]] StmtPtr instantiate_template_types(const Type& template_type) const override;
+    void execute() const override;
 
 private:
     vector<ExprPtr> exprs_;

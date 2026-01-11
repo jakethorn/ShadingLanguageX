@@ -7,6 +7,9 @@
 
 #include "utils/common.h"
 #include "Argument.h"
+#include "Type.h"
+
+class Parameter;
 
 class ArgumentList
 {
@@ -22,13 +25,9 @@ public:
         (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
     }
 
-    [[nodiscard]] ArgumentList instantiate_templated_types(const Type& template_type) const
+    [[nodiscard]] ArgumentList instantiate_template_types(const Type& template_type) const
     {
-        vector<Argument> args;
-        args.reserve(args_.size());
-        for (const Argument& arg : args_)
-            args.push_back(arg.instantiate_templated_types(template_type));
-        return ArgumentList{std::move(args)};
+        return Type::instantiate_template_types(args_, template_type);
     }
 
     [[nodiscard]] vector<ValuePtr> evaluate() const
@@ -44,6 +43,7 @@ public:
     [[nodiscard]] bool empty() const { return args_.empty(); }
 
     const Argument& operator[](const size_t i) const { return args_.at(i); }
+    const Argument* operator[](const Parameter& param) const;
 
     auto begin() { return args_.begin(); }
     auto begin() const { return args_.begin(); }

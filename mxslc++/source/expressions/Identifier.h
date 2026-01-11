@@ -5,8 +5,6 @@
 #ifndef FENNEC_IDENTIFIER_H
 #define FENNEC_IDENTIFIER_H
 
-#include <cassert>
-
 #include "Expression.h"
 
 class Variable;
@@ -16,14 +14,7 @@ class Identifier final : public Expression
 public:
     Identifier(const Runtime& runtime, Token token) : Expression{runtime, std::move(token)} { }
 
-    [[nodiscard]] ExprPtr instantiate_templated_types(const Type& template_type) const override;
-
-    [[nodiscard]] const string& name() const { return token_.lexeme(); }
-    [[nodiscard]] const Variable& variable() const
-    {
-        assert(is_initialized_);
-        return *var_;
-    }
+    [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
 
 protected:
     void init_impl(const vector<Type> &types) override;

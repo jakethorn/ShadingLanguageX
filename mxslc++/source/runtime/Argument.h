@@ -23,7 +23,7 @@ public:
     [[nodiscard]] const string& name() const { return name_.value(); }
     [[nodiscard]] size_t index() const { return index_; }
 
-    [[nodiscard]] Argument instantiate_templated_types(const Type& template_type) const;
+    [[nodiscard]] Argument instantiate_template_types(const Type& template_type) const;
     void init(const vector<Type>& types) const;
     [[nodiscard]] bool try_init(const vector<Type>& types) const;
     [[nodiscard]] bool is_initialized() const;

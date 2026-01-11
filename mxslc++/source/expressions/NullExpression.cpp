@@ -5,9 +5,9 @@
 #include "NullExpression.h"
 
 #include "CompileError.h"
-#include "runtime/values/NullValue.h"
+#include "values/NullValue.h"
 
-ExprPtr NullExpression::instantiate_templated_types(const Type& template_type) const
+ExprPtr NullExpression::instantiate_template_types(const Type& template_type) const
 {
     return std::make_unique<NullExpression>(runtime_, token_);
 }

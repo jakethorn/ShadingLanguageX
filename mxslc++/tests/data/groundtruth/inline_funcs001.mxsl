@@ -1,0 +1,7 @@
+inline float foo(float x, float y)
+{
+    return add(x, y);
+}
+
+float f = foo(1.0, 2.0);
+print f;

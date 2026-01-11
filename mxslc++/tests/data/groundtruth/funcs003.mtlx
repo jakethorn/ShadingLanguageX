@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo" />
+  <nodegraph name="NG_foo">
+    <randomcolor name="node1" type="color3">
+      <input name="in" type="integer" value="2" />
+    </randomcolor>
+    <output name="out1" type="float" value="1" />
+    <output name="out2" type="color3" nodename="node1" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <output name="out1" type="float" />
+    <output name="out2" type="color3" />
+  </foo>
+  <add name="node2" type="color3">
+    <input name="in1" type="color3" output="out2" nodename="node1" />
+    <input name="in2" type="float" output="out1" nodename="node1" />
+  </add>
+  <foo name="node3" type="multioutput">
+    <output name="out1" type="float" />
+    <output name="out2" type="color3" />
+  </foo>
+  <add name="node4" type="float">
+    <input name="in1" type="float" output="out1" nodename="node1" />
+    <input name="in2" type="float" output="out1" nodename="node3" />
+  </add>
+</materialx>

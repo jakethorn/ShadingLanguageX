@@ -10,6 +10,7 @@
 #include "utils/common.h"
 #include "Token.h"
 #include "TokenReader.h"
+#include "runtime/Type.h"
 
 class Attribute;
 class Parameter;
@@ -29,13 +30,16 @@ private:
     Attribute attribute();
 
     StmtPtr statement();
-    vector<Token> modifiers();
     StmtPtr print_statement();
-    StmtPtr variable_definition(vector<Token> modifiers);
-    StmtPtr function_definition(vector<Token> modifiers);
-    StmtPtr function_definition_modern(vector<Token> modifiers);
-    Parameter parameter();
-    StmtPtr return_statement();
+    StmtPtr variable_definition(vector<string> mods, Type type);
+    StmtPtr multi_variable_definition(vector<string> mods, Type type);
+    StmtPtr function_definition(vector<string> mods, Type type);
+    StmtPtr function_definition_modern(vector<string> mods);
+
+    vector<string> modifiers();
+    Type complex_type();
+    Parameter parameter(size_t index);
+    tuple<vector<StmtPtr>, ExprPtr> function_body();
 
     ExprPtr expression();
     ExprPtr logical();
@@ -48,6 +52,8 @@ private:
     ExprPtr property();
     ExprPtr primary();
     ExprPtr function_call();
+    ExprPtr constructor();
+
     Argument argument(size_t i);
 
     template<typename T>
@@ -73,6 +79,7 @@ private:
     bool is_templated_function() const;
 
     const Runtime& runtime_;
+    Type current_function_type_;
 };
 
 #endif //FENNEC_PARSE_H

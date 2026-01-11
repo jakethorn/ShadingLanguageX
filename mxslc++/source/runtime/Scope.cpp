@@ -50,7 +50,7 @@ const Variable& Scope::get_variable(const Token& name) const
     throw CompileError{name, "Variable not defined: " + name.lexeme()};
 }
 
-void Scope::add_function(Function&& func)
+void Scope::add_function(FuncPtr func)
 {
     functions_.push_back(std::move(func));
 }
@@ -100,11 +100,15 @@ vector<const Function*> Scope::get_functions(
 ) const
 {
     vector<const Function*> funcs;
-    for (const Function& func : functions_)
+    for (const FuncPtr& func : functions_)
     {
-        if (is_match(func, return_types, name, template_type, args))
-            funcs.push_back(&func);
+        if (is_match(*func, return_types, name, template_type, args))
+            funcs.push_back(func.get());
     }
+
+    if (funcs.empty() and parent_)
+        return parent_->get_functions(return_types, name, template_type, args);
+
     return funcs;
 }
 
@@ -125,15 +129,25 @@ const Function& Scope::get_function(
 
 void Scope::add_type(Type&& type)
 {
-    if (contains(types_, type.name()))
-        throw CompileError{"Type already defined: " + type.name()};
+    if (contains(types_, type.str()))
+        throw CompileError{"Type already defined: " + type.str()};
 
-    types_.emplace(type.name(), std::move(type));
+    types_.emplace(type.str(), std::move(type));
 }
 
 bool Scope::has_type(const Type& type) const
 {
-    return has_type(type.name());
+    if (type.is_complex())
+    {
+        bool has = true;
+        for (const Type& t : type.subtypes())
+            has &= has_type(t);
+        return has;
+    }
+    else
+    {
+        return has_type(type.str());
+    }
 }
 
 bool Scope::has_type(const string& name) const

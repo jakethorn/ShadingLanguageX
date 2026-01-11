@@ -4,9 +4,9 @@
 
 #include "Literal.h"
 
-#include "runtime/values/BasicValue.h"
+#include "values/BasicValue.h"
 
-ExprPtr Literal::instantiate_templated_types(const Type& template_type) const
+ExprPtr Literal::instantiate_template_types(const Type& template_type) const
 {
     return std::make_unique<Literal>(runtime_, token_);
 }
