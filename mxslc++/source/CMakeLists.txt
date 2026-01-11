@@ -20,6 +20,7 @@ add_library(mxslc_lib
         expressions/ExpressionFactory.cpp
         expressions/NullExpression.cpp
         expressions/Constructor.cpp
+        expressions/IndexingExpression.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
         statements/FunctionDefinition.cpp

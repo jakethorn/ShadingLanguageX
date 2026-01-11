@@ -5,9 +5,11 @@
 #include "parse.h"
 
 #include "TokenReader.h"
+#include "expressions/Constructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
+#include "expressions/IndexingExpression.h"
 #include "runtime/Attribute.h"
 #include "statements/Statement.h"
 #include "expressions/Literal.h"
@@ -17,6 +19,7 @@
 #include "runtime/Variable.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/MultiVariableDefinition.h"
+#include "statements/NoStatement.h"
 #include "statements/PrintStatement.h"
 #include "statements/VariableDefinition.h"
 
@@ -57,35 +60,42 @@ Attribute Parser::attribute()
 
 StmtPtr Parser::statement()
 {
-    vector<string> mods = modifiers();
+    if (consume(TokenType::Break))
+    {
+        match(';');
+    }
 
     if (peek() == TokenType::Print)
     {
         return print_statement();
     }
 
+    vector<string> mods = modifiers();
+
     if (peek() == TokenType::Function)
     {
         return function_definition_modern(std::move(mods));
     }
 
-    if (peek() == TokenType::Identifier and peek(1) == TokenType::Identifier)
+    if (peek() == '{' or (peek() == TokenType::Identifier and peek(1) == TokenType::Identifier))
     {
-        if (peek(2) == '=')
+        Type type = complex_type();
+
+        if (peek(1) == '=')
         {
-            return variable_definition(std::move(mods));
+            return variable_definition(std::move(mods), std::move(type));
         }
-        if (peek(2) == ',')
+        if (peek(1) == ',')
         {
-            return multi_variable_definition(std::move(mods));
+            return multi_variable_definition(std::move(mods), std::move(type));
         }
-        if (peek(2) == '<' or peek(2) == '(')
+        if (peek(1) == '<' or peek(1) == '(')
         {
-            return function_definition(std::move(mods));
+            return function_definition(std::move(mods), std::move(type));
         }
     }
 
-    throw CompileError{peek(), "Invalid statement"};
+    throw CompileError{peek(), "Invalid statement"s};
 }
 
 StmtPtr Parser::print_statement()
@@ -103,9 +113,8 @@ StmtPtr Parser::print_statement()
     return std::make_unique<PrintStatement>(runtime_, std::move(exprs));
 }
 
-StmtPtr Parser::variable_definition(vector<string> mods)
+StmtPtr Parser::variable_definition(vector<string> mods, Type type)
 {
-    Type type = complex_type();
     Token name = match(TokenType::Identifier);
     match('=');
     ExprPtr expr = expression();
@@ -120,19 +129,19 @@ StmtPtr Parser::variable_definition(vector<string> mods)
     );
 }
 
-StmtPtr Parser::multi_variable_definition(vector<string> mods)
+StmtPtr Parser::multi_variable_definition(vector<string> mods, Type type)
 {
     vector<VariableDeclaration> decls;
-    Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     decls.emplace_back(std::move(mods), std::move(type), std::move(name));
     while (consume(','))
     {
         if (peek(1) == TokenType::Identifier)
         {
-            type = match(TokenType::Identifier);
+            mods = modifiers();
+            type = complex_type();
             name = match(TokenType::Identifier);
-            decls.emplace_back(modifiers(), std::move(type), std::move(name));
+            decls.emplace_back(std::move(mods), std::move(type), std::move(name));
         }
         else
         {
@@ -151,9 +160,8 @@ StmtPtr Parser::multi_variable_definition(vector<string> mods)
     );
 }
 
-StmtPtr Parser::function_definition(vector<string> mods)
+StmtPtr Parser::function_definition(vector<string> mods, Type type)
 {
-    Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     vector<Type> template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
     ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
@@ -199,8 +207,8 @@ vector<string> Parser::modifiers()
 
 Type Parser::complex_type()
 {
-    if (peek() == TokenType::Identifier)
-        return match(TokenType::Identifier);
+    if (optional<Token> type = consume(TokenType::Identifier))
+        return *type;
 
     vector<Type> subtypes = list<Type>('{', '}', [this](const size_t){ return complex_type(); });
     return Type{std::move(subtypes)};
@@ -245,7 +253,7 @@ ExprPtr Parser::expression()
 ExprPtr Parser::logical()
 {
     ExprPtr expr = equality();
-    while (optional<Token> op = consume("and"s, "or"s))
+    while (optional<Token> op = consume('&', '|'))
     {
         ExprPtr right = equality();
         expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
@@ -324,14 +332,22 @@ ExprPtr Parser::exponent()
 
 ExprPtr Parser::unary()
 {
-    if (optional<Token> op = consume("!"s, "not"s, "+"s, "-"s))
+    if (optional<Token> op = consume('!', '+', '-'))
         return ExpressionFactory::unary(std::move(*op), property());
     return property();
 }
 
 ExprPtr Parser::property()
 {
-    return primary();
+    ExprPtr expr = primary();
+    while (consume('['))
+    {
+        ExprPtr index = expression();
+        expr = std::make_unique<IndexingExpression>(runtime_, std::move(expr), std::move(index));
+        match(']');
+    }
+
+    return expr;
 }
 
 ExprPtr Parser::primary()
@@ -354,7 +370,12 @@ ExprPtr Parser::primary()
         }
     }
 
-    throw CompileError{peek(), "Invalid expression"};
+    if (peek() == '{')
+    {
+        return constructor();
+    }
+
+    throw CompileError{peek(), "Invalid expression"s};
 }
 
 ExprPtr Parser::function_call()
@@ -368,6 +389,14 @@ ExprPtr Parser::function_call()
     }
     vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i);});
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(template_type), std::move(args));
+}
+
+ExprPtr Parser::constructor()
+{
+    vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
+    if (exprs.size() == 0)
+        throw CompileError{peek(), "Invalid constructor"s};
+    return std::make_unique<Constructor>(runtime_, std::move(exprs));
 }
 
 Argument Parser::argument(const size_t i)

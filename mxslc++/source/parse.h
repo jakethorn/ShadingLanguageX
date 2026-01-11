@@ -31,9 +31,9 @@ private:
 
     StmtPtr statement();
     StmtPtr print_statement();
-    StmtPtr variable_definition(vector<string> mods);
-    StmtPtr multi_variable_definition(vector<string> mods);
-    StmtPtr function_definition(vector<string> mods);
+    StmtPtr variable_definition(vector<string> mods, Type type);
+    StmtPtr multi_variable_definition(vector<string> mods, Type type);
+    StmtPtr function_definition(vector<string> mods, Type type);
     StmtPtr function_definition_modern(vector<string> mods);
 
     vector<string> modifiers();
@@ -52,6 +52,7 @@ private:
     ExprPtr property();
     ExprPtr primary();
     ExprPtr function_call();
+    ExprPtr constructor();
 
     Argument argument(size_t i);
 

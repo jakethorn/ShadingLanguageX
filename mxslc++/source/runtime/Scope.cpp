@@ -137,7 +137,17 @@ void Scope::add_type(Type&& type)
 
 bool Scope::has_type(const Type& type) const
 {
-    return has_type(type.str());
+    if (type.is_complex())
+    {
+        bool has = true;
+        for (const Type& t : type.subtypes())
+            has &= has_type(t);
+        return has;
+    }
+    else
+    {
+        return has_type(type.str());
+    }
 }
 
 bool Scope::has_type(const string& name) const

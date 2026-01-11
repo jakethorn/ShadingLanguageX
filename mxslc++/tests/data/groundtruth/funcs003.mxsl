@@ -1,0 +1,10 @@
+function foo() -> {float, color3}
+{
+    return {1.0, randomcolor(in=2)};
+}
+
+float x, color3 c = foo();
+color3 cx = add(c, x);
+{float, color3} a = foo();
+break;
+float y = x + a[0];

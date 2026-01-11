@@ -73,6 +73,7 @@ public:
         Varying,
         Namespace,
         Print,
+        Break,
 
         // Dynamic
         Identifier,
@@ -100,7 +101,7 @@ public:
 
     inline static const unordered_set Keywords {
         If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline,
-        Function, Struct, Uniform, Varying, Namespace, Print
+        Function, Struct, Uniform, Varying, Namespace, Print, Break
     };
 
 private:
@@ -137,6 +138,7 @@ private:
         {"varying", Varying},
         {"namespace", Namespace},
         {"print", Print},
+        {"break", Break},
         {"<identifier>", Identifier},
         {"<bool>", Bool},
         {"<int>", Int},

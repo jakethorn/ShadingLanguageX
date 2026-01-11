@@ -12,7 +12,7 @@ ExprPtr Constructor::instantiate_template_types(const Type& template_type) const
     vector<ExprPtr> instantiated;
     for (const ExprPtr& expr : exprs_)
         instantiated.push_back(expr->instantiate_template_types(template_type));
-    return std::make_unique<Constructor>(runtime_, token_, std::move(instantiated));
+    return std::make_unique<Constructor>(runtime_, std::move(instantiated));
 }
 
 void Constructor::init_subexpressions(const vector<Type>& types)

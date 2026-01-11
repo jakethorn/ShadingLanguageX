@@ -18,6 +18,8 @@ public:
     Expression(const Runtime& runtime, Token token);
     virtual ~Expression() = default;
 
+    [[nodiscard]] const Token& token() const { return token_; }
+
     void init();
     void init(const Type& type);
     void init(const vector<Type>& types);

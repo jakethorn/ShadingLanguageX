@@ -10,8 +10,8 @@
 class Constructor final : public Expression
 {
 public:
-    Constructor(const Runtime& runtime, Token token, vector<ExprPtr> exprs)
-        : Expression{runtime, std::move(token)}, exprs_{std::move(exprs)} { }
+    Constructor(const Runtime& runtime, vector<ExprPtr> exprs)
+        : Expression{runtime, std::move(exprs.at(0)->token())}, exprs_{std::move(exprs)} { }
 
     [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
 

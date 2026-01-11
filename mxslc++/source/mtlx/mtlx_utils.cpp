@@ -17,5 +17,5 @@ string as_string(const mx::NodePtr& node)
 
 string get_output_name(const size_t i)
 {
-    return "__out" + str(i+1) + "__";
+    return "out" + str(i+1);
 }

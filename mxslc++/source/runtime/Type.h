@@ -15,6 +15,8 @@ class Token;
 class Type
 {
 public:
+    static const Type Bool, Int, Float, String;
+
     Type();
     Type(string name);
     Type(const Token& token);
@@ -27,6 +29,7 @@ public:
     [[nodiscard]] bool is_complex() const { return not subtypes_.empty(); }
     [[nodiscard]] size_t subtype_count() const { return subtypes_.size(); }
     [[nodiscard]] const Type& subtype(const size_t i) const { return subtypes_.at(i); }
+    [[nodiscard]] const vector<Type>& subtypes() const { return subtypes_; }
     [[nodiscard]] const string& str() const { return name_; }
 
     bool operator==(const Type& other) const { return str() == other.str(); }
