@@ -8,6 +8,7 @@
 #include "statements/Statement.h"
 #include "utils/template_utils.h"
 #include "expressions/Expression.h"
+#include "mtlx/mtlx_utils.h"
 #include "utils/str_utils.h"
 
 Function::Function(
@@ -26,14 +27,14 @@ Function::Function(
 }
 
 Function::Function(
-    vector<string> modifiers,
+    vector<string> mods,
     Type type,
     Token name,
     optional<Type> template_type,
     ParameterList params,
     vector<StmtPtr> body,
     ExprPtr return_expr
-) : modifiers_{std::move(modifiers)},
+) : mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
@@ -41,20 +42,20 @@ Function::Function(
     body_{std::move(body)},
     return_expr_{std::move(return_expr)}
 {
-    static const vector valid_modifiers{"inline"s};
-    for (const string& modifier : modifiers_)
-        if (not contains(valid_modifiers, modifier))
-            throw CompileError{name_, "'" + modifier + "' is not a valid function modifier"};
+    static const vector valid_mods{"inline"s};
+    for (const string& mod : mods_)
+        if (not contains(valid_mods, mod))
+            throw CompileError{name_, "'" + mod + "' is not a valid function modifier"};
 
     if (type_ == "void"s and return_expr_ != nullptr)
         throw CompileError{name_, "Cannot return a value from a void function"s};
 
     for (size_t i = 0; i < type_.subtype_count(); ++i)
-        output_names_.push_back("__out" + str(i+1) + "__");
+        output_names_.push_back(get_output_name(i));
 }
 
 Function::Function(Function&& other) noexcept
-    : modifiers_{std::move(other.modifiers_)},
+    : mods_{std::move(other.mods_)},
     type_{std::move(other.type_)},
     name_{std::move(other.name_)},
     template_type_{std::move(other.template_type_)},
@@ -70,7 +71,7 @@ Function& Function::operator=(Function&& other) noexcept
 {
     if (this != &other)
     {
-        modifiers_     = std::move(other.modifiers_);
+        mods_     = std::move(other.mods_);
         type_          = std::move(other.type_);
         name_          = std::move(other.name_);
         template_type_ = std::move(other.template_type_);

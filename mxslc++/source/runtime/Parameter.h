@@ -13,14 +13,14 @@
 class Parameter
 {
 public:
-    Parameter(vector<string> modifiers, Type type, Token name, size_t index);
-    Parameter(vector<string> modifiers, Type type, Token name, ExprPtr expr, size_t index);
+    Parameter(vector<string> mods, Type type, Token name, size_t index);
+    Parameter(vector<string> mods, Type type, Token name, ExprPtr expr, size_t index);
 
     Parameter(Parameter&&) noexcept;
 
     ~Parameter();
 
-    [[nodiscard]] bool is_out() const { return contains(modifiers_, "out"s); }
+    [[nodiscard]] bool is_out() const { return contains(mods_, "out"s); }
     [[nodiscard]] const Type& type() const { return type_; }
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] size_t index() const { return index_; }
@@ -32,7 +32,7 @@ public:
     [[nodiscard]] ValuePtr evaluate() const;
 
 private:
-    vector<string> modifiers_;
+    vector<string> mods_;
     Type type_;
     Token name_;
     ExprPtr expr_;

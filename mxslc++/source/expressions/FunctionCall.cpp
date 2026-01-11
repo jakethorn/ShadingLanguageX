@@ -18,21 +18,21 @@ ExprPtr FunctionCall::instantiate_template_types(const Type& template_type) cons
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(_template_type), std::move(args));
 }
 
-void FunctionCall::init_child_expressions(const vector<Type>& types)
+void FunctionCall::init_subexpressions(const vector<Type>& types)
 {
     const Scope& scope = runtime_.scope();
 
-    while (initialised_args_count_ < args_.size())
+    while (initialised_arg_count_ < args_.size())
     {
         vector<const Function*> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
 
         if (matching_funcs.empty())
             throw CompileError{token_, "No matching functions: "s + token_.lexeme()};
 
-        const size_t prev_initialised_args_count = initialised_args_count_;
+        const size_t prev_initialised_arg_count = initialised_arg_count_;
         try_init_arguments(matching_funcs);
 
-        if (initialised_args_count_ == prev_initialised_args_count)
+        if (initialised_arg_count_ == prev_initialised_arg_count)
             throw CompileError{token_, "Ambiguous function call"s};
     }
 }
@@ -94,7 +94,7 @@ void FunctionCall::try_init_arguments(const vector<const Function*>& funcs)
             if (const vector<Type> types = get_parameter_types(funcs, arg);
                 arg.try_init(types))
             {
-                initialised_args_count_++;
+                ++initialised_arg_count_;
             }
         }
     }

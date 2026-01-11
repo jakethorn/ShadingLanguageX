@@ -57,7 +57,7 @@ Attribute Parser::attribute()
 
 StmtPtr Parser::statement()
 {
-    vector mods = modifiers();
+    vector<string> mods = modifiers();
 
     if (peek() == TokenType::Print)
     {
@@ -88,12 +88,6 @@ StmtPtr Parser::statement()
     throw CompileError{peek(), "Invalid statement"};
 }
 
-vector<string> Parser::modifiers()
-{
-    vector mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline);
-    return Token::as_strings(mods);
-}
-
 StmtPtr Parser::print_statement()
 {
     match(TokenType::Print);
@@ -111,7 +105,7 @@ StmtPtr Parser::print_statement()
 
 StmtPtr Parser::variable_definition(vector<string> mods)
 {
-    Type type = match(TokenType::Identifier);
+    Type type = complex_type();
     Token name = match(TokenType::Identifier);
     match('=');
     ExprPtr expr = expression();
@@ -143,7 +137,7 @@ StmtPtr Parser::multi_variable_definition(vector<string> mods)
         else
         {
             name = match(TokenType::Identifier);
-            decls.emplace_back(decls.back().modifiers, decls.back().type, std::move(name));
+            decls.emplace_back(decls.back().mods, decls.back().type, std::move(name));
         }
     }
     match('=');
@@ -161,7 +155,7 @@ StmtPtr Parser::function_definition(vector<string> mods)
 {
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
-    vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
+    vector<Type> template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
     ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
     auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
@@ -180,10 +174,10 @@ StmtPtr Parser::function_definition_modern(vector<string> mods)
 {
     match(TokenType::Function);
     Token name = match(TokenType::Identifier);
-    vector template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
+    vector<Type> template_types = peek() == '<' ? list<Type>('<', '>', [this](const size_t){ return match(TokenType::Identifier); }) : vector<Type>{};
     ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
     match(TokenType::Arrow);
-    Type type = match(TokenType::Identifier);
+    Type type = complex_type();
     auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
         runtime_,
@@ -197,13 +191,28 @@ StmtPtr Parser::function_definition_modern(vector<string> mods)
     );
 }
 
+vector<string> Parser::modifiers()
+{
+    vector<Token> mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Out);
+    return Token::as_strings(mods);
+}
+
+Type Parser::complex_type()
+{
+    if (peek() == TokenType::Identifier)
+        return match(TokenType::Identifier);
+
+    vector<Type> subtypes = list<Type>('{', '}', [this](const size_t){ return complex_type(); });
+    return Type{std::move(subtypes)};
+}
+
 Parameter Parser::parameter(const size_t index)
 {
-    vector mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Out);
+    vector<string> mods = modifiers();
     Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     ExprPtr expr = consume('=') ? expression() : nullptr;
-    return Parameter{Token::as_strings(mods), std::move(type), std::move(name), std::move(expr), index};
+    return Parameter{std::move(mods), std::move(type), std::move(name), std::move(expr), index};
 }
 
 tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
@@ -357,7 +366,7 @@ ExprPtr Parser::function_call()
         template_type = match(TokenType::Identifier);
         match('>');
     }
-    vector args = list<Argument>('(', ')', [this](const size_t i){ return argument(i);});
+    vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i);});
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(template_type), std::move(args));
 }
 

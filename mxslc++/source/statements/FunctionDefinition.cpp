@@ -11,7 +11,7 @@
 
 FunctionDefinition::FunctionDefinition(
     const Runtime& runtime,
-    vector<string> modifiers,
+    vector<string> mods,
     Type type,
     Token name,
     vector<Type> template_types,
@@ -19,7 +19,7 @@ FunctionDefinition::FunctionDefinition(
     vector<StmtPtr> body,
     ExprPtr return_expr
 ) : Statement{runtime},
-    mods_{std::move(modifiers)},
+    mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     template_types_{std::move(template_types)},

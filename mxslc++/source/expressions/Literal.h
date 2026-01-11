@@ -15,8 +15,6 @@ public:
 
     [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
 
-    [[nodiscard]] const basic_t& value() const { return value_; }
-
 protected:
     [[nodiscard]] const Type& type_impl() const override;
     [[nodiscard]] ValuePtr evaluate_impl() const override;

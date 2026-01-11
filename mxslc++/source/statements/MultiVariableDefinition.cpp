@@ -31,7 +31,7 @@ void MultiVariableDefinition::execute() const
     expr_->init(type);
 
     const ValuePtr value = expr_->evaluate();
-    for (size_t i = 0; i < decls_.size(); i++)
+    for (size_t i = 0; i < decls_.size(); ++i)
     {
         ValuePtr subvalue = value->subvalue(i);
         Variable var{decls_[i], std::move(subvalue)};

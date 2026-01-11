@@ -31,7 +31,7 @@ public:
     [[nodiscard]] virtual ExprPtr copy() const { return instantiate_template_types(Type{"T"s}); }
 
 protected:
-    virtual void init_child_expressions(const vector<Type>& types) { }
+    virtual void init_subexpressions(const vector<Type>& types) { }
     virtual void init_impl(const vector<Type>& types) { }
     [[nodiscard]] virtual const Type& type_impl() const = 0;
     [[nodiscard]] virtual ValuePtr evaluate_impl() const = 0;

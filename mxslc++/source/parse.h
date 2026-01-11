@@ -30,12 +30,14 @@ private:
     Attribute attribute();
 
     StmtPtr statement();
-    vector<string> modifiers();
     StmtPtr print_statement();
     StmtPtr variable_definition(vector<string> mods);
     StmtPtr multi_variable_definition(vector<string> mods);
     StmtPtr function_definition(vector<string> mods);
     StmtPtr function_definition_modern(vector<string> mods);
+
+    vector<string> modifiers();
+    Type complex_type();
     Parameter parameter(size_t index);
     tuple<vector<StmtPtr>, ExprPtr> function_body();
 
@@ -50,6 +52,7 @@ private:
     ExprPtr property();
     ExprPtr primary();
     ExprPtr function_call();
+
     Argument argument(size_t i);
 
     template<typename T>

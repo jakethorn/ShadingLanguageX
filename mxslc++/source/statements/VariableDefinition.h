@@ -13,14 +13,14 @@
 class VariableDefinition final : public Statement
 {
 public:
-    VariableDefinition(const Runtime& runtime, vector<string> modifiers, Type type, Token name, ExprPtr expr);
+    VariableDefinition(const Runtime& runtime, vector<string> mods, Type type, Token name, ExprPtr expr);
     ~VariableDefinition() override;
 
     [[nodiscard]] StmtPtr instantiate_template_types(const Type& template_type) const override;
     void execute() const override;
 
 private:
-    vector<string> modifiers_;
+    vector<string> mods_;
     Type type_;
     Token name_;
     ExprPtr expr_;

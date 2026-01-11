@@ -10,7 +10,7 @@
 class NullExpression final : public Expression
 {
 public:
-    NullExpression(const Runtime& runtime) : Expression{runtime} { }
+    explicit NullExpression(const Runtime& runtime) : Expression{runtime} { }
     NullExpression(const Runtime& runtime, Token token) : Expression{runtime, std::move(token)} { }
 
     [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;

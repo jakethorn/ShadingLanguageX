@@ -6,6 +6,7 @@
 #define FENNEC_VALUE_H
 
 #include <MaterialXCore/Node.h>
+#include "utils/common.h"
 
 class Type;
 
