@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <multiply name="node1" type="float">
+    <input name="in1" type="float" value="3.14" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <power name="node2" type="float">
+    <input name="in1" type="float" nodename="node1" />
+    <input name="in2" type="float" value="2" />
+  </power>
+  <combine2 name="node3" type="vector2">
+    <input name="in1" type="float" nodename="node2" />
+    <input name="in2" type="float" value="7" />
+  </combine2>
+  <separate2 name="node4" type="multioutput">
+    <input name="in" type="vector2" nodename="node3" />
+    <output name="outx" type="float" />
+    <output name="outy" type="float" />
+  </separate2>
+  <divide name="node5" type="float">
+    <input name="in1" type="float" output="outx" nodename="node4" />
+    <input name="in2" type="float" output="outy" nodename="node4" />
+  </divide>
+</materialx>
