@@ -22,7 +22,7 @@ StmtPtr PrintStatement::instantiate_template_types(const Type& template_type) co
     return std::make_unique<PrintStatement>(runtime_, std::move(instantiated_exprs));
 }
 
-void PrintStatement::execute()
+void PrintStatement::execute() const
 {
     std::cout << std::endl;
     for (const ExprPtr& expr : exprs_)

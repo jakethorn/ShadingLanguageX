@@ -13,8 +13,9 @@
 
 namespace mxslc
 {
-    void compile(const std::filesystem::path& src_path, const std::filesystem::path& dst_path);
-    void compile(const std::filesystem::path& src_path);
+    void compile_to_file(const std::filesystem::path& src_path, const std::filesystem::path& dst_path);
+
+    std::filesystem::path compile_to_file(const std::filesystem::path &src_path);
 
     //std::string compile_to_string(const std::string& source, const CompileOptions* opts = nullptr);
     //std::string compile_to_string(const std::filesystem::path& src_path, const CompileOptions* opts = nullptr);

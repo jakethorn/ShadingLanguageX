@@ -24,7 +24,7 @@ StmtPtr VariableDefinition::instantiate_template_types(const Type& template_type
     return std::make_unique<VariableDefinition>(runtime_, modifiers_, std::move(type), name_, std::move(expr));
 }
 
-void VariableDefinition::execute()
+void VariableDefinition::execute() const
 {
     expr_->init(type_);
     ValuePtr val = expr_->evaluate();

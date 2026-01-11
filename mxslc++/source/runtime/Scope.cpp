@@ -50,7 +50,7 @@ const Variable& Scope::get_variable(const Token& name) const
     throw CompileError{name, "Variable not defined: " + name.lexeme()};
 }
 
-void Scope::add_function(Function&& func)
+void Scope::add_function(FuncPtr func)
 {
     functions_.push_back(std::move(func));
 }
@@ -100,10 +100,10 @@ vector<const Function*> Scope::get_functions(
 ) const
 {
     vector<const Function*> funcs;
-    for (const Function& func : functions_)
+    for (const FuncPtr& func : functions_)
     {
-        if (is_match(func, return_types, name, template_type, args))
-            funcs.push_back(&func);
+        if (is_match(*func, return_types, name, template_type, args))
+            funcs.push_back(func.get());
     }
 
     if (funcs.empty() and parent_)

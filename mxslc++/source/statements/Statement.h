@@ -17,7 +17,7 @@ public:
     virtual ~Statement() = default;
 
     [[nodiscard]] virtual StmtPtr instantiate_template_types(const Type& template_type) const = 0;
-    virtual void execute() = 0;
+    virtual void execute() const = 0;
 
 protected:
     const Runtime& runtime_;

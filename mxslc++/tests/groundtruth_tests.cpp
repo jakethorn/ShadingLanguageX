@@ -23,7 +23,7 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
     const fs::path actual_path = path.replace_extension(".tmp");
     const fs::path expected_path = path.replace_extension(".mtlx");
 
-    ASSERT_NO_THROW(mxslc::compile(input_path, actual_path))
+    ASSERT_NO_THROW(mxslc::compile_to_file(input_path, actual_path))
         << "Failed to compile: " << input_path;
 
     const string actual_output = read_file(actual_path);

@@ -90,7 +90,7 @@ StmtPtr Parser::statement()
 
 vector<string> Parser::modifiers()
 {
-    vector<Token> mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline);
+    vector mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline);
     return Token::as_strings(mods);
 }
 

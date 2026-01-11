@@ -19,7 +19,7 @@ FunctionDefinition::FunctionDefinition(
     vector<StmtPtr> body,
     ExprPtr return_expr
 ) : Statement{runtime},
-    modifiers_{std::move(modifiers)},
+    mods_{std::move(modifiers)},
     type_{std::move(type)},
     name_{std::move(name)},
     template_types_{std::move(template_types)},
@@ -27,7 +27,25 @@ FunctionDefinition::FunctionDefinition(
     body_{std::move(body)},
     return_expr_{std::move(return_expr)}
 {
-
+    if (is_templated())
+    {
+        for (const Type& template_type : template_types_)
+        {
+            type = type_.instantiate_template_types(template_type);
+            params = params_.instantiate_template_types(template_type);
+            body = Type::instantiate_template_types(body_, template_type);
+            return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
+            funcs_.push_back(std::make_shared<Function>(
+                mods_, std::move(type), name_, std::move(template_type), std::move(params), std::move(body), std::move(return_expr)
+            ));
+        }
+    }
+    else
+    {
+        funcs_.push_back(std::make_shared<Function>(
+            std::move(mods_), std::move(type_), std::move(name_), std::nullopt, std::move(params_), std::move(body_), std::move(return_expr_)
+        ));
+    }
 }
 
 StmtPtr FunctionDefinition::instantiate_template_types(const Type& template_type) const
@@ -39,28 +57,17 @@ StmtPtr FunctionDefinition::instantiate_template_types(const Type& template_type
     ParameterList params = params_.instantiate_template_types(template_type);
     vector body = Type::instantiate_template_types(body_, template_type);
     ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
-    return std::make_unique<FunctionDefinition>(runtime_, modifiers_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
+    return std::make_unique<FunctionDefinition>(runtime_, mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
 }
 
-vector<Function> FunctionDefinition::functions()
+void FunctionDefinition::execute() const
 {
-    vector<Function> funcs;
-    if (is_templated())
+    for (const FuncPtr& func : funcs_)
     {
-        for (const Type& template_type : template_types_)
-        {
-            Type type = type_.instantiate_template_types(template_type);
-            ParameterList params = params_.instantiate_template_types(template_type);
-            vector body = Type::instantiate_template_types(body_, template_type);
-            ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
-            funcs.emplace_back(modifiers_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr));
-        }
+        if (not func->is_inline())
+            write_function_definition(*func);
+        runtime_.scope().add_function(func);
     }
-    else
-    {
-        funcs.emplace_back(std::move(modifiers_), std::move(type_), std::move(name_), std::nullopt, std::move(params_), std::move(body_), std::move(return_expr_));
-    }
-    return funcs;
 }
 
 void FunctionDefinition::write_function_definition(const Function& func) const
@@ -74,14 +81,4 @@ void FunctionDefinition::write_function_definition(const Function& func) const
     }
     runtime_.serializer().write_function(func);
     runtime_.exit_scope();
-}
-
-void FunctionDefinition::execute()
-{
-    for (Function& func : functions())
-    {
-        if (not func.is_inline())
-            write_function_definition(func);
-        runtime_.scope().add_function(std::move(func));
-    }
 }

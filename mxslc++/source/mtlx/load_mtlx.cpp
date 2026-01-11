@@ -51,7 +51,7 @@ namespace
         return names;
     }
 
-    Function to_function(const Runtime& runtime, const mx::NodeDefPtr& nd)
+    FuncPtr to_function(const Runtime& runtime, const mx::NodeDefPtr& nd)
     {
         const Scope& scope = runtime.scope();
 
@@ -62,7 +62,7 @@ namespace
             template_type = std::nullopt;
         ParameterList params = get_parameters(runtime, nd);
         vector<string> output_names = get_output_names(nd);
-        return Function{std::move(type), name, std::move(template_type), std::move(params), std::move(output_names)};
+        return std::make_shared<Function>(std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
     }
 }
 

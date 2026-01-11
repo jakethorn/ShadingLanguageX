@@ -50,6 +50,9 @@ using ScopePtr = unique_ptr<Scope>;
 class Serializer;
 using SerializerPtr = unique_ptr<Serializer>;
 
+class Function;
+using FuncPtr = shared_ptr<Function>;
+
 // type aliases
 using basic_t = variant<bool, int, float, string>;
 

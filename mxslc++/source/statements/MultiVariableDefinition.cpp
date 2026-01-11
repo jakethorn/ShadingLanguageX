@@ -5,7 +5,6 @@
 #include "MultiVariableDefinition.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
-#include "runtime/Variable.h"
 #include "runtime/values/Value.h"
 
 MultiVariableDefinition::MultiVariableDefinition(const Runtime& runtime, vector<VariableDeclaration> decls, ExprPtr expr)
@@ -21,7 +20,7 @@ StmtPtr MultiVariableDefinition::instantiate_template_types(const Type& template
     return std::make_unique<MultiVariableDefinition>(runtime_, std::move(decls), std::move(expr));
 }
 
-void MultiVariableDefinition::execute()
+void MultiVariableDefinition::execute() const
 {
     vector<Type> types;
     types.reserve(decls_.size());

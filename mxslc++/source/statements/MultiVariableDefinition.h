@@ -16,7 +16,7 @@ public:
     MultiVariableDefinition(const Runtime& runtime, vector<VariableDeclaration> decls, ExprPtr expr);
 
     [[nodiscard]] StmtPtr instantiate_template_types(const Type& template_type) const override;
-    void execute() override;
+    void execute() const override;
 
 private:
     vector<VariableDeclaration> decls_;

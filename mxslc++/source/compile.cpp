@@ -14,32 +14,44 @@
 
 namespace
 {
-    void prepend_mxsl_stdlib(vector<Token>& tokens)
+    void compile(const Runtime& runtime, const fs::path& src_path)
+    {
+        vector<Token> tokens = fscan(src_path);
+        const vector<StmtPtr> stmts = parse(runtime, std::move(tokens));
+        for (const StmtPtr& stmt : stmts)
+            stmt->execute();
+    }
+
+    void compile_mxsl_stdlib(const Runtime& runtime)
     {
         const fs::path stdlib_path = get_libraries_dir() / "stdlib.mxsl";
-        vector<Token> stdlib_tokens = fscan(stdlib_path);
-        tokens.insert(tokens.cbegin(), std::make_move_iterator(stdlib_tokens.begin()), std::make_move_iterator(stdlib_tokens.end()));
+        compile(runtime, stdlib_path);
     }
 }
 
-void mxslc::compile(const fs::path& src_path, const fs::path& dst_path)
+void mxslc::compile_to_file(const fs::path& src_path, const fs::path& dst_path)
 {
-    vector<Token> tokens = fscan(src_path);
-    prepend_mxsl_stdlib(tokens);
     const Runtime runtime;
     load_materialx_library(runtime, "1.39.4"s);
-    const vector<StmtPtr> stmts = parse(runtime, std::move(tokens));
-    runtime.enter_scope();
-    for (const StmtPtr& stmt : stmts)
-        stmt->execute();
-    runtime.exit_scope();
+    {
+        runtime.enter_scope();
+        compile_mxsl_stdlib(runtime);
+        {
+            runtime.enter_scope();
+            compile(runtime, src_path);
+            runtime.exit_scope();
+        }
+        runtime.exit_scope();
+    }
     runtime.serializer().save(dst_path);
 }
 
-void mxslc::compile(const fs::path& src_path)
+fs::path mxslc::compile_to_file(const fs::path &src_path)
 {
     fs::path dst_path = src_path;
     dst_path.replace_extension(".mtlx");
 
-    compile(src_path, dst_path);
+    compile_to_file(src_path, dst_path);
+
+    return dst_path;
 }
