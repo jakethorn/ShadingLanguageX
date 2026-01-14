@@ -15,7 +15,7 @@ string as_string(const mx::NodePtr& node)
     return str;
 }
 
-string port_name(const string& port_name, const size_t i)
+string get_output_name(const size_t i)
 {
-    return port_name + "__" + str(i+1);
+    return "out" + str(i+1);
 }

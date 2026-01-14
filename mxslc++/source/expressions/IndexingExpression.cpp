@@ -36,7 +36,7 @@ void IndexingExpression::init_impl(const vector<Type> &types)
         }
         else
         {
-            throw CompileError{token_, "Index out of bounds (subvalue_count: " + str(count) + ", index: " + str(index) + ")"};
+            throw CompileError{token_, "Index out of bounds (subvalue_count: " + str(count) + ", index: " + str(index)};
         }
     }
     else

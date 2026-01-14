@@ -8,9 +8,6 @@
 #include "runtime/Runtime.h"
 #include "values/InterfaceValue.h"
 #include "expressions/Expression.h"
-#include "mtlx/mtlx_utils.h"
-#include "values/UnnamedStructValue.h"
-#include "values/ValueFactory.h"
 
 FunctionDefinition::FunctionDefinition(
     const Runtime& runtime,
@@ -78,7 +75,7 @@ void FunctionDefinition::write_function_definition(const Function& func) const
     runtime_.enter_scope();
     for (const Parameter& param : func.parameters())
     {
-        ValuePtr val = ValueFactory::create_parameter_interface(param);
+        ValuePtr val = std::make_unique<InterfaceValue>(param.name(), param.type());
         Variable var{{}, param.type(), param.name(), std::move(val)};
         runtime_.scope().add_variable(std::move(var));
     }

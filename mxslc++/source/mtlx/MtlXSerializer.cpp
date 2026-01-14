@@ -138,15 +138,7 @@ void MtlXSerializer::write_node_def(const Function& func) const
         }
         else
         {
-            if (param.type().is_complex())
-            {
-                for (size_t i = 0; i < param.type().subtype_count(); ++i)
-                    node_def->addInput(port_name(param.name(), i), param.type().subtype(i).str());
-            }
-            else
-            {
-                node_def->addInput(param.name(), param.type().str());
-            }
+            node_def->addInput(param.name(), param.type().str());
         }
     }
 }

@@ -51,7 +51,7 @@ Function::Function(
         throw CompileError{name_, "Cannot return a value from a void function"s};
 
     for (size_t i = 0; i < type_.subtype_count(); ++i)
-        output_names_.push_back(port_name("out"s, i));
+        output_names_.push_back(get_output_name(i));
 }
 
 Function::Function(Function&& other) noexcept

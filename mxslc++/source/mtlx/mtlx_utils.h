@@ -10,6 +10,6 @@
 #include "utils/common.h"
 
 string as_string(const mx::NodePtr& node);
-string port_name(const string &port_name, size_t i);
+string get_output_name(size_t i);
 
 #endif //FENNEC_MTLX_UTILS_H

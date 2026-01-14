@@ -217,7 +217,7 @@ Type Parser::complex_type()
 Parameter Parser::parameter(const size_t index)
 {
     vector<string> mods = modifiers();
-    Type type = complex_type();
+    Type type = match(TokenType::Identifier);
     Token name = match(TokenType::Identifier);
     ExprPtr expr = consume('=') ? expression() : nullptr;
     return Parameter{std::move(mods), std::move(type), std::move(name), std::move(expr), index};
@@ -237,10 +237,10 @@ tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
         return_expr = expression();
         match(';');
     }
-
-    // ignore statements after return
-    while (not consume('}'))
+    
+    while (peek() != '}')
         statement();
+    match('}');
 
     return {std::move(body), std::move(return_expr)};
 }
@@ -387,7 +387,7 @@ ExprPtr Parser::function_call()
         template_type = match(TokenType::Identifier);
         match('>');
     }
-    vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
+    vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i);});
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(template_type), std::move(args));
 }
 
