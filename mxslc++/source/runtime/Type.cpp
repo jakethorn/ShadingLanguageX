@@ -79,13 +79,13 @@ Type Type::instantiate_template_types(const Type& template_type) const
 
 string Type::complex_name() const
 {
-    string str = "<";
+    string str = "{";
     for (size_t i = 0; i < subtypes_.size(); ++i)
     {
         str += subtypes_[i].name_;
         if (i < subtypes_.size() - 1)
             str += ", ";
     }
-    str += ">";
+    str += "}";
     return str;
 }

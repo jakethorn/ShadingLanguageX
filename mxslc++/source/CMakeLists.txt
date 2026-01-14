@@ -31,6 +31,7 @@ add_library(mxslc_lib
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
+        values/ValueFactory.cpp
 )
 
 target_include_directories(mxslc_lib
