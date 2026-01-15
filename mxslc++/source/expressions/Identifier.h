@@ -6,8 +6,7 @@
 #define FENNEC_IDENTIFIER_H
 
 #include "Expression.h"
-
-class Variable;
+#include "runtime/Variable.h"
 
 class Identifier final : public Expression
 {
@@ -22,7 +21,7 @@ protected:
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
-    const Variable* var_ = nullptr;
+    Variable var_;
 };
 
 #endif //FENNEC_IDENTIFIER_H

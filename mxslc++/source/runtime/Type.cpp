@@ -15,7 +15,6 @@ const Type Type::Int = Type{"integer"s};
 const Type Type::Float = Type{"float"s};
 const Type Type::String = Type{"string"s};
 
-Type::Type() : Type{"__not_a_type__"s} { }
 Type::Type(string name) : name_{std::move(name)} { }
 Type::Type(const Token& token) : Type{token.lexeme()} { }
 
@@ -79,13 +78,13 @@ Type Type::instantiate_template_types(const Type& template_type) const
 
 string Type::complex_name() const
 {
-    string str = "<";
+    string str = "{";
     for (size_t i = 0; i < subtypes_.size(); ++i)
     {
         str += subtypes_[i].name_;
         if (i < subtypes_.size() - 1)
             str += ", ";
     }
-    str += ">";
+    str += "}";
     return str;
 }

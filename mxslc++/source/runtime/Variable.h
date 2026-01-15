@@ -19,12 +19,13 @@ struct VariableDeclaration
     VariableDeclaration(vector<string> mods, Type type, Token name)
         : mods{std::move(mods)}, type{std::move(type)}, name{std::move(name)} { }
 
-    VariableDeclaration instantiate_template_types(const Type& template_type) const;
+    [[nodiscard]] VariableDeclaration instantiate_template_types(const Type& template_type) const;
 };
 
 class Variable
 {
 public:
+    Variable() = default;
     Variable(vector<string> mods, Type type, Token name);
     Variable(vector<string> mods, Type type, Token name, ValuePtr value);
     Variable(VariableDeclaration decl);

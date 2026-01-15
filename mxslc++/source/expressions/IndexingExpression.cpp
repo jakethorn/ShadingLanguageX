@@ -21,11 +21,11 @@ void IndexingExpression::init_subexpressions(const vector<Type>&)
     index_->init(Type::Int);
 }
 
-void IndexingExpression::init_impl(const vector<Type> &types)
+void IndexingExpression::init_impl(const vector<Type>&)
 {
     const ValuePtr expr_val = expr_->evaluate();
     const ValuePtr index_val = index_->evaluate();
-    if (const BasicValue* basic_value = dynamic_cast<const BasicValue*>(index_val.get()))
+    if (const shared_ptr<BasicValue> basic_value = std::dynamic_pointer_cast<BasicValue>(index_val))
     {
         const int index = basic_value->get<int>();
         const size_t count = expr_val->subvalue_count();
@@ -36,7 +36,7 @@ void IndexingExpression::init_impl(const vector<Type> &types)
         }
         else
         {
-            throw CompileError{token_, "Index out of bounds (subvalue_count: " + str(count) + ", index: " + str(index)};
+            throw CompileError{token_, "Index out of bounds (subvalue_count: " + str(count) + ", index: " + str(index) + ")"};
         }
     }
     else
@@ -54,7 +54,7 @@ ValuePtr IndexingExpression::evaluate_impl() const
 {
     const ValuePtr expr_val = expr_->evaluate();
     const ValuePtr index_val = index_->evaluate();
-    const BasicValue* basic_value = dynamic_cast<const BasicValue*>(index_val.get());
+    const shared_ptr<BasicValue> basic_value = std::dynamic_pointer_cast<BasicValue>(index_val);
     const int index = basic_value->get<int>();
     return expr_val->subvalue(index);
 }

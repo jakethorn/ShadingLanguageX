@@ -20,11 +20,11 @@
 
 #define BINARY_OP(ltype, op, rtype) \
     if (values[0]->is<ltype>() && values[1]->is<rtype>()) \
-        return std::make_unique<BasicValue>(values[0]->get<ltype>() op values[1]->get<rtype>());
+        return std::make_shared<BasicValue>(values[0]->get<ltype>() op values[1]->get<rtype>());
 
 namespace
 {
-    using BasicValues = vector<const BasicValue*>;
+    using BasicValues = vector<shared_ptr<BasicValue>>;
 
     ValuePtr evaluate_add(const BasicValues& values)
     {
@@ -45,10 +45,12 @@ namespace
             return false;
 
         for (const ValuePtr& arg : args)
-            if (const BasicValue* value = dynamic_cast<BasicValue*>(arg.get()))
+        {
+            if (shared_ptr<BasicValue> value = std::dynamic_pointer_cast<BasicValue>(arg))
                 values.push_back(value);
             else
                 return false;
+        }
 
         return true;
     }
@@ -138,7 +140,15 @@ void MtlXSerializer::write_node_def(const Function& func) const
         }
         else
         {
-            node_def->addInput(param.name(), param.type().str());
+            if (param.type().is_complex())
+            {
+                for (size_t i = 0; i < param.type().subtype_count(); ++i)
+                    node_def->addInput(port_name(param.name(), i), param.type().subtype(i).str());
+            }
+            else
+            {
+                node_def->addInput(param.name(), param.type().str());
+            }
         }
     }
 }

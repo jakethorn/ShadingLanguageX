@@ -28,13 +28,13 @@ public:
     [[nodiscard]] const Variable& get_variable(const Token& name) const;
 
     void add_function(FuncPtr func);
-    [[nodiscard]] vector<const Function*> get_functions(
+    [[nodiscard]] vector<FuncPtr> get_functions(
         const vector<Type>& return_types,
         const Token& name,
         const optional<Type>& template_type,
         const ArgumentList& args
     ) const;
-    [[nodiscard]] const Function& get_function(
+    [[nodiscard]] FuncPtr get_function(
         const vector<Type>& return_types,
         const Token& name,
         const optional<Type>& template_type,
