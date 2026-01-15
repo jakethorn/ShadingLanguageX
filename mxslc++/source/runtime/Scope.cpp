@@ -65,7 +65,7 @@ namespace
         const ArgumentList& args
     )
     {
-        if (return_types.size() > 0 and not contains(return_types, func.type()))
+        if (not return_types.empty() and not contains(return_types, func.type()))
             return false;
 
         if (name.lexeme() != func.name())
@@ -92,18 +92,18 @@ namespace
     }
 }
 
-vector<const Function*> Scope::get_functions(
+vector<FuncPtr> Scope::get_functions(
     const vector<Type>& return_types,
     const Token& name,
     const optional<Type>& template_type,
     const ArgumentList& args
 ) const
 {
-    vector<const Function*> funcs;
+    vector<FuncPtr> funcs;
     for (const FuncPtr& func : functions_)
     {
         if (is_match(*func, return_types, name, template_type, args))
-            funcs.push_back(func.get());
+            funcs.push_back(func);
     }
 
     if (funcs.empty() and parent_)
@@ -112,19 +112,19 @@ vector<const Function*> Scope::get_functions(
     return funcs;
 }
 
-const Function& Scope::get_function(
+FuncPtr Scope::get_function(
     const vector<Type>& return_types,
     const Token& name,
     const optional<Type>& template_type,
     const ArgumentList& args
 ) const
 {
-    const vector<const Function*> funcs = get_functions(return_types, name, template_type, args);
+    const vector<FuncPtr> funcs = get_functions(return_types, name, template_type, args);
     if (funcs.empty())
         throw CompileError{name, "Function not defined: " + name.lexeme()};
     if (funcs.size() > 1)
         throw CompileError{name, "Ambiguous function: " + name.lexeme()};
-    return *funcs[0];
+    return funcs[0];
 }
 
 void Scope::add_type(Type&& type)

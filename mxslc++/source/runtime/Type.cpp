@@ -15,7 +15,6 @@ const Type Type::Int = Type{"integer"s};
 const Type Type::Float = Type{"float"s};
 const Type Type::String = Type{"string"s};
 
-Type::Type() : Type{"__not_a_type__"s} { }
 Type::Type(string name) : name_{std::move(name)} { }
 Type::Type(const Token& token) : Type{token.lexeme()} { }
 

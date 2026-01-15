@@ -33,7 +33,7 @@ protected:
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
-    void try_init_arguments(const vector<const Function*>& funcs);
+    void try_init_arguments(const vector<FuncPtr>& funcs);
     void evaluate_arguments() const;
     [[nodiscard]] ValuePtr evaluate_return() const;
 
@@ -41,7 +41,7 @@ private:
     ArgumentList args_;
 
     size_t initialised_arg_count_ = 0;
-    const Function* func_ = nullptr;
+    FuncPtr func_ = nullptr;
 };
 
 #endif //FENNEC_FUNCTIONCALL_H

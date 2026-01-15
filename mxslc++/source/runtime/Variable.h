@@ -25,6 +25,7 @@ struct VariableDeclaration
 class Variable
 {
 public:
+    Variable() = default;
     Variable(vector<string> mods, Type type, Token name);
     Variable(vector<string> mods, Type type, Token name, ValuePtr value);
     Variable(VariableDeclaration decl);

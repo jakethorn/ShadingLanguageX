@@ -17,7 +17,7 @@ class Type
 public:
     static const Type Bool, Int, Float, String;
 
-    Type();
+    Type() = default;
     Type(string name);
     Type(const Token& token);
     explicit Type(const basic_t& value);

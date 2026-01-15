@@ -24,7 +24,7 @@ void FunctionCall::init_subexpressions(const vector<Type>& types)
 
     while (initialised_arg_count_ < args_.size())
     {
-        vector<const Function*> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
+        vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
 
         if (matching_funcs.empty())
             throw CompileError{token_, "No matching functions: "s + token_.lexeme()};
@@ -40,7 +40,7 @@ void FunctionCall::init_subexpressions(const vector<Type>& types)
 void FunctionCall::init_impl(const vector<Type>& types)
 {
     const Scope& scope = runtime_.scope();
-    func_ = &scope.get_function(types, token_, template_type_, args_);
+    func_ = scope.get_function(types, token_, template_type_, args_);
 }
 
 const Type& FunctionCall::type_impl() const
@@ -68,12 +68,12 @@ ValuePtr FunctionCall::evaluate_impl() const
 
 namespace
 {
-    vector<Type> get_parameter_types(const vector<const Function*>& funcs, const Argument& arg)
+    vector<Type> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
     {
         vector<Type> types;
         types.reserve(funcs.size());
 
-        for (const Function* func : funcs)
+        for (const FuncPtr& func : funcs)
         {
             const ParameterList& params = func->parameters();
             const Parameter& param = params[arg];
@@ -85,7 +85,7 @@ namespace
     }
 }
 
-void FunctionCall::try_init_arguments(const vector<const Function*>& funcs)
+void FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
 {
     for (const Argument& arg : args_)
     {
