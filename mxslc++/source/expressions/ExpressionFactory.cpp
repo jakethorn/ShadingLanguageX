@@ -69,3 +69,9 @@ ExprPtr ExpressionFactory::unary(Token op, ExprPtr right)
     ArgumentList args{std::move(right)};
     return std::make_unique<FunctionCall>(*runtime_, std::move(op), std::move(args));
 }
+
+ExprPtr ExpressionFactory::named_constructor(Token name, vector<Argument> arguments)
+{
+    name.set_lexeme("__" + name.lexeme() + "__");
+    return std::make_unique<FunctionCall>(*runtime_, std::move(name), std::move(arguments));
+}

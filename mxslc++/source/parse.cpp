@@ -5,7 +5,7 @@
 #include "parse.h"
 
 #include "TokenReader.h"
-#include "expressions/Constructor.h"
+#include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
@@ -201,7 +201,10 @@ StmtPtr Parser::function_definition_modern(vector<string> mods)
 
 vector<string> Parser::modifiers()
 {
-    vector<Token> mods = consume_while(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Out);
+    const vector<Token> mods = consume_while(
+        TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Out
+    );
+
     return Token::as_strings(mods);
 }
 
@@ -363,16 +366,19 @@ ExprPtr Parser::primary()
         {
             return function_call();
         }
-        else
+
+        if (peek(1) == '{')
         {
-            Token name = match(TokenType::Identifier);
-            return std::make_unique<Identifier>(runtime_, std::move(name));
+            return named_constructor();
         }
+
+        Token name = match(TokenType::Identifier);
+        return std::make_unique<Identifier>(runtime_, std::move(name));
     }
 
     if (peek() == '{')
     {
-        return constructor();
+        return unnamed_constructor();
     }
 
     throw CompileError{peek(), "Invalid expression"s};
@@ -391,12 +397,19 @@ ExprPtr Parser::function_call()
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(template_type), std::move(args));
 }
 
-ExprPtr Parser::constructor()
+ExprPtr Parser::named_constructor()
+{
+    Token type = match(TokenType::Identifier);
+    vector<Argument> arguments = list<Argument>('{', '}', [this](const size_t i) { return argument(i); });
+    return ExpressionFactory::named_constructor(std::move(type), std::move(arguments));
+}
+
+ExprPtr Parser::unnamed_constructor()
 {
     vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
     if (exprs.empty())
         throw CompileError{peek(), "Invalid constructor"s};
-    return std::make_unique<Constructor>(runtime_, std::move(exprs));
+    return std::make_unique<UnnamedConstructor>(runtime_, std::move(exprs));
 }
 
 Argument Parser::argument(const size_t i)

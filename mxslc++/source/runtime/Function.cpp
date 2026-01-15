@@ -42,7 +42,7 @@ Function::Function(
     body_{std::move(body)},
     return_expr_{std::move(return_expr)}
 {
-    static const vector valid_mods{"inline"s};
+    static const vector valid_mods{"inline"s, "default"s};
     for (const string& mod : mods_)
         if (not contains(valid_mods, mod))
             throw CompileError{name_, "'" + mod + "' is not a valid function modifier"};

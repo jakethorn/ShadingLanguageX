@@ -39,14 +39,14 @@ public:
     bool operator!=(const string& s) const { return not (*this == s); }
     bool operator!=(const TokenType t) const { return not (*this == t); }
     bool operator!=(const TokenType::Enum t) const { return not (*this == t); }
-    bool operator!=(const Token t) const { return not (*this == t); }
+    bool operator!=(const Token& t) const { return not (*this == t); }
 
-    static vector<string> as_strings(vector<Token>& tokens)
+    static vector<string> as_strings(const vector<Token>& tokens)
     {
         vector<string> strings;
         strings.reserve(tokens.size());
-        for (Token& token : tokens)
-            strings.push_back(std::move(token.lexeme()));
+        for (const Token& token : tokens)
+            strings.push_back(token.lexeme());
         return strings;
     }
 

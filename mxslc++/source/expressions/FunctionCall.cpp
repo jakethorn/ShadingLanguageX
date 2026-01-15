@@ -22,18 +22,26 @@ void FunctionCall::init_subexpressions(const vector<Type>& types)
 {
     const Scope& scope = runtime_.scope();
 
-    while (initialised_arg_count_ < args_.size())
+    size_t initialised_arg_count = 0;
+    while (initialised_arg_count < args_.size())
     {
         vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
 
         if (matching_funcs.empty())
-            throw CompileError{token_, "No matching functions: "s + token_.lexeme()};
+            throw CompileError{token_, "No matching functions: " + token_.lexeme()};
 
-        const size_t prev_initialised_arg_count = initialised_arg_count_;
-        try_init_arguments(matching_funcs);
+        const size_t prev_initialised_arg_count = initialised_arg_count;
+        initialised_arg_count = try_init_arguments(matching_funcs);
 
-        if (initialised_arg_count_ == prev_initialised_arg_count)
-            throw CompileError{token_, "Ambiguous function call"s};
+        if (initialised_arg_count == prev_initialised_arg_count)
+        {
+            // init failed, try to init with a default function...
+            FuncPtr default_func = scope.get_function(types, token_, template_type_, args_);
+            initialised_arg_count = try_init_arguments({std::move(default_func)});
+
+            if (initialised_arg_count == prev_initialised_arg_count)
+                throw CompileError{token_, "Ambiguous function call: " + token_.lexeme()};
+        }
     }
 }
 
@@ -85,8 +93,9 @@ namespace
     }
 }
 
-void FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
+size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
 {
+    size_t initialised_arg_count = 0;
     for (const Argument& arg : args_)
     {
         if (not arg.is_initialized())
@@ -97,7 +106,14 @@ void FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
                 ++initialised_arg_count_;
             }
         }
+
+        if (arg.is_initialized())
+        {
+            ++initialised_arg_count;
+        }
     }
+
+    return initialised_arg_count;
 }
 
 void FunctionCall::evaluate_arguments() const

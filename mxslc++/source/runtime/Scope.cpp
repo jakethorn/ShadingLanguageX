@@ -90,6 +90,18 @@ namespace
 
         return true;
     }
+
+    vector<FuncPtr> default_functions(const vector<FuncPtr>& funcs)
+    {
+        vector<FuncPtr> def_funcs;
+        for (const FuncPtr& func : funcs)
+        {
+            if (func->is_default())
+                def_funcs.push_back(func);
+        }
+
+        return def_funcs;
+    }
 }
 
 vector<FuncPtr> Scope::get_functions(
@@ -120,10 +132,19 @@ FuncPtr Scope::get_function(
 ) const
 {
     const vector<FuncPtr> funcs = get_functions(return_types, name, template_type, args);
+
     if (funcs.empty())
         throw CompileError{name, "Function not defined: " + name.lexeme()};
+
     if (funcs.size() > 1)
+    {
+        vector<FuncPtr> def_funcs = default_functions(funcs);
+        if (def_funcs.size() == 1)
+            return def_funcs[0];
+
         throw CompileError{name, "Ambiguous function: " + name.lexeme()};
+    }
+
     return funcs[0];
 }
 

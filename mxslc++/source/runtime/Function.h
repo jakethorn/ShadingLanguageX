@@ -42,6 +42,7 @@ public:
     ~Function();
 
     [[nodiscard]] bool is_inline() const { return contains(mods_, "inline"s); }
+    [[nodiscard]] bool is_default() const { return contains(mods_, "default"s); }
     [[nodiscard]] const Type& type() const { return type_; }
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] bool has_template_type() const { return template_type_.has_value(); }

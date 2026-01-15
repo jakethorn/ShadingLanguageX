@@ -6,6 +6,7 @@
 #define FENNEC_EXPRESSIONFACTORY_H
 
 #include "utils/common.h"
+#include "runtime/Argument.h"
 #include "Token.h"
 
 class Runtime;
@@ -17,6 +18,7 @@ public:
     static ExprPtr binary(ExprPtr left, Token op, ExprPtr right);
     static ExprPtr ternary_relational(ExprPtr left, Token op1, ExprPtr middle, Token op2, ExprPtr right);
     static ExprPtr unary(Token op, ExprPtr right);
+    static ExprPtr named_constructor(Token name, vector<Argument> arguments);
 
 private:
     ExpressionFactory() = default;

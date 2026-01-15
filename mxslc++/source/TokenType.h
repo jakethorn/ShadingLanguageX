@@ -67,6 +67,7 @@ public:
         Consteval,
         Global,
         Inline,
+        Default,
         Function,
         Struct,
         Uniform,
@@ -100,7 +101,7 @@ public:
     };
 
     inline static const unordered_set Keywords {
-        If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline,
+        If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline, Default,
         Function, Struct, Uniform, Varying, Namespace, Print, Break
     };
 
@@ -132,6 +133,7 @@ private:
         {"consteval", Consteval},
         {"global", Global},
         {"inline", Inline},
+        {"default", Default},
         {"function", Function},
         {"struct", Struct},
         {"uniform", Uniform},

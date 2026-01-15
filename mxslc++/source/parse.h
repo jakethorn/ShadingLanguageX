@@ -52,7 +52,8 @@ private:
     ExprPtr property();
     ExprPtr primary();
     ExprPtr function_call();
-    ExprPtr constructor();
+    ExprPtr named_constructor();
+    ExprPtr unnamed_constructor();
 
     Argument argument(size_t i);
 
