@@ -1,18 +1,20 @@
 
+
+## Status of mxslc
+A new C++ version of mxslc is currently under development, progress can be found in [mxslc++](https://github.com/jakethorn/ShadingLanguageX/blob/main/mxslc++).
+In the meantime, the python version can still be used, but no more updates are planned. All documentation is based on the python version.  
+  
+  
 <h1 align="center">ShadingLanguageX</h1>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/jakethorn/ShadingLanguageX/blob/main/LICENSE)
 ![version](https://img.shields.io/badge/version-0.6_beta-blue)
 [![Automated Tests](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/automated-tests.yml)
 
-__ShadingLanguageX__ is a high level programming language that can be used to create complex [MaterialX](https://materialx.org/) shaders.  
+__ShadingLanguageX__ is a high level programming language that can be used to create complex [MaterialX](https://materialx.org/) shaders. Click [here](https://youtu.be/n0-5Tx9cS58?si=tRpTGt7ZWPGW0eh0) to see the ASWF talk from SIGGRAPH 2025.
+
+
   
-
-## Status of mxslc
-A new C++ version of mxslc is under development, progress can be found in [mxslc++](https://github.com/jakethorn/ShadingLanguageX/blob/main/mxslc++). 
-Please stay tuned for future updates. In the meantime, the python version can still be used, but no more updates are planned. All documentation is still
-based on the python version, I'll update it when time permits.
-
 ![](examples/screenshots/readme_example.png)
 
 
