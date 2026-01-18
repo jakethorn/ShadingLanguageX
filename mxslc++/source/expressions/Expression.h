@@ -21,21 +21,21 @@ public:
     [[nodiscard]] const Token& token() const { return token_; }
 
     void init();
-    void init(const Type& type);
-    void init(const vector<Type>& types);
-    [[nodiscard]] bool try_init(const vector<Type>& types);
+    void init(const TypeInfoPtr& type);
+    void init(const string& type_name);
+    void init(const vector<TypeInfoPtr>& types);
+    [[nodiscard]] bool try_init(const vector<TypeInfoPtr>& types);
 
     [[nodiscard]] bool is_initialized() const { return is_initialized_; }
-    [[nodiscard]] const Type& type() const;
+    [[nodiscard]] TypeInfoPtr type() const;
     [[nodiscard]] ValuePtr evaluate() const;
 
-    [[nodiscard]] virtual ExprPtr instantiate_template_types(const Type& template_type) const = 0;
-    [[nodiscard]] virtual ExprPtr copy() const { return instantiate_template_types(Type{"T"s}); }
+    [[nodiscard]] virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
 
 protected:
-    virtual void init_subexpressions(const vector<Type>& types) { }
-    virtual void init_impl(const vector<Type>& types) { }
-    [[nodiscard]] virtual const Type& type_impl() const = 0;
+    virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
+    virtual void init_impl(const vector<TypeInfoPtr>& types) { }
+    [[nodiscard]] virtual TypeInfoPtr type_impl() const = 0;
     [[nodiscard]] virtual ValuePtr evaluate_impl() const = 0;
 
     const Runtime& runtime_;

@@ -11,7 +11,6 @@
 #include "runtime/Function.h"
 #include "utils/io_utils.h"
 #include "utils/str_utils.h"
-#include "statements/Statement.h"
 
 namespace
 {
@@ -98,6 +97,6 @@ void load_materialx_library(const Runtime& runtime, const string& version)
     const mx::DocumentPtr doc = mx::createDocument();
     const mx::StringSet loaded = mx::loadLibraries(fpv, fsp, doc);
     if (loaded.empty())
-        throw CompileError{"Unsupported MaterialX version: "s + version};
+        throw CompileError{"MaterialX version '" + version + "' is not supported"};
     load_library(runtime, doc);
 }

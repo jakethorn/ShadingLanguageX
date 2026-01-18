@@ -8,14 +8,13 @@
 #include "utils/common.h"
 #include "TokenType.h"
 
-class Type;
-
 class Token
 {
 public:
     Token() = default;
     Token(string lexeme) : Token{init_type_(lexeme), std::move(lexeme)} { }
-    Token(const TokenType type, string lexeme) : type_(type), lexeme_(std::move(lexeme)) { }
+    Token(const TokenType type) : Token{type, type.str()} { }
+    Token(const TokenType type, string lexeme) : type_{type}, lexeme_(std::move(lexeme)) { }
 
     [[nodiscard]] TokenType type() const { return type_; }
     [[nodiscard]] const string& lexeme() const { return lexeme_; }
@@ -27,7 +26,8 @@ public:
     void set_filename(const string& filename) { filename_ = filename; }
     void set_lexeme(const string& lexeme) { lexeme_ = lexeme; }
 
-    [[nodiscard]] Token instantiate_template_types(const Type& type) const;
+    [[nodiscard]] Token instantiate_template_types(const TypeInfoPtr& type) const;
+    [[nodiscard]] bool empty() const { return lexeme_.empty(); }
 
     bool operator==(const char c) const { return type_ == c; }
     bool operator==(const string& s) const { return type_ == s; }

@@ -35,6 +35,7 @@ private:
     StmtPtr multi_variable_definition(vector<string> mods, Type type);
     StmtPtr function_definition(vector<string> mods, Type type);
     StmtPtr function_definition_modern(vector<string> mods);
+    StmtPtr using_declaration();
 
     vector<string> modifiers();
     Type complex_type();

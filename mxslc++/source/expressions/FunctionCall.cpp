@@ -9,23 +9,24 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "statements/Statement.h"
+#include "utils/instantiate_template_types_utils.h"
 
-ExprPtr FunctionCall::instantiate_template_types(const Type& template_type) const
+ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     Token name = token_.instantiate_template_types(template_type);
-    optional<Type> _template_type = Type::instantiate_template_types(template_type_, template_type);
+    optional<Token> _template_type = ::instantiate_template_types(template_type_, template_type);
     ArgumentList args = args_.instantiate_template_types(template_type);
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(_template_type), std::move(args));
 }
 
-void FunctionCall::init_subexpressions(const vector<Type>& types)
+void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
     const Scope& scope = runtime_.scope();
 
     size_t initialised_arg_count = 0;
     while (initialised_arg_count < args_.size())
     {
-        vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
+        vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type(), args_);
 
         if (matching_funcs.empty())
             throw CompileError{token_, "No matching functions: " + token_.lexeme()};
@@ -36,7 +37,7 @@ void FunctionCall::init_subexpressions(const vector<Type>& types)
         if (initialised_arg_count == prev_initialised_arg_count)
         {
             // init failed, try to init with a default function...
-            FuncPtr default_func = scope.get_function(types, token_, template_type_, args_);
+            FuncPtr default_func = scope.get_function(types, token_, template_type(), args_);
             initialised_arg_count = try_init_arguments({std::move(default_func)});
 
             if (initialised_arg_count == prev_initialised_arg_count)
@@ -45,13 +46,13 @@ void FunctionCall::init_subexpressions(const vector<Type>& types)
     }
 }
 
-void FunctionCall::init_impl(const vector<Type>& types)
+void FunctionCall::init_impl(const vector<TypeInfoPtr>& types)
 {
     const Scope& scope = runtime_.scope();
-    func_ = scope.get_function(types, token_, template_type_, args_);
+    func_ = scope.get_function(types, token_, template_type(), args_);
 }
 
-const Type& FunctionCall::type_impl() const
+TypeInfoPtr FunctionCall::type_impl() const
 {
     return func_->type();
 }
@@ -72,6 +73,13 @@ ValuePtr FunctionCall::evaluate_impl() const
     {
         return runtime_.serializer().write_node(*func_, args_);
     }
+}
+
+TypeInfoPtr FunctionCall::template_type() const
+{
+    if (template_type_)
+        return runtime_.scope().get_type(*template_type_);
+    return nullptr;
 }
 
 namespace
@@ -132,7 +140,7 @@ void FunctionCall::evaluate_arguments() const
         }
         else
         {
-            throw CompileError(token_, "Missing argument"s);
+            throw CompileError{token_, "Missing argument"s};
         }
 
         Variable var{{}, param.type(), param.name(), std::move(val)};

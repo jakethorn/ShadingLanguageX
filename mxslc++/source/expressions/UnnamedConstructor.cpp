@@ -5,9 +5,10 @@
 #include "UnnamedConstructor.h"
 
 #include "CompileError.h"
+#include "runtime/TypeInfo.h"
 #include "values/UnnamedStructValue.h"
 
-ExprPtr UnnamedConstructor::instantiate_template_types(const Type& template_type) const
+ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     vector<ExprPtr> instantiated;
     for (const ExprPtr& expr : exprs_)
@@ -15,7 +16,7 @@ ExprPtr UnnamedConstructor::instantiate_template_types(const Type& template_type
     return std::make_unique<UnnamedConstructor>(runtime_, std::move(instantiated));
 }
 
-void UnnamedConstructor::init_subexpressions(const vector<Type>& types)
+void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
     if (exprs_.size() == 1)
     {
@@ -33,19 +34,13 @@ void UnnamedConstructor::init_subexpressions(const vector<Type>& types)
     }
 }
 
-void UnnamedConstructor::init_impl(const vector<Type>&)
+TypeInfoPtr UnnamedConstructor::type_impl() const
 {
-    vector<Type> types;
+    vector<TypeInfoPtr> types;
     types.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         types.push_back(expr->type());
-
-    type_ = Type{std::move(types)};
-}
-
-const Type& UnnamedConstructor::type_impl() const
-{
-    return type_;
+    return TypeInfo::create_unnamed_struct_type(types);
 }
 
 ValuePtr UnnamedConstructor::evaluate_impl() const
@@ -54,33 +49,28 @@ ValuePtr UnnamedConstructor::evaluate_impl() const
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-
     return std::make_shared<UnnamedStructValue>(std::move(values));
 }
 
-void UnnamedConstructor::try_init_expressions(const vector<Type>& types)
+void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)
 {
     for (size_t i = 0; i < exprs_.size(); ++i)
     {
-        if (not exprs_[i]->is_initialized())
-        {
-            if (const vector<Type> index_types = index_type(types, i);
-                exprs_[i]->try_init(index_types))
-            {
-                ++initialised_expr_count_;
-            }
-        }
+        if (exprs_[i]->is_initialized())
+            continue;
+        if (exprs_[i]->try_init(index_types(types, i)))
+            ++initialised_expr_count_;
     }
 }
 
-vector<Type> UnnamedConstructor::index_type(const vector<Type>& types, const size_t index) const
+vector<TypeInfoPtr> UnnamedConstructor::index_types(const vector<TypeInfoPtr>& types, const size_t index) const
 {
-    vector<Type> index_types;
-    for (const Type& type : types)
+    vector<TypeInfoPtr> index_types;
+    for (const TypeInfoPtr& type : types)
     {
         bool is_compatible = true;
 
-        if (type.subtype_count() != exprs_.size())
+        if (type->field_count() != exprs_.size())
         {
             is_compatible = false;
         }
@@ -88,13 +78,13 @@ vector<Type> UnnamedConstructor::index_type(const vector<Type>& types, const siz
         {
             for (size_t i = 0; i < exprs_.size(); ++i)
             {
-                if (exprs_[i]->is_initialized() and type.subtype(i) != exprs_[i]->type())
+                if (exprs_[i]->is_initialized() and type->field_type(i) != exprs_[i]->type())
                     is_compatible = false;
             }
         }
 
         if (is_compatible)
-            index_types.push_back(type.subtype(index));
+            index_types.push_back(type->field_type(index));
     }
 
     return index_types;

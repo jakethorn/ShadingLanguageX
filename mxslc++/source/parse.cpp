@@ -19,9 +19,9 @@
 #include "runtime/Variable.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/MultiVariableDefinition.h"
-#include "statements/NoStatement.h"
 #include "statements/PrintStatement.h"
 #include "statements/VariableDefinition.h"
+#include "statements/UsingDeclaration.h"
 
 vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens)
 {
@@ -68,6 +68,11 @@ StmtPtr Parser::statement()
     if (peek() == TokenType::Print)
     {
         return print_statement();
+    }
+
+    if (peek() == TokenType::Using)
+    {
+        return using_declaration();
     }
 
     vector<string> mods = modifiers();
@@ -197,6 +202,15 @@ StmtPtr Parser::function_definition_modern(vector<string> mods)
         std::move(body),
         std::move(return_expr)
     );
+}
+
+StmtPtr Parser::using_declaration()
+{
+    match(TokenType::Using);
+    Token name = match(TokenType::Identifier);
+    match('=');
+    Type type = complex_type();
+    return std::make_unique<UsingDeclaration>(runtime_, std::move(name), std::move(type));
 }
 
 vector<string> Parser::modifiers()
@@ -422,7 +436,7 @@ Argument Parser::argument(const size_t i)
     }
 
     ExprPtr expr = expression();
-    return Argument(std::move(name), std::move(expr), i);
+    return Argument{std::move(name), std::move(expr), i};
 }
 
 bool Parser::is_templated_function() const

@@ -5,7 +5,6 @@
 #ifndef FENNEC_FUNCTION_H
 #define FENNEC_FUNCTION_H
 
-#include <MaterialXCore/Node.h>
 #include "utils/common.h"
 #include "utils/template_utils.h"
 #include "Type.h"

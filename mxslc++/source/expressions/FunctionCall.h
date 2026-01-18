@@ -19,25 +19,26 @@ public:
     FunctionCall(const Runtime& runtime, Token name, ArgumentList args)
         : FunctionCall{runtime, std::move(name), std::nullopt, std::move(args)} { }
 
-    FunctionCall(const Runtime& runtime, Token name, optional<Type> template_type, ArgumentList args)
+    FunctionCall(const Runtime& runtime, Token name, optional<Token> template_type, ArgumentList args)
         : Expression{runtime, std::move(name)},
         template_type_{std::move(template_type)},
         args_{std::move(args)} { }
 
-    [[nodiscard]] ExprPtr instantiate_template_types(const Type& template_type) const override;
+    [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
-    void init_subexpressions(const vector<Type>& types) override;
-    void init_impl(const vector<Type>& types) override;
-    [[nodiscard]] const Type& type_impl() const override;
+    void init_subexpressions(const vector<TypeInfoPtr>& types) override;
+    void init_impl(const vector<TypeInfoPtr>& types) override;
+    [[nodiscard]] TypeInfoPtr type_impl() const override;
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
+    TypeInfoPtr template_type() const;
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
     void evaluate_arguments() const;
     [[nodiscard]] ValuePtr evaluate_return() const;
 
-    optional<Type> template_type_;
+    optional<Token> template_type_;
     ArgumentList args_;
 
     size_t initialised_arg_count_ = 0;

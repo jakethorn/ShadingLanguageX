@@ -12,7 +12,7 @@ class PrintStatement final : public Statement
 public:
     PrintStatement(const Runtime& runtime, vector<ExprPtr> exprs);
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const Type& template_type) const override;
+    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
     void execute() const override;
 
 private:

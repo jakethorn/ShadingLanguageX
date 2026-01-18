@@ -6,8 +6,9 @@
 #include "Token.h"
 #include "scan.h"
 #include "runtime/Type.h"
+#include "runtime/TypeInfo.h"
 
-TokenType Token::init_type_(const string &lexeme)
+TokenType Token::init_type_(const string& lexeme)
 {
     const vector tokens = sscan(lexeme);
     assert(tokens.size() == 1);
@@ -32,9 +33,9 @@ basic_t Token::literal() const
     return lexeme_.substr(1, lexeme_.size() - 2);
 }
 
-Token Token::instantiate_template_types(const Type& type) const
+Token Token::instantiate_template_types(const TypeInfoPtr& type) const
 {
-    Token t{type_, lexeme_ == "T" ? type.str() : lexeme_};
+    Token t{type_, lexeme_ == "T" ? type->name() : lexeme_};
     t.set_line(line_);
     t.set_filename(filename_);
     return t;

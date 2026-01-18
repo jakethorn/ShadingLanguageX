@@ -11,17 +11,17 @@ Argument::Argument(Argument&& other) noexcept : name_{std::move(other.name_)}, e
 
 Argument::~Argument() = default;
 
-Argument Argument::instantiate_template_types(const Type& template_type) const
+Argument Argument::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     return Argument{name_, expr_->instantiate_template_types(template_type), index_};
 }
 
-void Argument::init(const vector<Type>& types) const
+void Argument::init(const vector<TypeInfoPtr>& types) const
 {
     expr_->init(types);
 }
 
-bool Argument::try_init(const vector<Type>& types) const
+bool Argument::try_init(const vector<TypeInfoPtr>& types) const
 {
     return expr_->try_init(types);
 }
@@ -31,7 +31,7 @@ bool Argument::is_initialized() const
     return expr_->is_initialized();
 }
 
-Type Argument::type() const
+TypeInfoPtr Argument::type() const
 {
     return expr_->type();
 }

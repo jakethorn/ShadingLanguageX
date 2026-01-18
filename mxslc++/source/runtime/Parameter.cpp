@@ -3,34 +3,30 @@
 //
 
 #include "Parameter.h"
-
-#include <cassert>
-
-#include "CompileError.h"
 #include "expressions/Expression.h"
-#include "utils/template_utils.h"
+#include "runtime/Runtime.h"
+#include "runtime/TypeInfo.h"
 
-Parameter::Parameter(vector<string> mods, Type type, Token name, const size_t index)
-    : Parameter{std::move(mods), std::move(type), std::move(name), nullptr, index}
+Parameter::Parameter(const Runtime& runtime, ModifierList mods, Token type, Token name, const size_t index)
+    : Parameter{runtime, std::move(mods), std::move(type), std::move(name), nullptr, index}
 {
 
 }
 
-Parameter::Parameter(vector<string> mods, Type type, Token name, ExprPtr expr, const size_t index)
-    : mods_{std::move(mods)},
+Parameter::Parameter(const Runtime& runtime, ModifierList mods, Token type, Token name, ExprPtr expr, const size_t index)
+    : runtime_{runtime},
+    mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     expr_{std::move(expr)},
     index_{index}
 {
-    static const vector valid_mods{"const"s, "mutable"s, "out"s};
-    for (const string& mod : mods_)
-        if (not contains(valid_mods, mod))
-            throw CompileError{name_, "'" + mod + "' is not a valid parameter modifier"};
+    mods_.validate("const"s, "mutable"s, "out"s);
 }
 
 Parameter::Parameter(Parameter&& other) noexcept
-    : mods_{std::move(other.mods_)},
+    : runtime_{other.runtime_},
+    mods_{std::move(other.mods_)},
     type_{std::move(other.type_)},
     name_{std::move(other.name_)},
     expr_{std::move(other.expr_)},
@@ -41,21 +37,25 @@ Parameter::Parameter(Parameter&& other) noexcept
 
 Parameter::~Parameter() = default;
 
-Parameter Parameter::instantiate_template_types(const Type& template_type) const
+Parameter Parameter::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
-    Type type = type_.instantiate_template_types(template_type);
+    Token type = type_.instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
-    return Parameter{mods_, std::move(type), name_, std::move(expr), index_};
+    return Parameter{runtime_, mods_, std::move(type), name_, std::move(expr), index_};
 }
 
 void Parameter::init() const
 {
     if (has_default_value())
-        expr_->init(type_);
+        expr_->init(type());
+}
+
+TypeInfoPtr Parameter::type() const
+{
+    return runtime_.scope().get_type(type_);
 }
 
 ValuePtr Parameter::evaluate() const
 {
-    assert(expr_);
     return expr_->evaluate();
 }

@@ -8,15 +8,16 @@
 #include "utils/common.h"
 #include "Parameter.h"
 #include "Argument.h"
+#include "utils/instantiate_template_types_utils.h"
 
 class ParameterList
 {
 public:
     ParameterList(vector<Parameter> params) : params_{std::move(params)} { }
 
-    [[nodiscard]] ParameterList instantiate_template_types(const Type& template_type) const
+    [[nodiscard]] ParameterList instantiate_template_types(const TypeInfoPtr& template_type) const
     {
-        return Type::instantiate_template_types(params_, template_type);
+        return ::instantiate_template_types(params_, template_type);
     }
 
     [[nodiscard]] size_t size() const { return params_.size(); }

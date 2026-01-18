@@ -39,7 +39,7 @@ class Statement;
 using StmtPtr = unique_ptr<Statement>;
 
 class Expression;
-using ExprPtr = unique_ptr<Expression>;
+using ExprPtr = shared_ptr<Expression>;
 
 class Value;
 using ValuePtr = shared_ptr<Value>;
@@ -47,11 +47,11 @@ using ValuePtr = shared_ptr<Value>;
 class Scope;
 using ScopePtr = unique_ptr<Scope>;
 
-class Serializer;
-using SerializerPtr = unique_ptr<Serializer>;
-
 class Function;
 using FuncPtr = shared_ptr<Function>;
+
+class TypeInfo;
+using TypeInfoPtr = shared_ptr<TypeInfo>;
 
 // type aliases
 using basic_t = variant<bool, int, float, string>;

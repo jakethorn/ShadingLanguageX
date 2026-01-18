@@ -69,6 +69,8 @@ public:
         Inline,
         Default,
         Function,
+        Typedef,
+        Using,
         Struct,
         Uniform,
         Varying,
@@ -102,7 +104,7 @@ public:
 
     inline static const unordered_set Keywords {
         If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline, Default,
-        Function, Struct, Uniform, Varying, Namespace, Print, Break
+        Function, Typedef, Using, Struct, Uniform, Varying, Namespace, Print, Break
     };
 
 private:
@@ -135,6 +137,8 @@ private:
         {"inline", Inline},
         {"default", Default},
         {"function", Function},
+        {"typedef", Typedef},
+        {"using", Using},
         {"struct", Struct},
         {"uniform", Uniform},
         {"varying", Varying},

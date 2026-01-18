@@ -3,20 +3,20 @@
 //
 
 #include "Literal.h"
-
+#include "runtime/Runtime.h"
 #include "values/BasicValue.h"
 
-ExprPtr Literal::instantiate_template_types(const Type& template_type) const
+ExprPtr Literal::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
-    return std::make_unique<Literal>(runtime_, token_);
+    return std::make_shared<Literal>(runtime_, token_);
 }
 
-const Type& Literal::type_impl() const
+TypeInfoPtr Literal::type_impl() const
 {
-    return type_;
+    return runtime_.scope().get_type(token_.literal());
 }
 
 ValuePtr Literal::evaluate_impl() const
 {
-    return std::make_shared<BasicValue>(value_);
+    return std::make_shared<BasicValue>(token_.literal());
 }

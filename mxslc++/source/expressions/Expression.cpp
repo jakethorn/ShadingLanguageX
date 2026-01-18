@@ -11,41 +11,44 @@
 #include "runtime/Runtime.h"
 #include "utils/template_utils.h"
 
-Expression::Expression(const Runtime &runtime) : runtime_{runtime} { }
+Expression::Expression(const Runtime& runtime) : runtime_{runtime} { }
 Expression::Expression(const Runtime& runtime, Token token) : runtime_{runtime}, token_{std::move(token)} { }
 
 void Expression::init()
 {
-    init(vector<Type>{});
+    init(vector<TypeInfoPtr>{});
 }
 
-void Expression::init(const Type& type)
+void Expression::init(const TypeInfoPtr& type)
 {
     init(vector{type});
 }
 
-void Expression::init(const vector<Type>& types)
+void Expression::init(const string& type_name)
 {
-    if (not try_init(types))
-        throw CompileError{token_, "Invalid expression type"};
+    const TypeInfoPtr type = runtime_.scope().get_type(type_name);
+    init(type);
 }
 
-bool Expression::try_init(const vector<Type>& types)
+void Expression::init(const vector<TypeInfoPtr>& types)
+{
+    if (not try_init(types))
+        throw CompileError{token_, "Expression failed to initialize"s};
+}
+
+bool Expression::try_init(const vector<TypeInfoPtr>& types)
 {
     if (not is_initialized_)
     {
         init_subexpressions(types);
         init_impl(types);
-        if (types.empty())
-            is_initialized_ = runtime_.scope().has_type(type_impl());
-        else
-            is_initialized_ = contains(types, type_impl());
+        is_initialized_ = types.empty() || contains(types, type_impl());
     }
 
     return is_initialized_;
 }
 
-const Type& Expression::type() const
+TypeInfoPtr Expression::type() const
 {
     assert(is_initialized_);
     return type_impl();

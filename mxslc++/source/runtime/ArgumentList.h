@@ -8,6 +8,7 @@
 #include "utils/common.h"
 #include "Argument.h"
 #include "Type.h"
+#include "utils/instantiate_template_types_utils.h"
 
 class Parameter;
 
@@ -25,9 +26,9 @@ public:
         (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
     }
 
-    [[nodiscard]] ArgumentList instantiate_template_types(const Type& template_type) const
+    [[nodiscard]] ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const
     {
-        return Type::instantiate_template_types(args_, template_type);
+        return ::instantiate_template_types(args_, template_type);
     }
 
     [[nodiscard]] vector<ValuePtr> evaluate() const
