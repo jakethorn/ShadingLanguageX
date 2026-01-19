@@ -18,6 +18,7 @@ public:
     [[nodiscard]] TypeInfoPtr type() const { return type_; }
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] ExprPtr initializer() const { return initializer_; }
+    [[nodiscard]] const Token& name_token() const { return name_;}
 
     [[nodiscard]] FieldInfo instantiate_template_types(const TypeInfoPtr& template_type) const;
 
