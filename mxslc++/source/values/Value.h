@@ -22,8 +22,9 @@ public:
     virtual void set_as_node_input(const mx::NodePtr& node, const string& input_name) const { }
     virtual void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const { }
     virtual void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const { }
+    virtual void set_name(const string& name) { }
 
-    [[nodiscard]] virtual const Type& type() const = 0;
+    [[nodiscard]] virtual TypeInfoPtr type() const = 0;
     [[nodiscard]] virtual string str() const = 0;
 };
 

@@ -20,6 +20,12 @@ public:
         return ::instantiate_template_types(params_, template_type);
     }
 
+    void init()
+    {
+        for (Parameter& param : params_)
+            param.init();
+    }
+
     [[nodiscard]] size_t size() const { return params_.size(); }
     [[nodiscard]] bool empty() const { return params_.empty(); }
 
@@ -34,11 +40,11 @@ public:
     }
     const Parameter& operator[](const Argument& a) const;
 
-    auto begin() { return params_.begin(); }
-    auto begin() const { return params_.begin(); }
+    [[nodiscard]] auto begin() { return params_.begin(); }
+    [[nodiscard]] auto begin() const { return params_.begin(); }
 
-    auto end() { return params_.end(); }
-    auto end() const { return params_.end(); }
+    [[nodiscard]] auto end() { return params_.end(); }
+    [[nodiscard]] auto end() const { return params_.end(); }
 
 private:
     vector<Parameter> params_;

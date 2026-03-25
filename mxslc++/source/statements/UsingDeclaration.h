@@ -7,7 +7,6 @@
 
 #include "Statement.h"
 #include "Token.h"
-#include "runtime/Type.h"
 
 class UsingDeclaration final : public Statement
 {

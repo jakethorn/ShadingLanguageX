@@ -16,6 +16,22 @@ optional<T> instantiate_template_types(const optional<T>& src, const TypeInfoPtr
 }
 
 template<typename T>
+unique_ptr<T> instantiate_template_types(const unique_ptr<T>& src, const TypeInfoPtr& template_type)
+{
+    if (src)
+        return src->instantiate_template_types(template_type);
+    return nullptr;
+}
+
+template<typename T>
+shared_ptr<T> instantiate_template_types(const shared_ptr<T>& src, const TypeInfoPtr& template_type)
+{
+    if (src)
+        return src->instantiate_template_types(template_type);
+    return nullptr;
+}
+
+template<typename T>
 vector<T> instantiate_template_types(const vector<T>& src, const TypeInfoPtr& template_type)
 {
     vector<T> dst;

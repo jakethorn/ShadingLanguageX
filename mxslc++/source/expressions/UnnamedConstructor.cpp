@@ -5,6 +5,7 @@
 #include "UnnamedConstructor.h"
 
 #include "CompileError.h"
+#include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 #include "values/UnnamedStructValue.h"
 
@@ -24,12 +25,12 @@ void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
         return;
     }
 
-    while (initialised_expr_count_ < exprs_.size())
+    while (initialized_expr_count_ < exprs_.size())
     {
-        const size_t prev_initialised_expr_count = initialised_expr_count_;
+        const size_t prev_initialized_expr_count = initialized_expr_count_;
         try_init_expressions(types);
 
-        if (initialised_expr_count_ == prev_initialised_expr_count)
+        if (initialized_expr_count_ == prev_initialized_expr_count)
             throw CompileError{token_, "Invalid constructor call"s};
     }
 }
@@ -40,7 +41,8 @@ TypeInfoPtr UnnamedConstructor::type_impl() const
     types.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         types.push_back(expr->type());
-    return TypeInfo::create_unnamed_struct_type(types);
+    const TypeInfoPtr type = std::make_shared<TypeInfo>(std::move(types));
+    return runtime_.scope().init_type(type);
 }
 
 ValuePtr UnnamedConstructor::evaluate_impl() const
@@ -59,7 +61,7 @@ void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)
         if (exprs_[i]->is_initialized())
             continue;
         if (exprs_[i]->try_init(index_types(types, i)))
-            ++initialised_expr_count_;
+            ++initialized_expr_count_;
     }
 }
 

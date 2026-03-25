@@ -7,7 +7,6 @@
 
 #include "ModifierList.h"
 #include "utils/common.h"
-#include "utils/template_utils.h"
 #include "Token.h"
 
 class Runtime;
@@ -15,8 +14,8 @@ class Runtime;
 class Parameter
 {
 public:
-    Parameter(const Runtime& runtime, ModifierList mods, Token type, Token name, size_t index);
-    Parameter(const Runtime& runtime, ModifierList mods, Token type, Token name, ExprPtr expr, size_t index);
+    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, size_t index);
+    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr, size_t index);
 
     Parameter(Parameter&&) noexcept;
 
@@ -27,7 +26,7 @@ public:
     [[nodiscard]] size_t index() const { return index_; }
 
     [[nodiscard]] Parameter instantiate_template_types(const TypeInfoPtr& template_type) const;
-    void init() const;
+    void init();
     [[nodiscard]] TypeInfoPtr type() const;
 
     [[nodiscard]] bool has_default_value() const { return expr_ != nullptr; }
@@ -36,7 +35,7 @@ public:
 private:
     const Runtime& runtime_;
     ModifierList mods_;
-    Token type_;
+    TypeInfoPtr type_;
     Token name_;
     ExprPtr expr_;
     size_t index_;

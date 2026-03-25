@@ -10,7 +10,7 @@
 #include "utils/common.h"
 #include "Token.h"
 #include "TokenReader.h"
-#include "runtime/Type.h"
+#include "runtime/ModifierList.h"
 
 class Attribute;
 class Parameter;
@@ -22,7 +22,7 @@ vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens);
 class Parser final : protected TokenReader
 {
 public:
-    explicit Parser(const Runtime& runtime, vector<Token> tokens_);
+    Parser(const Runtime& runtime, vector<Token> tokens_);
 
     vector<StmtPtr> parse();
 
@@ -31,15 +31,16 @@ private:
 
     StmtPtr statement();
     StmtPtr print_statement();
-    StmtPtr variable_definition(vector<string> mods, Type type);
-    StmtPtr multi_variable_definition(vector<string> mods, Type type);
-    StmtPtr function_definition(vector<string> mods, Type type);
-    StmtPtr function_definition_modern(vector<string> mods);
+    StmtPtr variable_definition(ModifierList mods, TypeInfoPtr type);
+    StmtPtr multi_variable_definition(ModifierList mods, TypeInfoPtr type);
+    StmtPtr function_definition(ModifierList mods, TypeInfoPtr type);
+    StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr using_declaration();
 
-    vector<string> modifiers();
-    Type complex_type();
+    ModifierList modifiers();
+    TypeInfoPtr struct_type();
     Parameter parameter(size_t index);
+    vector<TypeInfoPtr> template_list();
     tuple<vector<StmtPtr>, ExprPtr> function_body();
 
     ExprPtr expression();
@@ -77,11 +78,9 @@ private:
         return args;
     }
 
-
-    bool is_templated_function() const;
+    [[nodiscard]] bool is_templated_function() const;
 
     const Runtime& runtime_;
-    Type current_function_type_;
 };
 
 #endif //FENNEC_PARSE_H

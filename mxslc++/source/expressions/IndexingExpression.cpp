@@ -19,7 +19,7 @@ ExprPtr IndexingExpression::instantiate_template_types(const TypeInfoPtr& templa
 void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>&)
 {
     expr_->init();
-    index_->init(TypeInfo::Basic::Int);
+    index_->init(TypeInfo::Int);
 }
 
 TypeInfoPtr IndexingExpression::type_impl() const

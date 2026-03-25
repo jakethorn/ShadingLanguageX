@@ -5,7 +5,6 @@
 #include <cassert>
 #include "Token.h"
 #include "scan.h"
-#include "runtime/Type.h"
 #include "runtime/TypeInfo.h"
 
 TokenType Token::init_type_(const string& lexeme)

@@ -29,8 +29,8 @@ add_subdirectory(source)
 add_executable(mxslc main.cpp)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(mxslc PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
-    target_link_options(mxslc PRIVATE -fsanitize=address,undefined)
+        target_compile_options(mxslc PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+        target_link_options(mxslc PRIVATE -fsanitize=address,undefined)
 endif()
 
 target_include_directories(mxslc PRIVATE

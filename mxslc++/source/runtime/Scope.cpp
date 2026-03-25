@@ -66,17 +66,17 @@ namespace
         const ArgumentList& args
     )
     {
-        if (not return_types.empty() and not contains(return_types, func.type()))
+        if (name.lexeme() != func.name())
             return false;
 
-        if (name.lexeme() != func.name())
+        if (not return_types.empty() and not func.type()->is_compatible(return_types))
             return false;
 
         if (template_type)
         {
             if (not func.has_template_type())
                 return false;
-            if (*template_type != func.template_type())
+            if (not template_type->is_compatible(func.template_type()))
                 return false;
         }
 
@@ -85,7 +85,8 @@ namespace
 
         for (const Argument& arg : args)
         {
-            if (arg.is_initialized() and func.parameters()[arg].type() != arg.type())
+            TypeInfoPtr param_type = func.parameters()[arg].type();
+            if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
                 return false;
         }
 
@@ -153,6 +154,7 @@ void Scope::add_type(TypeInfoPtr type)
 {
     if (contains(types_, type->name()))
         throw CompileError{type->name_token(), "Type '" + type->name() + "' already defined"};
+    type->set_initialized();
     types_.emplace(type->name(), std::move(type));
 }
 
@@ -164,22 +166,32 @@ void Scope::add_type(const string& name)
 
 bool Scope::has_type(const Token& name) const
 {
-    if (contains(types_, name.lexeme()))
+    return has_type(name.lexeme());
+}
+
+bool Scope::has_type(const string& name) const
+{
+    if (contains(types_, name))
         return true;
     if (parent_)
         return parent_->has_type(name);
     return false;
 }
 
-TypeInfoPtr Scope::get_type(const TypeInfoPtr& type) const
+TypeInfoPtr Scope::init_type(const TypeInfoPtr& type) const
 {
     if (type->name().empty())
     {
         vector<FieldInfo> fields;
         fields.reserve(type->field_count());
         for (const FieldInfo& field : type->fields())
-            fields.emplace_back(field.modifiers(), get_type(field.type()), field.name(), field.initializer());
-        return std::make_shared<TypeInfo>(type->modifiers(), type->name(), type->parent(), std::move(fields));
+        {
+            optional<Token> name = as_optional(field.has_name(), field.name_token());
+            fields.emplace_back(field.modifiers(), init_type(field.type()), name, field.initializer());
+        }
+        TypeInfoPtr new_type = std::make_shared<TypeInfo>(type->modifiers(), type->name_token(), type->parent_token(), std::move(fields));
+        new_type->set_initialized();
+        return new_type;
     }
     else
     {
@@ -201,16 +213,8 @@ TypeInfoPtr Scope::get_type(const string& name) const
     return get_type(Token{name});
 }
 
-TypeInfoPtr Scope::get_type(const basic_t& value) const
+TypeInfoPtr Scope::get_type(const basic_t& val) const
 {
-    string type;
-    if (std::holds_alternative<bool>(value))
-        type = TypeInfo::Basic::Bool;
-    if (std::holds_alternative<int>(value))
-        type = TypeInfo::Basic::Int;
-    if (std::holds_alternative<float>(value))
-        type = TypeInfo::Basic::Float;
-    if (std::holds_alternative<string>(value))
-        type = TypeInfo::Basic::String;
-    return get_type(type);
+    const TypeInfoPtr type = std::make_shared<TypeInfo>(val);
+    return init_type(type);
 }

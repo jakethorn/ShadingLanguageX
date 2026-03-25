@@ -23,7 +23,7 @@ protected:
 private:
     ExprPtr expr_;
     ExprPtr index_;
-    Type type_;
+    TypeInfoPtr type_;
 };
 
 #endif //MXSLC_INDEXINGEXPRESSION_H

@@ -1,0 +1,19 @@
+//break;
+
+inline integer my_func(integer a, integer b)
+{
+    return add(a, b);
+}
+
+float get_last({float, float, float} v)
+{
+    //integer i = my_func(1, 1);
+    return v[my_func(1, 1)];
+}
+
+//break;
+
+float z = get_last({1.0, 2.0, 3.0});
+float w = z / 3.0;
+
+print z, w;

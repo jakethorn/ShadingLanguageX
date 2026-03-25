@@ -17,9 +17,9 @@ class FunctionCall final : public Expression
 {
 public:
     FunctionCall(const Runtime& runtime, Token name, ArgumentList args)
-        : FunctionCall{runtime, std::move(name), std::nullopt, std::move(args)} { }
+        : FunctionCall{runtime, std::move(name), nullptr, std::move(args)} { }
 
-    FunctionCall(const Runtime& runtime, Token name, optional<Token> template_type, ArgumentList args)
+    FunctionCall(const Runtime& runtime, Token name, TypeInfoPtr template_type, ArgumentList args)
         : Expression{runtime, std::move(name)},
         template_type_{std::move(template_type)},
         args_{std::move(args)} { }
@@ -33,15 +33,14 @@ protected:
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
-    TypeInfoPtr template_type() const;
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
     void evaluate_arguments() const;
     [[nodiscard]] ValuePtr evaluate_return() const;
 
-    optional<Token> template_type_;
+    TypeInfoPtr template_type_;
     ArgumentList args_;
 
-    size_t initialised_arg_count_ = 0;
+    size_t initialized_arg_count_ = 0;
     FuncPtr func_ = nullptr;
 };
 

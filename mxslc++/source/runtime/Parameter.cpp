@@ -7,13 +7,13 @@
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, Token type, Token name, const size_t index)
+Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, const size_t index)
     : Parameter{runtime, std::move(mods), std::move(type), std::move(name), nullptr, index}
 {
 
 }
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, Token type, Token name, ExprPtr expr, const size_t index)
+Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr, const size_t index)
     : runtime_{runtime},
     mods_{std::move(mods)},
     type_{std::move(type)},
@@ -39,20 +39,22 @@ Parameter::~Parameter() = default;
 
 Parameter Parameter::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
-    Token type = type_.instantiate_template_types(template_type);
+    TypeInfoPtr type = type_->instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
     return Parameter{runtime_, mods_, std::move(type), name_, std::move(expr), index_};
 }
 
-void Parameter::init() const
+void Parameter::init()
 {
+    type_ = runtime_.scope().init_type(type_);
+
     if (has_default_value())
         expr_->init(type());
 }
 
 TypeInfoPtr Parameter::type() const
 {
-    return runtime_.scope().get_type(type_);
+    return type_;
 }
 
 ValuePtr Parameter::evaluate() const

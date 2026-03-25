@@ -23,7 +23,7 @@ StmtPtr MultiVariableDefinition::instantiate_template_types(const TypeInfoPtr& t
 
 void MultiVariableDefinition::execute() const
 {
-    const TypeInfoPtr type = runtime_.scope().get_type(type_);
+    const TypeInfoPtr type = runtime_.scope().init_type(type_);
     expr_->init(type);
 
     const ValuePtr value = expr_->evaluate();

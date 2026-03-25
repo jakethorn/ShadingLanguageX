@@ -6,12 +6,11 @@
 #define FENNEC_NULLVALUE_H
 
 #include "Value.h"
-#include "runtime/Type.h"
 
 class NullValue final : public Value
 {
 public:
-    explicit NullValue(Type type) : type_{std::move(type)} { }
+    explicit NullValue(TypeInfoPtr type) : type_{std::move(type)} { }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
@@ -23,11 +22,11 @@ public:
         throw CompileError{"Cannot return null value"s};
     }
 
-    [[nodiscard]] const Type& type() const override { return type_; }
+    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
     [[nodiscard]] string str() const override { return "null"s; }
 
 private:
-    Type type_;
+    TypeInfoPtr type_;
 };
 
 #endif //FENNEC_NULLVALUE_H

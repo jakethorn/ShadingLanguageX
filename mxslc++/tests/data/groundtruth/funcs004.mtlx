@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_get_last" node="get_last">
+    <output name="out" type="float" />
+    <input name="v__0" type="float" />
+    <input name="v__1" type="float" />
+    <input name="v__2" type="float" />
+  </nodedef>
+  <nodegraph name="NG_get_last">
+    <output name="out" type="float" interfacename="v__2" />
+  </nodegraph>
+  <get_last name="z" type="float">
+    <input name="v__0" type="float" value="1" />
+    <input name="v__1" type="float" value="2" />
+    <input name="v__2" type="float" value="3" />
+  </get_last>
+  <divide name="w" type="float">
+    <input name="in1" type="float" nodename="z" />
+    <input name="in2" type="float" value="3" />
+  </divide>
+</materialx>

@@ -6,7 +6,6 @@
 #define FENNEC_EXPRESSION_H
 
 #include "utils/common.h"
-#include "runtime/Type.h"
 #include "Token.h"
 
 class Runtime;

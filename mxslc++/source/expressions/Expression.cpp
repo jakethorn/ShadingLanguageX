@@ -9,6 +9,7 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
+#include "runtime/TypeInfo.h"
 #include "utils/template_utils.h"
 
 Expression::Expression(const Runtime& runtime) : runtime_{runtime} { }
@@ -38,11 +39,14 @@ void Expression::init(const vector<TypeInfoPtr>& types)
 
 bool Expression::try_init(const vector<TypeInfoPtr>& types)
 {
+    for (const TypeInfoPtr& type : types)
+        assert(type->is_initialized());
+
     if (not is_initialized_)
     {
         init_subexpressions(types);
         init_impl(types);
-        is_initialized_ = types.empty() || contains(types, type_impl());
+        is_initialized_ = types.empty() || type_impl()->is_compatible(types);
     }
 
     return is_initialized_;
@@ -51,7 +55,9 @@ bool Expression::try_init(const vector<TypeInfoPtr>& types)
 TypeInfoPtr Expression::type() const
 {
     assert(is_initialized_);
-    return type_impl();
+    TypeInfoPtr type = type_impl();
+    assert(type->is_initialized());
+    return type;
 }
 
 ValuePtr Expression::evaluate() const

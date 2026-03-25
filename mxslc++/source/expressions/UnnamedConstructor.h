@@ -25,7 +25,7 @@ private:
     [[nodiscard]] vector<TypeInfoPtr> index_types(const vector<TypeInfoPtr>& types, size_t index) const;
 
     vector<ExprPtr> exprs_;
-    size_t initialised_expr_count_ = 0;
+    size_t initialized_expr_count_ = 0;
 };
 
 #endif //MXSLC_CONSTRUCTOR_H

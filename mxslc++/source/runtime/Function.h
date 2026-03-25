@@ -7,7 +7,6 @@
 
 #include "utils/common.h"
 #include "utils/template_utils.h"
-#include "Type.h"
 #include "Token.h"
 #include "ParameterList.h"
 
@@ -15,18 +14,18 @@ class Function
 {
 public:
     Function(
-        Type type,
+        TypeInfoPtr type,
         Token name,
-        optional<Type> template_type,
+        TypeInfoPtr template_type,
         ParameterList params,
         vector<string> output_names
     );
 
     Function(
-        vector<string> mods,
-        Type type,
+        ModifierList mods,
+        TypeInfoPtr type,
         Token name,
-        optional<Type> template_type,
+        TypeInfoPtr template_type,
         ParameterList params,
         vector<StmtPtr> body,
         ExprPtr return_expr
@@ -40,12 +39,12 @@ public:
 
     ~Function();
 
-    [[nodiscard]] bool is_inline() const { return contains(mods_, "inline"s); }
-    [[nodiscard]] bool is_default() const { return contains(mods_, "default"s); }
-    [[nodiscard]] const Type& type() const { return type_; }
+    [[nodiscard]] bool is_inline() const { return mods_.contains("inline"s); }
+    [[nodiscard]] bool is_default() const { return mods_.contains("default"s); }
+    [[nodiscard]] TypeInfoPtr type() const { return type_; }
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
-    [[nodiscard]] bool has_template_type() const { return template_type_.has_value(); }
-    [[nodiscard]] const Type& template_type() const { return template_type_.value(); }
+    [[nodiscard]] bool has_template_type() const { return template_type_ != nullptr; }
+    [[nodiscard]] TypeInfoPtr template_type() const { return template_type_; }
     [[nodiscard]] size_t arity() const { return params_.size(); }
     [[nodiscard]] const ParameterList& parameters() const { return params_; }
     [[nodiscard]] const vector<StmtPtr>& body() const { return body_; }
@@ -55,11 +54,13 @@ public:
     [[nodiscard]] const vector<string>& output_names() const { return output_names_; }
     [[nodiscard]] const string& output_name(const size_t i) const { return output_names_.at(i); }
 
+    void init(const Runtime& runtime);
+
 private:
-    vector<string> mods_;
-    Type type_;
+    ModifierList mods_;
+    TypeInfoPtr type_;
     Token name_;
-    optional<Type> template_type_;
+    TypeInfoPtr template_type_;
     ParameterList params_;
     vector<StmtPtr> body_;
     ExprPtr return_expr_;

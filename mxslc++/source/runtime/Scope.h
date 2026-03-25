@@ -44,10 +44,11 @@ public:
     void add_type(TypeInfoPtr type);
     void add_type(const string& name);
     [[nodiscard]] bool has_type(const Token& name) const;
-    [[nodiscard]] TypeInfoPtr get_type(const TypeInfoPtr& type) const;
+    [[nodiscard]] bool has_type(const string& name) const;
+    [[nodiscard]] TypeInfoPtr init_type(const TypeInfoPtr& type) const;
     [[nodiscard]] TypeInfoPtr get_type(const Token& name) const;
     [[nodiscard]] TypeInfoPtr get_type(const string& name) const;
-    [[nodiscard]] TypeInfoPtr get_type(const basic_t& value) const;
+    [[nodiscard]] TypeInfoPtr get_type(const basic_t& val) const;
 
 private:
     ScopePtr parent_;

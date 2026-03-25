@@ -12,7 +12,6 @@ add_library(mxslc_lib
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
         runtime/Variable.cpp
-        runtime/Type.cpp
         runtime/TypeInfo.cpp
         runtime/FieldInfo.cpp
         expressions/Expression.cpp
@@ -43,5 +42,5 @@ target_include_directories(mxslc_lib
 )
 
 target_link_libraries(mxslc_lib
-    PUBLIC mtlx_lib
+        PUBLIC mtlx_lib
 )

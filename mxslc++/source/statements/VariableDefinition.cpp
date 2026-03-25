@@ -8,6 +8,7 @@
 #include "runtime/Variable.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
+#include "values/Value.h"
 
 VariableDefinition::VariableDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr)
     : Statement{runtime}, mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, expr_{std::move(expr)}
@@ -26,9 +27,12 @@ StmtPtr VariableDefinition::instantiate_template_types(const TypeInfoPtr& templa
 
 void VariableDefinition::execute() const
 {
-    TypeInfoPtr type = runtime_.scope().get_type(type_);
+    Scope& scope = runtime_.scope();
+
+    TypeInfoPtr type = scope.init_type(type_);
     expr_->init(type);
     ValuePtr val = expr_->evaluate();
+    val->set_name(name_.lexeme());
     Variable var{mods_, std::move(type), name_, std::move(val)};
-    runtime_.scope().add_variable(std::move(var));
+    scope.add_variable(std::move(var));
 }

@@ -10,20 +10,19 @@
 #include "OutputValue.h"
 #include "utils/common.h"
 #include "Value.h"
-#include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
 
 class NodeValue final : public Value
 {
 public:
-    explicit NodeValue(mx::NodePtr node) : node_{std::move(node)}, type_{node_->getType()} { }
+    NodeValue(mx::NodePtr node, TypeInfoPtr type) : node_{std::move(node)}, type_{std::move(type)} { }
 
-    size_t subvalue_count() const override
+    [[nodiscard]] size_t subvalue_count() const override
     {
         return node_->isMultiOutputType() ? node_->getOutputCount() : 0;
     }
 
-    ValuePtr subvalue(const size_t i) const override
+    [[nodiscard]] ValuePtr subvalue(const size_t i) const override
     {
         if (node_->isMultiOutputType())
         {
@@ -49,12 +48,17 @@ public:
         output->setConnectedNode(node_);
     }
 
-    [[nodiscard]] const Type& type() const override { return type_; }
+    void set_name(const string &name) override
+    {
+        node_->setName(name);
+    }
+
+    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
     [[nodiscard]] string str() const override { return as_string(node_); }
 
 private:
     mx::NodePtr node_;
-    Type type_;
+    TypeInfoPtr type_;
 };
 
 #endif //FENNEC_NODEVALUE_H

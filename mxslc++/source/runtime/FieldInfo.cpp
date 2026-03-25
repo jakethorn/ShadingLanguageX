@@ -12,3 +12,8 @@ FieldInfo FieldInfo::instantiate_template_types(const TypeInfoPtr& template_type
     ExprPtr initializer = initializer_->instantiate_template_types(template_type);
     return FieldInfo{mods_, std::move(type), name_, std::move(initializer)};
 }
+
+bool FieldInfo::is_compatible(const FieldInfo& other) const
+{
+    return type_->is_compatible(other.type_);
+}
