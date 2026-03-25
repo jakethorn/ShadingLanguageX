@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine3 name="node1" type="color3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <convert name="node2" type="float">
+    <input name="in" type="integer" value="2" />
+  </convert>
+  <add name="y" type="color3">
+    <input name="in1" type="color3" nodename="node1" />
+    <input name="in2" type="float" nodename="node2" />
+  </add>
+</materialx>

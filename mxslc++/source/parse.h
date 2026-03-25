@@ -16,6 +16,7 @@ class Attribute;
 class Parameter;
 class Argument;
 class Runtime;
+class FieldInfo;
 
 vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens);
 
@@ -38,7 +39,8 @@ private:
     StmtPtr using_declaration();
 
     ModifierList modifiers();
-    TypeInfoPtr struct_type();
+    TypeInfoPtr type_info();
+    FieldInfo field_info();
     Parameter parameter(size_t index);
     vector<TypeInfoPtr> template_list();
     tuple<vector<StmtPtr>, ExprPtr> function_body();

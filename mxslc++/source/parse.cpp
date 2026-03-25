@@ -17,6 +17,7 @@
 #include "runtime/Argument.h"
 #include "runtime/ParameterList.h"
 #include "runtime/Variable.h"
+#include "runtime/FieldInfo.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
@@ -84,7 +85,7 @@ StmtPtr Parser::statement()
 
     if (peek() == '{' or (peek() == TokenType::Identifier and peek(1) == TokenType::Identifier))
     {
-        TypeInfoPtr type = struct_type();
+        TypeInfoPtr type = type_info();
 
         if (peek(1) == '=')
         {
@@ -149,7 +150,7 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypeInfoPtr type)
         else
         {
             mods = modifiers();
-            type = struct_type();
+            type = type_info();
             name = match(TokenType::Identifier);
             fields.emplace_back(std::move(mods), std::move(type), std::move(name), nullptr);
         }
@@ -190,7 +191,7 @@ StmtPtr Parser::function_definition_modern(ModifierList mods)
     vector<TypeInfoPtr> template_types = template_list();
     ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
     match(TokenType::Arrow);
-    TypeInfoPtr type = struct_type();
+    TypeInfoPtr type = type_info();
     auto [body, return_expr] = function_body();
     return std::make_unique<FunctionDefinition>(
         runtime_,
@@ -209,7 +210,7 @@ StmtPtr Parser::using_declaration()
     match(TokenType::Using);
     Token name = match(TokenType::Identifier);
     match('=');
-    TypeInfoPtr type = struct_type();
+    TypeInfoPtr type = type_info();
     return std::make_unique<UsingDeclaration>(runtime_, std::move(name), std::move(type));
 }
 
@@ -222,19 +223,27 @@ ModifierList Parser::modifiers()
     return ModifierList{mods};
 }
 
-TypeInfoPtr Parser::struct_type()
+TypeInfoPtr Parser::type_info()
 {
     if (optional<Token> type = consume(TokenType::Identifier))
         return std::make_shared<TypeInfo>(*type);
 
-    vector<TypeInfoPtr> subtypes = list<TypeInfoPtr>('{', '}', [this](const size_t){ return struct_type(); });
-    return std::make_shared<TypeInfo>(std::move(subtypes));
+    vector<FieldInfo> fields = list<FieldInfo>('{', '}', [this](const size_t){ return field_info(); });
+    return std::make_shared<TypeInfo>(std::move(fields));
+}
+
+FieldInfo Parser::field_info()
+{
+    ModifierList mods = modifiers();
+    TypeInfoPtr type = type_info();
+    optional<Token> name = consume(TokenType::Identifier);
+    return FieldInfo{std::move(mods), std::move(type), std::move(name), nullptr};
 }
 
 Parameter Parser::parameter(const size_t index)
 {
     ModifierList mods = modifiers();
-    TypeInfoPtr type = struct_type();
+    TypeInfoPtr type = type_info();
     Token name = match(TokenType::Identifier);
     ExprPtr expr = consume('=') ? expression() : nullptr;
     return Parameter{runtime_, std::move(mods), std::move(type), std::move(name), std::move(expr), index};
@@ -244,7 +253,7 @@ vector<TypeInfoPtr> Parser::template_list()
 {
     if (peek() != '<')
         return {};
-    return list<TypeInfoPtr>('<', '>', [this](const size_t){ return struct_type(); });
+    return list<TypeInfoPtr>('<', '>', [this](const size_t){ return type_info(); });
 }
 
 tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
@@ -411,7 +420,7 @@ ExprPtr Parser::function_call()
     TypeInfoPtr template_type = nullptr;
     if (consume('<'))
     {
-        template_type = struct_type();
+        template_type = type_info();
         match('>');
     }
     vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
