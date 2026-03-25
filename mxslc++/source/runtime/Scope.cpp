@@ -5,6 +5,7 @@
 #include "Scope.h"
 #include "CompileError.h"
 #include "ArgumentList.h"
+#include "TypeInfo.h"
 #include "utils/template_utils.h"
 
 Scope::Scope() : parent_{nullptr} { }
@@ -59,23 +60,23 @@ namespace
 {
     bool is_match(
         const Function& func,
-        const vector<Type>& return_types,
+        const vector<TypeInfoPtr>& return_types,
         const Token& name,
-        const optional<Type>& template_type,
+        const TypeInfoPtr& template_type,
         const ArgumentList& args
     )
     {
-        if (not return_types.empty() and not contains(return_types, func.type()))
+        if (name.lexeme() != func.name())
             return false;
 
-        if (name.lexeme() != func.name())
+        if (not return_types.empty() and not func.type()->is_compatible(return_types))
             return false;
 
         if (template_type)
         {
             if (not func.has_template_type())
                 return false;
-            if (*template_type != func.template_type())
+            if (not template_type->is_compatible(func.template_type()))
                 return false;
         }
 
@@ -84,7 +85,8 @@ namespace
 
         for (const Argument& arg : args)
         {
-            if (arg.is_initialized() and func.parameters()[arg].type() != arg.type())
+            TypeInfoPtr param_type = func.parameters()[arg].type();
+            if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
                 return false;
         }
 
@@ -105,9 +107,9 @@ namespace
 }
 
 vector<FuncPtr> Scope::get_functions(
-    const vector<Type>& return_types,
+    const vector<TypeInfoPtr>& return_types,
     const Token& name,
-    const optional<Type>& template_type,
+    const TypeInfoPtr& template_type,
     const ArgumentList& args
 ) const
 {
@@ -125,9 +127,9 @@ vector<FuncPtr> Scope::get_functions(
 }
 
 FuncPtr Scope::get_function(
-    const vector<Type>& return_types,
+    const vector<TypeInfoPtr>& return_types,
     const Token& name,
-    const optional<Type>& template_type,
+    const TypeInfoPtr& template_type,
     const ArgumentList& args
 ) const
 {
@@ -148,40 +150,71 @@ FuncPtr Scope::get_function(
     return funcs[0];
 }
 
-void Scope::add_type(Type&& type)
+void Scope::add_type(TypeInfoPtr type)
 {
-    if (contains(types_, type.str()))
-        throw CompileError{"Type already defined: " + type.str()};
-
-    types_.emplace(type.str(), std::move(type));
+    if (contains(types_, type->name()))
+        throw CompileError{type->name_token(), "Type '" + type->name() + "' already defined"};
+    type->set_initialized();
+    types_.emplace(type->name(), std::move(type));
 }
 
-bool Scope::has_type(const Type& type) const
+void Scope::add_type(const string& name)
 {
-    if (type.is_complex())
-    {
-        bool has = true;
-        for (const Type& t : type.subtypes())
-            has &= has_type(t);
-        return has;
-    }
-    else
-    {
-        return has_type(type.str());
-    }
+    TypeInfoPtr type = std::make_shared<TypeInfo>(name);
+    add_type(std::move(type));
+}
+
+bool Scope::has_type(const Token& name) const
+{
+    return has_type(name.lexeme());
 }
 
 bool Scope::has_type(const string& name) const
 {
     if (contains(types_, name))
-    {
         return true;
-    }
-
     if (parent_)
-    {
         return parent_->has_type(name);
-    }
-
     return false;
+}
+
+TypeInfoPtr Scope::init_type(const TypeInfoPtr& type) const
+{
+    if (type->name().empty())
+    {
+        vector<FieldInfo> fields;
+        fields.reserve(type->field_count());
+        for (const FieldInfo& field : type->fields())
+        {
+            optional<Token> name = as_optional(field.has_name(), field.name_token());
+            fields.emplace_back(field.modifiers(), init_type(field.type()), name, field.initializer());
+        }
+        TypeInfoPtr new_type = std::make_shared<TypeInfo>(type->modifiers(), type->name_token(), type->parent_token(), std::move(fields));
+        new_type->set_initialized();
+        return new_type;
+    }
+    else
+    {
+        return get_type(type->name_token());
+    }
+}
+
+TypeInfoPtr Scope::get_type(const Token& name) const
+{
+    if (contains(types_, name.lexeme()))
+        return types_.at(name.lexeme());
+    if (parent_)
+        return parent_->get_type(name);
+    throw CompileError{name, "Type '" + name.lexeme() + "' not defined"};
+}
+
+TypeInfoPtr Scope::get_type(const string& name) const
+{
+    return get_type(Token{name});
+}
+
+TypeInfoPtr Scope::get_type(const basic_t& val) const
+{
+    const TypeInfoPtr type = std::make_shared<TypeInfo>(val);
+    return init_type(type);
 }

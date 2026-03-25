@@ -6,7 +6,6 @@ add_executable(mxslc_tests
         span_tests.cpp
         parse_args_tests.cpp
         groundtruth_tests.cpp
-        type_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

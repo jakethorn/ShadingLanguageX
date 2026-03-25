@@ -9,16 +9,18 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "statements/Statement.h"
+#include "utils/instantiate_template_types_utils.h"
+#include "runtime/TypeInfo.h"
 
-ExprPtr FunctionCall::instantiate_template_types(const Type& template_type) const
+ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     Token name = token_.instantiate_template_types(template_type);
-    optional<Type> _template_type = Type::instantiate_template_types(template_type_, template_type);
+    TypeInfoPtr _template_type = ::instantiate_template_types(template_type_, template_type);
     ArgumentList args = args_.instantiate_template_types(template_type);
     return std::make_unique<FunctionCall>(runtime_, std::move(name), std::move(_template_type), std::move(args));
 }
 
-void FunctionCall::init_subexpressions(const vector<Type>& types)
+void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
     const Scope& scope = runtime_.scope();
 
@@ -30,28 +32,28 @@ void FunctionCall::init_subexpressions(const vector<Type>& types)
         if (matching_funcs.empty())
             throw CompileError{token_, "No matching functions: " + token_.lexeme()};
 
-        const size_t prev_initialised_arg_count = initialised_arg_count;
+        const size_t prev_initialized_arg_count = initialised_arg_count;
         initialised_arg_count = try_init_arguments(matching_funcs);
 
-        if (initialised_arg_count == prev_initialised_arg_count)
+        if (initialised_arg_count == prev_initialized_arg_count)
         {
             // init failed, try to init with a default function...
             FuncPtr default_func = scope.get_function(types, token_, template_type_, args_);
             initialised_arg_count = try_init_arguments({std::move(default_func)});
 
-            if (initialised_arg_count == prev_initialised_arg_count)
+            if (initialised_arg_count == prev_initialized_arg_count)
                 throw CompileError{token_, "Ambiguous function call: " + token_.lexeme()};
         }
     }
 }
 
-void FunctionCall::init_impl(const vector<Type>& types)
+void FunctionCall::init_impl(const vector<TypeInfoPtr>& types)
 {
     const Scope& scope = runtime_.scope();
     func_ = scope.get_function(types, token_, template_type_, args_);
 }
 
-const Type& FunctionCall::type_impl() const
+TypeInfoPtr FunctionCall::type_impl() const
 {
     return func_->type();
 }
@@ -76,17 +78,16 @@ ValuePtr FunctionCall::evaluate_impl() const
 
 namespace
 {
-    vector<Type> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
+    vector<TypeInfoPtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
     {
-        vector<Type> types;
+        vector<TypeInfoPtr> types;
         types.reserve(funcs.size());
 
         for (const FuncPtr& func : funcs)
         {
             const ParameterList& params = func->parameters();
             const Parameter& param = params[arg];
-            const Type& type = param.type();
-            types.push_back(type);
+            types.push_back(param.type());
         }
 
         return types;
@@ -100,10 +101,10 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     {
         if (not arg.is_initialized())
         {
-            if (const vector<Type> types = get_parameter_types(funcs, arg);
+            if (const vector<TypeInfoPtr> types = get_parameter_types(funcs, arg);
                 arg.try_init(types))
             {
-                ++initialised_arg_count_;
+                ++initialized_arg_count_;
             }
         }
 
@@ -127,12 +128,11 @@ void FunctionCall::evaluate_arguments() const
         }
         else if (param.has_default_value())
         {
-            param.init();
             val = param.evaluate();
         }
         else
         {
-            throw CompileError(token_, "Missing argument"s);
+            throw CompileError{token_, "Missing argument"s};
         }
 
         Variable var{{}, param.type(), param.name(), std::move(val)};

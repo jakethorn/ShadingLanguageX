@@ -4,9 +4,8 @@ mxslc/LICENSE
 mxslc/pyproject.toml
 mxslc/notes.txt
 mxslc++/examples/
-mxslc++/.gdbinit
 mxslc++/main.rsp
-mxslc++/mxslc_gdb.py
+mxslc++/gdb_printers.py
 mxslc++/todo.txt
 mxslc++/notes.txt
 

@@ -8,7 +8,6 @@
 #include "utils/common.h"
 
 class Runtime;
-class Type;
 
 class Statement
 {
@@ -16,7 +15,7 @@ public:
     explicit Statement(const Runtime& runtime) : runtime_{runtime} { }
     virtual ~Statement() = default;
 
-    [[nodiscard]] virtual StmtPtr instantiate_template_types(const Type& template_type) const = 0;
+    [[nodiscard]] virtual StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
     virtual void execute() const = 0;
 
 protected:

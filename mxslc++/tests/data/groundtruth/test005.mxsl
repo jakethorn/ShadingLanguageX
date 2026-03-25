@@ -1,0 +1,2 @@
+{integer, color3} x = {2, color3{1.0, 0.0, 1.0}};
+color3 y = x[1] + float{x[0]};

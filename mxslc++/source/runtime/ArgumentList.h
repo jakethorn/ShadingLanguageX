@@ -7,7 +7,7 @@
 
 #include "utils/common.h"
 #include "Argument.h"
-#include "Type.h"
+#include "utils/instantiate_template_types_utils.h"
 
 class Parameter;
 
@@ -25,9 +25,9 @@ public:
         (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
     }
 
-    [[nodiscard]] ArgumentList instantiate_template_types(const Type& template_type) const
+    [[nodiscard]] ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const
     {
-        return Type::instantiate_template_types(args_, template_type);
+        return ::instantiate_template_types(args_, template_type);
     }
 
     [[nodiscard]] vector<ValuePtr> evaluate() const
@@ -45,11 +45,11 @@ public:
     const Argument& operator[](const size_t i) const { return args_.at(i); }
     const Argument* operator[](const Parameter& param) const;
 
-    auto begin() { return args_.begin(); }
-    auto begin() const { return args_.begin(); }
+    [[nodiscard]] auto begin() { return args_.begin(); }
+    [[nodiscard]] auto begin() const { return args_.begin(); }
 
-    auto end() { return args_.end(); }
-    auto end() const { return args_.end(); }
+    [[nodiscard]] auto end() { return args_.end(); }
+    [[nodiscard]] auto end() const { return args_.end(); }
 
 private:
     vector<Argument> args_;

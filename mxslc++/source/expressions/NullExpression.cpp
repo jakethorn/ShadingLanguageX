@@ -7,19 +7,19 @@
 #include "CompileError.h"
 #include "values/NullValue.h"
 
-ExprPtr NullExpression::instantiate_template_types(const Type& template_type) const
+ExprPtr NullExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     return std::make_unique<NullExpression>(runtime_, token_);
 }
 
-void NullExpression::init_impl(const vector<Type>& types)
+void NullExpression::init_impl(const vector<TypeInfoPtr>& types)
 {
     if (types.size() != 1)
-        throw CompileError{token_, "Ambiguous null expression"};
+        throw CompileError{token_, "Ambiguous null expression"s};
     type_ = types.at(0);
 }
 
-const Type& NullExpression::type_impl() const
+TypeInfoPtr NullExpression::type_impl() const
 {
     return type_;
 }

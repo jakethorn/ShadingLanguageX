@@ -23,11 +23,11 @@ public:
     [[nodiscard]] const string& name() const { return name_.value(); }
     [[nodiscard]] size_t index() const { return index_; }
 
-    [[nodiscard]] Argument instantiate_template_types(const Type& template_type) const;
-    void init(const vector<Type>& types) const;
-    [[nodiscard]] bool try_init(const vector<Type>& types) const;
+    [[nodiscard]] Argument instantiate_template_types(const TypeInfoPtr& template_type) const;
+    void init(const vector<TypeInfoPtr>& types) const;
+    [[nodiscard]] bool try_init(const vector<TypeInfoPtr>& types) const;
     [[nodiscard]] bool is_initialized() const;
-    [[nodiscard]] Type type() const;
+    [[nodiscard]] TypeInfoPtr type() const;
     [[nodiscard]] ValuePtr evaluate() const;
 
 private:

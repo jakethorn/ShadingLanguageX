@@ -5,16 +5,17 @@
 #include "Function.h"
 
 #include "CompileError.h"
+#include "Runtime.h"
+#include "TypeInfo.h"
 #include "statements/Statement.h"
 #include "utils/template_utils.h"
 #include "expressions/Expression.h"
 #include "mtlx/mtlx_utils.h"
-#include "utils/str_utils.h"
 
 Function::Function(
-    Type type,
+    TypeInfoPtr type,
     Token name,
-    optional<Type> template_type,
+    TypeInfoPtr template_type,
     ParameterList params,
     vector<string> output_names
 ) : type_{std::move(type)},
@@ -27,10 +28,10 @@ Function::Function(
 }
 
 Function::Function(
-    vector<string> mods,
-    Type type,
+    ModifierList mods,
+    TypeInfoPtr type,
     Token name,
-    optional<Type> template_type,
+    TypeInfoPtr template_type,
     ParameterList params,
     vector<StmtPtr> body,
     ExprPtr return_expr
@@ -42,15 +43,14 @@ Function::Function(
     body_{std::move(body)},
     return_expr_{std::move(return_expr)}
 {
-    static const vector valid_mods{"inline"s, "default"s};
-    for (const string& mod : mods_)
-        if (not contains(valid_mods, mod))
-            throw CompileError{name_, "'" + mod + "' is not a valid function modifier"};
+    mods_.validate("inline"s, "default"s);
 
-    if (type_ == "void"s and return_expr_ != nullptr)
+    if (type_ == TypeInfo::Void and return_expr_ != nullptr)
         throw CompileError{name_, "Cannot return a value from a void function"s};
+    if (type_ != TypeInfo::Void and return_expr_ == nullptr)
+        throw CompileError{name_, "Must return a value from a non-void function"s};
 
-    for (size_t i = 0; i < type_.subtype_count(); ++i)
+    for (size_t i = 0; i < type_->field_count(); ++i)
         output_names_.push_back(port_name("out"s, i));
 }
 
@@ -71,16 +71,24 @@ Function& Function::operator=(Function&& other) noexcept
 {
     if (this != &other)
     {
-        mods_     = std::move(other.mods_);
-        type_          = std::move(other.type_);
-        name_          = std::move(other.name_);
+        mods_ = std::move(other.mods_);
+        type_ = std::move(other.type_);
+        name_ = std::move(other.name_);
         template_type_ = std::move(other.template_type_);
-        params_        = std::move(other.params_);
-        body_          = std::move(other.body_);
-        return_expr_   = std::move(other.return_expr_);
-        output_names_  = std::move(other.output_names_);
+        params_ = std::move(other.params_);
+        body_ = std::move(other.body_);
+        return_expr_ = std::move(other.return_expr_);
+        output_names_ = std::move(other.output_names_);
     }
     return *this;
+}
+
+void Function::init(const Runtime& runtime)
+{
+    type_ = runtime.scope().init_type(type_);
+    if (template_type_)
+        template_type_ = runtime.scope().init_type(template_type_);
+    params_.init();
 }
 
 Function::~Function() = default;

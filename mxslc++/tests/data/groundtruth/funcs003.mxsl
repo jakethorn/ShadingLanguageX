@@ -8,3 +8,4 @@ color3 cx = add(c, x);
 {float, color3} a = foo();
 break;
 float y = x + a[0];
+color3 z = c + a[1];

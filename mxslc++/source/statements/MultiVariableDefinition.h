@@ -7,19 +7,17 @@
 
 #include "Statement.h"
 #include "Token.h"
-#include "runtime/Type.h"
-#include "runtime/Variable.h"
 
 class MultiVariableDefinition final : public Statement
 {
 public:
-    MultiVariableDefinition(const Runtime& runtime, vector<VariableDeclaration> decls, ExprPtr expr);
+    MultiVariableDefinition(const Runtime& runtime, TypeInfoPtr type, ExprPtr expr);
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const Type& template_type) const override;
+    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
     void execute() const override;
 
 private:
-    vector<VariableDeclaration> decls_;
+    TypeInfoPtr type_;
     ExprPtr expr_;
 };
 

@@ -29,8 +29,8 @@ public:
 
     Token consume();
 
-    template<typename... Ts>
-    optional<Token> consume(const Ts&... types)
+    template<typename... Args>
+    optional<Token> consume(const Args&... types)
     {
         const Token& token = peek();
         if ((... || (token == types)))
@@ -41,8 +41,8 @@ public:
         return std::nullopt;
     }
 
-    template<typename... Ts>
-    vector<Token> consume_while(const Ts&... types)
+    template<typename... Args>
+    vector<Token> consume_while(const Args&... types)
     {
         vector<Token> tokens;
         while (optional<Token> token = consume(types...))
@@ -53,8 +53,8 @@ public:
         return tokens;
     }
 
-    template<typename... Ts>
-    Token match(const Ts&... types)
+    template<typename... Args>
+    Token match(const Args&... types)
     {
         const Token& token = peek();
         if ((... || (token == types)))

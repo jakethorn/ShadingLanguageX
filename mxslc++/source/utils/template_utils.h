@@ -40,8 +40,8 @@ optional<T> as_optional(const bool pred, const T& value)
     return std::nullopt;
 }
 
-template<typename T>
-bool contains(const vector<T>& ts, const T& t)
+template<typename T0, typename T1>
+bool contains(const vector<T0>& ts, const T1& t)
 {
     return std::find(ts.begin(), ts.end(), t) != ts.end();
 }

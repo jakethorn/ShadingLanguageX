@@ -11,7 +11,7 @@
     </add>
     <output name="out" type="float" nodename="node1" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="f" type="float">
     <input name="a" type="float" value="2" />
   </foo>
 </materialx>

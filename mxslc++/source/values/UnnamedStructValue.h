@@ -7,7 +7,7 @@
 
 #include "Value.h"
 #include "mtlx/mtlx_utils.h"
-#include "runtime/Type.h"
+#include "runtime/TypeInfo.h"
 #include "utils/str_utils.h"
 
 class UnnamedStructValue final : public Value
@@ -15,12 +15,12 @@ class UnnamedStructValue final : public Value
 public:
     explicit UnnamedStructValue(vector<ValuePtr> values) : values_{std::move(values)}
     {
-        vector<Type> types;
+        vector<TypeInfoPtr> types;
         types.reserve(values_.size());
         for (const ValuePtr& val : values_)
             types.push_back(val->type());
 
-        type_ = Type{std::move(types)};
+        type_ = std::make_shared<TypeInfo>(types);
     }
 
     [[nodiscard]] size_t subvalue_count() const override { return values_.size(); }
@@ -44,8 +44,8 @@ public:
             values_[i]->set_as_node_def_input(node_def, port_name(input_name, i));
     }
 
-    const Type& type() const override { return type_; }
-    string str() const override
+    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
+    [[nodiscard]] string str() const override
     {
         string result;
         for (size_t i = 0; i < values_.size(); ++i)
@@ -60,7 +60,7 @@ public:
 
 private:
     vector<ValuePtr> values_;
-    Type type_;
+    TypeInfoPtr type_;
 };
 
 #endif //MXSLC_UNNAMEDSTRUCTVALUE_H

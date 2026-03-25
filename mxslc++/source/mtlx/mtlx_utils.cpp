@@ -17,5 +17,10 @@ string as_string(const mx::NodePtr& node)
 
 string port_name(const string& port_name, const size_t i)
 {
-    return port_name + "__" + str(i+1);
+    return port_name + "__" + str(i);
+}
+
+string port_name(const string& port_name, const string& s)
+{
+    return port_name + "__" + s;
 }

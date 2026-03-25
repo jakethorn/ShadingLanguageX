@@ -14,6 +14,7 @@
 #include "values/Value.h"
 #include "runtime/Function.h"
 #include "runtime/ArgumentList.h"
+#include "runtime/TypeInfo.h"
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "utils/template_utils.h"
@@ -63,13 +64,13 @@ namespace
         return nullptr;
     }
 
-    string serialize_type(const Type& type)
+    string serialize_type(const TypeInfoPtr& type)
     {
-        if (type.is_complex())
-            return "multioutput"s;
-        if (type == "void"s)
-            return "integer"s;
-        return type.str();
+        if (type->has_fields())
+            return TypeInfo::MultiOutput;
+        if (type == TypeInfo::Void)
+            return TypeInfo::Int;
+        return type->name();
     }
 }
 
@@ -92,13 +93,13 @@ ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& ar
     }
 
     // outputs
-    if (func.type().is_complex())
+    if (func.type()->has_fields())
     {
-        for (size_t i = 0; i < func.type().subtype_count(); ++i)
-            node->addOutput(func.output_name(i), func.type().subtype(i).str());
+        for (size_t i = 0; i < func.type()->field_count(); ++i)
+            node->addOutput(func.output_name(i), func.type()->field(i).type()->name());
     }
 
-    return std::make_shared<NodeValue>(node);
+    return std::make_shared<NodeValue>(node, func.type());
 }
 
 void MtlXSerializer::write_node_def_graph(const Function& func) const
@@ -117,14 +118,40 @@ namespace
 {
     string node_def_name(const Function& func)
     {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().str() : func.name();
+        const string name = func.has_template_type() ? func.name() + "_" + func.template_type()->name() : func.name();
         return "ND_" + name;
     }
 
     string node_graph_name(const Function& func)
     {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type().str() : func.name();
+        const string name = func.has_template_type() ? func.name() + "_" + func.template_type()->name() : func.name();
         return "NG_" + name;
+    }
+    
+    void add_inputs_from_type(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
+    {
+        if (type->has_fields())
+        {
+            for (size_t i = 0; i < type->field_count(); ++i)
+                add_inputs_from_type(node_def, type->field_type(i), port_name(name, i));
+        }
+        else
+        {
+            node_def->addInput(name, type->name());
+        }
+    }
+
+    void add_outputs_from_type(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
+    {
+        if (type->has_fields())
+        {
+            for (size_t i = 0; i < type->field_count(); ++i)
+                add_outputs_from_type(node_def, type->field_type(i), port_name(name, i));
+        }
+        else
+        {
+            node_def->addOutput(name, type->name());
+        }
     }
 }
 
@@ -140,16 +167,13 @@ void MtlXSerializer::write_node_def(const Function& func) const
         }
         else
         {
-            if (param.type().is_complex())
-            {
-                for (size_t i = 0; i < param.type().subtype_count(); ++i)
-                    node_def->addInput(port_name(param.name(), i), param.type().subtype(i).str());
-            }
-            else
-            {
-                node_def->addInput(param.name(), param.type().str());
-            }
+            add_inputs_from_type(node_def, param.type(), param.name());
         }
+    }
+
+    if (func.type()->has_fields())
+    {
+        add_outputs_from_type(node_def, func.type(), "out"s);
     }
 }
 
@@ -167,7 +191,7 @@ void MtlXSerializer::write_node_graph(const Function& func) const
     }
     exit_node_graph();
 
-    if (func.type() == "void"s)
+    if (func.type() == TypeInfo::Void)
     {
         const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
         output->setValue(0, "integer"s);

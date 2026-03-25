@@ -6,18 +6,16 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
-#include "values/InterfaceValue.h"
 #include "expressions/Expression.h"
-#include "mtlx/mtlx_utils.h"
-#include "values/UnnamedStructValue.h"
+#include "runtime/TypeInfo.h"
 #include "values/ValueFactory.h"
 
 FunctionDefinition::FunctionDefinition(
     const Runtime& runtime,
-    vector<string> mods,
-    Type type,
+    ModifierList mods,
+    TypeInfoPtr type,
     Token name,
-    vector<Type> template_types,
+    vector<TypeInfoPtr> template_types,
     ParameterList params,
     vector<StmtPtr> body,
     ExprPtr return_expr
@@ -32,34 +30,34 @@ FunctionDefinition::FunctionDefinition(
 {
     if (is_templated())
     {
-        for (const Type& template_type : template_types_)
+        for (const TypeInfoPtr& template_type : template_types_)
         {
-            type = type_.instantiate_template_types(template_type);
+            type = type_->instantiate_template_types(template_type);
             params = params_.instantiate_template_types(template_type);
-            body = Type::instantiate_template_types(body_, template_type);
-            return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
+            body = ::instantiate_template_types(body_, template_type);
+            return_expr = ::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
-                mods_, std::move(type), name_, std::move(template_type), std::move(params), std::move(body), std::move(return_expr)
+                mods_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr)
             ));
         }
     }
     else
     {
         funcs_.push_back(std::make_shared<Function>(
-            std::move(mods_), std::move(type_), std::move(name_), std::nullopt, std::move(params_), std::move(body_), std::move(return_expr_)
+            std::move(mods_), std::move(type_), std::move(name_), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
         ));
     }
 }
 
-StmtPtr FunctionDefinition::instantiate_template_types(const Type& template_type) const
+StmtPtr FunctionDefinition::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     if (is_templated())
         throw CompileError{name_, "Nested templated functions is not supported"s};
 
-    Type type = type_.instantiate_template_types(template_type);
+    TypeInfoPtr type = type_->instantiate_template_types(template_type);
     ParameterList params = params_.instantiate_template_types(template_type);
-    vector body = Type::instantiate_template_types(body_, template_type);
-    ExprPtr return_expr = return_expr_ ? return_expr_->instantiate_template_types(template_type) : nullptr;
+    vector<StmtPtr> body = ::instantiate_template_types(body_, template_type);
+    ExprPtr return_expr = ::instantiate_template_types(return_expr_, template_type);
     return std::make_unique<FunctionDefinition>(runtime_, mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
 }
 
@@ -67,6 +65,7 @@ void FunctionDefinition::execute() const
 {
     for (const FuncPtr& func : funcs_)
     {
+        func->init(runtime_);
         if (not func->is_inline())
             write_function_definition(*func);
         runtime_.scope().add_function(func);

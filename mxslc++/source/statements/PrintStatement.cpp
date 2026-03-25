@@ -5,6 +5,7 @@
 #include <iostream>
 #include "PrintStatement.h"
 #include "expressions/Expression.h"
+#include "utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
 PrintStatement::PrintStatement(const Runtime& runtime, vector<ExprPtr> exprs) : Statement{runtime}, exprs_{std::move(exprs)}
@@ -12,14 +13,10 @@ PrintStatement::PrintStatement(const Runtime& runtime, vector<ExprPtr> exprs) : 
 
 }
 
-StmtPtr PrintStatement::instantiate_template_types(const Type& template_type) const
+StmtPtr PrintStatement::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
-    vector<ExprPtr> instantiated_exprs;
-    instantiated_exprs.reserve(exprs_.size());
-    for (const ExprPtr& expr : exprs_)
-        instantiated_exprs.push_back(expr->instantiate_template_types(template_type));
-
-    return std::make_unique<PrintStatement>(runtime_, std::move(instantiated_exprs));
+    vector<ExprPtr> exprs = ::instantiate_template_types(exprs_, template_type);
+    return std::make_unique<PrintStatement>(runtime_, std::move(exprs));
 }
 
 void PrintStatement::execute() const
