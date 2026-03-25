@@ -10,6 +10,8 @@
 
 class FieldInfo
 {
+    friend class Scope;
+
 public:
     FieldInfo(ModifierList mods, TypeInfoPtr type, optional<Token> name, ExprPtr initializer)
         : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, initializer_{std::move(initializer)} { }

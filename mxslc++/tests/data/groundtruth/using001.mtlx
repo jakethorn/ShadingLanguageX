@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_to" node="to">
+    <input name="a__0" type="float" />
+    <input name="a__1" type="float" />
+    <input name="b__0" type="float" />
+    <input name="b__1" type="float" />
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+  </nodedef>
+  <nodegraph name="NG_to">
+    <subtract name="x" type="float">
+      <input name="in1" type="float" interfacename="b__0" />
+      <input name="in2" type="float" interfacename="a__0" />
+    </subtract>
+    <subtract name="y" type="float">
+      <input name="in1" type="float" interfacename="b__0" />
+      <input name="in2" type="float" interfacename="a__0" />
+    </subtract>
+    <output name="out__0" type="float" nodename="x" />
+    <output name="out__1" type="float" nodename="y" />
+  </nodegraph>
+  <to name="p" type="multioutput">
+    <input name="a__0" type="float" value="0" />
+    <input name="a__1" type="float" value="0" />
+    <input name="b__0" type="float" value="1" />
+    <input name="b__1" type="float" value="1" />
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+  </to>
+  <combine2 name="node1" type="vector2">
+    <input name="in1" type="float" output="out__0" nodename="p" />
+    <input name="in2" type="float" output="out__1" nodename="p" />
+  </combine2>
+  <separate2 name="node2" type="multioutput">
+    <input name="in" type="vector2" nodename="node1" />
+    <output name="outx" type="float" />
+    <output name="outy" type="float" />
+  </separate2>
+  <divide name="z" type="float">
+    <input name="in1" type="float" output="outx" nodename="node2" />
+    <input name="in2" type="float" output="outy" nodename="node2" />
+  </divide>
+</materialx>

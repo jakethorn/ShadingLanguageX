@@ -152,16 +152,30 @@ FuncPtr Scope::get_function(
 
 void Scope::add_type(TypeInfoPtr type)
 {
+    assert(type->has_name());
+
     if (contains(types_, type->name()))
         throw CompileError{type->name_token(), "Type '" + type->name() + "' already defined"};
-    type->set_initialized();
+
+    resolve_fields(type);
+    type->set_resolved();
+
     types_.emplace(type->name(), std::move(type));
 }
 
-void Scope::add_type(const string& name)
+void Scope::add_basic_type(const string& name)
 {
     TypeInfoPtr type = std::make_shared<TypeInfo>(name);
     add_type(std::move(type));
+}
+
+void Scope::add_alias(const Token& name, TypeInfoPtr type)
+{
+    if (contains(types_, name.lexeme()))
+        throw CompileError{name, "Type '" + name.lexeme() + "' already defined"};
+
+    type = resolve_type(type);
+    types_.emplace(name.lexeme(), type);
 }
 
 bool Scope::has_type(const Token& name) const
@@ -178,25 +192,24 @@ bool Scope::has_type(const string& name) const
     return false;
 }
 
-TypeInfoPtr Scope::init_type(const TypeInfoPtr& type) const
+TypeInfoPtr Scope::resolve_type(const TypeInfoPtr& type) const
 {
-    if (type->name().empty())
-    {
-        vector<FieldInfo> fields;
-        fields.reserve(type->field_count());
-        for (const FieldInfo& field : type->fields())
-        {
-            optional<Token> name = as_optional(field.has_name(), field.name_token());
-            fields.emplace_back(field.modifiers(), init_type(field.type()), name, field.initializer());
-        }
-        TypeInfoPtr new_type = std::make_shared<TypeInfo>(type->modifiers(), type->name_token(), type->parent_token(), std::move(fields));
-        new_type->set_initialized();
-        return new_type;
-    }
-    else
+    if (type->has_name())
     {
         return get_type(type->name_token());
     }
+    else
+    {
+        resolve_fields(type);
+        type->set_resolved();
+        return type;
+    }
+}
+
+void Scope::resolve_fields(const TypeInfoPtr& type) const
+{
+    for (FieldInfo& field : type->fields_)
+        field.type_ = resolve_type(field.type_);
 }
 
 TypeInfoPtr Scope::get_type(const Token& name) const
@@ -216,5 +229,5 @@ TypeInfoPtr Scope::get_type(const string& name) const
 TypeInfoPtr Scope::get_type(const basic_t& val) const
 {
     const TypeInfoPtr type = std::make_shared<TypeInfo>(val);
-    return init_type(type);
+    return resolve_type(type);
 }

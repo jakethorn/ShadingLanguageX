@@ -3,6 +3,8 @@
 //
 
 #include "UsingDeclaration.h"
+
+#include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 
 StmtPtr UsingDeclaration::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -13,5 +15,5 @@ StmtPtr UsingDeclaration::instantiate_template_types(const TypeInfoPtr& template
 
 void UsingDeclaration::execute() const
 {
-
+    runtime_.scope().add_alias(name_, type_);
 }

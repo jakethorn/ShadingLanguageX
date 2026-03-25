@@ -42,10 +42,12 @@ public:
     ) const;
 
     void add_type(TypeInfoPtr type);
-    void add_type(const string& name);
+    void add_basic_type(const string& name);
+    void add_alias(const Token& name, TypeInfoPtr type);
     [[nodiscard]] bool has_type(const Token& name) const;
     [[nodiscard]] bool has_type(const string& name) const;
-    [[nodiscard]] TypeInfoPtr init_type(const TypeInfoPtr& type) const;
+    [[nodiscard]] TypeInfoPtr resolve_type(const TypeInfoPtr& type) const;
+    void resolve_fields(const TypeInfoPtr& type) const;
     [[nodiscard]] TypeInfoPtr get_type(const Token& name) const;
     [[nodiscard]] TypeInfoPtr get_type(const string& name) const;
     [[nodiscard]] TypeInfoPtr get_type(const basic_t& val) const;

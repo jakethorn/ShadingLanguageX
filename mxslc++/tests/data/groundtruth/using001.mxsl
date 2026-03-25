@@ -1,0 +1,15 @@
+//break;
+using Point = {float x, float y};
+
+Point to(Point a, Point b)
+{
+    float x = b[0] - a[0];
+    float y = b[0] - a[0];
+    return {x, y};
+}
+
+Point p = to({0.0, 0.0}, {1.0, 1.0});
+//print p;
+
+float x, y = separate2(vector2{p[0], p[1]});
+float z = x / y;

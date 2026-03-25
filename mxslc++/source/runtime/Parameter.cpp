@@ -46,7 +46,7 @@ Parameter Parameter::instantiate_template_types(const TypeInfoPtr& template_type
 
 void Parameter::init()
 {
-    type_ = runtime_.scope().init_type(type_);
+    type_ = runtime_.scope().resolve_type(type_);
 
     if (has_default_value())
         expr_->init(type());

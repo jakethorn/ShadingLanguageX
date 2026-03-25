@@ -40,7 +40,7 @@ void Expression::init(const vector<TypeInfoPtr>& types)
 bool Expression::try_init(const vector<TypeInfoPtr>& types)
 {
     for (const TypeInfoPtr& type : types)
-        assert(type->is_initialized());
+        assert(type->is_resolved());
 
     if (not is_initialized_)
     {
@@ -56,7 +56,7 @@ TypeInfoPtr Expression::type() const
 {
     assert(is_initialized_);
     TypeInfoPtr type = type_impl();
-    assert(type->is_initialized());
+    assert(type->is_resolved());
     return type;
 }
 

@@ -16,6 +16,8 @@
 
 class TypeInfo
 {
+    friend class Scope;
+
 public:
     inline static string Void = "void"s;
     inline static string Bool = "boolean"s;
@@ -51,6 +53,7 @@ public:
     }
 
     [[nodiscard]] const ModifierList& modifiers() const { return mods_; }
+    [[nodiscard]] bool has_name() const { return not name_.lexeme().empty(); }
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] const string& parent() const { return parent_.lexeme(); }
     [[nodiscard]] const vector<FieldInfo>& fields() const { return fields_; }
@@ -101,13 +104,12 @@ public:
         return "field" + str(index);
     }
 
-    void set_initialized() { is_initialized_ = true; }
-    [[nodiscard]] bool is_initialized() const { return is_initialized_; }
-
+    [[nodiscard]] bool is_basic() const { return has_name() and not has_fields(); }
+    [[nodiscard]] bool is_resolved() const { return is_resolved_; }
     [[nodiscard]] bool is_compatible(const TypeInfoPtr& other) const
     {
-        assert(is_initialized_);
-        assert(other->is_initialized_);
+        assert(is_resolved_);
+        assert(other->is_resolved_);
         if (has_fields() and other->has_fields())
         {
             if (field_count() != other->field_count())
@@ -124,7 +126,6 @@ public:
             return name_ == other->name_;
         }
     }
-
     [[nodiscard]] bool is_compatible(const vector<TypeInfoPtr>& other) const
     {
         for (const TypeInfoPtr& type : other)
@@ -140,12 +141,14 @@ public:
     bool operator!=(const string& other) const { return not (*this == other); }
 
 private:
+    void set_resolved() { is_resolved_ = true; }
+
     ModifierList mods_;
     Token name_;
     Token parent_;
     vector<FieldInfo> fields_;
 
-    bool is_initialized_ = false;
+    bool is_resolved_ = false;
 };
 
 inline bool operator==(const TypeInfoPtr& type, const string& other)

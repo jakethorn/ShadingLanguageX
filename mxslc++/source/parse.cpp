@@ -211,6 +211,7 @@ StmtPtr Parser::using_declaration()
     Token name = match(TokenType::Identifier);
     match('=');
     TypeInfoPtr type = type_info();
+    match(';');
     return std::make_unique<UsingDeclaration>(runtime_, std::move(name), std::move(type));
 }
 

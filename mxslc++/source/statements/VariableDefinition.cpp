@@ -29,7 +29,7 @@ void VariableDefinition::execute() const
 {
     Scope& scope = runtime_.scope();
 
-    TypeInfoPtr type = scope.init_type(type_);
+    TypeInfoPtr type = scope.resolve_type(type_);
     expr_->init(type);
     ValuePtr val = expr_->evaluate();
     val->set_name(name_.lexeme());

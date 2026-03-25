@@ -42,7 +42,7 @@ TypeInfoPtr UnnamedConstructor::type_impl() const
     for (const ExprPtr& expr : exprs_)
         types.push_back(expr->type());
     const TypeInfoPtr type = std::make_shared<TypeInfo>(std::move(types));
-    return runtime_.scope().init_type(type);
+    return runtime_.scope().resolve_type(type);
 }
 
 ValuePtr UnnamedConstructor::evaluate_impl() const

@@ -41,7 +41,7 @@ namespace
             subtypes.emplace_back(std::make_shared<TypeInfo>(o->getType()));
 
         const TypeInfoPtr type = subtypes.size() == 1 ? subtypes.at(0) : std::make_shared<TypeInfo>(std::move(subtypes));
-        return runtime.scope().init_type(type);
+        return runtime.scope().resolve_type(type);
     }
 
     vector<string> get_output_names(const mx::NodeDefPtr& nd)
@@ -73,7 +73,7 @@ void load_library(const Runtime& runtime, const mx::DocumentPtr& doc)
 
     for (const mx::TypeDefPtr& td : doc->getTypeDefs())
     {
-        scope.add_type(td->getName());
+        scope.add_basic_type(td->getName());
     }
 
     for (const mx::NodeDefPtr& nd : doc->getNodeDefs())

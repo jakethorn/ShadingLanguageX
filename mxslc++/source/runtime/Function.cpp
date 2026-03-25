@@ -49,9 +49,6 @@ Function::Function(
         throw CompileError{name_, "Cannot return a value from a void function"s};
     if (type_ != TypeInfo::Void and return_expr_ == nullptr)
         throw CompileError{name_, "Must return a value from a non-void function"s};
-
-    for (size_t i = 0; i < type_->field_count(); ++i)
-        output_names_.push_back(port_name("out"s, i));
 }
 
 Function::Function(Function&& other) noexcept
@@ -85,9 +82,16 @@ Function& Function::operator=(Function&& other) noexcept
 
 void Function::init(const Runtime& runtime)
 {
-    type_ = runtime.scope().init_type(type_);
+    type_ = runtime.scope().resolve_type(type_);
+
+    if (output_names_.empty())
+    {
+        for (size_t i = 0; i < type_->field_count(); ++i)
+            output_names_.push_back(port_name("out"s, i));
+    }
+
     if (template_type_)
-        template_type_ = runtime.scope().init_type(template_type_);
+        template_type_ = runtime.scope().resolve_type(template_type_);
     params_.init();
 }
 
