@@ -11,6 +11,7 @@
 #include "runtime/TypeInfo.h"
 #include "runtime/Variable.h"
 #include "values/Value.h"
+#include "values/ValueFactory.h"
 
 ExprPtr Identifier::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -29,7 +30,7 @@ TypeInfoPtr Identifier::type_impl() const
 
 ValuePtr Identifier::evaluate_impl() const
 {
-    return var_->value()->cast(type());
+    return ValueFactory::cast_value(var_->value(), type());
 }
 
 void Identifier::assign(const ValuePtr& value)

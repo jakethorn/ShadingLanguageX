@@ -3,6 +3,8 @@
 //
 
 #include "ValueFactory.h"
+
+#include "CastValue.h"
 #include "runtime/Parameter.h"
 #include "InterfaceValue.h"
 #include "StructValue.h"
@@ -33,4 +35,14 @@ namespace
 ValuePtr ValueFactory::create_parameter_interface(const Parameter& param)
 {
     return get_interface_from_type(param.type(), param.name());
+}
+
+ValuePtr ValueFactory::cast_value(ValuePtr value, TypeInfoPtr type)
+{
+    assert(type->is_resolved());
+
+    if (value->type()->is_equal(type))
+        return value;
+    else
+        return std::make_shared<CastValue>(std::move(value), std::move(type));
 }

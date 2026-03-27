@@ -1,0 +1,4 @@
+using Point = {float x, float y};
+Point p = {1.0, 2.0};
+p.y = 3.0;
+print p.y * 4.0;

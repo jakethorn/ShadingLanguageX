@@ -22,11 +22,6 @@ public:
         throw CompileError{"Cannot return null value"s};
     }
 
-    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
-    {
-        return std::make_shared<NullValue>(type);
-    }
-
     [[nodiscard]] string str() const override { return "null"s; }
 };
 

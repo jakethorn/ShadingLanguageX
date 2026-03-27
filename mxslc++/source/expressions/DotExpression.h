@@ -24,7 +24,6 @@ protected:
 
 private:
     ExprPtr expr_;
-    TypeInfoPtr type_;
 };
 
 #endif //MXSLC_DOTEXPRESSION_H

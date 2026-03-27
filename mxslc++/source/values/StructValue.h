@@ -42,11 +42,6 @@ public:
             values_[i]->set_as_node_def_input(node_def, port_name(input_name, i));
     }
 
-    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
-    {
-        return std::make_shared<StructValue>(values_, type);
-    }
-
     [[nodiscard]] string str() const override
     {
         string result;

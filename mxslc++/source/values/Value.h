@@ -18,19 +18,18 @@ public:
 
     [[nodiscard]] virtual size_t subvalue_count() const { return 0; }
     [[nodiscard]] virtual ValuePtr subvalue(size_t i) const;
-    [[nodiscard]] virtual ValuePtr subvalue(const Token& name) const;
     virtual void set_subvalue(size_t i, const ValuePtr& value);
-    virtual void set_subvalue(const Token& name, const ValuePtr& value);
+
+    [[nodiscard]] ValuePtr subvalue(const Token& name) const;
+    void set_subvalue(const Token& name, const ValuePtr& value);
 
     virtual void set_as_node_input(const mx::NodePtr& node, const string& input_name) const { }
     virtual void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const { }
     virtual void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const { }
     virtual void set_name(const string& name) { }
 
-    [[nodiscard]] ValuePtr cast(const TypeInfoPtr& type) const;
-    [[nodiscard]] virtual ValuePtr cast_impl(const TypeInfoPtr& type) const = 0;
+    [[nodiscard]] TypeInfoPtr type() { return type_; }
 
-    [[nodiscard]] virtual TypeInfoPtr type() { return type_; }
     [[nodiscard]] virtual string str() const = 0;
 
 protected:

@@ -13,6 +13,7 @@ class ValueFactory
 {
 public:
     static ValuePtr create_parameter_interface(const Parameter& param);
+    static ValuePtr cast_value(ValuePtr value, TypeInfoPtr type);
 
 private:
     ValueFactory() = default;

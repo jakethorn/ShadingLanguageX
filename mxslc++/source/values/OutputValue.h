@@ -26,11 +26,6 @@ public:
         output->setConnectedOutput(output_);
     }
 
-    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
-    {
-        return std::make_shared<OutputValue>(output_, type);
-    }
-
     [[nodiscard]] string str() const override { return output_->asString(); }
 
 private:

@@ -64,11 +64,6 @@ public:
         node_->setName(name);
     }
 
-    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
-    {
-        return std::make_shared<NodeValue>(node_, type);
-    }
-
     [[nodiscard]] string str() const override { return as_string(node_); }
 
 private:

@@ -46,11 +46,6 @@ public:
         );
     }
 
-    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
-    {
-        return std::make_shared<BasicValue>(val_);
-    }
-
     [[nodiscard]] string str() const override
     {
         return std::visit(
