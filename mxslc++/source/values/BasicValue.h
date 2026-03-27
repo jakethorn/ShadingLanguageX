@@ -12,10 +12,7 @@
 class BasicValue final : public Value
 {
 public:
-    explicit BasicValue(basic_t val) : val_{std::move(val)}
-    {
-        type_ = std::make_shared<TypeInfo>(val);
-    }
+    explicit BasicValue(basic_t val) : Value{std::make_shared<TypeInfo>(val)}, val_{std::move(val)} { }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
@@ -49,7 +46,11 @@ public:
         );
     }
 
-    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
+    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
+    {
+        return std::make_shared<BasicValue>(val_);
+    }
+
     [[nodiscard]] string str() const override
     {
         return std::visit(
@@ -76,7 +77,6 @@ public:
 
 private:
     basic_t val_;
-    TypeInfoPtr type_;
 };
 
 #endif //FENNEC_BASICVALUE_H

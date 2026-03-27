@@ -13,10 +13,7 @@
 class OutputValue final : public Value
 {
 public:
-    explicit OutputValue(mx::OutputPtr output) : output_{std::move(output)}
-    {
-        type_ = std::make_shared<TypeInfo>(output_->getType());
-    }
+    OutputValue(mx::OutputPtr output, TypeInfoPtr type) : Value{std::move(type)}, output_{std::move(output)} { }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
@@ -29,12 +26,15 @@ public:
         output->setConnectedOutput(output_);
     }
 
-    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
+    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
+    {
+        return std::make_shared<OutputValue>(output_, type);
+    }
+
     [[nodiscard]] string str() const override { return output_->asString(); }
 
 private:
     mx::OutputPtr output_;
-    TypeInfoPtr type_;
 };
 
 #endif //MXSLC_OUTPUTVALUE_H

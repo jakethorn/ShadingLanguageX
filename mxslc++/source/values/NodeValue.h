@@ -15,7 +15,7 @@
 class NodeValue final : public Value
 {
 public:
-    NodeValue(mx::NodePtr node, TypeInfoPtr type) : node_{std::move(node)}, type_{std::move(type)} { }
+    NodeValue(mx::NodePtr node, TypeInfoPtr type) : Value{std::move(type)}, node_{std::move(node)} { }
 
     [[nodiscard]] size_t subvalue_count() const override
     {
@@ -30,7 +30,7 @@ public:
             for (const mx::OutputPtr& output : node_->getOutputs())
             {
                 if (i == j++)
-                    return std::make_shared<OutputValue>(output);
+                    return std::make_shared<OutputValue>(output, type_->field_type(i));
             }
         }
 
@@ -48,17 +48,20 @@ public:
         output->setConnectedNode(node_);
     }
 
-    void set_name(const string &name) override
+    void set_name(const string& name) override
     {
         node_->setName(name);
     }
 
-    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
+    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
+    {
+        return std::make_shared<NodeValue>(node_, type);
+    }
+
     [[nodiscard]] string str() const override { return as_string(node_); }
 
 private:
     mx::NodePtr node_;
-    TypeInfoPtr type_;
 };
 
 #endif //FENNEC_NODEVALUE_H

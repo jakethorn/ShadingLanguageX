@@ -5,6 +5,7 @@
 #include "parse.h"
 
 #include "TokenReader.h"
+#include "expressions/DotExpression.h"
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
@@ -374,11 +375,20 @@ ExprPtr Parser::unary()
 ExprPtr Parser::property()
 {
     ExprPtr expr = primary();
-    while (consume('['))
+    optional<Token> next;
+    while ((next = consume('[', '.')))
     {
-        ExprPtr index = expression();
-        expr = std::make_unique<IndexingExpression>(runtime_, std::move(expr), std::move(index));
-        match(']');
+        if (next == '[')
+        {
+            ExprPtr index = expression();
+            expr = std::make_unique<IndexingExpression>(runtime_, std::move(expr), std::move(index));
+            match(']');
+        }
+        else
+        {
+            Token name = match(TokenType::Identifier);
+            expr = std::make_unique<DotExpression>(runtime_, std::move(expr), std::move(name));
+        }
     }
 
     return expr;

@@ -29,10 +29,10 @@ void VariableDefinition::execute() const
 {
     Scope& scope = runtime_.scope();
 
-    TypeInfoPtr type = scope.resolve_type(type_);
+    const TypeInfoPtr type = scope.resolve_type(type_);
     expr_->init(type);
     ValuePtr val = expr_->evaluate();
     val->set_name(name_.lexeme());
-    Variable var{mods_, std::move(type), name_, std::move(val)};
+    Variable var{mods_, name_, std::move(val)};
     scope.add_variable(std::move(var));
 }

@@ -46,7 +46,12 @@ bool Expression::try_init(const vector<TypeInfoPtr>& types)
     {
         init_subexpressions(types);
         init_impl(types);
-        is_initialized_ = types.empty() || type_impl()->is_compatible(types);
+
+        const TypeInfoPtr type = type_impl();
+        assert(type->is_resolved());
+
+        assigned_type_ = type->find_unique_compatible(types);
+        is_initialized_ = assigned_type_ != nullptr || types.empty();
     }
 
     return is_initialized_;
@@ -55,6 +60,8 @@ bool Expression::try_init(const vector<TypeInfoPtr>& types)
 TypeInfoPtr Expression::type() const
 {
     assert(is_initialized_);
+    if (assigned_type_)
+        return assigned_type_;
     TypeInfoPtr type = type_impl();
     assert(type->is_resolved());
     return type;

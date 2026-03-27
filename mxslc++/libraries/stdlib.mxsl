@@ -1,5 +1,17 @@
 
 //
+// typedefs
+//
+
+using bool = boolean;
+using int = integer;
+using vec2 = vector2;
+using vec3 = vector3;
+using vec4 = vector4;
+using mat3 = matrix33;
+using mat4 = matrix44;
+
+//
 // arithmetic operators
 //
 

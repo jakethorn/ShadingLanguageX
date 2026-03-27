@@ -7,7 +7,7 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "values/UnnamedStructValue.h"
+#include "values/StructValue.h"
 
 ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -51,7 +51,7 @@ ValuePtr UnnamedConstructor::evaluate_impl() const
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-    return std::make_shared<UnnamedStructValue>(std::move(values));
+    return std::make_shared<StructValue>(std::move(values), type());
 }
 
 void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)

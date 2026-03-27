@@ -1,0 +1,62 @@
+//
+// Created by jaket on 11/01/2026.
+//
+
+#ifndef MXSLC_STRUCTVALUE_H
+#define MXSLC_STRUCTVALUE_H
+
+#include "Value.h"
+#include "mtlx/mtlx_utils.h"
+#include "runtime/TypeInfo.h"
+#include "utils/str_utils.h"
+
+class StructValue final : public Value
+{
+public:
+    explicit StructValue(vector<ValuePtr> values, TypeInfoPtr type)
+        : Value{std::move(type)}, values_{std::move(values)} { }
+
+    [[nodiscard]] size_t subvalue_count() const override { return values_.size(); }
+    [[nodiscard]] ValuePtr subvalue(const size_t i) const override { return values_.at(i); }
+
+    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
+    {
+        for (size_t i = 0; i < values_.size(); ++i)
+            values_[i]->set_as_node_input(node, port_name(input_name, i));
+    }
+
+    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    {
+        for (size_t i = 0; i < values_.size(); ++i)
+            values_[i]->set_as_node_graph_output(node_graph, port_name(output_name, i));
+    }
+
+    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override
+    {
+        for (size_t i = 0; i < values_.size(); ++i)
+            values_[i]->set_as_node_def_input(node_def, port_name(input_name, i));
+    }
+
+    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
+    {
+        return std::make_shared<StructValue>(values_, type);
+    }
+
+    [[nodiscard]] string str() const override
+    {
+        string result;
+        for (size_t i = 0; i < values_.size(); ++i)
+        {
+            result += "index " + ::str(i) + ": " + values_[i]->str();
+            if (i < values_.size() - 1)
+                result += "\n";
+        }
+
+        return result;
+    }
+
+private:
+    vector<ValuePtr> values_;
+};
+
+#endif //MXSLC_STRUCTVALUE_H

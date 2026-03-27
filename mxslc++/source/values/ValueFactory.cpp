@@ -5,7 +5,7 @@
 #include "ValueFactory.h"
 #include "runtime/Parameter.h"
 #include "InterfaceValue.h"
-#include "UnnamedStructValue.h"
+#include "StructValue.h"
 #include "mtlx/mtlx_utils.h"
 
 namespace
@@ -21,7 +21,7 @@ namespace
                 field_vals.push_back(std::move(field_val));
             }
 
-            return std::make_shared<UnnamedStructValue>(std::move(field_vals));
+            return std::make_shared<StructValue>(std::move(field_vals), type);
         }
         else
         {

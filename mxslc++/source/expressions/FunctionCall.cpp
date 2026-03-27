@@ -81,13 +81,12 @@ namespace
     vector<TypeInfoPtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
     {
         vector<TypeInfoPtr> types;
-        types.reserve(funcs.size());
 
         for (const FuncPtr& func : funcs)
         {
-            const ParameterList& params = func->parameters();
-            const Parameter& param = params[arg];
-            types.push_back(param.type());
+            const TypeInfoPtr& type = func->parameters()[arg].type();
+            if (not type->is_in(types))
+                types.push_back(type);
         }
 
         return types;
@@ -135,7 +134,7 @@ void FunctionCall::evaluate_arguments() const
             throw CompileError{token_, "Missing argument"s};
         }
 
-        Variable var{{}, param.type(), param.name(), std::move(val)};
+        Variable var{{}, param.name(), std::move(val)};
         runtime_.scope().add_variable(std::move(var));
     }
 }

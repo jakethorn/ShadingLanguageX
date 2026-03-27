@@ -39,6 +39,7 @@ protected:
 
     const Runtime& runtime_;
     Token token_;
+    TypeInfoPtr assigned_type_;
     bool is_initialized_ = false;
 };
 

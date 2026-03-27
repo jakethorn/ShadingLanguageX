@@ -96,7 +96,7 @@ ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& ar
     if (func.type()->has_fields())
     {
         for (size_t i = 0; i < func.type()->field_count(); ++i)
-            node->addOutput(func.output_name(i), func.type()->field(i).type()->name());
+            node->addOutput(func.output_name(i), func.type()->field_type(i)->name());
     }
 
     return std::make_shared<NodeValue>(node, func.type());

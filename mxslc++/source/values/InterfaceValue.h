@@ -12,7 +12,7 @@
 class InterfaceValue final : public Value
 {
 public:
-    InterfaceValue(string name, TypeInfoPtr type) : name_{std::move(name)}, type_{std::move(type)} { }
+    InterfaceValue(string name, TypeInfoPtr type) : Value{std::move(type)}, name_{std::move(name)} { }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
@@ -26,12 +26,15 @@ public:
         output->setInterfaceName(name_);
     }
 
-    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
+    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
+    {
+        return std::make_shared<InterfaceValue>(name_, type);
+    }
+
     [[nodiscard]] string str() const override { return name_; }
 
 private:
     string name_;
-    TypeInfoPtr type_;
 };
 
 #endif //MXSLC_INTERFACEVALUE_H

@@ -10,7 +10,7 @@
 class NullValue final : public Value
 {
 public:
-    explicit NullValue(TypeInfoPtr type) : type_{std::move(type)} { }
+    explicit NullValue(TypeInfoPtr type) : Value{std::move(type)} { }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
@@ -22,11 +22,12 @@ public:
         throw CompileError{"Cannot return null value"s};
     }
 
-    [[nodiscard]] TypeInfoPtr type() const override { return type_; }
-    [[nodiscard]] string str() const override { return "null"s; }
+    [[nodiscard]] ValuePtr cast_impl(const TypeInfoPtr& type) const override
+    {
+        return std::make_shared<NullValue>(type);
+    }
 
-private:
-    TypeInfoPtr type_;
+    [[nodiscard]] string str() const override { return "null"s; }
 };
 
 #endif //FENNEC_NULLVALUE_H

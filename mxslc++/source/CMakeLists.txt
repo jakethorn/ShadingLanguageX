@@ -22,6 +22,7 @@ add_library(mxslc_lib
         expressions/NullExpression.cpp
         expressions/UnnamedConstructor.cpp
         expressions/IndexingExpression.cpp
+        expressions/DotExpression.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
         statements/FunctionDefinition.cpp
@@ -33,6 +34,7 @@ add_library(mxslc_lib
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
+        values/Value.cpp
         values/ValueFactory.cpp
 )
 

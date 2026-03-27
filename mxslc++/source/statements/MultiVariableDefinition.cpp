@@ -30,7 +30,7 @@ void MultiVariableDefinition::execute() const
     for (size_t i = 0; i < type->field_count(); ++i)
     {
         ValuePtr subvalue = value->subvalue(i);
-        Variable var{type->field(i).modifiers(), type->field(i).type(), type->field(i).name_token(), std::move(subvalue)};
+        Variable var{type->field(i).modifiers(), type->field(i).name_token(), std::move(subvalue)};
         runtime_.scope().add_variable(std::move(var));
     }
 }

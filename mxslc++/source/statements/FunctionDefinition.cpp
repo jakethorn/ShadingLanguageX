@@ -78,7 +78,7 @@ void FunctionDefinition::write_function_definition(const Function& func) const
     for (const Parameter& param : func.parameters())
     {
         ValuePtr val = ValueFactory::create_parameter_interface(param);
-        Variable var{{}, param.type(), param.name(), std::move(val)};
+        Variable var{{}, param.name(), std::move(val)};
         runtime_.scope().add_variable(std::move(var));
     }
     runtime_.serializer().write_node_def_graph(func);

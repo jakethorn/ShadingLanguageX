@@ -43,6 +43,8 @@ public:
             name_ = Float;
         if (std::holds_alternative<string>(val))
             name_ = String;
+
+        set_resolved();
     }
 
     explicit TypeInfo(const vector<TypeInfoPtr>& fields)
@@ -85,18 +87,31 @@ public:
             return fields_.at(index);
         throw CompileError{"Field not found by index"s};
     }
-    [[nodiscard]] const FieldInfo& field(const string& name) const
+    [[nodiscard]] const FieldInfo& field(const Token& name) const
     {
         for (const FieldInfo& field : fields_)
         {
-            if (field.has_name() and field.name() == name)
+            if (field.has_name() and field.name() == name.lexeme())
                 return field;
         }
 
-        throw CompileError{"Field not found by name"s};
+        throw CompileError{name, "Field '" + name.lexeme() + "' not found"s};
     }
+    [[nodiscard]] size_t field_index(const Token& name) const
+    {
+        size_t i = 0;
+        for (const FieldInfo& field : fields_)
+        {
+            if (field.has_name() and field.name() == name.lexeme())
+                return i;
+            ++i;
+        }
+
+        throw CompileError{name, "Field '" + name.lexeme() + "' not found"s};
+    }
+
     [[nodiscard]] TypeInfoPtr field_type(const size_t index) const { return field(index).type(); }
-    [[nodiscard]] TypeInfoPtr field_type(const string& name) const { return field(name).type(); }
+    [[nodiscard]] TypeInfoPtr field_type(const Token& name) const { return field(name).type(); }
     [[nodiscard]] string field_name(const size_t index) const
     {
         if (field(index).has_name())
@@ -110,6 +125,12 @@ public:
     {
         assert(is_resolved_);
         assert(other->is_resolved_);
+
+        if (has_name() and other->has_name())
+        {
+            return name_ == other->name_;
+        }
+
         if (has_fields() and other->has_fields())
         {
             if (field_count() != other->field_count())
@@ -121,20 +142,66 @@ public:
             }
             return true;
         }
-        else
-        {
-            return name_ == other->name_;
-        }
+
+        return false;
     }
-    [[nodiscard]] bool is_compatible(const vector<TypeInfoPtr>& other) const
+    [[nodiscard]] bool is_compatible(const vector<TypeInfoPtr>& types) const
     {
-        for (const TypeInfoPtr& type : other)
+        for (const TypeInfoPtr& type : types)
         {
             if (is_compatible(type))
                 return true;
         }
 
         return false;
+    }
+    [[nodiscard]] bool is_equal(const TypeInfoPtr& other) const
+    {
+        assert(is_resolved_);
+        assert(other->is_resolved_);
+
+        if (name_ != other->name_)
+        {
+            return false;
+        }
+
+        if (field_count() != other->field_count())
+            return false;
+
+        for (size_t i = 0; i < field_count(); i++)
+        {
+            if (not field(i).is_compatible(other->field(i)))
+                return false;
+        }
+
+        return true;
+    }
+    [[nodiscard]] bool is_in(const vector<TypeInfoPtr>& types) const
+    {
+        for (const TypeInfoPtr& type : types)
+        {
+            if (is_equal(type))
+                return true;
+        }
+
+        return false;
+    }
+
+    [[nodiscard]] TypeInfoPtr find_unique_compatible(const vector<TypeInfoPtr>& types) const
+    {
+        TypeInfoPtr compatible = nullptr;
+        for (const TypeInfoPtr& type : types)
+        {
+            if (is_compatible(type))
+            {
+                if (compatible == nullptr)
+                    compatible = type;
+                else
+                    return nullptr;
+            }
+        }
+
+        return compatible;
     }
 
     bool operator==(const string& other) const { return name_.lexeme() == other; }
