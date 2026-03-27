@@ -31,10 +31,9 @@ public:
         }
     }
 
-    [[nodiscard]] bool contains(const string& mod) const
-    {
-        return ::contains(mods_, mod);
-    }
+    [[nodiscard]] bool contains(const string& mod) const { return ::contains(mods_, mod); }
+    [[nodiscard]] size_t size() const { return mods_.size(); }
+    [[nodiscard]] bool empty() const { return mods_.empty(); }
 
 private:
     vector<Token> mods_;

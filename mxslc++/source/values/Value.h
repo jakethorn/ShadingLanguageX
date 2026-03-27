@@ -17,8 +17,10 @@ public:
     virtual ~Value() = default;
 
     [[nodiscard]] virtual size_t subvalue_count() const { return 0; }
-    [[nodiscard]] virtual ValuePtr subvalue(const size_t i) const;
+    [[nodiscard]] virtual ValuePtr subvalue(size_t i) const;
     [[nodiscard]] virtual ValuePtr subvalue(const Token& name) const;
+    virtual void set_subvalue(size_t i, const ValuePtr& value);
+    virtual void set_subvalue(const Token& name, const ValuePtr& value);
 
     virtual void set_as_node_input(const mx::NodePtr& node, const string& input_name) const { }
     virtual void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const { }

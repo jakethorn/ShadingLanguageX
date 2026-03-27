@@ -6,24 +6,25 @@
 #include "CompileError.h"
 #include "ArgumentList.h"
 #include "TypeInfo.h"
+#include "Variable.h"
 #include "utils/template_utils.h"
 
 Scope::Scope() : parent_{nullptr} { }
 Scope::Scope(ScopePtr parent) : parent_{std::move(parent)} { }
 
-void Scope::add_variable(Variable&& var)
+void Scope::add_variable(VarPtr var)
 {
-    if (contains(variables_, var.name()))
-        throw CompileError{var.token(), "Variable already defined: " + var.name()};
+    if (contains(variables_, var->name()))
+        throw CompileError{var->token(), "Variable already defined: " + var->name()};
 
-    variables_.emplace(var.name(), std::move(var));
+    variables_.emplace(var->name(), std::move(var));
 }
 
-void Scope::set_variable(Variable&& var)
+void Scope::set_variable(VarPtr var)
 {
-    if (contains(variables_, var.name()))
+    if (contains(variables_, var->name()))
     {
-        variables_.insert_or_assign(var.name(), std::move(var));
+        variables_.insert_or_assign(var->name(), std::move(var));
         return;
     }
 
@@ -33,10 +34,10 @@ void Scope::set_variable(Variable&& var)
         return;
     }
 
-    throw CompileError{var.token(), "Variable not defined: " + var.name()};
+    throw CompileError{var->token(), "Variable not defined: " + var->name()};
 }
 
-const Variable& Scope::get_variable(const Token& name) const
+VarPtr Scope::get_variable(const Token& name) const
 {
     if (contains(variables_, name.lexeme()))
     {

@@ -28,6 +28,7 @@ add_library(mxslc_lib
         statements/FunctionDefinition.cpp
         statements/MultiVariableDefinition.cpp
         statements/UsingDeclaration.cpp
+        statements/VariableAssignment.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp

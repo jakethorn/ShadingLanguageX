@@ -8,6 +8,7 @@
 #include "runtime/Runtime.h"
 #include "expressions/Expression.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable.h"
 #include "values/ValueFactory.h"
 
 FunctionDefinition::FunctionDefinition(
@@ -78,7 +79,7 @@ void FunctionDefinition::write_function_definition(const Function& func) const
     for (const Parameter& param : func.parameters())
     {
         ValuePtr val = ValueFactory::create_parameter_interface(param);
-        Variable var{{}, param.name(), std::move(val)};
+        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));
         runtime_.scope().add_variable(std::move(var));
     }
     runtime_.serializer().write_node_def_graph(func);

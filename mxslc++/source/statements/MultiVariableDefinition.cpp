@@ -6,6 +6,7 @@
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable.h"
 #include "values/Value.h"
 
 MultiVariableDefinition::MultiVariableDefinition(const Runtime& runtime, TypeInfoPtr type, ExprPtr expr)
@@ -30,7 +31,7 @@ void MultiVariableDefinition::execute() const
     for (size_t i = 0; i < type->field_count(); ++i)
     {
         ValuePtr subvalue = value->subvalue(i);
-        Variable var{type->field(i).modifiers(), type->field(i).name_token(), std::move(subvalue)};
+        VarPtr var = std::make_shared<Variable>(type->field(i).modifiers(), type->field(i).name_token(), std::move(subvalue));
         runtime_.scope().add_variable(std::move(var));
     }
 }

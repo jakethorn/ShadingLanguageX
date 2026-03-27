@@ -15,7 +15,7 @@ ExprPtr DotExpression::instantiate_template_types(const TypeInfoPtr& template_ty
     return std::make_unique<DotExpression>(runtime_, std::move(expr), token_);
 }
 
-void DotExpression::init_subexpressions(const vector<TypeInfoPtr>&)
+void DotExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
     expr_->init();
 }
@@ -29,4 +29,10 @@ ValuePtr DotExpression::evaluate_impl() const
 {
     const ValuePtr expr_val = expr_->evaluate();
     return expr_val->subvalue(token_);
+}
+
+void DotExpression::assign(const ValuePtr& value)
+{
+    const ValuePtr expr_val = expr_->evaluate();
+    expr_val->set_subvalue(token_, value);
 }

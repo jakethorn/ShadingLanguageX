@@ -19,6 +19,11 @@ public:
     [[nodiscard]] size_t subvalue_count() const override { return values_.size(); }
     [[nodiscard]] ValuePtr subvalue(const size_t i) const override { return values_.at(i); }
 
+    void set_subvalue(const size_t i, const ValuePtr& value) override
+    {
+        values_[i] = value;
+    }
+
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
         for (size_t i = 0; i < values_.size(); ++i)

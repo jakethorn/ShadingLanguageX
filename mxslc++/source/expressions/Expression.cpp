@@ -72,3 +72,8 @@ ValuePtr Expression::evaluate() const
     assert(is_initialized_);
     return evaluate_impl();
 }
+
+void Expression::assign(const ValuePtr& value)
+{
+    throw CompileError{"This expression cannot be assigned to"s};
+}

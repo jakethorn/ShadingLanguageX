@@ -6,7 +6,6 @@
 #define FENNEC_SCOPE_H
 
 #include "utils/common.h"
-#include "Variable.h"
 #include "Function.h"
 
 class Token;
@@ -23,9 +22,9 @@ public:
         return std::move(parent_);
     }
 
-    void add_variable(Variable&& var);
-    void set_variable(Variable&& var);
-    [[nodiscard]] const Variable& get_variable(const Token& name) const;
+    void add_variable(VarPtr var);
+    void set_variable(VarPtr var);
+    [[nodiscard]] VarPtr get_variable(const Token& name) const;
 
     void add_function(FuncPtr func);
     [[nodiscard]] vector<FuncPtr> get_functions(
@@ -55,7 +54,7 @@ public:
 private:
     ScopePtr parent_;
 
-    unordered_map<string, Variable> variables_;
+    unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;
     unordered_map<string, TypeInfoPtr> types_;
 };

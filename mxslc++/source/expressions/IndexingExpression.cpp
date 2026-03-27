@@ -16,7 +16,7 @@ ExprPtr IndexingExpression::instantiate_template_types(const TypeInfoPtr& templa
     return std::make_unique<IndexingExpression>(runtime_, std::move(expr), std::move(index));
 }
 
-void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>&)
+void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
     expr_->init();
     index_->init(TypeInfo::Int);
@@ -41,4 +41,13 @@ ValuePtr IndexingExpression::evaluate_impl() const
     const shared_ptr<BasicValue> basic_value = std::dynamic_pointer_cast<BasicValue>(index_val);
     const int index = basic_value->get<int>();
     return expr_val->subvalue(index);
+}
+
+void IndexingExpression::assign(const ValuePtr& value)
+{
+    const ValuePtr expr_val = expr_->evaluate();
+    const ValuePtr index_val = index_->evaluate();
+    const shared_ptr<BasicValue> basic_value = std::dynamic_pointer_cast<BasicValue>(index_val);
+    const int index = basic_value->get<int>();
+    expr_val->set_subvalue(index, value);
 }

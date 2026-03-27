@@ -23,6 +23,8 @@ public:
     [[nodiscard]] ValuePtr value() const { return val_; }
     [[nodiscard]] const Token& token() const { return name_; }
 
+    void set_value(const ValuePtr& val) { val_ = val; }
+
 private:
     ModifierList mods_;
     Token name_;

@@ -24,10 +24,15 @@ void Identifier::init_impl(const vector<TypeInfoPtr>& types)
 
 TypeInfoPtr Identifier::type_impl() const
 {
-    return var_.type();
+    return var_->type();
 }
 
 ValuePtr Identifier::evaluate_impl() const
 {
-    return var_.value()->cast(type());
+    return var_->value()->cast(type());
+}
+
+void Identifier::assign(const ValuePtr& value)
+{
+    var_->set_value(value);
 }

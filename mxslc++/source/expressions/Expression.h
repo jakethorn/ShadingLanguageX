@@ -31,6 +31,8 @@ public:
 
     [[nodiscard]] virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
 
+    virtual void assign(const ValuePtr& value);
+
 protected:
     virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
     virtual void init_impl(const vector<TypeInfoPtr>& types) { }

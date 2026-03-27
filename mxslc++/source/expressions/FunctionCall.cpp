@@ -11,6 +11,7 @@
 #include "statements/Statement.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable.h"
 
 ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -134,7 +135,7 @@ void FunctionCall::evaluate_arguments() const
             throw CompileError{token_, "Missing argument"s};
         }
 
-        Variable var{{}, param.name(), std::move(val)};
+        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));
         runtime_.scope().add_variable(std::move(var));
     }
 }

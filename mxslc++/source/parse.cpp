@@ -24,6 +24,7 @@
 #include "statements/PrintStatement.h"
 #include "statements/VariableDefinition.h"
 #include "statements/UsingDeclaration.h"
+#include "statements/VariableAssignment.h"
 
 vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens)
 {
@@ -102,6 +103,12 @@ StmtPtr Parser::statement()
         }
     }
 
+    if (peek() == TokenType::Identifier)
+    {
+        mods.validate();
+        return variable_assignment();
+    }
+
     throw CompileError{peek(), "Invalid statement"s};
 }
 
@@ -165,6 +172,15 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypeInfoPtr type)
         std::make_unique<TypeInfo>(std::move(fields)),
         std::move(expr)
     );
+}
+
+StmtPtr Parser::variable_assignment()
+{
+    ExprPtr lhs = expression();
+    match('=');
+    ExprPtr rhs = expression();
+    match(';');
+    return std::make_unique<VariableAssignment>(runtime_, lhs, rhs);
 }
 
 StmtPtr Parser::function_definition(ModifierList mods, TypeInfoPtr type)

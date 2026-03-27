@@ -34,6 +34,7 @@ private:
     StmtPtr print_statement();
     StmtPtr variable_definition(ModifierList mods, TypeInfoPtr type);
     StmtPtr multi_variable_definition(ModifierList mods, TypeInfoPtr type);
+    StmtPtr variable_assignment();
     StmtPtr function_definition(ModifierList mods, TypeInfoPtr type);
     StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr using_declaration();

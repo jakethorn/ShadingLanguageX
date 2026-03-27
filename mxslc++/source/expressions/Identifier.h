@@ -6,7 +6,6 @@
 #define FENNEC_IDENTIFIER_H
 
 #include "Expression.h"
-#include "runtime/Variable.h"
 
 class Identifier final : public Expression
 {
@@ -15,13 +14,15 @@ public:
 
     [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
+    void assign(const ValuePtr &value) override;
+
 protected:
     void init_impl(const vector<TypeInfoPtr> &types) override;
     [[nodiscard]] TypeInfoPtr type_impl() const override;
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
-    Variable var_;
+    VarPtr var_;
 };
 
 #endif //FENNEC_IDENTIFIER_H

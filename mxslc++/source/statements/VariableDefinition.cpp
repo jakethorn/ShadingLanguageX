@@ -33,6 +33,6 @@ void VariableDefinition::execute() const
     expr_->init(type);
     ValuePtr val = expr_->evaluate();
     val->set_name(name_.lexeme());
-    Variable var{mods_, name_, std::move(val)};
+    VarPtr var = std::make_shared<Variable>(mods_, name_, std::move(val));
     scope.add_variable(std::move(var));
 }

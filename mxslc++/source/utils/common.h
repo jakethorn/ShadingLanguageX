@@ -47,6 +47,9 @@ using ValuePtr = shared_ptr<Value>;
 class Scope;
 using ScopePtr = unique_ptr<Scope>;
 
+class Variable;
+using VarPtr = shared_ptr<Variable>;
+
 class Function;
 using FuncPtr = shared_ptr<Function>;
 
