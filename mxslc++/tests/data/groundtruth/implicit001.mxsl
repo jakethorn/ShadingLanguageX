@@ -1,0 +1,22 @@
+//function foo(string s) -> float
+//{
+//	return 1.0;
+//}
+//
+//function foo(vec2 v2) -> float
+//{
+//	return 1.0;
+//}
+//
+//float f = foo("hello world") * 2.0;
+//float g = f[2];
+
+//{float, vec2} f = 1;
+
+//string s = "hello world".hello;
+
+float f = 1;
+float g = f * 2;
+
+filename p = "hello world.txt";
+color3 c = image(p);

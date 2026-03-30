@@ -84,7 +84,7 @@ ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& ar
         return value;
 
     // node
-    mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, serialize_type(func.type()));
+    const mx::NodePtr node = graph()->addNode(func.name(), mx::EMPTY_STRING, serialize_type(func.type()));
 
     // inputs
     for (size_t i = 0; i < args.size(); ++i)

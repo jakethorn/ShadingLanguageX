@@ -49,7 +49,6 @@ public:
     void resolve_fields(const TypeInfoPtr& type) const;
     [[nodiscard]] TypeInfoPtr get_type(const Token& name) const;
     [[nodiscard]] TypeInfoPtr get_type(const string& name) const;
-    [[nodiscard]] TypeInfoPtr get_type(const basic_t& val) const;
 
 private:
     ScopePtr parent_;

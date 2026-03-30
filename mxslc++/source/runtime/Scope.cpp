@@ -228,9 +228,3 @@ TypeInfoPtr Scope::get_type(const string& name) const
 {
     return get_type(Token{name});
 }
-
-TypeInfoPtr Scope::get_type(const basic_t& val) const
-{
-    const TypeInfoPtr type = std::make_shared<TypeInfo>(val);
-    return resolve_type(type);
-}

@@ -21,6 +21,7 @@ public:
     inline static string Int = "integer"s;
     inline static string Float = "float"s;
     inline static string String = "string"s;
+    inline static string Filename = "filename"s;
     inline static string MultiOutput = "multioutput"s;
 
     TypeInfo(ModifierList mods, Token name, vector<FieldInfo> fields)

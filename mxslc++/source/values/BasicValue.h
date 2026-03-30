@@ -13,6 +13,7 @@ class BasicValue final : public Value
 {
 public:
     explicit BasicValue(basic_t val) : Value{std::make_shared<TypeInfo>(val)}, val_{std::move(val)} { }
+    BasicValue(basic_t val, TypeInfoPtr type) : Value{std::move(type)}, val_{std::move(val)} { }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
