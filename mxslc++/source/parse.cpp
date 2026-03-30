@@ -19,6 +19,8 @@
 #include "runtime/ParameterList.h"
 #include "runtime/Variable.h"
 #include "runtime/FieldInfo.h"
+#include "statements/ForEachLoop.h"
+#include "statements/ForRangeLoop.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
@@ -76,6 +78,11 @@ StmtPtr Parser::statement()
     if (peek() == TokenType::Using)
     {
         return using_declaration();
+    }
+
+    if (peek() == TokenType::For)
+    {
+        return for_loop();
     }
 
     ModifierList mods = modifiers();
@@ -232,6 +239,40 @@ StmtPtr Parser::using_declaration()
     return std::make_unique<UsingDeclaration>(runtime_, std::move(name), std::move(type));
 }
 
+StmtPtr Parser::for_loop()
+{
+    match(TokenType::For);
+    match('(');
+    TypeInfoPtr type = type_info();
+    Token name = match(TokenType::Identifier);
+    match('=');
+    ExprPtr expr1 = expression();
+    if (consume(':'))
+    {
+        ExprPtr expr2 = expression();
+        ExprPtr expr3 = nullptr;
+        if (consume(':'))
+        {
+            expr3 = expression();
+        }
+        else
+        {
+            expr3 = std::move(expr2);
+            expr2 = nullptr;
+        }
+
+        match(')');
+        vector<StmtPtr> body = loop_body();
+        return std::make_unique<ForRangeLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
+    }
+    else
+    {
+        match(')');
+        vector<StmtPtr> body = loop_body();
+        return std::make_unique<ForEachLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(body));
+    }
+}
+
 ModifierList Parser::modifiers()
 {
     const vector<Token> mods = consume_while(
@@ -294,6 +335,14 @@ tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
         statement();
 
     return {std::move(body), std::move(return_expr)};
+}
+
+vector<StmtPtr> Parser::loop_body()
+{
+    auto [body, return_expr] = function_body();
+    if (return_expr)
+        throw CompileError{peek(), "Return statement not allowed in loop body"s};
+    return std::move(body);
 }
 
 ExprPtr Parser::expression()

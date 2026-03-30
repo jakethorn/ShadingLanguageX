@@ -46,6 +46,12 @@ public:
         );
     }
 
+    [[nodiscard]] bool is_basic() const override { return true; }
+    [[nodiscard]] bool as_bool() const override { return get<bool>(); }
+    [[nodiscard]] int as_int() const override { return get<int>(); }
+    [[nodiscard]] float as_float() const override { return get<float>(); }
+    [[nodiscard]] string as_string() const override { return get<string>(); }
+
     [[nodiscard]] string str() const override
     {
         return std::visit(

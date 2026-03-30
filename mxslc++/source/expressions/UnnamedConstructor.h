@@ -21,6 +21,7 @@ protected:
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
+    bool expressions_are_initialized();
     void try_init_expressions(const vector<TypeInfoPtr>& types);
     [[nodiscard]] vector<TypeInfoPtr> index_types(const vector<TypeInfoPtr>& types, size_t index) const;
 

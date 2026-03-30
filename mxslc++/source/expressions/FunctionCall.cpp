@@ -23,26 +23,29 @@ ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_typ
 
 void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
+    if (arguments_are_initialized())
+        return;
+
     const Scope& scope = runtime_.scope();
 
-    size_t initialised_arg_count = 0;
-    while (initialised_arg_count < args_.size())
+    size_t initialized_arg_count = initialized_arg_count_;
+    while (initialized_arg_count < args_.size())
     {
         vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
 
         if (matching_funcs.empty())
             throw CompileError{token_, "No matching functions: " + token_.lexeme()};
 
-        const size_t prev_initialized_arg_count = initialised_arg_count;
-        initialised_arg_count = try_init_arguments(matching_funcs);
+        const size_t prev_initialized_arg_count = initialized_arg_count;
+        initialized_arg_count = try_init_arguments(matching_funcs);
 
-        if (initialised_arg_count == prev_initialized_arg_count)
+        if (initialized_arg_count == prev_initialized_arg_count)
         {
             // init failed, try to init with a default function...
             FuncPtr default_func = scope.get_function(types, token_, template_type_, args_);
-            initialised_arg_count = try_init_arguments({std::move(default_func)});
+            initialized_arg_count = try_init_arguments({std::move(default_func)});
 
-            if (initialised_arg_count == prev_initialized_arg_count)
+            if (initialized_arg_count == prev_initialized_arg_count)
                 throw CompileError{token_, "Ambiguous function call: " + token_.lexeme()};
         }
     }
@@ -94,9 +97,28 @@ namespace
     }
 }
 
+bool FunctionCall::arguments_are_initialized()
+{
+    bool are = true;
+    for (const Argument& arg : args_)
+    {
+        if (arg.is_initialized())
+        {
+            arg.init(arg.type());
+            ++initialized_arg_count_;
+        }
+        else
+        {
+            are = false;
+        }
+    }
+
+    return are;
+}
+
 size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
 {
-    size_t initialised_arg_count = 0;
+    size_t initialized_arg_count = 0;
     for (const Argument& arg : args_)
     {
         if (not arg.is_initialized())
@@ -110,11 +132,11 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
 
         if (arg.is_initialized())
         {
-            ++initialised_arg_count;
+            ++initialized_arg_count;
         }
     }
 
-    return initialised_arg_count;
+    return initialized_arg_count;
 }
 
 void FunctionCall::evaluate_arguments() const

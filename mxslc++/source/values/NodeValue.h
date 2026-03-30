@@ -50,10 +50,11 @@ public:
 
     void set_name(const string& name) override
     {
-        node_->setName(name);
+        const string valid_name = node_->getParent()->createValidChildName(name);
+        node_->setName(valid_name);
     }
 
-    [[nodiscard]] string str() const override { return as_string(node_); }
+    [[nodiscard]] string str() const override { return ::as_string(node_); }
 
 private:
     mx::NodePtr node_;

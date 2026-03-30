@@ -16,6 +16,11 @@ Argument Argument::instantiate_template_types(const TypeInfoPtr& template_type) 
     return Argument{name_, expr_->instantiate_template_types(template_type), index_};
 }
 
+void Argument::init(const TypeInfoPtr& type) const
+{
+    expr_->init(type);
+}
+
 void Argument::init(const vector<TypeInfoPtr>& types) const
 {
     expr_->init(types);

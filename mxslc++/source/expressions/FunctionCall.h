@@ -33,6 +33,7 @@ protected:
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
+    bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
     void evaluate_arguments() const;
     [[nodiscard]] ValuePtr evaluate_return() const;

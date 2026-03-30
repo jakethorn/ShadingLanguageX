@@ -1,0 +1,17 @@
+for (int i = {1, 2, 3})
+{
+    vec2 uv = texcoord(i);
+    print i;
+}
+
+for (int i = 4:6)
+{
+    vec2 uv = texcoord(i);
+    print i;
+}
+
+for (int i = 7:1:9)
+{
+    vec2 uv = texcoord(i);
+    print i;
+}

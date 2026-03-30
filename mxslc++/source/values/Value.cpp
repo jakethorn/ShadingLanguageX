@@ -24,3 +24,23 @@ void Value::set_subvalue(const Token& name, const ValuePtr& value)
 {
     set_subvalue(type_->field_index(name), value);
 }
+
+bool Value::as_bool() const
+{
+    throw CompileError{"Value is not a compile-time bool"s};
+}
+
+int Value::as_int() const
+{
+    throw CompileError{"Value is not a compile-time int"s};
+}
+
+float Value::as_float() const
+{
+    throw CompileError{"Value is not a compile-time float"s};
+}
+
+string Value::as_string() const
+{
+    throw CompileError{"Value is not a compile-time string"s};
+}

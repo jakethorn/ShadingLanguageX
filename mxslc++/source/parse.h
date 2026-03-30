@@ -38,6 +38,7 @@ private:
     StmtPtr function_definition(ModifierList mods, TypeInfoPtr type);
     StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr using_declaration();
+    StmtPtr for_loop();
 
     ModifierList modifiers();
     TypeInfoPtr type_info();
@@ -45,6 +46,7 @@ private:
     Parameter parameter(size_t index);
     vector<TypeInfoPtr> template_list();
     tuple<vector<StmtPtr>, ExprPtr> function_body();
+    vector<StmtPtr> loop_body();
 
     ExprPtr expression();
     ExprPtr logical();

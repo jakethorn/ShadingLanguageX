@@ -29,6 +29,12 @@ public:
 
     [[nodiscard]] TypeInfoPtr type() { return type_; }
 
+    [[nodiscard]] virtual bool is_basic() const { return false; }
+    [[nodiscard]] virtual bool as_bool() const;
+    [[nodiscard]] virtual int as_int() const;
+    [[nodiscard]] virtual float as_float() const;
+    [[nodiscard]] virtual string as_string() const;
+
     [[nodiscard]] virtual string str() const = 0;
 
 protected:

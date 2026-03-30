@@ -46,7 +46,7 @@
     <input name="in2" type="float" value="4" />
   </multiply>
   <multiply name="h" type="float">
-    <input name="in1" type="float" value="4" />
+    <input name="in1" type="float" nodename="node4" />
     <input name="in2" type="float" value="4" />
   </multiply>
 </materialx>

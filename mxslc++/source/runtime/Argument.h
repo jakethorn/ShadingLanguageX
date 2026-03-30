@@ -24,6 +24,7 @@ public:
     [[nodiscard]] size_t index() const { return index_; }
 
     [[nodiscard]] Argument instantiate_template_types(const TypeInfoPtr& template_type) const;
+    void init(const TypeInfoPtr& type) const;
     void init(const vector<TypeInfoPtr>& types) const;
     [[nodiscard]] bool try_init(const vector<TypeInfoPtr>& types) const;
     [[nodiscard]] bool is_initialized() const;

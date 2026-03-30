@@ -19,6 +19,9 @@ ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& templa
 
 void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
+    if (expressions_are_initialized())
+        return;
+
     if (exprs_.size() == 1)
     {
         exprs_.at(0)->init(types);
@@ -52,6 +55,25 @@ ValuePtr UnnamedConstructor::evaluate_impl() const
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
     return std::make_shared<StructValue>(std::move(values), type());
+}
+
+bool UnnamedConstructor::expressions_are_initialized()
+{
+    bool are = true;
+    for (const ExprPtr& expr : exprs_)
+    {
+        if (expr->is_initialized())
+        {
+            expr->init(expr->type());
+            ++initialized_expr_count_;
+        }
+        else
+        {
+            are = false;
+        }
+    }
+
+    return are;
 }
 
 void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)

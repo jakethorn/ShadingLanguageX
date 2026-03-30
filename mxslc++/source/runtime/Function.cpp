@@ -92,6 +92,7 @@ void Function::init(const Runtime& runtime)
 
     if (template_type_)
         template_type_ = runtime.scope().resolve_type(template_type_);
+
     params_.init();
 }
 
