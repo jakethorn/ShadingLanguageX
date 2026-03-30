@@ -7,6 +7,7 @@
 #include "CastValue.h"
 #include "runtime/Parameter.h"
 #include "InterfaceValue.h"
+#include "NodeValue.h"
 #include "StructValue.h"
 #include "mtlx/mtlx_utils.h"
 
@@ -35,6 +36,27 @@ namespace
 ValuePtr ValueFactory::create_parameter_interface(const Parameter& param)
 {
     return get_interface_from_type(param.type(), param.name());
+}
+
+ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)
+{
+    ValuePtr value = std::make_shared<NodeValue>(node, type);
+
+    if (value->subvalue_count() > 0)
+    {
+        vector<ValuePtr> subvalues;
+        subvalues.reserve(value->subvalue_count());
+        for (size_t i = 0; i < value->subvalue_count(); ++i)
+        {
+            subvalues.push_back(std::move(value->subvalue(i)));
+        }
+
+        return std::make_shared<StructValue>(std::move(subvalues), type);
+    }
+    else
+    {
+        return value;
+    }
 }
 
 ValuePtr ValueFactory::cast_value(ValuePtr value, TypeInfoPtr type)

@@ -18,6 +18,7 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "utils/template_utils.h"
+#include "values/ValueFactory.h"
 
 #define BINARY_OP(ltype, op, rtype) \
     if (values[0]->is<ltype>() && values[1]->is<rtype>()) \
@@ -99,7 +100,7 @@ ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& ar
             node->addOutput(func.output_name(i), func.type()->field_type(i)->name());
     }
 
-    return std::make_shared<NodeValue>(node, func.type());
+    return ValueFactory::create_node_value(node, func.type());
 }
 
 void MtlXSerializer::write_node_def_graph(const Function& func) const

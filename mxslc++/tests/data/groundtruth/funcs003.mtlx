@@ -19,16 +19,16 @@
     <input name="in1" type="color3" output="out__1" nodename="node1" />
     <input name="in2" type="float" output="out__0" nodename="node1" />
   </add>
-  <foo name="a" type="multioutput">
+  <foo name="node2" type="multioutput">
     <output name="out__0" type="float" />
     <output name="out__1" type="color3" />
   </foo>
   <add name="y" type="float">
     <input name="in1" type="float" output="out__0" nodename="node1" />
-    <input name="in2" type="float" output="out__0" nodename="a" />
+    <input name="in2" type="float" output="out__0" nodename="node2" />
   </add>
   <add name="z" type="color3">
     <input name="in1" type="color3" output="out__1" nodename="node1" />
-    <input name="in2" type="color3" output="out__1" nodename="a" />
+    <input name="in2" type="color3" output="out__1" nodename="node2" />
   </add>
 </materialx>

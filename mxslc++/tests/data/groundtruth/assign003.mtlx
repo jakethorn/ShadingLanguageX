@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_my_function" node="my_function">
+    <input name="z" type="float" />
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+  </nodedef>
+  <nodegraph name="NG_my_function">
+    <subtract name="node1" type="float">
+      <input name="in1" type="float" interfacename="z" />
+      <input name="in2" type="float" value="1" />
+    </subtract>
+    <output name="out__0" type="float" value="3" />
+    <output name="out__1" type="float" nodename="node1" />
+  </nodegraph>
+  <my_function name="node1" type="multioutput">
+    <input name="z" type="float" value="2" />
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+  </my_function>
+  <multiply name="node2" type="float">
+    <input name="in1" type="float" output="out__0" nodename="node1" />
+    <input name="in2" type="float" value="4" />
+  </multiply>
+</materialx>

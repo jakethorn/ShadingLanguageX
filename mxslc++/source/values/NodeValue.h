@@ -15,10 +15,7 @@
 class NodeValue final : public Value
 {
 public:
-    NodeValue(mx::NodePtr node, TypeInfoPtr type) : Value{std::move(type)}, node_{std::move(node)}
-    {
-        subvalues_.resize(type_->field_count());
-    }
+    NodeValue(mx::NodePtr node, TypeInfoPtr type) : Value{std::move(type)}, node_{std::move(node)} { }
 
     [[nodiscard]] size_t subvalue_count() const override
     {
@@ -27,9 +24,6 @@ public:
 
     [[nodiscard]] ValuePtr subvalue(const size_t i) const override
     {
-        if (i < subvalues_.size() and subvalues_[i] != nullptr)
-            return subvalues_[i];
-
         if (node_->isMultiOutputType())
         {
             size_t j = 0;
@@ -41,11 +35,6 @@ public:
         }
 
         throw std::out_of_range{"Subvalue index out of range"};
-    }
-
-    void set_subvalue(const size_t i, const ValuePtr& value) override
-    {
-        subvalues_[i] = value;
     }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
@@ -68,7 +57,6 @@ public:
 
 private:
     mx::NodePtr node_;
-    vector<ValuePtr> subvalues_;
 };
 
 #endif //FENNEC_NODEVALUE_H

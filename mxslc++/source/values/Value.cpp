@@ -7,7 +7,7 @@
 
 ValuePtr Value::subvalue(const size_t i) const
 {
-    throw CompileError{"Value does not have subvalues"s};
+    throw CompileError{"Cannot get subvalue"s};
 }
 
 ValuePtr Value::subvalue(const Token& name) const
@@ -17,7 +17,7 @@ ValuePtr Value::subvalue(const Token& name) const
 
 void Value::set_subvalue(size_t i, const ValuePtr& value)
 {
-    throw CompileError{"Value does not have subvalues"s};
+    throw CompileError{"Cannot set subvalue"s};
 }
 
 void Value::set_subvalue(const Token& name, const ValuePtr& value)
