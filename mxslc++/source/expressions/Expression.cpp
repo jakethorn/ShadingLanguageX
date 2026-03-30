@@ -10,7 +10,7 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "utils/template_utils.h"
+#include "utils/str_utils.h"
 
 Expression::Expression(const Runtime& runtime) : runtime_{runtime} { }
 Expression::Expression(const Runtime& runtime, Token token) : runtime_{runtime}, token_{std::move(token)} { }
@@ -34,7 +34,11 @@ void Expression::init(const string& type_name)
 void Expression::init(const vector<TypeInfoPtr>& types)
 {
     if (not try_init(types))
-        throw CompileError{token_, "Expression failed to initialize"s};
+    {
+        const string expr_type = type_impl()->str();
+        const string msg = "Cannot initialize expression of type " + expr_type + " with " + str(types);
+        throw CompileError{token_, msg};
+    }
 }
 
 bool Expression::try_init(const vector<TypeInfoPtr>& types)

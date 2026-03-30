@@ -15,4 +15,6 @@ string str(const T& t)
     return std::to_string(t);
 }
 
+string str(const vector<TypeInfoPtr>& types);
+
 #endif //FENNEC_STR_UTILS_H

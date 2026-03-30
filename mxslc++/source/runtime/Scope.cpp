@@ -2,6 +2,8 @@
 // Created by jaket on 03/12/2025.
 //
 
+#include <cassert>
+
 #include "Scope.h"
 #include "CompileError.h"
 #include "ArgumentList.h"

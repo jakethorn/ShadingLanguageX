@@ -117,18 +117,6 @@ void MtlXSerializer::save(const fs::path& filepath) const
 
 namespace
 {
-    string node_def_name(const Function& func)
-    {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type()->name() : func.name();
-        return "ND_" + name;
-    }
-
-    string node_graph_name(const Function& func)
-    {
-        const string name = func.has_template_type() ? func.name() + "_" + func.template_type()->name() : func.name();
-        return "NG_" + name;
-    }
-    
     void add_inputs_from_type(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
     {
         if (type->has_fields())
@@ -197,6 +185,22 @@ void MtlXSerializer::write_node_graph(const Function& func) const
         const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
         output->setValue(0, "integer"s);
     }
+}
+
+string MtlXSerializer::node_def_name(const Function& func) const
+{
+    string name = "ND_" + func.name();
+    if (func.has_template_type() and func.template_type()->has_name())
+        name += "_" + func.template_type()->name();
+    return doc_->createValidChildName(std::move(name));
+}
+
+string MtlXSerializer::node_graph_name(const Function& func) const
+{
+    string name = "NG_" + func.name();
+    if (func.has_template_type() and func.template_type()->has_name())
+        name += "_" + func.template_type()->name();
+    return doc_->createValidChildName(std::move(name));
 }
 
 void MtlXSerializer::enter_node_graph(const mx::NodeGraphPtr& node_graph) const

@@ -27,8 +27,7 @@ public:
     [[nodiscard]] const Token& name_token() const { return *name_;}
 
     [[nodiscard]] FieldInfo instantiate_template_types(const TypeInfoPtr& template_type) const;
-
-    [[nodiscard]] bool is_compatible(const FieldInfo& other) const;
+    [[nodiscard]] string str() const;
 
 private:
     ModifierList mods_;

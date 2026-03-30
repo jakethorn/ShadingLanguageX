@@ -466,6 +466,13 @@ ExprPtr Parser::primary()
         return std::make_unique<Literal>(runtime_, std::move(*literal));
     }
 
+    if (consume('('))
+    {
+        ExprPtr expr = expression();
+        match(')');
+        return expr;
+    }
+
     if (peek() == TokenType::Identifier)
     {
         if (peek(1) == '(' or is_templated_function())

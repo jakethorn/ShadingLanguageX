@@ -28,6 +28,9 @@ private:
     void write_node_def(const Function& func) const;
     void write_node_graph(const Function& func) const;
 
+    string node_def_name(const Function& func) const;
+    string node_graph_name(const Function& func) const;
+
     void enter_node_graph(const mx::NodeGraphPtr& node_graph) const;
     void exit_node_graph() const;
     const mx::GraphElementPtr& graph() const { return graphs_.back(); }
