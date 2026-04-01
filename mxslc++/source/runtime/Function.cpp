@@ -80,6 +80,8 @@ Function& Function::operator=(Function&& other) noexcept
     return *this;
 }
 
+Function::~Function() = default;
+
 void Function::init(const Runtime& runtime)
 {
     type_ = runtime.scope().resolve_type(type_);
@@ -95,5 +97,3 @@ void Function::init(const Runtime& runtime)
 
     params_.init();
 }
-
-Function::~Function() = default;

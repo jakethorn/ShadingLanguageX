@@ -30,6 +30,17 @@ TypeInfoPtr Identifier::type_impl() const
 
 ValuePtr Identifier::evaluate_impl() const
 {
+    // check if value is in the current node_graph
+    // if it is:
+        // all good
+    // else:
+        // add input to the node_def with the correct type
+        // instead return an interface_value
+        // save variable and use it in mtlx_serializer::write_node, passing its value to the node with the correct input from the node_def
+
+    // do the appropriate similar logic for assign
+    // and also in dot_expression and indexing_expression
+
     return ValueFactory::cast_value(var_->value(), type());
 }
 

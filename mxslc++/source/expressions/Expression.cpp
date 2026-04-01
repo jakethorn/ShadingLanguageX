@@ -76,5 +76,5 @@ ValuePtr Expression::evaluate() const
 
 void Expression::assign(const ValuePtr& value)
 {
-    throw CompileError{"This expression cannot be assigned to"s};
+    throw CompileError{token_, "This expression cannot be assigned to"s};
 }

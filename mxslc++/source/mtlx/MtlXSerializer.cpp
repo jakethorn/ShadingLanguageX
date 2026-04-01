@@ -105,8 +105,8 @@ ValuePtr MtlXSerializer::write_node(const Function& func, const ArgumentList& ar
 
 void MtlXSerializer::write_node_def_graph(const Function& func) const
 {
-    write_node_def(func);
-    write_node_graph(func);
+    const mx::NodeDefPtr node_def = write_node_def(func);
+    write_node_graph(func, node_def);
 }
 
 void MtlXSerializer::save(const fs::path& filepath) const
@@ -144,7 +144,7 @@ namespace
     }
 }
 
-void MtlXSerializer::write_node_def(const Function& func) const
+mx::NodeDefPtr MtlXSerializer::write_node_def(const Function& func) const
 {
     const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func.type()), func.name());
     for (const Parameter& param : func.parameters())
@@ -164,20 +164,27 @@ void MtlXSerializer::write_node_def(const Function& func) const
     {
         add_outputs_from_type(node_def, func.type(), "out"s);
     }
+
+    return node_def;
 }
 
-void MtlXSerializer::write_node_graph(const Function& func) const
+void MtlXSerializer::write_node_graph(const Function& func, const mx::NodeDefPtr& node_def) const
 {
     const mx::NodeGraphPtr node_graph = doc_->addNodeGraph(node_graph_name(func));
+    node_graph->setNodeDef(node_def);
+
     enter_node_graph(node_graph);
+
     for (const StmtPtr& stmt : func.body())
         stmt->execute();
+
     if (func.return_expr() != nullptr)
     {
         func.return_expr()->init(func.type());
         const ValuePtr return_value = func.return_expr()->evaluate();
         return_value->set_as_node_graph_output(graph(), "out"s);
     }
+
     exit_node_graph();
 
     if (func.type() == TypeInfo::Void)
