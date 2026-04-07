@@ -4,7 +4,7 @@
     <output name="out" type="float" />
     <input name="a" type="float" />
   </nodedef>
-  <nodegraph name="NG_foo">
+  <nodegraph name="NG_foo" nodedef="ND_foo">
     <add name="node1" type="float">
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" interfacename="a" />

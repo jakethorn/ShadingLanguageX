@@ -20,7 +20,7 @@ public:
 
 private:
     [[nodiscard]] bool is_templated() const { return not template_types_.empty(); }
-    void write_function_definition(const Function& func) const;
+    void write_function_definition(const FuncPtr& func) const;
 
     ModifierList mods_;
     TypeInfoPtr type_;

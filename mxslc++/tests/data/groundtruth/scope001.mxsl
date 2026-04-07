@@ -1,0 +1,8 @@
+float f = 6.9 * 5;
+
+float foo()
+{
+	return f * 2;
+}
+
+float g = foo();

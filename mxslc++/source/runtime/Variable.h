@@ -21,7 +21,7 @@ public:
     [[nodiscard]] TypeInfoPtr type() const;
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] ValuePtr value() const { return val_; }
-    [[nodiscard]] const Token& token() const { return name_; }
+    [[nodiscard]] const Token& name_token() const { return name_; }
 
     void set_value(const ValuePtr& val) { val_ = val; }
 

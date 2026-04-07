@@ -18,9 +18,14 @@ public:
     [[nodiscard]] Scope& scope() const { return *scope_; }
     [[nodiscard]] const MtlXSerializer& serializer() const { return serializer_; }
 
-    void enter_scope() const
+    void enter_scope(bool is_inline = false) const
     {
-        scope_ = std::make_unique<Scope>(std::move(scope_));
+        scope_ = std::make_unique<Scope>(std::move(scope_), is_inline);
+    }
+
+    void enter_inline_scope() const
+    {
+        enter_scope(true);
     }
 
     void exit_scope() const

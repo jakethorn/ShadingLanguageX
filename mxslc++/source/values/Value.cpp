@@ -7,7 +7,7 @@
 
 ValuePtr Value::subvalue(const size_t i) const
 {
-    throw CompileError{"Cannot get subvalue"s};
+    throw CompileError{type_->name_token(), "Cannot get subvalue"s};
 }
 
 ValuePtr Value::subvalue(const Token& name) const
@@ -17,7 +17,7 @@ ValuePtr Value::subvalue(const Token& name) const
 
 void Value::set_subvalue(size_t i, const ValuePtr& value)
 {
-    throw CompileError{"Cannot set subvalue"s};
+    throw CompileError{type_->name_token(), "Cannot set subvalue"s};
 }
 
 void Value::set_subvalue(const Token& name, const ValuePtr& value)
@@ -27,20 +27,20 @@ void Value::set_subvalue(const Token& name, const ValuePtr& value)
 
 bool Value::as_bool() const
 {
-    throw CompileError{"Value is not a compile-time bool"s};
+    throw CompileError{type_->name_token(), "Value is not a compile-time bool"s};
 }
 
 int Value::as_int() const
 {
-    throw CompileError{"Value is not a compile-time int"s};
+    throw CompileError{type_->name_token(), "Value is not a compile-time int"s};
 }
 
 float Value::as_float() const
 {
-    throw CompileError{"Value is not a compile-time float"s};
+    throw CompileError{type_->name_token(), "Value is not a compile-time float"s};
 }
 
 string Value::as_string() const
 {
-    throw CompileError{"Value is not a compile-time string"s};
+    throw CompileError{type_->name_token(), "Value is not a compile-time string"s};
 }

@@ -5,7 +5,7 @@
     <output name="out__0" type="float" />
     <output name="out__1" type="float" />
   </nodedef>
-  <nodegraph name="NG_my_function">
+  <nodegraph name="NG_my_function" nodedef="ND_my_function">
     <subtract name="node1" type="float">
       <input name="in1" type="float" interfacename="z" />
       <input name="in2" type="float" value="1" />

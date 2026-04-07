@@ -56,7 +56,14 @@ ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)
     }
     else
     {
-        return value;
+        if (node->getOutputCount() == 0)
+        {
+            return value;
+        }
+        else
+        {
+            return std::make_shared<OutputValue>(node->addOutput("out"s, type->name()), type);
+        }
     }
 }
 

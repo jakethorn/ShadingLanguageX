@@ -6,6 +6,7 @@
 #define FENNEC_NULLVALUE_H
 
 #include "Value.h"
+#include "runtime/TypeInfo.h"
 
 class NullValue final : public Value
 {
@@ -19,7 +20,7 @@ public:
 
     void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
     {
-        throw CompileError{"Cannot return null value"s};
+        throw CompileError{type_->name_token(), "Cannot return null value"s};
     }
 
     [[nodiscard]] string str() const override { return "null"s; }

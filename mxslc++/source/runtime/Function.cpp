@@ -4,6 +4,8 @@
 
 #include "Function.h"
 
+#include <cassert>
+
 #include "CompileError.h"
 #include "Runtime.h"
 #include "TypeInfo.h"
@@ -81,6 +83,18 @@ Function& Function::operator=(Function&& other) noexcept
 }
 
 Function::~Function() = default;
+
+void Function::add_nonlocal_input(const string& name, const VarPtr& var)
+{
+    assert(not contains(nonlocal_inputs_, name));
+    nonlocal_inputs_[name] = var;
+}
+
+void Function::add_nonlocal_output(const string& name, const VarPtr& var)
+{
+    assert(not contains(nonlocal_outputs_, name));
+    nonlocal_outputs_[name] = var;
+}
 
 void Function::init(const Runtime& runtime)
 {

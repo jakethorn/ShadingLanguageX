@@ -44,7 +44,7 @@ void ForEachLoop::execute() const
     const ValuePtr iter_val = iter_expr_->evaluate();
     for (size_t i = 0; i < iter_val->subvalue_count(); i++)
     {
-        runtime_.enter_scope();
+        runtime_.enter_inline_scope();
 
         ValuePtr subvalue = iter_val->subvalue(i);
         if (not subvalue->type()->is_equal(type))

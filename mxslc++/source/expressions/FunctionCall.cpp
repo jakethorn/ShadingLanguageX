@@ -66,7 +66,7 @@ ValuePtr FunctionCall::evaluate_impl() const
 {
     if (func_->is_inline())
     {
-        runtime_.enter_scope();
+        runtime_.enter_inline_scope();
         evaluate_arguments();
         for (const StmtPtr& stmt : func_->body())
             stmt->execute();
@@ -76,7 +76,7 @@ ValuePtr FunctionCall::evaluate_impl() const
     }
     else
     {
-        return runtime_.serializer().write_node(*func_, args_);
+        return runtime_.serializer().write_node(func_, args_);
     }
 }
 

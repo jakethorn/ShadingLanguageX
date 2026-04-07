@@ -30,6 +30,14 @@ TypeInfoPtr Identifier::type_impl() const
 
 ValuePtr Identifier::evaluate_impl() const
 {
+    ValuePtr value;
+    if (runtime_.scope().is_variable_inline(var_))
+        value = var_->value();
+    else
+        value = runtime_.serializer().write_node_def_input(var_);
+
+    return ValueFactory::cast_value(value, type());
+
     // check if value is in the current node_graph
     // if it is:
         // all good
@@ -40,11 +48,12 @@ ValuePtr Identifier::evaluate_impl() const
 
     // do the appropriate similar logic for assign
     // and also in dot_expression and indexing_expression
-
-    return ValueFactory::cast_value(var_->value(), type());
 }
 
 void Identifier::assign(const ValuePtr& value)
 {
-    var_->set_value(value);
+    if (runtime_.scope().is_variable_inline(var_))
+        var_->set_value(value);
+    else
+        runtime_.serializer().write_node_def_output(var_, value);
 }
