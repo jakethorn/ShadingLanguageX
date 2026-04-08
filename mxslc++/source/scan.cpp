@@ -30,31 +30,48 @@ namespace
 
     bool try_match_float(const string_view text, Token& token)
     {
-        static const regex pattern{R"(^(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))(e-?[0-9]+)?)"};
+        static const regex pattern{R"(^(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))(e-?[0-9]+)?)", std::regex_constants::optimize};
         return try_match(TokenType::Float, pattern, text, token);
     }
 
     bool try_match_int(const string_view text, Token& token)
     {
-        static const regex pattern{R"(^\d+)"};
+        static const regex pattern{R"(^\d+)", std::regex_constants::optimize};
         return try_match(TokenType::Int, pattern, text, token);
     }
 
     bool try_match_string(const string_view text, Token& token)
     {
-        static const regex pattern{R"(^"[^"]*")"};
+        static const regex pattern{R"(^"[^"]*")", std::regex_constants::optimize};
         return try_match(TokenType::String, pattern, text, token);
     }
 
     bool try_match_bool(const string_view text, Token& token)
     {
-        static const regex pattern{R"(^(true|false))"};
-        return try_match(TokenType::Bool, pattern, text, token);
+        if (text.front() == 't')
+        {
+            if (text.size() >= 4 && text.compare(0, 4, "true") == 0)
+            {
+                token = Token{TokenType::Bool, string{text.substr(0, 4)}};
+                return true;
+            }
+        }
+
+        if (text.front() == 'f')
+        {
+            if (text.size() >= 5 && text.compare(0, 5, "false") == 0)
+            {
+                token = Token{TokenType::Bool, string{text.substr(0, 5)}};
+                return true;
+            }
+        }
+
+        return false;
     }
 
     bool try_match_keyword_identifier(const string_view text, Token& token)
     {
-        static const regex pattern{R"(^[_a-zA-Z][_a-zA-Z0-9]*)"};
+        static const regex pattern{R"(^[_a-zA-Z][_a-zA-Z0-9]*)", std::regex_constants::optimize};
         if (string_view_match match;
             std::regex_search(text.begin(), text.end(), match, pattern))
         {
@@ -68,7 +85,10 @@ namespace
 
     bool try_match_comment(const string_view text, Token& token)
     {
-        static const regex pattern{R"(^//.*)"};
+        if (text.size() < 2 or text[0] != '/' or text[1] != '/')
+            return false;
+
+        static const regex pattern{R"(^//.*)", std::regex_constants::optimize};
         return try_match(TokenType::Comment, pattern, text, token);
     }
 
@@ -116,14 +136,14 @@ namespace
     Token next_token(const string_view text, const size_t line)
     {
         if (Token token; try_match_whitespace(text, token)
+                         or try_match_compound_symbol(text, token)
                          or try_match_comment(text, token)
-                         or try_match_float(text, token)
-                         or try_match_int(text, token)
-                         or try_match_string(text, token)
+                         or try_match_symbol(text, token)
                          or try_match_bool(text, token)
                          or try_match_keyword_identifier(text, token)
-                         or try_match_compound_symbol(text, token)
-                         or try_match_symbol(text, token))
+                         or try_match_float(text, token)
+                         or try_match_int(text, token)
+                         or try_match_string(text, token))
         {
             token.set_line(line);
             return token;
