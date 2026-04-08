@@ -12,6 +12,8 @@ class Identifier final : public Expression
 public:
     Identifier(const Runtime& runtime, Token token) : Expression{runtime, std::move(token)} { }
 
+    [[nodiscard]] VarPtr variable() const override { return var_; }
+
     [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
     void assign(const ValuePtr &value) override;
