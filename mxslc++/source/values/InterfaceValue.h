@@ -7,6 +7,7 @@
 
 #include "utils/common.h"
 #include "Value.h"
+#include "mtlx/mtlx_utils.h"
 #include "runtime/TypeInfo.h"
 
 class InterfaceValue final : public Value
@@ -20,9 +21,9 @@ public:
         input->setInterfaceName(name_);
     }
 
-    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
-        const mx::OutputPtr output = node_graph->addOutput(output_name, type_->name());
+        const mx::OutputPtr output = add_or_get_output(node_graph, output_name, type_);
         output->setInterfaceName(name_);
     }
 

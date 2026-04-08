@@ -5,20 +5,20 @@
     <input name="in2" type="float" value="5" />
   </multiply>
   <nodedef name="ND_foo" node="foo">
+    <input name="nonlocal_in__f" type="float" />
     <output name="out" type="float" />
-    <input name="in__" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <multiply name="node1" type="float">
-      <input name="in1" type="float" interfacename="in__" />
+      <input name="in1" type="float" interfacename="nonlocal_in__f" />
       <input name="in2" type="float" value="2" />
     </multiply>
     <output name="out" type="float" nodename="node1" />
   </nodegraph>
   <foo name="g" type="float">
-    <input name="in__" type="float" nodename="f" />
+    <input name="nonlocal_in__f" type="float" nodename="f" />
   </foo>
   <foo name="h" type="float">
-    <input name="in__" type="float" value="6.9" />
+    <input name="nonlocal_in__f" type="float" value="6.9" />
   </foo>
 </materialx>

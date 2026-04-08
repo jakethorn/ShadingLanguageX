@@ -17,24 +17,16 @@ class NodeValue final : public Value
 public:
     NodeValue(mx::NodePtr node, TypeInfoPtr type) : Value{std::move(type)}, node_{std::move(node)} { }
 
-    [[nodiscard]] size_t subvalue_count() const override
-    {
-        return node_->isMultiOutputType() ? node_->getOutputCount() : 0;
-    }
-
     [[nodiscard]] ValuePtr subvalue(const size_t i) const override
     {
-        if (node_->isMultiOutputType())
+        size_t j = 0;
+        for (const mx::OutputPtr& output : node_->getOutputs())
         {
-            size_t j = 0;
-            for (const mx::OutputPtr& output : node_->getOutputs())
-            {
-                if (i == j++)
-                    return std::make_shared<OutputValue>(output, type_->field_type(i));
-            }
+            if (i == j++)
+                return std::make_shared<OutputValue>(output, type_->field_type(i));
         }
 
-        throw std::out_of_range{"Subvalue index out of range"};
+        throw CompileError{type_->name_token(), "Trying to access multiple outputs from a node (" + node_->getName() + ") that only has one output"};
     }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
@@ -42,9 +34,9 @@ public:
         node->setConnectedNode(input_name, node_);
     }
 
-    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
-        const mx::OutputPtr output = node_graph->addOutput(output_name, node_->getType());
+        const mx::OutputPtr output = add_or_get_output(node_graph, output_name, type_);
         output->setConnectedNode(node_);
     }
 

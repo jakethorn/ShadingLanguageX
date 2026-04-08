@@ -1,0 +1,14 @@
+using Point = {float x, float y};
+Point a = {1, 2};
+Point b = {5, 6};
+
+float some_func()
+{
+    a = {3, 4};
+    a = {7, 8};
+    return 3;
+}
+
+float c = a.x * b.y;
+float _ = some_func();
+float d = b.x * a.y;

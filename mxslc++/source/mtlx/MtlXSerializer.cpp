@@ -19,7 +19,6 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "utils/template_utils.h"
-#include "values/InterfaceValue.h"
 #include "values/ValueFactory.h"
 
 #define BINARY_OP(ltype, op, rtype) \
@@ -67,13 +66,15 @@ namespace
         return nullptr;
     }
 
-    string serialize_type(const TypeInfoPtr& type)
+    string serialize_type(const FuncPtr& func)
     {
-        if (type->has_fields())
+        if (not func->nonlocal_outputs().empty())
             return TypeInfo::MultiOutput;
-        if (type == TypeInfo::Void)
+        if (func->type()->has_fields())
+            return TypeInfo::MultiOutput;
+        if (func->type() == TypeInfo::Void)
             return TypeInfo::Int;
-        return type->name();
+        return func->type()->name();
     }
 }
 
@@ -86,7 +87,7 @@ ValuePtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& arg
         return value;
 
     // node
-    const mx::NodePtr node = graph()->addNode(func->name(), mx::EMPTY_STRING, serialize_type(func->type()));
+    const mx::NodePtr node = graph()->addNode(func->name(), mx::EMPTY_STRING, serialize_type(func));
 
     // inputs
     for (size_t i = 0; i < args.size(); ++i)
@@ -108,27 +109,40 @@ ValuePtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& arg
 
     for (const auto& [output_name, var] : func->nonlocal_outputs())
     {
-        mx::OutputPtr output = node->addOutput(output_name, var->type()->name());
-        var->set_value(std::make_shared<OutputValue>(output, var->type()));
+        var->set_value(ValueFactory::create_output_value(node, output_name, var->type()));
     }
 
     return ValueFactory::create_node_value(node, func->type());
 }
 
+namespace
+{
+    void add_inputs_from_type(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
+    {
+        if (type->has_fields())
+        {
+            for (size_t i = 0; i < type->field_count(); ++i)
+                add_inputs_from_type(node_def, type->field_type(i), port_name(name, i));
+        }
+        else
+        {
+            if (node_def->getInput(name) == nullptr)
+                node_def->addInput(name, type->name());
+        }
+    }
+}
+
 ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
 {
-    const mx::NodeDefPtr node_def = node_graph()->getNodeDef();
-    const string input_name = node_graph()->createValidChildName("in__"s);
-    node_def->addInput(input_name, var->type()->name());
+    const string input_name = "nonlocal_in__" + var->name();
+    add_inputs_from_type(node_graph()->getNodeDef(), var->type(), input_name);
     graph_function()->add_nonlocal_input(input_name, var);
-    return std::make_shared<InterfaceValue>(input_name, var->type());
+    return ValueFactory::create_nonlocal_interface(var);
 }
 
 void MtlXSerializer::write_node_def_output(const VarPtr& var, const ValuePtr& value) const
 {
-    const mx::NodeDefPtr node_def = node_graph()->getNodeDef();
-    const string output_name = node_graph()->createValidChildName("out__"s);
-    node_def->addOutput(output_name, var->type()->name());
+    const string output_name = "nonlocal_out__" + var->name();
     value->set_as_node_graph_output(node_graph(), output_name);
     graph_function()->add_nonlocal_output(output_name, var);
 }
@@ -145,38 +159,9 @@ void MtlXSerializer::save(const fs::path& filepath) const
     save_file(filepath, xml);
 }
 
-namespace
-{
-    void add_inputs_from_type(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
-    {
-        if (type->has_fields())
-        {
-            for (size_t i = 0; i < type->field_count(); ++i)
-                add_inputs_from_type(node_def, type->field_type(i), port_name(name, i));
-        }
-        else
-        {
-            node_def->addInput(name, type->name());
-        }
-    }
-
-    void add_outputs_from_type(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
-    {
-        if (type->has_fields())
-        {
-            for (size_t i = 0; i < type->field_count(); ++i)
-                add_outputs_from_type(node_def, type->field_type(i), port_name(name, i));
-        }
-        else
-        {
-            node_def->addOutput(name, type->name());
-        }
-    }
-}
-
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
 {
-    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func->type()), func->name());
+    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), func->name());
     for (const Parameter& param : func->parameters())
     {
         if (param.has_default_value())
@@ -190,10 +175,7 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
         }
     }
 
-    if (func->type()->has_fields())
-    {
-        add_outputs_from_type(node_def, func->type(), "out"s);
-    }
+    node_def->removeOutput("out"s);
 
     return node_def;
 }
@@ -212,13 +194,14 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
     {
         func->return_expr()->init(func->type());
         const ValuePtr return_value = func->return_expr()->evaluate();
-        return_value->set_as_node_graph_output(graph(), "out"s);
+        return_value->set_as_node_graph_output(node_graph, "out"s);
     }
 
     exit_node_graph();
 
     if (func->type() == TypeInfo::Void)
     {
+        node_graph->getNodeDef()->addOutput("out"s, "integer"s);
         const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
         output->setValue(0, "integer"s);
     }

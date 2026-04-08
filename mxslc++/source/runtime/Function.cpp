@@ -4,13 +4,10 @@
 
 #include "Function.h"
 
-#include <cassert>
-
 #include "CompileError.h"
 #include "Runtime.h"
 #include "TypeInfo.h"
 #include "statements/Statement.h"
-#include "utils/template_utils.h"
 #include "expressions/Expression.h"
 #include "mtlx/mtlx_utils.h"
 
@@ -86,13 +83,11 @@ Function::~Function() = default;
 
 void Function::add_nonlocal_input(const string& name, const VarPtr& var)
 {
-    assert(not contains(nonlocal_inputs_, name));
     nonlocal_inputs_[name] = var;
 }
 
 void Function::add_nonlocal_output(const string& name, const VarPtr& var)
 {
-    assert(not contains(nonlocal_outputs_, name));
     nonlocal_outputs_[name] = var;
 }
 

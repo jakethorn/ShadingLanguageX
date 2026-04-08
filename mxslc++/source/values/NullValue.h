@@ -18,7 +18,7 @@ public:
         node->removeInput(input_name);
     }
 
-    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
         throw CompileError{type_->name_token(), "Cannot return null value"s};
     }
