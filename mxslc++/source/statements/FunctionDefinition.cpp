@@ -68,15 +68,15 @@ void FunctionDefinition::execute() const
     {
         func->init(runtime_);
         if (not func->is_inline())
-            write_function_definition(*func);
+            write_function_definition(func);
         runtime_.scope().add_function(func);
     }
 }
 
-void FunctionDefinition::write_function_definition(const Function& func) const
+void FunctionDefinition::write_function_definition(const FuncPtr& func) const
 {
     runtime_.enter_scope();
-    for (const Parameter& param : func.parameters())
+    for (const Parameter& param : func->parameters())
     {
         ValuePtr val = ValueFactory::create_parameter_interface(param);
         VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));

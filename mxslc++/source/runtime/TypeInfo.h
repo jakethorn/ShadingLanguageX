@@ -63,10 +63,11 @@ public:
     [[nodiscard]] size_t field_count() const { return fields_.size(); }
     [[nodiscard]] bool has_fields() const { return field_count() > 0; }
     [[nodiscard]] bool has_field(const string& name) const;
+
     [[nodiscard]] const FieldInfo& field(size_t index) const;
     [[nodiscard]] const FieldInfo& field(const Token& name) const;
+    [[nodiscard]] const string& field_name(const size_t index) const { return field(index).name(); }
     [[nodiscard]] size_t field_index(const Token& name) const;
-
     [[nodiscard]] TypeInfoPtr field_type(const size_t index) const { return field(index).type(); }
     [[nodiscard]] TypeInfoPtr field_type(const Token& name) const { return field(name).type(); }
 

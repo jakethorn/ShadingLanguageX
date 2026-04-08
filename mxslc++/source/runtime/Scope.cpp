@@ -13,11 +13,12 @@
 
 Scope::Scope() : parent_{nullptr} { }
 Scope::Scope(ScopePtr parent) : parent_{std::move(parent)} { }
+Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_inline_{is_inline} { }
 
 void Scope::add_variable(VarPtr var)
 {
     if (contains(variables_, var->name()))
-        throw CompileError{var->token(), "Variable already defined: " + var->name()};
+        throw CompileError{var->name_token(), "Variable already defined: " + var->name()};
 
     variables_.emplace(var->name(), std::move(var));
 }
@@ -36,7 +37,7 @@ void Scope::set_variable(VarPtr var)
         return;
     }
 
-    throw CompileError{var->token(), "Variable not defined: " + var->name()};
+    throw CompileError{var->name_token(), "Variable not defined: " + var->name()};
 }
 
 VarPtr Scope::get_variable(const Token& name) const
@@ -49,6 +50,26 @@ VarPtr Scope::get_variable(const Token& name) const
     if (parent_)
     {
         return parent_->get_variable(name);
+    }
+
+    throw CompileError{name, "Variable not defined: " + name.lexeme()};
+}
+
+bool Scope::is_variable_inline(const VarPtr& var) const
+{
+    return is_variable_inline(var->name_token());
+}
+
+bool Scope::is_variable_inline(const Token& name) const
+{
+    if (contains(variables_, name.lexeme()))
+    {
+        return true;
+    }
+
+    if (parent_)
+    {
+        return parent_->is_variable_inline(name) and is_inline_;
     }
 
     throw CompileError{name, "Variable not defined: " + name.lexeme()};

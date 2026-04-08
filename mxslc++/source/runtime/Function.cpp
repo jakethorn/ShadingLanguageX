@@ -8,7 +8,6 @@
 #include "Runtime.h"
 #include "TypeInfo.h"
 #include "statements/Statement.h"
-#include "utils/template_utils.h"
 #include "expressions/Expression.h"
 #include "mtlx/mtlx_utils.h"
 
@@ -80,6 +79,18 @@ Function& Function::operator=(Function&& other) noexcept
     return *this;
 }
 
+Function::~Function() = default;
+
+void Function::add_nonlocal_input(const string& name, const VarPtr& var)
+{
+    nonlocal_inputs_[name] = var;
+}
+
+void Function::add_nonlocal_output(const string& name, const VarPtr& var)
+{
+    nonlocal_outputs_[name] = var;
+}
+
 void Function::init(const Runtime& runtime)
 {
     type_ = runtime.scope().resolve_type(type_);
@@ -95,5 +106,3 @@ void Function::init(const Runtime& runtime)
 
     params_.init();
 }
-
-Function::~Function() = default;

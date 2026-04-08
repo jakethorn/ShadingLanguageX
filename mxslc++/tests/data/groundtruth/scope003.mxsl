@@ -1,0 +1,10 @@
+float f = 6.9 * 5;
+
+float foo(float x, float y)
+{
+    f = 8/9;
+	return x/y;
+}
+
+float g = foo(1, 2);
+float h = f * g;

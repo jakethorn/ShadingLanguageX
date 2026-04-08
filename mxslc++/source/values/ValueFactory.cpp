@@ -11,6 +11,7 @@
 #include "NodeValue.h"
 #include "StructValue.h"
 #include "mtlx/mtlx_utils.h"
+#include "runtime/Variable.h"
 
 namespace
 {
@@ -39,6 +40,12 @@ ValuePtr ValueFactory::create_parameter_interface(const Parameter& param)
     return get_interface_from_type(param.type(), param.name());
 }
 
+ValuePtr ValueFactory::create_nonlocal_interface(const VarPtr& var)
+{
+    const string output_name = "nonlocal_in__" + var->name();
+    return get_interface_from_type(var->type(), output_name);
+}
+
 ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)
 {
     ValuePtr value = std::make_shared<NodeValue>(node, type);
@@ -56,7 +63,34 @@ ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)
     }
     else
     {
-        return value;
+        if (node->getOutputCount() == 0)
+        {
+            return value;
+        }
+        else
+        {
+            return std::make_shared<OutputValue>(node, "out"s, type);
+        }
+    }
+}
+
+ValuePtr ValueFactory::create_output_value(mx::NodePtr node, const string& output_name, TypeInfoPtr type)
+{
+    if (type->has_fields())
+    {
+        vector<ValuePtr> subvalues;
+        subvalues.reserve(type->field_count());
+        for (size_t i = 0; i < type->field_count(); ++i)
+        {
+            ValuePtr subvalue = std::make_shared<OutputValue>(node, port_name(output_name, i), type->field_type(i));
+            subvalues.push_back(std::move(subvalue));
+        }
+
+        return std::make_shared<StructValue>(std::move(subvalues), type);
+    }
+    else
+    {
+        return std::make_shared<OutputValue>(node, output_name, type);
     }
 }
 

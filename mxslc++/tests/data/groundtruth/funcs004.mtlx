@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_get_last" node="get_last">
-    <output name="out" type="float" />
     <input name="v__0" type="float" />
     <input name="v__1" type="float" />
     <input name="v__2" type="float" />
+    <output name="out" type="float" />
   </nodedef>
-  <nodegraph name="NG_get_last">
+  <nodegraph name="NG_get_last" nodedef="ND_get_last">
     <output name="out" type="float" interfacename="v__2" />
   </nodegraph>
   <get_last name="z" type="float">

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="nonlocal_out__a" type="float" />
+    <output name="nonlocal_out__b" type="float" />
+    <output name="nonlocal_out__c" type="float" />
+    <output name="out" type="float" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="nonlocal_out__a" type="float" value="1" />
+    <output name="nonlocal_out__b" type="float" value="2" />
+    <output name="nonlocal_out__c" type="float" value="3" />
+    <output name="out" type="float" value="0" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <output name="nonlocal_out__c" type="float" />
+    <output name="nonlocal_out__b" type="float" />
+    <output name="nonlocal_out__a" type="float" />
+    <output name="out" type="float" />
+  </foo>
+  <divide name="node2" type="float">
+    <input name="in1" type="float" output="nonlocal_out__a" nodename="node1" />
+    <input name="in2" type="float" output="nonlocal_out__b" nodename="node1" />
+  </divide>
+  <divide name="node3" type="float">
+    <input name="in1" type="float" nodename="node2" />
+    <input name="in2" type="float" output="nonlocal_out__c" nodename="node1" />
+  </divide>
+  <divide name="e" type="float">
+    <input name="in1" type="float" nodename="node3" />
+    <input name="in2" type="float" output="out" nodename="node1" />
+  </divide>
+</materialx>

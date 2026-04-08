@@ -53,7 +53,7 @@ void ForRangeLoop::execute() const
 
         while (lower <= upper)
         {
-            runtime_.enter_scope();
+            runtime_.enter_inline_scope();
 
             VarPtr var = std::make_shared<Variable>(ModifierList{}, name_, std::make_shared<BasicValue>(lower));
             runtime_.scope().add_variable(std::move(var));
@@ -74,7 +74,7 @@ void ForRangeLoop::execute() const
 
         while (lower <= upper)
         {
-            runtime_.enter_scope();
+            runtime_.enter_inline_scope();
 
             VarPtr var = std::make_shared<Variable>(ModifierList{}, name_, std::make_shared<BasicValue>(lower));
             runtime_.scope().add_variable(std::move(var));

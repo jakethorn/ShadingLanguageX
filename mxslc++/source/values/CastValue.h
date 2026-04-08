@@ -12,7 +12,6 @@ class CastValue final : public Value
 public:
     CastValue(ValuePtr value, TypeInfoPtr type) : Value{std::move(type)}, value_{std::move(value)} { }
 
-    [[nodiscard]] size_t subvalue_count() const override { return value_->subvalue_count(); }
     [[nodiscard]] ValuePtr subvalue(const size_t i) const override { return value_->subvalue(i); }
     void set_subvalue(const size_t i, const ValuePtr& value) override { value_->set_subvalue(i, value); }
 
@@ -21,7 +20,7 @@ public:
         value_->set_as_node_input(node, input_name);
     }
 
-    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
         value_->set_as_node_graph_output(node_graph, output_name);
     }

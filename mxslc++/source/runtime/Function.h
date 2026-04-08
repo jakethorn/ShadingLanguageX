@@ -54,6 +54,12 @@ public:
     [[nodiscard]] const vector<string>& output_names() const { return output_names_; }
     [[nodiscard]] const string& output_name(const size_t i) const { return output_names_.at(i); }
 
+    void add_nonlocal_input(const string& name, const VarPtr& var);
+    void add_nonlocal_output(const string& name, const VarPtr& var);
+
+    const unordered_map<string, VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
+    const unordered_map<string, VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
+
     void init(const Runtime& runtime);
 
 private:
@@ -64,7 +70,10 @@ private:
     ParameterList params_;
     vector<StmtPtr> body_;
     ExprPtr return_expr_;
+
     vector<string> output_names_;
+    unordered_map<string, VarPtr> nonlocal_inputs_;
+    unordered_map<string, VarPtr> nonlocal_outputs_;
 };
 
 #endif //FENNEC_FUNCTION_H

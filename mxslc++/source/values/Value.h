@@ -6,6 +6,8 @@
 #define FENNEC_VALUE_H
 
 #include <MaterialXCore/Node.h>
+
+#include "runtime/TypeInfo.h"
 #include "utils/common.h"
 
 class Token;
@@ -16,14 +18,15 @@ public:
     explicit Value(TypeInfoPtr type) : type_{std::move(type)} { }
     virtual ~Value() = default;
 
-    [[nodiscard]] virtual size_t subvalue_count() const { return 0; }
-    [[nodiscard]] virtual ValuePtr subvalue(size_t i) const;
+    [[nodiscard]] size_t subvalue_count() const { return type_->field_count(); }
     [[nodiscard]] ValuePtr subvalue(const Token& name) const;
-    virtual void set_subvalue(size_t i, const ValuePtr& value);
     void set_subvalue(const Token& name, const ValuePtr& value);
 
+    [[nodiscard]] virtual ValuePtr subvalue(size_t i) const;
+    virtual void set_subvalue(size_t i, const ValuePtr& value);
+
     virtual void set_as_node_input(const mx::NodePtr& node, const string& input_name) const { }
-    virtual void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const { }
+    virtual void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const { }
     virtual void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const { }
     virtual void set_name(const string& name) { }
 

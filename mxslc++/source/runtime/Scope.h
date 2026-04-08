@@ -16,15 +16,16 @@ class Scope
 public:
     Scope();
     explicit Scope(ScopePtr parent);
+    Scope(ScopePtr parent, bool is_inline);
 
-    ScopePtr parent()
-    {
-        return std::move(parent_);
-    }
+    ScopePtr parent() { return std::move(parent_); }
+    bool is_inline() const { return is_inline_; }
 
     void add_variable(VarPtr var);
     void set_variable(VarPtr var);
     [[nodiscard]] VarPtr get_variable(const Token& name) const;
+    [[nodiscard]] bool is_variable_inline(const VarPtr& var) const;
+    [[nodiscard]] bool is_variable_inline(const Token& name) const;
 
     void add_function(FuncPtr func);
     [[nodiscard]] vector<FuncPtr> get_functions(
@@ -52,6 +53,7 @@ public:
 
 private:
     ScopePtr parent_;
+    bool is_inline_ = false;
 
     unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;

@@ -30,10 +30,19 @@ TypeInfoPtr Identifier::type_impl() const
 
 ValuePtr Identifier::evaluate_impl() const
 {
-    return ValueFactory::cast_value(var_->value(), type());
+    ValuePtr value;
+    if (runtime_.scope().is_variable_inline(var_))
+        value = var_->value();
+    else
+        value = runtime_.serializer().write_node_def_input(var_);
+
+    return ValueFactory::cast_value(value, type());
 }
 
 void Identifier::assign(const ValuePtr& value)
 {
-    var_->set_value(value);
+    if (runtime_.scope().is_variable_inline(var_))
+        var_->set_value(value);
+    else
+        runtime_.serializer().write_node_def_output(var_, value);
 }

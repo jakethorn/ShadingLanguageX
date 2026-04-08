@@ -3,6 +3,8 @@
 //
 
 #include "mtlx_utils.h"
+
+#include "runtime/TypeInfo.h"
 #include "utils/str_utils.h"
 
 string as_string(const mx::NodePtr& node)
@@ -23,4 +25,17 @@ string port_name(const string& port_name, const size_t i)
 string port_name(const string& port_name, const string& s)
 {
     return port_name + "__" + s;
+}
+
+mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const string& name, const TypeInfoPtr& type)
+{
+    mx::NodeDefPtr node_def = node_graph->getNodeDef();
+    if (node_def->getOutput(name) == nullptr)
+        node_def->addOutput(name, type->name());
+
+    mx::OutputPtr output = node_graph->getOutput(name);
+    if (output == nullptr)
+        output = node_graph->addOutput(name, type->name());
+
+    return output;
 }

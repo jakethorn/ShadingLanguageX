@@ -7,7 +7,6 @@
 
 #include "Value.h"
 #include "mtlx/mtlx_utils.h"
-#include "runtime/TypeInfo.h"
 #include "utils/str_utils.h"
 
 class StructValue final : public Value
@@ -16,7 +15,6 @@ public:
     explicit StructValue(vector<ValuePtr> values, TypeInfoPtr type)
         : Value{std::move(type)}, values_{std::move(values)} { }
 
-    [[nodiscard]] size_t subvalue_count() const override { return values_.size(); }
     [[nodiscard]] ValuePtr subvalue(const size_t i) const override { return values_.at(i); }
 
     void set_subvalue(const size_t i, const ValuePtr& value) override
@@ -30,7 +28,7 @@ public:
             values_[i]->set_as_node_input(node, port_name(input_name, i));
     }
 
-    void set_as_node_graph_output(const mx::GraphElementPtr& node_graph, const string& output_name) const override
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
         for (size_t i = 0; i < values_.size(); ++i)
             values_[i]->set_as_node_graph_output(node_graph, port_name(output_name, i));

@@ -8,7 +8,7 @@
     <output name="out__0" type="float" />
     <output name="out__1" type="float" />
   </nodedef>
-  <nodegraph name="NG_to">
+  <nodegraph name="NG_to" nodedef="ND_to">
     <subtract name="x" type="float">
       <input name="in1" type="float" interfacename="b__0" />
       <input name="in2" type="float" interfacename="a__0" />

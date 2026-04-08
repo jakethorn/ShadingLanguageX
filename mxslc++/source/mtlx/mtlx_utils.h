@@ -13,4 +13,6 @@ string as_string(const mx::NodePtr& node);
 string port_name(const string& port_name, size_t i);
 string port_name(const string& port_name, const string& s);
 
+mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const string& name, const TypeInfoPtr& type);
+
 #endif //FENNEC_MTLX_UTILS_H

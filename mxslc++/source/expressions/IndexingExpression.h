@@ -11,7 +11,9 @@ class IndexingExpression final : public Expression
 {
 public:
     IndexingExpression(const Runtime& runtime, ExprPtr expr, ExprPtr index)
-        : Expression{runtime, index->token()}, expr_{std::move(expr)}, index_{std::move(index)} { }
+        : Expression{runtime, index->token()}, expr_{std::move(expr)}, index_expr_{std::move(index)} { }
+
+    [[nodiscard]] VarPtr variable() const override;
 
     [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
@@ -19,13 +21,14 @@ public:
 
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;
+    void init_impl(const vector<TypeInfoPtr>& types) override;
     [[nodiscard]] TypeInfoPtr type_impl() const override;
     [[nodiscard]] ValuePtr evaluate_impl() const override;
 
 private:
     ExprPtr expr_;
-    ExprPtr index_;
-    TypeInfoPtr type_;
+    ExprPtr index_expr_;
+    size_t index_;
 };
 
 #endif //MXSLC_INDEXINGEXPRESSION_H

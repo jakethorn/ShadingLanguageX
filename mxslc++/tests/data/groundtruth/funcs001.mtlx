@@ -3,13 +3,13 @@
   <nodedef name="ND_foo" node="foo">
     <output name="out" type="float" />
   </nodedef>
-  <nodegraph name="NG_foo">
+  <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="out" type="float" value="1" />
   </nodegraph>
   <nodedef name="ND_bar" node="bar">
     <output name="out" type="float" />
   </nodedef>
-  <nodegraph name="NG_bar">
+  <nodegraph name="NG_bar" nodedef="ND_bar">
     <output name="out" type="float" value="5" />
   </nodegraph>
   <foo name="f" type="float" />

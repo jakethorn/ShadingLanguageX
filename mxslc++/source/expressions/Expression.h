@@ -27,10 +27,11 @@ public:
 
     [[nodiscard]] bool is_initialized() const { return is_initialized_; }
     [[nodiscard]] TypeInfoPtr type() const;
-    [[nodiscard]] ValuePtr evaluate() const;
+    [[nodiscard]] virtual VarPtr variable() const { return nullptr; }
 
     [[nodiscard]] virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
 
+    [[nodiscard]] ValuePtr evaluate() const;
     virtual void assign(const ValuePtr& value);
 
 protected:

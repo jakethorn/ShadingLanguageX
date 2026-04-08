@@ -1,0 +1,14 @@
+float a = 0;
+float b = 0;
+float c = 0;
+
+float foo()
+{
+    a = 1;
+    b = 2;
+    c = 3;
+	return 0;
+}
+
+float d = foo();
+float e = a/b/c/d;
