@@ -1,0 +1,11 @@
+void foo()
+{
+
+}
+
+void bar()
+{
+    foo();
+}
+
+bar();

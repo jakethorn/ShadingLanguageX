@@ -39,6 +39,7 @@ private:
     StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr using_declaration();
     StmtPtr for_loop();
+    StmtPtr expression_statement();
 
     ModifierList modifiers();
     TypeInfoPtr type_info();

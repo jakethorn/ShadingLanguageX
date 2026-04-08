@@ -4,6 +4,8 @@
 
 #include "FunctionCall.h"
 
+#include <cassert>
+
 #include "runtime/Function.h"
 #include "CompileError.h"
 #include "runtime/Runtime.h"
@@ -164,6 +166,15 @@ void FunctionCall::evaluate_arguments() const
 
 ValuePtr FunctionCall::evaluate_return() const
 {
-    func_->return_expr()->init(func_->type());
-    return func_->return_expr()->evaluate();
+    if (func_->return_expr() != nullptr)
+    {
+        assert(func_->type() != TypeInfo::Void);
+        func_->return_expr()->init(func_->type());
+        return func_->return_expr()->evaluate();
+    }
+    else
+    {
+        assert(func_->type() == TypeInfo::Void);
+        return nullptr;
+    }
 }

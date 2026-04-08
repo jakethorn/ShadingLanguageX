@@ -1,0 +1,9 @@
+float b = 1;
+
+void foo(float x)
+{
+    b = x;
+}
+
+foo(2);
+print b;

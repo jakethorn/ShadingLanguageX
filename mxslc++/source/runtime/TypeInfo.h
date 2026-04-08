@@ -27,7 +27,7 @@ public:
     TypeInfo(ModifierList mods, Token name, vector<FieldInfo> fields)
         : mods_{std::move(mods)}, name_{std::move(name)}, fields_{std::move(fields)} { }
 
-    explicit TypeInfo(const string& name) : name_{name} { }
+    explicit TypeInfo(const string& name) : name_{Token{TokenType::Identifier, name}} { }
     explicit TypeInfo(Token name) : name_{std::move(name)} { }
     explicit TypeInfo(vector<FieldInfo> fields) : fields_{std::move(fields)} { }
 
@@ -84,6 +84,13 @@ public:
 
     bool operator==(const string& other) const { return name_.lexeme() == other; }
     bool operator!=(const string& other) const { return not (*this == other); }
+
+    [[nodiscard]] static TypeInfoPtr resolved_void()
+    {
+        TypeInfoPtr type = std::make_shared<TypeInfo>(Void);
+        type->set_resolved();
+        return type;
+    }
 
 private:
     void set_resolved() { is_resolved_ = true; }

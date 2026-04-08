@@ -192,19 +192,20 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
 
     if (func->return_expr() != nullptr)
     {
+        assert(func->type() != TypeInfo::Void);
         func->return_expr()->init(func->type());
         const ValuePtr return_value = func->return_expr()->evaluate();
         return_value->set_as_node_graph_output(node_graph, "out"s);
     }
-
-    exit_node_graph();
-
-    if (func->type() == TypeInfo::Void)
+    else
     {
+        assert(func->type() == TypeInfo::Void);
         node_graph->getNodeDef()->addOutput("out"s, "integer"s);
         const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
         output->setValue(0, "integer"s);
     }
+
+    exit_node_graph();
 }
 
 string MtlXSerializer::node_def_name(const FuncPtr& func) const

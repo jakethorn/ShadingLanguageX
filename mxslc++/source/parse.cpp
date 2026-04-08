@@ -19,6 +19,7 @@
 #include "runtime/ParameterList.h"
 #include "runtime/Variable.h"
 #include "runtime/FieldInfo.h"
+#include "statements/ExpressionStatement.h"
 #include "statements/ForEachLoop.h"
 #include "statements/ForRangeLoop.h"
 #include "statements/FunctionDefinition.h"
@@ -113,7 +114,16 @@ StmtPtr Parser::statement()
     if (peek() == TokenType::Identifier)
     {
         mods.validate();
-        return variable_assignment();
+
+        if (peek(1) == '=' or peek(1) == '.' or peek(1) == '[')
+        {
+            return variable_assignment();
+        }
+
+        if (peek(1) == '<' or peek(1) == '(')
+        {
+            return expression_statement();
+        }
     }
 
     throw CompileError{peek(), "Invalid statement"s};
@@ -271,6 +281,13 @@ StmtPtr Parser::for_loop()
         vector<StmtPtr> body = loop_body();
         return std::make_unique<ForEachLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(body));
     }
+}
+
+StmtPtr Parser::expression_statement()
+{
+    ExprPtr expr = function_call();
+    match(';');
+    return std::make_unique<ExpressionStatement>(runtime_, std::move(expr));
 }
 
 ModifierList Parser::modifiers()

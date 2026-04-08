@@ -93,7 +93,20 @@ void Function::add_nonlocal_output(const string& name, const VarPtr& var)
 
 void Function::init(const Runtime& runtime)
 {
-    type_ = runtime.scope().resolve_type(type_);
+    if (type_ != TypeInfo::Void and return_expr_ == nullptr)
+    {
+        throw CompileError{name_, "Non-void function '" + name_.lexeme() + "' does not have a return statement"s};
+    }
+
+    if (type_ == TypeInfo::Void and return_expr_ != nullptr)
+    {
+        throw CompileError{name_, "Void function '" + name_.lexeme() + "' has a return statement"s};
+    }
+
+    if (type_ == TypeInfo::Void)
+        type_ = TypeInfo::resolved_void();
+    else
+        type_ = runtime.scope().resolve_type(type_);
 
     if (output_names_.empty())
     {
