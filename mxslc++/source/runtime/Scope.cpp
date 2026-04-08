@@ -247,5 +247,5 @@ TypeInfoPtr Scope::get_type(const Token& name) const
 
 TypeInfoPtr Scope::get_type(const string& name) const
 {
-    return get_type(Token{name});
+    return get_type(Token{TokenType::Identifier, name});
 }

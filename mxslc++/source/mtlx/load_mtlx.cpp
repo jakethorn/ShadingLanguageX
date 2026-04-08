@@ -20,7 +20,7 @@ namespace
         const TypeInfoPtr type = runtime.scope().get_type(i->getType());
         const string& name = i->getName();
         ExprPtr expr = std::make_unique<NullExpression>(runtime);
-        return Parameter{runtime, {}, type, name, std::move(expr), index};
+        return Parameter{runtime, {}, type, Token{TokenType::Identifier, name}, std::move(expr), index};
     }
 
     ParameterList get_parameters(const Runtime& runtime, const mx::NodeDefPtr& nd)
