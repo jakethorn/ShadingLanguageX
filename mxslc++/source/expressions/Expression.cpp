@@ -10,6 +10,7 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable.h"
 #include "utils/str_utils.h"
 
 Expression::Expression(const Runtime& runtime) : runtime_{runtime} { }
@@ -75,6 +76,17 @@ ValuePtr Expression::evaluate() const
 }
 
 void Expression::assign(const ValuePtr& value)
+{
+    if (const VarPtr var = variable(); var != nullptr and (var->is_const() or not var->is_mutable()))
+    {
+        throw CompileError{token_, "Const variable '" + var->name() + "' cannot be changed (use mutable modifier)"};
+    }
+
+    assert(is_initialized_);
+    assign_impl(value);
+}
+
+void Expression::assign_impl(const ValuePtr& value)
 {
     throw CompileError{token_, "This expression cannot be assigned to"s};
 }

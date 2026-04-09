@@ -1,4 +1,4 @@
-float f = 6.9 * 5;
+mutable float f = 6.9 * 5;
 
 float foo()
 {

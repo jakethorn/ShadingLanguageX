@@ -5,7 +5,7 @@
 #include "CompileError.h"
 #include "Token.h"
 
-string CompileError::format(const Token& debug_info, const string& message)
+string mxslc::CompileError::format(const Token& debug_info, const string& message)
 {
     if (debug_info.line() == 0)
     {

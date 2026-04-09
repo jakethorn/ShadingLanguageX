@@ -14,12 +14,16 @@ class FieldInfo
 
 public:
     FieldInfo(ModifierList mods, TypeInfoPtr type, optional<Token> name, ExprPtr initializer)
-        : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, initializer_{std::move(initializer)} { }
+        : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, initializer_{std::move(initializer)}
+    {
+        mods_.validate("const"s, "mutable"s);
+    }
 
-    explicit FieldInfo(TypeInfoPtr type)
-        : type_{std::move(type)} { }
+    explicit FieldInfo(TypeInfoPtr type) : FieldInfo{{}, std::move(type), std::nullopt, nullptr} { }
 
     [[nodiscard]] const ModifierList& modifiers() const { return mods_; }
+    [[nodiscard]] bool is_const() const { return mods_.contains("const"s); }
+    [[nodiscard]] bool is_mutable() const { return mods_.contains("mutable"s); }
     [[nodiscard]] TypeInfoPtr type() const { return type_; }
     [[nodiscard]] bool has_name() const { return name_.has_value(); }
     [[nodiscard]] const string& name() const { return name_->lexeme(); }

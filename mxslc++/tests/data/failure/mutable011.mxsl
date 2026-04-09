@@ -1,5 +1,5 @@
-using Point = {float x, float y};
-mutable Point a = {1, 2};
+using Point = {mutable float x, mutable float y};
+Point a = {1, 2};
 Point b = {5, 6};
 
 float some_func()

@@ -39,7 +39,7 @@ ValuePtr Identifier::evaluate_impl() const
     return ValueFactory::cast_value(value, type());
 }
 
-void Identifier::assign(const ValuePtr& value)
+void Identifier::assign_impl(const ValuePtr& value)
 {
     if (runtime_.scope().is_variable_inline(var_))
         var_->set_value(value);

@@ -23,6 +23,9 @@ namespace mx = MaterialX;
 
 using namespace std::string_literals;
 
+namespace mxslc { }
+using namespace mxslc;
+
 using std::unique_ptr;
 using std::shared_ptr;
 using std::optional;

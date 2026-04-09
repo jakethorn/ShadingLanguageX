@@ -1,0 +1,5 @@
+using Point = {mutable float x, mutable float y};
+
+const Point p = {1, 2};
+p.x = 3;
+p[1] = 4;

@@ -7,7 +7,7 @@
 #include "scan.h"
 #include "runtime/TypeInfo.h"
 
-TokenType Token::init_type_(const string& lexeme)
+TokenType Token::init_type(const string& lexeme)
 {
     const vector tokens = sscan(lexeme);
     assert(tokens.size() == 1);

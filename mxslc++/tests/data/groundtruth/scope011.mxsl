@@ -1,4 +1,4 @@
-using Point = {float x, float y};
+using Point = {mutable float x, float y};
 Point b = {5, 6};
 Point p = {1, 2};
 

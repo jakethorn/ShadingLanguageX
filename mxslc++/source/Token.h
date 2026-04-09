@@ -12,7 +12,7 @@ class Token
 {
 public:
     Token() = default;
-    Token(string lexeme) : Token{init_type_(lexeme), std::move(lexeme)} { }
+    Token(string lexeme) : Token{init_type(lexeme), std::move(lexeme)} { }
     Token(const TokenType type) : Token{type, type.str()} { }
     Token(const TokenType type, string lexeme) : type_{type}, lexeme_(std::move(lexeme)) { }
 
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    static TokenType init_type_(const string& lexeme);
+    static TokenType init_type(const string& lexeme);
 
     TokenType type_;
     string lexeme_;

@@ -1,0 +1,8 @@
+float b = 1;
+
+void foo()
+{
+    b = 2;
+}
+
+foo();

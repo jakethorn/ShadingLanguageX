@@ -13,8 +13,6 @@
 #include "TokenType.h"
 #include "Span.h"
 
-using namespace mxslc;
-
 class TokenReader
 {
 public:

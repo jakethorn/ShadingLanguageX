@@ -22,7 +22,7 @@ public:
     }
 
     template<typename... Args>
-    void validate(const Args&... valid_mods)
+    void validate(const Args&... valid_mods) const
     {
         for (const Token& mod : mods_)
         {

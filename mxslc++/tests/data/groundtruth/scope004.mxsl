@@ -1,6 +1,6 @@
-float a = 0;
-float b = 0;
-float c = 0;
+mutable float a = 0;
+mutable float b = 0;
+mutable float c = 0;
 
 float foo()
 {

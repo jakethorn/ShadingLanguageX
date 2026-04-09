@@ -15,23 +15,6 @@ using namespace std::string_literals;
 using std::string;
 using std::vector;
 
-void print_debug_info(const fs::path& input_path, const string& actual_output, const string& expected_output)
-{
-    const string border = string(input_path.filename().string().size() + 4, '-');
-    std::cout
-    << "\n\n\n"
-    << border
-    << "\n"
-    << "| " << input_path.filename().string() << " |"
-    << "\n"
-    << border
-    << "\n\n"
-    << column_compare("Actual Output"s, actual_output, "Expected Output"s, expected_output, true)
-    << "\n\n"
-    << column_compare("Actual Output"s, actual_output, "Input"s, read_file(input_path), false)
-    << "\n\n\n";
-}
-
 using groundtruth_tests = testing::TestWithParam<fs::path>;
 
 TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)

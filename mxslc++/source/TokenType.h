@@ -52,6 +52,9 @@ public:
         AmpersandEq,
         PipeEq,
         Arrow,
+        DoubleColon,
+        Increment,
+        Decrement,
         
         // Keyword
         If,
@@ -122,6 +125,9 @@ private:
         {"&=", AmpersandEq},
         {"|=", PipeEq},
         {"->", Arrow},
+        {"::", DoubleColon},
+        {"++", Increment},
+        {"--", Decrement},
         {"if", If},
         {"else", Else},
         {"switch", Switch},

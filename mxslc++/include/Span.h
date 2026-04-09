@@ -80,6 +80,6 @@ namespace mxslc
     };
 }
 
-#undef str
+#undef STR
 
 #endif //MXSLC_SPAN_H

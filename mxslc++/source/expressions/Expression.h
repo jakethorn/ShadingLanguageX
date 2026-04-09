@@ -32,13 +32,14 @@ public:
     [[nodiscard]] virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
 
     [[nodiscard]] ValuePtr evaluate() const;
-    virtual void assign(const ValuePtr& value);
+    void assign(const ValuePtr& value);
 
 protected:
     virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
     virtual void init_impl(const vector<TypeInfoPtr>& types) { }
     [[nodiscard]] virtual TypeInfoPtr type_impl() const = 0;
     [[nodiscard]] virtual ValuePtr evaluate_impl() const = 0;
+    virtual void assign_impl(const ValuePtr& value);
 
     const Runtime& runtime_;
     Token token_;

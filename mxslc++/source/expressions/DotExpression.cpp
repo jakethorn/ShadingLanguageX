@@ -42,7 +42,7 @@ ValuePtr DotExpression::evaluate_impl() const
         return runtime_.serializer().write_node_def_input(variable());
 }
 
-void DotExpression::assign(const ValuePtr& value)
+void DotExpression::assign_impl(const ValuePtr& value)
 {
     if (expr_->variable() == nullptr or runtime_.scope().is_variable_inline(expr_->variable()))
         expr_->evaluate()->set_subvalue(token_, value);

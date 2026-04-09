@@ -9,10 +9,13 @@
 #include "utils/common.h"
 #include "Token.h"
 
+class FieldInfo;
+
 class IVariable
 {
 public:
     virtual ~IVariable() = default;
+
     [[nodiscard]] virtual bool is_const() const = 0;
     [[nodiscard]] virtual bool is_mutable() const = 0;
     [[nodiscard]] virtual bool is_global() const = 0;
@@ -57,6 +60,7 @@ public:
     [[nodiscard]] bool is_mutable() const override;
     [[nodiscard]] bool is_global() const override;
     [[nodiscard]] TypeInfoPtr type() const override;
+    [[nodiscard]] const FieldInfo& field() const;
     [[nodiscard]] const string& name() const override;
     [[nodiscard]] ValuePtr value() const override;
     [[nodiscard]] const Token& name_token() const override;
@@ -66,11 +70,11 @@ public:
 private:
     VarPtr owner_;
     Token name_;
-    size_t index_;
+    size_t index_ = 0;
     string qualified_name_;
 };
 
-VarPtr get_subvariable(VarPtr owner, size_t index);
-VarPtr get_subvariable(VarPtr owner, Token name);
+VarPtr get_subvariable(const VarPtr& owner, size_t index);
+VarPtr get_subvariable(const VarPtr& owner, const Token& name);
 
 #endif //FENNEC_VARIABLE_H

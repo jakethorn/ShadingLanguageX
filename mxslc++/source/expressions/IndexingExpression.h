@@ -17,7 +17,7 @@ public:
 
     [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
-    void assign(const ValuePtr &value) override;
+    void assign_impl(const ValuePtr &value) override;
 
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;
@@ -28,7 +28,7 @@ protected:
 private:
     ExprPtr expr_;
     ExprPtr index_expr_;
-    size_t index_;
+    size_t index_ = 0;
 };
 
 #endif //MXSLC_INDEXINGEXPRESSION_H

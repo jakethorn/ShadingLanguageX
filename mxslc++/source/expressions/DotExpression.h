@@ -13,11 +13,11 @@ public:
     DotExpression(const Runtime& runtime, ExprPtr expr, Token property)
         : Expression{runtime, std::move(property)}, expr_{std::move(expr)} { }
 
-    VarPtr variable() const override;
+    [[nodiscard]] VarPtr variable() const override;
 
     [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
-    void assign(const ValuePtr &value) override;
+    void assign_impl(const ValuePtr &value) override;
 
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;

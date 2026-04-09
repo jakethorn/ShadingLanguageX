@@ -52,7 +52,7 @@ ValuePtr IndexingExpression::evaluate_impl() const
         return runtime_.serializer().write_node_def_input(variable());
 }
 
-void IndexingExpression::assign(const ValuePtr& value)
+void IndexingExpression::assign_impl(const ValuePtr& value)
 {
     if (expr_->variable() == nullptr or runtime_.scope().is_variable_inline(expr_->variable()))
         expr_->evaluate()->set_subvalue(index_, value);

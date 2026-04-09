@@ -5,7 +5,7 @@ function my_function(float z) -> Point
     return {3.0, z - 1.0};
 }
 
-Point p = my_function(2.0);
+mutable Point p = my_function(2.0);
 p.y = 4.0;
 print p.x * p.y;
 print p;
