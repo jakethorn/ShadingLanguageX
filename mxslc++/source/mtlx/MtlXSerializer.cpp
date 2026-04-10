@@ -140,8 +140,7 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
 
     enter_node_graph(node_graph, func);
 
-    for (const StmtPtr& stmt : func->body())
-        stmt->execute();
+    func->body()->execute();
 
     if (func->return_expr() != nullptr)
     {

@@ -9,6 +9,7 @@
 #include "Value.h"
 #include "mtlx/mtlx_utils.h"
 #include "runtime/TypeInfo.h"
+#include "utils/str_utils.h"
 
 class BasicValue final : public Value
 {
@@ -56,14 +57,7 @@ public:
 
     [[nodiscard]] string str() const override
     {
-        return std::visit(
-            [](const auto& v){
-                std::stringstream ss;
-                ss << std::boolalpha << v;
-                return ss.str();
-            },
-            val_
-        );
+        return ::str(val_);
     }
 
     template<typename T>

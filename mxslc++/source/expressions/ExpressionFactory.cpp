@@ -75,3 +75,9 @@ ExprPtr ExpressionFactory::named_constructor(Token name, vector<Argument> argume
     name.set_lexeme("__" + name.lexeme() + "__");
     return std::make_unique<FunctionCall>(*runtime_, std::move(name), std::move(arguments));
 }
+
+ExprPtr ExpressionFactory::if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr)
+{
+    ArgumentList args{std::move(cond_expr), std::move(then_expr), std::move(else_expr)};
+    return std::make_shared<FunctionCall>(*runtime_, Token{TokenType::Identifier, "__if__"s}, std::move(args));
+}

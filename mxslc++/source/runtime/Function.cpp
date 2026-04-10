@@ -34,7 +34,7 @@ Function::Function(
     Token name,
     TypeInfoPtr template_type,
     ParameterList params,
-    vector<StmtPtr> body,
+    StmtPtr body,
     ExprPtr return_expr
 ) : mods_{std::move(mods)},
     type_{std::move(type)},

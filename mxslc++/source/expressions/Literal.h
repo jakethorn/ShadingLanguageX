@@ -6,12 +6,16 @@
 #define FENNEC_LITERAL_H
 
 #include "Expression.h"
+#include "utils/str_utils.h"
 
 class Literal final : public Expression
 {
 public:
     Literal(const Runtime& runtime, Token token)
         : Expression{runtime, std::move(token)}, value_{token_.literal()} { }
+
+    Literal(const Runtime& runtime, basic_t value)
+        : Expression{runtime, Token{str(value)}}, value_{std::move(value)} { }
 
     [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 

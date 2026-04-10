@@ -18,7 +18,7 @@ FunctionDefinition::FunctionDefinition(
     Token name,
     vector<TypeInfoPtr> template_types,
     ParameterList params,
-    vector<StmtPtr> body,
+    StmtPtr body,
     ExprPtr return_expr
 ) : Statement{runtime},
     mods_{std::move(mods)},
@@ -35,7 +35,7 @@ FunctionDefinition::FunctionDefinition(
         {
             type = type_->instantiate_template_types(template_type);
             params = params_.instantiate_template_types(template_type);
-            body = ::instantiate_template_types(body_, template_type);
+            body = body_->instantiate_template_types(template_type);
             return_expr = ::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
                 mods_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr)
@@ -57,7 +57,7 @@ StmtPtr FunctionDefinition::instantiate_template_types(const TypeInfoPtr& templa
 
     TypeInfoPtr type = type_->instantiate_template_types(template_type);
     ParameterList params = params_.instantiate_template_types(template_type);
-    vector<StmtPtr> body = ::instantiate_template_types(body_, template_type);
+    StmtPtr body = body_->instantiate_template_types(template_type);
     ExprPtr return_expr = ::instantiate_template_types(return_expr_, template_type);
     return std::make_unique<FunctionDefinition>(runtime_, mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
 }

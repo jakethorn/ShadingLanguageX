@@ -28,7 +28,7 @@ public:
         Token name,
         TypeInfoPtr template_type,
         ParameterList params,
-        vector<StmtPtr> body,
+        StmtPtr body,
         ExprPtr return_expr
     );
 
@@ -49,8 +49,8 @@ public:
     [[nodiscard]] size_t min_arity() const;
     [[nodiscard]] size_t max_arity() const { return params_.size(); }
     [[nodiscard]] const ParameterList& parameters() const { return params_; }
-    [[nodiscard]] bool has_body() const { return not body_.empty(); }
-    [[nodiscard]] const vector<StmtPtr>& body() const { return body_; }
+    [[nodiscard]] bool has_body() const { return body_ != nullptr; }
+    [[nodiscard]] const StmtPtr& body() const { return body_; }
     [[nodiscard]] const ExprPtr& return_expr() const { return return_expr_; }
     [[nodiscard]] const Token& name_token() const { return name_; }
     [[nodiscard]] bool is_initialized() const { return is_initialized_; }
@@ -74,7 +74,7 @@ private:
     Token name_;
     TypeInfoPtr template_type_;
     ParameterList params_;
-    vector<StmtPtr> body_;
+    StmtPtr body_;
     ExprPtr return_expr_;
 
     bool is_initialized_ = false;

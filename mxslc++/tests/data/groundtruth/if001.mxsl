@@ -1,0 +1,20 @@
+
+mutable float x = if (randomfloat() < 0.5) { 1.0 } else { 0.0 };
+
+float r = randomfloat(max=3.0);
+float y = if (r < 1.0)
+{
+    10.0
+}
+else if (r < 2.0)
+{
+    20.0
+}
+else
+{
+    30.0
+};
+
+x = if (randomfloat() < 0.5) { 1.0 };
+
+print x;

@@ -32,6 +32,8 @@ add_library(mxslc_lib
         statements/ForRangeLoop.cpp
         statements/ForEachLoop.cpp
         statements/ExpressionStatement.cpp
+        statements/IfStatement.cpp
+        statements/BlockStatement.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp

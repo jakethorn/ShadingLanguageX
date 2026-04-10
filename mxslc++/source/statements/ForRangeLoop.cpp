@@ -10,7 +10,7 @@
 #include "values/BasicValue.h"
 #include "values/Value.h"
 
-ForRangeLoop::ForRangeLoop(const Runtime& runtime, TypeInfoPtr type, Token name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, vector<StmtPtr> body)
+ForRangeLoop::ForRangeLoop(const Runtime& runtime, TypeInfoPtr type, Token name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body)
     : Statement{runtime},
     type_{std::move(type)},
     name_{std::move(name)},
@@ -28,7 +28,7 @@ StmtPtr ForRangeLoop::instantiate_template_types(const TypeInfoPtr& template_typ
     ExprPtr lower_expr = ::instantiate_template_types(lower_expr_, template_type);
     ExprPtr step_expr = ::instantiate_template_types(step_expr_, template_type);
     ExprPtr upper_expr = ::instantiate_template_types(upper_expr_, template_type);
-    vector<StmtPtr> body = ::instantiate_template_types(body_, template_type);
+    StmtPtr body = body_->instantiate_template_types(template_type);
     return std::make_unique<ForRangeLoop>(runtime_, std::move(type), name_, std::move(lower_expr), std::move(step_expr), std::move(upper_expr), std::move(body));
 }
 
@@ -54,15 +54,10 @@ void ForRangeLoop::execute() const
         while (lower <= upper)
         {
             runtime_.enter_inline_scope();
-
             VarPtr var = std::make_shared<Variable>(ModifierList{}, name_, std::make_shared<BasicValue>(lower));
             runtime_.scope().add_variable(std::move(var));
-
-            for (const StmtPtr& stmt : body_)
-                stmt->execute();
-
+            body_->execute();
             runtime_.exit_scope();
-
             lower += step;
         }
     }
@@ -75,15 +70,10 @@ void ForRangeLoop::execute() const
         while (lower <= upper)
         {
             runtime_.enter_inline_scope();
-
             VarPtr var = std::make_shared<Variable>(ModifierList{}, name_, std::make_shared<BasicValue>(lower));
             runtime_.scope().add_variable(std::move(var));
-
-            for (const StmtPtr& stmt : body_)
-                stmt->execute();
-
+            body_->execute();
             runtime_.exit_scope();
-
             lower += step;
         }
     }

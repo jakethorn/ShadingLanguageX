@@ -13,7 +13,7 @@
 class FunctionDefinition final : public Statement
 {
 public:
-    FunctionDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, vector<TypeInfoPtr> template_types, ParameterList params, vector<StmtPtr> body, ExprPtr return_expr);
+    FunctionDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, vector<TypeInfoPtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
 
     [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
     void execute() const override;
@@ -27,7 +27,7 @@ private:
     Token name_;
     vector<TypeInfoPtr> template_types_;
     ParameterList params_;
-    vector<StmtPtr> body_;
+    StmtPtr body_;
     ExprPtr return_expr_;
 
     vector<FuncPtr> funcs_;

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="node1" type="float" />
+  <ifgreater name="node2" type="boolean">
+    <input name="value1" type="float" value="0.5" />
+    <input name="value2" type="float" nodename="node1" />
+  </ifgreater>
+  <ifequal name="x" type="float">
+    <input name="value1" type="boolean" nodename="node2" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="0" />
+  </ifequal>
+  <randomfloat name="r" type="float">
+    <input name="max" type="float" value="3" />
+  </randomfloat>
+  <ifgreater name="node3" type="boolean">
+    <input name="value1" type="float" value="2" />
+    <input name="value2" type="float" nodename="r" />
+  </ifgreater>
+  <ifequal name="node4" type="float">
+    <input name="value1" type="boolean" nodename="node3" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="20" />
+    <input name="in2" type="float" value="30" />
+  </ifequal>
+  <ifgreater name="node5" type="boolean">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" nodename="r" />
+  </ifgreater>
+  <ifequal name="y" type="float">
+    <input name="value1" type="boolean" nodename="node5" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="10" />
+    <input name="in2" type="float" nodename="node4" />
+  </ifequal>
+  <randomfloat name="node6" type="float" />
+  <ifgreater name="node7" type="boolean">
+    <input name="value1" type="float" value="0.5" />
+    <input name="value2" type="float" nodename="node6" />
+  </ifgreater>
+  <ifequal name="node8" type="float">
+    <input name="value1" type="boolean" nodename="node7" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="x" />
+  </ifequal>
+</materialx>

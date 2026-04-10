@@ -12,6 +12,18 @@ string get_postfix(const string& str, const char delim)
     return ""s;
 }
 
+string str(const basic_t& value)
+{
+    return std::visit(
+        [](const auto& v){
+            std::stringstream ss;
+            ss << std::boolalpha << v;
+            return ss.str();
+        },
+        value
+    );
+}
+
 string str(const vector<TypeInfoPtr>& types)
 {
     if (types.empty())

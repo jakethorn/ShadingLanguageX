@@ -19,6 +19,7 @@ public:
     static ExprPtr ternary_relational(ExprPtr left, Token op1, ExprPtr middle, Token op2, ExprPtr right);
     static ExprPtr unary(Token op, ExprPtr right);
     static ExprPtr named_constructor(Token name, vector<Argument> arguments);
+    static ExprPtr if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr);
 
 private:
     ExpressionFactory() = default;

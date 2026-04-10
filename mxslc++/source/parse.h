@@ -40,14 +40,15 @@ private:
     StmtPtr using_declaration();
     StmtPtr for_loop();
     StmtPtr expression_statement();
+    StmtPtr block_statement();
+    StmtPtr if_statement();
 
     ModifierList modifiers();
     TypeInfoPtr type_info();
     FieldInfo field_info();
     Parameter parameter(size_t index);
     vector<TypeInfoPtr> template_list();
-    tuple<vector<StmtPtr>, ExprPtr> function_body();
-    vector<StmtPtr> loop_body();
+    tuple<StmtPtr, ExprPtr> function_body();
 
     ExprPtr expression();
     ExprPtr logical();
@@ -59,6 +60,7 @@ private:
     ExprPtr unary();
     ExprPtr property();
     ExprPtr primary();
+    ExprPtr if_expression(ExprPtr else_expr);
     ExprPtr function_call();
     ExprPtr named_constructor();
     ExprPtr unnamed_constructor();

@@ -73,8 +73,7 @@ ValuePtr FunctionCall::evaluate_impl() const
     {
         runtime_.enter_inline_scope();
         add_arguments_to_scope(args);
-        for (const StmtPtr& stmt : func_->body())
-            stmt->execute();
+        func_->body()->execute();
         ValuePtr return_value = evaluate_return();
         runtime_.exit_scope();
         return return_value;

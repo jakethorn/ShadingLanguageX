@@ -1,0 +1,31 @@
+
+if (true)
+{
+    randomfloat(min=1);
+}
+
+if (false)
+{
+    randomfloat(min=2);
+}
+
+if (false)
+{
+    randomfloat(min=3);
+}
+else if (true)
+{
+    randomfloat(min=4);
+}
+else if (false)
+{
+    randomfloat(min=5);
+}
+else if (true)
+{
+    randomfloat(min=6);
+}
+else
+{
+    randomfloat(min=7);
+}

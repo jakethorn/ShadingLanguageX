@@ -253,6 +253,15 @@ inline boolean __not__(boolean in)
 }
 
 //
+// conditional functions
+//
+
+inline T __if__<boolean, integer, float, vector2, vector3, vector4, color3, color4, matrix33, matrix44>(boolean condition, T then_value, T else_value)
+{
+    return ifequal(condition, true, then_value, else_value);
+}
+
+//
 // cast functions
 //
 

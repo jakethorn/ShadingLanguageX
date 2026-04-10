@@ -30,6 +30,9 @@ public:
     template<typename... Args>
     optional<Token> consume(const Args&... types)
     {
+        if (empty())
+            return std::nullopt;
+
         const Token& token = peek();
         if ((... || (token == types)))
         {

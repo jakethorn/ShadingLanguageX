@@ -19,10 +19,12 @@
 #include "runtime/ParameterList.h"
 #include "runtime/Variable.h"
 #include "runtime/FieldInfo.h"
+#include "statements/BlockStatement.h"
 #include "statements/ExpressionStatement.h"
 #include "statements/ForEachLoop.h"
 #include "statements/ForRangeLoop.h"
 #include "statements/FunctionDefinition.h"
+#include "statements/IfStatement.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
 #include "statements/VariableDefinition.h"
@@ -84,6 +86,11 @@ StmtPtr Parser::statement()
     if (peek() == TokenType::For)
     {
         return for_loop();
+    }
+
+    if (peek() == TokenType::If)
+    {
+        return if_statement();
     }
 
     ModifierList mods = modifiers();
@@ -195,9 +202,13 @@ StmtPtr Parser::variable_assignment()
 {
     ExprPtr lhs = expression();
     match('=');
-    ExprPtr rhs = expression();
+    ExprPtr rhs;
+    if (peek() == TokenType::If)
+        rhs = if_expression(lhs);
+    else
+        rhs = expression();
     match(';');
-    return std::make_unique<VariableAssignment>(runtime_, lhs, rhs);
+    return std::make_unique<VariableAssignment>(runtime_, std::move(lhs), std::move(rhs));
 }
 
 StmtPtr Parser::function_definition(ModifierList mods, TypeInfoPtr type)
@@ -272,13 +283,13 @@ StmtPtr Parser::for_loop()
         }
 
         match(')');
-        vector<StmtPtr> body = loop_body();
+        StmtPtr body = block_statement();
         return std::make_unique<ForRangeLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
     }
     else
     {
         match(')');
-        vector<StmtPtr> body = loop_body();
+        StmtPtr body = block_statement();
         return std::make_unique<ForEachLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(body));
     }
 }
@@ -288,6 +299,41 @@ StmtPtr Parser::expression_statement()
     ExprPtr expr = function_call();
     match(';');
     return std::make_unique<ExpressionStatement>(runtime_, std::move(expr));
+}
+
+StmtPtr Parser::block_statement()
+{
+    vector<StmtPtr> body;
+
+    match('{');
+    while (not consume('}'))
+        body.push_back(statement());
+
+    return std::make_unique<BlockStatement>(runtime_, std::move(body));
+}
+
+StmtPtr Parser::if_statement()
+{
+    match(TokenType::If);
+    match('(');
+    ExprPtr cond_expr = expression();
+    match(')');
+    StmtPtr then_block = block_statement();
+
+    StmtPtr else_block = nullptr;
+    if (consume(TokenType::Else))
+    {
+        if (peek() == TokenType::If)
+        {
+            else_block = if_statement();
+        }
+        else
+        {
+            else_block = block_statement();
+        }
+    }
+
+    return std::make_unique<IfStatement>(runtime_, std::move(cond_expr), std::move(then_block), std::move(else_block));
 }
 
 ModifierList Parser::modifiers()
@@ -332,7 +378,7 @@ vector<TypeInfoPtr> Parser::template_list()
     return list<TypeInfoPtr>('<', '>', [this](const size_t){ return type_info(); });
 }
 
-tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
+tuple<StmtPtr, ExprPtr> Parser::function_body()
 {
     vector<StmtPtr> body;
     ExprPtr return_expr;
@@ -351,15 +397,7 @@ tuple<vector<StmtPtr>, ExprPtr> Parser::function_body()
     while (not consume('}'))
         statement();
 
-    return {std::move(body), std::move(return_expr)};
-}
-
-vector<StmtPtr> Parser::loop_body()
-{
-    auto [body, return_expr] = function_body();
-    if (return_expr)
-        throw CompileError{peek(), "Return statement not allowed in loop body"s};
-    return std::move(body);
+    return {std::make_unique<BlockStatement>(runtime_, std::move(body)), std::move(return_expr)};
 }
 
 ExprPtr Parser::expression()
@@ -511,7 +549,41 @@ ExprPtr Parser::primary()
         return unnamed_constructor();
     }
 
+    if (peek() == TokenType::If)
+    {
+        return if_expression(nullptr);
+    }
+
     throw CompileError{peek(), "Invalid expression"s};
+}
+
+ExprPtr Parser::if_expression(ExprPtr else_expr)
+{
+    match(TokenType::If);
+    match('(');
+    ExprPtr cond_expr = expression();
+    match(')');
+    match('{');
+    ExprPtr then_expr = expression();
+    match('}');
+    if (consume(TokenType::Else))
+    {
+        if (peek() == TokenType::If)
+        {
+            else_expr = if_expression(else_expr);
+        }
+        else
+        {
+            match('{');
+            else_expr = expression();
+            match('}');
+        }
+    }
+
+    if (else_expr == nullptr)
+        throw CompileError{peek(), "Missing else branch in if-expression"s};
+
+    return ExpressionFactory::if_expression(std::move(cond_expr), std::move(then_expr), std::move(else_expr));
 }
 
 ExprPtr Parser::function_call()
