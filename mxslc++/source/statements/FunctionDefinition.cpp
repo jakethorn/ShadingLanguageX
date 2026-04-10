@@ -79,7 +79,7 @@ void FunctionDefinition::write_function_definition(const FuncPtr& func) const
     for (const Parameter& param : func->parameters())
     {
         ValuePtr val = ValueFactory::create_parameter_interface(param);
-        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));
+        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name_token(), std::move(val));
         runtime_.scope().add_variable(std::move(var));
     }
     runtime_.serializer().write_node_def_graph(func);

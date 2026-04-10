@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="x" type="float" />
+  <randomfloat name="y" type="float" />
+  <randomfloat name="z" type="float" />
+  <add name="node1" type="float">
+    <input name="in1" type="float" nodename="x" />
+    <input name="in2" type="float" nodename="y" />
+  </add>
+  <add name="b" type="float">
+    <input name="in1" type="float" nodename="node1" />
+    <input name="in2" type="float" nodename="z" />
+  </add>
+</materialx>

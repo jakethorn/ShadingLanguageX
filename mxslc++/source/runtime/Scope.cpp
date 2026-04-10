@@ -9,11 +9,16 @@
 #include "ArgumentList.h"
 #include "TypeInfo.h"
 #include "Variable.h"
+#include "utils/error_utils.h"
 #include "utils/template_utils.h"
 
-Scope::Scope() : parent_{nullptr} { }
-Scope::Scope(ScopePtr parent) : parent_{std::move(parent)} { }
-Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_inline_{is_inline} { }
+Scope::Scope() : Scope{nullptr} { }
+Scope::Scope(ScopePtr parent) : Scope{std::move(parent), false} { }
+Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_current_{true}, is_inline_{is_inline}
+{
+    if (parent_)
+        parent_->set_current(false);
+}
 
 void Scope::add_variable(VarPtr var)
 {
@@ -77,6 +82,7 @@ bool Scope::is_variable_inline(const Token& name) const
 
 void Scope::add_function(FuncPtr func)
 {
+    assert(func->is_initialized());
     functions_.push_back(std::move(func));
 }
 
@@ -104,7 +110,7 @@ namespace
                 return false;
         }
 
-        if (args.size() > func.arity())
+        if (args.size() > func.max_arity() or args.size() < func.min_arity())
             return false;
 
         for (const Argument& arg : args)
@@ -130,6 +136,24 @@ namespace
     }
 }
 
+vector<FuncPtr> Scope::get_all_functions(const Token& name) const
+{
+    vector<FuncPtr> funcs;
+    for (const FuncPtr& func : functions_)
+    {
+        if (name.lexeme() == func->name())
+            funcs.push_back(func);
+    }
+
+    if (parent_)
+    {
+        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
+        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
+    }
+
+    return funcs;
+}
+
 vector<FuncPtr> Scope::get_functions(
     const vector<TypeInfoPtr>& return_types,
     const Token& name,
@@ -145,7 +169,12 @@ vector<FuncPtr> Scope::get_functions(
     }
 
     if (funcs.empty() and parent_)
-        return parent_->get_functions(return_types, name, template_type, args);
+        funcs = parent_->get_functions(return_types, name, template_type, args);
+
+    if (funcs.empty() and is_current_)
+    {
+        throw CompileError{name, missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
+    }
 
     return funcs;
 }
@@ -158,17 +187,15 @@ FuncPtr Scope::get_function(
 ) const
 {
     const vector<FuncPtr> funcs = get_functions(return_types, name, template_type, args);
-
-    if (funcs.empty())
-        throw CompileError{name, "Function not defined: " + name.lexeme()};
+    assert(not funcs.empty());
 
     if (funcs.size() > 1)
     {
-        vector<FuncPtr> def_funcs = default_functions(funcs);
+        const vector<FuncPtr> def_funcs = default_functions(funcs);
         if (def_funcs.size() == 1)
             return def_funcs[0];
 
-        throw CompileError{name, "Ambiguous function: " + name.lexeme()};
+        throw CompileError{name, ambiguous_overload_error(funcs)};
     }
 
     return funcs[0];

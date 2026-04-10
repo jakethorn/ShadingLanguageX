@@ -34,10 +34,10 @@ void mxslc::compile_to_file(const fs::path& src_path, const fs::path& dst_path)
     const Runtime runtime;
     load_materialx_library(runtime, "1.39.4"s);
     {
-        runtime.enter_scope();
+        runtime.enter_inline_scope();
         compile_mxsl_stdlib(runtime);
         {
-            runtime.enter_scope();
+            runtime.enter_inline_scope();
             compile(runtime, src_path);
             runtime.exit_scope();
         }

@@ -30,7 +30,7 @@ public:
 
     void exit_scope() const
     {
-        scope_ = scope_->parent();
+        scope_ = scope_->exit();
     }
 
 private:

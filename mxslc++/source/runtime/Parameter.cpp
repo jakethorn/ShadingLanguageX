@@ -61,3 +61,12 @@ ValuePtr Parameter::evaluate() const
 {
     return expr_->evaluate();
 }
+
+string Parameter::str() const
+{
+    string result;
+    result += mods_.str();
+    result += type_->str();
+    result += " " + name_.lexeme();
+    return result;
+}

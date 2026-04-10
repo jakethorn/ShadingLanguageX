@@ -24,6 +24,7 @@ public:
     [[nodiscard]] bool is_out() const { return mods_.contains("out"s); }
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] size_t index() const { return index_; }
+    [[nodiscard]] const Token& name_token() const { return name_; }
 
     [[nodiscard]] Parameter instantiate_template_types(const TypeInfoPtr& template_type) const;
     void init();
@@ -31,6 +32,8 @@ public:
 
     [[nodiscard]] bool has_default_value() const { return expr_ != nullptr; }
     [[nodiscard]] ValuePtr evaluate() const;
+
+    [[nodiscard]] string str() const;
 
 private:
     const Runtime& runtime_;

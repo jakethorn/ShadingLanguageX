@@ -18,8 +18,16 @@ public:
     explicit Scope(ScopePtr parent);
     Scope(ScopePtr parent, bool is_inline);
 
-    ScopePtr parent() { return std::move(parent_); }
+    ScopePtr exit()
+    {
+        parent_->set_current(true);
+        return std::move(parent_);
+    }
+
+    bool is_current() const { return is_current_; }
     bool is_inline() const { return is_inline_; }
+
+    void set_current(const bool is_current) { is_current_ = is_current; }
 
     void add_variable(VarPtr var);
     void set_variable(VarPtr var);
@@ -33,13 +41,15 @@ public:
         const Token& name,
         const TypeInfoPtr& template_type,
         const ArgumentList& args
-    ) const;
+        ) const;
     [[nodiscard]] FuncPtr get_function(
         const vector<TypeInfoPtr>& return_types,
         const Token& name,
         const TypeInfoPtr& template_type,
         const ArgumentList& args
     ) const;
+
+    [[nodiscard]] vector<FuncPtr> get_all_functions(const Token& name) const;
 
     void add_type(TypeInfoPtr type);
     void add_basic_type(const string& name);
@@ -53,7 +63,8 @@ public:
 
 private:
     ScopePtr parent_;
-    bool is_inline_ = false;
+    bool is_current_;
+    bool is_inline_;
 
     unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;

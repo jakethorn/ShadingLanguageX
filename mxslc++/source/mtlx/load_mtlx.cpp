@@ -15,6 +15,8 @@
 
 namespace
 {
+    const unordered_set<string> default_node_defs = {"ND_randomfloat_float"s};
+
     Parameter to_parameter(const Runtime& runtime, const mx::InputPtr& i, const size_t index)
     {
         const TypeInfoPtr type = runtime.scope().get_type(i->getType());
@@ -57,13 +59,19 @@ namespace
     {
         const Scope& scope = runtime.scope();
 
+        ModifierList mods = {};
+        if (contains(default_node_defs, nd->getName()))
+            mods.add("default"s);
+
         TypeInfoPtr type = get_type(runtime, nd);
         const string name = nd->getNodeString();
-        const string template_type_name = get_postfix(name, '_');
+        const string template_type_name = get_postfix(nd->getName(), '_');
         TypeInfoPtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
         ParameterList params = get_parameters(runtime, nd);
         vector<string> output_names = get_output_names(nd);
-        return std::make_shared<Function>(std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
+        FuncPtr func = std::make_shared<Function>(mods, std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
+        func->init(runtime);
+        return func;
     }
 }
 

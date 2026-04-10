@@ -9,6 +9,7 @@
 #include "Value.h"
 #include "runtime/TypeInfo.h"
 #include "utils/common.h"
+#include "mtlx/mtlx_utils.h"
 
 class OutputValue final : public Value
 {

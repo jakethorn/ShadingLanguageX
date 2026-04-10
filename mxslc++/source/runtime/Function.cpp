@@ -12,12 +12,14 @@
 #include "mtlx/mtlx_utils.h"
 
 Function::Function(
+    ModifierList mods,
     TypeInfoPtr type,
     Token name,
     TypeInfoPtr template_type,
     ParameterList params,
     vector<string> output_names
-) : type_{std::move(type)},
+) : mods_{std::move(mods)},
+    type_{std::move(type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
     params_{std::move(params)},
@@ -81,6 +83,18 @@ Function& Function::operator=(Function&& other) noexcept
 
 Function::~Function() = default;
 
+size_t Function::min_arity() const
+{
+    size_t arity = 0;
+    for (const Parameter& param : params_)
+    {
+        if (not param.has_default_value())
+            ++arity;
+    }
+
+    return arity;
+}
+
 void Function::add_nonlocal_input(const string& name, const VarPtr& var)
 {
     nonlocal_inputs_[name] = var;
@@ -93,14 +107,17 @@ void Function::add_nonlocal_output(const string& name, const VarPtr& var)
 
 void Function::init(const Runtime& runtime)
 {
-    if (type_ != TypeInfo::Void and return_expr_ == nullptr)
+    if (has_body())
     {
-        throw CompileError{name_, "Non-void function '" + name_.lexeme() + "' does not have a return statement"s};
-    }
+        if (type_ != TypeInfo::Void and return_expr_ == nullptr)
+        {
+            throw CompileError{name_, "Non-void function '" + name_.lexeme() + "' does not have a return statement"s};
+        }
 
-    if (type_ == TypeInfo::Void and return_expr_ != nullptr)
-    {
-        throw CompileError{name_, "Void function '" + name_.lexeme() + "' has a return statement"s};
+        if (type_ == TypeInfo::Void and return_expr_ != nullptr)
+        {
+            throw CompileError{name_, "Void function '" + name_.lexeme() + "' has a return statement"s};
+        }
     }
 
     if (type_ == TypeInfo::Void)
@@ -118,4 +135,20 @@ void Function::init(const Runtime& runtime)
         template_type_ = runtime.scope().resolve_type(template_type_);
 
     params_.init();
+
+    is_initialized_ = true;
+}
+
+string Function::str() const
+{
+    string result;
+    result += mods_.str();
+    result += type_->str();
+    result += " " + name_.lexeme();
+    if (template_type_)
+        result += "<" + template_type_->str() + ">";
+    result += "(";
+    result += params_.str();
+    result += ")";
+    return result;
 }

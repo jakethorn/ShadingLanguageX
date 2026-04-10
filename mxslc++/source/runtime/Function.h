@@ -14,6 +14,7 @@ class Function
 {
 public:
     Function(
+        ModifierList mods,
         TypeInfoPtr type,
         Token name,
         TypeInfoPtr template_type,
@@ -45,11 +46,14 @@ public:
     [[nodiscard]] const string& name() const { return name_.lexeme(); }
     [[nodiscard]] bool has_template_type() const { return template_type_ != nullptr; }
     [[nodiscard]] TypeInfoPtr template_type() const { return template_type_; }
-    [[nodiscard]] size_t arity() const { return params_.size(); }
+    [[nodiscard]] size_t min_arity() const;
+    [[nodiscard]] size_t max_arity() const { return params_.size(); }
     [[nodiscard]] const ParameterList& parameters() const { return params_; }
+    [[nodiscard]] bool has_body() const { return not body_.empty(); }
     [[nodiscard]] const vector<StmtPtr>& body() const { return body_; }
     [[nodiscard]] const ExprPtr& return_expr() const { return return_expr_; }
-    [[nodiscard]] const Token& token() const { return name_; }
+    [[nodiscard]] const Token& name_token() const { return name_; }
+    [[nodiscard]] bool is_initialized() const { return is_initialized_; }
 
     [[nodiscard]] const vector<string>& output_names() const { return output_names_; }
     [[nodiscard]] const string& output_name(const size_t i) const { return output_names_.at(i); }
@@ -62,6 +66,8 @@ public:
 
     void init(const Runtime& runtime);
 
+    string str() const;
+
 private:
     ModifierList mods_;
     TypeInfoPtr type_;
@@ -70,6 +76,8 @@ private:
     ParameterList params_;
     vector<StmtPtr> body_;
     ExprPtr return_expr_;
+
+    bool is_initialized_ = false;
 
     vector<string> output_names_;
     unordered_map<string, VarPtr> nonlocal_inputs_;

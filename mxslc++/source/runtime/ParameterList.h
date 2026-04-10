@@ -13,7 +13,7 @@
 class ParameterList
 {
 public:
-    ParameterList(vector<Parameter> params) : params_{std::move(params)} { }
+    ParameterList(vector<Parameter> params);
 
     [[nodiscard]] ParameterList instantiate_template_types(const TypeInfoPtr& template_type) const
     {
@@ -45,6 +45,8 @@ public:
 
     [[nodiscard]] auto end() { return params_.end(); }
     [[nodiscard]] auto end() const { return params_.end(); }
+
+    [[nodiscard]] string str() const;
 
 private:
     vector<Parameter> params_;

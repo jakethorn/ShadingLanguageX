@@ -1,0 +1,7 @@
+float x = randomfloat<int>();
+float y = randomfloat<float>();
+float z = randomfloat();
+float a = 1.0 + 2.0;
+float b = x + y + z;
+print a;
+print b;

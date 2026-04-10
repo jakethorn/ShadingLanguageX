@@ -1,0 +1,6 @@
+int foo(float x, float y)
+{
+    return 0;
+}
+
+foo();

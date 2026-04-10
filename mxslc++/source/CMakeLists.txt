@@ -35,9 +35,11 @@ add_library(mxslc_lib
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp
+        utils/error_utils.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
+        mtlx/evaluate_mtlx.cpp
         values/Value.cpp
         values/ValueFactory.cpp
 )

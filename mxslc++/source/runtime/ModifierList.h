@@ -31,9 +31,20 @@ public:
         }
     }
 
+    void add(const Token& mod) { mods_.push_back(mod); }
+    void add(const string& mod) { mods_.emplace_back(mod); }
+
     [[nodiscard]] bool contains(const string& mod) const { return ::contains(mods_, mod); }
     [[nodiscard]] size_t size() const { return mods_.size(); }
     [[nodiscard]] bool empty() const { return mods_.empty(); }
+
+    [[nodiscard]] string str() const
+    {
+        string result;
+        for (const Token& mod : mods_)
+            result += mod.lexeme() + " ";
+        return result;
+    }
 
 private:
     vector<Token> mods_;

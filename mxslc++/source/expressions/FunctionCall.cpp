@@ -14,6 +14,7 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "runtime/TypeInfo.h"
 #include "runtime/Variable.h"
+#include "utils/error_utils.h"
 
 ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -25,18 +26,18 @@ ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_typ
 
 void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
 {
+    const Scope& scope = runtime_.scope();
+    if (template_type_)
+        template_type_ = scope.resolve_type(template_type_);
+
     if (arguments_are_initialized())
         return;
-
-    const Scope& scope = runtime_.scope();
 
     size_t initialized_arg_count = initialized_arg_count_;
     while (initialized_arg_count < args_.size())
     {
         vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
-
-        if (matching_funcs.empty())
-            throw CompileError{token_, "No matching functions: " + token_.lexeme()};
+        assert(not matching_funcs.empty());
 
         const size_t prev_initialized_arg_count = initialized_arg_count;
         initialized_arg_count = try_init_arguments(matching_funcs);
@@ -48,7 +49,7 @@ void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
             initialized_arg_count = try_init_arguments({std::move(default_func)});
 
             if (initialized_arg_count == prev_initialized_arg_count)
-                throw CompileError{token_, "Ambiguous function call: " + token_.lexeme()};
+                throw CompileError{token_, ambiguous_overload_error(matching_funcs)};
         }
     }
 }
@@ -66,10 +67,12 @@ TypeInfoPtr FunctionCall::type_impl() const
 
 ValuePtr FunctionCall::evaluate_impl() const
 {
+    const unordered_map<string, ValuePtr> args = evaluate_arguments();
+
     if (func_->is_inline())
     {
         runtime_.enter_inline_scope();
-        evaluate_arguments();
+        add_arguments_to_scope(args);
         for (const StmtPtr& stmt : func_->body())
             stmt->execute();
         ValuePtr return_value = evaluate_return();
@@ -78,7 +81,7 @@ ValuePtr FunctionCall::evaluate_impl() const
     }
     else
     {
-        return runtime_.serializer().write_node(func_, args_);
+        return runtime_.serializer().write_node(func_, args);
     }
 }
 
@@ -141,25 +144,43 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     return initialized_arg_count;
 }
 
-void FunctionCall::evaluate_arguments() const
+unordered_map<string, ValuePtr> FunctionCall::evaluate_arguments() const
 {
-    for (const Parameter& param : func_->parameters())
+    unordered_map<string, ValuePtr> result;
+
+    // iterate params in reverse order so node inputs are written in the "correct" order
+    // e.g.,
+    // <input name="in1" ... />
+    // <input name="in2" ... />
+    for (size_t i = func_->max_arity(); i > 0; --i)
     {
-        ValuePtr val;
+        const Parameter& param = func_->parameters()[i-1];
+
+        ValuePtr value;
         if (const Argument* arg = args_[param])
         {
-            val = arg->evaluate();
+            value = arg->evaluate();
         }
         else if (param.has_default_value())
         {
-            val = param.evaluate();
+            value = param.evaluate();
         }
         else
         {
-            throw CompileError{token_, "Missing argument"s};
+            throw CompileError{token_, "Function call '" + func_->name() +  "' missing argument for parameter '" + param.name() + "'"};
         }
 
-        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));
+        result[param.name()] = std::move(value);
+    }
+
+    return result;
+}
+
+void FunctionCall::add_arguments_to_scope(const unordered_map<string, ValuePtr>& args) const
+{
+    for (const auto& [name, value] : args)
+    {
+        VarPtr var = std::make_shared<Variable>(ModifierList{}, name, value);
         runtime_.scope().add_variable(std::move(var));
     }
 }

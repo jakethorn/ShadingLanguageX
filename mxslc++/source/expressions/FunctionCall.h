@@ -35,7 +35,8 @@ protected:
 private:
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
-    void evaluate_arguments() const;
+    unordered_map<string, ValuePtr> evaluate_arguments() const;
+    void add_arguments_to_scope(const unordered_map<string, ValuePtr>& args) const;
     [[nodiscard]] ValuePtr evaluate_return() const;
 
     TypeInfoPtr template_type_;

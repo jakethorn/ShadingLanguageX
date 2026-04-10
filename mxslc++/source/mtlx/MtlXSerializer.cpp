@@ -5,67 +5,21 @@
 #include "MtlXSerializer.h"
 
 #include <cassert>
-#include <functional>
 #include <MaterialXFormat/XmlIo.h>
 #include "CompileError.h"
+#include "evaluate_mtlx.h"
 #include "expressions/Expression.h"
-#include "values/BasicValue.h"
 #include "values/NodeValue.h"
 #include "values/Value.h"
 #include "runtime/Function.h"
-#include "runtime/ArgumentList.h"
 #include "runtime/TypeInfo.h"
 #include "runtime/Variable.h"
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
-#include "utils/template_utils.h"
 #include "values/ValueFactory.h"
-
-#define BINARY_OP(ltype, op, rtype) \
-    if (values[0]->is<ltype>() && values[1]->is<rtype>()) \
-        return std::make_shared<BasicValue>(values[0]->get<ltype>() op values[1]->get<rtype>());
 
 namespace
 {
-    using BasicValues = vector<shared_ptr<BasicValue>>;
-
-    ValuePtr evaluate_add(const BasicValues& values)
-    {
-        BINARY_OP(int, +, int)
-        BINARY_OP(int, +, float)
-        BINARY_OP(float, +, int)
-        BINARY_OP(float, +, float)
-        return nullptr;
-    }
-
-    unordered_map<string, std::function<ValuePtr(const BasicValues&)>> constexpr_funcs {
-        {"add"s, evaluate_add}
-    };
-
-    bool is_constexpr(const FuncPtr& func, const vector<ValuePtr>& args, BasicValues& values)
-    {
-        if (not contains(constexpr_funcs, func->name()))
-            return false;
-
-        for (const ValuePtr& arg : args)
-        {
-            if (shared_ptr<BasicValue> value = std::dynamic_pointer_cast<BasicValue>(arg))
-                values.push_back(value);
-            else
-                return false;
-        }
-
-        return true;
-    }
-
-    ValuePtr evaluate_constexpr(const FuncPtr& func, const vector<ValuePtr>& args)
-    {
-        if (BasicValues basic_values; is_constexpr(func, args, basic_values))
-            if (ValuePtr value = constexpr_funcs.at(func->name())(basic_values))
-                return value;
-        return nullptr;
-    }
-
     string serialize_type(const FuncPtr& func)
     {
         if (not func->nonlocal_outputs().empty())
@@ -78,24 +32,22 @@ namespace
     }
 }
 
-ValuePtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args) const
+ValuePtr MtlXSerializer::write_node(const FuncPtr& func, const unordered_map<string, ValuePtr>& args) const
 {
-    const vector<ValuePtr> values = args.evaluate();
-
-    // evaluate as constexpr if possible
-    if (ValuePtr value = evaluate_constexpr(func, values))
+    // evaluate at compile-time if possible
+    if (ValuePtr value = evaluate_now(func->name(), args))
         return value;
 
     // node
     const mx::NodePtr node = graph()->addNode(func->name(), mx::EMPTY_STRING, serialize_type(func));
 
     // inputs
-    for (size_t i = 0; i < args.size(); ++i)
+    for (const auto& [input_name, value] : args)
     {
-        const string& input_name = func->parameters()[args[i]].name();
-        values[i]->set_as_node_input(node, input_name);
+        value->set_as_node_input(node, input_name);
     }
 
+    // inputs from nonlocal variables
     for (const auto& [input_name, var] : func->nonlocal_inputs())
     {
         var->value()->set_as_node_input(node, input_name);
@@ -107,6 +59,7 @@ ValuePtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& arg
         node->addOutput(func->output_name(i), func->type()->field_type(i)->name());
     }
 
+    // outputs to nonlocal variables
     for (const auto& [output_name, var] : func->nonlocal_outputs())
     {
         var->set_value(ValueFactory::create_output_value(node, output_name, var->type()));
@@ -242,5 +195,3 @@ mx::NodeGraphPtr MtlXSerializer::node_graph() const
 
     throw CompileError{"Not a NodeGraph"s};
 }
-
-#undef BINARY_OP
