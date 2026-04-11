@@ -42,7 +42,7 @@ TEST_P(failure_tests, compiler_throws_compile_error)
         fs::remove(actual_path);
 }
 
-vector<fs::path> get_error_test_files()
+vector<fs::path> get_failure_files()
 {
     vector<fs::path> files;
     const fs::path test_dir = get_test_data("failure"s);
@@ -58,7 +58,7 @@ vector<fs::path> get_error_test_files()
 INSTANTIATE_TEST_SUITE_P(
     compiler,
     failure_tests,
-    testing::ValuesIn(get_error_test_files()),
+    testing::ValuesIn(get_failure_files()),
     [](const testing::TestParamInfo<fs::path>& info) {
         return info.param.stem().string();
     }

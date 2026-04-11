@@ -17,17 +17,7 @@ class NodeValue final : public Value
 public:
     NodeValue(mx::NodePtr node, TypeInfoPtr type) : Value{std::move(type)}, node_{std::move(node)} { }
 
-    [[nodiscard]] ValuePtr subvalue(const size_t i) const override
-    {
-        size_t j = 0;
-        for (const mx::OutputPtr& output : node_->getOutputs())
-        {
-            if (i == j++)
-                return std::make_shared<OutputValue>(output, type_->field_type(i));
-        }
-
-        throw CompileError{type_->name_token(), "Trying to access multiple outputs from a node (" + node_->getName() + ") that only has one output"};
-    }
+    ValuePtr subvalue(size_t i) const override;
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
@@ -46,7 +36,7 @@ public:
         node_->setName(valid_name);
     }
 
-    [[nodiscard]] string str() const override { return ::as_string(node_); }
+    string str() const override { return ::as_string(node_); }
 
 private:
     mx::NodePtr node_;

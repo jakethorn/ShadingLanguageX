@@ -1,0 +1,1 @@
+errmsg015.mxsl, line 1: 'inline' is not a valid modifier here

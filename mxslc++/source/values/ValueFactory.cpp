@@ -13,37 +13,34 @@
 #include "mtlx/mtlx_utils.h"
 #include "runtime/Variable.h"
 
-namespace
+ValuePtr ValueFactory::create_interface_value(const TypeInfoPtr& type, const string& name)
 {
-    ValuePtr get_interface_from_type(const TypeInfoPtr& type, const string& name)
+    if (type->has_fields())
     {
-        if (type->has_fields())
+        vector<ValuePtr> field_vals;
+        for (size_t i = 0; i < type->field_count(); ++i)
         {
-            vector<ValuePtr> field_vals;
-            for (size_t i = 0; i < type->field_count(); ++i)
-            {
-                ValuePtr field_val = get_interface_from_type(type->field_type(i), port_name(name, i));
-                field_vals.push_back(std::move(field_val));
-            }
+            ValuePtr field_val = create_interface_value(type->field_type(i), port_name(name, i));
+            field_vals.push_back(std::move(field_val));
+        }
 
-            return std::make_shared<StructValue>(std::move(field_vals), type);
-        }
-        else
-        {
-            return std::make_shared<InterfaceValue>(name, type);
-        }
+        return std::make_shared<StructValue>(std::move(field_vals), type);
+    }
+    else
+    {
+        return std::make_shared<InterfaceValue>(name, type);
     }
 }
 
-ValuePtr ValueFactory::create_parameter_interface(const Parameter& param)
+ValuePtr ValueFactory::create_interface_value(const Parameter& param)
 {
-    return get_interface_from_type(param.type(), param.name());
+    return create_interface_value(param.type(), param.name());
 }
 
-ValuePtr ValueFactory::create_nonlocal_interface(const VarPtr& var)
+ValuePtr ValueFactory::create_interface_value(const VarPtr& var)
 {
     const string output_name = "nonlocal_in__" + var->name();
-    return get_interface_from_type(var->type(), output_name);
+    return create_interface_value(var->type(), output_name);
 }
 
 ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)

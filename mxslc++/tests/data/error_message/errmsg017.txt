@@ -1,0 +1,1 @@
+errmsg017.mxsl, line 1: Cannot initialize expression of type string with boolean

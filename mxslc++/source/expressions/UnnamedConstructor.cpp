@@ -14,7 +14,7 @@ ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& templa
     vector<ExprPtr> instantiated;
     for (const ExprPtr& expr : exprs_)
         instantiated.push_back(expr->instantiate_template_types(template_type));
-    return std::make_unique<UnnamedConstructor>(runtime_, std::move(instantiated));
+    return std::make_unique<UnnamedConstructor>(runtime_, token_, std::move(instantiated));
 }
 
 void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
@@ -34,7 +34,7 @@ void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
         try_init_expressions(types);
 
         if (initialized_expr_count_ == prev_initialized_expr_count)
-            throw CompileError{token_, "Invalid constructor call"s};
+            throw CompileError{"Invalid constructor call"s};
     }
 }
 

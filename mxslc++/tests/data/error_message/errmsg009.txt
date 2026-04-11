@@ -1,0 +1,11 @@
+errmsg009.mxsl, line 11: No matching overload for function 'foo'
+Potential matches:
+float foo(float a)
+    Too many arguments
+    Parameter 'a' was given an argument of the wrong type
+
+float foo(float a, float b, float c)
+    Too few arguments
+    Parameter 'a' was given an argument of the wrong type
+    Parameter 'b' was given an argument of the wrong type
+

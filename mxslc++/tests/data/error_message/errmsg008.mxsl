@@ -1,0 +1,6 @@
+string foo()
+{
+    return 1;
+}
+
+foo();

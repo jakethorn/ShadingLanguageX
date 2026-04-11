@@ -33,7 +33,7 @@ public:
         output->setConnectedOutput(output_);
     }
 
-    [[nodiscard]] string str() const override { return output_->asString(); }
+    string str() const override { return output_->asString(); }
 
 private:
     mx::OutputPtr output_;

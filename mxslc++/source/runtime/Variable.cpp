@@ -12,27 +12,30 @@
  * Variable
  */
 
-Variable::Variable(ModifierList mods, Token name, ValuePtr val)
+Variable::Variable(ModifierList mods, string name, ValuePtr val)
     : mods_{std::move(mods)},
     name_{std::move(name)},
     val_{std::move(val)}
 {
-    mods_.validate("const"s, "mutable"s, "global"s);
+    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global);
     if (is_const() and is_mutable())
-        throw CompileError{name_, "Variables cannot be both const and mutable"s};
+        throw CompileError{"Variables cannot be both const and mutable"s};
 }
 
-TypeInfoPtr Variable::type() const { return val_->type(); }
+TypeInfoPtr Variable::type() const
+{
+    return val_->type();
+}
 
 /*
  * SubVariable
  */
 
 SubVariable::SubVariable(VarPtr owner, const size_t index)
-    : owner_{std::move(owner)}, name_{owner_->type()->field_name(index)}, index_{index}, qualified_name_{port_name(owner_->name(), index_)} { }
+    : owner_{std::move(owner)}, index_{index}, name_{port_name(owner_->name(), index_)} { }
 
-SubVariable::SubVariable(VarPtr owner, Token name)
-    : owner_{std::move(owner)}, name_{std::move(name)}, index_{owner_->type()->field_index(name_)}, qualified_name_{port_name(owner_->name(), index_)} { }
+SubVariable::SubVariable(VarPtr owner, const string& name)
+    : SubVariable{owner, owner->type()->field_index(name)} { }
 
 bool SubVariable::is_const() const
 {
@@ -61,17 +64,12 @@ const FieldInfo& SubVariable::field() const
 
 const string& SubVariable::name() const
 {
-    return qualified_name_;
+    return name_;
 }
 
 ValuePtr SubVariable::value() const
 {
     return owner_->value()->subvalue(index_);
-}
-
-const Token& SubVariable::name_token() const
-{
-    return name_;
 }
 
 void SubVariable::set_value(const ValuePtr& val)
@@ -83,12 +81,12 @@ void SubVariable::set_value(const ValuePtr& val)
  * Standalone Functions
  */
 
-VarPtr get_subvariable(const VarPtr& owner, size_t index)
+VarPtr get_subvariable(VarPtr owner, size_t index)
 {
-    return std::make_shared<SubVariable>(owner, index);
+    return std::make_shared<SubVariable>(std::move(owner), index);
 }
 
-VarPtr get_subvariable(const VarPtr& owner, const Token& name)
+VarPtr get_subvariable(VarPtr owner, const string& name)
 {
-    return std::make_shared<SubVariable>(owner, name);
+    return std::make_shared<SubVariable>(std::move(owner), name);
 }

@@ -20,24 +20,23 @@ public:
         : FunctionCall{runtime, std::move(name), nullptr, std::move(args)} { }
 
     FunctionCall(const Runtime& runtime, Token name, TypeInfoPtr template_type, ArgumentList args)
-        : Expression{runtime, std::move(name)},
-        template_type_{std::move(template_type)},
-        args_{std::move(args)} { }
+        : Expression{runtime, std::move(name)}, template_type_{std::move(template_type)}, args_{std::move(args)} { }
 
-    [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;
     void init_impl(const vector<TypeInfoPtr>& types) override;
-    [[nodiscard]] TypeInfoPtr type_impl() const override;
-    [[nodiscard]] ValuePtr evaluate_impl() const override;
+    TypeInfoPtr type_impl() const override;
+    ValuePtr evaluate_impl() const override;
 
 private:
+    const string& name() const { return token_.lexeme(); }
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
     unordered_map<string, ValuePtr> evaluate_arguments() const;
     void add_arguments_to_scope(const unordered_map<string, ValuePtr>& args) const;
-    [[nodiscard]] ValuePtr evaluate_return() const;
+    ValuePtr evaluate_return() const;
 
     TypeInfoPtr template_type_;
     ArgumentList args_;

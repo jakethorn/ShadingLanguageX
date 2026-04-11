@@ -40,7 +40,7 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
     fs::remove(actual_path);
 }
 
-vector<fs::path> get_mxsl_files()
+vector<fs::path> get_groundtruth_files()
 {
     vector<fs::path> files;
     const fs::path test_dir = get_test_data("groundtruth"s);
@@ -55,7 +55,7 @@ vector<fs::path> get_mxsl_files()
 INSTANTIATE_TEST_SUITE_P(
     compiler,
     groundtruth_tests,
-    testing::ValuesIn(get_mxsl_files()),
+    testing::ValuesIn(get_groundtruth_files()),
     [](const testing::TestParamInfo<fs::path>& info) {
         return info.param.stem().string();
     }

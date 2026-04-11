@@ -8,13 +8,10 @@
 
 #include "ExpressionStatement.h"
 
-#include "runtime/Scope.h"
 #include "expressions/Expression.h"
-#include "runtime/Runtime.h"
-#include "values/Value.h"
 
 ExpressionStatement::ExpressionStatement(const Runtime& runtime, ExprPtr expr)
-    : Statement{runtime}, expr_{std::move(expr)}
+    : Statement{runtime, expr->token()}, expr_{std::move(expr)}
 {
 
 }
@@ -27,7 +24,7 @@ StmtPtr ExpressionStatement::instantiate_template_types(const TypeInfoPtr& templ
     return std::make_unique<ExpressionStatement>(runtime_, std::move(expr));
 }
 
-void ExpressionStatement::execute() const
+void ExpressionStatement::execute_impl() const
 {
     expr_->init();
     ValuePtr _ = expr_->evaluate();

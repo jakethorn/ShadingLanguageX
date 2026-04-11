@@ -1,0 +1,1 @@
+errmsg002.mxsl, line 3: Expression of type {float x, float y} does not have a field at index 2

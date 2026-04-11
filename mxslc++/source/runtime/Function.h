@@ -7,7 +7,6 @@
 
 #include "utils/common.h"
 #include "utils/template_utils.h"
-#include "Token.h"
 #include "ParameterList.h"
 
 class Function
@@ -16,7 +15,7 @@ public:
     Function(
         ModifierList mods,
         TypeInfoPtr type,
-        Token name,
+        string name,
         TypeInfoPtr template_type,
         ParameterList params,
         vector<string> output_names
@@ -25,7 +24,7 @@ public:
     Function(
         ModifierList mods,
         TypeInfoPtr type,
-        Token name,
+        string name,
         TypeInfoPtr template_type,
         ParameterList params,
         StmtPtr body,
@@ -40,23 +39,22 @@ public:
 
     ~Function();
 
-    [[nodiscard]] bool is_inline() const { return mods_.contains("inline"s); }
-    [[nodiscard]] bool is_default() const { return mods_.contains("default"s); }
-    [[nodiscard]] TypeInfoPtr type() const { return type_; }
-    [[nodiscard]] const string& name() const { return name_.lexeme(); }
-    [[nodiscard]] bool has_template_type() const { return template_type_ != nullptr; }
-    [[nodiscard]] TypeInfoPtr template_type() const { return template_type_; }
-    [[nodiscard]] size_t min_arity() const;
-    [[nodiscard]] size_t max_arity() const { return params_.size(); }
-    [[nodiscard]] const ParameterList& parameters() const { return params_; }
-    [[nodiscard]] bool has_body() const { return body_ != nullptr; }
-    [[nodiscard]] const StmtPtr& body() const { return body_; }
-    [[nodiscard]] const ExprPtr& return_expr() const { return return_expr_; }
-    [[nodiscard]] const Token& name_token() const { return name_; }
-    [[nodiscard]] bool is_initialized() const { return is_initialized_; }
+    bool is_inline() const { return mods_.contains(TokenType::Inline); }
+    bool is_default() const { return mods_.contains(TokenType::Default); }
+    TypeInfoPtr type() const { return type_; }
+    const string& name() const { return name_; }
+    bool has_template_type() const { return template_type_ != nullptr; }
+    TypeInfoPtr template_type() const { return template_type_; }
+    size_t min_arity() const;
+    size_t max_arity() const { return params_.size(); }
+    const ParameterList& parameters() const { return params_; }
+    bool has_body() const { return body_ != nullptr; }
+    const StmtPtr& body() const { return body_; }
+    const ExprPtr& return_expr() const { return return_expr_; }
+    bool is_initialized() const { return is_initialized_; }
 
-    [[nodiscard]] const vector<string>& output_names() const { return output_names_; }
-    [[nodiscard]] const string& output_name(const size_t i) const { return output_names_.at(i); }
+    const vector<string>& output_names() const { return output_names_; }
+    const string& output_name(const size_t i) const { return output_names_.at(i); }
 
     void add_nonlocal_input(const string& name, const VarPtr& var);
     void add_nonlocal_output(const string& name, const VarPtr& var);
@@ -71,7 +69,7 @@ public:
 private:
     ModifierList mods_;
     TypeInfoPtr type_;
-    Token name_;
+    string name_;
     TypeInfoPtr template_type_;
     ParameterList params_;
     StmtPtr body_;

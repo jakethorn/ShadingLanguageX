@@ -27,7 +27,7 @@ public:
         output->setInterfaceName(name_);
     }
 
-    [[nodiscard]] string str() const override { return name_; }
+    string str() const override { return name_; }
 
 private:
     string name_;

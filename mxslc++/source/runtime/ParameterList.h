@@ -15,7 +15,7 @@ class ParameterList
 public:
     ParameterList(vector<Parameter> params);
 
-    [[nodiscard]] ParameterList instantiate_template_types(const TypeInfoPtr& template_type) const
+    ParameterList instantiate_template_types(const TypeInfoPtr& template_type) const
     {
         return ::instantiate_template_types(params_, template_type);
     }
@@ -26,8 +26,8 @@ public:
             param.init();
     }
 
-    [[nodiscard]] size_t size() const { return params_.size(); }
-    [[nodiscard]] bool empty() const { return params_.empty(); }
+    size_t size() const { return params_.size(); }
+    bool empty() const { return params_.empty(); }
 
     const Parameter& operator[](const size_t i) const { return params_.at(i); }
     const Parameter& operator[](const string& s) const
@@ -40,13 +40,13 @@ public:
     }
     const Parameter& operator[](const Argument& a) const;
 
-    [[nodiscard]] auto begin() { return params_.begin(); }
-    [[nodiscard]] auto begin() const { return params_.begin(); }
+    auto begin() { return params_.begin(); }
+    auto begin() const { return params_.begin(); }
 
-    [[nodiscard]] auto end() { return params_.end(); }
-    [[nodiscard]] auto end() const { return params_.end(); }
+    auto end() { return params_.end(); }
+    auto end() const { return params_.end(); }
 
-    [[nodiscard]] string str() const;
+    string str() const;
 
 private:
     vector<Parameter> params_;

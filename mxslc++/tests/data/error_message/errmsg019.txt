@@ -1,0 +1,4 @@
+errmsg019.mxsl, line 1: More than one matching overload for function 'randomcolor'
+Potential matches:
+color3 randomcolor<float>(float in, float huelow, float huehigh, float saturationlow, float saturationhigh, float brightnesslow, float brightnesshigh, integer seed)
+color3 randomcolor<integer>(integer in, float huelow, float huehigh, float saturationlow, float saturationhigh, float brightnesslow, float brightnesshigh, integer seed)

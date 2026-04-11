@@ -7,39 +7,39 @@
 
 #include "ModifierList.h"
 #include "utils/common.h"
-#include "Token.h"
 
 class Runtime;
 
 class Parameter
 {
 public:
-    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, size_t index);
-    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr, size_t index);
+    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, size_t index);
+    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, size_t index);
 
     Parameter(Parameter&&) noexcept;
 
     ~Parameter();
 
-    [[nodiscard]] bool is_out() const { return mods_.contains("out"s); }
-    [[nodiscard]] const string& name() const { return name_.lexeme(); }
-    [[nodiscard]] size_t index() const { return index_; }
-    [[nodiscard]] const Token& name_token() const { return name_; }
+    bool is_const() const { return mods_.contains(TokenType::Const); }
+    bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
+    bool is_out() const { return mods_.contains(TokenType::Out); }
+    const string& name() const { return name_; }
+    size_t index() const { return index_; }
 
-    [[nodiscard]] Parameter instantiate_template_types(const TypeInfoPtr& template_type) const;
+    Parameter instantiate_template_types(const TypeInfoPtr& template_type) const;
     void init();
-    [[nodiscard]] TypeInfoPtr type() const;
+    TypeInfoPtr type() const;
 
-    [[nodiscard]] bool has_default_value() const { return expr_ != nullptr; }
-    [[nodiscard]] ValuePtr evaluate() const;
+    bool has_default_value() const { return expr_ != nullptr; }
+    ValuePtr evaluate() const;
 
-    [[nodiscard]] string str() const;
+    string str() const;
 
 private:
     const Runtime& runtime_;
     ModifierList mods_;
     TypeInfoPtr type_;
-    Token name_;
+    string name_;
     ExprPtr expr_;
     size_t index_;
 };

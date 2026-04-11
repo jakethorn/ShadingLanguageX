@@ -10,20 +10,22 @@
 class Identifier final : public Expression
 {
 public:
-    Identifier(const Runtime& runtime, Token token) : Expression{runtime, std::move(token)} { }
+    Identifier(const Runtime& runtime, Token name) : Expression{runtime, std::move(name)} { }
 
-    [[nodiscard]] VarPtr variable() const override { return var_; }
+    VarPtr variable() const override { return var_; }
 
-    [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
     void assign_impl(const ValuePtr &value) override;
 
 protected:
     void init_impl(const vector<TypeInfoPtr> &types) override;
-    [[nodiscard]] TypeInfoPtr type_impl() const override;
-    [[nodiscard]] ValuePtr evaluate_impl() const override;
+    TypeInfoPtr type_impl() const override;
+    ValuePtr evaluate_impl() const override;
 
 private:
+    const string& name() const { return token_.lexeme(); }
+
     VarPtr var_;
 };
 

@@ -8,8 +8,6 @@
 #include <MaterialXCore/Document.h>
 #include "utils/common.h"
 
-class ArgumentList;
-
 struct GraphFunction
 {
     mx::GraphElementPtr graph;
@@ -25,8 +23,8 @@ public:
         graphs_.push_back(GraphFunction{doc_, nullptr});
     }
 
-    [[nodiscard]] ValuePtr write_node(const FuncPtr& func, const unordered_map<string, ValuePtr>& args) const;
-    [[nodiscard]] ValuePtr write_node_def_input(const VarPtr& var) const;
+    ValuePtr write_node(const FuncPtr& func, const unordered_map<string, ValuePtr>& args) const;
+    ValuePtr write_node_def_input(const VarPtr& var) const;
     void write_node_def_output(const VarPtr& var, const ValuePtr& value) const;
     void write_node_def_graph(const FuncPtr& func) const;
     void save(const fs::path& filepath) const;

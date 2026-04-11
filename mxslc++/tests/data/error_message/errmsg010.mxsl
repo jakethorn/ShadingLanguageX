@@ -1,0 +1,11 @@
+float foo(int a, float b)
+{
+	return b;
+}
+
+float foo(vec2 a, float b)
+{
+	return b;
+}
+
+foo(b=3.0);

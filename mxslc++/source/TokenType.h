@@ -184,11 +184,11 @@ public:
     TokenType(const char c) : enum_{to_enum_(c)} { }
     TokenType(const string& s) : enum_{to_enum_(s)} { }
 
-    [[nodiscard]] bool is_symbol() const { return contains(Symbols, enum_); }
-    [[nodiscard]] bool is_compound_symbol() const { return contains(CompoundSymbols, enum_); }
-    [[nodiscard]] bool is_keyword() const { return contains(Keywords, enum_); }
+    bool is_symbol() const { return contains(Symbols, enum_); }
+    bool is_compound_symbol() const { return contains(CompoundSymbols, enum_); }
+    bool is_keyword() const { return contains(Keywords, enum_); }
 
-    [[nodiscard]] string str() const
+    string str() const
     {
         for (const auto& [k, e] : lexemes_)
         {
@@ -206,7 +206,7 @@ public:
     bool operator==(const TokenType& t) const { return enum_ == t.enum_; }
     bool operator==(const Enum e) const { return enum_ == e; }
 
-    [[nodiscard]] size_t index() const { return enum_; }
+    size_t index() const { return enum_; }
 
 private:
     Enum enum_;

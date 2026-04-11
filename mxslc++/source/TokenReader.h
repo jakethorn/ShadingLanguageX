@@ -19,11 +19,11 @@ public:
     TokenReader() = default;
     explicit TokenReader(vector<Token> tokens) : tokens_{std::move(tokens)} { }
 
-    [[nodiscard]] size_t size() const;
-    [[nodiscard]] bool empty() const;
+    size_t size() const;
+    bool empty() const;
 
-    [[nodiscard]] const Token& peek(size_t n = 0) const;
-    [[nodiscard]] Span<Token> peek_until(TokenType type, size_t max_tokens = std::numeric_limits<size_t>::max()) const;
+    const Token& peek(size_t n = 0) const;
+    Span<Token> peek_until(TokenType type, size_t max_tokens = std::numeric_limits<size_t>::max()) const;
 
     Token consume();
 

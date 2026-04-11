@@ -15,7 +15,7 @@ public:
     explicit StructValue(vector<ValuePtr> values, TypeInfoPtr type)
         : Value{std::move(type)}, values_{std::move(values)} { }
 
-    [[nodiscard]] ValuePtr subvalue(const size_t i) const override { return values_.at(i); }
+    ValuePtr subvalue(const size_t i) const override { return values_.at(i); }
 
     void set_subvalue(const size_t i, const ValuePtr& value) override
     {
@@ -40,7 +40,7 @@ public:
             values_[i]->set_as_node_def_input(node_def, port_name(input_name, i));
     }
 
-    [[nodiscard]] string str() const override
+    string str() const override
     {
         string result;
         for (size_t i = 0; i < values_.size(); ++i)

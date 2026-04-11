@@ -1,0 +1,6 @@
+void foo()
+{
+    return 1;
+}
+
+foo();

@@ -20,10 +20,10 @@ public:
 
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
-        throw CompileError{type_->name_token(), "Cannot return null value"s};
+        throw CompileError{"Cannot return null value"s};
     }
 
-    [[nodiscard]] string str() const override { return "null"s; }
+    string str() const override { return "null"s; }
 };
 
 #endif //FENNEC_NULLVALUE_H

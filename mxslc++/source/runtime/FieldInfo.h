@@ -13,30 +13,29 @@ class FieldInfo
     friend class Scope;
 
 public:
-    FieldInfo(ModifierList mods, TypeInfoPtr type, optional<Token> name, ExprPtr initializer)
+    FieldInfo(ModifierList mods, TypeInfoPtr type, string name, ExprPtr initializer)
         : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, initializer_{std::move(initializer)}
     {
-        mods_.validate("const"s, "mutable"s);
+        mods_.validate(TokenType::Const, TokenType::Mutable);
     }
 
-    explicit FieldInfo(TypeInfoPtr type) : FieldInfo{{}, std::move(type), std::nullopt, nullptr} { }
+    explicit FieldInfo(TypeInfoPtr type) : FieldInfo{ModifierList{}, std::move(type), ""s, nullptr} { }
 
-    [[nodiscard]] const ModifierList& modifiers() const { return mods_; }
-    [[nodiscard]] bool is_const() const { return mods_.contains("const"s); }
-    [[nodiscard]] bool is_mutable() const { return mods_.contains("mutable"s); }
-    [[nodiscard]] TypeInfoPtr type() const { return type_; }
-    [[nodiscard]] bool has_name() const { return name_.has_value(); }
-    [[nodiscard]] const string& name() const { return name_->lexeme(); }
-    [[nodiscard]] ExprPtr initializer() const { return initializer_; }
-    [[nodiscard]] const Token& name_token() const { return *name_;}
+    const ModifierList& modifiers() const { return mods_; }
+    bool is_const() const { return mods_.contains(TokenType::Const); }
+    bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
+    TypeInfoPtr type() const { return type_; }
+    bool has_name() const { return not name_.empty(); }
+    const string& name() const { return name_; }
+    ExprPtr initializer() const { return initializer_; }
 
-    [[nodiscard]] FieldInfo instantiate_template_types(const TypeInfoPtr& template_type) const;
-    [[nodiscard]] string str() const;
+    FieldInfo instantiate_template_types(const TypeInfoPtr& template_type) const;
+    string str() const;
 
 private:
     ModifierList mods_;
     TypeInfoPtr type_;
-    optional<Token> name_;
+    string name_;
     ExprPtr initializer_;
 };
 

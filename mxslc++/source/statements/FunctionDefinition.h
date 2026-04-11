@@ -15,16 +15,18 @@ class FunctionDefinition final : public Statement
 public:
     FunctionDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, vector<TypeInfoPtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
-    void execute() const override;
+    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+
+protected:
+    void execute_impl() const override;
 
 private:
-    [[nodiscard]] bool is_templated() const { return not template_types_.empty(); }
+    bool is_templated() const { return not template_types_.empty(); }
     void write_function_definition(const FuncPtr& func) const;
 
     ModifierList mods_;
     TypeInfoPtr type_;
-    Token name_;
+    string name_;
     vector<TypeInfoPtr> template_types_;
     ParameterList params_;
     StmtPtr body_;

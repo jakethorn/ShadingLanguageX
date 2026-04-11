@@ -3,6 +3,8 @@
 //
 
 #include "ForRangeLoop.h"
+
+#include "CompileError.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
@@ -10,8 +12,8 @@
 #include "values/BasicValue.h"
 #include "values/Value.h"
 
-ForRangeLoop::ForRangeLoop(const Runtime& runtime, TypeInfoPtr type, Token name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body)
-    : Statement{runtime},
+ForRangeLoop::ForRangeLoop(const Runtime& runtime, Token token, TypeInfoPtr type, string name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body)
+    : Statement{runtime, std::move(token)},
     type_{std::move(type)},
     name_{std::move(name)},
     lower_expr_{std::move(lower_expr)},
@@ -29,10 +31,10 @@ StmtPtr ForRangeLoop::instantiate_template_types(const TypeInfoPtr& template_typ
     ExprPtr step_expr = ::instantiate_template_types(step_expr_, template_type);
     ExprPtr upper_expr = ::instantiate_template_types(upper_expr_, template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
-    return std::make_unique<ForRangeLoop>(runtime_, std::move(type), name_, std::move(lower_expr), std::move(step_expr), std::move(upper_expr), std::move(body));
+    return std::make_unique<ForRangeLoop>(runtime_, token_, std::move(type), name_, std::move(lower_expr), std::move(step_expr), std::move(upper_expr), std::move(body));
 }
 
-void ForRangeLoop::execute() const
+void ForRangeLoop::execute_impl() const
 {
     const TypeInfoPtr type = runtime_.scope().resolve_type(type_);
 
@@ -79,6 +81,6 @@ void ForRangeLoop::execute() const
     }
     else
     {
-        throw CompileError{name_, "Unsupported loop iterator type"s};
+        throw CompileError{"Unsupported loop iterator type"s};
     }
 }

@@ -4,21 +4,18 @@
 
 #include "BlockStatement.h"
 
-#include "expressions/Expression.h"
-#include "runtime/Runtime.h"
 #include "utils/instantiate_template_types_utils.h"
-#include "values/Value.h"
 
-BlockStatement::BlockStatement(const Runtime& runtime, vector<StmtPtr> body)
-    : Statement{runtime}, body_{std::move(body)} { }
+BlockStatement::BlockStatement(const Runtime& runtime, Token token, vector<StmtPtr> body)
+    : Statement{runtime, std::move(token)}, body_{std::move(body)} { }
 
 StmtPtr BlockStatement::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     vector<StmtPtr> body = ::instantiate_template_types(body_, template_type);
-    return std::make_unique<BlockStatement>(runtime_, std::move(body));
+    return std::make_unique<BlockStatement>(runtime_, token_, std::move(body));
 }
 
-void BlockStatement::execute() const
+void BlockStatement::execute_impl() const
 {
     for (const StmtPtr& stmt : body_)
         stmt->execute();

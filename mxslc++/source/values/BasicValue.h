@@ -9,7 +9,6 @@
 #include "Value.h"
 #include "mtlx/mtlx_utils.h"
 #include "runtime/TypeInfo.h"
-#include "utils/str_utils.h"
 
 class BasicValue final : public Value
 {
@@ -49,25 +48,32 @@ public:
         );
     }
 
-    [[nodiscard]] bool is_basic() const override { return true; }
-    [[nodiscard]] bool as_bool() const override { return get<bool>(); }
-    [[nodiscard]] int as_int() const override { return get<int>(); }
-    [[nodiscard]] float as_float() const override { return get<float>(); }
-    [[nodiscard]] string as_string() const override { return get<string>(); }
+    bool is_basic() const override { return true; }
+    bool as_bool() const override { return get<bool>(); }
+    int as_int() const override { return get<int>(); }
+    float as_float() const override { return get<float>(); }
+    string as_string() const override { return get<string>(); }
 
-    [[nodiscard]] string str() const override
+    string str() const override
     {
-        return ::str(val_);
+        return std::visit(
+            [](const auto& v){
+                std::stringstream ss;
+                ss << std::boolalpha << v;
+                return ss.str();
+            },
+            val_
+        );
     }
 
     template<typename T>
-    [[nodiscard]] bool is() const
+    bool is() const
     {
         return std::holds_alternative<T>(val_);
     }
 
     template<typename T>
-    [[nodiscard]] T get() const
+    T get() const
     {
         return std::get<T>(val_);
     }

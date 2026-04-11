@@ -3,6 +3,8 @@
 //
 
 #include "str_utils.h"
+
+#include "Token.h"
 #include "runtime/TypeInfo.h"
 
 string get_postfix(const string& str, const char delim)
@@ -12,16 +14,9 @@ string get_postfix(const string& str, const char delim)
     return ""s;
 }
 
-string str(const basic_t& value)
+string str(const optional<Token>& token)
 {
-    return std::visit(
-        [](const auto& v){
-            std::stringstream ss;
-            ss << std::boolalpha << v;
-            return ss.str();
-        },
-        value
-    );
+    return token ? token->lexeme() : ""s;
 }
 
 string str(const vector<TypeInfoPtr>& types)

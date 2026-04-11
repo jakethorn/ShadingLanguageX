@@ -15,8 +15,8 @@ public:
     Runtime() : Runtime{std::make_unique<Scope>(), MtlXSerializer{}} { }
     Runtime(ScopePtr scope, MtlXSerializer serializer) : scope_{std::move(scope)}, serializer_{std::move(serializer)} { }
 
-    [[nodiscard]] Scope& scope() const { return *scope_; }
-    [[nodiscard]] const MtlXSerializer& serializer() const { return serializer_; }
+    Scope& scope() const { return *scope_; }
+    const MtlXSerializer& serializer() const { return serializer_; }
 
     void enter_scope(bool is_inline = false) const
     {

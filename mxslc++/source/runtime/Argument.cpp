@@ -5,8 +5,8 @@
 #include "Argument.h"
 #include "expressions/Expression.h"
 
-Argument::Argument(ExprPtr expr, const size_t index) : Argument{std::nullopt, std::move(expr), index} { }
-Argument::Argument(optional<string> name, ExprPtr expr, const size_t index) : name_{std::move(name)}, expr_{std::move(expr)}, index_{index} { }
+Argument::Argument(ExprPtr expr, const size_t index) : Argument{""s, std::move(expr), index} { }
+Argument::Argument(string name, ExprPtr expr, const size_t index) : name_{std::move(name)}, expr_{std::move(expr)}, index_{index} { }
 Argument::Argument(Argument&& other) noexcept : name_{std::move(other.name_)}, expr_{std::move(other.expr_)}, index_{other.index_} { }
 
 Argument::~Argument() = default;

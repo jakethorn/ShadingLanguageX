@@ -29,7 +29,7 @@ void IndexingExpression::init_impl(const vector<TypeInfoPtr>& types)
     if (const shared_ptr<BasicValue> basic_value = std::dynamic_pointer_cast<BasicValue>(index_val))
         index_ = basic_value->get<int>();
     else
-        throw CompileError{token_, "Indexing expression could not be evaluated at compile time"s};
+        throw CompileError{"Indexing expression could not be evaluated at compile time"s};
 }
 
 TypeInfoPtr IndexingExpression::type_impl() const

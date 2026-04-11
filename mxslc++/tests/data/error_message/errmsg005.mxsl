@@ -1,0 +1,1 @@
+float x = if (true) {1.0};

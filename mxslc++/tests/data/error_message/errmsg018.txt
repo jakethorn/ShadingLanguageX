@@ -1,0 +1,1 @@
+errmsg018.mxsl, line 1: If statement condition could not be evaluated at compile time

@@ -1,0 +1,1 @@
+errmsg008.mxsl, line 3: Cannot initialize expression of type integer with string

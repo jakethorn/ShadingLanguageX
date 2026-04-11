@@ -8,7 +8,6 @@
 #include "utils/common.h"
 #include "Function.h"
 
-class Token;
 class ArgumentList;
 
 class Scope
@@ -29,37 +28,46 @@ public:
 
     void set_current(const bool is_current) { is_current_ = is_current; }
 
+    /*
+     * variables
+     */
+
     void add_variable(VarPtr var);
     void set_variable(VarPtr var);
-    [[nodiscard]] VarPtr get_variable(const Token& name) const;
-    [[nodiscard]] bool is_variable_inline(const VarPtr& var) const;
-    [[nodiscard]] bool is_variable_inline(const Token& name) const;
+    VarPtr get_variable(const string& name) const;
+    bool is_variable_inline(const VarPtr& var) const;
+    bool is_variable_inline(const string& name) const;
+
+    /*
+     * functions
+     */
 
     void add_function(FuncPtr func);
-    [[nodiscard]] vector<FuncPtr> get_functions(
+    vector<FuncPtr> get_functions(
         const vector<TypeInfoPtr>& return_types,
-        const Token& name,
+        const string& name,
         const TypeInfoPtr& template_type,
         const ArgumentList& args
         ) const;
-    [[nodiscard]] FuncPtr get_function(
+    FuncPtr get_function(
         const vector<TypeInfoPtr>& return_types,
-        const Token& name,
+        const string& name,
         const TypeInfoPtr& template_type,
         const ArgumentList& args
     ) const;
+    vector<FuncPtr> get_all_functions(const string& name) const;
 
-    [[nodiscard]] vector<FuncPtr> get_all_functions(const Token& name) const;
+    /*
+     * types
+     */
 
     void add_type(TypeInfoPtr type);
     void add_basic_type(const string& name);
-    void add_alias(const Token& name, TypeInfoPtr type);
-    [[nodiscard]] bool has_type(const Token& name) const;
-    [[nodiscard]] bool has_type(const string& name) const;
-    [[nodiscard]] TypeInfoPtr resolve_type(const TypeInfoPtr& type) const;
+    void add_alias(const string& name, TypeInfoPtr type);
+    bool has_type(const string& name) const;
+    TypeInfoPtr resolve_type(const TypeInfoPtr& type) const;
     void resolve_fields(const TypeInfoPtr& type) const;
-    [[nodiscard]] TypeInfoPtr get_type(const Token& name) const;
-    [[nodiscard]] TypeInfoPtr get_type(const string& name) const;
+    TypeInfoPtr get_type(const string& name) const;
 
 private:
     ScopePtr parent_;

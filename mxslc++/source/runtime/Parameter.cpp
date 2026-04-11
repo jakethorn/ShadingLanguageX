@@ -7,13 +7,13 @@
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, const size_t index)
+Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, const size_t index)
     : Parameter{runtime, std::move(mods), std::move(type), std::move(name), nullptr, index}
 {
 
 }
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr, const size_t index)
+Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, const size_t index)
     : runtime_{runtime},
     mods_{std::move(mods)},
     type_{std::move(type)},
@@ -21,7 +21,7 @@ Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type
     expr_{std::move(expr)},
     index_{index}
 {
-    mods_.validate("const"s, "mutable"s, "out"s);
+    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
 }
 
 Parameter::Parameter(Parameter&& other) noexcept
@@ -67,6 +67,6 @@ string Parameter::str() const
     string result;
     result += mods_.str();
     result += type_->str();
-    result += " " + name_.lexeme();
+    result += " " + name_;
     return result;
 }

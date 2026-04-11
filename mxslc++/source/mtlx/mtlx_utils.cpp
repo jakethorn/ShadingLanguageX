@@ -22,11 +22,6 @@ string port_name(const string& port_name, const size_t i)
     return port_name + "__" + str(i);
 }
 
-string port_name(const string& port_name, const string& s)
-{
-    return port_name + "__" + s;
-}
-
 mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const string& name, const TypeInfoPtr& type)
 {
     mx::NodeDefPtr node_def = node_graph->getNodeDef();

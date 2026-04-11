@@ -5,16 +5,14 @@
 #include "ParameterList.h"
 
 #include "Argument.h"
+#include "CompileError.h"
 
 ParameterList::ParameterList(vector<Parameter> params) : params_{std::move(params)}
 {
-    vector<string> names;
-    for (const Parameter& param : params_)
-    {
-        if (contains(names, param.name()))
-            throw CompileError{param.name_token(), "Multiple parameters with the name '" + param.name() + "'"};
-        names.push_back(param.name());
-    }
+    for (size_t i = 0; i < params_.size(); ++i)
+        for (size_t j = i+1; j < params_.size(); ++j)
+            if (params_[i].name() == params_[j].name())
+                throw CompileError{"Multiple parameters with the name '" + params_[j].name() + "'"};
 }
 
 const Parameter& ParameterList::operator[](const Argument& a) const

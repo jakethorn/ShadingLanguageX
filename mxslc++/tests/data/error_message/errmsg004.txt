@@ -1,0 +1,1 @@
+errmsg004.mxsl, line 8: Indexing expression could not be evaluated at compile time

@@ -14,7 +14,7 @@
 Function::Function(
     ModifierList mods,
     TypeInfoPtr type,
-    Token name,
+    string name,
     TypeInfoPtr template_type,
     ParameterList params,
     vector<string> output_names
@@ -31,7 +31,7 @@ Function::Function(
 Function::Function(
     ModifierList mods,
     TypeInfoPtr type,
-    Token name,
+    string name,
     TypeInfoPtr template_type,
     ParameterList params,
     StmtPtr body,
@@ -44,12 +44,12 @@ Function::Function(
     body_{std::move(body)},
     return_expr_{std::move(return_expr)}
 {
-    mods_.validate("inline"s, "default"s);
+    mods_.validate(TokenType::Inline, TokenType::Default);
 
     if (type_ == TypeInfo::Void and return_expr_ != nullptr)
-        throw CompileError{name_, "Cannot return a value from a void function"s};
+        throw CompileError{"Void function '" + name_ + "' has a return statement"s};
     if (type_ != TypeInfo::Void and return_expr_ == nullptr)
-        throw CompileError{name_, "Must return a value from a non-void function"s};
+        throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"s};
 }
 
 Function::Function(Function&& other) noexcept
@@ -107,19 +107,6 @@ void Function::add_nonlocal_output(const string& name, const VarPtr& var)
 
 void Function::init(const Runtime& runtime)
 {
-    if (has_body())
-    {
-        if (type_ != TypeInfo::Void and return_expr_ == nullptr)
-        {
-            throw CompileError{name_, "Non-void function '" + name_.lexeme() + "' does not have a return statement"s};
-        }
-
-        if (type_ == TypeInfo::Void and return_expr_ != nullptr)
-        {
-            throw CompileError{name_, "Void function '" + name_.lexeme() + "' has a return statement"s};
-        }
-    }
-
     if (type_ == TypeInfo::Void)
         type_ = TypeInfo::resolved_void();
     else
@@ -144,7 +131,7 @@ string Function::str() const
     string result;
     result += mods_.str();
     result += type_->str();
-    result += " " + name_.lexeme();
+    result += " " + name_;
     if (template_type_)
         result += "<" + template_type_->str() + ">";
     result += "(";

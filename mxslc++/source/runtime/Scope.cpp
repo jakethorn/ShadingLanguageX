@@ -23,7 +23,7 @@ Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}
 void Scope::add_variable(VarPtr var)
 {
     if (contains(variables_, var->name()))
-        throw CompileError{var->name_token(), "Variable already defined: " + var->name()};
+        throw CompileError{"Variable already defined: " + var->name()};
 
     variables_.emplace(var->name(), std::move(var));
 }
@@ -42,14 +42,14 @@ void Scope::set_variable(VarPtr var)
         return;
     }
 
-    throw CompileError{var->name_token(), "Variable not defined: " + var->name()};
+    throw CompileError{"Variable not defined: " + var->name()};
 }
 
-VarPtr Scope::get_variable(const Token& name) const
+VarPtr Scope::get_variable(const string& name) const
 {
-    if (contains(variables_, name.lexeme()))
+    if (contains(variables_, name))
     {
-        return variables_.at(name.lexeme());
+        return variables_.at(name);
     }
 
     if (parent_)
@@ -57,17 +57,17 @@ VarPtr Scope::get_variable(const Token& name) const
         return parent_->get_variable(name);
     }
 
-    throw CompileError{name, "Variable not defined: " + name.lexeme()};
+    throw CompileError{"Variable not defined: " + name};
 }
 
 bool Scope::is_variable_inline(const VarPtr& var) const
 {
-    return is_variable_inline(var->name_token());
+    return is_variable_inline(var->name());
 }
 
-bool Scope::is_variable_inline(const Token& name) const
+bool Scope::is_variable_inline(const string& name) const
 {
-    if (contains(variables_, name.lexeme()))
+    if (contains(variables_, name))
     {
         return true;
     }
@@ -77,7 +77,7 @@ bool Scope::is_variable_inline(const Token& name) const
         return parent_->is_variable_inline(name) and is_inline_;
     }
 
-    throw CompileError{name, "Variable not defined: " + name.lexeme()};
+    throw CompileError{"Variable not defined: " + name};
 }
 
 void Scope::add_function(FuncPtr func)
@@ -91,12 +91,12 @@ namespace
     bool is_match(
         const Function& func,
         const vector<TypeInfoPtr>& return_types,
-        const Token& name,
+        const string& name,
         const TypeInfoPtr& template_type,
         const ArgumentList& args
     )
     {
-        if (name.lexeme() != func.name())
+        if (name != func.name())
             return false;
 
         if (not return_types.empty() and not func.type()->is_compatible(return_types))
@@ -136,27 +136,9 @@ namespace
     }
 }
 
-vector<FuncPtr> Scope::get_all_functions(const Token& name) const
-{
-    vector<FuncPtr> funcs;
-    for (const FuncPtr& func : functions_)
-    {
-        if (name.lexeme() == func->name())
-            funcs.push_back(func);
-    }
-
-    if (parent_)
-    {
-        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
-        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
-    }
-
-    return funcs;
-}
-
 vector<FuncPtr> Scope::get_functions(
     const vector<TypeInfoPtr>& return_types,
-    const Token& name,
+    const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 ) const
@@ -173,7 +155,7 @@ vector<FuncPtr> Scope::get_functions(
 
     if (funcs.empty() and is_current_)
     {
-        throw CompileError{name, missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
+        throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
     }
 
     return funcs;
@@ -181,7 +163,7 @@ vector<FuncPtr> Scope::get_functions(
 
 FuncPtr Scope::get_function(
     const vector<TypeInfoPtr>& return_types,
-    const Token& name,
+    const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 ) const
@@ -195,10 +177,28 @@ FuncPtr Scope::get_function(
         if (def_funcs.size() == 1)
             return def_funcs[0];
 
-        throw CompileError{name, ambiguous_overload_error(funcs)};
+        throw CompileError{ambiguous_overload_error(funcs)};
     }
 
     return funcs[0];
+}
+
+vector<FuncPtr> Scope::get_all_functions(const string& name) const
+{
+    vector<FuncPtr> funcs;
+    for (const FuncPtr& func : functions_)
+    {
+        if (name == func->name())
+            funcs.push_back(func);
+    }
+
+    if (parent_)
+    {
+        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
+        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
+    }
+
+    return funcs;
 }
 
 void Scope::add_type(TypeInfoPtr type)
@@ -206,7 +206,7 @@ void Scope::add_type(TypeInfoPtr type)
     assert(type->has_name());
 
     if (contains(types_, type->name()))
-        throw CompileError{type->name_token(), "Type '" + type->name() + "' already defined"};
+        throw CompileError{"Type '" + type->name() + "' already defined"};
 
     resolve_fields(type);
     type->set_resolved();
@@ -220,18 +220,13 @@ void Scope::add_basic_type(const string& name)
     add_type(std::move(type));
 }
 
-void Scope::add_alias(const Token& name, TypeInfoPtr type)
+void Scope::add_alias(const string& name, TypeInfoPtr type)
 {
-    if (contains(types_, name.lexeme()))
-        throw CompileError{name, "Type '" + name.lexeme() + "' already defined"};
+    if (contains(types_, name))
+        throw CompileError{"Type '" + name + "' already defined"};
 
     type = resolve_type(type);
-    types_.emplace(name.lexeme(), type);
-}
-
-bool Scope::has_type(const Token& name) const
-{
-    return has_type(name.lexeme());
+    types_.emplace(name, type);
 }
 
 bool Scope::has_type(const string& name) const
@@ -247,7 +242,7 @@ TypeInfoPtr Scope::resolve_type(const TypeInfoPtr& type) const
 {
     if (type->has_name())
     {
-        return get_type(type->name_token());
+        return get_type(type->name());
     }
     else
     {
@@ -263,16 +258,11 @@ void Scope::resolve_fields(const TypeInfoPtr& type) const
         field.type_ = resolve_type(field.type_);
 }
 
-TypeInfoPtr Scope::get_type(const Token& name) const
-{
-    if (contains(types_, name.lexeme()))
-        return types_.at(name.lexeme());
-    if (parent_)
-        return parent_->get_type(name);
-    throw CompileError{name, "Type '" + name.lexeme() + "' not defined"};
-}
-
 TypeInfoPtr Scope::get_type(const string& name) const
 {
-    return get_type(Token{TokenType::Identifier, name});
+    if (contains(types_, name))
+        return types_.at(name);
+    if (parent_)
+        return parent_->get_type(name);
+    throw CompileError{"Type '" + name + "' not defined"};
 }

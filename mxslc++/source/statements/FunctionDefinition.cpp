@@ -20,10 +20,10 @@ FunctionDefinition::FunctionDefinition(
     ParameterList params,
     StmtPtr body,
     ExprPtr return_expr
-) : Statement{runtime},
+) : Statement{runtime, name},
     mods_{std::move(mods)},
     type_{std::move(type)},
-    name_{std::move(name)},
+    name_{name.lexeme()},
     template_types_{std::move(template_types)},
     params_{std::move(params)},
     body_{std::move(body)},
@@ -53,16 +53,16 @@ FunctionDefinition::FunctionDefinition(
 StmtPtr FunctionDefinition::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     if (is_templated())
-        throw CompileError{name_, "Nested templated functions is not supported"s};
+        throw CompileError{"Nested templated functions is not supported"s};
 
     TypeInfoPtr type = type_->instantiate_template_types(template_type);
     ParameterList params = params_.instantiate_template_types(template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
     ExprPtr return_expr = ::instantiate_template_types(return_expr_, template_type);
-    return std::make_unique<FunctionDefinition>(runtime_, mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr));
+    return std::make_unique<FunctionDefinition>(runtime_, mods_, std::move(type), token_, template_types_, std::move(params), std::move(body), std::move(return_expr));
 }
 
-void FunctionDefinition::execute() const
+void FunctionDefinition::execute_impl() const
 {
     for (const FuncPtr& func : funcs_)
     {
@@ -78,8 +78,8 @@ void FunctionDefinition::write_function_definition(const FuncPtr& func) const
     runtime_.enter_scope();
     for (const Parameter& param : func->parameters())
     {
-        ValuePtr val = ValueFactory::create_parameter_interface(param);
-        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name_token(), std::move(val));
+        ValuePtr val = ValueFactory::create_interface_value(param);
+        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));
         runtime_.scope().add_variable(std::move(var));
     }
     runtime_.serializer().write_node_def_graph(func);

@@ -1,0 +1,1 @@
+errmsg006.mxsl, line 1: Multiple parameters with the name 'a'

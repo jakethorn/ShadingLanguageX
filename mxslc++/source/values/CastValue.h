@@ -12,7 +12,7 @@ class CastValue final : public Value
 public:
     CastValue(ValuePtr value, TypeInfoPtr type) : Value{std::move(type)}, value_{std::move(value)} { }
 
-    [[nodiscard]] ValuePtr subvalue(const size_t i) const override { return value_->subvalue(i); }
+    ValuePtr subvalue(const size_t i) const override { return value_->subvalue(i); }
     void set_subvalue(const size_t i, const ValuePtr& value) override { value_->set_subvalue(i, value); }
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override

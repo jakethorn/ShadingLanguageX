@@ -20,7 +20,7 @@ ExprPtr Identifier::instantiate_template_types(const TypeInfoPtr& template_type)
 
 void Identifier::init_impl(const vector<TypeInfoPtr>& types)
 {
-    var_ = runtime_.scope().get_variable(token_);
+    var_ = runtime_.scope().get_variable(name());
 }
 
 TypeInfoPtr Identifier::type_impl() const

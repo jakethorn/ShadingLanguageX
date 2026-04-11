@@ -24,20 +24,20 @@ void DotExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
 
 TypeInfoPtr DotExpression::type_impl() const
 {
-    return expr_->type()->field_type(token_);
+    return expr_->type()->field_type(property());
 }
 
 VarPtr DotExpression::variable() const
 {
     if (expr_->variable())
-        return get_subvariable(expr_->variable(), token_);
+        return get_subvariable(expr_->variable(), property());
     return nullptr;
 }
 
 ValuePtr DotExpression::evaluate_impl() const
 {
     if (expr_->variable() == nullptr or runtime_.scope().is_variable_inline(expr_->variable()))
-        return expr_->evaluate()->subvalue(token_);
+        return expr_->evaluate()->subvalue(property());
     else
         return runtime_.serializer().write_node_def_input(variable());
 }
@@ -45,7 +45,7 @@ ValuePtr DotExpression::evaluate_impl() const
 void DotExpression::assign_impl(const ValuePtr& value)
 {
     if (expr_->variable() == nullptr or runtime_.scope().is_variable_inline(expr_->variable()))
-        expr_->evaluate()->set_subvalue(token_, value);
+        expr_->evaluate()->set_subvalue(property(), value);
     else
         runtime_.serializer().write_node_def_output(variable(), value);
 }

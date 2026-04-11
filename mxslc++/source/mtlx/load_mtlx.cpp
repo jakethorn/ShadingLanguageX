@@ -22,7 +22,7 @@ namespace
         const TypeInfoPtr type = runtime.scope().get_type(i->getType());
         const string& name = i->getName();
         ExprPtr expr = std::make_unique<NullExpression>(runtime);
-        return Parameter{runtime, {}, type, Token{TokenType::Identifier, name}, std::move(expr), index};
+        return Parameter{runtime, ModifierList{}, type, name, std::move(expr), index};
     }
 
     ParameterList get_parameters(const Runtime& runtime, const mx::NodeDefPtr& nd)
@@ -40,7 +40,7 @@ namespace
         vector<TypeInfoPtr> subtypes;
         subtypes.reserve(nd->getOutputCount());
         for (const mx::OutputPtr& o : nd->getActiveOutputs())
-            subtypes.emplace_back(std::make_shared<TypeInfo>(o->getType()));
+            subtypes.push_back(std::make_shared<TypeInfo>(o->getType()));
 
         const TypeInfoPtr type = subtypes.size() == 1 ? subtypes.at(0) : std::make_shared<TypeInfo>(std::move(subtypes));
         return runtime.scope().resolve_type(type);
@@ -64,12 +64,12 @@ namespace
             mods.add("default"s);
 
         TypeInfoPtr type = get_type(runtime, nd);
-        const string name = nd->getNodeString();
+        const string& name = nd->getNodeString();
         const string template_type_name = get_postfix(nd->getName(), '_');
         TypeInfoPtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
         ParameterList params = get_parameters(runtime, nd);
         vector<string> output_names = get_output_names(nd);
-        FuncPtr func = std::make_shared<Function>(mods, std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
+        FuncPtr func = std::make_shared<Function>(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
         func->init(runtime);
         return func;
     }

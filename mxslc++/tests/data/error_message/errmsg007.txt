@@ -1,0 +1,1 @@
+errmsg007.mxsl, line 1: Void function 'foo' has a return statement

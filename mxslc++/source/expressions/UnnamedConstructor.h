@@ -10,20 +10,20 @@
 class UnnamedConstructor final : public Expression
 {
 public:
-    UnnamedConstructor(const Runtime& runtime, vector<ExprPtr> exprs)
-        : Expression{runtime, exprs.at(0)->token()}, exprs_{std::move(exprs)} { }
+    UnnamedConstructor(const Runtime& runtime, Token token, vector<ExprPtr> exprs)
+        : Expression{runtime, std::move(token)}, exprs_{std::move(exprs)} { }
 
-    [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;
-    [[nodiscard]] TypeInfoPtr type_impl() const override;
-    [[nodiscard]] ValuePtr evaluate_impl() const override;
+    TypeInfoPtr type_impl() const override;
+    ValuePtr evaluate_impl() const override;
 
 private:
     bool expressions_are_initialized();
     void try_init_expressions(const vector<TypeInfoPtr>& types);
-    [[nodiscard]] vector<TypeInfoPtr> index_types(const vector<TypeInfoPtr>& types, size_t index) const;
+    vector<TypeInfoPtr> index_types(const vector<TypeInfoPtr>& types, size_t index) const;
 
     vector<ExprPtr> exprs_;
     size_t initialized_expr_count_ = 0;

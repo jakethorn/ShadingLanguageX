@@ -1,0 +1,1 @@
+errmsg016.mxsl, line 1: Type 'Point' not defined

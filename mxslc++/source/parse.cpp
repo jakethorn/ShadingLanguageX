@@ -12,12 +12,10 @@
 #include "expressions/Identifier.h"
 #include "expressions/IndexingExpression.h"
 #include "runtime/Attribute.h"
-#include "statements/Statement.h"
 #include "expressions/Literal.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
 #include "runtime/ParameterList.h"
-#include "runtime/Variable.h"
 #include "runtime/FieldInfo.h"
 #include "statements/BlockStatement.h"
 #include "statements/ExpressionStatement.h"
@@ -43,13 +41,22 @@ Parser::Parser(const Runtime& runtime, vector<Token> tokens_) : TokenReader{std:
 
 vector<StmtPtr> Parser::parse()
 {
-    vector<StmtPtr> statements;
-    while (not empty())
+    Token debug_info;
+    try
     {
-        statements.push_back(statement());
-    }
+        vector<StmtPtr> statements;
+        while (not empty())
+        {
+            debug_info = peek();
+            statements.push_back(statement());
+        }
 
-    return statements;
+        return statements;
+    }
+    catch (const CompileError& e)
+    {
+        throw CompileError{debug_info, e};
+    }
 }
 
 Attribute Parser::attribute()
@@ -138,7 +145,7 @@ StmtPtr Parser::statement()
 
 StmtPtr Parser::print_statement()
 {
-    match(TokenType::Print);
+    Token token = match(TokenType::Print);
 
     vector<ExprPtr> exprs;
     do
@@ -148,18 +155,19 @@ StmtPtr Parser::print_statement()
     while (consume(',') and peek() != ';');
     match(';');
 
-    return std::make_unique<PrintStatement>(runtime_, std::move(exprs));
+    return std::make_unique<PrintStatement>(runtime_, std::move(token), std::move(exprs));
 }
 
 StmtPtr Parser::variable_definition(ModifierList mods, TypeInfoPtr type)
 {
     Token name = match(TokenType::Identifier);
-    match('=');
+    Token token = match('=');
     ExprPtr expr = expression();
     match(';');
 
     return std::make_unique<VariableDefinition>(
         runtime_,
+        std::move(token),
         std::move(mods),
         std::move(type),
         std::move(name),
@@ -187,12 +195,13 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypeInfoPtr type)
             fields.emplace_back(std::move(mods), std::move(type), std::move(name), nullptr);
         }
     }
-    match('=');
+    Token token = match('=');
     ExprPtr expr = expression();
     match(';');
 
     return std::make_unique<MultiVariableDefinition>(
         runtime_,
+        std::move(token),
         std::make_unique<TypeInfo>(std::move(fields)),
         std::move(expr)
     );
@@ -201,14 +210,14 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypeInfoPtr type)
 StmtPtr Parser::variable_assignment()
 {
     ExprPtr lhs = expression();
-    match('=');
+    Token token = match('=');
     ExprPtr rhs;
     if (peek() == TokenType::If)
         rhs = if_expression(lhs);
     else
         rhs = expression();
     match(';');
-    return std::make_unique<VariableAssignment>(runtime_, std::move(lhs), std::move(rhs));
+    return std::make_unique<VariableAssignment>(runtime_, std::move(token), std::move(lhs), std::move(rhs));
 }
 
 StmtPtr Parser::function_definition(ModifierList mods, TypeInfoPtr type)
@@ -252,17 +261,17 @@ StmtPtr Parser::function_definition_modern(ModifierList mods)
 
 StmtPtr Parser::using_declaration()
 {
-    match(TokenType::Using);
+    Token token = match(TokenType::Using);
     Token name = match(TokenType::Identifier);
     match('=');
     TypeInfoPtr type = type_info();
     match(';');
-    return std::make_unique<UsingDeclaration>(runtime_, std::move(name), std::move(type));
+    return std::make_unique<UsingDeclaration>(runtime_, std::move(token), std::move(name), std::move(type));
 }
 
 StmtPtr Parser::for_loop()
 {
-    match(TokenType::For);
+    Token token = match(TokenType::For);
     match('(');
     TypeInfoPtr type = type_info();
     Token name = match(TokenType::Identifier);
@@ -284,13 +293,13 @@ StmtPtr Parser::for_loop()
 
         match(')');
         StmtPtr body = block_statement();
-        return std::make_unique<ForRangeLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
+        return std::make_unique<ForRangeLoop>(runtime_, std::move(token), std::move(type), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
     }
     else
     {
         match(')');
         StmtPtr body = block_statement();
-        return std::make_unique<ForEachLoop>(runtime_, std::move(type), std::move(name), std::move(expr1), std::move(body));
+        return std::make_unique<ForEachLoop>(runtime_, std::move(token), std::move(type), std::move(name), std::move(expr1), std::move(body));
     }
 }
 
@@ -305,16 +314,16 @@ StmtPtr Parser::block_statement()
 {
     vector<StmtPtr> body;
 
-    match('{');
+    Token token = match('{');
     while (not consume('}'))
         body.push_back(statement());
 
-    return std::make_unique<BlockStatement>(runtime_, std::move(body));
+    return std::make_unique<BlockStatement>(runtime_, std::move(token), std::move(body));
 }
 
 StmtPtr Parser::if_statement()
 {
-    match(TokenType::If);
+    Token token = match(TokenType::If);
     match('(');
     ExprPtr cond_expr = expression();
     match(')');
@@ -333,7 +342,7 @@ StmtPtr Parser::if_statement()
         }
     }
 
-    return std::make_unique<IfStatement>(runtime_, std::move(cond_expr), std::move(then_block), std::move(else_block));
+    return std::make_unique<IfStatement>(runtime_, std::move(token), std::move(cond_expr), std::move(then_block), std::move(else_block));
 }
 
 ModifierList Parser::modifiers()
@@ -342,13 +351,13 @@ ModifierList Parser::modifiers()
         TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Out
     );
 
-    return ModifierList{mods};
+    return ModifierList{Token::to_strings(mods)};
 }
 
 TypeInfoPtr Parser::type_info()
 {
-    if (optional<Token> type = consume(TokenType::Identifier))
-        return std::make_shared<TypeInfo>(*type);
+    if (const optional<Token> type = consume(TokenType::Identifier))
+        return std::make_shared<TypeInfo>(Token::to_string(type));
 
     vector<FieldInfo> fields = list<FieldInfo>('{', '}', [this](const size_t){ return field_info(); });
     return std::make_shared<TypeInfo>(std::move(fields));
@@ -358,8 +367,8 @@ FieldInfo Parser::field_info()
 {
     ModifierList mods = modifiers();
     TypeInfoPtr type = type_info();
-    optional<Token> name = consume(TokenType::Identifier);
-    return FieldInfo{std::move(mods), std::move(type), std::move(name), nullptr};
+    const optional<Token> name = consume(TokenType::Identifier);
+    return FieldInfo{std::move(mods), std::move(type), Token::to_string(name), nullptr};
 }
 
 Parameter Parser::parameter(const size_t index)
@@ -383,7 +392,7 @@ tuple<StmtPtr, ExprPtr> Parser::function_body()
     vector<StmtPtr> body;
     ExprPtr return_expr;
     
-    match('{');
+    Token token = match('{');
     while (peek() != '}' and peek() != "return"s)
         body.push_back(statement());
     
@@ -397,7 +406,7 @@ tuple<StmtPtr, ExprPtr> Parser::function_body()
     while (not consume('}'))
         statement();
 
-    return {std::make_unique<BlockStatement>(runtime_, std::move(body)), std::move(return_expr)};
+    return {std::make_unique<BlockStatement>(runtime_, std::move(token), std::move(body)), std::move(return_expr)};
 }
 
 ExprPtr Parser::expression()
@@ -608,15 +617,14 @@ ExprPtr Parser::named_constructor()
 
 ExprPtr Parser::unnamed_constructor()
 {
+    const Token& token = peek();
     vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
-    if (exprs.empty())
-        throw CompileError{peek(), "Invalid constructor"s};
-    return std::make_unique<UnnamedConstructor>(runtime_, std::move(exprs));
+    return std::make_unique<UnnamedConstructor>(runtime_, token, std::move(exprs));
 }
 
 Argument Parser::argument(const size_t i)
 {
-    optional<string> name = std::nullopt;
+    string name;
     if (peek(1) == '=')
     {
         name = match(TokenType::Identifier).lexeme();

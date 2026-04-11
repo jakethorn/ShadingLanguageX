@@ -10,10 +10,12 @@
 class BlockStatement final : public Statement
 {
 public:
-    BlockStatement(const Runtime& runtime, vector<StmtPtr> body);
+    BlockStatement(const Runtime& runtime, Token token, vector<StmtPtr> body);
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
-    void execute() const override;
+    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+
+protected:
+    void execute_impl() const override;
 
 private:
     vector<StmtPtr> body_;

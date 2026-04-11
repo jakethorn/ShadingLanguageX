@@ -5,6 +5,7 @@
 #ifndef FENNEC_STATEMENT_H
 #define FENNEC_STATEMENT_H
 
+#include "Token.h"
 #include "utils/common.h"
 
 class Runtime;
@@ -12,14 +13,17 @@ class Runtime;
 class Statement
 {
 public:
-    explicit Statement(const Runtime& runtime) : runtime_{runtime} { }
+    explicit Statement(const Runtime& runtime, Token token) : runtime_{runtime}, token_{std::move(token)} { }
     virtual ~Statement() = default;
 
-    [[nodiscard]] virtual StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
-    virtual void execute() const = 0;
+    virtual StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
+    void execute() const;
 
 protected:
+    virtual void execute_impl() const = 0;
+
     const Runtime& runtime_;
+    Token token_;
 };
 
 #endif //FENNEC_STATEMENT_H

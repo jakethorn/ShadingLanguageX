@@ -4,7 +4,7 @@
 
 #include "error_utils.h"
 
-#include <assert.h>
+#include <cassert>
 
 #include "runtime/ArgumentList.h"
 #include "runtime/Function.h"
@@ -13,7 +13,7 @@
 string missing_overload_error(
     const FuncPtr& func,
     const vector<TypeInfoPtr>& return_types,
-    const Token& name,
+    const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 )
@@ -23,7 +23,7 @@ string missing_overload_error(
     if (not return_types.empty() and not contains(return_types, func->type()))
         result += "    Return type does not match\n";
 
-    if (name != func->name_token())
+    if (name != func->name())
         result += "    Name does not match\n";
 
     if (template_type)
@@ -58,17 +58,17 @@ string missing_overload_error(
 string missing_overload_error(
     const vector<FuncPtr>& funcs,
     const vector<TypeInfoPtr>& return_types,
-    const Token& name,
+    const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 )
 {
     if (funcs.empty())
     {
-        return "No functions found with the name '" + name.lexeme() + "'";
+        return "No functions found with the name '" + name + "'";
     }
 
-    string result = "No matching overload for function '" + name.lexeme() + "'\n";
+    string result = "No matching overload for function '" + name + "'\n";
     result += "Potential matches:\n";
     for (const FuncPtr& func : funcs)
         result += missing_overload_error(func, return_types, name, template_type, args) + "\n";

@@ -90,7 +90,7 @@ ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
     const string input_name = "nonlocal_in__" + var->name();
     add_inputs_from_type(node_graph()->getNodeDef(), var->type(), input_name);
     graph_function()->add_nonlocal_input(input_name, var);
-    return ValueFactory::create_nonlocal_interface(var);
+    return ValueFactory::create_interface_value(var);
 }
 
 void MtlXSerializer::write_node_def_output(const VarPtr& var, const ValuePtr& value) const

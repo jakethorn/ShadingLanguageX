@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "ModifierList.h"
-#include "Token.h"
 #include "FieldInfo.h"
 
 class TypeInfo
@@ -24,11 +23,10 @@ public:
     inline static string Filename = "filename"s;
     inline static string MultiOutput = "multioutput"s;
 
-    TypeInfo(ModifierList mods, Token name, vector<FieldInfo> fields)
+    TypeInfo(ModifierList mods, string name, vector<FieldInfo> fields)
         : mods_{std::move(mods)}, name_{std::move(name)}, fields_{std::move(fields)} { }
 
-    explicit TypeInfo(const string& name) : name_{Token{TokenType::Identifier, name}} { }
-    explicit TypeInfo(Token name) : name_{std::move(name)} { }
+    explicit TypeInfo(string name) : name_{std::move(name)} { }
     explicit TypeInfo(vector<FieldInfo> fields) : fields_{std::move(fields)} { }
 
     explicit TypeInfo(const basic_t& val)
@@ -52,51 +50,46 @@ public:
             fields_.emplace_back(field);
     }
 
-    [[nodiscard]] const ModifierList& modifiers() const { return mods_; }
-    [[nodiscard]] bool has_name() const { return not name_.lexeme().empty(); }
-    [[nodiscard]] const string& name() const { return name_.lexeme(); }
-    [[nodiscard]] const vector<FieldInfo>& fields() const { return fields_; }
-    [[nodiscard]] const Token& name_token() const { return name_; }
+    const ModifierList& modifiers() const { return mods_; }
+    bool has_name() const { return not name_.empty(); }
+    const string& name() const { return name_; }
+    const vector<FieldInfo>& fields() const { return fields_; }
 
-    [[nodiscard]] TypeInfoPtr instantiate_template_types(const TypeInfoPtr& template_type) const;
+    TypeInfoPtr instantiate_template_types(const TypeInfoPtr& template_type) const;
 
-    [[nodiscard]] size_t field_count() const { return fields_.size(); }
-    [[nodiscard]] bool has_fields() const { return field_count() > 0; }
-    [[nodiscard]] bool has_field(const string& name) const;
+    size_t field_count() const { return fields_.size(); }
+    bool has_fields() const { return field_count() > 0; }
+    bool has_field(const string& name) const;
 
-    [[nodiscard]] const FieldInfo& field(size_t index) const;
-    [[nodiscard]] const FieldInfo& field(const Token& name) const;
-    [[nodiscard]] const string& field_name(const size_t index) const { return field(index).name(); }
-    [[nodiscard]] size_t field_index(const Token& name) const;
-    [[nodiscard]] TypeInfoPtr field_type(const size_t index) const { return field(index).type(); }
-    [[nodiscard]] TypeInfoPtr field_type(const Token& name) const { return field(name).type(); }
+    const FieldInfo& field(size_t index) const;
+    const FieldInfo& field(const string& name) const;
+    const string& field_name(const size_t index) const { return field(index).name(); }
+    size_t field_index(const string& name) const;
+    TypeInfoPtr field_type(const size_t index) const { return field(index).type(); }
+    TypeInfoPtr field_type(const string& name) const { return field(name).type(); }
 
-    [[nodiscard]] bool is_basic() const { return has_name() and not has_fields(); }
-    [[nodiscard]] bool is_resolved() const { return is_resolved_; }
-    [[nodiscard]] bool is_compatible(const TypeInfoPtr& other) const;
-    [[nodiscard]] bool is_compatible(const vector<TypeInfoPtr>& types) const;
-    [[nodiscard]] bool is_equal(const TypeInfoPtr& other) const;
-    [[nodiscard]] bool is_in(const vector<TypeInfoPtr>& types) const;
+    bool is_basic() const { return has_name() and not has_fields(); }
+    bool is_resolved() const { return is_resolved_; }
+    bool is_compatible(const TypeInfoPtr& other) const;
+    bool is_compatible(const vector<TypeInfoPtr>& types) const;
+    bool is_equal(const TypeInfoPtr& other) const;
+    bool is_in(const vector<TypeInfoPtr>& types) const;
 
-    [[nodiscard]] TypeInfoPtr find_unique_compatible(const vector<TypeInfoPtr>& types) const;
+    TypeInfoPtr find_unique_compatible(const vector<TypeInfoPtr>& types) const;
 
-    [[nodiscard]] string str() const;
+    string str() const;
 
-    bool operator==(const string& other) const { return name_.lexeme() == other; }
+    bool operator==(const string& other) const { return name_ == other; }
     bool operator!=(const string& other) const { return not (*this == other); }
 
-    [[nodiscard]] static TypeInfoPtr resolved_void()
-    {
-        TypeInfoPtr type = std::make_shared<TypeInfo>(Void);
-        type->set_resolved();
-        return type;
-    }
+    static TypeInfoPtr resolved_void();
+    static string to_string(const vector<TypeInfoPtr>& types);
 
 private:
     void set_resolved() { is_resolved_ = true; }
 
     ModifierList mods_;
-    Token name_;
+    string name_;
     vector<FieldInfo> fields_;
 
     bool is_resolved_ = false;

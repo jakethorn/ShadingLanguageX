@@ -5,49 +5,37 @@
 #ifndef MXSLC_MODIFIERLIST_H
 #define MXSLC_MODIFIERLIST_H
 
-#include "CompileError.h"
 #include "utils/common.h"
-#include "Token.h"
+#include "TokenType.h"
 
 class ModifierList
 {
 public:
     ModifierList() = default;
-    explicit ModifierList(vector<Token> mods) : mods_{std::move(mods)}
-    {
-        for (size_t i = 0; i < mods_.size(); ++i)
-            for (size_t j = i+1; j < mods_.size(); ++j)
-                if (mods_[i] == mods_[j])
-                    throw CompileError{mods_[j], "Duplicate '" + mods_[j].lexeme() + "' modifiers"};
-    }
+    explicit ModifierList(vector<string> mods);
 
     template<typename... Args>
     void validate(const Args&... valid_mods) const
     {
-        for (const Token& mod : mods_)
+        for (const string& mod : mods_)
         {
-            if (not (... || (mod == valid_mods)))
-                throw CompileError{mod, "'" + mod.lexeme() + "' is not a valid modifier here"};
+            if (not (... || (TokenType{valid_mods} == mod)))
+                throw_error("'" + mod + "' is not a valid modifier here");
         }
     }
 
-    void add(const Token& mod) { mods_.push_back(mod); }
-    void add(const string& mod) { mods_.emplace_back(mod); }
+    void add(string mod) { mods_.push_back(std::move(mod)); }
 
-    [[nodiscard]] bool contains(const string& mod) const { return ::contains(mods_, mod); }
-    [[nodiscard]] size_t size() const { return mods_.size(); }
-    [[nodiscard]] bool empty() const { return mods_.empty(); }
+    bool contains(const TokenType mod) const { return ::contains(mods_, mod.str()); }
+    size_t size() const { return mods_.size(); }
+    bool empty() const { return mods_.empty(); }
 
-    [[nodiscard]] string str() const
-    {
-        string result;
-        for (const Token& mod : mods_)
-            result += mod.lexeme() + " ";
-        return result;
-    }
+    string str() const;
 
 private:
-    vector<Token> mods_;
+    static void throw_error(const string& msg) ;
+
+    vector<string> mods_;
 };
 
 #endif //MXSLC_MODIFIERLIST_H

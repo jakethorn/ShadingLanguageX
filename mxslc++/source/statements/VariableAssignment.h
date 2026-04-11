@@ -11,11 +11,13 @@
 class VariableAssignment final : public Statement
 {
 public:
-    VariableAssignment(const Runtime& runtime, ExprPtr lhs, ExprPtr rhs);
+    VariableAssignment(const Runtime& runtime, Token token, ExprPtr lhs, ExprPtr rhs);
     ~VariableAssignment() override;
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
-    void execute() const override;
+    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+
+protected:
+    void execute_impl() const override;
 
 private:
     ExprPtr lhs_;

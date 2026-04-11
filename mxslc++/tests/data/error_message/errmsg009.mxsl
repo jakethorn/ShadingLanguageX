@@ -1,0 +1,11 @@
+float foo(float a)
+{
+	return a;
+}
+
+float foo(float a, float b, float c)
+{
+	return a;
+}
+
+foo(1.0, 2.0);

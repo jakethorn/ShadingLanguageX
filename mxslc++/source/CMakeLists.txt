@@ -14,6 +14,7 @@ add_library(mxslc_lib
         runtime/Variable.cpp
         runtime/TypeInfo.cpp
         runtime/FieldInfo.cpp
+        runtime/ModifierList.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp
@@ -23,6 +24,7 @@ add_library(mxslc_lib
         expressions/UnnamedConstructor.cpp
         expressions/IndexingExpression.cpp
         expressions/DotExpression.cpp
+        statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
         statements/FunctionDefinition.cpp
@@ -38,12 +40,14 @@ add_library(mxslc_lib
         utils/str_utils.cpp
         utils/parse_args.cpp
         utils/error_utils.cpp
+        utils/instantiate_template_types_utils.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
         mtlx/evaluate_mtlx.cpp
         values/Value.cpp
         values/ValueFactory.cpp
+        values/NodeValue.cpp
 )
 
 target_include_directories(mxslc_lib

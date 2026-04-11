@@ -10,12 +10,9 @@
 string get_postfix(const string& str, char delim);
 
 template<typename T>
-string str(const T& t)
+string str(const T& value)
 {
-    return std::to_string(t);
+    return std::to_string(value);
 }
-
-string str(const basic_t& value);
-string str(const vector<TypeInfoPtr>& types);
 
 #endif //FENNEC_STR_UTILS_H

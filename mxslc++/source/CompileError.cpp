@@ -4,6 +4,8 @@
 
 #include "CompileError.h"
 #include "Token.h"
+#include "utils/common.h"
+#include "utils/str_utils.h"
 
 string mxslc::CompileError::format(const Token& debug_info, const string& message)
 {
@@ -14,8 +16,16 @@ string mxslc::CompileError::format(const Token& debug_info, const string& messag
 
     if (debug_info.filename().empty())
     {
-        return "line " + std::to_string(debug_info.line()) + ": " + message;
+        return "line " + str(debug_info.line()) + ": " + message;
     }
 
-    return debug_info.filename() + ", line " + std::to_string(debug_info.line()) + ": " + message;
+    return debug_info.filename() + ", line " + str(debug_info.line()) + ": " + message;
+}
+
+std::string CompileError::format(const Token& debug_info, const CompileError& error)
+{
+    if (error.has_debug_info())
+        return error.what();
+    else
+        return format(debug_info, error.what());
 }

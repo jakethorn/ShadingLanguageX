@@ -36,7 +36,7 @@ void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
     size_t initialized_arg_count = initialized_arg_count_;
     while (initialized_arg_count < args_.size())
     {
-        vector<FuncPtr> matching_funcs = scope.get_functions(types, token_, template_type_, args_);
+        vector<FuncPtr> matching_funcs = scope.get_functions(types, name(), template_type_, args_);
         assert(not matching_funcs.empty());
 
         const size_t prev_initialized_arg_count = initialized_arg_count;
@@ -45,11 +45,11 @@ void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
         if (initialized_arg_count == prev_initialized_arg_count)
         {
             // init failed, try to init with a default function...
-            FuncPtr default_func = scope.get_function(types, token_, template_type_, args_);
+            FuncPtr default_func = scope.get_function(types, name(), template_type_, args_);
             initialized_arg_count = try_init_arguments({std::move(default_func)});
 
             if (initialized_arg_count == prev_initialized_arg_count)
-                throw CompileError{token_, ambiguous_overload_error(matching_funcs)};
+                throw CompileError{ambiguous_overload_error(matching_funcs)};
         }
     }
 }
@@ -57,7 +57,7 @@ void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
 void FunctionCall::init_impl(const vector<TypeInfoPtr>& types)
 {
     const Scope& scope = runtime_.scope();
-    func_ = scope.get_function(types, token_, template_type_, args_);
+    func_ = scope.get_function(types, name(), template_type_, args_);
 }
 
 TypeInfoPtr FunctionCall::type_impl() const
@@ -166,7 +166,7 @@ unordered_map<string, ValuePtr> FunctionCall::evaluate_arguments() const
         }
         else
         {
-            throw CompileError{token_, "Function call '" + func_->name() +  "' missing argument for parameter '" + param.name() + "'"};
+            throw CompileError{"Function call '" + func_->name() +  "' missing argument for parameter '" + param.name() + "'"};
         }
 
         result[param.name()] = std::move(value);

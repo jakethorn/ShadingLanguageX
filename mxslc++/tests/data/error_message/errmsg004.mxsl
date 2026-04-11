@@ -1,0 +1,8 @@
+int foo()
+{
+    return 0;
+}
+
+using Point = {float x, float y};
+Point p = {1, 2};
+p[foo()] = 3;

@@ -10,10 +10,10 @@
 StmtPtr UsingDeclaration::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     TypeInfoPtr type = type_->instantiate_template_types(template_type);
-    return std::make_unique<UsingDeclaration>(runtime_, name_, type);
+    return std::make_unique<UsingDeclaration>(runtime_, token_, name_, type);
 }
 
-void UsingDeclaration::execute() const
+void UsingDeclaration::execute_impl() const
 {
     runtime_.scope().add_alias(name_, type_);
 }

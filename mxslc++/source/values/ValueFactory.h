@@ -14,8 +14,9 @@ class Parameter;
 class ValueFactory
 {
 public:
-    static ValuePtr create_parameter_interface(const Parameter& param);
-    static ValuePtr create_nonlocal_interface(const VarPtr& var);
+    static ValuePtr create_interface_value(const TypeInfoPtr& type, const string& name);
+    static ValuePtr create_interface_value(const Parameter& param);
+    static ValuePtr create_interface_value(const VarPtr& var);
     static ValuePtr create_node_value(mx::NodePtr node, TypeInfoPtr type);
     static ValuePtr create_output_value(mx::NodePtr node, const string& output_name, TypeInfoPtr type);
     static ValuePtr cast_value(ValuePtr value, TypeInfoPtr type);

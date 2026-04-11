@@ -14,8 +14,10 @@ public:
     ExpressionStatement(const Runtime& runtime, ExprPtr expr);
     ~ExpressionStatement() override;
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
-    void execute() const override;
+    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+
+protected:
+    void execute_impl() const override;
 
 private:
     ExprPtr expr_;

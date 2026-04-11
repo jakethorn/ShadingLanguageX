@@ -8,7 +8,7 @@
 #include "utils/common.h"
 #include "Token.h"
 
-[[nodiscard]] vector<Token> sscan(string_view text);
-[[nodiscard]] vector<Token> fscan(const fs::path& filepath);
+vector<Token> sscan(string_view text);
+vector<Token> fscan(const fs::path& filepath);
 
 #endif //FENNEC_SCAN_H

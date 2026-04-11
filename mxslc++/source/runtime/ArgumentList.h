@@ -25,12 +25,12 @@ public:
         (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
     }
 
-    [[nodiscard]] ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const
+    ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const
     {
         return ::instantiate_template_types(args_, template_type);
     }
 
-    [[nodiscard]] vector<ValuePtr> evaluate() const
+    vector<ValuePtr> evaluate() const
     {
         vector<ValuePtr> values;
         values.reserve(args_.size());
@@ -39,17 +39,17 @@ public:
         return values;
     }
 
-    [[nodiscard]] size_t size() const { return args_.size(); }
-    [[nodiscard]] bool empty() const { return args_.empty(); }
+    size_t size() const { return args_.size(); }
+    bool empty() const { return args_.empty(); }
 
     const Argument& operator[](const size_t i) const { return args_.at(i); }
     const Argument* operator[](const Parameter& param) const;
 
-    [[nodiscard]] auto begin() { return args_.begin(); }
-    [[nodiscard]] auto begin() const { return args_.begin(); }
+    auto begin() { return args_.begin(); }
+    auto begin() const { return args_.begin(); }
 
-    [[nodiscard]] auto end() { return args_.end(); }
-    [[nodiscard]] auto end() const { return args_.end(); }
+    auto end() { return args_.end(); }
+    auto end() const { return args_.end(); }
 
 private:
     vector<Argument> args_;

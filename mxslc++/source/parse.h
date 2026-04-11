@@ -86,7 +86,7 @@ private:
         return args;
     }
 
-    [[nodiscard]] bool is_templated_function() const;
+    bool is_templated_function() const;
 
     const Runtime& runtime_;
 };

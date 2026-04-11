@@ -11,14 +11,16 @@
 class ForRangeLoop final : public Statement
 {
 public:
-    ForRangeLoop(const Runtime& runtime, TypeInfoPtr type, Token name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body);
+    ForRangeLoop(const Runtime& runtime, Token token, TypeInfoPtr type, string name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body);
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
-    void execute() const override;
+    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+
+protected:
+    void execute_impl() const override;
 
 private:
     TypeInfoPtr type_;
-    Token name_;
+    string name_;
     ExprPtr lower_expr_;
     ExprPtr step_expr_;
     ExprPtr upper_expr_;

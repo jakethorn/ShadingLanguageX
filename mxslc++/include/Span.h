@@ -48,10 +48,10 @@ namespace mxslc
             return ptr_ + size_;
         }
 
-        [[nodiscard]] size_t size() const { return size_; }
-        [[nodiscard]] bool empty() const { return size_ == 0; }
-        [[nodiscard]] const T& front() const { return *ptr_; }
-        [[nodiscard]] const T& back() const { return *(ptr_ + size_ - 1); }
+        size_t size() const { return size_; }
+        bool empty() const { return size_ == 0; }
+        const T& front() const { return *ptr_; }
+        const T& back() const { return *(ptr_ + size_ - 1); }
 
         const T& pop_front()
         {

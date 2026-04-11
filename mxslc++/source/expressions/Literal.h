@@ -14,15 +14,12 @@ public:
     Literal(const Runtime& runtime, Token token)
         : Expression{runtime, std::move(token)}, value_{token_.literal()} { }
 
-    Literal(const Runtime& runtime, basic_t value)
-        : Expression{runtime, Token{str(value)}}, value_{std::move(value)} { }
-
-    [[nodiscard]] ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_impl(const vector<TypeInfoPtr>& types) override;
-    [[nodiscard]] TypeInfoPtr type_impl() const override;
-    [[nodiscard]] ValuePtr evaluate_impl() const override;
+    TypeInfoPtr type_impl() const override;
+    ValuePtr evaluate_impl() const override;
 
 private:
     basic_t value_;

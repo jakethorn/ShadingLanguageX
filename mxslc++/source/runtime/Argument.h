@@ -7,32 +7,30 @@
 
 #include "utils/common.h"
 
-#include "Token.h"
-
 class Argument
 {
 public:
     Argument(ExprPtr expr, size_t index);
-    Argument(optional<string> name, ExprPtr expr, size_t index);
+    Argument(string name, ExprPtr expr, size_t index);
 
     Argument(Argument&& other) noexcept;
 
     ~Argument();
 
-    [[nodiscard]] bool has_name() const { return name_.has_value(); }
-    [[nodiscard]] const string& name() const { return name_.value(); }
-    [[nodiscard]] size_t index() const { return index_; }
+    bool has_name() const { return not name_.empty(); }
+    const string& name() const { return name_; }
+    size_t index() const { return index_; }
 
-    [[nodiscard]] Argument instantiate_template_types(const TypeInfoPtr& template_type) const;
+    Argument instantiate_template_types(const TypeInfoPtr& template_type) const;
     void init(const TypeInfoPtr& type) const;
     void init(const vector<TypeInfoPtr>& types) const;
-    [[nodiscard]] bool try_init(const vector<TypeInfoPtr>& types) const;
-    [[nodiscard]] bool is_initialized() const;
-    [[nodiscard]] TypeInfoPtr type() const;
-    [[nodiscard]] ValuePtr evaluate() const;
+    bool try_init(const vector<TypeInfoPtr>& types) const;
+    bool is_initialized() const;
+    TypeInfoPtr type() const;
+    ValuePtr evaluate() const;
 
 private:
-    optional<string> name_;
+    string name_;
     ExprPtr expr_;
     size_t index_;
 };

@@ -11,14 +11,16 @@
 class ForEachLoop final : public Statement
 {
 public:
-    ForEachLoop(const Runtime& runtime, TypeInfoPtr type, Token name, ExprPtr iter_expr, StmtPtr body);
+    ForEachLoop(const Runtime& runtime, Token token, TypeInfoPtr type, string name, ExprPtr iter_expr, StmtPtr body);
 
-    [[nodiscard]] StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
-    void execute() const override;
+    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+
+protected:
+    void execute_impl() const override;
 
 private:
     TypeInfoPtr type_;
-    Token name_;
+    string name_;
     ExprPtr iter_expr_;
     StmtPtr body_;
 };
