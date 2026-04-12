@@ -1,0 +1,9 @@
+inline float foo(float a, out float b)
+{
+    b = 5.0;
+	return a * 2.0;
+}
+
+mutable float out_y;
+float x = foo(7.0, out_y);
+float b = out_y * 9.0;

@@ -15,6 +15,7 @@ void Literal::init_impl(const vector<TypeInfoPtr>& types)
 {
     type_ = std::make_shared<TypeInfo>(value_);
 
+    // implicit cast from int to float
     if (std::holds_alternative<int>(value_))
     {
         const TypeInfoPtr int_type = runtime_.scope().get_type(TypeInfo::Int);
@@ -25,6 +26,7 @@ void Literal::init_impl(const vector<TypeInfoPtr>& types)
         }
     }
 
+    // implicit cast from string to filename
     if (std::holds_alternative<string>(value_))
     {
         const TypeInfoPtr str_type = runtime_.scope().get_type(TypeInfo::String);

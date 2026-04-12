@@ -80,7 +80,9 @@ ValuePtr FunctionCall::evaluate_impl() const
     }
     else
     {
-        return runtime_.serializer().write_node(func_, args);
+        ValuePtr val = runtime_.serializer().write_node(func_, args);
+        set_out_arguments();
+        return val;
     }
 }
 
@@ -155,6 +157,9 @@ unordered_map<string, ValuePtr> FunctionCall::evaluate_arguments() const
     {
         const Parameter& param = func_->parameters()[i-1];
 
+        if (param.is_out())
+            continue;
+
         ValuePtr value;
         if (const Argument* arg = args_[param])
         {
@@ -182,6 +187,15 @@ void FunctionCall::add_arguments_to_scope(const unordered_map<string, ValuePtr>&
         VarPtr var = std::make_shared<Variable>(ModifierList{}, name, value);
         runtime_.scope().add_variable(std::move(var));
     }
+
+    // add references to arguments passed to out parameters
+    for (const Parameter& param : func_->parameters())
+    {
+        if (param.is_out())
+        {
+            runtime_.scope().add_reference(param.name(), args_[param]->expression()->variable());
+        }
+    }
 }
 
 ValuePtr FunctionCall::evaluate_return() const
@@ -196,5 +210,17 @@ ValuePtr FunctionCall::evaluate_return() const
     {
         assert(func_->type() == TypeInfo::Void);
         return nullptr;
+    }
+}
+
+void FunctionCall::set_out_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        if (param.is_out())
+        {
+            const VarPtr out_var = runtime_.scope().get_variable(func_->nonlocal_name(param));
+            args_[param]->expression()->assign(out_var->value());
+        }
     }
 }

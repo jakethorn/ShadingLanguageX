@@ -1,0 +1,11 @@
+using Point = {float x, float y};
+
+inline float foo(float a, out float b)
+{
+    b = 5.0;
+	return a * 2.0;
+}
+
+mutable Point out_y;
+float x = foo(7.0, out_y[0]);
+float b = out_y[0] * 9.0;

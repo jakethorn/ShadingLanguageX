@@ -1,0 +1,6 @@
+inline float foo(float a)
+{
+	return a * 2.0;
+}
+
+float x = foo(5.0);

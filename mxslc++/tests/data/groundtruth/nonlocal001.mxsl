@@ -1,0 +1,10 @@
+mutable float x = 1.0;
+
+float foo()
+{
+    x = 2.0;
+    float y = x * 3.0;
+    return y;
+}
+
+float z = foo();

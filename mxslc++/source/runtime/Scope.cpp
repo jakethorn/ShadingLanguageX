@@ -28,48 +28,53 @@ void Scope::add_variable(VarPtr var)
     variables_.emplace(var->name(), std::move(var));
 }
 
-void Scope::set_variable(VarPtr var)
+void Scope::add_variable(string name, ValuePtr value)
 {
-    if (contains(variables_, var->name()))
-    {
-        variables_.insert_or_assign(var->name(), std::move(var));
-        return;
-    }
+    add_variable(ModifierList{}, std::move(name), std::move(value));
+}
 
-    if (parent_)
-    {
-        parent_->set_variable(std::move(var));
-        return;
-    }
+void Scope::add_variable(ModifierList mods, string name, ValuePtr value)
+{
+    add_variable(std::make_shared<Variable>(std::move(mods), std::move(name), std::move(value)));
+}
 
-    throw CompileError{"Variable not defined: " + var->name()};
+void Scope::add_reference(string name, VarPtr var)
+{
+    add_variable(std::make_shared<VariableReference>(std::move(name), std::move(var)));
+}
+
+void Scope::add_reference(string ref_name, const string& var_name)
+{
+    add_reference(std::move(ref_name), get_variable(var_name));
 }
 
 VarPtr Scope::get_variable(const string& name) const
 {
     if (contains(variables_, name))
-    {
         return variables_.at(name);
-    }
 
     if (parent_)
-    {
         return parent_->get_variable(name);
-    }
 
     throw CompileError{"Variable not defined: " + name};
 }
 
 bool Scope::is_variable_inline(const VarPtr& var) const
 {
-    return is_variable_inline(var->name());
+    if (var->is_child())
+        return is_variable_inline(var->parent());
+    else
+        return is_variable_inline(var->name());
 }
 
 bool Scope::is_variable_inline(const string& name) const
 {
     if (contains(variables_, name))
     {
-        return true;
+        if (variables_.at(name)->is_reference())
+            return is_variable_inline(variables_.at(name)->dereference());
+        else
+            return true;
     }
 
     if (parent_)

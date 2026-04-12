@@ -3,6 +3,8 @@
 //
 
 #include "Parameter.h"
+
+#include "CompileError.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
@@ -22,6 +24,12 @@ Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type
     index_{index}
 {
     mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
+
+    if (mods_.contains(TokenType::Out) and not mods_.contains(TokenType::Mutable))
+        mods_.add(TokenType::Mutable);
+
+    if (is_const() and is_mutable())
+        throw CompileError{"Parameters cannot be both const and mutable (out parameters are mutable by default)"s};
 }
 
 Parameter::Parameter(Parameter&& other) noexcept

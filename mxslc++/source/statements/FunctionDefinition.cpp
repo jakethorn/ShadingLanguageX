@@ -20,10 +20,9 @@ FunctionDefinition::FunctionDefinition(
     ParameterList params,
     StmtPtr body,
     ExprPtr return_expr
-) : Statement{runtime, name},
+) : Statement{runtime, std::move(name)},
     mods_{std::move(mods)},
     type_{std::move(type)},
-    name_{name.lexeme()},
     template_types_{std::move(template_types)},
     params_{std::move(params)},
     body_{std::move(body)},
@@ -38,14 +37,14 @@ FunctionDefinition::FunctionDefinition(
             body = body_->instantiate_template_types(template_type);
             return_expr = ::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
-                mods_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr)
+                mods_, std::move(type), FunctionDefinition::name(), template_type, std::move(params), std::move(body), std::move(return_expr)
             ));
         }
     }
     else
     {
         funcs_.push_back(std::make_shared<Function>(
-            std::move(mods_), std::move(type_), std::move(name_), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
+            std::move(mods_), std::move(type_), FunctionDefinition::name(), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
         ));
     }
 }
@@ -75,13 +74,38 @@ void FunctionDefinition::execute_impl() const
 
 void FunctionDefinition::write_function_definition(const FuncPtr& func) const
 {
+    create_out_variables(func);
     runtime_.enter_scope();
-    for (const Parameter& param : func->parameters())
-    {
-        ValuePtr val = ValueFactory::create_interface_value(param);
-        VarPtr var = std::make_shared<Variable>(ModifierList{}, param.name(), std::move(val));
-        runtime_.scope().add_variable(std::move(var));
-    }
+    add_parameters_to_scope(func);
     runtime_.serializer().write_node_def_graph(func);
     runtime_.exit_scope();
+}
+
+void FunctionDefinition::create_out_variables(const FuncPtr& func) const
+{
+    for (const Parameter& param : func->parameters())
+    {
+        if (param.is_out())
+        {
+            ValuePtr val = ValueFactory::create_default_value(param.type());
+            runtime_.scope().add_variable(ModifierList{TokenType::Mutable}, func->nonlocal_name(param), std::move(val));
+        }
+    }
+}
+
+void FunctionDefinition::add_parameters_to_scope(const FuncPtr &func) const
+{
+    for (const Parameter& param : func->parameters())
+    {
+        if (param.is_out())
+        {
+            runtime_.scope().add_reference(param.name(), func->nonlocal_name(param));
+        }
+        else
+        {
+            ValuePtr val = ValueFactory::create_interface_value(param);
+            VarPtr var = std::make_shared<Variable>(param.modifiers(), param.name(), std::move(val));
+            runtime_.scope().add_variable(std::move(var));
+        }
+    }
 }

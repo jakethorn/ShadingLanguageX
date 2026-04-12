@@ -64,6 +64,8 @@ public:
 
     void init(const Runtime& runtime);
 
+    string nonlocal_name(const Parameter& param) const;
+
     string str() const;
 
 private:

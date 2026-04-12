@@ -1,0 +1,13 @@
+using Point = {float x, float y};
+
+float foo (float x, out Point y)
+{
+    y = {x, 7.0};
+    return x * x;
+}
+
+mutable Point out_y;
+print out_y;
+float z = foo(3.0, out_y);
+float w = z * out_y[1];
+print out_y;

@@ -111,7 +111,7 @@ StmtPtr Parser::statement()
     {
         TypeInfoPtr type = type_info();
 
-        if (peek(1) == '=')
+        if (peek(1) == '=' or peek(1) == ';')
         {
             return variable_definition(std::move(mods), std::move(type));
         }
@@ -161,13 +161,11 @@ StmtPtr Parser::print_statement()
 StmtPtr Parser::variable_definition(ModifierList mods, TypeInfoPtr type)
 {
     Token name = match(TokenType::Identifier);
-    Token token = match('=');
-    ExprPtr expr = expression();
+    ExprPtr expr = consume('=') ? expression() : nullptr;
     match(';');
 
     return std::make_unique<VariableDefinition>(
         runtime_,
-        std::move(token),
         std::move(mods),
         std::move(type),
         std::move(name),

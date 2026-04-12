@@ -33,7 +33,10 @@ public:
      */
 
     void add_variable(VarPtr var);
-    void set_variable(VarPtr var);
+    void add_variable(string name, ValuePtr value);
+    void add_variable(ModifierList mods, string name, ValuePtr value);
+    void add_reference(string name, VarPtr var);
+    void add_reference(string ref_name, const string& var_name);
     VarPtr get_variable(const string& name) const;
     bool is_variable_inline(const VarPtr& var) const;
     bool is_variable_inline(const string& name) const;

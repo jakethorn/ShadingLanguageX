@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
-#include <MaterialXCore/Generated.h>
+#include <MaterialXCore/Node.h>
 
 // namespaces
 namespace fs = std::filesystem;
@@ -60,6 +60,18 @@ class TypeInfo;
 using TypeInfoPtr = shared_ptr<TypeInfo>;
 
 // type aliases
-using basic_t = variant<bool, int, float, string>;
+using basic_t = variant<
+    bool,
+    int,
+    float,
+    string,
+    mx::Vector2,
+    mx::Vector3,
+    mx::Vector4,
+    mx::Color3,
+    mx::Color4,
+    mx::Matrix33,
+    mx::Matrix44
+>;
 
 #endif //FENNEC_COMMON_H

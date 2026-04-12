@@ -20,6 +20,7 @@ public:
 
     ~Parameter();
 
+    const ModifierList& modifiers() const { return mods_; }
     bool is_const() const { return mods_.contains(TokenType::Const); }
     bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
     bool is_out() const { return mods_.contains(TokenType::Out); }

@@ -15,6 +15,12 @@ public:
     explicit ModifierList(vector<string> mods);
 
     template<typename... Args>
+    explicit ModifierList(Args&&... args)
+    {
+        (add(std::forward<Args>(args)), ...);
+    }
+
+    template<typename... Args>
     void validate(const Args&... valid_mods) const
     {
         for (const string& mod : mods_)
@@ -25,6 +31,7 @@ public:
     }
 
     void add(string mod) { mods_.push_back(std::move(mod)); }
+    void add(const TokenType mod) { mods_.push_back(mod.str()); }
 
     bool contains(const TokenType mod) const { return ::contains(mods_, mod.str()); }
     size_t size() const { return mods_.size(); }

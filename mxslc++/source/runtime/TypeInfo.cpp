@@ -10,6 +10,30 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "utils/str_utils.h"
 
+TypeInfo::TypeInfo(const basic_t& val)
+{
+#define START_INIT if constexpr (false) { }
+#define INIT_BASIC(t, n) else if (std::holds_alternative<t>(val)) name_ = n;
+
+    START_INIT
+    INIT_BASIC(bool, Bool)
+    INIT_BASIC(int, Int)
+    INIT_BASIC(float, Float)
+    INIT_BASIC(string, String)
+    INIT_BASIC(mx::Vector2, Vec2)
+    INIT_BASIC(mx::Vector3, Vec3)
+    INIT_BASIC(mx::Vector4, Vec4)
+    INIT_BASIC(mx::Color3, Color3)
+    INIT_BASIC(mx::Color4, Color4)
+    INIT_BASIC(mx::Matrix33, Mat33)
+    INIT_BASIC(mx::Matrix44, Mat44)
+
+#undef INIT_BASIC
+#undef START_INIT
+
+    set_resolved();
+}
+
 TypeInfoPtr TypeInfo::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     string name = ::instantiate_template_types(name_, template_type);

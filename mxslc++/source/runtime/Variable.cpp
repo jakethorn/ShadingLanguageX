@@ -31,25 +31,25 @@ TypeInfoPtr Variable::type() const
  * SubVariable
  */
 
-SubVariable::SubVariable(VarPtr owner, const size_t index)
-    : owner_{std::move(owner)}, index_{index}, name_{port_name(owner_->name(), index_)} { }
+SubVariable::SubVariable(VarPtr parent, const size_t index)
+    : parent_{std::move(parent)}, index_{index}, name_{port_name(parent_->name(), index_)} { }
 
-SubVariable::SubVariable(VarPtr owner, const string& name)
-    : SubVariable{owner, owner->type()->field_index(name)} { }
+SubVariable::SubVariable(VarPtr parent, const string& name)
+    : SubVariable{parent, parent->type()->field_index(name)} { }
 
 bool SubVariable::is_const() const
 {
-    return field().is_const() or owner_->is_const();
+    return field().is_const() or parent_->is_const();
 }
 
 bool SubVariable::is_mutable() const
 {
-    return field().is_mutable() or owner_->is_mutable();
+    return field().is_mutable() or parent_->is_mutable();
 }
 
 bool SubVariable::is_global() const
 {
-    return owner_->is_global();
+    return parent_->is_global();
 }
 
 TypeInfoPtr SubVariable::type() const
@@ -59,7 +59,7 @@ TypeInfoPtr SubVariable::type() const
 
 const FieldInfo& SubVariable::field() const
 {
-    return owner_->type()->field(index_);
+    return parent_->type()->field(index_);
 }
 
 const string& SubVariable::name() const
@@ -69,24 +69,20 @@ const string& SubVariable::name() const
 
 ValuePtr SubVariable::value() const
 {
-    return owner_->value()->subvalue(index_);
+    return parent_->value()->subvalue(index_);
 }
 
 void SubVariable::set_value(const ValuePtr& val)
 {
-    owner_->value()->set_subvalue(index_, val);
+    parent_->value()->set_subvalue(index_, val);
 }
 
-/*
- * Standalone Functions
- */
-
-VarPtr get_subvariable(VarPtr owner, size_t index)
+VarPtr get_subvariable(VarPtr parent, size_t index)
 {
-    return std::make_shared<SubVariable>(std::move(owner), index);
+    return std::make_shared<SubVariable>(std::move(parent), index);
 }
 
-VarPtr get_subvariable(VarPtr owner, const string& name)
+VarPtr get_subvariable(VarPtr parent, const string& name)
 {
-    return std::make_shared<SubVariable>(std::move(owner), name);
+    return std::make_shared<SubVariable>(std::move(parent), name);
 }

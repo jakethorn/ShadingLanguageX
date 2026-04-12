@@ -10,6 +10,10 @@
 
 class FieldInfo;
 
+/*
+ * Variable Interface
+ */
+
 class IVariable
 {
 public:
@@ -22,8 +26,18 @@ public:
     virtual const string& name() const = 0;
     virtual ValuePtr value() const = 0;
 
-    void virtual set_value(const ValuePtr& val) = 0;
+    virtual void set_value(const ValuePtr& val) = 0;
+
+    virtual bool is_child() const { return false; }
+    virtual VarPtr parent() const { return nullptr; }
+
+    virtual bool is_reference() const { return false; }
+    virtual VarPtr dereference() const { return nullptr; }
 };
+
+/*
+ * Variable
+ */
 
 class Variable final : public IVariable
 {
@@ -45,11 +59,15 @@ private:
     ValuePtr val_;
 };
 
+/*
+ * SubVariable
+ */
+
 class SubVariable final : public IVariable
 {
 public:
-    SubVariable(VarPtr owner, size_t index);
-    SubVariable(VarPtr owner, const string& name);
+    SubVariable(VarPtr parent, size_t index);
+    SubVariable(VarPtr parent, const string& name);
 
     bool is_const() const override;
     bool is_mutable() const override;
@@ -61,13 +79,42 @@ public:
 
     void set_value(const ValuePtr& val) override;
 
+    bool is_child() const override { return true; }
+    VarPtr parent() const override { return parent_; }
+
 private:
-    VarPtr owner_;
+    VarPtr parent_;
     size_t index_;
     string name_;
 };
 
-VarPtr get_subvariable(VarPtr owner, size_t index);
-VarPtr get_subvariable(VarPtr owner, const string& name);
+VarPtr get_subvariable(VarPtr parent, size_t index);
+VarPtr get_subvariable(VarPtr parent, const string& name);
+
+/*
+ * VariableReference
+ */
+
+class VariableReference final : public IVariable
+{
+public:
+    VariableReference(string name, VarPtr var) : name_{std::move(name)}, var_{std::move(var)} { }
+
+    bool is_const() const override { return var_->is_const(); }
+    bool is_mutable() const override { return var_->is_mutable(); }
+    bool is_global() const override { return var_->is_global(); }
+    TypeInfoPtr type() const override { return var_->type(); }
+    const string& name() const override { return name_; }
+    ValuePtr value() const override { return var_->value(); }
+
+    void set_value(const ValuePtr& val) override { var_->set_value(val); }
+
+    bool is_reference() const override { return true; }
+    VarPtr dereference() const override { return var_; }
+
+private:
+    string name_;
+    VarPtr var_;
+};
 
 #endif //FENNEC_VARIABLE_H

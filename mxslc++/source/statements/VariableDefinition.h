@@ -13,7 +13,7 @@
 class VariableDefinition final : public Statement
 {
 public:
-    VariableDefinition(const Runtime& runtime, Token token, ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr);
+    VariableDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr);
     ~VariableDefinition() override;
 
     StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
@@ -22,9 +22,10 @@ protected:
     void execute_impl() const override;
 
 private:
+    const string& name() const { return token_.lexeme(); }
+
     ModifierList mods_;
     TypeInfoPtr type_;
-    string name_;
     ExprPtr expr_;
 };
 

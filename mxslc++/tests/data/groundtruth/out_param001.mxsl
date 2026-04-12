@@ -1,0 +1,11 @@
+float foo (float x, out float y)
+{
+    y = x;
+    return x * x;
+}
+
+mutable float out_y;
+print out_y;
+float z = foo(3.0, out_y);
+float w = z * out_y;
+print out_y;

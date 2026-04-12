@@ -83,11 +83,30 @@ namespace
                 node_def->addInput(name, type->name());
         }
     }
+
+    string nonlocal_out_name(const VarPtr& var)
+    {
+        return "nonlocal_out__" + var->name();
+    }
+
+    string nonlocal_in_name(const VarPtr& var)
+    {
+        return "nonlocal_in__" + var->name();
+    }
 }
 
 ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
 {
-    const string input_name = "nonlocal_in__" + var->name();
+    // in the case that a nonlocal variable has been assigned a local value
+    // we grab that instead of nonlocal variables value
+    const string output_name = nonlocal_out_name(var);
+    const mx::OutputPtr& output = node_graph()->getOutput(output_name);
+    if (output)
+    {
+        return ValueFactory::copy_value_from_port(output);
+    }
+
+    const string input_name = nonlocal_in_name(var);
     add_inputs_from_type(node_graph()->getNodeDef(), var->type(), input_name);
     graph_function()->add_nonlocal_input(input_name, var);
     return ValueFactory::create_interface_value(var);
@@ -95,7 +114,7 @@ ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
 
 void MtlXSerializer::write_node_def_output(const VarPtr& var, const ValuePtr& value) const
 {
-    const string output_name = "nonlocal_out__" + var->name();
+    const string output_name = nonlocal_out_name(var);
     value->set_as_node_graph_output(node_graph(), output_name);
     graph_function()->add_nonlocal_output(output_name, var);
 }
@@ -117,6 +136,9 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
     const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), func->name());
     for (const Parameter& param : func->parameters())
     {
+        if (param.is_out())
+            continue;
+
         if (param.has_default_value())
         {
             const ValuePtr value = param.evaluate();
@@ -128,6 +150,7 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
         }
     }
 
+    // node def outputs are added with the node graph outputs
     node_def->removeOutput("out"s);
 
     return node_def;

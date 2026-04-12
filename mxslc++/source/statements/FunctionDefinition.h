@@ -21,12 +21,14 @@ protected:
     void execute_impl() const override;
 
 private:
+    const string& name() const { return token_.lexeme(); }
     bool is_templated() const { return not template_types_.empty(); }
     void write_function_definition(const FuncPtr& func) const;
+    void create_out_variables(const FuncPtr& func) const;
+    void add_parameters_to_scope(const FuncPtr& func) const;
 
     ModifierList mods_;
     TypeInfoPtr type_;
-    string name_;
     vector<TypeInfoPtr> template_types_;
     ParameterList params_;
     StmtPtr body_;

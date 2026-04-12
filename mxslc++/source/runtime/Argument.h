@@ -19,6 +19,7 @@ public:
 
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
+    ExprPtr expression() const { return expr_; }
     size_t index() const { return index_; }
 
     Argument instantiate_template_types(const TypeInfoPtr& template_type) const;
