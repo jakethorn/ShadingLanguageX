@@ -38,7 +38,7 @@ public:
 
         throw std::out_of_range{"Parameter not found:" + s};
     }
-    const Parameter& operator[](const Argument& a) const;
+    const Parameter& operator[](const Argument& arg) const;
 
     auto begin() { return params_.begin(); }
     auto begin() const { return params_.begin(); }

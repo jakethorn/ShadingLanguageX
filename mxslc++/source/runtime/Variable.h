@@ -27,6 +27,8 @@ public:
     virtual ValuePtr value() const = 0;
 
     virtual void set_value(const ValuePtr& val) = 0;
+    virtual void set_const(bool cnt) = 0;
+    virtual void set_mutable(bool mut) = 0;
 
     virtual bool is_child() const { return false; }
     virtual VarPtr parent() const { return nullptr; }
@@ -52,6 +54,8 @@ public:
     ValuePtr value() const override { return val_; }
 
     void set_value(const ValuePtr& val) override { val_ = val; }
+    void set_const(bool cnt) override;
+    void set_mutable(bool mut) override;
 
 private:
     ModifierList mods_;
@@ -78,6 +82,8 @@ public:
     ValuePtr value() const override;
 
     void set_value(const ValuePtr& val) override;
+    void set_const(bool mut) override;
+    void set_mutable(bool mut) override;
 
     bool is_child() const override { return true; }
     VarPtr parent() const override { return parent_; }
@@ -108,6 +114,8 @@ public:
     ValuePtr value() const override { return var_->value(); }
 
     void set_value(const ValuePtr& val) override { var_->set_value(val); }
+    void set_const(const bool cnt) override { var_->set_const(cnt); }
+    void set_mutable(const bool mut) override { var_->set_mutable(mut); }
 
     bool is_reference() const override { return true; }
     VarPtr dereference() const override { return var_; }

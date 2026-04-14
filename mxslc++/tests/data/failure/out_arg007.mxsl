@@ -1,0 +1,7 @@
+float foo1(float x)
+{
+    return 3.0 * 7.0;
+}
+
+float out_x1;
+foo1(out out_x1);

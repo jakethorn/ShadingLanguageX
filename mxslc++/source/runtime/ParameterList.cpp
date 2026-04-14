@@ -15,11 +15,11 @@ ParameterList::ParameterList(vector<Parameter> params) : params_{std::move(param
                 throw CompileError{"Multiple parameters with the name '" + params_[j].name() + "'"};
 }
 
-const Parameter& ParameterList::operator[](const Argument& a) const
+const Parameter& ParameterList::operator[](const Argument& arg) const
 {
-    if (a.has_name())
-        return (*this)[a.name()];
-    return (*this)[a.index()];
+    if (arg.has_name())
+        return (*this)[arg.name()];
+    return (*this)[arg.index()];
 }
 
 string ParameterList::str() const

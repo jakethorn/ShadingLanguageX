@@ -4,21 +4,25 @@
 
 #include "ModifierList.h"
 
+#include "Token.h"
 #include "CompileError.h"
 
-ModifierList::ModifierList(vector<string> mods) : mods_{std::move(mods)}
+ModifierList::ModifierList(vector<TokenType> mods)
 {
-    for (size_t i = 0; i < mods_.size(); ++i)
-        for (size_t j = i+1; j < mods_.size(); ++j)
-            if (mods_[i] == mods_[j])
-                throw CompileError{"Multiple '" + mods_[j] + "' modifiers"};
+    for (const TokenType mod : mods)
+    {
+        if (not contains(mod))
+            add(mod);
+        else
+            throw CompileError{"Multiple '" + mod.str() + "' modifiers"};
+    }
 }
 
 string ModifierList::str() const
 {
     string result;
-    for (const string& mod : mods_)
-        result += mod + " ";
+    for (TokenType mod : mods_)
+        result += mod.str() + " ";
     return result;
 }
 

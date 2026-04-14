@@ -9,6 +9,7 @@
 #include "CompileError.h"
 #include "evaluate_mtlx.h"
 #include "expressions/Expression.h"
+#include "expressions/ExpressionFactory.h"
 #include "values/NodeValue.h"
 #include "values/Value.h"
 #include "runtime/Function.h"
@@ -134,19 +135,16 @@ void MtlXSerializer::save(const fs::path& filepath) const
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
 {
     const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), func->name());
-    for (const Parameter& param : func->parameters())
+    for (const Parameter* param : func->in_parameters())
     {
-        if (param.is_out())
-            continue;
-
-        if (param.has_default_value())
+        if (param->has_default_value())
         {
-            const ValuePtr value = param.evaluate();
-            value->set_as_node_def_input(node_def, param.name());
+            const ValuePtr value = param->evaluate();
+            value->set_as_node_def_input(node_def, param->name());
         }
         else
         {
-            add_inputs_from_type(node_def, param.type(), param.name());
+            add_inputs_from_type(node_def, param->type(), param->name());
         }
     }
 
@@ -163,21 +161,16 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
 
     enter_node_graph(node_graph, func);
 
-    func->body()->execute();
+    const ValuePtr return_value = func->invoke();
 
-    if (func->return_expr() != nullptr)
+    if (not func->is_void())
     {
-        assert(func->type() != TypeInfo::Void);
-        func->return_expr()->init(func->type());
-        const ValuePtr return_value = func->return_expr()->evaluate();
         return_value->set_as_node_graph_output(node_graph, "out"s);
     }
     else
     {
-        assert(func->type() == TypeInfo::Void);
-        node_graph->getNodeDef()->addOutput("out"s, "integer"s);
-        const mx::OutputPtr output = node_graph->addOutput("out"s, "integer"s);
-        output->setValue(0, "integer"s);
+        const ValuePtr default_value = ValueFactory::create_default_value<int>();
+        default_value->set_as_node_graph_output(node_graph, "out"s);
     }
 
     exit_node_graph();

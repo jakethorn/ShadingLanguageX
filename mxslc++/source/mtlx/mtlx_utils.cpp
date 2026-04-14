@@ -34,3 +34,9 @@ mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const string
 
     return output;
 }
+
+void set_interface(const mx::PortElementPtr& port, const string& interface_name)
+{
+    port->removeAttribute("value"s);
+    port->setInterfaceName(interface_name);
+}

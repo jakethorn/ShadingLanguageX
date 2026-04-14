@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="nonlocal_out__x" type="float" />
+    <output name="out" type="integer" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <multiply name="node1" type="float">
+      <input name="in1" type="float" value="3" />
+      <input name="in2" type="float" value="7" />
+    </multiply>
+    <output name="nonlocal_out__x" type="float" nodename="node1" />
+    <output name="out" type="integer" value="0" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <output name="nonlocal_out__x" type="float" />
+    <output name="out" type="void" />
+  </foo>
+  <foo name="node2" type="multioutput">
+    <output name="nonlocal_out__x" type="float" />
+    <output name="out" type="void" />
+  </foo>
+  <add name="HERE1" type="float">
+    <input name="in1" type="float" output="nonlocal_out__x" nodename="node1" />
+    <input name="in2" type="float" output="nonlocal_out__x" nodename="node2" />
+  </add>
+  <nodedef name="ND_foo2" node="foo2">
+    <output name="nonlocal_out__y__0" type="float" />
+    <output name="nonlocal_out__y__1" type="float" />
+    <output name="out" type="integer" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <output name="nonlocal_out__y__0" type="float" value="2" />
+    <output name="nonlocal_out__y__1" type="float" value="8" />
+    <output name="out" type="integer" value="0" />
+  </nodegraph>
+  <foo2 name="node3" type="multioutput">
+    <output name="nonlocal_out__y__0" type="float" />
+    <output name="nonlocal_out__y__1" type="float" />
+    <output name="out" type="void" />
+  </foo2>
+  <foo2 name="node4" type="multioutput">
+    <output name="nonlocal_out__y__0" type="float" />
+    <output name="nonlocal_out__y__1" type="float" />
+    <output name="out" type="void" />
+  </foo2>
+  <add name="HERE2" type="float">
+    <input name="in1" type="float" output="nonlocal_out__y__0" nodename="node3" />
+    <input name="in2" type="float" output="nonlocal_out__y__0" nodename="node4" />
+  </add>
+  <add name="HERE3" type="float">
+    <input name="in1" type="float" output="nonlocal_out__y__1" nodename="node3" />
+    <input name="in2" type="float" output="nonlocal_out__y__1" nodename="node4" />
+  </add>
+</materialx>

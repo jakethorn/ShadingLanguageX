@@ -4,13 +4,9 @@
 
 #include "Identifier.h"
 
-#include <cassert>
-
 #include "runtime/Scope.h"
 #include "runtime/Runtime.h"
-#include "runtime/TypeInfo.h"
 #include "runtime/Variable.h"
-#include "values/Value.h"
 #include "values/ValueFactory.h"
 
 ExprPtr Identifier::instantiate_template_types(const TypeInfoPtr& template_type) const

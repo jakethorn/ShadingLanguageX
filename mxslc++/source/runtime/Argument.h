@@ -7,16 +7,20 @@
 
 #include "utils/common.h"
 
+class Parameter;
+
 class Argument
 {
 public:
     Argument(ExprPtr expr, size_t index);
     Argument(string name, ExprPtr expr, size_t index);
+    Argument(bool is_out, string name, ExprPtr expr, size_t index);
 
     Argument(Argument&& other) noexcept;
 
     ~Argument();
 
+    bool is_out() const { return is_out_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
     ExprPtr expression() const { return expr_; }
@@ -30,7 +34,10 @@ public:
     TypeInfoPtr type() const;
     ValuePtr evaluate() const;
 
+    void validate(const Parameter& param) const;
+
 private:
+    bool is_out_;
     string name_;
     ExprPtr expr_;
     size_t index_;

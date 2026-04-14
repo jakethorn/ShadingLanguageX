@@ -17,13 +17,12 @@ public:
 
     ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
-    void assign_impl(const ValuePtr &value) override;
-
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;
     void init_impl(const vector<TypeInfoPtr>& types) override;
     TypeInfoPtr type_impl() const override;
     ValuePtr evaluate_impl() const override;
+    void assign_impl(const ValuePtr &value) override;
 
 private:
     ExprPtr expr_;

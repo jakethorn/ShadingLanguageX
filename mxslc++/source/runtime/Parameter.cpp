@@ -25,11 +25,14 @@ Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type
 {
     mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
 
-    if (mods_.contains(TokenType::Out) and not mods_.contains(TokenType::Mutable))
+    if (mods_.contains(TokenType::Out))
         mods_.add(TokenType::Mutable);
 
     if (is_const() and is_mutable())
         throw CompileError{"Parameters cannot be both const and mutable (out parameters are mutable by default)"s};
+
+    if (is_out() and has_default_value())
+        throw CompileError{"Out parameters cannot have default values"s};
 }
 
 Parameter::Parameter(Parameter&& other) noexcept

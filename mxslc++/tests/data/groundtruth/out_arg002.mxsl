@@ -1,0 +1,24 @@
+void foo1(out mutable float x)
+{
+    x = 3.0 * 7.0;
+}
+
+foo1(float out_x1);
+
+void foo2(out float x)
+{
+    x = 3.0 * 7.0;
+}
+
+foo2(mutable float out_x2);
+out_x2 = 10.0;
+
+void foo3(out mutable float x)
+{
+    x = 3.0 * 7.0;
+}
+
+foo3(mutable float out_x3);
+out_x3 = 100.0;
+
+float HERE = out_x1 + out_x2 + out_x3;

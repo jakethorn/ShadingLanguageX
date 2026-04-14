@@ -37,14 +37,14 @@ FunctionDefinition::FunctionDefinition(
             body = body_->instantiate_template_types(template_type);
             return_expr = ::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
-                mods_, std::move(type), FunctionDefinition::name(), template_type, std::move(params), std::move(body), std::move(return_expr)
+                runtime_, mods_, std::move(type), FunctionDefinition::name(), template_type, std::move(params), std::move(body), std::move(return_expr)
             ));
         }
     }
     else
     {
         funcs_.push_back(std::make_shared<Function>(
-            std::move(mods_), std::move(type_), FunctionDefinition::name(), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
+            runtime_, std::move(mods_), std::move(type_), FunctionDefinition::name(), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
         ));
     }
 }
@@ -65,13 +65,14 @@ void FunctionDefinition::execute_impl() const
 {
     for (const FuncPtr& func : funcs_)
     {
-        func->init(runtime_);
+        func->init();
         if (not func->is_inline())
             write_function_definition(func);
         runtime_.scope().add_function(func);
     }
 }
 
+// outline
 void FunctionDefinition::write_function_definition(const FuncPtr& func) const
 {
     create_out_variables(func);
@@ -81,19 +82,18 @@ void FunctionDefinition::write_function_definition(const FuncPtr& func) const
     runtime_.exit_scope();
 }
 
+// outline
 void FunctionDefinition::create_out_variables(const FuncPtr& func) const
 {
-    for (const Parameter& param : func->parameters())
+    for (const Parameter* param : func->out_parameters())
     {
-        if (param.is_out())
-        {
-            ValuePtr val = ValueFactory::create_default_value(param.type());
-            runtime_.scope().add_variable(ModifierList{TokenType::Mutable}, func->nonlocal_name(param), std::move(val));
-        }
+        ValuePtr val = ValueFactory::create_default_value(param->type());
+        runtime_.scope().add_variable(ModifierList{TokenType::Mutable}, func->nonlocal_name(*param), std::move(val));
     }
 }
 
-void FunctionDefinition::add_parameters_to_scope(const FuncPtr &func) const
+// outline
+void FunctionDefinition::add_parameters_to_scope(const FuncPtr& func) const
 {
     for (const Parameter& param : func->parameters())
     {

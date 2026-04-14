@@ -4,21 +4,28 @@
 
 #include "Function.h"
 
+#include <cassert>
+
 #include "CompileError.h"
 #include "Runtime.h"
 #include "TypeInfo.h"
+#include "Variable.h"
 #include "statements/Statement.h"
 #include "expressions/Expression.h"
 #include "mtlx/mtlx_utils.h"
+#include "values/Value.h"
+#include "values/ValueFactory.h"
 
 Function::Function(
+    const Runtime& runtime,
     ModifierList mods,
     TypeInfoPtr type,
     string name,
     TypeInfoPtr template_type,
     ParameterList params,
     vector<string> output_names
-) : mods_{std::move(mods)},
+) : runtime_{runtime},
+    mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
@@ -29,6 +36,7 @@ Function::Function(
 }
 
 Function::Function(
+    const Runtime& runtime,
     ModifierList mods,
     TypeInfoPtr type,
     string name,
@@ -36,7 +44,8 @@ Function::Function(
     ParameterList params,
     StmtPtr body,
     ExprPtr return_expr
-) : mods_{std::move(mods)},
+) : runtime_{runtime},
+    mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
@@ -53,7 +62,8 @@ Function::Function(
 }
 
 Function::Function(Function&& other) noexcept
-    : mods_{std::move(other.mods_)},
+    : runtime_{other.runtime_},
+    mods_{std::move(other.mods_)},
     type_{std::move(other.type_)},
     name_{std::move(other.name_)},
     template_type_{std::move(other.template_type_)},
@@ -62,26 +72,14 @@ Function::Function(Function&& other) noexcept
     return_expr_{std::move(other.return_expr_)},
     output_names_{std::move(other.output_names_)}
 {
-
-}
-
-Function& Function::operator=(Function&& other) noexcept
-{
-    if (this != &other)
-    {
-        mods_ = std::move(other.mods_);
-        type_ = std::move(other.type_);
-        name_ = std::move(other.name_);
-        template_type_ = std::move(other.template_type_);
-        params_ = std::move(other.params_);
-        body_ = std::move(other.body_);
-        return_expr_ = std::move(other.return_expr_);
-        output_names_ = std::move(other.output_names_);
-    }
-    return *this;
 }
 
 Function::~Function() = default;
+
+bool Function::is_void() const
+{
+    return type_ == TypeInfo::Void;
+}
 
 size_t Function::min_arity() const
 {
@@ -95,22 +93,37 @@ size_t Function::min_arity() const
     return arity;
 }
 
-void Function::add_nonlocal_input(const string& name, const VarPtr& var)
+vector<const Parameter*> Function::in_parameters() const
 {
-    nonlocal_inputs_[name] = var;
+    vector<const Parameter*> result;
+    for (const Parameter& param : params_)
+    {
+        if (not param.is_out())
+            result.push_back(&param);
+    }
+
+    return result;
 }
 
-void Function::add_nonlocal_output(const string& name, const VarPtr& var)
+vector<const Parameter*> Function::out_parameters() const
 {
-    nonlocal_outputs_[name] = var;
+    vector<const Parameter*> result;
+    for (const Parameter& param : params_)
+    {
+        if (param.is_out())
+            result.push_back(&param);
+    }
+
+    return result;
 }
 
-void Function::init(const Runtime& runtime)
+// outline/inline
+void Function::init()
 {
     if (type_ == TypeInfo::Void)
         type_ = TypeInfo::resolved_void();
     else
-        type_ = runtime.scope().resolve_type(type_);
+        type_ = runtime_.scope().resolve_type(type_);
 
     if (output_names_.empty())
     {
@@ -119,11 +132,44 @@ void Function::init(const Runtime& runtime)
     }
 
     if (template_type_)
-        template_type_ = runtime.scope().resolve_type(template_type_);
+        template_type_ = runtime_.scope().resolve_type(template_type_);
 
     params_.init();
 
     is_initialized_ = true;
+}
+
+// outline/inline
+ValuePtr Function::invoke() const
+{
+    body_->execute();
+    return evaluate_return();
+}
+
+// outline/inline
+ValuePtr Function::evaluate_return() const
+{
+    if (return_expr_ != nullptr)
+    {
+        assert(not is_void());
+        return_expr_->init(type_);
+        return return_expr_->evaluate();
+    }
+    else
+    {
+        assert(is_void());
+        return nullptr;
+    }
+}
+
+void Function::add_nonlocal_input(const string& name, const VarPtr& var)
+{
+    nonlocal_inputs_[name] = var;
+}
+
+void Function::add_nonlocal_output(const string& name, const VarPtr& var)
+{
+    nonlocal_outputs_[name] = var;
 }
 
 string Function::nonlocal_name(const Parameter& param) const

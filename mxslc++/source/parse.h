@@ -64,6 +64,7 @@ private:
     ExprPtr function_call();
     ExprPtr named_constructor();
     ExprPtr unnamed_constructor();
+    ExprPtr variable_definition_argument(ModifierList mods);
 
     Argument argument(size_t i);
 
@@ -86,6 +87,7 @@ private:
         return args;
     }
 
+    bool is_variable_definition() const;
     bool is_templated_function() const;
 
     const Runtime& runtime_;

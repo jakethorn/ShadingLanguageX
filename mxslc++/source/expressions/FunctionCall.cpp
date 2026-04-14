@@ -58,6 +58,9 @@ void FunctionCall::init_impl(const vector<TypeInfoPtr>& types)
 {
     const Scope& scope = runtime_.scope();
     func_ = scope.get_function(types, name(), template_type_, args_);
+
+    for (const Argument& arg : args_)
+        arg.validate(func_->parameters()[arg]);
 }
 
 TypeInfoPtr FunctionCall::type_impl() const
@@ -73,8 +76,7 @@ ValuePtr FunctionCall::evaluate_impl() const
     {
         runtime_.enter_inline_scope();
         add_arguments_to_scope(args);
-        func_->body()->execute();
-        ValuePtr return_value = evaluate_return();
+        ValuePtr return_value = func_->invoke();
         runtime_.exit_scope();
         return return_value;
     }
@@ -145,6 +147,7 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     return initialized_arg_count;
 }
 
+// outline/inline
 unordered_map<string, ValuePtr> FunctionCall::evaluate_arguments() const
 {
     unordered_map<string, ValuePtr> result;
@@ -153,12 +156,10 @@ unordered_map<string, ValuePtr> FunctionCall::evaluate_arguments() const
     // e.g.,
     // <input name="in1" ... />
     // <input name="in2" ... />
-    for (size_t i = func_->max_arity(); i > 0; --i)
+    const vector<const Parameter*> in_params = func_->in_parameters();
+    for (size_t i = in_params.size(); i > 0; --i)
     {
-        const Parameter& param = func_->parameters()[i-1];
-
-        if (param.is_out())
-            continue;
+        const Parameter& param = *in_params[i-1];
 
         ValuePtr value;
         if (const Argument* arg = args_[param])
@@ -180,6 +181,7 @@ unordered_map<string, ValuePtr> FunctionCall::evaluate_arguments() const
     return result;
 }
 
+// inline
 void FunctionCall::add_arguments_to_scope(const unordered_map<string, ValuePtr>& args) const
 {
     for (const auto& [name, value] : args)
@@ -189,38 +191,29 @@ void FunctionCall::add_arguments_to_scope(const unordered_map<string, ValuePtr>&
     }
 
     // add references to arguments passed to out parameters
-    for (const Parameter& param : func_->parameters())
+    for (const Parameter* param : func_->out_parameters())
     {
-        if (param.is_out())
-        {
-            runtime_.scope().add_reference(param.name(), args_[param]->expression()->variable());
-        }
+        runtime_.scope().add_reference(param->name(), args_[*param]->expression()->variable());
     }
 }
 
-ValuePtr FunctionCall::evaluate_return() const
-{
-    if (func_->return_expr() != nullptr)
-    {
-        assert(func_->type() != TypeInfo::Void);
-        func_->return_expr()->init(func_->type());
-        return func_->return_expr()->evaluate();
-    }
-    else
-    {
-        assert(func_->type() == TypeInfo::Void);
-        return nullptr;
-    }
-}
-
+// outline
 void FunctionCall::set_out_arguments() const
 {
-    for (const Parameter& param : func_->parameters())
+    for (const Parameter* param : func_->out_parameters())
     {
-        if (param.is_out())
-        {
-            const VarPtr out_var = runtime_.scope().get_variable(func_->nonlocal_name(param));
-            args_[param]->expression()->assign(out_var->value());
-        }
+        const ExprPtr arg_expr = args_[*param]->expression();
+        const VarPtr out_var = runtime_.scope().get_variable(func_->nonlocal_name(*param));
+
+        // temporarily disable const/mutable so we can assign the value to the out argument
+        const bool is_const = arg_expr->variable()->is_const();
+        const bool is_mutable = arg_expr->variable()->is_mutable();
+        arg_expr->variable()->set_const(false);
+        arg_expr->variable()->set_mutable(true);
+
+        arg_expr->assign(out_var->value());
+
+        arg_expr->variable()->set_const(is_const);
+        arg_expr->variable()->set_mutable(is_mutable);
     }
 }

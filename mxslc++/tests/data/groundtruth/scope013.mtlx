@@ -7,7 +7,7 @@
     <output name="out" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
-    <output name="nonlocal_out__b__0" type="float" value="3" interfacename="nonlocal_in__b__1" />
+    <output name="nonlocal_out__b__0" type="float" interfacename="nonlocal_in__b__1" />
     <output name="nonlocal_out__b__1" type="float" value="7" />
     <output name="out" type="float" value="0" />
   </nodegraph>

@@ -3,11 +3,22 @@
 //
 
 #include "Argument.h"
+
+#include "CompileError.h"
+#include "Parameter.h"
 #include "expressions/Expression.h"
 
-Argument::Argument(ExprPtr expr, const size_t index) : Argument{""s, std::move(expr), index} { }
-Argument::Argument(string name, ExprPtr expr, const size_t index) : name_{std::move(name)}, expr_{std::move(expr)}, index_{index} { }
-Argument::Argument(Argument&& other) noexcept : name_{std::move(other.name_)}, expr_{std::move(other.expr_)}, index_{other.index_} { }
+Argument::Argument(ExprPtr expr, const size_t index)
+    : Argument{false, ""s, std::move(expr), index} { }
+
+Argument::Argument(string name, ExprPtr expr, const size_t index)
+    : Argument{false, std::move(name), std::move(expr), index} { }
+
+Argument::Argument(const bool is_out, string name, ExprPtr expr, const size_t index)
+    : is_out_{is_out}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index} { }
+
+Argument::Argument(Argument&& other) noexcept
+    : is_out_{other.is_out_}, name_{std::move(other.name_)}, expr_{std::move(other.expr_)}, index_{other.index_} { }
 
 Argument::~Argument() = default;
 
@@ -44,4 +55,12 @@ TypeInfoPtr Argument::type() const
 ValuePtr Argument::evaluate() const
 {
     return expr_->evaluate();
+}
+
+void Argument::validate(const Parameter& param) const
+{
+    if (is_out() and not param.is_out())
+    {
+        throw CompileError{"Out argument is being passed to a non-out parameter"s};
+    }
 }

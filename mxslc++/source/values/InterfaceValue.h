@@ -18,13 +18,13 @@ public:
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
         const mx::InputPtr input = node->addInput(input_name, type_->name());
-        input->setInterfaceName(name_);
+        set_interface(input, name_);
     }
 
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
     {
         const mx::OutputPtr output = add_or_get_output(node_graph, output_name, type_);
-        output->setInterfaceName(name_);
+        set_interface(output, name_);
     }
 
     string str() const override { return name_; }

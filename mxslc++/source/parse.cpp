@@ -13,6 +13,7 @@
 #include "expressions/IndexingExpression.h"
 #include "runtime/Attribute.h"
 #include "expressions/Literal.h"
+#include "expressions/VariableDefinitionExpression.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
 #include "runtime/ParameterList.h"
@@ -345,11 +346,16 @@ StmtPtr Parser::if_statement()
 
 ModifierList Parser::modifiers()
 {
-    const vector<Token> mods = consume_while(
+    const vector<Token> mod_tokens = consume_while(
         TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Out
     );
 
-    return ModifierList{Token::to_strings(mods)};
+    vector<TokenType> mods;
+    mods.reserve(mod_tokens.size());
+    for (const Token& mod : mod_tokens)
+        mods.push_back(mod.type());
+
+    return ModifierList{std::move(mods)};
 }
 
 TypeInfoPtr Parser::type_info()
@@ -620,6 +626,13 @@ ExprPtr Parser::unnamed_constructor()
     return std::make_unique<UnnamedConstructor>(runtime_, token, std::move(exprs));
 }
 
+ExprPtr Parser::variable_definition_argument(ModifierList mods)
+{
+    TypeInfoPtr type = type_info();
+    Token name = match(TokenType::Identifier);
+    return std::make_unique<VariableDefinitionExpression>(runtime_, std::move(mods), std::move(type), std::move(name));
+}
+
 Argument Parser::argument(const size_t i)
 {
     string name;
@@ -629,8 +642,50 @@ Argument Parser::argument(const size_t i)
         match('=');
     }
 
-    ExprPtr expr = expression();
-    return Argument{std::move(name), std::move(expr), i};
+    ModifierList mods = modifiers();
+    bool is_out = mods.contains(TokenType::Out);
+
+    ExprPtr expr;
+    if (is_variable_definition())
+    {
+        expr = variable_definition_argument(std::move(mods));
+        is_out = true;
+    }
+    else
+    {
+        mods.validate(TokenType::Out);
+        expr = expression();
+    }
+
+    return Argument{is_out, std::move(name), std::move(expr), i};
+}
+
+bool Parser::is_variable_definition() const
+{
+    // consume modifiers before calling this function
+
+    if (peek(0) == TokenType::Identifier and peek(1) == TokenType::Identifier)
+    {
+        return true;
+    }
+
+    if (peek(0) == '{')
+    {
+        size_t i = 1;
+        size_t count = 1;
+        while (count > 0)
+        {
+            if (peek(i) == '{')
+                count++;
+            else if (peek(i) == '}')
+                count--;
+            i++;
+        }
+
+        return peek(i) == TokenType::Identifier;
+    }
+
+    return false;
 }
 
 bool Parser::is_templated_function() const

@@ -30,10 +30,12 @@ public:
     ExprPtr initializer() const { return initializer_; }
 
     FieldInfo instantiate_template_types(const TypeInfoPtr& template_type) const;
+    void set_const(bool cnt) const;
+    void set_mutable(bool mut) const;
     string str() const;
 
 private:
-    ModifierList mods_;
+    mutable ModifierList mods_;
     TypeInfoPtr type_;
     string name_;
     ExprPtr initializer_;

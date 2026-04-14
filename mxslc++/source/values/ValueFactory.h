@@ -7,6 +7,8 @@
 
 #include <MaterialXCore/Node.h>
 
+#include "BasicValue.h"
+#include "runtime/TypeInfo.h"
 #include "utils/common.h"
 
 class Parameter;
@@ -22,6 +24,12 @@ public:
     static ValuePtr create_default_value(TypeInfoPtr type);
     static ValuePtr copy_value_from_port(const mx::PortElementPtr& port);
     static ValuePtr cast_value(ValuePtr value, TypeInfoPtr type);
+
+    template<typename T>
+    static ValuePtr create_default_value()
+    {
+        return std::make_shared<BasicValue>(T{});
+    }
 
 private:
     ValueFactory() = default;

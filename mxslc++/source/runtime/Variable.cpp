@@ -27,6 +27,22 @@ TypeInfoPtr Variable::type() const
     return val_->type();
 }
 
+void Variable::set_const(const bool cnt)
+{
+    if (cnt)
+        mods_.add(TokenType::Const);
+    else
+        mods_.remove(TokenType::Const);
+}
+
+void Variable::set_mutable(const bool mut)
+{
+    if (mut)
+        mods_.add(TokenType::Mutable);
+    else
+        mods_.remove(TokenType::Mutable);
+}
+
 /*
  * SubVariable
  */
@@ -75,6 +91,16 @@ ValuePtr SubVariable::value() const
 void SubVariable::set_value(const ValuePtr& val)
 {
     parent_->value()->set_subvalue(index_, val);
+}
+
+void SubVariable::set_const(const bool cnt)
+{
+    field().set_const(cnt);
+}
+
+void SubVariable::set_mutable(const bool mut)
+{
+    field().set_mutable(mut);
 }
 
 VarPtr get_subvariable(VarPtr parent, size_t index)

@@ -24,6 +24,7 @@ add_library(mxslc_lib
         expressions/UnnamedConstructor.cpp
         expressions/IndexingExpression.cpp
         expressions/DotExpression.cpp
+        expressions/VariableDefinitionExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp

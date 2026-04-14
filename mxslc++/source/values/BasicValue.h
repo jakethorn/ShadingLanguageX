@@ -8,6 +8,7 @@
 #include "utils/common.h"
 #include "Value.h"
 #include "mtlx/mtlx_utils.h"
+#include "mtlx/mtlx_type_ostream_ops.h"
 #include "runtime/TypeInfo.h"
 
 class BasicValue final : public Value

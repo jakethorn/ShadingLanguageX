@@ -12,26 +12,34 @@ class ModifierList
 {
 public:
     ModifierList() = default;
-    explicit ModifierList(vector<string> mods);
+    explicit ModifierList(vector<TokenType> mods);
 
     template<typename... Args>
-    explicit ModifierList(Args&&... args)
+    explicit ModifierList(Args&&... mods)
     {
-        (add(std::forward<Args>(args)), ...);
+        (add(std::forward<Args>(mods)), ...);
     }
 
     template<typename... Args>
     void validate(const Args&... valid_mods) const
     {
-        for (const string& mod : mods_)
+        for (const TokenType& mod : mods_)
         {
-            if (not (... || (TokenType{valid_mods} == mod)))
-                throw_error("'" + mod + "' is not a valid modifier here");
+            if (not (... || (mod == valid_mods)))
+                throw_error("'" + mod.str() + "' is not a valid modifier here");
         }
     }
 
-    void add(string mod) { mods_.push_back(std::move(mod)); }
-    void add(const TokenType mod) { mods_.push_back(mod.str()); }
+    void add(const TokenType mod) { mods_.insert(mod); }
+    void remove(const TokenType mod) { mods_.erase(mod); }
+
+    template<typename... Args>
+    ModifierList without(Args&&... mods)
+    {
+        ModifierList list = *this;
+        (list.remove(std::forward<Args>(mods)), ...);
+        return list;
+    }
 
     bool contains(const TokenType mod) const { return ::contains(mods_, mod.str()); }
     size_t size() const { return mods_.size(); }
@@ -40,9 +48,9 @@ public:
     string str() const;
 
 private:
-    static void throw_error(const string& msg) ;
+    static void throw_error(const string& msg);
 
-    vector<string> mods_;
+    unordered_set<TokenType> mods_;
 };
 
 #endif //MXSLC_MODIFIERLIST_H

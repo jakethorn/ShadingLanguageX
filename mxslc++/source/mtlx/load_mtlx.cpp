@@ -69,8 +69,8 @@ namespace
         TypeInfoPtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
         ParameterList params = get_parameters(runtime, nd);
         vector<string> output_names = get_output_names(nd);
-        FuncPtr func = std::make_shared<Function>(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
-        func->init(runtime);
+        FuncPtr func = std::make_shared<Function>(runtime, std::move(mods), std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
+        func->init();
         return func;
     }
 }
