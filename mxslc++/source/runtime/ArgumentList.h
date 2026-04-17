@@ -30,9 +30,9 @@ public:
         return ::instantiate_template_types(args_, template_type);
     }
 
-    vector<ValuePtr> evaluate() const
+    vector<VarPtr2> evaluate() const
     {
-        vector<ValuePtr> values;
+        vector<VarPtr2> values;
         values.reserve(args_.size());
         for (const Argument& arg : args_)
             values.push_back(arg.evaluate());

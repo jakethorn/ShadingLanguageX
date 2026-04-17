@@ -4,12 +4,11 @@
 
 #include "DotExpression.h"
 
-#include "CompileError.h"
 #include "Identifier.h"
-#include "values/BasicValue.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/ChildVariable.h"
+#include "values/Value.h"
 
 ExprPtr DotExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -30,7 +29,7 @@ TypeInfoPtr DotExpression::type_impl() const
 VarPtr DotExpression::variable() const
 {
     if (expr_->variable())
-        return get_subvariable(expr_->variable(), property());
+        return get_child_variable(expr_->variable(), property());
     return nullptr;
 }
 

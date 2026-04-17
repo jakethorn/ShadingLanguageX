@@ -5,9 +5,10 @@
 #include "VariableAssignment.h"
 
 #include "expressions/Expression.h"
+#include "runtime/Variable2.h"
 
-VariableAssignment::VariableAssignment(const Runtime& runtime, Token token, ExprPtr lhs, ExprPtr rhs)
-    : Statement{runtime, std::move(token)}, lhs_{std::move(lhs)}, rhs_{std::move(rhs)}
+VariableAssignment::VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rhs_expr)
+    : Statement{std::move(token)}, lhs_expr_{std::move(lhs_expr)}, rhs_expr_{std::move(rhs_expr)}
 {
 
 }
@@ -16,15 +17,14 @@ VariableAssignment::~VariableAssignment() = default;
 
 StmtPtr VariableAssignment::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
-    ExprPtr lhs = lhs_->instantiate_template_types(template_type);
-    ExprPtr rhs = rhs_->instantiate_template_types(template_type);
-    return std::make_unique<VariableAssignment>(runtime_, token_, std::move(lhs), std::move(rhs));
+    ExprPtr lhs = lhs_expr_->instantiate_template_types(template_type);
+    ExprPtr rhs = rhs_expr_->instantiate_template_types(template_type);
+    return std::make_unique<VariableAssignment>(token_, std::move(lhs), std::move(rhs));
 }
 
 void VariableAssignment::execute_impl() const
 {
-    lhs_->init();
-    rhs_->init(lhs_->type());
-    const ValuePtr value = rhs_->evaluate();
-    lhs_->assign(value);
+    lhs_expr_->init();
+    rhs_expr_->init(lhs_expr_->type());
+    lhs_expr_->evaluate()->copy_value(rhs_expr_->evaluate());
 }

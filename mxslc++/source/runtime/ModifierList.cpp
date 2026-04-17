@@ -25,8 +25,3 @@ string ModifierList::str() const
         result += mod.str() + " ";
     return result;
 }
-
-void ModifierList::throw_error(const string& msg)
-{
-    throw CompileError{msg};
-}

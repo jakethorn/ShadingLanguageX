@@ -8,7 +8,7 @@
 #include "runtime/Runtime.h"
 #include "expressions/Expression.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "values/ValueFactory.h"
 
 FunctionDefinition::FunctionDefinition(

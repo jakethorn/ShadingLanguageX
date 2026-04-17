@@ -9,7 +9,7 @@
 #include "CompileError.h"
 #include "Runtime.h"
 #include "TypeInfo.h"
-#include "Variable.h"
+#include "variables/Variable.h"
 #include "statements/Statement.h"
 #include "expressions/Expression.h"
 #include "mtlx/mtlx_utils.h"
@@ -162,7 +162,7 @@ ValuePtr Function::evaluate_return() const
     }
 }
 
-void Function::add_nonlocal_input(const string& name, const VarPtr& var)
+void Function::add_nonlocal_input(const string& name, const ConstVarPtr& var)
 {
     nonlocal_inputs_[name] = var;
 }

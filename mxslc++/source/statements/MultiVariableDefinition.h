@@ -11,7 +11,7 @@
 class MultiVariableDefinition final : public Statement
 {
 public:
-    MultiVariableDefinition(const Runtime& runtime, Token token, TypeInfoPtr type, ExprPtr expr);
+    MultiVariableDefinition(Token token, TypeInfoPtr type, ExprPtr expr);
 
     StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 

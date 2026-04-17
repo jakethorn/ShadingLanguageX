@@ -12,9 +12,10 @@ class Parameter;
 class Argument
 {
 public:
-    Argument(ExprPtr expr, size_t index);
-    Argument(string name, ExprPtr expr, size_t index);
     Argument(bool is_out, string name, ExprPtr expr, size_t index);
+    Argument(bool is_out, ExprPtr expr, size_t index);
+    Argument(string name, ExprPtr expr, size_t index);
+    Argument(ExprPtr expr, size_t index);
 
     Argument(Argument&& other) noexcept;
 
@@ -32,7 +33,7 @@ public:
     bool try_init(const vector<TypeInfoPtr>& types) const;
     bool is_initialized() const;
     TypeInfoPtr type() const;
-    ValuePtr evaluate() const;
+    VarPtr2 evaluate() const;
 
     void validate(const Parameter& param) const;
 

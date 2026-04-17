@@ -11,8 +11,8 @@
 class UsingDeclaration final : public Statement
 {
 public:
-    UsingDeclaration(const Runtime& runtime, Token token, string name, TypeInfoPtr type)
-        : Statement{runtime, std::move(token)}, name_{std::move(name)}, type_{std::move(type)} { }
+    UsingDeclaration(Token token, string name, TypeInfoPtr type)
+        : Statement{std::move(token)}, name_{std::move(name)}, type_{std::move(type)} { }
 
     StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 

@@ -10,7 +10,7 @@
 class PrintStatement final : public Statement
 {
 public:
-    PrintStatement(const Runtime& runtime, Token token, vector<ExprPtr> exprs);
+    PrintStatement(Token token, vector<ExprPtr> exprs);
 
     StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 

@@ -13,7 +13,7 @@
 class VariableDefinition final : public Statement
 {
 public:
-    VariableDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr);
+    VariableDefinition(ModifierList mods, TypeInfoPtr type, Token name, ExprPtr expr);
     ~VariableDefinition() override;
 
     StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;

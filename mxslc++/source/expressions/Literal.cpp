@@ -4,6 +4,7 @@
 
 #include "Literal.h"
 #include "runtime/Runtime.h"
+#include "runtime/TypeInfo.h"
 #include "values/BasicValue.h"
 
 ExprPtr Literal::instantiate_template_types(const TypeInfoPtr& template_type) const

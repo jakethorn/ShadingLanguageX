@@ -5,25 +5,25 @@
 #include "Parameter.h"
 
 #include "CompileError.h"
+#include "Scope.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, const size_t index)
-    : Parameter{runtime, std::move(mods), std::move(type), std::move(name), nullptr, index}
+Parameter::Parameter(ModifierList mods, TypeInfoPtr type, string name, const size_t index)
+    : Parameter{std::move(mods), std::move(type), std::move(name), nullptr, index}
 {
 
 }
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, const size_t index)
-    : runtime_{runtime},
-    mods_{std::move(mods)},
+Parameter::Parameter(ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, const size_t index)
+    : mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     expr_{std::move(expr)},
     index_{index}
 {
-    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
+    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::In, TokenType::Out);
 
     if (mods_.contains(TokenType::Out))
         mods_.add(TokenType::Mutable);
@@ -36,8 +36,7 @@ Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type
 }
 
 Parameter::Parameter(Parameter&& other) noexcept
-    : runtime_{other.runtime_},
-    mods_{std::move(other.mods_)},
+    : mods_{std::move(other.mods_)},
     type_{std::move(other.type_)},
     name_{std::move(other.name_)},
     expr_{std::move(other.expr_)},
@@ -52,12 +51,12 @@ Parameter Parameter::instantiate_template_types(const TypeInfoPtr& template_type
 {
     TypeInfoPtr type = type_->instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
-    return Parameter{runtime_, mods_, std::move(type), name_, std::move(expr), index_};
+    return Parameter{mods_, std::move(type), name_, std::move(expr), index_};
 }
 
 void Parameter::init()
 {
-    type_ = runtime_.scope().resolve_type(type_);
+    type_ = Runtime::get().scope().resolve_type(type_);
 
     if (has_default_value())
         expr_->init(type());
@@ -68,7 +67,7 @@ TypeInfoPtr Parameter::type() const
     return type_;
 }
 
-ValuePtr Parameter::evaluate() const
+VarPtr2 Parameter::evaluate() const
 {
     return expr_->evaluate();
 }

@@ -10,14 +10,13 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable.h"
-#include "utils/str_utils.h"
+#include "runtime/Scope.h"
+#include "runtime/Variable2.h"
 
 #define TRY_START try {
 #define TRY_END } catch (const CompileError& e) { throw CompileError{token_, e}; }
 
-Expression::Expression(const Runtime& runtime) : runtime_{runtime} { }
-Expression::Expression(const Runtime& runtime, Token token) : runtime_{runtime}, token_{std::move(token)} { }
+Expression::Expression(Token token) : token_{std::move(token)} { }
 
 void Expression::init()
 {
@@ -31,7 +30,7 @@ void Expression::init(const TypeInfoPtr& type)
 
 void Expression::init(const string& type_name)
 {
-    const TypeInfoPtr type = runtime_.scope().get_type(type_name);
+    const TypeInfoPtr type = scope().get_type(type_name);
     init(type);
 }
 
@@ -80,7 +79,7 @@ TypeInfoPtr Expression::type() const
     TRY_END
 }
 
-ValuePtr Expression::evaluate() const
+VarPtr2 Expression::evaluate() const
 {
     TRY_START
 
@@ -90,24 +89,9 @@ ValuePtr Expression::evaluate() const
     TRY_END
 }
 
-void Expression::assign(const ValuePtr& value)
+Scope& Expression::scope()
 {
-    TRY_START
-
-    if (const VarPtr var = variable(); var != nullptr and (var->is_const() or not var->is_mutable()))
-    {
-        throw CompileError{"Const variable '" + var->name() + "' cannot be changed (use mutable modifier)"};
-    }
-
-    assert(is_initialized_);
-    assign_impl(value);
-
-    TRY_END
-}
-
-void Expression::assign_impl(const ValuePtr& value)
-{
-    throw CompileError{"This expression cannot be assigned to"s};
+    return Runtime::get().scope();
 }
 
 #undef TRY_START

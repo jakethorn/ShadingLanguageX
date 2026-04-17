@@ -13,10 +13,12 @@
 #include "InterfaceValue.h"
 #include "NodeValue.h"
 #include "StructValue.h"
+#include "OutputValue.h"
 #include "mtlx/mtlx_utils.h"
-#include "runtime/Variable.h"
+#include "runtime/TypeInfo.h"
+#include "runtime/Variable2.h"
 
-ValuePtr ValueFactory::create_interface_value(TypeInfoPtr type, const string& name)
+VarPtr2 ValueFactory::create_interface_value(TypeInfoPtr type, const string& name)
 {
     if (type->has_fields())
     {
@@ -31,19 +33,14 @@ ValuePtr ValueFactory::create_interface_value(TypeInfoPtr type, const string& na
     }
     else
     {
-        return std::make_shared<InterfaceValue>(name, std::move(type));
+        ValuePtr value = std::make_shared<InterfaceValue>(std::move(type), name);
+        return std::make_shared<Variable2>(std::move(value));
     }
 }
 
-ValuePtr ValueFactory::create_interface_value(const Parameter& param)
+VarPtr2 ValueFactory::create_interface_value(const Parameter& param)
 {
     return create_interface_value(param.type(), param.name());
-}
-
-ValuePtr ValueFactory::create_interface_value(const VarPtr& var)
-{
-    const string output_name = "nonlocal_in__" + var->name();
-    return create_interface_value(var->type(), output_name);
 }
 
 ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)
@@ -137,7 +134,7 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 
     if (port->hasInterfaceName())
     {
-        return create_interface_value(std::move(type), port->getInterfaceName());
+        return create_interface_value(port->getAncestorOfType<mx::NodeGraph>(), std::move(type), port->getInterfaceName());
     }
 
     if (port->hasNodeName())
@@ -185,4 +182,19 @@ ValuePtr ValueFactory::cast_value(ValuePtr value, TypeInfoPtr type)
         return value;
     else
         return std::make_shared<CastValue>(std::move(value), std::move(type));
+}
+
+ValuePtr ValueFactory::create_empty_value(TypeInfoPtr type)
+{
+    if (type->has_fields())
+    {
+        vector<ValuePtr> subvalues;
+        subvalues.reserve(type->field_count());
+        for (size_t i = 0; i < type->field_count(); ++i)
+            subvalues.push_back(create_empty_value(type->field_type(i)));
+
+        return std::make_shared<StructValue>(std::move(subvalues), std::move(type));
+    }
+
+    return nullptr;
 }

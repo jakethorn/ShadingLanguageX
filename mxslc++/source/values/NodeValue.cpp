@@ -4,16 +4,26 @@
 
 #include "NodeValue.h"
 
-#include "CompileError.h"
+#include "mtlx/mtlx_utils.h"
 
-ValuePtr NodeValue::subvalue(const size_t i) const
+NodeValue::NodeValue(mx::NodePtr node, TypeInfoPtr type)
+    : Value{std::move(type)}, node_{std::move(node)}
 {
-    size_t j = 0;
-    for (const mx::OutputPtr& output : node_->getOutputs())
-    {
-        if (i == j++)
-            return std::make_shared<OutputValue>(output, type_->field_type(i));
-    }
 
-    throw CompileError{"Trying to access multiple outputs from a node (" + node_->getName() + ") that only has one output"};
+}
+
+void NodeValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
+{
+    node->setConnectedNode(input_name, node_);
+}
+
+void NodeValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
+{
+    const mx::OutputPtr output = add_or_get_output(node_graph, type_, output_name);
+    output->setConnectedNode(node_);
+}
+
+string NodeValue::str() const
+{
+    return as_string(node_);
 }

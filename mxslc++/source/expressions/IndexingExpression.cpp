@@ -8,7 +8,7 @@
 #include "values/BasicValue.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/ChildVariable.h"
 
 ExprPtr IndexingExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -40,7 +40,7 @@ TypeInfoPtr IndexingExpression::type_impl() const
 VarPtr IndexingExpression::variable() const
 {
     if (expr_->variable())
-        return get_subvariable(expr_->variable(), index_);
+        return get_child_variable(expr_->variable(), index_);
     return nullptr;
 }
 

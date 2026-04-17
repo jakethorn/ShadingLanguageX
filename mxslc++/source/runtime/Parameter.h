@@ -13,8 +13,8 @@ class Runtime;
 class Parameter
 {
 public:
-    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, size_t index);
-    Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, size_t index);
+    Parameter(ModifierList mods, TypeInfoPtr type, string name, size_t index);
+    Parameter(ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, size_t index);
 
     Parameter(Parameter&&) noexcept;
 
@@ -23,6 +23,7 @@ public:
     const ModifierList& modifiers() const { return mods_; }
     bool is_const() const { return mods_.contains(TokenType::Const); }
     bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
+    bool is_in() const { return mods_.contains(TokenType::In) or not is_out(); }
     bool is_out() const { return mods_.contains(TokenType::Out); }
     const string& name() const { return name_; }
     size_t index() const { return index_; }
@@ -32,12 +33,11 @@ public:
     TypeInfoPtr type() const;
 
     bool has_default_value() const { return expr_ != nullptr; }
-    ValuePtr evaluate() const;
+    VarPtr2 evaluate() const;
 
     string str() const;
 
 private:
-    const Runtime& runtime_;
     ModifierList mods_;
     TypeInfoPtr type_;
     string name_;

@@ -5,6 +5,7 @@
 #include "Statement.h"
 
 #include "CompileError.h"
+#include "runtime/Runtime.h"
 
 void Statement::execute() const
 {
@@ -16,4 +17,9 @@ void Statement::execute() const
     {
         throw CompileError{token_, e};
     }
+}
+
+Runtime& Statement::runtime()
+{
+    return Runtime::get();
 }

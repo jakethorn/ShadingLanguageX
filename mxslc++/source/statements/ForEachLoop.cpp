@@ -10,12 +10,15 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable.h"
+#include "../runtime/variables/Variable.h"
+#include "runtime/Scope.h"
+#include "runtime/Variable2.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
-ForEachLoop::ForEachLoop(const Runtime& runtime, Token token, TypeInfoPtr type, string name, ExprPtr iter_expr, StmtPtr body)
-    : Statement{runtime, std::move(token)},
+ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypeInfoPtr type, string name, ExprPtr iter_expr, StmtPtr body)
+    : Statement{std::move(token)},
+    mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     iter_expr_{std::move(iter_expr)},
@@ -29,28 +32,28 @@ StmtPtr ForEachLoop::instantiate_template_types(const TypeInfoPtr& template_type
     TypeInfoPtr type = type_->instantiate_template_types(template_type);
     ExprPtr iter_expr = ::instantiate_template_types(iter_expr_, template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
-    return std::make_unique<ForEachLoop>(runtime_, token_, std::move(type), name_, std::move(iter_expr), std::move(body));
+    return std::make_unique<ForEachLoop>(token_, mods_, std::move(type), name_, std::move(iter_expr), std::move(body));
 }
 
 void ForEachLoop::execute_impl() const
 {
-    const TypeInfoPtr type = runtime_.scope().resolve_type(type_);
-    iter_expr_->init();
+    const TypeInfoPtr type = runtime().scope().resolve_type(type_);
 
+    iter_expr_->init();
     if (not iter_expr_->type()->has_fields())
         throw CompileError{"Value not iterable"s};
+    const VarPtr2 iter_value = iter_expr_->evaluate();
 
-    const ValuePtr iter_val = iter_expr_->evaluate();
-    for (size_t i = 0; i < iter_val->subvalue_count(); i++)
+    for (size_t i = 0; i < iter_value->child_count(); i++)
     {
-        ValuePtr subvalue = iter_val->subvalue(i);
-        if (not subvalue->type()->is_equal(type))
+        VarPtr2 next_value = iter_value->child(i);
+        if (not next_value->type()->is_compatible(type))
             throw CompileError{"Field value does not match loop iterator type"s};
 
-        runtime_.enter_inline_scope();
-        VarPtr var = std::make_shared<Variable>(ModifierList{}, name_, subvalue);
-        runtime_.scope().add_variable(std::move(var));
+        runtime().enter_inline_scope();
+        VarPtr2 var = std::make_shared<Variable2>(mods_, type, name_, next_value);
+        runtime().scope().add_variable(std::move(var));
         body_->execute();
-        runtime_.exit_scope();
+        runtime().exit_scope();
     }
 }

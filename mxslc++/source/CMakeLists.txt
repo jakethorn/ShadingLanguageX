@@ -5,18 +5,25 @@ add_library(mxslc_lib
         parse.cpp
         compile.cpp
         CompileError.cpp
+        runtime/Runtime.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
         runtime/Function.cpp
+        runtime/Function2.cpp
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
-        runtime/Variable.cpp
         runtime/TypeInfo.cpp
         runtime/FieldInfo.cpp
         runtime/ModifierList.cpp
+        runtime/variables/IVariable.cpp
+        runtime/variables/Variable.cpp
+        runtime/variables/ChildVariable.cpp
+        runtime/variables/InVariable.cpp
+        runtime/Variable2.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
+        expressions/FunctionCall2.cpp
         expressions/Identifier.cpp
         expressions/Literal.cpp
         expressions/ExpressionFactory.cpp
@@ -29,6 +36,7 @@ add_library(mxslc_lib
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
         statements/FunctionDefinition.cpp
+        statements/FunctionDefinition2.cpp
         statements/MultiVariableDefinition.cpp
         statements/UsingDeclaration.cpp
         statements/VariableAssignment.cpp
@@ -49,6 +57,9 @@ add_library(mxslc_lib
         values/Value.cpp
         values/ValueFactory.cpp
         values/NodeValue.cpp
+        values/InterfaceValue.cpp
+        values/OutputValue.cpp
+        values/BasicValue.cpp
 )
 
 target_include_directories(mxslc_lib

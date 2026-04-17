@@ -22,7 +22,21 @@ string port_name(const string& port_name, const size_t i)
     return port_name + "__" + str(i);
 }
 
-mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const string& name, const TypeInfoPtr& type)
+void add_input(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
+{
+    if (type->has_fields())
+    {
+        for (size_t i = 0; i < type->field_count(); ++i)
+            add_input(node_def, type->field_type(i), port_name(name, i));
+    }
+    else
+    {
+        if (node_def->getInput(name) == nullptr)
+            node_def->addInput(name, type->name());
+    }
+}
+
+mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const TypeInfoPtr& type, const string& name)
 {
     mx::NodeDefPtr node_def = node_graph->getNodeDef();
     if (node_def->getOutput(name) == nullptr)

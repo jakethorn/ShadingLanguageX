@@ -5,7 +5,7 @@
 #include "VariableDefinitionExpression.h"
 
 #include "Identifier.h"
-#include "runtime/Variable.h"
+#include "../runtime/variables/Variable.h"
 #include "statements/VariableDefinition.h"
 
 VariableDefinitionExpression::VariableDefinitionExpression(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name)

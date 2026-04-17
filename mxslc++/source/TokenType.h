@@ -64,6 +64,7 @@ public:
         Return,
         Auto,
         Null,
+        In,
         Out,
         Const,
         Mutable,
@@ -106,7 +107,7 @@ public:
     };
 
     inline static const unordered_set Keywords {
-        If, Else, Switch, For, Return, Auto, Null, Out, Const, Mutable, Consteval, Global, Inline, Default,
+        If, Else, Switch, For, Return, Auto, Null, In, Out, Const, Mutable, Consteval, Global, Inline, Default,
         Function, Typedef, Using, Struct, Uniform, Varying, Namespace, Print, Break
     };
 
@@ -135,6 +136,7 @@ private:
         {"return", Return},
         {"auto", Auto},
         {"null", Null},
+        {"in", In},
         {"out", Out},
         {"const", Const},
         {"mutable", Mutable},

@@ -4,8 +4,9 @@
 
 #include "evaluate_mtlx.h"
 
-#include "values/BasicValue.h"
+#include "runtime/TypeInfo.h"
 #include "values/Value.h"
+#include "values/BasicValue.h"
 
 /*
 

@@ -5,10 +5,11 @@
 #include <iostream>
 #include "PrintStatement.h"
 #include "expressions/Expression.h"
+#include "runtime/Variable2.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
-PrintStatement::PrintStatement(const Runtime& runtime, Token token, vector<ExprPtr> exprs) : Statement{runtime, std::move(token)}, exprs_{std::move(exprs)}
+PrintStatement::PrintStatement(Token token, vector<ExprPtr> exprs) : Statement{std::move(token)}, exprs_{std::move(exprs)}
 {
 
 }
@@ -16,7 +17,7 @@ PrintStatement::PrintStatement(const Runtime& runtime, Token token, vector<ExprP
 StmtPtr PrintStatement::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     vector<ExprPtr> exprs = ::instantiate_template_types(exprs_, template_type);
-    return std::make_unique<PrintStatement>(runtime_, token_, std::move(exprs));
+    return std::make_unique<PrintStatement>(token_, std::move(exprs));
 }
 
 void PrintStatement::execute_impl() const
@@ -25,7 +26,7 @@ void PrintStatement::execute_impl() const
     for (const ExprPtr& expr : exprs_)
     {
         expr->init();
-        const ValuePtr value = expr->evaluate();
-        std::cout << value->str() << std::endl;
+        const VarPtr2 var = expr->evaluate();
+        std::cout << var->str() << std::endl;
     }
 }

@@ -60,10 +60,10 @@ public:
     const vector<string>& output_names() const { return output_names_; }
     const string& output_name(const size_t i) const { return output_names_.at(i); }
 
-    void add_nonlocal_input(const string& name, const VarPtr& var);
+    void add_nonlocal_input(const string& name, const ConstVarPtr& var);
     void add_nonlocal_output(const string& name, const VarPtr& var);
 
-    const unordered_map<string, VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
+    const unordered_map<string, ConstVarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
     const unordered_map<string, VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
 
     string nonlocal_name(const Parameter& param) const;
@@ -85,7 +85,7 @@ private:
     bool is_initialized_ = false;
 
     vector<string> output_names_;
-    unordered_map<string, VarPtr> nonlocal_inputs_;
+    unordered_map<string, ConstVarPtr> nonlocal_inputs_;
     unordered_map<string, VarPtr> nonlocal_outputs_;
 };
 

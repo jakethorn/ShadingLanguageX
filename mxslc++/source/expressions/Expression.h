@@ -13,11 +13,14 @@ class Runtime;
 class Expression
 {
 public:
-    explicit Expression(const Runtime& runtime);
-    Expression(const Runtime& runtime, Token token);
+    Expression() = default;
+    explicit Expression(Token token);
+
     virtual ~Expression() = default;
 
     const Token& token() const { return token_; }
+
+    virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
 
     void init();
     void init(const TypeInfoPtr& type);
@@ -27,24 +30,20 @@ public:
 
     bool is_initialized() const { return is_initialized_; }
     TypeInfoPtr type() const;
-    virtual VarPtr variable() const { return nullptr; }
 
-    virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
-
-    ValuePtr evaluate() const;
-    void assign(const ValuePtr& value);
+    VarPtr2 evaluate() const;
 
 protected:
     virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
     virtual void init_impl(const vector<TypeInfoPtr>& types) { }
     virtual TypeInfoPtr type_impl() const = 0;
-    virtual ValuePtr evaluate_impl() const = 0;
-    virtual void assign_impl(const ValuePtr& value);
+    virtual VarPtr2 evaluate_impl() const = 0;
 
-    const Runtime& runtime_;
+    static Scope& scope();
+
     Token token_;
-    TypeInfoPtr assigned_type_ = nullptr;
     bool is_initialized_ = false;
+    TypeInfoPtr assigned_type_ = nullptr;
 };
 
 #endif //FENNEC_EXPRESSION_H

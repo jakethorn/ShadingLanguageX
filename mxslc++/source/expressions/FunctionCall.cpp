@@ -13,7 +13,7 @@
 #include "statements/Statement.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable.h"
+#include "../runtime/variables/Variable.h"
 #include "utils/error_utils.h"
 
 ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_type) const
