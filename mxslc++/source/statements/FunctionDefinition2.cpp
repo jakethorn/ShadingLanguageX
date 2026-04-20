@@ -71,7 +71,7 @@ void FunctionDefinition2::execute_impl() const
     }
 }
 
-void FunctionDefinition2::write_function_definition(const FuncPtr2& func) const
+void FunctionDefinition2::write_function_definition(const FuncPtr2& func)
 {
     runtime().enter_scope();
     runtime().serializer().write_node_def_graph(func);

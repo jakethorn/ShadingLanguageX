@@ -35,11 +35,13 @@ public:
     void add_variable(VarPtr2 var);
     //void add_variable(string name, ValuePtr value);
     //void add_variable(ModifierList mods, string name, ValuePtr value);
-    void add_reference(string name, VarPtr2 var);
+    void add_variable(string name, VarPtr2 var);
     //void add_reference(string ref_name, const string& var_name);
     VarPtr2 get_variable(const string& name) const;
     //bool is_variable_inline(const ConstVarPtr& var) const;
     //bool is_variable_inline(const string& name) const;
+    bool is_variable_nonlocal(const VarPtr2& var) const;
+    bool is_variable_nonlocal(const string& name) const;
 
     /*
      * functions

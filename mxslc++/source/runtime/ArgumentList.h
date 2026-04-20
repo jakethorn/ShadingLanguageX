@@ -30,6 +30,7 @@ public:
         return ::instantiate_template_types(args_, template_type);
     }
 
+    VarPtr2 evaluate(const Parameter& param) const;
     vector<VarPtr2> evaluate() const
     {
         vector<VarPtr2> values;

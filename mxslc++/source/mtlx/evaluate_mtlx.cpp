@@ -4,22 +4,22 @@
 
 #include "evaluate_mtlx.h"
 
+#include "runtime/ArgumentList.h"
+#include "runtime/Function2.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable2.h"
 #include "values/Value.h"
 #include "values/BasicValue.h"
 
-/*
-
-
 #define BINARY_OP(ltype, op, rtype) \
     if (values[0]->is<ltype>() && values[1]->is<rtype>()) \
-        return std::make_shared<BasicValue>(values[0]->get<ltype>() op values[1]->get<rtype>());
+        return std::make_shared<Variable2>(std::make_shared<BasicValue>(values[0]->get<ltype>() op values[1]->get<rtype>()));
 
 namespace
 {
     using BasicValues = vector<shared_ptr<BasicValue>>;
 
-    ValuePtr evaluate_add(const BasicValues& values)
+    VarPtr2 evaluate_add(const BasicValues& values)
     {
         BINARY_OP(int, +, int)
         BINARY_OP(int, +, float)
@@ -28,18 +28,18 @@ namespace
         return nullptr;
     }
 
-    unordered_map<string, std::function<ValuePtr(const BasicValues&)>> constexpr_funcs {
+    unordered_map<string, std::function<VarPtr2(const BasicValues&)>> constexpr_funcs {
         {"add"s, evaluate_add}
     };
 
-    bool is_constexpr(const FuncPtr& func, const vector<ValuePtr>& args, BasicValues& values)
+    bool is_constexpr(const string& node_name, const vector<VarPtr2>& args, BasicValues& values)
     {
-        if (not contains(constexpr_funcs, func->name()))
+        if (not contains(constexpr_funcs, node_name))
             return false;
 
-        for (const ValuePtr& arg : args)
+        for (const VarPtr2& arg : args)
         {
-            if (shared_ptr<BasicValue> value = std::dynamic_pointer_cast<BasicValue>(arg))
+            if (shared_ptr<BasicValue> value = std::dynamic_pointer_cast<BasicValue>(arg->value()))
                 values.push_back(value);
             else
                 return false;
@@ -47,54 +47,16 @@ namespace
 
         return true;
     }
+}
 
-    ValuePtr evaluate_constexpr(const FuncPtr& func, const vector<ValuePtr>& args)
-    {
-        if (BasicValues basic_values; is_constexpr(func, args, basic_values))
-            if (ValuePtr value = constexpr_funcs.at(func->name())(basic_values))
-                return value;
-        return nullptr;
-    }
+VarPtr2 evaluate_now(const string& node_name, const ArgumentList& args)
+{
+    const vector<VarPtr2> values = args.evaluate();
+
+    if (BasicValues basic_values; is_constexpr(node_name, values, basic_values))
+        if (VarPtr2 value = constexpr_funcs.at(node_name)(basic_values))
+            return value;
+    return nullptr;
 }
 
 #undef BINARY_OP
-
-
-*/
-
-ValuePtr evaluate_now(const string& node_name, const unordered_map<string, ValuePtr>& inputs)
-{
-    if (node_name != "add"s)
-        return nullptr;
-
-    for (const auto& [input_name, value] : inputs)
-    {
-        if (not value->is_basic())
-            return nullptr;
-    }
-
-    const ValuePtr in1 = inputs.at("in1"s);
-    const ValuePtr in2 = inputs.at("in2"s);
-
-    if (in1->type() == TypeInfo::Int and in2->type() == TypeInfo::Int)
-    {
-        return std::make_shared<BasicValue>(in1->as_int() + in2->as_int());
-    }
-
-    if (in1->type() == TypeInfo::Int and in2->type() == TypeInfo::Float)
-    {
-        return std::make_shared<BasicValue>(static_cast<float>(in1->as_int()) + in2->as_float());
-    }
-
-    if (in1->type() == TypeInfo::Float and in2->type() == TypeInfo::Int)
-    {
-        return std::make_shared<BasicValue>(in1->as_float() + static_cast<float>(in2->as_int()));
-    }
-
-    if (in1->type() == TypeInfo::Float and in2->type() == TypeInfo::Float)
-    {
-        return std::make_shared<BasicValue>(in1->as_float() + in2->as_float());
-    }
-
-    return nullptr;
-}

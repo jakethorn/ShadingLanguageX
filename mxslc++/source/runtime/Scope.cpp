@@ -25,10 +25,8 @@ Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}
 
 void Scope::add_variable(VarPtr2 var)
 {
-    if (contains(variables_, var->name()))
-        throw CompileError{"Variable already defined: " + var->name()};
-
-    variables_.emplace(var->name(), std::move(var));
+    assert(not var->name().empty());
+    add_variable(var->name(), std::move(var));
 }
 
 //void Scope::add_variable(string name, ValuePtr value)
@@ -41,11 +39,12 @@ void Scope::add_variable(VarPtr2 var)
 //    add_variable(std::make_shared<Variable>(std::move(mods), std::move(name), std::move(value)));
 //}
 
-void Scope::add_reference(string name, VarPtr2 var)
+void Scope::add_variable(string name, VarPtr2 var)
 {
     if (contains(variables_, name))
         throw CompileError{"Variable already defined: " + name};
 
+    var->set_name(name);
     variables_.emplace(std::move(name), std::move(var));
 }
 
@@ -61,6 +60,27 @@ VarPtr2 Scope::get_variable(const string& name) const
 
     if (parent_)
         return parent_->get_variable(name);
+
+    throw CompileError{"Variable not defined: " + name};
+}
+
+bool Scope::is_variable_nonlocal(const VarPtr2& var) const
+{
+    assert(not var->name().empty());
+    return is_variable_nonlocal(var->name());
+}
+
+bool Scope::is_variable_nonlocal(const string& name) const
+{
+    if (contains(variables_, name))
+    {
+        return false;
+    }
+
+    if (parent_)
+    {
+        return parent_->is_variable_nonlocal(name) or not is_inline_;
+    }
 
     throw CompileError{"Variable not defined: " + name};
 }

@@ -38,13 +38,14 @@ public:
     bool is_inline() const { return mods_.contains(TokenType::Inline); }
     bool is_default() const { return mods_.contains(TokenType::Default); }
     TypeInfoPtr type() const { return type_; }
-    //bool is_void() const;
+    bool is_void() const;
     const string& name() const { return name_; }
     bool has_template_type() const { return template_type_ != nullptr; }
     TypeInfoPtr template_type() const { return template_type_; }
     size_t min_arity() const;
     size_t max_arity() const { return params_.size(); }
     const ParameterList& parameters() const { return params_; }
+    mx::NodeDefPtr node_def() const { return node_def_; }
     //bool has_body() const { return body_ != nullptr; }
     //const StmtPtr& body() const { return body_; }
     //const ExprPtr& return_expr() const { return return_expr_; }

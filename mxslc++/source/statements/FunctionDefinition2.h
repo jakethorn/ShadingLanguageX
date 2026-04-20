@@ -22,7 +22,8 @@ protected:
 private:
     const string& name() const { return token_.lexeme(); }
     bool is_templated() const { return not template_types_.empty(); }
-    void write_function_definition(const FuncPtr2& func) const;
+
+    static void write_function_definition(const FuncPtr2& func);
 
     ModifierList mods_;
     TypeInfoPtr type_;

@@ -35,7 +35,7 @@ public:
     void remove(const TokenType mod) { mods_.erase(mod); }
 
     template<typename... Args>
-    ModifierList without(Args&&... mods)
+    ModifierList without(Args&&... mods) const
     {
         ModifierList list = *this;
         (list.remove(std::forward<Args>(mods)), ...);
