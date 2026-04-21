@@ -50,15 +50,15 @@ using ValuePtr = shared_ptr<Value>;
 class Scope;
 using ScopePtr = unique_ptr<Scope>;
 
-class IVariable;
-using VarPtr = shared_ptr<IVariable>;
-using ConstVarPtr = shared_ptr<const IVariable>;
+//class IVariable;
+//using VarPtr = shared_ptr<IVariable>;
+//using ConstVarPtr = shared_ptr<const IVariable>;
 
 class Variable2;
 using VarPtr2 = shared_ptr<Variable2>;
 
-class Function;
-using FuncPtr = shared_ptr<Function>;
+//class Function;
+//using FuncPtr = shared_ptr<Function>;
 
 class Function2;
 using FuncPtr2 = shared_ptr<Function2>;

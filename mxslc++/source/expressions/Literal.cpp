@@ -4,7 +4,9 @@
 
 #include "Literal.h"
 #include "runtime/Runtime.h"
+#include "runtime/Scope.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable2.h"
 #include "values/BasicValue.h"
 
 ExprPtr Literal::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -46,5 +48,6 @@ TypeInfoPtr Literal::type_impl() const
 
 VarPtr2 Literal::evaluate_impl() const
 {
-    return std::make_shared<BasicValue>(value_, type_);
+    ValuePtr value = std::make_shared<BasicValue>(value_, type_);
+    return std::make_shared<Variable2>(value);
 }

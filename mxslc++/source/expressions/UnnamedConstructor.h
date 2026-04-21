@@ -10,15 +10,15 @@
 class UnnamedConstructor final : public Expression
 {
 public:
-    UnnamedConstructor(const Runtime& runtime, Token token, vector<ExprPtr> exprs)
-        : Expression{runtime, std::move(token)}, exprs_{std::move(exprs)} { }
+    UnnamedConstructor(Token token, vector<ExprPtr> exprs)
+        : Expression{std::move(token)}, exprs_{std::move(exprs)} { }
 
     ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_subexpressions(const vector<TypeInfoPtr>& types) override;
     TypeInfoPtr type_impl() const override;
-    ValuePtr evaluate_impl() const override;
+    VarPtr2 evaluate_impl() const override;
 
 private:
     bool expressions_are_initialized();

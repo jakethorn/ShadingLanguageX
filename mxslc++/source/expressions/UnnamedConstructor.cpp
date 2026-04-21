@@ -6,15 +6,16 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
+#include "runtime/Scope.h"
 #include "runtime/TypeInfo.h"
-#include "values/StructValue.h"
+#include "runtime/Variable2.h"
 
 ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     vector<ExprPtr> instantiated;
     for (const ExprPtr& expr : exprs_)
         instantiated.push_back(expr->instantiate_template_types(template_type));
-    return std::make_unique<UnnamedConstructor>(runtime_, token_, std::move(instantiated));
+    return std::make_unique<UnnamedConstructor>(token_, std::move(instantiated));
 }
 
 void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
@@ -45,16 +46,16 @@ TypeInfoPtr UnnamedConstructor::type_impl() const
     for (const ExprPtr& expr : exprs_)
         types.push_back(expr->type());
     const TypeInfoPtr type = std::make_shared<TypeInfo>(std::move(types));
-    return runtime_.scope().resolve_type(type);
+    return scope().resolve_type(type);
 }
 
-ValuePtr UnnamedConstructor::evaluate_impl() const
+VarPtr2 UnnamedConstructor::evaluate_impl() const
 {
-    vector<ValuePtr> values;
+    vector<VarPtr2> values;
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-    return std::make_shared<StructValue>(std::move(values), type());
+    return std::make_shared<Variable2>(type(), std::move(values));
 }
 
 bool UnnamedConstructor::expressions_are_initialized()

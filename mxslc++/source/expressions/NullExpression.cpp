@@ -5,11 +5,12 @@
 #include "NullExpression.h"
 
 #include "CompileError.h"
+#include "runtime/Variable2.h"
 #include "values/NullValue.h"
 
 ExprPtr NullExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
-    return std::make_unique<NullExpression>(runtime_, token_);
+    return std::make_unique<NullExpression>(token_);
 }
 
 void NullExpression::init_impl(const vector<TypeInfoPtr>& types)
@@ -24,7 +25,8 @@ TypeInfoPtr NullExpression::type_impl() const
     return type_;
 }
 
-ValuePtr NullExpression::evaluate_impl() const
+VarPtr2 NullExpression::evaluate_impl() const
 {
-    return std::make_shared<NullValue>(type_);
+    ValuePtr value = std::make_shared<NullValue>(type_);
+    return std::make_shared<Variable2>(value);
 }

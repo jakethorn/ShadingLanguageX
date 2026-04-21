@@ -189,13 +189,6 @@ string TypeInfo::str() const
     return result;
 }
 
-TypeInfoPtr TypeInfo::resolved_void()
-{
-    TypeInfoPtr type = std::make_shared<TypeInfo>(Void);
-    type->set_resolved();
-    return type;
-}
-
 string TypeInfo::to_string(const vector<TypeInfoPtr>& types)
 {
     if (types.empty())

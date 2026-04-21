@@ -6,6 +6,7 @@
 #define FENNEC_TEMPLATE_UTILS_H
 
 #include <algorithm>
+
 #include "utils/common.h"
 
 template<typename Dst, typename Src>

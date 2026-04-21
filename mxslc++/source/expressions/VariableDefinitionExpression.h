@@ -11,18 +11,15 @@
 class VariableDefinitionExpression final : public Expression
 {
 public:
-    VariableDefinitionExpression(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name);
-    VariableDefinitionExpression(const Runtime& runtime, StmtPtr var_def, ExprPtr identifier);
-
-    VarPtr variable() const override { return identifier_->variable(); }
+    VariableDefinitionExpression(ModifierList mods, TypeInfoPtr type, Token name);
+    VariableDefinitionExpression(StmtPtr var_def, ExprPtr identifier);
 
     ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_impl(const vector<TypeInfoPtr>& types) override;
     TypeInfoPtr type_impl() const override;
-    ValuePtr evaluate_impl() const override;
-    void assign_impl(const ValuePtr& value) override;
+    VarPtr2 evaluate_impl() const override;
 
 private:
     const string& name() const { return token_.lexeme(); }

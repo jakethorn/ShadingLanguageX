@@ -77,7 +77,6 @@ public:
     bool operator==(const string& other) const { return name_ == other; }
     bool operator!=(const string& other) const { return not (*this == other); }
 
-    static TypeInfoPtr resolved_void();
     static string to_string(const vector<TypeInfoPtr>& types);
 
     inline static string Bool = "boolean"s;

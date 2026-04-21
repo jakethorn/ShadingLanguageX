@@ -6,6 +6,7 @@
 #define FENNEC_MTLXSERIALIZER_H
 
 #include <MaterialXCore/Document.h>
+
 #include "utils/common.h"
 
 class ArgumentList;

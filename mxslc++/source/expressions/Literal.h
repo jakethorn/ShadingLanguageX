@@ -11,7 +11,7 @@
 class Literal final : public Expression
 {
 public:
-    Literal(Token token) : Expression{token}, value_{token.literal()} { }
+    explicit Literal(Token token) : Expression{token}, value_{token.literal()} { }
 
     ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 

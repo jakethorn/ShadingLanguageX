@@ -46,10 +46,9 @@ public:
     size_t max_arity() const { return params_.size(); }
     const ParameterList& parameters() const { return params_; }
     mx::NodeDefPtr node_def() const { return node_def_; }
-    //bool has_body() const { return body_ != nullptr; }
-    //const StmtPtr& body() const { return body_; }
-    //const ExprPtr& return_expr() const { return return_expr_; }
     bool is_initialized() const { return is_initialized_; }
+
+    void set_node_def(mx::NodeDefPtr node_def);
 
     void init();
 
@@ -64,8 +63,6 @@ public:
     string str() const;
 
 private:
-    //VarPtr2 evaluate_return() const;
-
     ModifierList mods_;
     TypeInfoPtr type_;
     string name_;
@@ -76,7 +73,6 @@ private:
     mx::NodeDefPtr node_def_ = nullptr;
     bool is_initialized_ = false;
 
-    vector<string> output_names_;
     unordered_map<string, VarPtr2> nonlocal_inputs_;
     unordered_map<string, VarPtr2> nonlocal_outputs_;
 };
