@@ -7,6 +7,7 @@
 #include "Identifier.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable2.h"
 #include "runtime/variables/ChildVariable.h"
 #include "values/Value.h"
 
@@ -28,6 +29,6 @@ TypeInfoPtr DotExpression::type_impl() const
 
 VarPtr2 DotExpression::evaluate_impl() const
 {
-    VarPtr2 var = expr_->evaluate();
+    const VarPtr2 var = expr_->evaluate();
     return var->child(property());
 }

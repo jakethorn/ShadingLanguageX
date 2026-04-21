@@ -31,7 +31,7 @@ void MultiVariableDefinition::execute_impl() const
     for (size_t i = 0; i < value->child_count(); ++i)
     {
         VarPtr2 child_value = value->child(i);
-        VarPtr2 var = std::make_shared<Variable2>(type->field(i).modifiers(), type->field_type(i), type->field_name(i), child_value);
-        runtime().scope().add_variable(std::move(var));
+        VarPtr2 var = std::make_shared<Variable2>(type->field(i).modifiers(), type->field_type(i), child_value);
+        runtime().scope().add_variable(type->field_name(i), std::move(var));
     }
 }

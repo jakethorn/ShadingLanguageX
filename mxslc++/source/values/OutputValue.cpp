@@ -12,7 +12,10 @@ OutputValue::OutputValue(const mx::NodePtr& node, const string& output_name, Typ
 {
     output_ = node->getOutput(output_name);
     if (output_ == nullptr)
-        output_ = node->addOutput(output_name, type_->name());
+    {
+        const string& type_name = type_ == TypeInfo::Void ? TypeInfo::Int : type_->name();
+        output_ = node->addOutput(output_name, type_name);
+    }
 }
 
 void OutputValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const

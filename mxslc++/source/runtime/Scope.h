@@ -40,8 +40,8 @@ public:
     VarPtr2 get_variable(const string& name) const;
     //bool is_variable_inline(const ConstVarPtr& var) const;
     //bool is_variable_inline(const string& name) const;
-    bool is_variable_nonlocal(const VarPtr2& var) const;
-    bool is_variable_nonlocal(const string& name) const;
+    bool is_variable_local(const VarPtr2& var) const;
+    bool is_variable_local(const string& name) const;
 
     /*
      * functions

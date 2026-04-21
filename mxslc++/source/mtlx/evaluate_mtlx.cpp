@@ -4,6 +4,7 @@
 
 #include "evaluate_mtlx.h"
 
+#include "statements/Statement.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/Function2.h"
 #include "runtime/TypeInfo.h"

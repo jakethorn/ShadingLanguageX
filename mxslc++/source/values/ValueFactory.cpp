@@ -6,12 +6,14 @@
 
 #include "ValueFactory.h"
 
+#include "statements/Statement.h"
 #include "BasicValue.h"
 #include "CompileError.h"
 #include "InterfaceValue.h"
 #include "NodeValue.h"
 #include "OutputValue.h"
 #include "mtlx/mtlx_utils.h"
+#include "runtime/Function2.h"
 #include "runtime/TypeInfo.h"
 #include "runtime/Variable2.h"
 
@@ -48,6 +50,18 @@ VarPtr2 ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& 
     }
 }
 
+VarPtr2 ValueFactory::create_node_value(mx::NodePtr node, const FuncPtr2& func)
+{
+    if (func->is_defined() or func->node_def()->getOutputCount() == 1)
+    {
+        return create_node_value(std::move(node), func->node_def(), func->return_type());
+    }
+    else
+    {
+        return create_output_values(std::move(node), func->return_type(), func->output_names());
+    }
+}
+
 VarPtr2 ValueFactory::create_output_value(mx::NodePtr node, TypeInfoPtr type, const string& output_name)
 {
     if (type->has_fields())
@@ -67,6 +81,19 @@ VarPtr2 ValueFactory::create_output_value(mx::NodePtr node, TypeInfoPtr type, co
         ValuePtr value = std::make_shared<OutputValue>(std::move(node), output_name, std::move(type));
         return std::make_shared<Variable2>(std::move(value));
     }
+}
+
+VarPtr2 ValueFactory::create_output_values(mx::NodePtr node, TypeInfoPtr type, const vector<string>& output_names)
+{
+    assert(type->field_count() == output_names.size());
+    vector<VarPtr2> field_values;
+    field_values.reserve(type->field_count());
+    for (size_t i = 0; i < type->field_count(); ++i)
+    {
+        VarPtr2 field_value = create_output_value(node, type->field_type(i), output_names[i]);
+        field_values.push_back(std::move(field_value));
+    }
+    return std::make_shared<Variable2>(std::move(type), std::move(field_values));
 }
 
 VarPtr2 ValueFactory::create_default_value(TypeInfoPtr type)

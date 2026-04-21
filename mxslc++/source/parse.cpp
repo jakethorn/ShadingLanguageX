@@ -24,6 +24,7 @@
 #include "statements/ForEachLoop.h"
 #include "statements/ForRangeLoop.h"
 #include "statements/FunctionDefinition.h"
+#include "statements/FunctionDefinition2.h"
 #include "statements/IfStatement.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
@@ -31,12 +32,12 @@
 #include "statements/UsingDeclaration.h"
 #include "statements/VariableAssignment.h"
 
-vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens)
+vector<StmtPtr> parse(vector<Token> tokens)
 {
-    return Parser{runtime, std::move(tokens)}.parse();
+    return Parser{std::move(tokens)}.parse();
 }
 
-Parser::Parser(const Runtime& runtime, vector<Token> tokens_) : TokenReader{std::move(tokens_)}, runtime_{runtime}
+Parser::Parser(vector<Token> tokens_) : TokenReader{std::move(tokens_)}
 {
 
 }
@@ -224,8 +225,7 @@ StmtPtr Parser::function_definition(ModifierList mods, TypeInfoPtr type)
     vector<TypeInfoPtr> template_types = template_list();
     ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
     auto [body, return_expr] = function_body();
-    return std::make_unique<FunctionDefinition>(
-        runtime_,
+    return std::make_unique<FunctionDefinition2>(
         std::move(mods),
         std::move(type),
         std::move(name),
@@ -245,8 +245,7 @@ StmtPtr Parser::function_definition_modern(ModifierList mods)
     match(TokenType::Arrow);
     TypeInfoPtr type = type_info();
     auto [body, return_expr] = function_body();
-    return std::make_unique<FunctionDefinition>(
-        runtime_,
+    return std::make_unique<FunctionDefinition2>(
         std::move(mods),
         std::move(type),
         std::move(name),
@@ -271,6 +270,7 @@ StmtPtr Parser::for_loop()
 {
     Token token = match(TokenType::For);
     match('(');
+    ModifierList mods = modifiers();
     TypeInfoPtr type = type_info();
     Token name = match(TokenType::Identifier);
     match('=');
@@ -291,13 +291,13 @@ StmtPtr Parser::for_loop()
 
         match(')');
         StmtPtr body = block_statement();
-        return std::make_unique<ForRangeLoop>(std::move(token), std::move(type), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
+        return std::make_unique<ForRangeLoop>(std::move(token), std::move(mods), std::move(type), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
     }
     else
     {
         match(')');
         StmtPtr body = block_statement();
-        return std::make_unique<ForEachLoop>(std::move(token), std::move(type), std::move(name), std::move(expr1), std::move(body));
+        return std::make_unique<ForEachLoop>(std::move(token), std::move(mods), std::move(type), std::move(name), std::move(expr1), std::move(body));
     }
 }
 
@@ -346,7 +346,7 @@ StmtPtr Parser::if_statement()
 ModifierList Parser::modifiers()
 {
     const vector<Token> mod_tokens = consume_while(
-        TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Out
+        TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::In, TokenType::Out
     );
 
     vector<TokenType> mods;

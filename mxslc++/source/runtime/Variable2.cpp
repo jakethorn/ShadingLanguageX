@@ -27,14 +27,19 @@ Variable2::Variable2(ModifierList mods, TypeInfoPtr type, const VarPtr2& value) 
     copy_value(value);
 }
 
+Variable2::Variable2(TypeInfoPtr type, vector<VarPtr2> children) : type_{std::move(type)}, children_{std::move(children)}
+{
+
+}
+
 Variable2::Variable2(TypeInfoPtr type, const VarPtr2& value) : type_{std::move(type)}
 {
     copy_value(value);
 }
 
-Variable2::Variable2(TypeInfoPtr type, vector<VarPtr2> children) : type_{std::move(type)}, children_{std::move(children)}
+Variable2::Variable2(const VarPtr2& value) : type_{value->type()}
 {
-
+    copy_value(value);
 }
 
 Variable2::Variable2(ValuePtr value) : type_{value->type()}, value_{std::move(value)}
@@ -50,10 +55,21 @@ void Variable2::copy_value(const VarPtr2& other)
     }
     else
     {
-        for (size_t i = 0; i < other->child_count(); i++)
+        assert(child_count() == 0 or child_count() == other->child_count());
+        if (child_count() == 0)
         {
-            VarPtr2 child = std::make_shared<Variable2>(type_->field_type(i), other->child(i));
-            children_.push_back(std::move(child));
+            for (size_t i = 0; i < other->child_count(); ++i)
+            {
+                VarPtr2 child = std::make_shared<Variable2>(type_->field_type(i), other->child(i));
+                children_.push_back(std::move(child));
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < child_count(); ++i)
+            {
+                children_[i]->copy_value(other->child(i));
+            }
         }
     }
 }
@@ -118,27 +134,27 @@ bool Variable2::has_value() const
 
 ValuePtr Variable2::value()
 {
-    if (is_nonlocal())
+    if (is_temporary() or is_local())
     {
-        const VarPtr2 self = shared_from_this();
-        return Runtime::get().serializer().write_node_def_input(self);
+        return value_;
     }
     else
     {
-        return value_;
+        const VarPtr2 self = shared_from_this();
+        return Runtime::get().serializer().write_node_def_input(self);
     }
 }
 
 void Variable2::set_value(ValuePtr value)
 {
-    if (is_nonlocal())
+    if (is_temporary() or is_local())
     {
-        const VarPtr2 self = shared_from_this();
-        Runtime::get().serializer().write_node_def_output(self, value);
+        value_ = std::move(value);
     }
     else
     {
-        value_ = std::move(value);
+        const VarPtr2 self = shared_from_this();
+        Runtime::get().serializer().write_node_def_output(self, value);
     }
 }
 
@@ -199,9 +215,9 @@ void Variable2::add_to_scope(string name)
     Runtime::get().scope().add_variable(std::move(name), self);
 }
 
-bool Variable2::is_nonlocal() const
+bool Variable2::is_local() const
 {
-    return Runtime::get().scope().is_variable_nonlocal(name_);
+    return Runtime::get().scope().is_variable_local(name_);
 }
 
 string Variable2::str() const

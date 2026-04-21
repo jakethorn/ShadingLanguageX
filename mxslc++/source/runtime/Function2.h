@@ -37,7 +37,7 @@ public:
 
     bool is_inline() const { return mods_.contains(TokenType::Inline); }
     bool is_default() const { return mods_.contains(TokenType::Default); }
-    TypeInfoPtr type() const { return type_; }
+    TypeInfoPtr return_type() const { return return_type_; }
     bool is_void() const;
     const string& name() const { return name_; }
     bool has_template_type() const { return template_type_ != nullptr; }
@@ -45,10 +45,12 @@ public:
     size_t min_arity() const;
     size_t max_arity() const { return params_.size(); }
     const ParameterList& parameters() const { return params_; }
+    bool is_defined() const { return body_ != nullptr; }
     mx::NodeDefPtr node_def() const { return node_def_; }
     bool is_initialized() const { return is_initialized_; }
 
     void set_node_def(mx::NodeDefPtr node_def);
+    vector<string> output_names() const;
 
     void init();
 
@@ -64,7 +66,7 @@ public:
 
 private:
     ModifierList mods_;
-    TypeInfoPtr type_;
+    TypeInfoPtr return_type_;
     string name_;
     TypeInfoPtr template_type_;
     ParameterList params_;

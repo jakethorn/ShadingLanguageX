@@ -8,6 +8,7 @@
 #include <MaterialXFormat/XmlIo.h>
 #include "CompileError.h"
 #include "evaluate_mtlx.h"
+#include "mtlx_utils.h"
 #include "expressions/Expression.h"
 #include "expressions/ExpressionFactory.h"
 #include "runtime/ArgumentList.h"
@@ -26,15 +27,45 @@
 
 namespace
 {
+    string serialize_type(const TypeInfoPtr& type)
+    {
+        if (type->has_fields())
+            return TypeInfo::MultiOutput;
+        if (type == TypeInfo::Void)
+            return TypeInfo::Int;
+        return type->name();
+    }
+
     string serialize_type(const FuncPtr2& func)
     {
         if (not func->nonlocal_outputs().empty())
             return TypeInfo::MultiOutput;
-        if (func->type()->has_fields())
-            return TypeInfo::MultiOutput;
-        if (func->type() == TypeInfo::Void)
-            return TypeInfo::Int;
-        return func->type()->name();
+        return serialize_type(func->return_type());
+    }
+
+    void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name = "out"s)
+    {
+        if (type->has_fields())
+        {
+            for (size_t i = 0; i < type->field_count(); ++i)
+            {
+                add_outputs_to_node_def(node_def, type->field_type(i), port_name(name, i));
+            }
+        }
+        else
+        {
+            node_def->addOutput(name, serialize_type(type));
+        }
+    }
+
+    string nonlocal_out_name(const VarPtr2& var)
+    {
+        return "nonlocal_out__" + var->name();
+    }
+
+    string nonlocal_in_name(const VarPtr2& var)
+    {
+        return "nonlocal_in__" + var->name();
     }
 }
 
@@ -52,7 +83,7 @@ VarPtr2 MtlXSerializer::write_node(const FuncPtr2& func, const ArgumentList& arg
 
         if (param.is_in())
         {
-            arg->set_as_node_input(node, "in__" + param.name());
+            arg->set_as_node_input(node, param.name());
         }
 
         if (param.is_out())
@@ -75,20 +106,7 @@ VarPtr2 MtlXSerializer::write_node(const FuncPtr2& func, const ArgumentList& arg
         var->copy_value(nonlocal_output);
     }
 
-    return ValueFactory::create_node_value(node, func->node_def(), func->type());
-}
-
-namespace
-{
-    string nonlocal_out_name(const VarPtr2& var)
-    {
-        return "nonlocal_out__" + var->name();
-    }
-
-    string nonlocal_in_name(const VarPtr2& var)
-    {
-        return "nonlocal_in__" + var->name();
-    }
+    return ValueFactory::create_node_value(node, func);
 }
 
 ValuePtr MtlXSerializer::write_node_def_input(const VarPtr2& var) const
@@ -129,18 +147,19 @@ void MtlXSerializer::save(const fs::path& filepath) const
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr2& func) const
 {
     mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), func->name());
+    node_def->removeOutput("out"s);
+    add_outputs_to_node_def(node_def, func->return_type());
+
     for (const Parameter& param : func->parameters())
     {
         if (param.is_in())
         {
-            string input_name = "in__" + param.name();
-
             // create node def input
             const VarPtr2 input = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            input->set_as_node_def_input(node_def, input_name);
+            input->set_as_node_def_input(node_def, param.name());
 
             // create interface value
-            const VarPtr2 interface = ValueFactory::create_interface_value(param.type(), input_name);
+            const VarPtr2 interface = ValueFactory::create_interface_value(param.type(), param.name());
             interface->set_modifiers(param.modifiers().without(TokenType::In, TokenType::Out));
             interface->add_to_scope(param.name());
         }
@@ -152,6 +171,7 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr2& func) const
         }
     }
 
+    func->set_node_def(node_def);
     return node_def;
 }
 
@@ -163,21 +183,21 @@ void MtlXSerializer::write_node_graph(const FuncPtr2& func, const mx::NodeDefPtr
     enter_node_graph(node_graph, func);
 
     const VarPtr2 return_value = func->invoke();
-    if (not func->is_void())
-    {
-        return_value->set_as_node_graph_output(node_graph, "out"s);
-    }
-    else
+    if (func->is_void())
     {
         const VarPtr2 default_value = ValueFactory::create_default_value<int>();
         default_value->set_as_node_graph_output(node_graph, "out"s);
+    }
+    else
+    {
+        return_value->set_as_node_graph_output(node_graph, "out"s);
     }
 
     for (const Parameter& param : func->parameters())
     {
         if (param.is_out())
         {
-            const VarPtr2 output = Variable2::get_from_scope(param.name());
+            const VarPtr2 output = Runtime::get().scope().get_variable(param.name());
             output->set_as_node_graph_output(node_graph, "out__" + param.name());
         }
     }

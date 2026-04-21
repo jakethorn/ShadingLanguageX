@@ -5,18 +5,20 @@
 #include "load_mtlx.h"
 #include <MaterialXFormat/Util.h>
 
+#include "statements/Statement.h"
 #include "CompileError.h"
 #include "runtime/Scope.h"
 #include "runtime/TypeInfo.h"
 #include "expressions/NullExpression.h"
 #include "runtime/Function.h"
 #include "runtime/Function2.h"
+#include "runtime/Runtime.h"
 #include "utils/io_utils.h"
 #include "utils/str_utils.h"
 
 namespace
 {
-    const unordered_set<string> default_node_defs = {"ND_randomfloat_float"s};
+    const unordered_set<string> default_node_defs = {"ND_randomfloat_float"s, "ND_randomcolor_float"s};
 
     Parameter to_parameter(const mx::InputPtr& i, const size_t index)
     {
@@ -70,7 +72,7 @@ namespace
         TypeInfoPtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
         ParameterList params = get_parameters(nd);
         vector<string> output_names = get_output_names(nd);
-        FuncPtr2 func = std::make_shared<Function2>(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), std::move(output_names));
+        FuncPtr2 func = std::make_shared<Function2>(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), nd);
         func->init();
         return func;
     }

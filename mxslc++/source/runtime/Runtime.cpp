@@ -5,6 +5,8 @@
 #include "Runtime.h"
 #include "Scope.h"
 
+std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
+
 Runtime::Runtime()
     : Runtime{std::make_unique<Scope>(), MtlXSerializer{}}
 {

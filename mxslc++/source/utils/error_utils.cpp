@@ -6,6 +6,7 @@
 
 #include <cassert>
 
+#include "statements/Statement.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/Function.h"
 #include "runtime/Function2.h"
@@ -21,7 +22,7 @@ string missing_overload_error(
 {
     string result = func->str() + "\n";
 
-    if (not return_types.empty() and not contains(return_types, func->type()))
+    if (not return_types.empty() and not contains(return_types, func->return_type()))
         result += "    Return type does not match\n";
 
     if (name != func->name())

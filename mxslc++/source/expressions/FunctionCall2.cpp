@@ -65,7 +65,7 @@ void FunctionCall2::init_impl(const vector<TypeInfoPtr>& types)
 
 TypeInfoPtr FunctionCall2::type_impl() const
 {
-    return func_->type();
+    return func_->return_type();
 }
 
 VarPtr2 FunctionCall2::evaluate_impl() const
@@ -149,6 +149,7 @@ void FunctionCall2::add_arguments_to_inline_scope() const
     for (const Parameter& param : func_->parameters())
     {
         const VarPtr2 value = args_.evaluate(param);
-        value->add_to_scope(param.name());
+        const VarPtr2 value_copy = std::make_shared<Variable2>(value);
+        value_copy->add_to_scope(param.name());
     }
 }

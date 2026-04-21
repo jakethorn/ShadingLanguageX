@@ -41,8 +41,8 @@ private:
         while (lower <= upper)
         {
             runtime().enter_inline_scope();
-            VarPtr2 var = std::make_shared<Variable2>(mods_, type, name_, std::make_shared<BasicValue>(lower));
-            runtime().scope().add_variable(std::move(var));
+            VarPtr2 var = std::make_shared<Variable2>(mods_, type, std::make_shared<BasicValue>(lower));
+            runtime().scope().add_variable(name_, std::move(var));
             body_->execute();
             runtime().exit_scope();
             lower += step;

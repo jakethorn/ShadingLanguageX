@@ -51,8 +51,8 @@ void ForEachLoop::execute_impl() const
             throw CompileError{"Field value does not match loop iterator type"s};
 
         runtime().enter_inline_scope();
-        VarPtr2 var = std::make_shared<Variable2>(mods_, type, name_, next_value);
-        runtime().scope().add_variable(std::move(var));
+        VarPtr2 var = std::make_shared<Variable2>(mods_, type, next_value);
+        runtime().scope().add_variable(name_, std::move(var));
         body_->execute();
         runtime().exit_scope();
     }

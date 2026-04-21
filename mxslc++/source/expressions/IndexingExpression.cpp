@@ -8,13 +8,14 @@
 #include "values/BasicValue.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
+#include "runtime/Variable2.h"
 #include "runtime/variables/ChildVariable.h"
 
 ExprPtr IndexingExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
     ExprPtr expr = expr_->instantiate_template_types(template_type);
     ExprPtr index = index_expr_->instantiate_template_types(template_type);
-    return std::make_unique<IndexingExpression>(runtime_, std::move(expr), std::move(index));
+    return std::make_unique<IndexingExpression>(std::move(expr), std::move(index));
 }
 
 void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
@@ -36,6 +37,6 @@ TypeInfoPtr IndexingExpression::type_impl() const
 
 VarPtr2 IndexingExpression::evaluate_impl() const
 {
-    VarPtr2 var = expr_->evaluate();
+    const VarPtr2 var = expr_->evaluate();
     return var->child(index_);
 }

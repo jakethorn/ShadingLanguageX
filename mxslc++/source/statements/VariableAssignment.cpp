@@ -26,5 +26,7 @@ void VariableAssignment::execute_impl() const
 {
     lhs_expr_->init();
     rhs_expr_->init(lhs_expr_->type());
-    lhs_expr_->evaluate()->copy_value(rhs_expr_->evaluate());
+    const VarPtr2 lhs = lhs_expr_->evaluate();
+    const VarPtr2 rhs = rhs_expr_->evaluate();
+    lhs->copy_value(rhs);
 }

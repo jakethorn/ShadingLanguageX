@@ -18,7 +18,7 @@ Function2::Function2(
     ParameterList params,
     mx::NodeDefPtr node_def
 ) : mods_{std::move(mods)},
-    type_{std::move(return_type)},
+    return_type_{std::move(return_type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
     params_{std::move(params)}
@@ -35,7 +35,7 @@ Function2::Function2(
     StmtPtr body,
     ExprPtr return_expr
 ) : mods_{std::move(mods)},
-    type_{std::move(return_type)},
+    return_type_{std::move(return_type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
     params_{std::move(params)},
@@ -44,15 +44,15 @@ Function2::Function2(
 {
     mods_.validate(TokenType::Inline, TokenType::Default);
 
-    if (type_ == TypeInfo::Void and return_expr_ != nullptr)
+    if (return_type_ == TypeInfo::Void and return_expr_ != nullptr)
         throw CompileError{"Void function '" + name_ + "' has a return statement"s};
-    if (type_ != TypeInfo::Void and return_expr_ == nullptr)
+    if (return_type_ != TypeInfo::Void and return_expr_ == nullptr)
         throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"s};
 }
 
 Function2::Function2(Function2&& other) noexcept
     : mods_{std::move(other.mods_)},
-    type_{std::move(other.type_)},
+    return_type_{std::move(other.return_type_)},
     name_{std::move(other.name_)},
     template_type_{std::move(other.template_type_)},
     params_{std::move(other.params_)},
@@ -70,7 +70,7 @@ Function2::~Function2() = default;
 
 bool Function2::is_void() const
 {
-    return type_ == TypeInfo::Void;
+    return return_type_ == TypeInfo::Void;
 }
 
 size_t Function2::min_arity() const
@@ -90,12 +90,24 @@ void Function2::set_node_def(mx::NodeDefPtr node_def)
     node_def_ = std::move(node_def);
 }
 
+vector<string> Function2::output_names() const
+{
+    if (is_defined())
+        return {};
+
+    vector<string> names;
+    names.reserve(node_def_->getOutputCount());
+    for (const mx::OutputPtr& o : node_def_->getActiveOutputs())
+        names.push_back(o->getName());
+    return names;
+}
+
 void Function2::init()
 {
-    if (type_ == TypeInfo::Void)
-        type_ = std::make_shared<ResolvedTypeInfo>(TypeInfo::Void);
+    if (return_type_ == TypeInfo::Void)
+        return_type_ = std::make_shared<ResolvedTypeInfo>(TypeInfo::Void);
     else
-        type_ = Runtime::get().scope().resolve_type(type_);
+        return_type_ = Runtime::get().scope().resolve_type(return_type_);
 
     if (template_type_)
         template_type_ = Runtime::get().scope().resolve_type(template_type_);
@@ -115,7 +127,7 @@ VarPtr2 Function2::invoke() const
     }
     else
     {
-        return_expr_->init(type_);
+        return_expr_->init(return_type_);
         return return_expr_->evaluate();
     }
 }
@@ -129,7 +141,7 @@ string Function2::str() const
 {
     string result;
     result += mods_.str();
-    result += type_->str();
+    result += return_type_->str();
     result += " " + name_;
     if (template_type_)
         result += "<" + template_type_->str() + ">";

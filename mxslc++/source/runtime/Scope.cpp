@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "Scope.h"
+#include "statements/Statement.h"
 #include "CompileError.h"
 #include "ArgumentList.h"
 #include "Function2.h"
@@ -64,22 +65,22 @@ VarPtr2 Scope::get_variable(const string& name) const
     throw CompileError{"Variable not defined: " + name};
 }
 
-bool Scope::is_variable_nonlocal(const VarPtr2& var) const
+bool Scope::is_variable_local(const VarPtr2& var) const
 {
     assert(not var->name().empty());
-    return is_variable_nonlocal(var->name());
+    return is_variable_local(var->name());
 }
 
-bool Scope::is_variable_nonlocal(const string& name) const
+bool Scope::is_variable_local(const string& name) const
 {
     if (contains(variables_, name))
     {
-        return false;
+        return true;
     }
 
     if (parent_)
     {
-        return parent_->is_variable_nonlocal(name) or not is_inline_;
+        return parent_->is_variable_local(name) and is_inline_;
     }
 
     throw CompileError{"Variable not defined: " + name};
@@ -131,7 +132,7 @@ namespace
         if (name != func.name())
             return false;
 
-        if (not return_types.empty() and not func.type()->is_compatible(return_types))
+        if (not return_types.empty() and not func.return_type()->is_compatible(return_types))
             return false;
 
         if (template_type)

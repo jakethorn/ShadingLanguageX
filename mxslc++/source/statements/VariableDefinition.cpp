@@ -42,6 +42,6 @@ void VariableDefinition::execute_impl() const
         value = ValueFactory::create_default_value(type);
     }
 
-    VarPtr2 var = std::make_shared<Variable2>(mods_, type, name(), std::move(value));
-    runtime().scope().add_variable(std::move(var));
+    VarPtr2 var = std::make_shared<Variable2>(mods_, type, std::move(value));
+    runtime().scope().add_variable(name(), std::move(var));
 }

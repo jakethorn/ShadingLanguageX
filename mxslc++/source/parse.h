@@ -18,12 +18,12 @@ class Argument;
 class Runtime;
 class FieldInfo;
 
-vector<StmtPtr> parse(const Runtime& runtime, vector<Token> tokens);
+vector<StmtPtr> parse(vector<Token> tokens);
 
 class Parser final : protected TokenReader
 {
 public:
-    Parser(const Runtime& runtime, vector<Token> tokens_);
+    explicit Parser(vector<Token> tokens_);
 
     vector<StmtPtr> parse();
 
@@ -89,8 +89,6 @@ private:
 
     bool is_variable_definition() const;
     bool is_templated_function() const;
-
-    const Runtime& runtime_;
 };
 
 #endif //FENNEC_PARSE_H

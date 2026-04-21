@@ -18,6 +18,7 @@ public:
     Variable2(ModifierList mods, TypeInfoPtr type, const VarPtr2& value);
     Variable2(TypeInfoPtr type, vector<VarPtr2> children);
     Variable2(TypeInfoPtr type, const VarPtr2& value);
+    explicit Variable2(const VarPtr2& value);
     explicit Variable2(ValuePtr value);
 
     void copy_value(const VarPtr2& other);
@@ -32,6 +33,8 @@ public:
     const string& name() const;
     void set_name(string name);
 
+    bool is_temporary() const { return name_.empty(); }
+
     size_t child_count() const;
     VarPtr2 child(size_t index);
     VarPtr2 child(const string& field_name);
@@ -45,7 +48,7 @@ public:
 
     void add_to_scope();
     void add_to_scope(string name);
-    bool is_nonlocal() const;
+    bool is_local() const;
 
     string str() const;
 
