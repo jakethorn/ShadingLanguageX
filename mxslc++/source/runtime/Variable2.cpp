@@ -208,8 +208,3 @@ string Variable2::str() const
 {
     return name_;
 }
-
-VarPtr2 Variable2::get_from_scope(const string& name)
-{
-    return Runtime::get().scope().get_variable(name);
-}

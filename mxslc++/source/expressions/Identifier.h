@@ -10,22 +10,19 @@
 class Identifier final : public Expression
 {
 public:
-    Identifier(const Runtime& runtime, Token name) : Expression{runtime, std::move(name)} { }
-
-    VarPtr variable() const override { return var_; }
+    Identifier(Token name) : Expression{std::move(name)} { }
 
     ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_impl(const vector<TypeInfoPtr>& types) override;
     TypeInfoPtr type_impl() const override;
-    ValuePtr evaluate_impl() const override;
-    void assign_impl(const ValuePtr& value) override;
+    VarPtr2 evaluate_impl() const override;
 
 private:
     const string& name() const { return token_.lexeme(); }
 
-    VarPtr var_;
+    VarPtr2 var_;
 };
 
 #endif //FENNEC_IDENTIFIER_H

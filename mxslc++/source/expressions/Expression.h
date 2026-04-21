@@ -8,8 +8,6 @@
 #include "utils/common.h"
 #include "Token.h"
 
-class Runtime;
-
 class Expression
 {
 public:
@@ -17,8 +15,6 @@ public:
     explicit Expression(Token token);
 
     virtual ~Expression() = default;
-
-    const Token& token() const { return token_; }
 
     virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
 
@@ -28,6 +24,7 @@ public:
     void init(const vector<TypeInfoPtr>& types);
     bool try_init(const vector<TypeInfoPtr>& types);
 
+    const Token& token() const { return token_; }
     bool is_initialized() const { return is_initialized_; }
     TypeInfoPtr type() const;
 

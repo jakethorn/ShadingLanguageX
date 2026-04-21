@@ -11,15 +11,14 @@
 class Literal final : public Expression
 {
 public:
-    Literal(const Runtime& runtime, Token token)
-        : Expression{runtime, std::move(token)}, value_{token_.literal()} { }
+    Literal(Token token) : Expression{token}, value_{token.literal()} { }
 
     ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
 
 protected:
     void init_impl(const vector<TypeInfoPtr>& types) override;
     TypeInfoPtr type_impl() const override;
-    ValuePtr evaluate_impl() const override;
+    VarPtr2 evaluate_impl() const override;
 
 private:
     basic_t value_;

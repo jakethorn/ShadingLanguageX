@@ -58,8 +58,6 @@ public:
             throw CompileError{"Value is not a compile-time "s + typeid(T).name()};
     }
 
-    static VarPtr2 get_from_scope(const string& name);
-
 private:
     ModifierList mods_;
     TypeInfoPtr type_;

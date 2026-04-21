@@ -25,11 +25,8 @@ void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
 
 void IndexingExpression::init_impl(const vector<TypeInfoPtr>& types)
 {
-    const ValuePtr index_val = index_expr_->evaluate();
-    if (const shared_ptr<BasicValue> basic_value = std::dynamic_pointer_cast<BasicValue>(index_val))
-        index_ = basic_value->get<int>();
-    else
-        throw CompileError{"Indexing expression could not be evaluated at compile time"s};
+    const VarPtr2 index_val = index_expr_->evaluate();
+    index_ = index_val->value_as<int>();
 }
 
 TypeInfoPtr IndexingExpression::type_impl() const
@@ -37,25 +34,8 @@ TypeInfoPtr IndexingExpression::type_impl() const
     return expr_->type()->field_type(index_);
 }
 
-VarPtr IndexingExpression::variable() const
+VarPtr2 IndexingExpression::evaluate_impl() const
 {
-    if (expr_->variable())
-        return get_child_variable(expr_->variable(), index_);
-    return nullptr;
-}
-
-ValuePtr IndexingExpression::evaluate_impl() const
-{
-    if (expr_->variable() == nullptr or runtime_.scope().is_variable_inline(expr_->variable()))
-        return expr_->evaluate()->subvalue(index_);
-    else
-        return runtime_.serializer().write_node_def_input(variable());
-}
-
-void IndexingExpression::assign_impl(const ValuePtr& value)
-{
-    if (expr_->variable() == nullptr or runtime_.scope().is_variable_inline(expr_->variable()))
-        expr_->evaluate()->set_subvalue(index_, value);
-    else
-        runtime_.serializer().write_node_def_output(variable(), value);
+    VarPtr2 var = expr_->evaluate();
+    return var->child(index_);
 }
