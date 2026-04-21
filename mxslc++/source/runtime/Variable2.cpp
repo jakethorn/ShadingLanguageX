@@ -112,6 +112,23 @@ void Variable2::set_name(string name)
     name_ = std::move(name);
 }
 
+bool Variable2::is_temporary() const
+{
+    if (parent())
+        return parent()->is_temporary();
+    return name_.empty();
+}
+
+VarPtr2 Variable2::parent() const
+{
+    return parent_.lock();
+}
+
+void Variable2::set_parent(weak_ptr<Variable2> parent)
+{
+    parent_ = std::move(parent);
+}
+
 size_t Variable2::child_count() const
 {
     return children_.size();
@@ -119,12 +136,15 @@ size_t Variable2::child_count() const
 
 VarPtr2 Variable2::child(const size_t index)
 {
-    return children_.at(index);
+    VarPtr2 child = children_.at(index);
+    child->set_parent(weak_from_this());
+    child->set_name(port_name(name_, index));
+    return child;
 }
 
 VarPtr2 Variable2::child(const string& field_name)
 {
-    return children_.at(type_->field_index(field_name));
+    return child(type_->field_index(field_name));
 }
 
 bool Variable2::has_value() const
@@ -158,11 +178,11 @@ void Variable2::set_value(ValuePtr value)
     }
 }
 
-void Variable2::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
+void Variable2::set_as_node_input(const mx::NodePtr& node, const string& input_name)
 {
     if (has_value())
     {
-        value_->set_as_node_input(node, input_name);
+        value()->set_as_node_input(node, input_name);
     }
     else
     {
@@ -173,11 +193,11 @@ void Variable2::set_as_node_input(const mx::NodePtr& node, const string& input_n
     }
 }
 
-void Variable2::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
+void Variable2::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name)
 {
     if (has_value())
     {
-        value_->set_as_node_graph_output(node_graph, output_name);
+        value()->set_as_node_graph_output(node_graph, output_name);
     }
     else
     {
@@ -188,11 +208,11 @@ void Variable2::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, con
     }
 }
 
-void Variable2::set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const
+void Variable2::set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name)
 {
     if (has_value())
     {
-        value_->set_as_node_def_input(node_def, input_name);
+        value()->set_as_node_def_input(node_def, input_name);
     }
     else
     {
@@ -215,9 +235,10 @@ void Variable2::add_to_scope(string name)
     Runtime::get().scope().add_variable(std::move(name), self);
 }
 
-bool Variable2::is_local() const
+bool Variable2::is_local()
 {
-    return Runtime::get().scope().is_variable_local(name_);
+    const VarPtr2 self = shared_from_this();
+    return Runtime::get().scope().is_variable_local(self);
 }
 
 string Variable2::str() const

@@ -28,6 +28,7 @@ using namespace mxslc;
 
 using std::unique_ptr;
 using std::shared_ptr;
+using std::weak_ptr;
 using std::optional;
 using std::string;
 using std::string_view;

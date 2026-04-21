@@ -43,6 +43,21 @@ namespace
         return serialize_type(func->return_type());
     }
 
+    void add_inputs_to_node_def(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
+    {
+        if (type->has_fields())
+        {
+            for (size_t i = 0; i < type->field_count(); ++i)
+            {
+                add_inputs_to_node_def(node_def, type->field_type(i), port_name(name, i));
+            }
+        }
+        else
+        {
+            node_def->addInput(name, serialize_type(type));
+        }
+    }
+
     void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name = "out"s)
     {
         if (type->has_fields())
@@ -121,6 +136,7 @@ ValuePtr MtlXSerializer::write_node_def_input(const VarPtr2& var) const
     }
 
     const string input_name = nonlocal_in_name(var);
+    add_inputs_to_node_def(node_graph()->getNodeDef(), var->type(), input_name);
     graph_function()->add_nonlocal_input(input_name, var);
     return std::make_shared<InterfaceValue>(var->type(), input_name);
 }

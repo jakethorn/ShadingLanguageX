@@ -33,8 +33,10 @@ public:
     const string& name() const;
     void set_name(string name);
 
-    bool is_temporary() const { return name_.empty(); }
+    bool is_temporary() const;
 
+    VarPtr2 parent() const;
+    void set_parent(weak_ptr<Variable2> parent);
     size_t child_count() const;
     VarPtr2 child(size_t index);
     VarPtr2 child(const string& field_name);
@@ -42,13 +44,13 @@ public:
     bool has_value() const;
     ValuePtr value();
     void set_value(ValuePtr value);
-    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const;
-    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const;
-    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const;
+    void set_as_node_input(const mx::NodePtr& node, const string& input_name);
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name);
+    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name);
 
     void add_to_scope();
     void add_to_scope(string name);
-    bool is_local() const;
+    bool is_local();
 
     string str() const;
 
@@ -64,6 +66,7 @@ public:
 private:
     ModifierList mods_;
     TypeInfoPtr type_;
+    weak_ptr<Variable2> parent_;
     vector<VarPtr2> children_;
     ValuePtr value_;
     string name_;

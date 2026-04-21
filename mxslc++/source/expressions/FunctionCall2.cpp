@@ -146,6 +146,8 @@ size_t FunctionCall2::try_init_arguments(const vector<FuncPtr2>& funcs)
 
 void FunctionCall2::add_arguments_to_inline_scope() const
 {
+    // i need to fix out parameters in inline functions
+    
     for (const Parameter& param : func_->parameters())
     {
         const VarPtr2 value = args_.evaluate(param);

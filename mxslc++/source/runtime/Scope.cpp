@@ -67,8 +67,10 @@ VarPtr2 Scope::get_variable(const string& name) const
 
 bool Scope::is_variable_local(const VarPtr2& var) const
 {
-    assert(not var->name().empty());
-    return is_variable_local(var->name());
+    VarPtr2 tmp = var;
+    while (tmp->parent())
+        tmp = tmp->parent();
+    return is_variable_local(tmp->name());
 }
 
 bool Scope::is_variable_local(const string& name) const
