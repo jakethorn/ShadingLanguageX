@@ -151,16 +151,17 @@ void FunctionCall2::evaluate_arguments() const
 {
     for (const Parameter& param : func_->parameters())
     {
+        ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
         if (param.is_in())
         {
             const VarPtr2 arg_value = args_.evaluate(param);
-            const VarPtr2 arg_value_copy = Variable2::create(param.type(), arg_value);
+            const VarPtr2 arg_value_copy = Variable2::create(std::move(mods), param.type(), arg_value);
             arg_value_copy->add_to_scope(param.name());
         }
         else
         {
             const VarPtr2 default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            default_value->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
+            default_value->set_modifiers(std::move(mods));
             default_value->add_to_scope(param.name());
         }
     }

@@ -5,6 +5,7 @@
 #include "ArgumentList.h"
 #include "Parameter.h"
 #include "ParameterList.h"
+#include "Variable2.h"
 #include "utils/instantiate_template_types_utils.h"
 
 ArgumentList ArgumentList::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -25,11 +26,20 @@ VarPtr2 ArgumentList::evaluate(const Parameter& param) const
 {
     VarPtr2 value;
     if (const Argument* arg = (*this)[param])
+    {
         value = arg->evaluate();
+        if (value->is_temporary() and param.is_out())
+            throw CompileError{"Temporary variable being passed to ref or out parameter '" + param.name() + "'"};
+    }
     else if (param.has_default_value())
+    {
         value = param.evaluate();
+    }
     else
+    {
         throw CompileError{"Function call missing argument for parameter '" + param.name() + "'"};
+    }
+
     return value;
 }
 

@@ -126,8 +126,13 @@ ValuePtr Variable2::value()
 
 void Variable2::copy_value(const VarPtr2& other)
 {
-    if (not is_assignable())
-        throw CompileError{"Cannot assign value to non-mutable variable '" + name_ + "'"};
+    if (is_initialized_)
+    {
+        if (is_temporary())
+            throw CompileError{"Cannot assign value to temporary variable"s};
+        if (not is_assignable())
+            throw CompileError{"Cannot assign value to non-mutable variable '" + name_ + "'"};
+    }
 
     if (other->has_value())
     {
@@ -220,7 +225,6 @@ VarPtr2 Variable2::create(ModifierList mods, TypeInfoPtr type, const vector<VarP
 {
     VarPtr2 var = std::make_shared<Variable2>(std::move(mods), std::move(type));
     var->copy_children(children);
-    var->is_initialized_ = true;
     return var;
 }
 
@@ -228,7 +232,6 @@ VarPtr2 Variable2::create(ModifierList mods, TypeInfoPtr type, ValuePtr value)
 {
     VarPtr2 var = std::make_shared<Variable2>(std::move(mods), std::move(type));
     var->set_value(std::move(value));
-    var->is_initialized_ = true;
     return var;
 }
 
@@ -236,7 +239,6 @@ VarPtr2 Variable2::create(ModifierList mods, TypeInfoPtr type, const VarPtr2& va
 {
     VarPtr2 var = std::make_shared<Variable2>(std::move(mods), std::move(type));
     var->copy_value(value);
-    var->is_initialized_ = true;
     return var;
 }
 
@@ -282,6 +284,8 @@ void Variable2::set_value(ValuePtr value)
         const VarPtr2 self = shared_from_this();
         Runtime::get().serializer().write_node_def_output(self, value);
     }
+
+    is_initialized_ = true;
 }
 
 void Variable2::copy_children(const vector<VarPtr2>& children)
@@ -295,4 +299,6 @@ void Variable2::copy_children(const vector<VarPtr2>& children)
             child->set_name(port_name(name_, i));
         children_.push_back(std::move(child));
     }
+
+    is_initialized_ = true;
 }

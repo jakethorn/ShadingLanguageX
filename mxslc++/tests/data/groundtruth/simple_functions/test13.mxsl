@@ -3,6 +3,6 @@ void foo(ref {float x, float y, float z} p)
    p.x = randomfloat();
 }
 
-{float, float, float} xyz = {1.0, 2.0, 3.0};
+mutable {float, float, float} xyz = {1.0, 2.0, 3.0};
 foo(xyz);
 float z = xyz[0] * xyz[1] * xyz[2];

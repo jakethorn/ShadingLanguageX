@@ -1,4 +1,4 @@
-float x = 5.0;
+mutable float x = 5.0;
 
 void foo()
 {

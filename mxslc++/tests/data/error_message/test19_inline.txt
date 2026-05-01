@@ -1,0 +1,1 @@
+test19_inline.mxsl, line 9: Temporary variable being passed to ref or out parameter 'p'

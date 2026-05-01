@@ -3,6 +3,6 @@ inline void foo(out float x)
    x = 3.0;
 }
 
-{float, float} xy = {1.0, 2.0};
+{mutable float, float} xy = {1.0, 2.0};
 foo(out xy[0]);
 float z = xy[0] * xy[1];

@@ -1,4 +1,4 @@
-{float, float} p = {1.0, 2.0};
+{float, mutable float} p = {1.0, 2.0};
 
 inline float foo(ref {float, float} p)
 {

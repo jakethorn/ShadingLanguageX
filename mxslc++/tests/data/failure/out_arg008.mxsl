@@ -1,8 +1,0 @@
-inline float foo1(out float x = 12.0)
-{
-    return 3.0 * 7.0;
-}
-
-foo1(const out float out_x1);
-float HERE1 = out_x1 * 2.0;
-print out_x1;
