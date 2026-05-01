@@ -19,7 +19,7 @@ public:
 
     const Token& token() const { return token_; }
 
-    virtual StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
+    virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
     void execute() const;
 
 protected:

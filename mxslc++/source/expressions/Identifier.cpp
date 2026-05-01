@@ -8,17 +8,17 @@
 #include "runtime/Runtime.h"
 #include "values/ValueFactory.h"
 
-ExprPtr Identifier::instantiate_template_types(const TypeInfoPtr& template_type) const
+ExprPtr Identifier::instantiate_template_types(const TypePtr& template_type) const
 {
     return std::make_unique<Identifier>(token_);
 }
 
-void Identifier::init_impl(const vector<TypeInfoPtr>& types)
+void Identifier::init_impl(const vector<TypePtr>& types)
 {
     var_ = scope().get_variable(name());
 }
 
-TypeInfoPtr Identifier::type_impl() const
+TypePtr Identifier::type_impl() const
 {
     return var_->type();
 }

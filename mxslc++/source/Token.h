@@ -26,7 +26,7 @@ public:
     void set_filename(const string& filename) { filename_ = filename; }
     void set_line(const size_t line) { line_ = line; }
 
-    Token instantiate_template_types(const TypeInfoPtr& template_type) const;
+    Token instantiate_template_types(const TypePtr& template_type) const;
     bool empty() const { return lexeme_.empty(); }
 
     bool operator==(const char c) const { return type_ == c; }

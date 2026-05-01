@@ -12,7 +12,7 @@
 #include "mtlx/mtlx_utils.h"
 #include "values/NodeValue.h"
 
-Variable::Variable(ModifierList mods, TypeInfoPtr type) : type_{std::move(type)}
+Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
 {
     set_modifiers(std::move(mods));
 }
@@ -40,7 +40,7 @@ void Variable::set_modifiers(ModifierList mods)
         throw CompileError{"Variables cannot be both const and mutable"s};
 }
 
-const TypeInfoPtr& Variable::type() const
+const TypePtr& Variable::type() const
 {
     return type_;
 }
@@ -55,7 +55,7 @@ void Variable::set_name(string name)
     name_ = std::move(name);
     for (size_t i = 0; i < children_.size(); ++i)
     {
-        children_[i]->set_name(port_name(name_, i));
+        children_[i]->set_name(get_port_name(name_, i));
     }
 }
 
@@ -163,7 +163,7 @@ void Variable::set_as_node_input(const mx::NodePtr& node, const string& input_na
     {
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_as_node_input(node, port_name(input_name, i));
+            children_[i]->set_as_node_input(node, get_port_name(input_name, i));
         }
     }
 }
@@ -178,7 +178,7 @@ void Variable::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, cons
     {
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_as_node_graph_output(node_graph, port_name(output_name, i));
+            children_[i]->set_as_node_graph_output(node_graph, get_port_name(output_name, i));
         }
     }
 }
@@ -193,7 +193,7 @@ void Variable::set_as_node_def_input(const mx::NodeDefPtr& node_def, const strin
     {
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_as_node_def_input(node_def, port_name(input_name, i));
+            children_[i]->set_as_node_def_input(node_def, get_port_name(input_name, i));
         }
     }
 }
@@ -215,45 +215,45 @@ string Variable::str() const
     return name_;
 }
 
-VarPtr Variable::create(ModifierList mods, TypeInfoPtr type, const vector<VarPtr>& children)
+VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<VarPtr>& children)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
     var->copy_children(children);
     return var;
 }
 
-VarPtr Variable::create(ModifierList mods, TypeInfoPtr type, ValuePtr value)
+VarPtr Variable::create(ModifierList mods, TypePtr type, ValuePtr value)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
     var->set_value(std::move(value));
     return var;
 }
 
-VarPtr Variable::create(ModifierList mods, TypeInfoPtr type, const VarPtr& value)
+VarPtr Variable::create(ModifierList mods, TypePtr type, const VarPtr& value)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
     var->copy_value(value);
     return var;
 }
 
-VarPtr Variable::create(TypeInfoPtr type, const vector<VarPtr>& children)
+VarPtr Variable::create(TypePtr type, const vector<VarPtr>& children)
 {
     return create(ModifierList{}, std::move(type), children);
 }
 
-VarPtr Variable::create(TypeInfoPtr type, ValuePtr value)
+VarPtr Variable::create(TypePtr type, ValuePtr value)
 {
     return create(ModifierList{}, std::move(type), std::move(value));
 }
 
-VarPtr Variable::create(TypeInfoPtr type, const VarPtr& value)
+VarPtr Variable::create(TypePtr type, const VarPtr& value)
 {
     return create(ModifierList{}, std::move(type), value);
 }
 
 VarPtr Variable::create(ValuePtr value)
 {
-    TypeInfoPtr type = value->type();
+    TypePtr type = value->type();
     return create(ModifierList{}, std::move(type), std::move(value));
 }
 
@@ -290,7 +290,7 @@ void Variable::copy_children(const vector<VarPtr>& children)
         VarPtr child = create(type_->field(i).modifiers(), type_->field_type(i), children[i]);
         child->set_parent(weak_from_this());
         if (not name_.empty())
-            child->set_name(port_name(name_, i));
+            child->set_name(get_port_name(name_, i));
         children_.push_back(std::move(child));
     }
 

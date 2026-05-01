@@ -12,7 +12,7 @@ class IfStatement final : public Statement
 public:
     IfStatement(Token token, ExprPtr cond_expr, StmtPtr then_body, StmtPtr else_body);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;

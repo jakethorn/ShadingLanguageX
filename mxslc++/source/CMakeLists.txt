@@ -12,8 +12,8 @@ add_library(mxslc_lib
         runtime/Function.cpp
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
-        runtime/TypeInfo.cpp
-        runtime/FieldInfo.cpp
+        runtime/Type.cpp
+        runtime/Field.cpp
         runtime/ModifierList.cpp
         runtime/Variable.cpp
         expressions/Expression.cpp
@@ -29,7 +29,7 @@ add_library(mxslc_lib
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
-        statements/FunctionDefinition2.cpp
+        statements/FunctionDefinition.cpp
         statements/MultiVariableDefinition.cpp
         statements/UsingDeclaration.cpp
         statements/VariableAssignment.cpp

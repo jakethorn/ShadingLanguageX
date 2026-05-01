@@ -11,14 +11,14 @@
 class VariableDefinitionExpression final : public Expression
 {
 public:
-    VariableDefinitionExpression(ModifierList mods, TypeInfoPtr type, Token name);
+    VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name);
     VariableDefinitionExpression(StmtPtr var_def, ExprPtr identifier);
 
-    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
-    void init_impl(const vector<TypeInfoPtr>& types) override;
-    TypeInfoPtr type_impl() const override;
+    void init_impl(const vector<TypePtr>& types) override;
+    TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
 private:

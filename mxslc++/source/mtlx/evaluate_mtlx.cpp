@@ -6,7 +6,7 @@
 
 #include "statements/Statement.h"
 #include "runtime/Function.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "values/Value.h"
 #include "values/BasicValue.h"

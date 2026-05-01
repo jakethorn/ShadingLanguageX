@@ -4,16 +4,16 @@
 
 #include "OutputValue.h"
 
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
 
-OutputValue::OutputValue(mx::OutputPtr output, TypeInfoPtr type) : Value{std::move(type)}, output_{std::move(output)} { }
-OutputValue::OutputValue(const mx::NodePtr& node, const string& output_name, TypeInfoPtr type) : Value{std::move(type)}
+OutputValue::OutputValue(mx::OutputPtr output, TypePtr type) : Value{std::move(type)}, output_{std::move(output)} { }
+OutputValue::OutputValue(const mx::NodePtr& node, const string& output_name, TypePtr type) : Value{std::move(type)}
 {
     output_ = node->getOutput(output_name);
     if (output_ == nullptr)
     {
-        const string& type_name = type_ == TypeInfo::Void ? TypeInfo::Int : type_->name();
+        const string& type_name = type_ == Type::Void ? Type::Int : type_->name();
         output_ = node->addOutput(output_name, type_name);
     }
 }

@@ -11,8 +11,8 @@
 class Parameter
 {
 public:
-    Parameter(ModifierList mods, TypeInfoPtr type, string name, size_t index);
-    Parameter(ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, size_t index);
+    Parameter(ModifierList mods, TypePtr type, string name, size_t index);
+    Parameter(ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
 
     Parameter(Parameter&&) noexcept;
 
@@ -26,9 +26,9 @@ public:
     const string& name() const { return name_; }
     size_t index() const { return index_; }
 
-    Parameter instantiate_template_types(const TypeInfoPtr& template_type) const;
+    Parameter instantiate_template_types(const TypePtr& template_type) const;
     void init();
-    TypeInfoPtr type() const;
+    TypePtr type() const;
 
     bool has_default_value() const { return expr_ != nullptr; }
     VarPtr evaluate() const;
@@ -37,7 +37,7 @@ public:
 
 private:
     ModifierList mods_;
-    TypeInfoPtr type_;
+    TypePtr type_;
     string name_;
     ExprPtr expr_;
     size_t index_;

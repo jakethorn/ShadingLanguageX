@@ -14,7 +14,7 @@ public:
     explicit ExpressionStatement(ExprPtr expr);
     ~ExpressionStatement() override;
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;

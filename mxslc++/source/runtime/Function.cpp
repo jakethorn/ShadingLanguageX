@@ -6,15 +6,15 @@
 
 #include "Runtime.h"
 #include "Scope.h"
-#include "TypeInfo.h"
+#include "Type.h"
 #include "expressions/Expression.h"
 #include "statements/Statement.h"
 
 Function::Function(
     ModifierList mods,
-    TypeInfoPtr return_type,
+    TypePtr return_type,
     string name,
-    TypeInfoPtr template_type,
+    TypePtr template_type,
     ParameterList params,
     mx::NodeDefPtr node_def
 ) : mods_{std::move(mods)},
@@ -28,9 +28,9 @@ Function::Function(
 
 Function::Function(
     ModifierList mods,
-    TypeInfoPtr return_type,
+    TypePtr return_type,
     string name,
-    TypeInfoPtr template_type,
+    TypePtr template_type,
     ParameterList params,
     StmtPtr body,
     ExprPtr return_expr
@@ -44,9 +44,9 @@ Function::Function(
 {
     mods_.validate(TokenType::Inline, TokenType::Default);
 
-    if (return_type_ == TypeInfo::Void and return_expr_ != nullptr)
+    if (return_type_ == Type::Void and return_expr_ != nullptr)
         throw CompileError{"Void function '" + name_ + "' has a return statement"s};
-    if (return_type_ != TypeInfo::Void and return_expr_ == nullptr)
+    if (return_type_ != Type::Void and return_expr_ == nullptr)
         throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"s};
 }
 
@@ -70,7 +70,7 @@ Function::~Function() = default;
 
 bool Function::is_void() const
 {
-    return return_type_ == TypeInfo::Void;
+    return return_type_ == Type::Void;
 }
 
 size_t Function::min_arity() const
@@ -104,8 +104,8 @@ vector<string> Function::output_names() const
 
 void Function::init()
 {
-    if (return_type_ == TypeInfo::Void)
-        return_type_ = std::make_shared<ResolvedTypeInfo>(TypeInfo::Void);
+    if (return_type_ == Type::Void)
+        return_type_ = std::make_shared<ResolvedTypeInfo>(Type::Void);
     else
         return_type_ = Runtime::get().scope().resolve_type(return_type_);
 

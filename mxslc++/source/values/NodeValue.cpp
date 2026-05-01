@@ -6,7 +6,7 @@
 
 #include "mtlx/mtlx_utils.h"
 
-NodeValue::NodeValue(mx::NodePtr node, TypeInfoPtr type)
+NodeValue::NodeValue(mx::NodePtr node, TypePtr type)
     : Value{std::move(type)}, node_{std::move(node)}
 {
 

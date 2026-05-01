@@ -16,9 +16,9 @@
 class ForRangeLoop final : public Statement
 {
 public:
-    ForRangeLoop(Token token, ModifierList mods, TypeInfoPtr type, string name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body);
+    ForRangeLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;
@@ -27,7 +27,7 @@ private:
     template<typename T>
     void execute_with() const
     {
-        const TypeInfoPtr type = runtime().scope().resolve_type(type_);
+        const TypePtr type = runtime().scope().resolve_type(type_);
 
         lower_expr_->init(type);
         if (step_expr_)
@@ -50,7 +50,7 @@ private:
     }
 
     ModifierList mods_;
-    TypeInfoPtr type_;
+    TypePtr type_;
     string name_;
     ExprPtr lower_expr_;
     ExprPtr step_expr_;

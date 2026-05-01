@@ -10,13 +10,13 @@
 #include "runtime/ArgumentList.h"
 #include "runtime/Function.h"
 #include "runtime/Function.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 
 string missing_overload_error(
     const FuncPtr& func,
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 )
 {
@@ -59,9 +59,9 @@ string missing_overload_error(
 
 string missing_overload_error(
     const vector<FuncPtr>& funcs,
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 )
 {

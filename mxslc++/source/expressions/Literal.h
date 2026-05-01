@@ -13,16 +13,16 @@ class Literal final : public Expression
 public:
     explicit Literal(Token token) : Expression{token}, value_{token.literal()} { }
 
-    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
-    void init_impl(const vector<TypeInfoPtr>& types) override;
-    TypeInfoPtr type_impl() const override;
+    void init_impl(const vector<TypePtr>& types) override;
+    TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
 private:
     basic_t value_;
-    TypeInfoPtr type_;
+    TypePtr type_;
 };
 
 #endif //FENNEC_LITERAL_H

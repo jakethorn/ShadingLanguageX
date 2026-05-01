@@ -8,7 +8,7 @@
 #include "Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 
-ArgumentList ArgumentList::instantiate_template_types(const TypeInfoPtr& template_type) const
+ArgumentList ArgumentList::instantiate_template_types(const TypePtr& template_type) const
 {
     return ::instantiate_template_types(args_, template_type);
 }

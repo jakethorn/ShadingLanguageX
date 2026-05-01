@@ -58,8 +58,8 @@ using VarPtr = shared_ptr<Variable>;
 class Function;
 using FuncPtr = shared_ptr<Function>;
 
-class TypeInfo;
-using TypeInfoPtr = shared_ptr<TypeInfo>;
+class Type;
+using TypePtr = shared_ptr<Type>;
 
 // type aliases
 using basic_t = variant<

@@ -14,7 +14,7 @@ PrintStatement::PrintStatement(Token token, vector<ExprPtr> exprs) : Statement{s
 
 }
 
-StmtPtr PrintStatement::instantiate_template_types(const TypeInfoPtr& template_type) const
+StmtPtr PrintStatement::instantiate_template_types(const TypePtr& template_type) const
 {
     vector<ExprPtr> exprs = ::instantiate_template_types(exprs_, template_type);
     return std::make_unique<PrintStatement>(token_, std::move(exprs));

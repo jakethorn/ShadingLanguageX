@@ -6,29 +6,29 @@
 
 #include "values/BasicValue.h"
 #include "runtime/Runtime.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "runtime/Variable.h"
 
-ExprPtr IndexingExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
+ExprPtr IndexingExpression::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr expr = expr_->instantiate_template_types(template_type);
     ExprPtr index = index_expr_->instantiate_template_types(template_type);
     return std::make_unique<IndexingExpression>(std::move(expr), std::move(index));
 }
 
-void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
+void IndexingExpression::init_subexpressions(const vector<TypePtr>& types)
 {
     expr_->init();
-    index_expr_->init(TypeInfo::Int);
+    index_expr_->init(Type::Int);
 }
 
-void IndexingExpression::init_impl(const vector<TypeInfoPtr>& types)
+void IndexingExpression::init_impl(const vector<TypePtr>& types)
 {
     const VarPtr index_val = index_expr_->evaluate();
     index_ = index_val->value_as<int>();
 }
 
-TypeInfoPtr IndexingExpression::type_impl() const
+TypePtr IndexingExpression::type_impl() const
 {
     return expr_->type()->field_type(index_);
 }

@@ -13,12 +13,12 @@ public:
     IndexingExpression(ExprPtr expr, ExprPtr index_expr)
         : Expression{index_expr->token()}, expr_{std::move(expr)}, index_expr_{std::move(index_expr)} { }
 
-    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
-    void init_subexpressions(const vector<TypeInfoPtr>& types) override;
-    void init_impl(const vector<TypeInfoPtr>& types) override;
-    TypeInfoPtr type_impl() const override;
+    void init_subexpressions(const vector<TypePtr>& types) override;
+    void init_impl(const vector<TypePtr>& types) override;
+    TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
 private:

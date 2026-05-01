@@ -12,16 +12,16 @@
 class ForEachLoop final : public Statement
 {
 public:
-    ForEachLoop(Token token, ModifierList mods, TypeInfoPtr type, string name, ExprPtr iter_expr, StmtPtr body);
+    ForEachLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr iter_expr, StmtPtr body);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;
 
 private:
     ModifierList mods_;
-    TypeInfoPtr type_;
+    TypePtr type_;
     string name_;
     ExprPtr iter_expr_;
     StmtPtr body_;

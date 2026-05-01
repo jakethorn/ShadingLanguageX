@@ -27,12 +27,12 @@ public:
     ExprPtr expression() const { return expr_; }
     size_t index() const { return index_; }
 
-    Argument instantiate_template_types(const TypeInfoPtr& template_type) const;
-    void init(const TypeInfoPtr& type) const;
-    void init(const vector<TypeInfoPtr>& types) const;
-    bool try_init(const vector<TypeInfoPtr>& types) const;
+    Argument instantiate_template_types(const TypePtr& template_type) const;
+    void init(const TypePtr& type) const;
+    void init(const vector<TypePtr>& types) const;
+    bool try_init(const vector<TypePtr>& types) const;
     bool is_initialized() const;
-    TypeInfoPtr type() const;
+    TypePtr type() const;
     VarPtr evaluate() const;
 
     void validate(const Parameter& param) const;

@@ -6,11 +6,11 @@
 
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 
-StmtPtr UsingDeclaration::instantiate_template_types(const TypeInfoPtr& template_type) const
+StmtPtr UsingDeclaration::instantiate_template_types(const TypePtr& template_type) const
 {
-    TypeInfoPtr type = type_->instantiate_template_types(template_type);
+    TypePtr type = type_->instantiate_template_types(template_type);
     return std::make_unique<UsingDeclaration>(token_, name_, type);
 }
 

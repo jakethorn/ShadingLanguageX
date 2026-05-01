@@ -11,8 +11,8 @@
 class OutputValue final : public Value
 {
 public:
-    OutputValue(mx::OutputPtr output, TypeInfoPtr type);
-    OutputValue(const mx::NodePtr& node, const string& output_name, TypeInfoPtr type);
+    OutputValue(mx::OutputPtr output, TypePtr type);
+    OutputValue(const mx::NodePtr& node, const string& output_name, TypePtr type);
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override;
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;

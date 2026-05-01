@@ -12,20 +12,20 @@
 #include "runtime/Scope.h"
 #include "statements/Statement.h"
 #include "utils/instantiate_template_types_utils.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "utils/error_utils.h"
 #include "values/ValueFactory.h"
 
-ExprPtr FunctionCall::instantiate_template_types(const TypeInfoPtr& template_type) const
+ExprPtr FunctionCall::instantiate_template_types(const TypePtr& template_type) const
 {
     Token name = token_.instantiate_template_types(template_type);
-    TypeInfoPtr _template_type = ::instantiate_template_types(template_type_, template_type);
+    TypePtr _template_type = ::instantiate_template_types(template_type_, template_type);
     ArgumentList args = args_.instantiate_template_types(template_type);
     return std::make_unique<FunctionCall>(std::move(name), std::move(_template_type), std::move(args));
 }
 
-void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
+void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
 {
     if (template_type_)
         template_type_ = scope().resolve_type(template_type_);
@@ -54,7 +54,7 @@ void FunctionCall::init_subexpressions(const vector<TypeInfoPtr>& types)
     }
 }
 
-void FunctionCall::init_impl(const vector<TypeInfoPtr>& types)
+void FunctionCall::init_impl(const vector<TypePtr>& types)
 {
     func_ = Runtime::get().scope().get_function(types, name(), template_type_, args_);
 
@@ -62,7 +62,7 @@ void FunctionCall::init_impl(const vector<TypeInfoPtr>& types)
         arg.validate(func_->parameters()[arg]);
 }
 
-TypeInfoPtr FunctionCall::type_impl() const
+TypePtr FunctionCall::type_impl() const
 {
     return func_->return_type();
 }
@@ -86,13 +86,13 @@ VarPtr FunctionCall::evaluate_impl() const
 
 namespace
 {
-    vector<TypeInfoPtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
+    vector<TypePtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
     {
-        vector<TypeInfoPtr> types;
+        vector<TypePtr> types;
 
         for (const FuncPtr& func : funcs)
         {
-            const TypeInfoPtr& type = func->parameters()[arg].type();
+            const TypePtr& type = func->parameters()[arg].type();
             if (not type->is_in(types))
                 types.push_back(type);
         }
@@ -127,7 +127,7 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     {
         if (not arg.is_initialized())
         {
-            if (const vector<TypeInfoPtr> types = get_parameter_types(funcs, arg);
+            if (const vector<TypePtr> types = get_parameter_types(funcs, arg);
                 arg.try_init(types))
             {
                 ++initialized_arg_count_;

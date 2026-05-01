@@ -25,7 +25,7 @@ public:
         (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
     }
 
-    ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const;
+    ArgumentList instantiate_template_types(const TypePtr& template_type) const;
 
     VarPtr evaluate(const Parameter& param) const;
     vector<pair<const Parameter&, VarPtr>> evaluate(const ParameterList& params) const;

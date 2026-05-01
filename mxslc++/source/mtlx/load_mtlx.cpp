@@ -8,7 +8,7 @@
 #include "statements/Statement.h"
 #include "CompileError.h"
 #include "runtime/Scope.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "expressions/NullExpression.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
@@ -21,7 +21,7 @@ namespace
 
     Parameter to_parameter(const mx::InputPtr& i, const size_t index)
     {
-        const TypeInfoPtr type = Runtime::get().scope().get_type(i->getType());
+        const TypePtr type = Runtime::get().scope().get_type(i->getType());
         const string& name = i->getName();
         ExprPtr expr = std::make_unique<NullExpression>();
         return Parameter{ModifierList{}, type, name, std::move(expr), index};
@@ -37,14 +37,14 @@ namespace
         return ParameterList{std::move(params)};
     }
 
-    TypeInfoPtr get_type(const mx::NodeDefPtr& nd)
+    TypePtr get_type(const mx::NodeDefPtr& nd)
     {
-        vector<TypeInfoPtr> subtypes;
+        vector<TypePtr> subtypes;
         subtypes.reserve(nd->getOutputCount());
         for (const mx::OutputPtr& o : nd->getActiveOutputs())
-            subtypes.push_back(std::make_shared<TypeInfo>(o->getType()));
+            subtypes.push_back(std::make_shared<Type>(o->getType()));
 
-        const TypeInfoPtr type = subtypes.size() == 1 ? subtypes.at(0) : std::make_shared<TypeInfo>(std::move(subtypes));
+        const TypePtr type = subtypes.size() == 1 ? subtypes.at(0) : std::make_shared<Type>(std::move(subtypes));
         return Runtime::get().scope().resolve_type(type);
     }
 
@@ -65,10 +65,10 @@ namespace
         if (contains(default_node_defs, nd->getName()))
             mods.add(TokenType::Default);
 
-        TypeInfoPtr type = get_type(nd);
+        TypePtr type = get_type(nd);
         const string& name = nd->getNodeString();
         const string template_type_name = get_postfix(nd->getName(), '_');
-        TypeInfoPtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
+        TypePtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
         ParameterList params = get_parameters(nd);
         vector<string> output_names = get_output_names(nd);
         FuncPtr func = std::make_shared<Function>(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), nd);

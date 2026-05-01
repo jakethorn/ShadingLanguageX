@@ -9,7 +9,7 @@
 BlockStatement::BlockStatement(Token token, vector<StmtPtr> body)
     : Statement{std::move(token)}, body_{std::move(body)} { }
 
-StmtPtr BlockStatement::instantiate_template_types(const TypeInfoPtr& template_type) const
+StmtPtr BlockStatement::instantiate_template_types(const TypePtr& template_type) const
 {
     vector<StmtPtr> body = ::instantiate_template_types(body_, template_type);
     return std::make_unique<BlockStatement>(token_, std::move(body));

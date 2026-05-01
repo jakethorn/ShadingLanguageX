@@ -8,7 +8,7 @@
 #include "runtime/Variable.h"
 #include "statements/VariableDefinition.h"
 
-VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypeInfoPtr type, Token name)
+VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name)
     : VariableDefinitionExpression{
         std::make_unique<VariableDefinition>(std::move(mods), std::move(type), name, nullptr),
         std::make_unique<Identifier>(name)
@@ -23,20 +23,20 @@ VariableDefinitionExpression::VariableDefinitionExpression(StmtPtr var_def, Expr
 
 }
 
-ExprPtr VariableDefinitionExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
+ExprPtr VariableDefinitionExpression::instantiate_template_types(const TypePtr& template_type) const
 {
     StmtPtr var_def = var_def_->instantiate_template_types(template_type);
     ExprPtr identifier = identifier_->instantiate_template_types(template_type);
     return std::make_unique<VariableDefinitionExpression>(std::move(var_def), std::move(identifier));
 }
 
-void VariableDefinitionExpression::init_impl(const vector<TypeInfoPtr>& types)
+void VariableDefinitionExpression::init_impl(const vector<TypePtr>& types)
 {
     var_def_->execute();
     identifier_->init(types);
 }
 
-TypeInfoPtr VariableDefinitionExpression::type_impl() const
+TypePtr VariableDefinitionExpression::type_impl() const
 {
     return identifier_->type();
 }

@@ -14,17 +14,17 @@
 #include "OutputValue.h"
 #include "mtlx/mtlx_utils.h"
 #include "runtime/Function.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "runtime/Variable.h"
 
-VarPtr ValueFactory::create_interface_value(TypeInfoPtr type, const string& name)
+VarPtr ValueFactory::create_interface_value(TypePtr type, const string& name)
 {
     if (type->has_fields())
     {
         vector<VarPtr> field_values;
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            VarPtr field_value = create_interface_value(type->field_type(i), port_name(name, i));
+            VarPtr field_value = create_interface_value(type->field_type(i), get_port_name(name, i));
             field_values.push_back(std::move(field_value));
         }
 
@@ -37,7 +37,7 @@ VarPtr ValueFactory::create_interface_value(TypeInfoPtr type, const string& name
     }
 }
 
-VarPtr ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& node_def, TypeInfoPtr type)
+VarPtr ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& node_def, TypePtr type)
 {
     if (node_def->getOutputCount() > 1)
     {
@@ -62,7 +62,7 @@ VarPtr ValueFactory::create_node_value(mx::NodePtr node, const FuncPtr& func)
     }
 }
 
-VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypeInfoPtr type, const string& output_name)
+VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const string& output_name)
 {
     if (type->has_fields())
     {
@@ -70,7 +70,7 @@ VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypeInfoPtr type, con
         field_values.reserve(type->field_count());
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            VarPtr field_value = create_output_value(node, type->field_type(i), port_name(output_name, i));
+            VarPtr field_value = create_output_value(node, type->field_type(i), get_port_name(output_name, i));
             field_values.push_back(std::move(field_value));
         }
 
@@ -83,7 +83,7 @@ VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypeInfoPtr type, con
     }
 }
 
-VarPtr ValueFactory::create_output_values(mx::NodePtr node, TypeInfoPtr type, const vector<string>& output_names)
+VarPtr ValueFactory::create_output_values(mx::NodePtr node, TypePtr type, const vector<string>& output_names)
 {
     assert(type->field_count() == output_names.size());
     vector<VarPtr> field_values;
@@ -96,7 +96,7 @@ VarPtr ValueFactory::create_output_values(mx::NodePtr node, TypeInfoPtr type, co
     return Variable::create(std::move(type), field_values);
 }
 
-VarPtr ValueFactory::create_default_value(TypeInfoPtr type)
+VarPtr ValueFactory::create_default_value(TypePtr type)
 {
     if (type->has_fields())
     {
@@ -136,7 +136,7 @@ VarPtr ValueFactory::create_default_value(TypeInfoPtr type)
 
 ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 {
-    TypeInfoPtr type = std::make_shared<ResolvedTypeInfo>(port->getType());
+    TypePtr type = std::make_shared<ResolvedTypeInfo>(port->getType());
 
     if (port->hasInterfaceName())
     {

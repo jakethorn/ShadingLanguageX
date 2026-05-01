@@ -5,7 +5,7 @@
 #include "str_utils.h"
 
 #include "Token.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 
 string get_postfix(const string& str, const char delim)
 {
@@ -19,7 +19,7 @@ string str(const optional<Token>& token)
     return token ? token->lexeme() : ""s;
 }
 
-string str(const vector<TypeInfoPtr>& types)
+string str(const vector<TypePtr>& types)
 {
     if (types.empty())
         return ""s;

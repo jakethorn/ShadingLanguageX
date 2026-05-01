@@ -7,7 +7,7 @@
 
 #include "CompileError.h"
 #include "scan.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "utils/instantiate_template_types_utils.h"
 
 TokenType Token::init_type(const string& lexeme)
@@ -30,7 +30,7 @@ basic_t Token::literal() const
     throw CompileError{"Invalid literal"s};
 }
 
-Token Token::instantiate_template_types(const TypeInfoPtr& template_type) const
+Token Token::instantiate_template_types(const TypePtr& template_type) const
 {
     Token t{type_, ::instantiate_template_types(lexeme_, template_type)};
     t.set_line(line_);

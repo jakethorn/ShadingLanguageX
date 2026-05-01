@@ -8,15 +8,15 @@
 #include "Scope.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 
-Parameter::Parameter(ModifierList mods, TypeInfoPtr type, string name, const size_t index)
+Parameter::Parameter(ModifierList mods, TypePtr type, string name, const size_t index)
     : Parameter{std::move(mods), std::move(type), std::move(name), nullptr, index}
 {
 
 }
 
-Parameter::Parameter(ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, const size_t index)
+Parameter::Parameter(ModifierList mods, TypePtr type, string name, ExprPtr expr, const size_t index)
     : mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
@@ -48,9 +48,9 @@ Parameter::Parameter(Parameter&& other) noexcept
 
 Parameter::~Parameter() = default;
 
-Parameter Parameter::instantiate_template_types(const TypeInfoPtr& template_type) const
+Parameter Parameter::instantiate_template_types(const TypePtr& template_type) const
 {
-    TypeInfoPtr type = type_->instantiate_template_types(template_type);
+    TypePtr type = type_->instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
     return Parameter{mods_, std::move(type), name_, std::move(expr), index_};
 }
@@ -63,7 +63,7 @@ void Parameter::init()
         expr_->init(type());
 }
 
-TypeInfoPtr Parameter::type() const
+TypePtr Parameter::type() const
 {
     return type_;
 }

@@ -13,15 +13,15 @@ public:
     NullExpression() = default;
     explicit NullExpression(Token token) : Expression{std::move(token)} { }
 
-    ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
-    void init_impl(const vector<TypeInfoPtr>& types) override;
-    TypeInfoPtr type_impl() const override;
+    void init_impl(const vector<TypePtr>& types) override;
+    TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
 private:
-    TypeInfoPtr type_;
+    TypePtr type_;
 };
 
 #endif //FENNEC_NULLEXPRESSION_H

@@ -12,7 +12,7 @@ class BlockStatement final : public Statement
 public:
     BlockStatement(Token token, vector<StmtPtr> body);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;

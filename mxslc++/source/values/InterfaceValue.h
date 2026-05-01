@@ -11,7 +11,7 @@
 class InterfaceValue final : public Value
 {
 public:
-    InterfaceValue(TypeInfoPtr type, string name);
+    InterfaceValue(TypePtr type, string name);
 
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override;
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;

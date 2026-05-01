@@ -39,15 +39,15 @@ public:
 
     void add_function(FuncPtr func);
     vector<FuncPtr> get_functions(
-        const vector<TypeInfoPtr>& return_types,
+        const vector<TypePtr>& return_types,
         const string& name,
-        const TypeInfoPtr& template_type,
+        const TypePtr& template_type,
         const ArgumentList& args
         ) const;
     FuncPtr get_function(
-        const vector<TypeInfoPtr>& return_types,
+        const vector<TypePtr>& return_types,
         const string& name,
-        const TypeInfoPtr& template_type,
+        const TypePtr& template_type,
         const ArgumentList& args
     ) const;
     vector<FuncPtr> get_all_functions(const string& name) const;
@@ -56,13 +56,13 @@ public:
      * types
      */
 
-    void add_type(TypeInfoPtr type);
+    void add_type(TypePtr type);
     void add_basic_type(const string& name);
-    void add_alias(const string& name, TypeInfoPtr type);
+    void add_alias(const string& name, TypePtr type);
     bool has_type(const string& name) const;
-    TypeInfoPtr resolve_type(const TypeInfoPtr& type) const;
-    void resolve_fields(const TypeInfoPtr& type) const;
-    TypeInfoPtr get_type(const string& name) const;
+    TypePtr resolve_type(const TypePtr& type) const;
+    void resolve_fields(const TypePtr& type) const;
+    TypePtr get_type(const string& name) const;
 
 private:
     ScopePtr parent_;
@@ -70,7 +70,7 @@ private:
 
     unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;
-    unordered_map<string, TypeInfoPtr> types_;
+    unordered_map<string, TypePtr> types_;
 };
 
 #endif //FENNEC_SCOPE_H

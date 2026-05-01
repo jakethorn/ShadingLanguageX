@@ -9,7 +9,7 @@
 #include "CompileError.h"
 #include "ArgumentList.h"
 #include "Function.h"
-#include "TypeInfo.h"
+#include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"
 #include "utils/template_utils.h"
@@ -74,9 +74,9 @@ namespace
 {
     bool is_match(
         const Function& func,
-        const vector<TypeInfoPtr>& return_types,
+        const vector<TypePtr>& return_types,
         const string& name,
-        const TypeInfoPtr& template_type,
+        const TypePtr& template_type,
         const ArgumentList& args
     )
     {
@@ -99,7 +99,7 @@ namespace
 
         for (const Argument& arg : args)
         {
-            TypeInfoPtr param_type = func.parameters()[arg].type();
+            TypePtr param_type = func.parameters()[arg].type();
             if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
                 return false;
         }
@@ -121,9 +121,9 @@ namespace
 }
 
 vector<FuncPtr> Scope::get_functions(
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 ) const
 {
@@ -146,9 +146,9 @@ vector<FuncPtr> Scope::get_functions(
 }
 
 FuncPtr Scope::get_function(
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 ) const
 {
@@ -185,7 +185,7 @@ vector<FuncPtr> Scope::get_all_functions(const string& name) const
     return funcs;
 }
 
-void Scope::add_type(TypeInfoPtr type)
+void Scope::add_type(TypePtr type)
 {
     assert(type->has_name());
 
@@ -200,11 +200,11 @@ void Scope::add_type(TypeInfoPtr type)
 
 void Scope::add_basic_type(const string& name)
 {
-    TypeInfoPtr type = std::make_shared<TypeInfo>(name);
+    TypePtr type = std::make_shared<Type>(name);
     add_type(std::move(type));
 }
 
-void Scope::add_alias(const string& name, TypeInfoPtr type)
+void Scope::add_alias(const string& name, TypePtr type)
 {
     if (contains(types_, name))
         throw CompileError{"Type '" + name + "' already defined"};
@@ -222,7 +222,7 @@ bool Scope::has_type(const string& name) const
     return false;
 }
 
-TypeInfoPtr Scope::resolve_type(const TypeInfoPtr& type) const
+TypePtr Scope::resolve_type(const TypePtr& type) const
 {
     if (type->has_name())
     {
@@ -236,13 +236,13 @@ TypeInfoPtr Scope::resolve_type(const TypeInfoPtr& type) const
     }
 }
 
-void Scope::resolve_fields(const TypeInfoPtr& type) const
+void Scope::resolve_fields(const TypePtr& type) const
 {
-    for (FieldInfo& field : type->fields_)
+    for (Field& field : type->fields_)
         field.type_ = resolve_type(field.type_);
 }
 
-TypeInfoPtr Scope::get_type(const string& name) const
+TypePtr Scope::get_type(const string& name) const
 {
     if (contains(types_, name))
         return types_.at(name);

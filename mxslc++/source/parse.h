@@ -16,7 +16,7 @@ class Attribute;
 class Parameter;
 class Argument;
 class Runtime;
-class FieldInfo;
+class Field;
 
 vector<StmtPtr> parse(vector<Token> tokens);
 
@@ -32,10 +32,10 @@ private:
 
     StmtPtr statement();
     StmtPtr print_statement();
-    StmtPtr variable_definition(ModifierList mods, TypeInfoPtr type);
-    StmtPtr multi_variable_definition(ModifierList mods, TypeInfoPtr type);
+    StmtPtr variable_definition(ModifierList mods, TypePtr type);
+    StmtPtr multi_variable_definition(ModifierList mods, TypePtr type);
     StmtPtr variable_assignment();
-    StmtPtr function_definition(ModifierList mods, TypeInfoPtr type);
+    StmtPtr function_definition(ModifierList mods, TypePtr type);
     StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr using_declaration();
     StmtPtr for_loop();
@@ -44,10 +44,10 @@ private:
     StmtPtr if_statement();
 
     ModifierList modifiers();
-    TypeInfoPtr type_info();
-    FieldInfo field_info();
+    TypePtr type_info();
+    Field field_info();
     Parameter parameter(size_t index);
-    vector<TypeInfoPtr> template_list();
+    vector<TypePtr> template_list();
     tuple<StmtPtr, ExprPtr> function_body();
 
     ExprPtr expression();

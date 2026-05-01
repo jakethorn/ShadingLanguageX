@@ -7,10 +7,10 @@
 
 #include "common.h"
 
-string instantiate_template_types(const string& src, const TypeInfoPtr& template_type);
+string instantiate_template_types(const string& src, const TypePtr& template_type);
 
 template<typename T>
-optional<T> instantiate_template_types(const optional<T>& src, const TypeInfoPtr& template_type)
+optional<T> instantiate_template_types(const optional<T>& src, const TypePtr& template_type)
 {
     if (src)
         return src->instantiate_template_types(template_type);
@@ -18,7 +18,7 @@ optional<T> instantiate_template_types(const optional<T>& src, const TypeInfoPtr
 }
 
 template<typename T>
-unique_ptr<T> instantiate_template_types(const unique_ptr<T>& src, const TypeInfoPtr& template_type)
+unique_ptr<T> instantiate_template_types(const unique_ptr<T>& src, const TypePtr& template_type)
 {
     if (src)
         return src->instantiate_template_types(template_type);
@@ -26,7 +26,7 @@ unique_ptr<T> instantiate_template_types(const unique_ptr<T>& src, const TypeInf
 }
 
 template<typename T>
-shared_ptr<T> instantiate_template_types(const shared_ptr<T>& src, const TypeInfoPtr& template_type)
+shared_ptr<T> instantiate_template_types(const shared_ptr<T>& src, const TypePtr& template_type)
 {
     if (src)
         return src->instantiate_template_types(template_type);
@@ -34,7 +34,7 @@ shared_ptr<T> instantiate_template_types(const shared_ptr<T>& src, const TypeInf
 }
 
 template<typename T>
-vector<T> instantiate_template_types(const vector<T>& src, const TypeInfoPtr& template_type)
+vector<T> instantiate_template_types(const vector<T>& src, const TypePtr& template_type)
 {
     vector<T> dst;
     dst.reserve(src.size());
@@ -44,7 +44,7 @@ vector<T> instantiate_template_types(const vector<T>& src, const TypeInfoPtr& te
 }
 
 template<typename T>
-vector<unique_ptr<T>> instantiate_template_types(const vector<unique_ptr<T>>& src, const TypeInfoPtr& template_type)
+vector<unique_ptr<T>> instantiate_template_types(const vector<unique_ptr<T>>& src, const TypePtr& template_type)
 {
     vector<unique_ptr<T>> dst;
     dst.reserve(src.size());
@@ -54,7 +54,7 @@ vector<unique_ptr<T>> instantiate_template_types(const vector<unique_ptr<T>>& sr
 }
 
 template<typename T>
-vector<shared_ptr<T>> instantiate_template_types(const vector<shared_ptr<T>>& src, const TypeInfoPtr& template_type)
+vector<shared_ptr<T>> instantiate_template_types(const vector<shared_ptr<T>>& src, const TypePtr& template_type)
 {
     vector<shared_ptr<T>> dst;
     dst.reserve(src.size());

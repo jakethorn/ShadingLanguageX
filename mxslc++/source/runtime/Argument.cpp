@@ -32,22 +32,22 @@ Argument::Argument(Argument&& other) noexcept
 
 Argument::~Argument() = default;
 
-Argument Argument::instantiate_template_types(const TypeInfoPtr& template_type) const
+Argument Argument::instantiate_template_types(const TypePtr& template_type) const
 {
     return Argument{name_, expr_->instantiate_template_types(template_type), index_};
 }
 
-void Argument::init(const TypeInfoPtr& type) const
+void Argument::init(const TypePtr& type) const
 {
     expr_->init(type);
 }
 
-void Argument::init(const vector<TypeInfoPtr>& types) const
+void Argument::init(const vector<TypePtr>& types) const
 {
     expr_->init(types);
 }
 
-bool Argument::try_init(const vector<TypeInfoPtr>& types) const
+bool Argument::try_init(const vector<TypePtr>& types) const
 {
     return expr_->try_init(types);
 }
@@ -57,7 +57,7 @@ bool Argument::is_initialized() const
     return expr_->is_initialized();
 }
 
-TypeInfoPtr Argument::type() const
+TypePtr Argument::type() const
 {
     return expr_->type();
 }

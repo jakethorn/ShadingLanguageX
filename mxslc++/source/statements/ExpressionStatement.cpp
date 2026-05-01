@@ -18,7 +18,7 @@ ExpressionStatement::ExpressionStatement(ExprPtr expr)
 
 ExpressionStatement::~ExpressionStatement() = default;
 
-StmtPtr ExpressionStatement::instantiate_template_types(const TypeInfoPtr& template_type) const
+StmtPtr ExpressionStatement::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr expr = expr_->instantiate_template_types(template_type);
     return std::make_unique<ExpressionStatement>(std::move(expr));

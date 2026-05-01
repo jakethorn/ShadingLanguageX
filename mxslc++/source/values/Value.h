@@ -10,19 +10,19 @@
 class Value
 {
 public:
-    explicit Value(TypeInfoPtr type) : type_{std::move(type)} { }
+    explicit Value(TypePtr type) : type_{std::move(type)} { }
     virtual ~Value() = default;
 
     virtual void set_as_node_input(const mx::NodePtr& node, const string& input_name) const { }
     virtual void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const { }
     virtual void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const { }
 
-    TypeInfoPtr type() { return type_; }
+    TypePtr type() { return type_; }
 
     virtual string str() const = 0;
 
 protected:
-    TypeInfoPtr type_;
+    TypePtr type_;
 };
 
 #endif //FENNEC_VALUE_H

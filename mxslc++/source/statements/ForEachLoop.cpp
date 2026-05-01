@@ -9,13 +9,13 @@
 #include "expressions/Expression.h"
 #include "CompileError.h"
 #include "runtime/Runtime.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
-ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypeInfoPtr type, string name, ExprPtr iter_expr, StmtPtr body)
+ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr iter_expr, StmtPtr body)
     : Statement{std::move(token)},
     mods_{std::move(mods)},
     type_{std::move(type)},
@@ -26,9 +26,9 @@ ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypeInfoPtr type, strin
 
 }
 
-StmtPtr ForEachLoop::instantiate_template_types(const TypeInfoPtr& template_type) const
+StmtPtr ForEachLoop::instantiate_template_types(const TypePtr& template_type) const
 {
-    TypeInfoPtr type = type_->instantiate_template_types(template_type);
+    TypePtr type = type_->instantiate_template_types(template_type);
     ExprPtr iter_expr = ::instantiate_template_types(iter_expr_, template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
     return std::make_unique<ForEachLoop>(token_, mods_, std::move(type), name_, std::move(iter_expr), std::move(body));
@@ -36,7 +36,7 @@ StmtPtr ForEachLoop::instantiate_template_types(const TypeInfoPtr& template_type
 
 void ForEachLoop::execute_impl() const
 {
-    const TypeInfoPtr type = runtime().scope().resolve_type(type_);
+    const TypePtr type = runtime().scope().resolve_type(type_);
 
     iter_expr_->init();
     if (not iter_expr_->type()->has_fields())

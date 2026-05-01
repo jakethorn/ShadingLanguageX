@@ -13,14 +13,14 @@
 class Variable : public std::enable_shared_from_this<Variable>
 {
 public:
-    Variable(ModifierList mods, TypeInfoPtr type);
+    Variable(ModifierList mods, TypePtr type);
 
     bool is_const() const;
     bool is_mutable() const;
     const ModifierList& modifiers() const;
     void set_modifiers(ModifierList mods);
 
-    const TypeInfoPtr& type() const;
+    const TypePtr& type() const;
 
     const string& name() const;
     void set_name(string name);
@@ -58,12 +58,12 @@ public:
             throw CompileError{"Value is not a compile-time "s + typeid(T).name()};
     }
 
-    static VarPtr create(ModifierList mods, TypeInfoPtr type, const vector<VarPtr>& children);
-    static VarPtr create(ModifierList mods, TypeInfoPtr type, ValuePtr value);
-    static VarPtr create(ModifierList mods, TypeInfoPtr type, const VarPtr& value);
-    static VarPtr create(TypeInfoPtr type, const vector<VarPtr>& children);
-    static VarPtr create(TypeInfoPtr type, ValuePtr value);
-    static VarPtr create(TypeInfoPtr type, const VarPtr& value);
+    static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
+    static VarPtr create(ModifierList mods, TypePtr type, ValuePtr value);
+    static VarPtr create(ModifierList mods, TypePtr type, const VarPtr& value);
+    static VarPtr create(TypePtr type, const vector<VarPtr>& children);
+    static VarPtr create(TypePtr type, ValuePtr value);
+    static VarPtr create(TypePtr type, const VarPtr& value);
     static VarPtr create(ValuePtr value);
     static VarPtr create(const VarPtr& value);
 
@@ -73,7 +73,7 @@ private:
     void copy_children(const vector<VarPtr>& children);
 
     ModifierList mods_;
-    TypeInfoPtr type_;
+    TypePtr type_;
     weak_ptr<Variable> parent_;
     vector<VarPtr> children_;
     ValuePtr value_;

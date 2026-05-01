@@ -15,18 +15,18 @@ class Function
 public:
     Function(
         ModifierList mods,
-        TypeInfoPtr return_type,
+        TypePtr return_type,
         string name,
-        TypeInfoPtr template_type,
+        TypePtr template_type,
         ParameterList params,
         mx::NodeDefPtr node_def
     );
 
     Function(
         ModifierList mods,
-        TypeInfoPtr return_type,
+        TypePtr return_type,
         string name,
-        TypeInfoPtr template_type,
+        TypePtr template_type,
         ParameterList params,
         StmtPtr body,
         ExprPtr return_expr
@@ -38,11 +38,11 @@ public:
 
     bool is_inline() const { return mods_.contains(TokenType::Inline); }
     bool is_default() const { return mods_.contains(TokenType::Default); }
-    TypeInfoPtr return_type() const { return return_type_; }
+    TypePtr return_type() const { return return_type_; }
     bool is_void() const;
     const string& name() const { return name_; }
     bool has_template_type() const { return template_type_ != nullptr; }
-    TypeInfoPtr template_type() const { return template_type_; }
+    TypePtr template_type() const { return template_type_; }
     size_t min_arity() const;
     size_t max_arity() const { return params_.size(); }
     const ParameterList& parameters() const { return params_; }
@@ -67,9 +67,9 @@ public:
 
 private:
     ModifierList mods_;
-    TypeInfoPtr return_type_;
+    TypePtr return_type_;
     string name_;
-    TypeInfoPtr template_type_;
+    TypePtr template_type_;
     ParameterList params_;
     StmtPtr body_ = nullptr;
     ExprPtr return_expr_ = nullptr;

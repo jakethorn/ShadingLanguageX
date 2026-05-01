@@ -5,9 +5,9 @@
 #include "InterfaceValue.h"
 
 #include "mtlx/mtlx_utils.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 
-InterfaceValue::InterfaceValue(TypeInfoPtr type, string name)
+InterfaceValue::InterfaceValue(TypePtr type, string name)
     : Value{std::move(type)}, name_{std::move(name)}
 {
 

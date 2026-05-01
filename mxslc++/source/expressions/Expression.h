@@ -18,24 +18,24 @@ public:
 
     virtual ~Expression() = default;
 
-    virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
+    virtual ExprPtr instantiate_template_types(const TypePtr& template_type) const = 0;
 
     void init();
-    void init(const TypeInfoPtr& type);
+    void init(const TypePtr& type);
     void init(const string& type_name);
-    void init(const vector<TypeInfoPtr>& types);
-    bool try_init(const vector<TypeInfoPtr>& types);
+    void init(const vector<TypePtr>& types);
+    bool try_init(const vector<TypePtr>& types);
 
     const Token& token() const { return token_; }
     bool is_initialized() const { return is_initialized_; }
-    TypeInfoPtr type() const;
+    TypePtr type() const;
 
     VarPtr evaluate() const;
 
 protected:
-    virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
-    virtual void init_impl(const vector<TypeInfoPtr>& types) { }
-    virtual TypeInfoPtr type_impl() const = 0;
+    virtual void init_subexpressions(const vector<TypePtr>& types) { }
+    virtual void init_impl(const vector<TypePtr>& types) { }
+    virtual TypePtr type_impl() const = 0;
     virtual VarPtr evaluate_impl() const = 0;
 
     static Scope& scope();
@@ -43,7 +43,7 @@ protected:
 
     Token token_;
     bool is_initialized_ = false;
-    TypeInfoPtr assigned_type_ = nullptr;
+    TypePtr assigned_type_ = nullptr;
 };
 
 #endif //FENNEC_EXPRESSION_H

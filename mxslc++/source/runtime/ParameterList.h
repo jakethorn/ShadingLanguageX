@@ -15,7 +15,7 @@ class ParameterList
 public:
     ParameterList(vector<Parameter> params);
 
-    ParameterList instantiate_template_types(const TypeInfoPtr& template_type) const
+    ParameterList instantiate_template_types(const TypePtr& template_type) const
     {
         return ::instantiate_template_types(params_, template_type);
     }

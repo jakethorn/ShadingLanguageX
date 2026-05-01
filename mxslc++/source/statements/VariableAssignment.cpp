@@ -15,7 +15,7 @@ VariableAssignment::VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rh
 
 VariableAssignment::~VariableAssignment() = default;
 
-StmtPtr VariableAssignment::instantiate_template_types(const TypeInfoPtr& template_type) const
+StmtPtr VariableAssignment::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr lhs = lhs_expr_->instantiate_template_types(template_type);
     ExprPtr rhs = rhs_expr_->instantiate_template_types(template_type);

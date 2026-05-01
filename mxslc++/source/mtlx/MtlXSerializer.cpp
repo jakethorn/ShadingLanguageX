@@ -15,7 +15,7 @@
 #include "values/NodeValue.h"
 #include "values/Value.h"
 #include "runtime/Function.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
@@ -27,29 +27,29 @@
 
 namespace
 {
-    string serialize_type(const TypeInfoPtr& type)
+    string serialize_type(const TypePtr& type)
     {
         if (type->has_fields())
-            return TypeInfo::MultiOutput;
-        if (type == TypeInfo::Void)
-            return TypeInfo::Int;
+            return Type::MultiOutput;
+        if (type == Type::Void)
+            return Type::Int;
         return type->name();
     }
 
     string serialize_type(const FuncPtr& func)
     {
         if (not func->nonlocal_outputs().empty())
-            return TypeInfo::MultiOutput;
+            return Type::MultiOutput;
         return serialize_type(func->return_type());
     }
 
-    void add_inputs_to_node_def(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name)
+    void add_inputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name)
     {
         if (type->has_fields())
         {
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                add_inputs_to_node_def(node_def, type->field_type(i), port_name(name, i));
+                add_inputs_to_node_def(node_def, type->field_type(i), get_port_name(name, i));
             }
         }
         else
@@ -59,13 +59,13 @@ namespace
         }
     }
 
-    void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypeInfoPtr& type, const string& name = "out"s)
+    void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name = "out"s)
     {
         if (type->has_fields())
         {
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                add_outputs_to_node_def(node_def, type->field_type(i), port_name(name, i));
+                add_outputs_to_node_def(node_def, type->field_type(i), get_port_name(name, i));
             }
         }
         else
