@@ -1,0 +1,13 @@
+float x = randomfloat(1);
+
+float foo()
+{
+   return x * randomfloat(2);
+}
+
+float bar()
+{
+   return foo();
+}
+
+float y = bar();

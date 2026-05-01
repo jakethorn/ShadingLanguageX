@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <multiply name="x" type="float">
+  <multiply name="node1" type="float">
     <input name="in1" type="float" value="7" />
     <input name="in2" type="float" value="2" />
   </multiply>
-  <multiply name="b" type="float">
+  <multiply name="node2" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="9" />
   </multiply>

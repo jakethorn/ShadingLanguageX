@@ -34,7 +34,8 @@ private:
     const string& name() const { return token_.lexeme(); }
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr2>& funcs);
-    void add_arguments_to_inline_scope() const;
+    void evaluate_arguments() const;
+    void update_out_arguments() const;
 
     TypeInfoPtr template_type_;
     ArgumentList args_;

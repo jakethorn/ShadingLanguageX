@@ -1,6 +1,0 @@
-float foo1(float x)
-{
-    return 3.0 * 7.0;
-}
-
-foo1(float out_x1);

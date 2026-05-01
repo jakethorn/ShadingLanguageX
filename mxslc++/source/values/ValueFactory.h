@@ -30,7 +30,7 @@ public:
     static VarPtr2 create_default_value()
     {
         ValuePtr value = std::make_shared<BasicValue>(T{});
-        return std::make_shared<Variable2>(std::move(value));
+        return Variable2::create(std::move(value));
     }
 
 private:

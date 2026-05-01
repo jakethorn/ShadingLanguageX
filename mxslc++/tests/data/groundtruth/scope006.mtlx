@@ -1,32 +1,18 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_some_func" node="some_func">
-    <output name="nonlocal_out__a__0" type="float" />
-    <output name="nonlocal_out__a__1" type="float" />
-    <output name="nonlocal_out__b__0" type="float" />
-    <output name="nonlocal_out__b__1" type="float" />
     <output name="out" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
-    <output name="nonlocal_out__a__0" type="float" value="3" />
-    <output name="nonlocal_out__a__1" type="float" value="4" />
-    <output name="nonlocal_out__b__0" type="float" value="7" />
-    <output name="nonlocal_out__b__1" type="float" value="8" />
     <output name="out" type="float" value="3" />
   </nodegraph>
-  <multiply name="c" type="float">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="6" />
+  <multiply name="node1" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="8" />
   </multiply>
-  <some_func name="node1" type="multioutput">
-    <output name="nonlocal_out__b__0" type="float" />
-    <output name="nonlocal_out__b__1" type="float" />
-    <output name="nonlocal_out__a__0" type="float" />
-    <output name="nonlocal_out__a__1" type="float" />
-    <output name="out" type="float" />
-  </some_func>
-  <multiply name="d" type="float">
-    <input name="in1" type="float" output="nonlocal_out__b__0" nodename="node1" />
-    <input name="in2" type="float" output="nonlocal_out__a__1" nodename="node1" />
+  <some_func name="node2" type="float" />
+  <multiply name="node3" type="float">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" value="4" />
   </multiply>
 </materialx>

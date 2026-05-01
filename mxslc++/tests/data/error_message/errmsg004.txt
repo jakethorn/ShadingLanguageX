@@ -1,1 +1,1 @@
-errmsg004.mxsl, line 8: Indexing expression could not be evaluated at compile time
+errmsg004.mxsl, line 8: Value is not a compile-time i

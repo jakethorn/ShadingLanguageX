@@ -1,0 +1,10 @@
+{float, float} p = {1.0, 2.0};
+
+float foo()
+{
+   p[1] = randomfloat();
+   return p[0] + p[1];
+}
+
+float x = foo();
+float y = x * 2.0;

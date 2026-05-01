@@ -30,6 +30,8 @@ public:
     ValuePtr write_node_def_input(const VarPtr2& var) const;
     void write_node_def_output(const VarPtr2& var, const ValuePtr& value) const;
     void write_node_def_graph(const FuncPtr2& func) const;
+
+    string xml() const;
     void save(const fs::path& filepath) const;
 
 private:

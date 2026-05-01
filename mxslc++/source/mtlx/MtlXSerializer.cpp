@@ -54,7 +54,8 @@ namespace
         }
         else
         {
-            node_def->addInput(name, serialize_type(type));
+            if (node_def->getInput(name) == nullptr)
+                node_def->addInput(name, serialize_type(type));
         }
     }
 
@@ -86,25 +87,25 @@ namespace
 
 VarPtr2 MtlXSerializer::write_node(const FuncPtr2& func, const ArgumentList& args) const
 {
+    vector<pair<const Parameter&, VarPtr2>> arg_values = args.evaluate(func->parameters());
+
     // evaluate at compile-time if possible
-    if (VarPtr2 value = evaluate_now(func->name(), args))
+    if (VarPtr2 value = evaluate_now(func->name(), arg_values))
         return value;
 
     const mx::NodePtr node = graph()->addNode(func->name(), mx::EMPTY_STRING, serialize_type(func));
 
-    for (const Parameter& param : func->parameters())
+    for (const auto& [param, arg_value] : arg_values)
     {
-        const VarPtr2 arg = args.evaluate(param);
-
         if (param.is_in())
         {
-            arg->set_as_node_input(node, param.name());
+            arg_value->set_as_node_input(node, param.name());
         }
 
         if (param.is_out())
         {
             const VarPtr2 output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name());
-            arg->copy_value(output);
+            arg_value->copy_value(output);
         }
     }
 
@@ -154,10 +155,14 @@ void MtlXSerializer::write_node_def_graph(const FuncPtr2& func) const
     write_node_graph(func, node_def);
 }
 
+string MtlXSerializer::xml() const
+{
+    return mx::writeToXmlString(doc_);
+}
+
 void MtlXSerializer::save(const fs::path& filepath) const
 {
-    const string& xml = mx::writeToXmlString(doc_);
-    save_file(filepath, xml);
+    save_file(filepath, xml());
 }
 
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr2& func) const
@@ -176,13 +181,13 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr2& func) const
 
             // create interface value
             const VarPtr2 interface = ValueFactory::create_interface_value(param.type(), param.name());
-            interface->set_modifiers(param.modifiers().without(TokenType::In, TokenType::Out));
+            interface->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
             interface->add_to_scope(param.name());
         }
         else
         {
             const VarPtr2 output = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            output->set_modifiers(param.modifiers().without(TokenType::In, TokenType::Out));
+            output->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
             output->add_to_scope(param.name());
         }
     }

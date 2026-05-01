@@ -7,9 +7,9 @@
 
 #include "utils/common.h"
 #include "Argument.h"
-#include "utils/instantiate_template_types_utils.h"
 
 class Parameter;
+class ParameterList;
 
 class ArgumentList
 {
@@ -25,20 +25,11 @@ public:
         (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
     }
 
-    ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const
-    {
-        return ::instantiate_template_types(args_, template_type);
-    }
+    ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const;
 
+    vector<VarPtr2> evaluate() const;
     VarPtr2 evaluate(const Parameter& param) const;
-    vector<VarPtr2> evaluate() const
-    {
-        vector<VarPtr2> values;
-        values.reserve(args_.size());
-        for (const Argument& arg : args_)
-            values.push_back(arg.evaluate());
-        return values;
-    }
+    vector<pair<const Parameter&, VarPtr2>> evaluate(const ParameterList& params) const;
 
     size_t size() const { return args_.size(); }
     bool empty() const { return args_.empty(); }

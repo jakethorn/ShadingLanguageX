@@ -1,58 +1,58 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo1" node="foo1">
-    <output name="nonlocal_out__x" type="float" />
     <output name="out" type="integer" />
+    <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo1" nodedef="ND_foo1">
     <multiply name="node1" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="nonlocal_out__x" type="float" nodename="node1" />
     <output name="out" type="integer" value="0" />
+    <output name="out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo1 name="node1" type="multioutput">
-    <output name="nonlocal_out__x" type="float" />
-    <output name="out" type="void" />
+  <foo1 name="node1" type="integer">
+    <output name="out__x" type="float" />
+    <output name="out" type="integer" />
   </foo1>
   <nodedef name="ND_foo2" node="foo2">
-    <output name="nonlocal_out__x" type="float" />
     <output name="out" type="integer" />
+    <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
     <multiply name="node1" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="nonlocal_out__x" type="float" nodename="node1" />
     <output name="out" type="integer" value="0" />
+    <output name="out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo2 name="node2" type="multioutput">
-    <output name="nonlocal_out__x" type="float" />
-    <output name="out" type="void" />
+  <foo2 name="node2" type="integer">
+    <output name="out__x" type="float" />
+    <output name="out" type="integer" />
   </foo2>
   <nodedef name="ND_foo3" node="foo3">
-    <output name="nonlocal_out__x" type="float" />
     <output name="out" type="integer" />
+    <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo3" nodedef="ND_foo3">
     <multiply name="node1" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="nonlocal_out__x" type="float" nodename="node1" />
     <output name="out" type="integer" value="0" />
+    <output name="out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo3 name="node3" type="multioutput">
-    <output name="nonlocal_out__x" type="float" />
-    <output name="out" type="void" />
+  <foo3 name="node3" type="integer">
+    <output name="out__x" type="float" />
+    <output name="out" type="integer" />
   </foo3>
   <add name="node4" type="float">
-    <input name="in1" type="float" output="nonlocal_out__x" nodename="node1" />
+    <input name="in1" type="float" output="out__x" nodename="node1" />
     <input name="in2" type="float" value="10" />
   </add>
-  <add name="HERE" type="float">
+  <add name="node5" type="float">
     <input name="in1" type="float" nodename="node4" />
     <input name="in2" type="float" value="100" />
   </add>

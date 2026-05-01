@@ -10,68 +10,11 @@
 #include "Scope.h"
 #include "expressions/ExpressionFactory.h"
 #include "mtlx/mtlx_utils.h"
+#include "values/NodeValue.h"
 
-Variable2::Variable2(ModifierList mods, TypeInfoPtr type, vector<VarPtr2> children) : type_{std::move(type)}, children_{std::move(children)}
+Variable2::Variable2(ModifierList mods, TypeInfoPtr type) : type_{std::move(type)}
 {
     set_modifiers(std::move(mods));
-}
-
-Variable2::Variable2(ModifierList mods, TypeInfoPtr type, ValuePtr value) : type_{std::move(type)}, value_{std::move(value)}
-{
-    set_modifiers(std::move(mods));
-}
-
-Variable2::Variable2(ModifierList mods, TypeInfoPtr type, const VarPtr2& value) : type_{std::move(type)}
-{
-    set_modifiers(std::move(mods));
-    copy_value(value);
-}
-
-Variable2::Variable2(TypeInfoPtr type, vector<VarPtr2> children) : type_{std::move(type)}, children_{std::move(children)}
-{
-
-}
-
-Variable2::Variable2(TypeInfoPtr type, const VarPtr2& value) : type_{std::move(type)}
-{
-    copy_value(value);
-}
-
-Variable2::Variable2(const VarPtr2& value) : type_{value->type()}
-{
-    copy_value(value);
-}
-
-Variable2::Variable2(ValuePtr value) : type_{value->type()}, value_{std::move(value)}
-{
-
-}
-
-void Variable2::copy_value(const VarPtr2& other)
-{
-    if (other->has_value())
-    {
-        set_value(other->value());
-    }
-    else
-    {
-        assert(child_count() == 0 or child_count() == other->child_count());
-        if (child_count() == 0)
-        {
-            for (size_t i = 0; i < other->child_count(); ++i)
-            {
-                VarPtr2 child = std::make_shared<Variable2>(type_->field_type(i), other->child(i));
-                children_.push_back(std::move(child));
-            }
-        }
-        else
-        {
-            for (size_t i = 0; i < child_count(); ++i)
-            {
-                children_[i]->copy_value(other->child(i));
-            }
-        }
-    }
 }
 
 bool Variable2::is_const() const
@@ -110,23 +53,42 @@ const string& Variable2::name() const
 void Variable2::set_name(string name)
 {
     name_ = std::move(name);
+    for (size_t i = 0; i < children_.size(); ++i)
+    {
+        children_[i]->set_name(port_name(name_, i));
+    }
+}
+
+bool Variable2::is_assignable() const
+{
+    if (not is_initialized_)
+        return true;
+    if (is_const())
+        return false;
+    if (has_parent() and parent()->is_const())
+        return false;
+    if (is_mutable())
+        return true;
+    if (has_parent() and parent()->is_mutable())
+        return true;
+    return false;
 }
 
 bool Variable2::is_temporary() const
 {
-    if (parent())
+    if (has_parent())
         return parent()->is_temporary();
     return name_.empty();
+}
+
+bool Variable2::has_parent() const
+{
+    return parent_.lock() != nullptr;
 }
 
 VarPtr2 Variable2::parent() const
 {
     return parent_.lock();
-}
-
-void Variable2::set_parent(weak_ptr<Variable2> parent)
-{
-    parent_ = std::move(parent);
 }
 
 size_t Variable2::child_count() const
@@ -136,10 +98,7 @@ size_t Variable2::child_count() const
 
 VarPtr2 Variable2::child(const size_t index)
 {
-    VarPtr2 child = children_.at(index);
-    child->set_parent(weak_from_this());
-    child->set_name(port_name(name_, index));
-    return child;
+    return children_.at(index);
 }
 
 VarPtr2 Variable2::child(const string& field_name)
@@ -165,16 +124,27 @@ ValuePtr Variable2::value()
     }
 }
 
-void Variable2::set_value(ValuePtr value)
+void Variable2::copy_value(const VarPtr2& other)
 {
-    if (is_temporary() or is_local())
+    if (not is_assignable())
+        throw CompileError{"Cannot assign value to non-mutable variable '" + name_ + "'"};
+
+    if (other->has_value())
     {
-        value_ = std::move(value);
+        set_value(other->value());
     }
     else
     {
-        const VarPtr2 self = shared_from_this();
-        Runtime::get().serializer().write_node_def_output(self, value);
+        copy_children(other->children_);
+    }
+}
+
+void Variable2::uninitialize()
+{
+    is_initialized_ = false;
+    for (const VarPtr2& child : children_)
+    {
+        child->uninitialize();
     }
 }
 
@@ -244,4 +214,85 @@ bool Variable2::is_local()
 string Variable2::str() const
 {
     return name_;
+}
+
+VarPtr2 Variable2::create(ModifierList mods, TypeInfoPtr type, const vector<VarPtr2>& children)
+{
+    VarPtr2 var = std::make_shared<Variable2>(std::move(mods), std::move(type));
+    var->copy_children(children);
+    var->is_initialized_ = true;
+    return var;
+}
+
+VarPtr2 Variable2::create(ModifierList mods, TypeInfoPtr type, ValuePtr value)
+{
+    VarPtr2 var = std::make_shared<Variable2>(std::move(mods), std::move(type));
+    var->set_value(std::move(value));
+    var->is_initialized_ = true;
+    return var;
+}
+
+VarPtr2 Variable2::create(ModifierList mods, TypeInfoPtr type, const VarPtr2& value)
+{
+    VarPtr2 var = std::make_shared<Variable2>(std::move(mods), std::move(type));
+    var->copy_value(value);
+    var->is_initialized_ = true;
+    return var;
+}
+
+VarPtr2 Variable2::create(TypeInfoPtr type, const vector<VarPtr2>& children)
+{
+    return create(ModifierList{}, std::move(type), children);
+}
+
+VarPtr2 Variable2::create(TypeInfoPtr type, ValuePtr value)
+{
+    return create(ModifierList{}, std::move(type), std::move(value));
+}
+
+VarPtr2 Variable2::create(TypeInfoPtr type, const VarPtr2& value)
+{
+    return create(ModifierList{}, std::move(type), value);
+}
+
+VarPtr2 Variable2::create(ValuePtr value)
+{
+    TypeInfoPtr type = value->type();
+    return create(ModifierList{}, std::move(type), std::move(value));
+}
+
+VarPtr2 Variable2::create(const VarPtr2& value)
+{
+    return create(ModifierList{}, value->type(), value);
+}
+
+void Variable2::set_parent(weak_ptr<Variable2> parent)
+{
+    parent_ = std::move(parent);
+}
+
+void Variable2::set_value(ValuePtr value)
+{
+    if (is_temporary() or is_local())
+    {
+        value_ = std::move(value);
+    }
+    else
+    {
+        const VarPtr2 self = shared_from_this();
+        Runtime::get().serializer().write_node_def_output(self, value);
+    }
+}
+
+void Variable2::copy_children(const vector<VarPtr2>& children)
+{
+    children_.clear();
+    for (size_t i = 0; i < children.size(); ++i)
+    {
+        VarPtr2 child = create(type_->field(i).modifiers(), type_->field_type(i), children[i]);
+        child->set_parent(weak_from_this());
+        if (not name_.empty())
+            child->set_name(port_name(name_, i));
+        children_.push_back(std::move(child));
+    }
 }

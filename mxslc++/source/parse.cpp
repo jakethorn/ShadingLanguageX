@@ -346,7 +346,7 @@ StmtPtr Parser::if_statement()
 ModifierList Parser::modifiers()
 {
     const vector<Token> mod_tokens = consume_while(
-        TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::In, TokenType::Out
+        TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Ref, TokenType::Out
     );
 
     vector<TokenType> mods;
@@ -641,22 +641,21 @@ Argument Parser::argument(const size_t i)
         match('=');
     }
 
-    ModifierList mods = modifiers();
-    bool is_out = mods.contains(TokenType::Out);
+    const ModifierList mods = modifiers();
 
     ExprPtr expr;
     if (is_variable_definition())
     {
-        expr = variable_definition_argument(std::move(mods));
-        is_out = true;
+        mods.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
+        expr = variable_definition_argument(mods.without(TokenType::Out));
     }
     else
     {
-        mods.validate(TokenType::Out);
+        mods.validate(TokenType::Ref, TokenType::Out);
         expr = expression();
     }
 
-    return Argument{is_out, std::move(name), std::move(expr), i};
+    return Argument{mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
 }
 
 bool Parser::is_variable_definition() const

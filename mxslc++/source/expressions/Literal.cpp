@@ -49,5 +49,5 @@ TypeInfoPtr Literal::type_impl() const
 VarPtr2 Literal::evaluate_impl() const
 {
     ValuePtr value = std::make_shared<BasicValue>(value_, type_);
-    return std::make_shared<Variable2>(value);
+    return Variable2::create(std::move(value));
 }

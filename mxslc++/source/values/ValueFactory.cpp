@@ -28,12 +28,12 @@ VarPtr2 ValueFactory::create_interface_value(TypeInfoPtr type, const string& nam
             field_values.push_back(std::move(field_value));
         }
 
-        return std::make_shared<Variable2>(std::move(type), std::move(field_values));
+        return Variable2::create(std::move(type), field_values);
     }
     else
     {
         ValuePtr value = std::make_shared<InterfaceValue>(std::move(type), name);
-        return std::make_shared<Variable2>(std::move(value));
+        return Variable2::create(std::move(value));
     }
 }
 
@@ -46,7 +46,7 @@ VarPtr2 ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& 
     else
     {
         ValuePtr value = std::make_shared<NodeValue>(std::move(node), std::move(type));
-        return std::make_shared<Variable2>(std::move(value));
+        return Variable2::create(std::move(value));
     }
 }
 
@@ -74,12 +74,12 @@ VarPtr2 ValueFactory::create_output_value(mx::NodePtr node, TypeInfoPtr type, co
             field_values.push_back(std::move(field_value));
         }
 
-        return std::make_shared<Variable2>(std::move(type), std::move(field_values));
+        return Variable2::create(std::move(type), field_values);
     }
     else
     {
         ValuePtr value = std::make_shared<OutputValue>(std::move(node), output_name, std::move(type));
-        return std::make_shared<Variable2>(std::move(value));
+        return Variable2::create(std::move(value));
     }
 }
 
@@ -93,7 +93,7 @@ VarPtr2 ValueFactory::create_output_values(mx::NodePtr node, TypeInfoPtr type, c
         VarPtr2 field_value = create_output_value(node, type->field_type(i), output_names[i]);
         field_values.push_back(std::move(field_value));
     }
-    return std::make_shared<Variable2>(std::move(type), std::move(field_values));
+    return Variable2::create(std::move(type), field_values);
 }
 
 VarPtr2 ValueFactory::create_default_value(TypeInfoPtr type)
@@ -108,7 +108,7 @@ VarPtr2 ValueFactory::create_default_value(TypeInfoPtr type)
             fields_values.push_back(std::move(field_value));
         }
 
-        return std::make_shared<Variable2>(std::move(type), std::move(fields_values));
+        return Variable2::create(std::move(type), fields_values);
     }
 
 #define START_INIT basic_t basic_value = ""s; if constexpr (false) { }
@@ -131,7 +131,7 @@ VarPtr2 ValueFactory::create_default_value(TypeInfoPtr type)
 #undef START_INIT
 
     ValuePtr value = std::make_shared<BasicValue>(std::move(basic_value));
-    return std::make_shared<Variable2>(std::move(value));
+    return Variable2::create(std::move(value));
 }
 
 ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)

@@ -15,6 +15,7 @@
 #include "runtime/TypeInfo.h"
 #include "runtime/Variable2.h"
 #include "utils/error_utils.h"
+#include "values/ValueFactory.h"
 
 ExprPtr FunctionCall2::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -73,8 +74,9 @@ VarPtr2 FunctionCall2::evaluate_impl() const
     if (func_->is_inline())
     {
         Runtime::get().enter_inline_scope();
-        add_arguments_to_inline_scope();
+        evaluate_arguments();
         VarPtr2 return_value = func_->invoke();
+        update_out_arguments();
         Runtime::get().exit_scope();
         return return_value;
     }
@@ -144,14 +146,36 @@ size_t FunctionCall2::try_init_arguments(const vector<FuncPtr2>& funcs)
     return initialized_arg_count;
 }
 
-void FunctionCall2::add_arguments_to_inline_scope() const
+// inline only
+void FunctionCall2::evaluate_arguments() const
 {
-    // i need to fix out parameters in inline functions
-    
     for (const Parameter& param : func_->parameters())
     {
-        const VarPtr2 value = args_.evaluate(param);
-        const VarPtr2 value_copy = std::make_shared<Variable2>(value);
-        value_copy->add_to_scope(param.name());
+        if (param.is_in())
+        {
+            const VarPtr2 arg_value = args_.evaluate(param);
+            const VarPtr2 arg_value_copy = Variable2::create(param.type(), arg_value);
+            arg_value_copy->add_to_scope(param.name());
+        }
+        else
+        {
+            const VarPtr2 default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
+            default_value->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
+            default_value->add_to_scope(param.name());
+        }
+    }
+}
+
+// inline only
+void FunctionCall2::update_out_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        if (param.is_out())
+        {
+            const VarPtr2 nonlocal = args_.evaluate(param);
+            const VarPtr2 local = Runtime::get().scope().get_variable(param.name());
+            nonlocal->copy_value(local);
+        }
     }
 }

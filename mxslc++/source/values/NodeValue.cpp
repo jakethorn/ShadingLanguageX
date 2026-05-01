@@ -23,6 +23,13 @@ void NodeValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, con
     output->setConnectedNode(node_);
 }
 
+void NodeValue::set_node_name(const string& name) const
+{
+    node_->setName(
+        node_->getParent()->createValidChildName(name)
+    );
+}
+
 string NodeValue::str() const
 {
     return as_string(node_);

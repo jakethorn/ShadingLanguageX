@@ -43,6 +43,12 @@ void Runtime::exit_scope()
     scope_ = scope_->exit();
 }
 
+Runtime& Runtime::create()
+{
+    instance_ = std::make_unique<Runtime>();
+    return *instance_;
+}
+
 Runtime& Runtime::get()
 {
     if (instance_ == nullptr)

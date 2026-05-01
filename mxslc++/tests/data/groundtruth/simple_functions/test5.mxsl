@@ -1,0 +1,19 @@
+using Normal = {
+   float x,
+   float y,
+   float z,
+   string space
+};
+
+Normal foo({float, float} xy, float z, string space = "world")
+{
+   return {
+       xy[0] / z,
+       xy[1] / z,
+       randomfloat(),
+       space
+   };
+}
+
+Normal n = foo({1.0, 2.0}, 3.0);
+Normal m = foo({4.0, 5.0}, 6.0, "object");

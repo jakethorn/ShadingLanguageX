@@ -8,7 +8,7 @@
   <convert name="node2" type="float">
     <input name="in" type="integer" value="2" />
   </convert>
-  <add name="y" type="color3">
+  <add name="node3" type="color3">
     <input name="in1" type="color3" nodename="node1" />
     <input name="in2" type="float" nodename="node2" />
   </add>

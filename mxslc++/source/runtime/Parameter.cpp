@@ -23,16 +23,17 @@ Parameter::Parameter(ModifierList mods, TypeInfoPtr type, string name, ExprPtr e
     expr_{std::move(expr)},
     index_{index}
 {
-    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::In, TokenType::Out);
+    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Ref, TokenType::Out);
 
-    if (mods_.contains(TokenType::Out))
+    if (mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out))
         mods_.add(TokenType::Mutable);
 
     if (is_const() and is_mutable())
-        throw CompileError{"Parameters cannot be both const and mutable (out parameters are mutable by default)"s};
+        throw CompileError{"Parameters cannot be both const and mutable (ref and out parameters are mutable by default)"s};
 
-    if (is_out() and has_default_value())
-        throw CompileError{"Out parameters cannot have default values"s};
+    if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
+        throw CompileError{"Parameters cannot be both ref and out"s};
+
 }
 
 Parameter::Parameter(Parameter&& other) noexcept

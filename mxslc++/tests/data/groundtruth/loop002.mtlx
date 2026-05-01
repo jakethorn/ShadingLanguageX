@@ -1,30 +1,30 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <texcoord name="uv" type="vector2">
+  <texcoord name="node1" type="vector2">
     <input name="index" type="integer" value="1" />
   </texcoord>
-  <texcoord name="uv2" type="vector2">
+  <texcoord name="node2" type="vector2">
     <input name="index" type="integer" value="2" />
   </texcoord>
-  <texcoord name="uv3" type="vector2">
+  <texcoord name="node3" type="vector2">
     <input name="index" type="integer" value="3" />
   </texcoord>
-  <texcoord name="uv4" type="vector2">
+  <texcoord name="node4" type="vector2">
     <input name="index" type="integer" value="4" />
   </texcoord>
-  <texcoord name="uv5" type="vector2">
+  <texcoord name="node5" type="vector2">
     <input name="index" type="integer" value="5" />
   </texcoord>
-  <texcoord name="uv6" type="vector2">
+  <texcoord name="node6" type="vector2">
     <input name="index" type="integer" value="6" />
   </texcoord>
-  <texcoord name="uv7" type="vector2">
+  <texcoord name="node7" type="vector2">
     <input name="index" type="integer" value="7" />
   </texcoord>
-  <texcoord name="uv8" type="vector2">
+  <texcoord name="node8" type="vector2">
     <input name="index" type="integer" value="8" />
   </texcoord>
-  <texcoord name="uv9" type="vector2">
+  <texcoord name="node9" type="vector2">
     <input name="index" type="integer" value="9" />
   </texcoord>
 </materialx>

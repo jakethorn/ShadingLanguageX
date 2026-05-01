@@ -1,0 +1,9 @@
+{float, float} p = {1.0, 2.0};
+
+void foo()
+{
+   p[0] = randomfloat();
+}
+
+foo();
+float x = p[0] * 2.0;

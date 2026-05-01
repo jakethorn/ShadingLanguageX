@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out__0" type="float" />
+    <output name="out__1" type="color3" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <randomfloat name="node1" type="float" />
+    <randomcolor name="node2" type="color3" />
+    <output name="out__0" type="float" nodename="node1" />
+    <output name="out__1" type="color3" nodename="node2" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <output name="out__0" type="float" />
+    <output name="out__1" type="color3" />
+  </foo>
+</materialx>

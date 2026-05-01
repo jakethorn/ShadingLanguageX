@@ -32,7 +32,7 @@ namespace
 
 void mxslc::compile_to_file(const fs::path& src_path, const fs::path& dst_path)
 {
-    Runtime& runtime = Runtime::get();
+    Runtime& runtime = Runtime::create();
     load_materialx_library("1.39.4"s);
     {
         runtime.enter_inline_scope();

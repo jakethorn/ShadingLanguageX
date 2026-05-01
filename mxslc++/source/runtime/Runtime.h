@@ -21,6 +21,7 @@ public:
     void enter_inline_scope();
     void exit_scope();
 
+    static Runtime& create();
     static Runtime& get();
 
 private:

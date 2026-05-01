@@ -39,9 +39,10 @@ StmtPtr ForRangeLoop::instantiate_template_types(const TypeInfoPtr& template_typ
 
 void ForRangeLoop::execute_impl() const
 {
-    if (type_->is<int>())
+    const TypeInfoPtr type = runtime().scope().resolve_type(type_);
+    if (type->is<int>())
         execute_with<int>();
-    else if (type_->is<float>())
+    else if (type->is<float>())
         execute_with<float>();
     else
         throw CompileError{"Unsupported loop iterator type"s};

@@ -42,6 +42,14 @@ public:
         return list;
     }
 
+    template<typename... Args>
+    ModifierList only(Args&&... mods) const
+    {
+        ModifierList list;
+        ((this->contains(mods) ? list.add(mods) : void()), ...);
+        return list;
+    }
+
     bool contains(const TokenType mod) const { return ::contains(mods_, mod.str()); }
     size_t size() const { return mods_.size(); }
     bool empty() const { return mods_.empty(); }

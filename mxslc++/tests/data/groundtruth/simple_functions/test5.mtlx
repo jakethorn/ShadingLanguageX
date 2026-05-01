@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+    <output name="out__2" type="float" />
+    <output name="out__3" type="string" />
+    <input name="xy__0" type="float" value="0" />
+    <input name="xy__1" type="float" value="0" />
+    <input name="z" type="float" value="0" />
+    <input name="space" type="string" value="world" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <divide name="node1" type="float">
+      <input name="in1" type="float" interfacename="xy__0" />
+      <input name="in2" type="float" interfacename="z" />
+    </divide>
+    <divide name="node2" type="float">
+      <input name="in1" type="float" interfacename="xy__1" />
+      <input name="in2" type="float" interfacename="z" />
+    </divide>
+    <randomfloat name="node3" type="float" />
+    <output name="out__0" type="float" nodename="node1" />
+    <output name="out__1" type="float" nodename="node2" />
+    <output name="out__2" type="float" nodename="node3" />
+    <output name="out__3" type="string" interfacename="space" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <input name="xy__0" type="float" value="1" />
+    <input name="xy__1" type="float" value="2" />
+    <input name="z" type="float" value="3" />
+    <input name="space" type="string" value="world" />
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+    <output name="out__2" type="float" />
+    <output name="out__3" type="string" />
+  </foo>
+  <foo name="node2" type="multioutput">
+    <input name="xy__0" type="float" value="4" />
+    <input name="xy__1" type="float" value="5" />
+    <input name="z" type="float" value="6" />
+    <input name="space" type="string" value="object" />
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+    <output name="out__2" type="float" />
+    <output name="out__3" type="string" />
+  </foo>
+</materialx>

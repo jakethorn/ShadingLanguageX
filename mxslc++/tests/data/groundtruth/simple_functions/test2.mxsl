@@ -1,0 +1,9 @@
+{float, color3} foo()
+{
+   return {
+       randomfloat(),
+       randomcolor()
+   };
+}
+
+float f, color3 c = foo();

@@ -36,7 +36,7 @@ TEST_P(failure_tests, compiler_throws_compile_error)
             }
         },
         mxslc::CompileError
-    ) << "Failed to throw CompileError: " << input_path;
+    ) << "\nFailed to throw CompileError: " << input_path << "\n\n" << read_file(input_path);
 
     if (fs::exists(actual_path))
         fs::remove(actual_path);

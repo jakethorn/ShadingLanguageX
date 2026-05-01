@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" />
+    <input name="nonlocal_in__p__0" type="float" />
+    <input name="nonlocal_in__p__1" type="float" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="node1" type="float">
+      <input name="in1" type="float" interfacename="nonlocal_in__p__0" />
+      <input name="in2" type="float" interfacename="nonlocal_in__p__1" />
+    </add>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <foo name="node1" type="float">
+    <input name="nonlocal_in__p__1" type="float" value="2" />
+    <input name="nonlocal_in__p__0" type="float" value="1" />
+  </foo>
+  <multiply name="node2" type="float">
+    <input name="in1" type="float" nodename="node1" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+</materialx>

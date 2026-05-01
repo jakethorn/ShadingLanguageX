@@ -5,6 +5,8 @@
 #ifndef FENNEC_ARGUMENT_H
 #define FENNEC_ARGUMENT_H
 
+#include "ModifierList.h"
+#include "TokenType.h"
 #include "utils/common.h"
 
 class Parameter;
@@ -12,8 +14,8 @@ class Parameter;
 class Argument
 {
 public:
-    Argument(bool is_out, string name, ExprPtr expr, size_t index);
-    Argument(bool is_out, ExprPtr expr, size_t index);
+    Argument(ModifierList mods, string name, ExprPtr expr, size_t index);
+    Argument(ModifierList mods, ExprPtr expr, size_t index);
     Argument(string name, ExprPtr expr, size_t index);
     Argument(ExprPtr expr, size_t index);
 
@@ -21,7 +23,6 @@ public:
 
     ~Argument();
 
-    bool is_out() const { return is_out_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
     ExprPtr expression() const { return expr_; }
@@ -38,7 +39,7 @@ public:
     void validate(const Parameter& param) const;
 
 private:
-    bool is_out_;
+    ModifierList mods_;
     string name_;
     ExprPtr expr_;
     size_t index_;

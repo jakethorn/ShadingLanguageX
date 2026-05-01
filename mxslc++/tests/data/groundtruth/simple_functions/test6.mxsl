@@ -1,0 +1,7 @@
+void foo(float x, out float y)
+{
+   y = x * 2.0;
+}
+
+foo(1.0, float z);
+float w = z + 3.0;

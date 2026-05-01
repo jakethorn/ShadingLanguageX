@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="nonlocal_out__b" type="float" />
     <output name="out" type="integer" />
+    <output name="nonlocal_out__b" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="nonlocal_out__b" type="float" value="2" />
@@ -10,6 +10,6 @@
   </nodegraph>
   <foo name="node1" type="multioutput">
     <output name="nonlocal_out__b" type="float" />
-    <output name="out" type="void" />
+    <output name="out" type="integer" />
   </foo>
 </materialx>

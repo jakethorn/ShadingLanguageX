@@ -7,8 +7,8 @@
 
 #include "utils/common.h"
 
-class ArgumentList;
+class Parameter;
 
-VarPtr2 evaluate_now(const string& node_name, const ArgumentList& args);
+VarPtr2 evaluate_now(const string& node_name, const vector<pair<const Parameter&, VarPtr2>>& arg_values);
 
 #endif //MXSLC_EVALUATE_MTLX_H

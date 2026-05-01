@@ -1,0 +1,9 @@
+float x = 5.0;
+
+void foo()
+{
+   x = 10.0;
+}
+
+foo();
+float y = x * 2.0;

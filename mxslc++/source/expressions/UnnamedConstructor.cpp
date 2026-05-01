@@ -55,7 +55,7 @@ VarPtr2 UnnamedConstructor::evaluate_impl() const
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-    return std::make_shared<Variable2>(type(), std::move(values));
+    return Variable2::create(type(), values);
 }
 
 bool UnnamedConstructor::expressions_are_initialized()

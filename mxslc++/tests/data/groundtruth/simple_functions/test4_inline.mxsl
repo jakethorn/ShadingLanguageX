@@ -1,0 +1,19 @@
+using Normal = {
+   float x,
+   float y,
+   float z,
+   string space
+};
+
+inline Normal foo({float, float} xy, float z)
+{
+   return {
+       xy[0] / z,
+       xy[1] / z,
+       randomfloat(),
+       "world"
+   };
+}
+
+Normal n = foo({1.0, 2.0}, 3.0);
+vec3 t = tangent(n.space);
