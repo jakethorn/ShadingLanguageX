@@ -10,20 +10,14 @@ add_library(mxslc_lib
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
         runtime/Function.cpp
-        runtime/Function2.cpp
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
         runtime/TypeInfo.cpp
         runtime/FieldInfo.cpp
         runtime/ModifierList.cpp
-        runtime/variables/IVariable.cpp
-        runtime/variables/Variable.cpp
-        runtime/variables/ChildVariable.cpp
-        runtime/variables/InVariable.cpp
-        runtime/Variable2.cpp
+        runtime/Variable.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
-        expressions/FunctionCall2.cpp
         expressions/Identifier.cpp
         expressions/Literal.cpp
         expressions/ExpressionFactory.cpp
@@ -35,7 +29,6 @@ add_library(mxslc_lib
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
-        statements/FunctionDefinition.cpp
         statements/FunctionDefinition2.cpp
         statements/MultiVariableDefinition.cpp
         statements/UsingDeclaration.cpp

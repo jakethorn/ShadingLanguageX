@@ -11,7 +11,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/ModifierList.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 
 class ForRangeLoop final : public Statement
 {
@@ -41,7 +41,7 @@ private:
         while (lower <= upper)
         {
             runtime().enter_inline_scope();
-            VarPtr2 var = Variable2::create(mods_, type, std::make_shared<BasicValue>(lower));
+            VarPtr var = Variable::create(mods_, type, std::make_shared<BasicValue>(lower));
             runtime().scope().add_variable(name_, std::move(var));
             body_->execute();
             runtime().exit_scope();

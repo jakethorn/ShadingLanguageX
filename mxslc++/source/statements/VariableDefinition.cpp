@@ -5,10 +5,9 @@
 #include "VariableDefinition.h"
 
 #include "runtime/Scope.h"
-#include "../runtime/variables/Variable.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 #include "values/Value.h"
 #include "values/ValueFactory.h"
 
@@ -31,7 +30,7 @@ void VariableDefinition::execute_impl() const
 {
     const TypeInfoPtr type = runtime().scope().resolve_type(type_);
 
-    VarPtr2 value;
+    VarPtr value;
     if (expr_)
     {
         expr_->init(type);
@@ -42,6 +41,6 @@ void VariableDefinition::execute_impl() const
         value = ValueFactory::create_default_value(type);
     }
 
-    VarPtr2 var = Variable2::create(mods_, type, value);
+    VarPtr var = Variable::create(mods_, type, value);
     runtime().scope().add_variable(name(), std::move(var));
 }

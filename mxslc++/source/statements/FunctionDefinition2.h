@@ -23,7 +23,7 @@ private:
     const string& name() const { return token_.lexeme(); }
     bool is_templated() const { return not template_types_.empty(); }
 
-    static void write_function_definition(const FuncPtr2& func);
+    static void write_function_definition(const FuncPtr& func);
 
     ModifierList mods_;
     TypeInfoPtr type_;
@@ -32,7 +32,7 @@ private:
     StmtPtr body_;
     ExprPtr return_expr_;
 
-    vector<FuncPtr2> funcs_;
+    vector<FuncPtr> funcs_;
 };
 
 #endif //MXSLC_FUNCTIONDEFINITION2_H

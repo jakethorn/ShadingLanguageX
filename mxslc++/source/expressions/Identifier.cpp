@@ -6,7 +6,6 @@
 
 #include "runtime/Scope.h"
 #include "runtime/Runtime.h"
-#include "runtime/variables/IVariable.h"
 #include "values/ValueFactory.h"
 
 ExprPtr Identifier::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -24,7 +23,7 @@ TypeInfoPtr Identifier::type_impl() const
     return var_->type();
 }
 
-VarPtr2 Identifier::evaluate_impl() const
+VarPtr Identifier::evaluate_impl() const
 {
     return var_;
 }

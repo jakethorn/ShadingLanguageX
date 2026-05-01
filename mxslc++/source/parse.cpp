@@ -9,7 +9,7 @@
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
-#include "expressions/FunctionCall2.h"
+#include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
 #include "expressions/IndexingExpression.h"
 #include "runtime/Attribute.h"
@@ -608,7 +608,7 @@ ExprPtr Parser::function_call()
         match('>');
     }
     vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
-    return std::make_unique<FunctionCall2>(std::move(name), std::move(template_type), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(name), std::move(template_type), std::move(args));
 }
 
 ExprPtr Parser::named_constructor()

@@ -6,7 +6,6 @@
 #define FENNEC_ARGUMENT_H
 
 #include "ModifierList.h"
-#include "TokenType.h"
 #include "utils/common.h"
 
 class Parameter;
@@ -34,7 +33,7 @@ public:
     bool try_init(const vector<TypeInfoPtr>& types) const;
     bool is_initialized() const;
     TypeInfoPtr type() const;
-    VarPtr2 evaluate() const;
+    VarPtr evaluate() const;
 
     void validate(const Parameter& param) const;
 

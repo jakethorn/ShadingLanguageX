@@ -5,7 +5,7 @@
 #include "VariableAssignment.h"
 
 #include "expressions/Expression.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 
 VariableAssignment::VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rhs_expr)
     : Statement{std::move(token)}, lhs_expr_{std::move(lhs_expr)}, rhs_expr_{std::move(rhs_expr)}
@@ -26,7 +26,7 @@ void VariableAssignment::execute_impl() const
 {
     lhs_expr_->init();
     rhs_expr_->init(lhs_expr_->type());
-    const VarPtr2 lhs = lhs_expr_->evaluate();
-    const VarPtr2 rhs = rhs_expr_->evaluate();
+    const VarPtr lhs = lhs_expr_->evaluate();
+    const VarPtr rhs = rhs_expr_->evaluate();
     lhs->copy_value(rhs);
 }

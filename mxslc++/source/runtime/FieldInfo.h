@@ -31,9 +31,6 @@ public:
 
     FieldInfo instantiate_template_types(const TypeInfoPtr& template_type) const;
 
-    void set_const(bool cnt) const;
-    void set_mutable(bool mut) const;
-
     string str() const;
 
 private:

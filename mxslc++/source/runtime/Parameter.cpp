@@ -68,7 +68,7 @@ TypeInfoPtr Parameter::type() const
     return type_;
 }
 
-VarPtr2 Parameter::evaluate() const
+VarPtr Parameter::evaluate() const
 {
     return expr_->evaluate();
 }

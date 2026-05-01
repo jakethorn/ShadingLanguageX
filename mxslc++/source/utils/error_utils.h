@@ -11,7 +11,7 @@ class ArgumentList;
 class Token;
 
 string missing_overload_error(
-    const FuncPtr2& func,
+    const FuncPtr& func,
     const vector<TypeInfoPtr>& return_types,
     const string& name,
     const TypeInfoPtr& template_type,
@@ -19,13 +19,13 @@ string missing_overload_error(
 );
 
 string missing_overload_error(
-    const vector<FuncPtr2>& funcs,
+    const vector<FuncPtr>& funcs,
     const vector<TypeInfoPtr>& return_types,
     const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 );
 
-string ambiguous_overload_error(const vector<FuncPtr2>& funcs);
+string ambiguous_overload_error(const vector<FuncPtr>& funcs);
 
 #endif //MXSLC_ERROR_UTILS_H

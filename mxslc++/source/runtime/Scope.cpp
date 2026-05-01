@@ -8,39 +8,20 @@
 #include "statements/Statement.h"
 #include "CompileError.h"
 #include "ArgumentList.h"
-#include "Function2.h"
+#include "Function.h"
 #include "TypeInfo.h"
-#include "Variable2.h"
-#include "variables/Variable.h"
-#include "variables/RefVariable.h"
+#include "Variable.h"
 #include "utils/error_utils.h"
 #include "utils/template_utils.h"
 
 Scope::Scope() : Scope{nullptr} { }
 Scope::Scope(ScopePtr parent) : Scope{std::move(parent), false} { }
-Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_current_{true}, is_inline_{is_inline}
+Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_inline_{is_inline}
 {
-    if (parent_)
-        parent_->set_current(false);
+
 }
 
-void Scope::add_variable(VarPtr2 var)
-{
-    assert(not var->name().empty());
-    add_variable(var->name(), std::move(var));
-}
-
-//void Scope::add_variable(string name, ValuePtr value)
-//{
-//    add_variable(ModifierList{}, std::move(name), std::move(value));
-//}
-//
-//void Scope::add_variable(ModifierList mods, string name, ValuePtr value)
-//{
-//    add_variable(std::make_shared<Variable>(std::move(mods), std::move(name), std::move(value)));
-//}
-
-void Scope::add_variable(string name, VarPtr2 var)
+void Scope::add_variable(string name, VarPtr var)
 {
     if (contains(variables_, name))
         throw CompileError{"Variable already defined: " + name};
@@ -49,12 +30,7 @@ void Scope::add_variable(string name, VarPtr2 var)
     variables_.emplace(std::move(name), std::move(var));
 }
 
-//void Scope::add_reference(string ref_name, const string& var_name)
-//{
-//    add_reference(std::move(ref_name), get_variable(var_name));
-//}
-
-VarPtr2 Scope::get_variable(const string& name) const
+VarPtr Scope::get_variable(const string& name) const
 {
     if (contains(variables_, name))
         return variables_.at(name);
@@ -65,9 +41,9 @@ VarPtr2 Scope::get_variable(const string& name) const
     throw CompileError{"Variable not defined: " + name};
 }
 
-bool Scope::is_variable_local(const VarPtr2& var) const
+bool Scope::is_variable_local(const VarPtr& var) const
 {
-    VarPtr2 tmp = var;
+    VarPtr tmp = var;
     while (tmp->parent())
         tmp = tmp->parent();
     return is_variable_local(tmp->name());
@@ -88,34 +64,7 @@ bool Scope::is_variable_local(const string& name) const
     throw CompileError{"Variable not defined: " + name};
 }
 
-//bool Scope::is_variable_inline(const ConstVarPtr& var) const
-//{
-//    if (var->is_child())
-//        return is_variable_inline(var->parent());
-//    else
-//        return is_variable_inline(var->name());
-//}
-//
-//bool Scope::is_variable_inline(const string& name) const
-//{
-//    if (contains(variables_, name))
-//    {
-//        const VarPtr var = variables_.at(name);
-//        if (var->is_reference())
-//            return is_variable_inline(var->dereference());
-//        else
-//            return true;
-//    }
-//
-//    if (parent_)
-//    {
-//        return parent_->is_variable_inline(name) and is_inline_;
-//    }
-//
-//    throw CompileError{"Variable not defined: " + name};
-//}
-
-void Scope::add_function(FuncPtr2 func)
+void Scope::add_function(FuncPtr func)
 {
     assert(func->is_initialized());
     functions_.push_back(std::move(func));
@@ -124,7 +73,7 @@ void Scope::add_function(FuncPtr2 func)
 namespace
 {
     bool is_match(
-        const Function2& func,
+        const Function& func,
         const vector<TypeInfoPtr>& return_types,
         const string& name,
         const TypeInfoPtr& template_type,
@@ -158,10 +107,10 @@ namespace
         return true;
     }
 
-    vector<FuncPtr2> default_functions(const vector<FuncPtr2>& funcs)
+    vector<FuncPtr> default_functions(const vector<FuncPtr>& funcs)
     {
-        vector<FuncPtr2> def_funcs;
-        for (const FuncPtr2& func : funcs)
+        vector<FuncPtr> def_funcs;
+        for (const FuncPtr& func : funcs)
         {
             if (func->is_default())
                 def_funcs.push_back(func);
@@ -171,15 +120,15 @@ namespace
     }
 }
 
-vector<FuncPtr2> Scope::get_functions(
+vector<FuncPtr> Scope::get_functions(
     const vector<TypeInfoPtr>& return_types,
     const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 ) const
 {
-    vector<FuncPtr2> funcs;
-    for (const FuncPtr2& func : functions_)
+    vector<FuncPtr> funcs;
+    for (const FuncPtr& func : functions_)
     {
         if (is_match(*func, return_types, name, template_type, args))
             funcs.push_back(func);
@@ -188,7 +137,7 @@ vector<FuncPtr2> Scope::get_functions(
     if (funcs.empty() and parent_)
         funcs = parent_->get_functions(return_types, name, template_type, args);
 
-    if (funcs.empty() and is_current_)
+    if (funcs.empty())
     {
         throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
     }
@@ -196,19 +145,19 @@ vector<FuncPtr2> Scope::get_functions(
     return funcs;
 }
 
-FuncPtr2 Scope::get_function(
+FuncPtr Scope::get_function(
     const vector<TypeInfoPtr>& return_types,
     const string& name,
     const TypeInfoPtr& template_type,
     const ArgumentList& args
 ) const
 {
-    const vector<FuncPtr2> funcs = get_functions(return_types, name, template_type, args);
+    const vector<FuncPtr> funcs = get_functions(return_types, name, template_type, args);
     assert(not funcs.empty());
 
     if (funcs.size() > 1)
     {
-        const vector<FuncPtr2> def_funcs = default_functions(funcs);
+        const vector<FuncPtr> def_funcs = default_functions(funcs);
         if (def_funcs.size() == 1)
             return def_funcs[0];
 
@@ -218,10 +167,10 @@ FuncPtr2 Scope::get_function(
     return funcs[0];
 }
 
-vector<FuncPtr2> Scope::get_all_functions(const string& name) const
+vector<FuncPtr> Scope::get_all_functions(const string& name) const
 {
-    vector<FuncPtr2> funcs;
-    for (const FuncPtr2& func : functions_)
+    vector<FuncPtr> funcs;
+    for (const FuncPtr& func : functions_)
     {
         if (name == func->name())
             funcs.push_back(func);
@@ -229,7 +178,7 @@ vector<FuncPtr2> Scope::get_all_functions(const string& name) const
 
     if (parent_)
     {
-        vector<FuncPtr2> parent_funcs = parent_->get_all_functions(name);
+        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
         funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
     }
 

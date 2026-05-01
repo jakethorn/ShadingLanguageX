@@ -7,8 +7,7 @@
 #include "Identifier.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable2.h"
-#include "runtime/variables/ChildVariable.h"
+#include "runtime/Variable.h"
 #include "values/Value.h"
 
 ExprPtr DotExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -27,8 +26,7 @@ TypeInfoPtr DotExpression::type_impl() const
     return expr_->type()->field_type(property());
 }
 
-VarPtr2 DotExpression::evaluate_impl() const
+VarPtr DotExpression::evaluate_impl() const
 {
-    const VarPtr2 var = expr_->evaluate();
-    return var->child(property());
+    return expr_->evaluate()->child(property());
 }

@@ -62,7 +62,7 @@ TypeInfoPtr Argument::type() const
     return expr_->type();
 }
 
-VarPtr2 Argument::evaluate() const
+VarPtr Argument::evaluate() const
 {
     return expr_->evaluate();
 }

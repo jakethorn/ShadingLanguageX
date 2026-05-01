@@ -7,7 +7,7 @@
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 
 IfStatement::IfStatement(Token token, ExprPtr cond_expr, StmtPtr then_body, StmtPtr else_body)
@@ -24,7 +24,7 @@ StmtPtr IfStatement::instantiate_template_types(const TypeInfoPtr& template_type
 void IfStatement::execute_impl() const
 {
     cond_expr_->init(TypeInfo::Bool);
-    const VarPtr2 cond = cond_expr_->evaluate();
+    const VarPtr cond = cond_expr_->evaluate();
 
     runtime().enter_inline_scope();
     if (cond->value_as<bool>())

@@ -5,7 +5,7 @@
 #include "NullExpression.h"
 
 #include "CompileError.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 #include "values/NullValue.h"
 
 ExprPtr NullExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -25,8 +25,8 @@ TypeInfoPtr NullExpression::type_impl() const
     return type_;
 }
 
-VarPtr2 NullExpression::evaluate_impl() const
+VarPtr NullExpression::evaluate_impl() const
 {
     ValuePtr value = std::make_shared<NullValue>(type_);
-    return Variable2::create(std::move(value));
+    return Variable::create(std::move(value));
 }

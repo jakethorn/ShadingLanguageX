@@ -5,7 +5,7 @@
 #include <iostream>
 #include "PrintStatement.h"
 #include "expressions/Expression.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
@@ -26,7 +26,7 @@ void PrintStatement::execute_impl() const
     for (const ExprPtr& expr : exprs_)
     {
         expr->init();
-        const VarPtr2 var = expr->evaluate();
+        const VarPtr var = expr->evaluate();
         std::cout << var->str() << std::endl;
     }
 }

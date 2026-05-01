@@ -11,7 +11,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 
 #define TRY_START try {
 #define TRY_END } catch (const CompileError& e) { throw CompileError{token_, e}; }
@@ -79,7 +79,7 @@ TypeInfoPtr Expression::type() const
     TRY_END
 }
 
-VarPtr2 Expression::evaluate() const
+VarPtr Expression::evaluate() const
 {
     TRY_START
 
@@ -92,6 +92,11 @@ VarPtr2 Expression::evaluate() const
 Scope& Expression::scope()
 {
     return Runtime::get().scope();
+}
+
+MtlXSerializer& Expression::serializer()
+{
+    return Runtime::get().serializer();
 }
 
 #undef TRY_START

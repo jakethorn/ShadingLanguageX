@@ -4,12 +4,10 @@
 
 #include "IndexingExpression.h"
 
-#include "CompileError.h"
 #include "values/BasicValue.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable2.h"
-#include "runtime/variables/ChildVariable.h"
+#include "runtime/Variable.h"
 
 ExprPtr IndexingExpression::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -26,7 +24,7 @@ void IndexingExpression::init_subexpressions(const vector<TypeInfoPtr>& types)
 
 void IndexingExpression::init_impl(const vector<TypeInfoPtr>& types)
 {
-    const VarPtr2 index_val = index_expr_->evaluate();
+    const VarPtr index_val = index_expr_->evaluate();
     index_ = index_val->value_as<int>();
 }
 
@@ -35,8 +33,7 @@ TypeInfoPtr IndexingExpression::type_impl() const
     return expr_->type()->field_type(index_);
 }
 
-VarPtr2 IndexingExpression::evaluate_impl() const
+VarPtr IndexingExpression::evaluate_impl() const
 {
-    const VarPtr2 var = expr_->evaluate();
-    return var->child(index_);
+    return expr_->evaluate()->child(index_);
 }

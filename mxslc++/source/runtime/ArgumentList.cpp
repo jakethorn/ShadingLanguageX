@@ -5,7 +5,7 @@
 #include "ArgumentList.h"
 #include "Parameter.h"
 #include "ParameterList.h"
-#include "Variable2.h"
+#include "Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 
 ArgumentList ArgumentList::instantiate_template_types(const TypeInfoPtr& template_type) const
@@ -13,18 +13,9 @@ ArgumentList ArgumentList::instantiate_template_types(const TypeInfoPtr& templat
     return ::instantiate_template_types(args_, template_type);
 }
 
-vector<VarPtr2> ArgumentList::evaluate() const
+VarPtr ArgumentList::evaluate(const Parameter& param) const
 {
-    vector<VarPtr2> values;
-    values.reserve(args_.size());
-    for (const Argument& arg : args_)
-        values.push_back(arg.evaluate());
-    return values;
-}
-
-VarPtr2 ArgumentList::evaluate(const Parameter& param) const
-{
-    VarPtr2 value;
+    VarPtr value;
     if (const Argument* arg = (*this)[param])
     {
         value = arg->evaluate();
@@ -43,9 +34,9 @@ VarPtr2 ArgumentList::evaluate(const Parameter& param) const
     return value;
 }
 
-vector<pair<const Parameter&, VarPtr2>> ArgumentList::evaluate(const ParameterList& params) const
+vector<pair<const Parameter&, VarPtr>> ArgumentList::evaluate(const ParameterList& params) const
 {
-    vector<pair<const Parameter&, VarPtr2>> result;
+    vector<pair<const Parameter&, VarPtr>> result;
     result.reserve(params.size());
     for (const Parameter& param : params)
         result.emplace_back(param, evaluate(param));

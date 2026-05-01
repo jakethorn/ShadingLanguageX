@@ -5,8 +5,7 @@
 #include "VariableDefinitionExpression.h"
 
 #include "Identifier.h"
-#include "../runtime/variables/Variable.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 #include "statements/VariableDefinition.h"
 
 VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypeInfoPtr type, Token name)
@@ -42,9 +41,9 @@ TypeInfoPtr VariableDefinitionExpression::type_impl() const
     return identifier_->type();
 }
 
-VarPtr2 VariableDefinitionExpression::evaluate_impl() const
+VarPtr VariableDefinitionExpression::evaluate_impl() const
 {
-    VarPtr2 var = identifier_->evaluate();
+    VarPtr var = identifier_->evaluate();
     var->uninitialize();
     return var;
 }

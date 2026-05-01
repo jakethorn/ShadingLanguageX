@@ -5,7 +5,7 @@
 #include "ExpressionFactory.h"
 #include "utils/common.h"
 #include "FunctionCall.h"
-#include "FunctionCall2.h"
+#include "FunctionCall.h"
 #include "runtime/ArgumentList.h"
 
 ExprPtr ExpressionFactory::binary(ExprPtr left, Token op, ExprPtr right)
@@ -30,7 +30,7 @@ ExprPtr ExpressionFactory::binary(ExprPtr left, Token op, ExprPtr right)
     op.set_lexeme(op_names.at(op.type()));
 
     ArgumentList args{std::move(left), std::move(right)};
-    return std::make_unique<FunctionCall2>(std::move(op), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(op), std::move(args));
 }
 
 ExprPtr ExpressionFactory::ternary_relational(ExprPtr left, Token op1, ExprPtr middle, Token op2, ExprPtr right)
@@ -48,7 +48,7 @@ ExprPtr ExpressionFactory::ternary_relational(ExprPtr left, Token op1, ExprPtr m
     op1.set_lexeme(s);
 
     ArgumentList args{std::move(left), std::move(middle), std::move(right)};
-    return std::make_unique<FunctionCall2>(std::move(op1), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(op1), std::move(args));
 }
 
 ExprPtr ExpressionFactory::unary(Token op, ExprPtr right)
@@ -62,17 +62,17 @@ ExprPtr ExpressionFactory::unary(Token op, ExprPtr right)
     op.set_lexeme(op_names.at(op.type()));
 
     ArgumentList args{std::move(right)};
-    return std::make_unique<FunctionCall2>(std::move(op), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(op), std::move(args));
 }
 
 ExprPtr ExpressionFactory::named_constructor(Token name, vector<Argument> arguments)
 {
     name.set_lexeme("__" + name.lexeme() + "__");
-    return std::make_unique<FunctionCall2>(std::move(name), std::move(arguments));
+    return std::make_unique<FunctionCall>(std::move(name), std::move(arguments));
 }
 
 ExprPtr ExpressionFactory::if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr)
 {
     ArgumentList args{std::move(cond_expr), std::move(then_expr), std::move(else_expr)};
-    return std::make_shared<FunctionCall2>(Token{TokenType::Identifier, "__if__"s}, std::move(args));
+    return std::make_shared<FunctionCall>(Token{TokenType::Identifier, "__if__"s}, std::move(args));
 }

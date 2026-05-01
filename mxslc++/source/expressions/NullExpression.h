@@ -18,7 +18,7 @@ public:
 protected:
     void init_impl(const vector<TypeInfoPtr>& types) override;
     TypeInfoPtr type_impl() const override;
-    VarPtr2 evaluate_impl() const override;
+    VarPtr evaluate_impl() const override;
 
 private:
     TypeInfoPtr type_;

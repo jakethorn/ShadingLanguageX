@@ -7,7 +7,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 
 MultiVariableDefinition::MultiVariableDefinition(Token token, TypeInfoPtr type, ExprPtr expr)
     : Statement{std::move(token)}, type_{std::move(type)}, expr_{std::move(expr)}
@@ -27,11 +27,11 @@ void MultiVariableDefinition::execute_impl() const
     const TypeInfoPtr type = runtime().scope().resolve_type(type_);
     expr_->init(type);
 
-    const VarPtr2 value = expr_->evaluate();
+    const VarPtr value = expr_->evaluate();
     for (size_t i = 0; i < value->child_count(); ++i)
     {
-        VarPtr2 child_value = value->child(i);
-        VarPtr2 var = Variable2::create(type->field(i).modifiers(), type->field_type(i), child_value);
+        VarPtr child_value = value->child(i);
+        VarPtr var = Variable::create(type->field(i).modifiers(), type->field_type(i), child_value);
         runtime().scope().add_variable(type->field_name(i), std::move(var));
     }
 }

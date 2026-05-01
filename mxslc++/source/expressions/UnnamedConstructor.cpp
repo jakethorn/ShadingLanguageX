@@ -8,7 +8,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/TypeInfo.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 
 ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& template_type) const
 {
@@ -49,18 +49,18 @@ TypeInfoPtr UnnamedConstructor::type_impl() const
     return scope().resolve_type(type);
 }
 
-VarPtr2 UnnamedConstructor::evaluate_impl() const
+VarPtr UnnamedConstructor::evaluate_impl() const
 {
-    vector<VarPtr2> values;
+    vector<VarPtr> values;
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-    return Variable2::create(type(), values);
+    return Variable::create(type(), values);
 }
 
 bool UnnamedConstructor::expressions_are_initialized()
 {
-    bool are = true;
+    bool result = true;
     for (const ExprPtr& expr : exprs_)
     {
         if (expr->is_initialized())
@@ -70,11 +70,11 @@ bool UnnamedConstructor::expressions_are_initialized()
         }
         else
         {
-            are = false;
+            result = false;
         }
     }
 
-    return are;
+    return result;
 }
 
 void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)

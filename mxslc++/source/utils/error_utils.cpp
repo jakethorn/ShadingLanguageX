@@ -9,11 +9,11 @@
 #include "statements/Statement.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/Function.h"
-#include "runtime/Function2.h"
+#include "runtime/Function.h"
 #include "runtime/TypeInfo.h"
 
 string missing_overload_error(
-    const FuncPtr2& func,
+    const FuncPtr& func,
     const vector<TypeInfoPtr>& return_types,
     const string& name,
     const TypeInfoPtr& template_type,
@@ -58,7 +58,7 @@ string missing_overload_error(
 }
 
 string missing_overload_error(
-    const vector<FuncPtr2>& funcs,
+    const vector<FuncPtr>& funcs,
     const vector<TypeInfoPtr>& return_types,
     const string& name,
     const TypeInfoPtr& template_type,
@@ -72,18 +72,18 @@ string missing_overload_error(
 
     string result = "No matching overload for function '" + name + "'\n";
     result += "Potential matches:\n";
-    for (const FuncPtr2& func : funcs)
+    for (const FuncPtr& func : funcs)
         result += missing_overload_error(func, return_types, name, template_type, args) + "\n";
     return result;
 }
 
-string ambiguous_overload_error(const vector<FuncPtr2>& funcs)
+string ambiguous_overload_error(const vector<FuncPtr>& funcs)
 {
     assert(not funcs.empty());
 
     string result = "More than one matching overload for function '" + funcs[0]->name() + "'\n";
     result += "Potential matches:\n";
-    for (const FuncPtr2& func : funcs)
+    for (const FuncPtr& func : funcs)
         result += func->str() + "\n";
     return result;
 }

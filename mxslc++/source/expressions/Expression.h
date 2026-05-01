@@ -8,6 +8,8 @@
 #include "utils/common.h"
 #include "Token.h"
 
+class MtlXSerializer;
+
 class Expression
 {
 public:
@@ -28,15 +30,16 @@ public:
     bool is_initialized() const { return is_initialized_; }
     TypeInfoPtr type() const;
 
-    VarPtr2 evaluate() const;
+    VarPtr evaluate() const;
 
 protected:
     virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
     virtual void init_impl(const vector<TypeInfoPtr>& types) { }
     virtual TypeInfoPtr type_impl() const = 0;
-    virtual VarPtr2 evaluate_impl() const = 0;
+    virtual VarPtr evaluate_impl() const = 0;
 
     static Scope& scope();
+    static MtlXSerializer& serializer();
 
     Token token_;
     bool is_initialized_ = false;

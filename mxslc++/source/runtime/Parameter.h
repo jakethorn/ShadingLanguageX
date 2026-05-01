@@ -31,7 +31,7 @@ public:
     TypeInfoPtr type() const;
 
     bool has_default_value() const { return expr_ != nullptr; }
-    VarPtr2 evaluate() const;
+    VarPtr evaluate() const;
 
     string str() const;
 

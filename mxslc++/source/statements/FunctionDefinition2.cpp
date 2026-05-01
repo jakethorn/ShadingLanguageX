@@ -5,7 +5,7 @@
 #include "FunctionDefinition2.h"
 
 #include "CompileError.h"
-#include "runtime/Function2.h"
+#include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/TypeInfo.h"
@@ -35,14 +35,14 @@ FunctionDefinition2::FunctionDefinition2(
             params = params_.instantiate_template_types(template_type);
             body = body_->instantiate_template_types(template_type);
             return_expr = ::instantiate_template_types(return_expr_, template_type);
-            funcs_.push_back(std::make_shared<Function2>(
+            funcs_.push_back(std::make_shared<Function>(
                 mods_, std::move(type), FunctionDefinition2::name(), template_type, std::move(params), std::move(body), std::move(return_expr)
             ));
         }
     }
     else
     {
-        funcs_.push_back(std::make_shared<Function2>(
+        funcs_.push_back(std::make_shared<Function>(
             std::move(mods_), std::move(type_), FunctionDefinition2::name(), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
         ));
     }
@@ -62,7 +62,7 @@ StmtPtr FunctionDefinition2::instantiate_template_types(const TypeInfoPtr& templ
 
 void FunctionDefinition2::execute_impl() const
 {
-    for (const FuncPtr2& func : funcs_)
+    for (const FuncPtr& func : funcs_)
     {
         func->init();
         if (not func->is_inline())
@@ -71,7 +71,7 @@ void FunctionDefinition2::execute_impl() const
     }
 }
 
-void FunctionDefinition2::write_function_definition(const FuncPtr2& func)
+void FunctionDefinition2::write_function_definition(const FuncPtr& func)
 {
     runtime().enter_scope();
     runtime().serializer().write_node_def_graph(func);

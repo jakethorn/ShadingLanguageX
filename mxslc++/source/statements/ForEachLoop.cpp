@@ -10,9 +10,8 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/TypeInfo.h"
-#include "../runtime/variables/Variable.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable2.h"
+#include "runtime/Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
@@ -42,16 +41,16 @@ void ForEachLoop::execute_impl() const
     iter_expr_->init();
     if (not iter_expr_->type()->has_fields())
         throw CompileError{"Value not iterable"s};
-    const VarPtr2 iter_value = iter_expr_->evaluate();
+    const VarPtr iter_value = iter_expr_->evaluate();
 
     for (size_t i = 0; i < iter_value->child_count(); i++)
     {
-        VarPtr2 next_value = iter_value->child(i);
+        VarPtr next_value = iter_value->child(i);
         if (not next_value->type()->is_compatible(type))
             throw CompileError{"Field value does not match loop iterator type"s};
 
         runtime().enter_inline_scope();
-        VarPtr2 var = Variable2::create(mods_, type, next_value);
+        VarPtr var = Variable::create(mods_, type, next_value);
         runtime().scope().add_variable(name_, std::move(var));
         body_->execute();
         runtime().exit_scope();

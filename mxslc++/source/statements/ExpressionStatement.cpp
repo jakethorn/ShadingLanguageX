@@ -27,5 +27,5 @@ StmtPtr ExpressionStatement::instantiate_template_types(const TypeInfoPtr& templ
 void ExpressionStatement::execute_impl() const
 {
     expr_->init();
-    VarPtr2 _ = expr_->evaluate();
+    VarPtr _ = expr_->evaluate();
 }

@@ -27,9 +27,8 @@ public:
 
     ArgumentList instantiate_template_types(const TypeInfoPtr& template_type) const;
 
-    vector<VarPtr2> evaluate() const;
-    VarPtr2 evaluate(const Parameter& param) const;
-    vector<pair<const Parameter&, VarPtr2>> evaluate(const ParameterList& params) const;
+    VarPtr evaluate(const Parameter& param) const;
+    vector<pair<const Parameter&, VarPtr>> evaluate(const ParameterList& params) const;
 
     size_t size() const { return args_.size(); }
     bool empty() const { return args_.empty(); }
