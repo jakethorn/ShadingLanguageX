@@ -111,26 +111,26 @@ VarPtr ValueFactory::create_default_value(TypePtr type)
         return Variable::create(std::move(type), fields_values);
     }
 
-#define START_INIT basic_t basic_value = ""s; if constexpr (false) { }
-#define INIT_BASIC(t) else if (type->is<t>()) basic_value = t{};
+#define START_INIT primitive_t primitive_value = ""s; if constexpr (false) { }
+#define INIT_PRIM(t) else if (type->is<t>()) primitive_value = t{};
 
     START_INIT
-    INIT_BASIC(bool)
-    INIT_BASIC(int)
-    INIT_BASIC(float)
-    INIT_BASIC(string)
-    INIT_BASIC(mx::Vector2)
-    INIT_BASIC(mx::Vector3)
-    INIT_BASIC(mx::Vector4)
-    INIT_BASIC(mx::Color3)
-    INIT_BASIC(mx::Color4)
-    INIT_BASIC(mx::Matrix33)
-    INIT_BASIC(mx::Matrix44)
+    INIT_PRIM(bool)
+    INIT_PRIM(int)
+    INIT_PRIM(float)
+    INIT_PRIM(string)
+    INIT_PRIM(mx::Vector2)
+    INIT_PRIM(mx::Vector3)
+    INIT_PRIM(mx::Vector4)
+    INIT_PRIM(mx::Color3)
+    INIT_PRIM(mx::Color4)
+    INIT_PRIM(mx::Matrix33)
+    INIT_PRIM(mx::Matrix44)
 
-#undef INIT_BASIC
+#undef INIT_PRIM
 #undef START_INIT
 
-    ValuePtr value = std::make_shared<BasicValue>(std::move(basic_value));
+    ValuePtr value = std::make_shared<BasicValue>(std::move(primitive_value));
     return Variable::create(std::move(value));
 }
 
@@ -155,26 +155,26 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 
     if (port->hasValue())
     {
-#define START_INIT const mx::ValuePtr& port_value = port->getValue(); basic_t basic_value = ""s; if constexpr (false) { }
-#define INIT_BASIC(t) else if (port_value->isA<t>()) basic_value = port_value->asA<t>();
+#define START_INIT const mx::ValuePtr& port_value = port->getValue(); primitive_t primitive_value = ""s; if constexpr (false) { }
+#define INIT_PRIM(t) else if (port_value->isA<t>()) primitive_value = port_value->asA<t>();
 
         START_INIT
-        INIT_BASIC(bool)
-        INIT_BASIC(int)
-        INIT_BASIC(float)
-        INIT_BASIC(string)
-        INIT_BASIC(mx::Vector2)
-        INIT_BASIC(mx::Vector3)
-        INIT_BASIC(mx::Vector4)
-        INIT_BASIC(mx::Color3)
-        INIT_BASIC(mx::Color4)
-        INIT_BASIC(mx::Matrix33)
-        INIT_BASIC(mx::Matrix44)
+        INIT_PRIM(bool)
+        INIT_PRIM(int)
+        INIT_PRIM(float)
+        INIT_PRIM(string)
+        INIT_PRIM(mx::Vector2)
+        INIT_PRIM(mx::Vector3)
+        INIT_PRIM(mx::Vector4)
+        INIT_PRIM(mx::Color3)
+        INIT_PRIM(mx::Color4)
+        INIT_PRIM(mx::Matrix33)
+        INIT_PRIM(mx::Matrix44)
 
-#undef INIT_BASIC
+#undef INIT_PRIM
 #undef START_INIT
 
-        return std::make_shared<BasicValue>(basic_value);
+        return std::make_shared<BasicValue>(primitive_value);
     }
 
     throw CompileError{"Port does not have a value"s};

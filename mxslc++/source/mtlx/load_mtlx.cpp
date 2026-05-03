@@ -83,7 +83,7 @@ void load_library(const mx::DocumentPtr& doc)
 
     for (const mx::TypeDefPtr& td : doc->getTypeDefs())
     {
-        scope.add_basic_type(td->getName());
+        scope.add_primitive_type(td->getName());
     }
 
     for (const mx::NodeDefPtr& nd : doc->getNodeDefs())

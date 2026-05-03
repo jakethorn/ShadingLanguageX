@@ -20,7 +20,7 @@ public:
     const string& lexeme() const { return lexeme_; }
     const string& filename() const { return filename_; }
     size_t line() const { return line_; }
-    basic_t literal() const;
+    primitive_t literal() const;
 
     void set_lexeme(const string& lexeme) { lexeme_ = lexeme; }
     void set_filename(const string& filename) { filename_ = filename; }

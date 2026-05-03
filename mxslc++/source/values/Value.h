@@ -12,7 +12,7 @@ class Value
     friend class MtlXSerializer;
 
 public:
-    explicit Value(TypePtr type) : type_{std::move(type)} { }
+    explicit Value(TypePtr type);
     virtual ~Value() = default;
 
     TypePtr type() { return type_; }

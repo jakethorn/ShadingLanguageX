@@ -62,7 +62,7 @@ class Type;
 using TypePtr = shared_ptr<Type>;
 
 // type aliases
-using basic_t = variant<
+using primitive_t = variant<
     bool,
     int,
     float,

@@ -20,7 +20,7 @@ public:
 
     explicit Type(string name) : name_{std::move(name)} { }
     explicit Type(vector<Field> fields) : fields_{std::move(fields)} { }
-    explicit Type(const basic_t& val);
+    explicit Type(const primitive_t& val);
     explicit Type(const vector<TypePtr>& fields)
     {
         fields_.reserve(fields.size());
@@ -63,7 +63,7 @@ public:
         return false;
     }
 
-    bool is_basic() const { return has_name() and not has_fields(); }
+    bool is_primitive() const { return has_name() and not has_fields(); }
     bool is_resolved() const { return is_resolved_; }
     bool is_compatible(const TypePtr& other) const;
     bool is_compatible(const vector<TypePtr>& types) const;

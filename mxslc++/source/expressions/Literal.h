@@ -21,7 +21,7 @@ protected:
     VarPtr evaluate_impl() const override;
 
 private:
-    basic_t value_;
+    primitive_t value_;
     TypePtr type_;
 };
 

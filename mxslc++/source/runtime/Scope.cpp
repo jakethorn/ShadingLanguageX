@@ -215,7 +215,7 @@ void Scope::add_type(TypePtr type)
     types_.emplace(type->name(), std::move(type));
 }
 
-void Scope::add_basic_type(const string& name)
+void Scope::add_primitive_type(const string& name)
 {
     TypePtr type = std::make_shared<Type>(name);
     add_type(std::move(type));

@@ -17,7 +17,7 @@ TokenType Token::init_type(const string& lexeme)
     return tokens[0].type();
 }
 
-basic_t Token::literal() const
+primitive_t Token::literal() const
 {
     if (type_ == TokenType::Bool)
         return lexeme_ == "true";

@@ -8,8 +8,8 @@
 #include "mtlx/mtlx_utils.h"
 #include "mtlx/mtlx_type_ostream_ops.h"
 
-BasicValue::BasicValue(basic_t val) : Value{std::make_shared<Type>(val)}, val_{std::move(val)} { }
-BasicValue::BasicValue(basic_t val, TypePtr type) : Value{std::move(type)}, val_{std::move(val)} { }
+BasicValue::BasicValue(primitive_t val) : Value{std::make_shared<Type>(val)}, val_{std::move(val)} { }
+BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, val_{std::move(val)} { }
 
 void BasicValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
 {

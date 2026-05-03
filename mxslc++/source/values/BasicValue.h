@@ -13,8 +13,8 @@
 class BasicValue final : public Value
 {
 public:
-    explicit BasicValue(basic_t val);
-    BasicValue(basic_t val, TypePtr type);
+    explicit BasicValue(primitive_t val);
+    BasicValue(primitive_t val, TypePtr type);
 
     string str() const override;
 
@@ -38,7 +38,7 @@ protected:
     void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override;
 
 private:
-    basic_t val_;
+    primitive_t val_;
 };
 
 #endif //FENNEC_BASICVALUE_H

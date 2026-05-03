@@ -10,25 +10,25 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "utils/str_utils.h"
 
-Type::Type(const basic_t& val)
+Type::Type(const primitive_t& val)
 {
 #define START_INIT if constexpr (false) { }
-#define INIT_BASIC(t, n) else if (std::holds_alternative<t>(val)) name_ = n;
+#define INIT_PRIM(t, n) else if (std::holds_alternative<t>(val)) name_ = n;
 
     START_INIT
-    INIT_BASIC(bool, Bool)
-    INIT_BASIC(int, Int)
-    INIT_BASIC(float, Float)
-    INIT_BASIC(string, String)
-    INIT_BASIC(mx::Vector2, Vec2)
-    INIT_BASIC(mx::Vector3, Vec3)
-    INIT_BASIC(mx::Vector4, Vec4)
-    INIT_BASIC(mx::Color3, Color3)
-    INIT_BASIC(mx::Color4, Color4)
-    INIT_BASIC(mx::Matrix33, Mat33)
-    INIT_BASIC(mx::Matrix44, Mat44)
+    INIT_PRIM(bool, Bool)
+    INIT_PRIM(int, Int)
+    INIT_PRIM(float, Float)
+    INIT_PRIM(string, String)
+    INIT_PRIM(mx::Vector2, Vec2)
+    INIT_PRIM(mx::Vector3, Vec3)
+    INIT_PRIM(mx::Vector4, Vec4)
+    INIT_PRIM(mx::Color3, Color3)
+    INIT_PRIM(mx::Color4, Color4)
+    INIT_PRIM(mx::Matrix33, Mat33)
+    INIT_PRIM(mx::Matrix44, Mat44)
 
-#undef INIT_BASIC
+#undef INIT_PRIM
 #undef START_INIT
 
     set_resolved();

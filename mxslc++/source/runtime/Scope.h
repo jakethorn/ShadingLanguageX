@@ -59,7 +59,7 @@ public:
      */
 
     void add_type(TypePtr type);
-    void add_basic_type(const string& name);
+    void add_primitive_type(const string& name);
     void add_alias(const string& name, TypePtr type);
     bool has_type(const string& name) const;
     TypePtr resolve_type(const TypePtr& type) const;
