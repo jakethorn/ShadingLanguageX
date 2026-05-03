@@ -2,6 +2,7 @@
 <materialx version="1.39">
   <nodedef name="ND_foo1" node="foo1">
     <output name="out" type="float" />
+    <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo1" nodedef="ND_foo1">
     <multiply name="node1" type="float">
@@ -9,10 +10,14 @@
       <input name="in2" type="float" value="7" />
     </multiply>
     <output name="out" type="float" nodename="node1" />
+    <output name="out__x" type="float" value="0" />
   </nodegraph>
-  <foo1 name="node1" type="float" />
-  <multiply name="HERE1" type="float">
-    <input name="in1" type="float" value="0" />
+  <foo1 name="node1" type="float">
+    <output name="out__x" type="float" />
+    <output name="out" type="float" />
+  </foo1>
+  <multiply name="node2" type="float">
+    <input name="in1" type="float" output="out__x" nodename="node1" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

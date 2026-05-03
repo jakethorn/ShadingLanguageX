@@ -5,6 +5,7 @@
 #include "Statement.h"
 
 #include "CompileError.h"
+#include "runtime/Runtime.h"
 
 void Statement::execute() const
 {
@@ -16,4 +17,14 @@ void Statement::execute() const
     {
         throw CompileError{token_, e};
     }
+}
+
+Scope& Statement::scope()
+{
+    return Runtime::get().scope();
+}
+
+MtlXSerializer& Statement::serializer()
+{
+    return Runtime::get().serializer();
 }

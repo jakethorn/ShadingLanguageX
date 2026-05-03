@@ -1,0 +1,2 @@
+vec2 xy = vector2{1.0, 2.0};
+float x, y = separate2(xy);

@@ -1,21 +1,20 @@
 //
-// Created by jaket on 03/01/2026.
+// Created by jaket on 16/04/2026.
 //
 
-#ifndef FENNEC_FUNCTIONDEFINITION_H
-#define FENNEC_FUNCTIONDEFINITION_H
+#ifndef MXSLC_FUNCTIONDEFINITION_H
+#define MXSLC_FUNCTIONDEFINITION_H
 
-#include "utils/common.h"
 #include "Statement.h"
-#include "Token.h"
+#include "runtime/ModifierList.h"
 #include "runtime/ParameterList.h"
 
 class FunctionDefinition final : public Statement
 {
 public:
-    FunctionDefinition(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, Token name, vector<TypeInfoPtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
+    FunctionDefinition(ModifierList mods, TypePtr type, Token name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;
@@ -23,13 +22,10 @@ protected:
 private:
     const string& name() const { return token_.lexeme(); }
     bool is_templated() const { return not template_types_.empty(); }
-    void write_function_definition(const FuncPtr& func) const;
-    void create_out_variables(const FuncPtr& func) const;
-    void add_parameters_to_scope(const FuncPtr& func) const;
 
     ModifierList mods_;
-    TypeInfoPtr type_;
-    vector<TypeInfoPtr> template_types_;
+    TypePtr type_;
+    vector<TypePtr> template_types_;
     ParameterList params_;
     StmtPtr body_;
     ExprPtr return_expr_;
@@ -37,4 +33,4 @@ private:
     vector<FuncPtr> funcs_;
 };
 
-#endif //FENNEC_FUNCTIONDEFINITION_H
+#endif //MXSLC_FUNCTIONDEFINITION_H

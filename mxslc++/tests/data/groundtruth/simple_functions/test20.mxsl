@@ -1,0 +1,14 @@
+{mutable float, float} p = {1.0, 2.0};
+
+void foo()
+{
+   p[0] = randomfloat();
+}
+
+void bar()
+{
+   foo();
+}
+
+bar();
+float x = p[0] * 2.0;

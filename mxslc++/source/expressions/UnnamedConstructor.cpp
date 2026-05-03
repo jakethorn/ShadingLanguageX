@@ -6,18 +6,19 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
-#include "runtime/TypeInfo.h"
-#include "values/StructValue.h"
+#include "runtime/Scope.h"
+#include "runtime/Type.h"
+#include "runtime/Variable.h"
 
-ExprPtr UnnamedConstructor::instantiate_template_types(const TypeInfoPtr& template_type) const
+ExprPtr UnnamedConstructor::instantiate_template_types(const TypePtr& template_type) const
 {
     vector<ExprPtr> instantiated;
     for (const ExprPtr& expr : exprs_)
         instantiated.push_back(expr->instantiate_template_types(template_type));
-    return std::make_unique<UnnamedConstructor>(runtime_, token_, std::move(instantiated));
+    return std::make_unique<UnnamedConstructor>(token_, std::move(instantiated));
 }
 
-void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
+void UnnamedConstructor::init_subexpressions(const vector<TypePtr>& types)
 {
     if (expressions_are_initialized())
         return;
@@ -38,28 +39,28 @@ void UnnamedConstructor::init_subexpressions(const vector<TypeInfoPtr>& types)
     }
 }
 
-TypeInfoPtr UnnamedConstructor::type_impl() const
+TypePtr UnnamedConstructor::type_impl() const
 {
-    vector<TypeInfoPtr> types;
+    vector<TypePtr> types;
     types.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         types.push_back(expr->type());
-    const TypeInfoPtr type = std::make_shared<TypeInfo>(std::move(types));
-    return runtime_.scope().resolve_type(type);
+    const TypePtr type = std::make_shared<Type>(std::move(types));
+    return scope().resolve_type(type);
 }
 
-ValuePtr UnnamedConstructor::evaluate_impl() const
+VarPtr UnnamedConstructor::evaluate_impl() const
 {
-    vector<ValuePtr> values;
+    vector<VarPtr> values;
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-    return std::make_shared<StructValue>(std::move(values), type());
+    return Variable::create(type(), values);
 }
 
 bool UnnamedConstructor::expressions_are_initialized()
 {
-    bool are = true;
+    bool result = true;
     for (const ExprPtr& expr : exprs_)
     {
         if (expr->is_initialized())
@@ -69,14 +70,14 @@ bool UnnamedConstructor::expressions_are_initialized()
         }
         else
         {
-            are = false;
+            result = false;
         }
     }
 
-    return are;
+    return result;
 }
 
-void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)
+void UnnamedConstructor::try_init_expressions(const vector<TypePtr>& types)
 {
     for (size_t i = 0; i < exprs_.size(); ++i)
     {
@@ -87,10 +88,10 @@ void UnnamedConstructor::try_init_expressions(const vector<TypeInfoPtr>& types)
     }
 }
 
-vector<TypeInfoPtr> UnnamedConstructor::index_types(const vector<TypeInfoPtr>& types, const size_t index) const
+vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, const size_t index) const
 {
-    vector<TypeInfoPtr> index_types;
-    for (const TypeInfoPtr& type : types)
+    vector<TypePtr> index_types;
+    for (const TypePtr& type : types)
     {
         bool is_compatible = true;
 

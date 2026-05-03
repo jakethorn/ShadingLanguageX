@@ -1,32 +1,32 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_some_func" node="some_func">
+    <output name="out" type="float" />
     <output name="nonlocal_out__b__0" type="float" />
     <input name="nonlocal_in__b__1" type="float" />
     <output name="nonlocal_out__b__1" type="float" />
-    <output name="out" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
     <output name="nonlocal_out__b__0" type="float" interfacename="nonlocal_in__b__1" />
     <output name="nonlocal_out__b__1" type="float" value="7" />
     <output name="out" type="float" value="0" />
   </nodegraph>
-  <multiply name="c" type="float">
+  <multiply name="node1" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="6" />
   </multiply>
-  <some_func name="node1" type="multioutput">
+  <some_func name="node2" type="multioutput">
     <input name="nonlocal_in__b__1" type="float" value="6" />
     <output name="nonlocal_out__b__1" type="float" />
     <output name="nonlocal_out__b__0" type="float" />
     <output name="out" type="float" />
   </some_func>
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" output="nonlocal_out__b__0" nodename="node1" />
-    <input name="in2" type="float" output="nonlocal_out__b__1" nodename="node1" />
+  <multiply name="node3" type="float">
+    <input name="in1" type="float" output="nonlocal_out__b__0" nodename="node2" />
+    <input name="in2" type="float" output="nonlocal_out__b__1" nodename="node2" />
   </multiply>
-  <add name="d" type="float">
-    <input name="in1" type="float" nodename="node2" />
-    <input name="in2" type="float" output="out" nodename="node1" />
+  <add name="node4" type="float">
+    <input name="in1" type="float" nodename="node3" />
+    <input name="in2" type="float" output="out" nodename="node2" />
   </add>
 </materialx>

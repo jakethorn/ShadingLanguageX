@@ -4,40 +4,50 @@
 
 #include "Argument.h"
 
+#include "statements/Statement.h"
 #include "CompileError.h"
 #include "Parameter.h"
 #include "expressions/Expression.h"
+#include "expressions/VariableDefinitionExpression.h"
 
-Argument::Argument(ExprPtr expr, const size_t index)
-    : Argument{false, ""s, std::move(expr), index} { }
+Argument::Argument(ModifierList mods, string name, ExprPtr expr, const size_t index)
+    : mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
+{
+    mods_.validate(TokenType::Ref, TokenType::Out);
+    if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
+        throw CompileError{"An argument cannot be both ref and out"s};
+}
+
+Argument::Argument(ModifierList mods, ExprPtr expr, const size_t index)
+    : Argument{std::move(mods), ""s, std::move(expr), index} { }
 
 Argument::Argument(string name, ExprPtr expr, const size_t index)
-    : Argument{false, std::move(name), std::move(expr), index} { }
+    : Argument{{}, std::move(name), std::move(expr), index} { }
 
-Argument::Argument(const bool is_out, string name, ExprPtr expr, const size_t index)
-    : is_out_{is_out}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index} { }
+Argument::Argument(ExprPtr expr, const size_t index)
+    : Argument{{}, ""s, std::move(expr), index} { }
 
 Argument::Argument(Argument&& other) noexcept
-    : is_out_{other.is_out_}, name_{std::move(other.name_)}, expr_{std::move(other.expr_)}, index_{other.index_} { }
+    : mods_{std::move(other.mods_)}, name_{std::move(other.name_)}, expr_{std::move(other.expr_)}, index_{other.index_} { }
 
 Argument::~Argument() = default;
 
-Argument Argument::instantiate_template_types(const TypeInfoPtr& template_type) const
+Argument Argument::instantiate_template_types(const TypePtr& template_type) const
 {
     return Argument{name_, expr_->instantiate_template_types(template_type), index_};
 }
 
-void Argument::init(const TypeInfoPtr& type) const
+void Argument::init(const TypePtr& type) const
 {
     expr_->init(type);
 }
 
-void Argument::init(const vector<TypeInfoPtr>& types) const
+void Argument::init(const vector<TypePtr>& types) const
 {
     expr_->init(types);
 }
 
-bool Argument::try_init(const vector<TypeInfoPtr>& types) const
+bool Argument::try_init(const vector<TypePtr>& types) const
 {
     return expr_->try_init(types);
 }
@@ -47,20 +57,24 @@ bool Argument::is_initialized() const
     return expr_->is_initialized();
 }
 
-TypeInfoPtr Argument::type() const
+TypePtr Argument::type() const
 {
     return expr_->type();
 }
 
-ValuePtr Argument::evaluate() const
+VarPtr Argument::evaluate() const
 {
     return expr_->evaluate();
 }
 
 void Argument::validate(const Parameter& param) const
 {
-    if (is_out() and not param.is_out())
-    {
+    if (mods_.contains(TokenType::Ref) and not param.modifiers().contains(TokenType::Ref))
+        throw CompileError{"Ref argument is being passed to a non-ref parameter"s};
+
+    if (mods_.contains(TokenType::Out) and not param.modifiers().contains(TokenType::Out))
         throw CompileError{"Out argument is being passed to a non-out parameter"s};
-    }
+
+    if (std::dynamic_pointer_cast<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
+        throw CompileError{"Variable definition expressions can only be passed to out parameter"s};
 }

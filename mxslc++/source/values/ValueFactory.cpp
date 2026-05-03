@@ -6,143 +6,141 @@
 
 #include "ValueFactory.h"
 
+#include "statements/Statement.h"
 #include "BasicValue.h"
-#include "CastValue.h"
 #include "CompileError.h"
-#include "runtime/Parameter.h"
 #include "InterfaceValue.h"
 #include "NodeValue.h"
-#include "StructValue.h"
+#include "OutputValue.h"
 #include "mtlx/mtlx_utils.h"
+#include "runtime/Function.h"
+#include "runtime/Type.h"
 #include "runtime/Variable.h"
 
-ValuePtr ValueFactory::create_interface_value(TypeInfoPtr type, const string& name)
+VarPtr ValueFactory::create_interface_value(TypePtr type, const string& name)
 {
     if (type->has_fields())
     {
-        vector<ValuePtr> field_vals;
+        vector<VarPtr> field_values;
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            ValuePtr field_val = create_interface_value(type->field_type(i), port_name(name, i));
-            field_vals.push_back(std::move(field_val));
+            VarPtr field_value = create_interface_value(type->field_type(i), get_port_name(name, i));
+            field_values.push_back(std::move(field_value));
         }
 
-        return std::make_shared<StructValue>(std::move(field_vals), std::move(type));
+        return Variable::create(std::move(type), field_values);
     }
     else
     {
-        return std::make_shared<InterfaceValue>(name, std::move(type));
+        ValuePtr value = std::make_shared<InterfaceValue>(std::move(type), name);
+        return Variable::create(std::move(value));
     }
 }
 
-ValuePtr ValueFactory::create_interface_value(const Parameter& param)
+VarPtr ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& node_def, TypePtr type)
 {
-    return create_interface_value(param.type(), param.name());
-}
-
-ValuePtr ValueFactory::create_interface_value(const VarPtr& var)
-{
-    const string output_name = "nonlocal_in__" + var->name();
-    return create_interface_value(var->type(), output_name);
-}
-
-ValuePtr ValueFactory::create_node_value(mx::NodePtr node, TypeInfoPtr type)
-{
-    ValuePtr value = std::make_shared<NodeValue>(node, type);
-
-    if (value->subvalue_count() > 0)
+    if (node_def->getOutputCount() > 1)
     {
-        vector<ValuePtr> subvalues;
-        subvalues.reserve(value->subvalue_count());
-        for (size_t i = 0; i < value->subvalue_count(); ++i)
-        {
-            subvalues.push_back(std::move(value->subvalue(i)));
-        }
-
-        return std::make_shared<StructValue>(std::move(subvalues), type);
+        return create_output_value(std::move(node), std::move(type), "out"s);
     }
     else
     {
-        if (node->getOutputCount() == 0)
-        {
-            return value;
-        }
-        else
-        {
-            return std::make_shared<OutputValue>(node, "out"s, type);
-        }
+        ValuePtr value = std::make_shared<NodeValue>(std::move(node), std::move(type));
+        return Variable::create(std::move(value));
     }
 }
 
-ValuePtr ValueFactory::create_output_value(mx::NodePtr node, const string& output_name, TypeInfoPtr type)
+VarPtr ValueFactory::create_node_value(mx::NodePtr node, const FuncPtr& func)
+{
+    if (func->is_defined() or func->node_def()->getOutputCount() == 1)
+    {
+        return create_node_value(std::move(node), func->node_def(), func->return_type());
+    }
+    else
+    {
+        return create_output_values(std::move(node), func->return_type(), func->output_names());
+    }
+}
+
+VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const string& output_name)
 {
     if (type->has_fields())
     {
-        vector<ValuePtr> subvalues;
-        subvalues.reserve(type->field_count());
+        vector<VarPtr> field_values;
+        field_values.reserve(type->field_count());
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            ValuePtr subvalue = std::make_shared<OutputValue>(node, port_name(output_name, i), type->field_type(i));
-            subvalues.push_back(std::move(subvalue));
+            VarPtr field_value = create_output_value(node, type->field_type(i), get_port_name(output_name, i));
+            field_values.push_back(std::move(field_value));
         }
 
-        return std::make_shared<StructValue>(std::move(subvalues), std::move(type));
+        return Variable::create(std::move(type), field_values);
     }
     else
     {
-        return std::make_shared<OutputValue>(node, output_name, std::move(type));
+        ValuePtr value = std::make_shared<OutputValue>(std::move(node), output_name, std::move(type));
+        return Variable::create(std::move(value));
     }
 }
 
-ValuePtr ValueFactory::create_default_value(TypeInfoPtr type)
+VarPtr ValueFactory::create_output_values(mx::NodePtr node, TypePtr type, const vector<string>& output_names)
+{
+    assert(type->field_count() == output_names.size());
+    vector<VarPtr> field_values;
+    field_values.reserve(type->field_count());
+    for (size_t i = 0; i < type->field_count(); ++i)
+    {
+        VarPtr field_value = create_output_value(node, type->field_type(i), output_names[i]);
+        field_values.push_back(std::move(field_value));
+    }
+    return Variable::create(std::move(type), field_values);
+}
+
+VarPtr ValueFactory::create_default_value(TypePtr type)
 {
     if (type->has_fields())
     {
-        vector<ValuePtr> subvalues;
-        subvalues.reserve(type->field_count());
+        vector<VarPtr> fields_values;
+        fields_values.reserve(type->field_count());
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            ValuePtr subvalue = create_default_value(type->field_type(i));
-            subvalues.push_back(std::move(subvalue));
+            VarPtr field_value = create_default_value(type->field_type(i));
+            fields_values.push_back(std::move(field_value));
         }
 
-        return std::make_shared<StructValue>(std::move(subvalues), std::move(type));
+        return Variable::create(std::move(type), fields_values);
     }
 
-#define START_INIT basic_t value = ""s; if constexpr (false) { }
-#define INIT_BASIC(t) else if (type->is<t>()) value = t{};
+#define START_INIT primitive_t primitive_value = ""s; if constexpr (false) { }
+#define INIT_PRIM(t) else if (type->is<t>()) primitive_value = t{};
 
     START_INIT
-    INIT_BASIC(bool)
-    INIT_BASIC(int)
-    INIT_BASIC(float)
-    INIT_BASIC(string)
-    INIT_BASIC(mx::Vector2)
-    INIT_BASIC(mx::Vector3)
-    INIT_BASIC(mx::Vector4)
-    INIT_BASIC(mx::Color3)
-    INIT_BASIC(mx::Color4)
-    INIT_BASIC(mx::Matrix33)
-    INIT_BASIC(mx::Matrix44)
+    INIT_PRIM(bool)
+    INIT_PRIM(int)
+    INIT_PRIM(float)
+    INIT_PRIM(string)
+    INIT_PRIM(mx::Vector2)
+    INIT_PRIM(mx::Vector3)
+    INIT_PRIM(mx::Vector4)
+    INIT_PRIM(mx::Color3)
+    INIT_PRIM(mx::Color4)
+    INIT_PRIM(mx::Matrix33)
+    INIT_PRIM(mx::Matrix44)
 
-#undef INIT_BASIC
+#undef INIT_PRIM
 #undef START_INIT
 
-    return std::make_shared<BasicValue>(std::move(value));
+    ValuePtr value = std::make_shared<BasicValue>(std::move(primitive_value));
+    return Variable::create(std::move(value));
 }
 
 ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 {
-    TypeInfoPtr type = std::make_shared<ResolvedTypeInfo>(port->getType());
+    TypePtr type = std::make_shared<ResolvedTypeInfo>(port->getType());
 
     if (port->hasInterfaceName())
     {
-        return create_interface_value(std::move(type), port->getInterfaceName());
-    }
-
-    if (port->hasNodeName())
-    {
-        return create_node_value(port->getConnectedNode(), std::move(type));
+        return std::make_shared<InterfaceValue>(std::move(type), port->getInterfaceName());
     }
 
     if (port->hasOutputString())
@@ -150,39 +148,34 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
         return std::make_shared<OutputValue>(port->getConnectedOutput(), std::move(type));
     }
 
+    if (port->hasNodeName())
+    {
+        return std::make_shared<NodeValue>(port->getConnectedNode(), std::move(type));
+    }
+
     if (port->hasValue())
     {
-#define START_INIT const mx::ValuePtr& port_value = port->getValue(); basic_t value = ""s; if constexpr (false) { }
-#define INIT_BASIC(t) else if (port_value->isA<t>()) value = port_value->asA<t>();
+#define START_INIT const mx::ValuePtr& port_value = port->getValue(); primitive_t primitive_value = ""s; if constexpr (false) { }
+#define INIT_PRIM(t) else if (port_value->isA<t>()) primitive_value = port_value->asA<t>();
 
         START_INIT
-        INIT_BASIC(bool)
-        INIT_BASIC(int)
-        INIT_BASIC(float)
-        INIT_BASIC(string)
-        INIT_BASIC(mx::Vector2)
-        INIT_BASIC(mx::Vector3)
-        INIT_BASIC(mx::Vector4)
-        INIT_BASIC(mx::Color3)
-        INIT_BASIC(mx::Color4)
-        INIT_BASIC(mx::Matrix33)
-        INIT_BASIC(mx::Matrix44)
+        INIT_PRIM(bool)
+        INIT_PRIM(int)
+        INIT_PRIM(float)
+        INIT_PRIM(string)
+        INIT_PRIM(mx::Vector2)
+        INIT_PRIM(mx::Vector3)
+        INIT_PRIM(mx::Vector4)
+        INIT_PRIM(mx::Color3)
+        INIT_PRIM(mx::Color4)
+        INIT_PRIM(mx::Matrix33)
+        INIT_PRIM(mx::Matrix44)
 
-#undef INIT_BASIC
+#undef INIT_PRIM
 #undef START_INIT
 
-        return std::make_shared<BasicValue>(value);
+        return std::make_shared<BasicValue>(primitive_value);
     }
 
     throw CompileError{"Port does not have a value"s};
-}
-
-ValuePtr ValueFactory::cast_value(ValuePtr value, TypeInfoPtr type)
-{
-    assert(type->is_resolved());
-
-    if (value->type()->is_equal(type))
-        return value;
-    else
-        return std::make_shared<CastValue>(std::move(value), std::move(type));
 }

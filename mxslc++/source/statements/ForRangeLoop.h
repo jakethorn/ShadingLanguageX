@@ -7,19 +7,50 @@
 
 #include "Statement.h"
 #include "Token.h"
+#include "expressions/Expression.h"
+#include "runtime/Runtime.h"
+#include "runtime/ModifierList.h"
+#include "runtime/Scope.h"
+#include "runtime/Variable.h"
 
 class ForRangeLoop final : public Statement
 {
 public:
-    ForRangeLoop(const Runtime& runtime, Token token, TypeInfoPtr type, string name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body);
+    ForRangeLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, StmtPtr body);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;
 
 private:
-    TypeInfoPtr type_;
+    template<typename T>
+    void execute_with() const
+    {
+        const TypePtr type = scope().resolve_type(type_);
+
+        lower_expr_->init(type);
+        if (step_expr_)
+            step_expr_->init(type);
+        upper_expr_->init(type);
+
+        T lower = lower_expr_->evaluate()->value_as<T>();
+        T step = step_expr_ ? step_expr_->evaluate()->value_as<T>() : 1;
+        T upper = upper_expr_->evaluate()->value_as<T>();
+
+        while (lower <= upper)
+        {
+            Runtime::get().enter_scope();
+            VarPtr var = Variable::create(mods_, type, std::make_shared<BasicValue>(lower));
+            scope().add_variable(name_, std::move(var));
+            body_->execute();
+            Runtime::get().exit_scope();
+            lower += step;
+        }
+    }
+
+    ModifierList mods_;
+    TypePtr type_;
     string name_;
     ExprPtr lower_expr_;
     ExprPtr step_expr_;

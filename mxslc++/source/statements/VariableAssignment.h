@@ -11,17 +11,17 @@
 class VariableAssignment final : public Statement
 {
 public:
-    VariableAssignment(const Runtime& runtime, Token token, ExprPtr lhs, ExprPtr rhs);
+    VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rhs_expr);
     ~VariableAssignment() override;
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;
 
 private:
-    ExprPtr lhs_;
-    ExprPtr rhs_;
+    ExprPtr lhs_expr_;
+    ExprPtr rhs_expr_;
 };
 
 #endif //MXSLC_VARIABLEASSIGNMENT_H

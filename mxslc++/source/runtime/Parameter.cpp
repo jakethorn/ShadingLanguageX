@@ -5,39 +5,39 @@
 #include "Parameter.h"
 
 #include "CompileError.h"
+#include "Scope.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, const size_t index)
-    : Parameter{runtime, std::move(mods), std::move(type), std::move(name), nullptr, index}
+Parameter::Parameter(ModifierList mods, TypePtr type, string name, const size_t index)
+    : Parameter{std::move(mods), std::move(type), std::move(name), nullptr, index}
 {
 
 }
 
-Parameter::Parameter(const Runtime& runtime, ModifierList mods, TypeInfoPtr type, string name, ExprPtr expr, const size_t index)
-    : runtime_{runtime},
-    mods_{std::move(mods)},
+Parameter::Parameter(ModifierList mods, TypePtr type, string name, ExprPtr expr, const size_t index)
+    : mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     expr_{std::move(expr)},
     index_{index}
 {
-    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
+    mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Ref, TokenType::Out);
 
-    if (mods_.contains(TokenType::Out))
+    if (mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out))
         mods_.add(TokenType::Mutable);
 
     if (is_const() and is_mutable())
-        throw CompileError{"Parameters cannot be both const and mutable (out parameters are mutable by default)"s};
+        throw CompileError{"Parameters cannot be both const and mutable (ref and out parameters are mutable by default)"s};
 
-    if (is_out() and has_default_value())
-        throw CompileError{"Out parameters cannot have default values"s};
+    if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
+        throw CompileError{"Parameters cannot be both ref and out"s};
+
 }
 
 Parameter::Parameter(Parameter&& other) noexcept
-    : runtime_{other.runtime_},
-    mods_{std::move(other.mods_)},
+    : mods_{std::move(other.mods_)},
     type_{std::move(other.type_)},
     name_{std::move(other.name_)},
     expr_{std::move(other.expr_)},
@@ -48,27 +48,27 @@ Parameter::Parameter(Parameter&& other) noexcept
 
 Parameter::~Parameter() = default;
 
-Parameter Parameter::instantiate_template_types(const TypeInfoPtr& template_type) const
+Parameter Parameter::instantiate_template_types(const TypePtr& template_type) const
 {
-    TypeInfoPtr type = type_->instantiate_template_types(template_type);
+    TypePtr type = type_->instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
-    return Parameter{runtime_, mods_, std::move(type), name_, std::move(expr), index_};
+    return Parameter{mods_, std::move(type), name_, std::move(expr), index_};
 }
 
 void Parameter::init()
 {
-    type_ = runtime_.scope().resolve_type(type_);
+    type_ = Runtime::get().scope().resolve_type(type_);
 
     if (has_default_value())
         expr_->init(type());
 }
 
-TypeInfoPtr Parameter::type() const
+TypePtr Parameter::type() const
 {
     return type_;
 }
 
-ValuePtr Parameter::evaluate() const
+VarPtr Parameter::evaluate() const
 {
     return expr_->evaluate();
 }

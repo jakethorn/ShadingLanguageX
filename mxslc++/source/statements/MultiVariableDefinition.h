@@ -11,15 +11,15 @@
 class MultiVariableDefinition final : public Statement
 {
 public:
-    MultiVariableDefinition(const Runtime& runtime, Token token, TypeInfoPtr type, ExprPtr expr);
+    MultiVariableDefinition(Token token, TypePtr type, ExprPtr expr);
 
-    StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const override;
+    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void execute_impl() const override;
 
 private:
-    TypeInfoPtr type_;
+    TypePtr type_;
     ExprPtr expr_;
 };
 

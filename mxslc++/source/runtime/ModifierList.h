@@ -7,6 +7,7 @@
 
 #include "utils/common.h"
 #include "TokenType.h"
+#include "CompileError.h"
 
 class ModifierList
 {
@@ -26,7 +27,7 @@ public:
         for (const TokenType& mod : mods_)
         {
             if (not (... || (mod == valid_mods)))
-                throw_error("'" + mod.str() + "' is not a valid modifier here");
+                throw CompileError{"'" + mod.str() + "' is not a valid modifier here"};
         }
     }
 
@@ -34,10 +35,18 @@ public:
     void remove(const TokenType mod) { mods_.erase(mod); }
 
     template<typename... Args>
-    ModifierList without(Args&&... mods)
+    ModifierList without(Args&&... mods) const
     {
         ModifierList list = *this;
         (list.remove(std::forward<Args>(mods)), ...);
+        return list;
+    }
+
+    template<typename... Args>
+    ModifierList only(Args&&... mods) const
+    {
+        ModifierList list;
+        ((this->contains(mods) ? list.add(mods) : void()), ...);
         return list;
     }
 
@@ -48,8 +57,6 @@ public:
     string str() const;
 
 private:
-    static void throw_error(const string& msg);
-
     unordered_set<TokenType> mods_;
 };
 

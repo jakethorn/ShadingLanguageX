@@ -1,0 +1,8 @@
+void foo1(out mutable float x)
+{
+    x = 3.0 * 7.0;
+}
+
+foo1(float out_x1);
+out_x1 = 1.0;
+float OUT = out_x1 * 2.0;

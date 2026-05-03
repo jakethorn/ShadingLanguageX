@@ -8,23 +8,26 @@
 #include "Token.h"
 #include "utils/common.h"
 
+class MtlXSerializer;
 class Runtime;
 
 class Statement
 {
 public:
-    explicit Statement(const Runtime& runtime, Token token) : runtime_{runtime}, token_{std::move(token)} { }
+    explicit Statement(Token token) : token_{std::move(token)} { }
     virtual ~Statement() = default;
 
     const Token& token() const { return token_; }
 
-    virtual StmtPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
+    virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
     void execute() const;
 
 protected:
     virtual void execute_impl() const = 0;
 
-    const Runtime& runtime_;
+    static Scope& scope();
+    static MtlXSerializer& serializer();
+
     Token token_;
 };
 

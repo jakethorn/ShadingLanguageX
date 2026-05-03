@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <input name="a" type="float" />
     <output name="out" type="float" />
+    <input name="a" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <add name="node1" type="float">
@@ -11,7 +11,7 @@
     </add>
     <output name="out" type="float" nodename="node1" />
   </nodegraph>
-  <foo name="f" type="float">
+  <foo name="node1" type="float">
     <input name="a" type="float" value="2" />
   </foo>
 </materialx>

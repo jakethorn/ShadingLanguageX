@@ -232,24 +232,24 @@ inline boolean __pow__(boolean in1, boolean in2)
 // unary operators
 //
 
-inline T __pos__<integer, float, vector2, vector3, vector4>(T in)
+inline T __pos__<integer, float, vector2, vector3, vector4>(T in1)
 {
-    return in;
+    return in1;
 }
 
-inline T __neg__<float, vector2, vector3, vector4>(T in)
+inline T __neg__<float, vector2, vector3, vector4>(T in1)
 {
-    return invert(in);
+    return invert(in1);
 }
 
-inline integer __neg__(integer in)
+inline integer __neg__(integer in1)
 {
-    return subtract(0, in);
+    return subtract(0, in1);
 }
 
-inline boolean __not__(boolean in)
+inline boolean __not__(boolean in1)
 {
-    return not(in);
+    return not(in1);
 }
 
 //
@@ -274,19 +274,19 @@ inline boolean __boolean__()
     return false;
 }
 
-inline boolean __boolean__(boolean in)
+inline boolean __boolean__(boolean in1)
 {
-    return in;
+    return in1;
 }
 
-inline boolean __boolean__(integer in)
+inline boolean __boolean__(integer in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
-inline boolean __boolean__(float in)
+inline boolean __boolean__(float in1)
 {
-    return ifequal(in, 0.0);
+    return ifequal(in1, 0.0);
 }
 
 inline integer __integer__()
@@ -294,19 +294,19 @@ inline integer __integer__()
     return 0;
 }
 
-inline integer __integer__(integer in)
+inline integer __integer__(integer in1)
 {
-    return in;
+    return in1;
 }
 
-inline integer __integer__(boolean in)
+inline integer __integer__(boolean in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
-inline integer __integer__(float in)
+inline integer __integer__(float in1)
 {
-    return round(in);
+    return round(in1);
 }
 
 inline float __float__()
@@ -314,23 +314,23 @@ inline float __float__()
     return 0.0;
 }
 
-inline float __float__(float in)
+inline float __float__(float in1)
 {
-    return in;
+    return in1;
 }
 
-inline float __float__<boolean, integer>(T in)
+inline float __float__<boolean, integer>(T in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
 //
 // vec2
 //
 
-inline vector2 __vector2__<boolean, integer, float, vector3, vector4, color3, color4>(T in)
+inline vector2 __vector2__<boolean, integer, float, vector3, vector4, color3, color4>(T in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
 inline vector2 __vector2__(float x, float y)
@@ -338,9 +338,9 @@ inline vector2 __vector2__(float x, float y)
     return combine2(x, y);
 }
 
-inline vector2 __vector2__(vector2 in)
+inline vector2 __vector2__(vector2 in1)
 {
-    return in;
+    return in1;
 }
 
 inline vector2 __vector2__()
@@ -352,9 +352,9 @@ inline vector2 __vector2__()
 // vec3
 //
 
-inline vector3 __vector3__<boolean, integer, float, vector2, vector4, color3, color4>(T in)
+inline vector3 __vector3__<boolean, integer, float, vector2, vector4, color3, color4>(T in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
 inline default vector3 __vector3__(float x, float y, float z)
@@ -374,9 +374,9 @@ inline vector3 __vector3__(vector2 xy, float z)
     return combine3(x, y, z);
 }
 
-inline vector3 __vector3__(vector3 in)
+inline vector3 __vector3__(vector3 in1)
 {
-    return in;
+    return in1;
 }
 
 inline vector3 __vector3__()
@@ -388,9 +388,9 @@ inline vector3 __vector3__()
 // vec4
 //
 
-inline vector4 __vector4__<boolean, integer, float, vector2, vector3, color3, color4>(T in)
+inline vector4 __vector4__<boolean, integer, float, vector2, vector3, color3, color4>(T in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
 inline default vector4 __vector4__(float x, float y, float z, float w)
@@ -428,9 +428,9 @@ inline vector4 __vector4__<vector3, color3>(T xyz, float w)
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__(vector4 in)
+inline vector4 __vector4__(vector4 in1)
 {
-    return in;
+    return in1;
 }
 
 inline vector4 __vector4__()
@@ -442,9 +442,9 @@ inline vector4 __vector4__()
 // color3
 //
 
-inline color3 __color3__<boolean, integer, float, vector2, vector3, vector4, color4>(T in)
+inline color3 __color3__<boolean, integer, float, vector2, vector3, vector4, color4>(T in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
 inline default color3 __color3__(float r, float g, float b)
@@ -464,9 +464,9 @@ inline color3 __color3__(vector2 rg, float b)
     return combine3(r, g, b);
 }
 
-inline color3 __color3__(color3 in)
+inline color3 __color3__(color3 in1)
 {
-    return in;
+    return in1;
 }
 
 inline color3 __color3__()
@@ -478,9 +478,9 @@ inline color3 __color3__()
 // color4
 //
 
-inline color4 __color4__<boolean, integer, float, vector2, vector3, vector4, color3>(T in)
+inline color4 __color4__<boolean, integer, float, vector2, vector3, vector4, color3>(T in1)
 {
-    return convert(in);
+    return convert(in1);
 }
 
 inline default color4 __color4__(float r, float g, float b, float a)
@@ -518,9 +518,9 @@ inline color4 __color4__<vector3, color3>(T rgb, float a)
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__(color4 in)
+inline color4 __color4__(color4 in1)
 {
-    return in;
+    return in1;
 }
 
 inline color4 __color4__()

@@ -4,25 +4,29 @@
 
 #include "mtlx_utils.h"
 
-#include "runtime/TypeInfo.h"
+#include "runtime/Type.h"
 #include "utils/str_utils.h"
 
-string as_string(const mx::NodePtr& node)
-{
-    string str = node->asString();
-    for (const mx::InputPtr& i : node->getInputs())
-        str += "\n    "s + i->asString();
-    for (const mx::OutputPtr& i : node->getOutputs())
-        str += "\n    "s + i->asString();
-    return str;
-}
-
-string port_name(const string& port_name, const size_t i)
+string get_port_name(const string& port_name, const size_t i)
 {
     return port_name + "__" + str(i);
 }
 
-mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const string& name, const TypeInfoPtr& type)
+void add_input(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name)
+{
+    if (type->has_fields())
+    {
+        for (size_t i = 0; i < type->field_count(); ++i)
+            add_input(node_def, type->field_type(i), get_port_name(name, i));
+    }
+    else
+    {
+        if (node_def->getInput(name) == nullptr)
+            node_def->addInput(name, type->name());
+    }
+}
+
+mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const TypePtr& type, const string& name)
 {
     mx::NodeDefPtr node_def = node_graph->getNodeDef();
     if (node_def->getOutput(name) == nullptr)

@@ -25,7 +25,7 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
     const fs::path expected_path = path.replace_extension(".mtlx");
 
     ASSERT_NO_THROW(mxslc::compile_to_file(input_path, actual_path))
-        << "Failed to compile: " << input_path;
+        << "\nFailed to compile: " << input_path << "\n\n" << read_file(input_path);
 
     const string actual_output = read_file(actual_path);
     if (overwrite_data_files())

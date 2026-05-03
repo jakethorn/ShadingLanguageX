@@ -12,6 +12,6 @@
   <nodegraph name="NG_bar" nodedef="ND_bar">
     <output name="out" type="float" value="5" />
   </nodegraph>
-  <foo name="f" type="float" />
-  <bar name="b" type="float" />
+  <foo name="node1" type="float" />
+  <bar name="node2" type="float" />
 </materialx>

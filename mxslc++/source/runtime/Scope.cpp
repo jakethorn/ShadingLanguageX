@@ -5,47 +5,46 @@
 #include <cassert>
 
 #include "Scope.h"
+#include "statements/Statement.h"
 #include "CompileError.h"
 #include "ArgumentList.h"
-#include "TypeInfo.h"
+#include "Function.h"
+#include "Runtime.h"
+#include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"
 #include "utils/template_utils.h"
 
-Scope::Scope() : Scope{nullptr} { }
-Scope::Scope(ScopePtr parent) : Scope{std::move(parent), false} { }
-Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_current_{true}, is_inline_{is_inline}
+Scope::Scope() = default;
+
+Scope::Scope(ScopePtr parent) : parent_{std::move(parent)}
 {
-    if (parent_)
-        parent_->set_current(false);
+    graph_ = parent_->graph_;
+    func_ = parent_->func_;
 }
 
-void Scope::add_variable(VarPtr var)
+pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
 {
-    if (contains(variables_, var->name()))
-        throw CompileError{"Variable already defined: " + var->name()};
+    if (const mx::NodeGraphPtr& node_graph = std::dynamic_pointer_cast<mx::NodeGraph>(graph_))
+        return {node_graph, func_};
 
-    variables_.emplace(var->name(), std::move(var));
+    throw CompileError{"Not in a node graph"s};
 }
 
-void Scope::add_variable(string name, ValuePtr value)
+bool Scope::is_inline() const
 {
-    add_variable(ModifierList{}, std::move(name), std::move(value));
+    if (parent_ == nullptr)
+        return true;
+    return func_ == parent_->func_;
 }
 
-void Scope::add_variable(ModifierList mods, string name, ValuePtr value)
+void Scope::add_variable(string name, VarPtr var)
 {
-    add_variable(std::make_shared<Variable>(std::move(mods), std::move(name), std::move(value)));
-}
+    if (contains(variables_, name))
+        throw CompileError{"Variable already defined: " + name};
 
-void Scope::add_reference(string name, VarPtr var)
-{
-    add_variable(std::make_shared<VariableReference>(std::move(name), std::move(var)));
-}
-
-void Scope::add_reference(string ref_name, const string& var_name)
-{
-    add_reference(std::move(ref_name), get_variable(var_name));
+    var->set_name(name);
+    variables_.emplace(std::move(name), std::move(var));
 }
 
 VarPtr Scope::get_variable(const string& name) const
@@ -59,27 +58,24 @@ VarPtr Scope::get_variable(const string& name) const
     throw CompileError{"Variable not defined: " + name};
 }
 
-bool Scope::is_variable_inline(const VarPtr& var) const
+bool Scope::is_variable_local(const VarPtr& var) const
 {
-    if (var->is_child())
-        return is_variable_inline(var->parent());
-    else
-        return is_variable_inline(var->name());
+    VarPtr tmp = var;
+    while (tmp->parent())
+        tmp = tmp->parent();
+    return is_variable_local(tmp->name());
 }
 
-bool Scope::is_variable_inline(const string& name) const
+bool Scope::is_variable_local(const string& name) const
 {
     if (contains(variables_, name))
     {
-        if (variables_.at(name)->is_reference())
-            return is_variable_inline(variables_.at(name)->dereference());
-        else
-            return true;
+        return true;
     }
 
     if (parent_)
     {
-        return parent_->is_variable_inline(name) and is_inline_;
+        return parent_->is_variable_local(name) and is_inline();
     }
 
     throw CompileError{"Variable not defined: " + name};
@@ -95,16 +91,16 @@ namespace
 {
     bool is_match(
         const Function& func,
-        const vector<TypeInfoPtr>& return_types,
+        const vector<TypePtr>& return_types,
         const string& name,
-        const TypeInfoPtr& template_type,
+        const TypePtr& template_type,
         const ArgumentList& args
     )
     {
         if (name != func.name())
             return false;
 
-        if (not return_types.empty() and not func.type()->is_compatible(return_types))
+        if (not return_types.empty() and not func.return_type()->is_compatible(return_types))
             return false;
 
         if (template_type)
@@ -120,7 +116,7 @@ namespace
 
         for (const Argument& arg : args)
         {
-            TypeInfoPtr param_type = func.parameters()[arg].type();
+            TypePtr param_type = func.parameters()[arg].type();
             if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
                 return false;
         }
@@ -142,9 +138,9 @@ namespace
 }
 
 vector<FuncPtr> Scope::get_functions(
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 ) const
 {
@@ -158,7 +154,7 @@ vector<FuncPtr> Scope::get_functions(
     if (funcs.empty() and parent_)
         funcs = parent_->get_functions(return_types, name, template_type, args);
 
-    if (funcs.empty() and is_current_)
+    if (funcs.empty())
     {
         throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
     }
@@ -167,9 +163,9 @@ vector<FuncPtr> Scope::get_functions(
 }
 
 FuncPtr Scope::get_function(
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 ) const
 {
@@ -206,7 +202,7 @@ vector<FuncPtr> Scope::get_all_functions(const string& name) const
     return funcs;
 }
 
-void Scope::add_type(TypeInfoPtr type)
+void Scope::add_type(TypePtr type)
 {
     assert(type->has_name());
 
@@ -219,13 +215,13 @@ void Scope::add_type(TypeInfoPtr type)
     types_.emplace(type->name(), std::move(type));
 }
 
-void Scope::add_basic_type(const string& name)
+void Scope::add_primitive_type(const string& name)
 {
-    TypeInfoPtr type = std::make_shared<TypeInfo>(name);
+    TypePtr type = std::make_shared<Type>(name);
     add_type(std::move(type));
 }
 
-void Scope::add_alias(const string& name, TypeInfoPtr type)
+void Scope::add_alias(const string& name, TypePtr type)
 {
     if (contains(types_, name))
         throw CompileError{"Type '" + name + "' already defined"};
@@ -243,7 +239,7 @@ bool Scope::has_type(const string& name) const
     return false;
 }
 
-TypeInfoPtr Scope::resolve_type(const TypeInfoPtr& type) const
+TypePtr Scope::resolve_type(const TypePtr& type) const
 {
     if (type->has_name())
     {
@@ -257,13 +253,13 @@ TypeInfoPtr Scope::resolve_type(const TypeInfoPtr& type) const
     }
 }
 
-void Scope::resolve_fields(const TypeInfoPtr& type) const
+void Scope::resolve_fields(const TypePtr& type) const
 {
-    for (FieldInfo& field : type->fields_)
+    for (Field& field : type->fields_)
         field.type_ = resolve_type(field.type_);
 }
 
-TypeInfoPtr Scope::get_type(const string& name) const
+TypePtr Scope::get_type(const string& name) const
 {
     if (contains(types_, name))
         return types_.at(name);

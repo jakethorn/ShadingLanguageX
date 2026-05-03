@@ -6,21 +6,23 @@
 
 #include <cassert>
 
+#include "statements/Statement.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/Function.h"
-#include "runtime/TypeInfo.h"
+#include "runtime/Function.h"
+#include "runtime/Type.h"
 
 string missing_overload_error(
     const FuncPtr& func,
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 )
 {
     string result = func->str() + "\n";
 
-    if (not return_types.empty() and not contains(return_types, func->type()))
+    if (not return_types.empty() and not contains(return_types, func->return_type()))
         result += "    Return type does not match\n";
 
     if (name != func->name())
@@ -57,9 +59,9 @@ string missing_overload_error(
 
 string missing_overload_error(
     const vector<FuncPtr>& funcs,
-    const vector<TypeInfoPtr>& return_types,
+    const vector<TypePtr>& return_types,
     const string& name,
-    const TypeInfoPtr& template_type,
+    const TypePtr& template_type,
     const ArgumentList& args
 )
 {

@@ -1,1 +1,1 @@
-errmsg018.mxsl, line 1: If statement condition could not be evaluated at compile time
+errmsg018.mxsl, line 1: Value is not a compile-time b

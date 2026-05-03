@@ -1,0 +1,9 @@
+inline void foo(ref {float x, float y} p)
+{
+   p.y = p.x;
+   p.x = 5.0;
+}
+
+mutable {float, float} xy = {1.0, 2.0};
+foo(xy);
+float z = xy[0] * xy[1];

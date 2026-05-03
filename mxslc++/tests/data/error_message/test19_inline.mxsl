@@ -1,0 +1,10 @@
+{float, mutable float} p = {1.0, 2.0};
+
+inline float foo(ref {float, float} p)
+{
+   p[1] = randomfloat();
+   return p[0] + p[1];
+}
+
+float x = foo({3.0, 4.0});
+float y = x * 2.0;

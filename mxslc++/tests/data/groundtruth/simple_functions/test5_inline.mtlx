@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <divide name="node1" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="3" />
+  </divide>
+  <divide name="node2" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </divide>
+  <randomfloat name="node3" type="float" />
+  <divide name="node4" type="float">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="6" />
+  </divide>
+  <divide name="node5" type="float">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="6" />
+  </divide>
+  <randomfloat name="node6" type="float" />
+  <tangent name="node7" type="vector3">
+    <input name="space" type="string" value="world" />
+  </tangent>
+  <tangent name="node8" type="vector3">
+    <input name="space" type="string" value="object" />
+  </tangent>
+</materialx>

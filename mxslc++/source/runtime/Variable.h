@@ -1,128 +1,80 @@
 //
-// Created by jaket on 12/11/2025.
+// Created by jaket on 16/04/2026.
 //
 
-#ifndef FENNEC_VARIABLE_H
-#define FENNEC_VARIABLE_H
+#ifndef MXSLC_VARIABLE_H
+#define MXSLC_VARIABLE_H
 
+#include "CompileError.h"
 #include "ModifierList.h"
 #include "utils/common.h"
+#include "values/BasicValue.h"
 
-class FieldInfo;
-
-/*
- * Variable Interface
- */
-
-class IVariable
+class Variable : public std::enable_shared_from_this<Variable>
 {
 public:
-    virtual ~IVariable() = default;
+    Variable(ModifierList mods, TypePtr type);
 
-    virtual bool is_const() const = 0;
-    virtual bool is_mutable() const = 0;
-    virtual bool is_global() const = 0;
-    virtual TypeInfoPtr type() const = 0;
-    virtual const string& name() const = 0;
-    virtual ValuePtr value() const = 0;
+    bool is_const() const;
+    bool is_mutable() const;
+    const ModifierList& modifiers() const;
+    void set_modifiers(ModifierList mods);
 
-    virtual void set_value(const ValuePtr& val) = 0;
-    virtual void set_const(bool cnt) = 0;
-    virtual void set_mutable(bool mut) = 0;
+    const TypePtr& type() const;
 
-    virtual bool is_child() const { return false; }
-    virtual VarPtr parent() const { return nullptr; }
+    const string& name() const;
+    void set_name(string name);
 
-    virtual bool is_reference() const { return false; }
-    virtual VarPtr dereference() const { return nullptr; }
-};
+    bool is_assignable() const;
+    bool is_temporary() const;
 
-/*
- * Variable
- */
+    bool has_parent() const;
+    VarPtr parent() const;
+    size_t child_count() const;
+    VarPtr child(size_t index);
+    VarPtr child(const string& field_name);
 
-class Variable final : public IVariable
-{
-public:
-    Variable(ModifierList mods, string name, ValuePtr val);
+    bool has_value() const;
+    ValuePtr value();
+    void copy_value(const VarPtr& other);
 
-    bool is_const() const override { return mods_.contains(TokenType::Const); }
-    bool is_mutable() const override { return mods_.contains(TokenType::Mutable); }
-    bool is_global() const override { return mods_.contains(TokenType::Global); }
-    TypeInfoPtr type() const override;
-    const string& name() const override { return name_; }
-    ValuePtr value() const override { return val_; }
+    void uninitialize();
 
-    void set_value(const ValuePtr& val) override { val_ = val; }
-    void set_const(bool cnt) override;
-    void set_mutable(bool mut) override;
+    void add_to_scope(string name);
+    bool is_local();
+
+    string str() const;
+
+    template<typename T>
+    T value_as() const
+    {
+        if (const shared_ptr<BasicValue>& value = std::dynamic_pointer_cast<BasicValue>(value_))
+            return value->get<T>();
+        else
+            throw CompileError{"Value is not a compile-time "s + typeid(T).name()};
+    }
+
+    static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
+    static VarPtr create(ModifierList mods, TypePtr type, ValuePtr value);
+    static VarPtr create(ModifierList mods, TypePtr type, const VarPtr& value);
+    static VarPtr create(TypePtr type, const vector<VarPtr>& children);
+    static VarPtr create(TypePtr type, ValuePtr value);
+    static VarPtr create(TypePtr type, const VarPtr& value);
+    static VarPtr create(ValuePtr value);
+    static VarPtr create(const VarPtr& value);
 
 private:
+    void set_parent(weak_ptr<Variable> parent);
+    void set_value(ValuePtr value);
+    void copy_children(const vector<VarPtr>& children);
+
     ModifierList mods_;
+    TypePtr type_;
+    weak_ptr<Variable> parent_;
+    vector<VarPtr> children_;
+    ValuePtr value_;
     string name_;
-    ValuePtr val_;
+    bool is_initialized_ = false;
 };
 
-/*
- * SubVariable
- */
-
-class SubVariable final : public IVariable
-{
-public:
-    SubVariable(VarPtr parent, size_t index);
-    SubVariable(VarPtr parent, const string& name);
-
-    bool is_const() const override;
-    bool is_mutable() const override;
-    bool is_global() const override;
-    TypeInfoPtr type() const override;
-    const FieldInfo& field() const;
-    const string& name() const override;
-    ValuePtr value() const override;
-
-    void set_value(const ValuePtr& val) override;
-    void set_const(bool mut) override;
-    void set_mutable(bool mut) override;
-
-    bool is_child() const override { return true; }
-    VarPtr parent() const override { return parent_; }
-
-private:
-    VarPtr parent_;
-    size_t index_;
-    string name_;
-};
-
-VarPtr get_subvariable(VarPtr parent, size_t index);
-VarPtr get_subvariable(VarPtr parent, const string& name);
-
-/*
- * VariableReference
- */
-
-class VariableReference final : public IVariable
-{
-public:
-    VariableReference(string name, VarPtr var) : name_{std::move(name)}, var_{std::move(var)} { }
-
-    bool is_const() const override { return var_->is_const(); }
-    bool is_mutable() const override { return var_->is_mutable(); }
-    bool is_global() const override { return var_->is_global(); }
-    TypeInfoPtr type() const override { return var_->type(); }
-    const string& name() const override { return name_; }
-    ValuePtr value() const override { return var_->value(); }
-
-    void set_value(const ValuePtr& val) override { var_->set_value(val); }
-    void set_const(const bool cnt) override { var_->set_const(cnt); }
-    void set_mutable(const bool mut) override { var_->set_mutable(mut); }
-
-    bool is_reference() const override { return true; }
-    VarPtr dereference() const override { return var_; }
-
-private:
-    string name_;
-    VarPtr var_;
-};
-
-#endif //FENNEC_VARIABLE_H
+#endif //MXSLC_VARIABLE_H

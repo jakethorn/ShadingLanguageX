@@ -1,0 +1,11 @@
+inline {float, color3} foo()
+{
+   return {
+       randomfloat(),
+       randomcolor()
+   };
+}
+
+float f, color3 c = foo();
+float x = f * 2.0;
+color3 y = c * color3{1.0, 0.0, 0.0};

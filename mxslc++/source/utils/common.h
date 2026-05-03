@@ -28,11 +28,13 @@ using namespace mxslc;
 
 using std::unique_ptr;
 using std::shared_ptr;
+using std::weak_ptr;
 using std::optional;
 using std::string;
 using std::string_view;
 using std::vector;
 using std::tuple;
+using std::pair;
 using std::variant;
 using std::unordered_map;
 using std::unordered_set;
@@ -50,17 +52,17 @@ using ValuePtr = shared_ptr<Value>;
 class Scope;
 using ScopePtr = unique_ptr<Scope>;
 
-class IVariable;
-using VarPtr = shared_ptr<IVariable>;
+class Variable;
+using VarPtr = shared_ptr<Variable>;
 
 class Function;
 using FuncPtr = shared_ptr<Function>;
 
-class TypeInfo;
-using TypeInfoPtr = shared_ptr<TypeInfo>;
+class Type;
+using TypePtr = shared_ptr<Type>;
 
 // type aliases
-using basic_t = variant<
+using primitive_t = variant<
     bool,
     int,
     float,

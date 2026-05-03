@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_my_function" node="my_function">
-    <input name="z" type="float" />
     <output name="out__0" type="float" />
     <output name="out__1" type="float" />
+    <input name="z" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_my_function" nodedef="ND_my_function">
     <subtract name="node1" type="float">

@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <input name="x" type="float" />
-    <output name="nonlocal_out__y" type="float" />
     <output name="out" type="float" />
+    <input name="x" type="float" value="0" />
+    <output name="out__y" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="nonlocal_out__y" type="float" interfacename="x" />
     <output name="out" type="float" interfacename="x" />
+    <output name="out__y" type="float" interfacename="x" />
   </nodegraph>
-  <foo name="node1" type="multioutput">
+  <foo name="node1" type="float">
     <input name="x" type="float" value="3" />
-    <output name="nonlocal_out__y" type="float" />
+    <output name="out__y" type="float" />
     <output name="out" type="float" />
   </foo>
-  <multiply name="w" type="float">
+  <multiply name="node2" type="float">
     <input name="in1" type="float" output="out" nodename="node1" />
-    <input name="in2" type="float" output="nonlocal_out__y" nodename="node1" />
+    <input name="in2" type="float" output="out__y" nodename="node1" />
   </multiply>
 </materialx>

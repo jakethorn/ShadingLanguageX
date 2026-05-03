@@ -7,6 +7,8 @@
 
 #include "utils/common.h"
 
-ValuePtr evaluate_now(const string& node_name, const unordered_map<string, ValuePtr>& inputs);
+class Parameter;
+
+VarPtr evaluate_now(const string& node_name, const vector<pair<const Parameter&, VarPtr>>& arg_values);
 
 #endif //MXSLC_EVALUATE_MTLX_H

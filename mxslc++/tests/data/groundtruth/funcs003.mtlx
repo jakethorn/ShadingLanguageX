@@ -15,20 +15,20 @@
     <output name="out__0" type="float" />
     <output name="out__1" type="color3" />
   </foo>
-  <add name="cx" type="color3">
+  <add name="node2" type="color3">
     <input name="in1" type="color3" output="out__1" nodename="node1" />
     <input name="in2" type="float" output="out__0" nodename="node1" />
   </add>
-  <foo name="node2" type="multioutput">
+  <foo name="node3" type="multioutput">
     <output name="out__0" type="float" />
     <output name="out__1" type="color3" />
   </foo>
-  <add name="y" type="float">
+  <add name="node4" type="float">
     <input name="in1" type="float" output="out__0" nodename="node1" />
-    <input name="in2" type="float" output="out__0" nodename="node2" />
+    <input name="in2" type="float" output="out__0" nodename="node3" />
   </add>
-  <add name="z" type="color3">
+  <add name="node5" type="color3">
     <input name="in1" type="color3" output="out__1" nodename="node1" />
-    <input name="in2" type="color3" output="out__1" nodename="node2" />
+    <input name="in2" type="color3" output="out__1" nodename="node3" />
   </add>
 </materialx>

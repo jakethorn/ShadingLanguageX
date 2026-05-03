@@ -1,0 +1,10 @@
+inline void foo(out {float x, float y} p, out {float x, float y} q)
+{
+   p = {1.0, 2.0};
+   q = {3.0, 4.0};
+   q = {5.0, 6.0};
+}
+
+foo({float, float} a, {float, float} b);
+float x = a[0] * b[0];
+float y = a[1] * b[1];

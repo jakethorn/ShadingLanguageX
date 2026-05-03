@@ -8,43 +8,42 @@
 #include "utils/common.h"
 #include "Token.h"
 
-class Runtime;
+class MtlXSerializer;
 
 class Expression
 {
 public:
-    explicit Expression(const Runtime& runtime);
-    Expression(const Runtime& runtime, Token token);
+    Expression() = default;
+    explicit Expression(Token token);
+
     virtual ~Expression() = default;
 
-    const Token& token() const { return token_; }
+    virtual ExprPtr instantiate_template_types(const TypePtr& template_type) const = 0;
 
     void init();
-    void init(const TypeInfoPtr& type);
+    void init(const TypePtr& type);
     void init(const string& type_name);
-    void init(const vector<TypeInfoPtr>& types);
-    bool try_init(const vector<TypeInfoPtr>& types);
+    void init(const vector<TypePtr>& types);
+    bool try_init(const vector<TypePtr>& types);
 
+    const Token& token() const { return token_; }
     bool is_initialized() const { return is_initialized_; }
-    TypeInfoPtr type() const;
-    virtual VarPtr variable() const { return nullptr; }
+    TypePtr type() const;
 
-    virtual ExprPtr instantiate_template_types(const TypeInfoPtr& template_type) const = 0;
-
-    ValuePtr evaluate() const;
-    void assign(const ValuePtr& value);
+    VarPtr evaluate() const;
 
 protected:
-    virtual void init_subexpressions(const vector<TypeInfoPtr>& types) { }
-    virtual void init_impl(const vector<TypeInfoPtr>& types) { }
-    virtual TypeInfoPtr type_impl() const = 0;
-    virtual ValuePtr evaluate_impl() const = 0;
-    virtual void assign_impl(const ValuePtr& value);
+    virtual void init_subexpressions(const vector<TypePtr>& types) { }
+    virtual void init_impl(const vector<TypePtr>& types) { }
+    virtual TypePtr type_impl() const = 0;
+    virtual VarPtr evaluate_impl() const = 0;
 
-    const Runtime& runtime_;
+    static Scope& scope();
+    static MtlXSerializer& serializer();
+
     Token token_;
-    TypeInfoPtr assigned_type_ = nullptr;
     bool is_initialized_ = false;
+    TypePtr assigned_type_ = nullptr;
 };
 
 #endif //FENNEC_EXPRESSION_H
