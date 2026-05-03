@@ -162,7 +162,19 @@ bool Variable::is_local()
 
 string Variable::str() const
 {
-    return name_;
+    if (has_value())
+    {
+        return value_->str();
+    }
+    else
+    {
+        string result = "{";
+        for (const VarPtr& child : children_)
+        {
+            result += "\n\t" + child->str() + "\n";
+        }
+        return result + "}";
+    }
 }
 
 VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<VarPtr>& children)

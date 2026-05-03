@@ -27,5 +27,5 @@ void InterfaceValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph
 
 string InterfaceValue::str() const
 {
-    return name_;
+    return "<input name=\"" + name_ + "\" type=\"" + type_->name() + "\" />";
 }
