@@ -36,7 +36,7 @@ StmtPtr ForEachLoop::instantiate_template_types(const TypePtr& template_type) co
 
 void ForEachLoop::execute_impl() const
 {
-    const TypePtr type = runtime().scope().resolve_type(type_);
+    const TypePtr type = scope().resolve_type(type_);
 
     iter_expr_->init();
     if (not iter_expr_->type()->has_fields())
@@ -49,10 +49,10 @@ void ForEachLoop::execute_impl() const
         if (not next_value->type()->is_compatible(type))
             throw CompileError{"Field value does not match loop iterator type"s};
 
-        runtime().enter_inline_scope();
+        Runtime::get().enter_scope();
         VarPtr var = Variable::create(mods_, type, next_value);
-        runtime().scope().add_variable(name_, std::move(var));
+        scope().add_variable(name_, std::move(var));
         body_->execute();
-        runtime().exit_scope();
+        Runtime::get().exit_scope();
     }
 }

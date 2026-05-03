@@ -11,26 +11,20 @@
 
 class ArgumentList;
 
-struct GraphFunction
-{
-    mx::GraphElementPtr graph;
-    FuncPtr func;
-};
-
 class MtlXSerializer
 {
 public:
     MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
-    explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)}
-    {
-        graphs_.push_back(GraphFunction{doc_, nullptr});
-    }
+    explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
     VarPtr write_node(const FuncPtr& func, const ArgumentList& args) const;
-    ValuePtr write_node_def_input(const VarPtr& var) const;
-    void write_node_def_output(const VarPtr& var, const ValuePtr& value) const;
+
     void write_node_def_graph(const FuncPtr& func) const;
 
+    ValuePtr write_node_def_input(const VarPtr& var) const;
+    void write_node_def_output(const VarPtr& var, const ValuePtr& value) const;
+
+    mx::DocumentPtr document() const { return doc_; }
     string xml() const;
     void save(const fs::path& filepath) const;
 
@@ -38,18 +32,14 @@ private:
     mx::NodeDefPtr write_node_def(const FuncPtr& func) const;
     void write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
 
+    void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var) const;
+    void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var) const;
+    void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var) const;
+
     string node_def_name(const FuncPtr& func) const;
     string node_graph_name(const FuncPtr& func) const;
 
-    void enter_node_graph(const mx::NodeGraphPtr& node_graph, const FuncPtr& func) const;
-    void exit_node_graph() const;
-    bool in_node_graph() const { return graphs_.size() > 1; }
-    const mx::GraphElementPtr& graph() const { return graphs_.back().graph; }
-    mx::NodeGraphPtr node_graph() const;
-    FuncPtr graph_function() const { return graphs_.back().func; }
-
     mx::DocumentPtr doc_;
-    mutable vector<GraphFunction> graphs_;
 };
 
 #endif //FENNEC_MTLXSERIALIZER_H

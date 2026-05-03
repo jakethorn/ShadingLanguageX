@@ -27,7 +27,7 @@ private:
     template<typename T>
     void execute_with() const
     {
-        const TypePtr type = runtime().scope().resolve_type(type_);
+        const TypePtr type = scope().resolve_type(type_);
 
         lower_expr_->init(type);
         if (step_expr_)
@@ -40,11 +40,11 @@ private:
 
         while (lower <= upper)
         {
-            runtime().enter_inline_scope();
+            Runtime::get().enter_scope();
             VarPtr var = Variable::create(mods_, type, std::make_shared<BasicValue>(lower));
-            runtime().scope().add_variable(name_, std::move(var));
+            scope().add_variable(name_, std::move(var));
             body_->execute();
-            runtime().exit_scope();
+            Runtime::get().exit_scope();
             lower += step;
         }
     }

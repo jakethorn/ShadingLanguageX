@@ -40,10 +40,6 @@ public:
 
     void uninitialize();
 
-    void set_as_node_input(const mx::NodePtr& node, const string& input_name);
-    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name);
-    void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name);
-
     void add_to_scope(string name);
     bool is_local();
 

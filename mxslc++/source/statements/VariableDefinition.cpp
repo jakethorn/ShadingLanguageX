@@ -28,7 +28,7 @@ StmtPtr VariableDefinition::instantiate_template_types(const TypePtr& template_t
 
 void VariableDefinition::execute_impl() const
 {
-    const TypePtr type = runtime().scope().resolve_type(type_);
+    const TypePtr type = scope().resolve_type(type_);
 
     VarPtr value;
     if (expr_)
@@ -41,6 +41,6 @@ void VariableDefinition::execute_impl() const
         value = ValueFactory::create_default_value(type);
     }
 
-    VarPtr var = Variable::create(mods_, type, value);
-    runtime().scope().add_variable(name(), std::move(var));
+    const VarPtr var = Variable::create(mods_, type, value);
+    var->add_to_scope(name());
 }

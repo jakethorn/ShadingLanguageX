@@ -7,15 +7,13 @@
 
 std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-Runtime::Runtime()
-    : Runtime{std::make_unique<Scope>(), MtlXSerializer{}}
+Runtime::Runtime() : Runtime{std::make_unique<Scope>(), MtlXSerializer{}}
 {
 
 }
-Runtime::Runtime(ScopePtr scope, MtlXSerializer serializer)
-    : scope_{std::move(scope)}, serializer_{std::move(serializer)}
+Runtime::Runtime(ScopePtr scope, MtlXSerializer serializer) : scope_{std::move(scope)}, serializer_{std::move(serializer)}
 {
-
+    scope_->set_graph(serializer_.document(), nullptr);
 }
 
 Scope& Runtime::scope()
@@ -28,14 +26,9 @@ MtlXSerializer& Runtime::serializer()
     return serializer_;
 }
 
-void Runtime::enter_scope(bool is_inline)
+void Runtime::enter_scope()
 {
-    scope_ = std::make_unique<Scope>(std::move(scope_), is_inline);
-}
-
-void Runtime::enter_inline_scope()
-{
-    enter_scope(true);
+    scope_ = std::make_unique<Scope>(std::move(scope_));
 }
 
 void Runtime::exit_scope()

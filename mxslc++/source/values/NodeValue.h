@@ -13,12 +13,13 @@ class NodeValue final : public Value
 public:
     NodeValue(mx::NodePtr node, TypePtr type);
 
-    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override;
-    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
-
     void set_node_name(const string& name) const;
 
     string str() const override;
+
+protected:
+    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override;
+    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
 
 private:
     mx::NodePtr node_;

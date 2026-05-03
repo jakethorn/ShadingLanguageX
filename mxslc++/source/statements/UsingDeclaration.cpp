@@ -16,5 +16,5 @@ StmtPtr UsingDeclaration::instantiate_template_types(const TypePtr& template_typ
 
 void UsingDeclaration::execute_impl() const
 {
-    runtime().scope().add_alias(name_, type_);
+    scope().add_alias(name_, type_);
 }

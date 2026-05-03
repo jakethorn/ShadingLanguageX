@@ -14,10 +14,11 @@ public:
     OutputValue(mx::OutputPtr output, TypePtr type);
     OutputValue(const mx::NodePtr& node, const string& output_name, TypePtr type);
 
+    string str() const override;
+
+protected:
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override;
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
-
-    string str() const override;
 
 private:
     mx::OutputPtr output_;

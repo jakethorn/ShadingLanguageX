@@ -24,14 +24,13 @@ StmtPtr MultiVariableDefinition::instantiate_template_types(const TypePtr& templ
 
 void MultiVariableDefinition::execute_impl() const
 {
-    const TypePtr type = runtime().scope().resolve_type(type_);
+    const TypePtr type = scope().resolve_type(type_);
     expr_->init(type);
 
     const VarPtr value = expr_->evaluate();
     for (size_t i = 0; i < value->child_count(); ++i)
     {
-        VarPtr child_value = value->child(i);
-        VarPtr var = Variable::create(type->field(i).modifiers(), type->field_type(i), child_value);
-        runtime().scope().add_variable(type->field_name(i), std::move(var));
+        const VarPtr var = Variable::create(type->field(i).modifiers(), type->field_type(i), value->child(i));
+        var->add_to_scope(type->field_name(i));
     }
 }

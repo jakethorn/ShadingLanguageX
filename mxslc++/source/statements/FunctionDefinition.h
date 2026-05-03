@@ -23,8 +23,6 @@ private:
     const string& name() const { return token_.lexeme(); }
     bool is_templated() const { return not template_types_.empty(); }
 
-    static void write_function_definition(const FuncPtr& func);
-
     ModifierList mods_;
     TypePtr type_;
     vector<TypePtr> template_types_;

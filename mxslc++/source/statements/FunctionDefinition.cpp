@@ -66,14 +66,7 @@ void FunctionDefinition::execute_impl() const
     {
         func->init();
         if (not func->is_inline())
-            write_function_definition(func);
-        runtime().scope().add_function(func);
+            serializer().write_node_def_graph(func);
+        scope().add_function(func);
     }
-}
-
-void FunctionDefinition::write_function_definition(const FuncPtr& func)
-{
-    runtime().enter_scope();
-    runtime().serializer().write_node_def_graph(func);
-    runtime().exit_scope();
 }

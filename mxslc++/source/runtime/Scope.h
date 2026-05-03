@@ -15,14 +15,16 @@ class Scope
 public:
     Scope();
     explicit Scope(ScopePtr parent);
-    Scope(ScopePtr parent, bool is_inline);
 
     ScopePtr exit()
     {
         return std::move(parent_);
     }
 
-    bool is_inline() const { return is_inline_; }
+    mx::GraphElementPtr graph() const { return graph_; }
+    pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
+    void set_graph(mx::GraphElementPtr graph, FuncPtr func) { graph_ = std::move(graph); func_ = std::move(func); }
+    bool is_inline() const;
 
     /*
      * variables
@@ -66,11 +68,13 @@ public:
 
 private:
     ScopePtr parent_;
-    bool is_inline_;
 
     unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;
     unordered_map<string, TypePtr> types_;
+
+    mx::GraphElementPtr graph_;
+    FuncPtr func_;
 };
 
 #endif //FENNEC_SCOPE_H

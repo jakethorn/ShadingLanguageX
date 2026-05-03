@@ -13,6 +13,9 @@ class NullValue final : public Value
 public:
     explicit NullValue(TypePtr type) : Value{std::move(type)} { }
 
+    string str() const override { return "null"s; }
+
+protected:
     void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override
     {
         node->removeInput(input_name);
@@ -22,8 +25,6 @@ public:
     {
         throw CompileError{"Cannot return null value"s};
     }
-
-    string str() const override { return "null"s; }
 };
 
 #endif //FENNEC_NULLVALUE_H

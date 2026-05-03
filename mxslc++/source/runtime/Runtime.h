@@ -17,8 +17,7 @@ public:
     Scope& scope();
     MtlXSerializer& serializer();
 
-    void enter_scope(bool is_inline = false);
-    void enter_inline_scope();
+    void enter_scope();
     void exit_scope();
 
     static Runtime& create();

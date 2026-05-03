@@ -25,7 +25,8 @@ public:
 protected:
     virtual void execute_impl() const = 0;
 
-    static Runtime& runtime();
+    static Scope& scope();
+    static MtlXSerializer& serializer();
 
     Token token_;
 };

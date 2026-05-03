@@ -38,7 +38,7 @@ StmtPtr ForRangeLoop::instantiate_template_types(const TypePtr& template_type) c
 
 void ForRangeLoop::execute_impl() const
 {
-    const TypePtr type = runtime().scope().resolve_type(type_);
+    const TypePtr type = scope().resolve_type(type_);
     if (type->is<int>())
         execute_with<int>();
     else if (type->is<float>())

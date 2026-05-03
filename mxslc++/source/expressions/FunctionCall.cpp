@@ -71,7 +71,7 @@ VarPtr FunctionCall::evaluate_impl() const
 {
     if (func_->is_inline())
     {
-        Runtime::get().enter_inline_scope();
+        Runtime::get().enter_scope();
         evaluate_arguments();
         VarPtr return_value = func_->invoke();
         update_out_arguments();

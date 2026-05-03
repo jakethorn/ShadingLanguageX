@@ -4,8 +4,6 @@
 
 #include "Variable.h"
 
-#include <cassert>
-
 #include "Runtime.h"
 #include "Scope.h"
 #include "expressions/ExpressionFactory.h"
@@ -119,8 +117,7 @@ ValuePtr Variable::value()
     }
     else
     {
-        const VarPtr self = shared_from_this();
-        return Runtime::get().serializer().write_node_def_input(self);
+        return Runtime::get().serializer().write_node_def_input(shared_from_this());
     }
 }
 
@@ -153,61 +150,14 @@ void Variable::uninitialize()
     }
 }
 
-void Variable::set_as_node_input(const mx::NodePtr& node, const string& input_name)
-{
-    if (has_value())
-    {
-        value()->set_as_node_input(node, input_name);
-    }
-    else
-    {
-        for (size_t i = 0; i < children_.size(); ++i)
-        {
-            children_[i]->set_as_node_input(node, get_port_name(input_name, i));
-        }
-    }
-}
-
-void Variable::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name)
-{
-    if (has_value())
-    {
-        value()->set_as_node_graph_output(node_graph, output_name);
-    }
-    else
-    {
-        for (size_t i = 0; i < children_.size(); ++i)
-        {
-            children_[i]->set_as_node_graph_output(node_graph, get_port_name(output_name, i));
-        }
-    }
-}
-
-void Variable::set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name)
-{
-    if (has_value())
-    {
-        value()->set_as_node_def_input(node_def, input_name);
-    }
-    else
-    {
-        for (size_t i = 0; i < children_.size(); ++i)
-        {
-            children_[i]->set_as_node_def_input(node_def, get_port_name(input_name, i));
-        }
-    }
-}
-
 void Variable::add_to_scope(string name)
 {
-    const VarPtr self = shared_from_this();
-    Runtime::get().scope().add_variable(std::move(name), self);
+    Runtime::get().scope().add_variable(std::move(name), shared_from_this());
 }
 
 bool Variable::is_local()
 {
-    const VarPtr self = shared_from_this();
-    return Runtime::get().scope().is_variable_local(self);
+    return Runtime::get().scope().is_variable_local(shared_from_this());
 }
 
 string Variable::str() const
@@ -275,8 +225,7 @@ void Variable::set_value(ValuePtr value)
     }
     else
     {
-        const VarPtr self = shared_from_this();
-        Runtime::get().serializer().write_node_def_output(self, value);
+        Runtime::get().serializer().write_node_def_output(shared_from_this(), value);
     }
 
     is_initialized_ = true;

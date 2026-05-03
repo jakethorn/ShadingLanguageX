@@ -19,7 +19,12 @@ void Statement::execute() const
     }
 }
 
-Runtime& Statement::runtime()
+Scope& Statement::scope()
 {
-    return Runtime::get();
+    return Runtime::get().scope();
+}
+
+MtlXSerializer& Statement::serializer()
+{
+    return Runtime::get().serializer();
 }

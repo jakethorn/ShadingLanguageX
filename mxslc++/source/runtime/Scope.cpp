@@ -9,16 +9,33 @@
 #include "CompileError.h"
 #include "ArgumentList.h"
 #include "Function.h"
+#include "Runtime.h"
 #include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"
 #include "utils/template_utils.h"
 
-Scope::Scope() : Scope{nullptr} { }
-Scope::Scope(ScopePtr parent) : Scope{std::move(parent), false} { }
-Scope::Scope(ScopePtr parent, const bool is_inline) : parent_{std::move(parent)}, is_inline_{is_inline}
-{
+Scope::Scope() = default;
 
+Scope::Scope(ScopePtr parent) : parent_{std::move(parent)}
+{
+    graph_ = parent_->graph_;
+    func_ = parent_->func_;
+}
+
+pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
+{
+    if (const mx::NodeGraphPtr& node_graph = std::dynamic_pointer_cast<mx::NodeGraph>(graph_))
+        return {node_graph, func_};
+
+    throw CompileError{"Not in a node graph"s};
+}
+
+bool Scope::is_inline() const
+{
+    if (parent_ == nullptr)
+        return true;
+    return func_ == parent_->func_;
 }
 
 void Scope::add_variable(string name, VarPtr var)
@@ -58,7 +75,7 @@ bool Scope::is_variable_local(const string& name) const
 
     if (parent_)
     {
-        return parent_->is_variable_local(name) and is_inline_;
+        return parent_->is_variable_local(name) and is_inline();
     }
 
     throw CompileError{"Variable not defined: " + name};
