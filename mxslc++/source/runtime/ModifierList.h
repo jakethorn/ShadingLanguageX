@@ -7,7 +7,6 @@
 
 #include "utils/common.h"
 #include "TokenType.h"
-#include "CompileError.h"
 
 class ModifierList
 {
@@ -27,7 +26,7 @@ public:
         for (const TokenType& mod : mods_)
         {
             if (not (... || (mod == valid_mods)))
-                throw CompileError{"'" + mod.str() + "' is not a valid modifier here"};
+                throw_error("'" + mod.str() + "' is not a valid modifier here");
         }
     }
 
@@ -57,6 +56,7 @@ public:
     string str() const;
 
 private:
+    static void throw_error(const string& message);
     unordered_set<TokenType> mods_;
 };
 

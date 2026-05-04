@@ -4,14 +4,12 @@
 
 #include "Expression.h"
 
-#include <algorithm>
 #include <cassert>
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
-#include "runtime/Type.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable.h"
+#include "runtime/Type.h"
 
 #define TRY_START try {
 #define TRY_END } catch (const CompileError& e) { throw CompileError{token_, e}; }

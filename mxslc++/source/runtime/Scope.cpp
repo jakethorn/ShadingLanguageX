@@ -2,14 +2,13 @@
 // Created by jaket on 03/12/2025.
 //
 
+#include "Scope.h"
+
 #include <cassert>
 
-#include "Scope.h"
-#include "statements/Statement.h"
-#include "CompileError.h"
 #include "ArgumentList.h"
+#include "CompileError.h"
 #include "Function.h"
-#include "Runtime.h"
 #include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"

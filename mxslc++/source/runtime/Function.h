@@ -5,10 +5,8 @@
 #ifndef MXSLC_FUNCTION_H
 #define MXSLC_FUNCTION_H
 
-#include "statements/Statement.h"
 #include "ModifierList.h"
 #include "ParameterList.h"
-#include "utils/common.h"
 
 class Function
 {
@@ -71,9 +69,9 @@ private:
     string name_;
     TypePtr template_type_;
     ParameterList params_;
-    StmtPtr body_ = nullptr;
-    ExprPtr return_expr_ = nullptr;
-    mx::NodeDefPtr node_def_ = nullptr;
+    StmtPtr body_;
+    ExprPtr return_expr_;
+    mx::NodeDefPtr node_def_;
     bool is_initialized_ = false;
 
     unordered_map<string, VarPtr> nonlocal_inputs_;

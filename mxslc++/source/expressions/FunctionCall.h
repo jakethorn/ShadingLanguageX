@@ -7,11 +7,8 @@
 
 #include "Expression.h"
 #include "utils/common.h"
-#include "utils/template_utils.h"
 #include "Token.h"
 #include "runtime/ArgumentList.h"
-
-class Function;
 
 class FunctionCall final : public Expression
 {

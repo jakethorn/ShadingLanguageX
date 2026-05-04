@@ -4,11 +4,11 @@
 
 #include "Variable.h"
 
+#include "CompileError.h"
 #include "Runtime.h"
 #include "Scope.h"
-#include "expressions/ExpressionFactory.h"
+#include "Type.h"
 #include "mtlx/mtlx_utils.h"
-#include "values/NodeValue.h"
 
 Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
 {
@@ -266,4 +266,9 @@ void Variable::copy_children(const vector<VarPtr>& children)
     }
 
     is_initialized_ = true;
+}
+
+void Variable::throw_error(const string& message)
+{
+    throw CompileError{message};
 }

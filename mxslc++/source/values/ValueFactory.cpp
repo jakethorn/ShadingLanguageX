@@ -2,12 +2,10 @@
 // Created by jaket on 12/01/2026.
 //
 
-#include <cassert>
-
 #include "ValueFactory.h"
 
-#include "statements/Statement.h"
-#include "BasicValue.h"
+#include <cassert>
+
 #include "CompileError.h"
 #include "InterfaceValue.h"
 #include "NodeValue.h"
@@ -178,4 +176,11 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
     }
 
     throw CompileError{"Port does not have a value"s};
+}
+
+VarPtr ValueFactory::create_default_value_impl(primitive_t value)
+{
+    return Variable::create(
+        std::make_shared<BasicValue>(std::move(value))
+    );
 }

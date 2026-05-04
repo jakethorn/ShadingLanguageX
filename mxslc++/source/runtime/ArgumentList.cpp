@@ -3,6 +3,8 @@
 //
 
 #include "ArgumentList.h"
+
+#include "CompileError.h"
 #include "Parameter.h"
 #include "ParameterList.h"
 #include "Variable.h"

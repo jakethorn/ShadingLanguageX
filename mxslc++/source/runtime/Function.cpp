@@ -4,11 +4,12 @@
 
 #include "Function.h"
 
+#include "expressions/Expression.h"
+#include "statements/Statement.h"
 #include "Runtime.h"
 #include "Scope.h"
 #include "Type.h"
-#include "expressions/Expression.h"
-#include "statements/Statement.h"
+#include "CompileError.h"
 
 Function::Function(
     ModifierList mods,

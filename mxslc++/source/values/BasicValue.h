@@ -5,9 +5,7 @@
 #ifndef FENNEC_BASICVALUE_H
 #define FENNEC_BASICVALUE_H
 
-#include "CompileError.h"
 #include "Value.h"
-#include "runtime/Type.h"
 #include "utils/common.h"
 
 class BasicValue final : public Value
@@ -31,12 +29,15 @@ public:
     template<typename T>
     T get() const
     {
-        if (not is<T>())
-            throw CompileError{"Trying to access a value of type " + type_->str() + " as a " + typeid(T).name()};
-        return std::get<T>(val_);
+        if (is<T>())
+            return std::get<T>(val_);
+        throw_type_error(typeid(T).name());
+        return T{};
     }
 
 private:
+    void throw_type_error(const char* type_name) const;
+
     primitive_t val_;
 };
 

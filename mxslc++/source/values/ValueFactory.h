@@ -5,10 +5,6 @@
 #ifndef MXSLC_VALUEFACTORY_H
 #define MXSLC_VALUEFACTORY_H
 
-#include <MaterialXCore/Node.h>
-
-#include "BasicValue.h"
-#include "runtime/Variable.h"
 #include "utils/common.h"
 
 class Parameter;
@@ -27,13 +23,14 @@ public:
     template<typename T>
     static VarPtr create_default_value()
     {
-        ValuePtr value = std::make_shared<BasicValue>(T{});
-        return Variable::create(std::move(value));
+        return create_default_value_impl(T{});
     }
 
 private:
     ValueFactory() = default;
     ~ValueFactory() = default;
+
+    static VarPtr create_default_value_impl(primitive_t value);
 };
 
 #endif //MXSLC_VALUEFACTORY_H

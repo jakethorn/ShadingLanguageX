@@ -10,11 +10,10 @@
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
-#include "statements/Statement.h"
-#include "utils/instantiate_template_types_utils.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "utils/error_utils.h"
+#include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
 ExprPtr FunctionCall::instantiate_template_types(const TypePtr& template_type) const

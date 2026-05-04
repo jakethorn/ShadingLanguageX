@@ -4,26 +4,19 @@
 
 #include "MtlXSerializer.h"
 
-#include <cassert>
 #include <MaterialXFormat/XmlIo.h>
-#include "CompileError.h"
-#include "evaluate_mtlx.h"
+
 #include "mtlx_utils.h"
-#include "expressions/Expression.h"
-#include "expressions/ExpressionFactory.h"
-#include "runtime/ArgumentList.h"
-#include "values/NodeValue.h"
-#include "values/Value.h"
-#include "runtime/Function.h"
-#include "runtime/Type.h"
-#include "runtime/Function.h"
+#include "evaluate_mtlx.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "statements/Statement.h"
-#include "utils/io_utils.h"
+#include "runtime/ArgumentList.h"
+#include "runtime/Type.h"
+#include "runtime/Function.h"
 #include "values/InterfaceValue.h"
 #include "values/ValueFactory.h"
+#include "utils/io_utils.h"
 
 namespace
 {

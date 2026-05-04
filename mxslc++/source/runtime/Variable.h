@@ -5,9 +5,8 @@
 #ifndef MXSLC_VARIABLE_H
 #define MXSLC_VARIABLE_H
 
-#include "CompileError.h"
-#include "ModifierList.h"
 #include "utils/common.h"
+#include "ModifierList.h"
 #include "values/BasicValue.h"
 
 class Variable : public std::enable_shared_from_this<Variable>
@@ -53,8 +52,8 @@ public:
     {
         if (const shared_ptr<BasicValue>& value = std::dynamic_pointer_cast<BasicValue>(value_))
             return value->get<T>();
-        else
-            throw CompileError{"Value is not a compile-time "s + typeid(T).name()};
+        throw_error("Value is not a compile-time "s + typeid(T).name());
+        return T{};
     }
 
     static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
@@ -74,6 +73,8 @@ private:
     void set_parent(weak_ptr<Variable> parent);
     void set_value(ValuePtr value);
     void copy_children(const vector<VarPtr>& children);
+
+    static void throw_error(const string& message);
 
     ModifierList mods_;
     TypePtr type_;

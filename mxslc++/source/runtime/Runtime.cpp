@@ -3,8 +3,10 @@
 //
 
 #include "Runtime.h"
+
 #include "Scope.h"
 #include "mtlx/load_mtlx.h"
+#include "CompileError.h"
 
 std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
 

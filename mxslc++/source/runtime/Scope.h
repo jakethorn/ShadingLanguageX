@@ -6,7 +6,6 @@
 #define FENNEC_SCOPE_H
 
 #include "utils/common.h"
-#include "Function.h"
 
 class ArgumentList;
 

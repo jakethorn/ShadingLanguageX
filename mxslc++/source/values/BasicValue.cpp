@@ -4,6 +4,7 @@
 
 #include "BasicValue.h"
 
+#include "CompileError.h"
 #include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
 #include "mtlx/mtlx_type_ostream_ops.h"
@@ -53,4 +54,9 @@ string BasicValue::str() const
         },
         val_
     );
+}
+
+void BasicValue::throw_type_error(const char* type_name) const
+{
+    throw CompileError{"Trying to access a value of type " + type_->str() + " as a " + type_name};
 }

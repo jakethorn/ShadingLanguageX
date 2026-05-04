@@ -5,6 +5,8 @@
 #ifndef FENNEC_RUNTIME_H
 #define FENNEC_RUNTIME_H
 
+#include <MaterialXCore/Document.h>
+
 #include "utils/common.h"
 #include "mtlx/MtlXSerializer.h"
 

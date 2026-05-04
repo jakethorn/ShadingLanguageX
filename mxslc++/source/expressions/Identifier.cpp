@@ -5,8 +5,7 @@
 #include "Identifier.h"
 
 #include "runtime/Scope.h"
-#include "runtime/Runtime.h"
-#include "values/ValueFactory.h"
+#include "runtime/Variable.h"
 
 ExprPtr Identifier::instantiate_template_types(const TypePtr& template_type) const
 {
