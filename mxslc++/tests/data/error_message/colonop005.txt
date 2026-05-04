@@ -1,0 +1,1 @@
+colonop005.mxsl, line 2: No input named 'base_colo' found in NodeDef ND_standard_surface_surfaceshader

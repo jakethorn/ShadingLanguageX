@@ -1,0 +1,2 @@
+surfaceshader surface = standard_surface();
+surface.base_colo = randomcolor();

@@ -19,7 +19,7 @@ using namespace std::string_literals;
 
 inline bool overwrite_data_files()
 {
-    return true;
+    return false;
 }
 
 inline fs::path get_test_data_dir()

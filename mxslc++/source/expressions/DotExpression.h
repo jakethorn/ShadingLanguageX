@@ -7,23 +7,24 @@
 
 #include "Expression.h"
 
+class DotAccessor;
+
 class DotExpression final : public Expression
 {
 public:
-    DotExpression(ExprPtr expr, Token property)
-        : Expression{std::move(property)}, expr_{std::move(expr)} { }
+    DotExpression(ExprPtr expr, Token property);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
     void init_subexpressions(const vector<TypePtr>& types) override;
+    void init_impl(const vector<TypePtr>& types) override;
     TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
 private:
-    const string& property() const { return token_.lexeme(); }
-
     ExprPtr expr_;
+    shared_ptr<DotAccessor> accessor_;
 };
 
 #endif //MXSLC_DOTEXPRESSION_H

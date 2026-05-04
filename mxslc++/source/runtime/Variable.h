@@ -14,6 +14,7 @@ class Variable : public std::enable_shared_from_this<Variable>
 {
 public:
     Variable(ModifierList mods, TypePtr type);
+    virtual ~Variable() = default;
 
     bool is_const() const;
     bool is_mutable() const;
@@ -27,6 +28,7 @@ public:
 
     bool is_assignable() const;
     bool is_temporary() const;
+    bool is_local();
 
     bool has_parent() const;
     VarPtr parent() const;
@@ -36,12 +38,13 @@ public:
 
     bool has_value() const;
     ValuePtr value();
+    ValuePtr raw_value() const;
     void copy_value(const VarPtr& other);
 
     void uninitialize();
 
+    Scope& defining_scope();
     void add_to_scope(string name);
-    bool is_local();
 
     string str() const;
 
@@ -62,6 +65,10 @@ public:
     static VarPtr create(TypePtr type, const VarPtr& value);
     static VarPtr create(ValuePtr value);
     static VarPtr create(const VarPtr& value);
+
+protected:
+    virtual ValuePtr value_impl() const { return value_; }
+    virtual void set_value_impl(ValuePtr value) { value_ = std::move(value); }
 
 private:
     void set_parent(weak_ptr<Variable> parent);

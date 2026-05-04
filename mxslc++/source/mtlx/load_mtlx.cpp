@@ -101,7 +101,7 @@ void load_library(const fs::path& filepath)
     load_library(doc);
 }
 
-void load_materialx_library(const string& version)
+mx::DocumentPtr get_materialx_library(const string& version)
 {
     const mx::FilePathVec fpv{version};
     const fs::path lib_dir = get_libraries_dir();
@@ -110,5 +110,5 @@ void load_materialx_library(const string& version)
     const mx::StringSet loaded = mx::loadLibraries(fpv, fsp, doc);
     if (loaded.empty())
         throw CompileError{"MaterialX version '" + version + "' is not supported"};
-    load_library(doc);
+    return doc;
 }

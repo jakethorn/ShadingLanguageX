@@ -1,0 +1,12 @@
+vec3 n = normal();
+surfaceshader surface = standard_surface(0.5);
+surface.base_color = randomcolor();
+
+inline void set_surface_properties(surfaceshader surface)
+{
+    surface.specular_roughness = randomfloat();
+}
+
+set_surface_properties(surface);
+
+float r = surface.specular_roughness * 2.0;

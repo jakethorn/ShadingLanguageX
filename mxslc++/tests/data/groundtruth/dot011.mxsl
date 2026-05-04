@@ -1,0 +1,8 @@
+inline {float x, float y} my_func()
+{
+    float tmp = 1.0 * 2.0;
+    return {tmp * 3.0, 4.0};
+}
+
+float my_var = my_func().y;
+float OUT = my_var * 5.0;

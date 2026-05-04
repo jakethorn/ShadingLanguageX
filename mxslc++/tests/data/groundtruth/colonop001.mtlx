@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <normal name="node1" type="vector3" />
+  <standard_surface name="node2" type="surfaceshader">
+    <input name="base" type="float" value="0.5" />
+    <input name="base_color" type="color3" nodename="node3" />
+  </standard_surface>
+  <randomcolor name="node3" type="color3" />
+</materialx>

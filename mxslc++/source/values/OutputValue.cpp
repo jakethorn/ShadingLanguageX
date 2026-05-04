@@ -18,9 +18,9 @@ OutputValue::OutputValue(const mx::NodePtr& node, const string& output_name, Typ
     }
 }
 
-void OutputValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
+void OutputValue::set_as_node_input(const mx::InputPtr& input) const
 {
-    node->setConnectedOutput(input_name, output_);
+    input->setConnectedOutput(output_);
 }
 
 void OutputValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <normal name="node1" type="vector3" />
+  <standard_surface name="node2" type="surfaceshader">
+    <input name="base" type="float" value="0.5" />
+    <input name="base_color" type="color3" nodename="node3" />
+    <input name="specular_roughness" type="float" output="nonlocal_out__surface__specular_roughness" nodename="node4" />
+  </standard_surface>
+  <randomcolor name="node3" type="color3" />
+  <nodedef name="ND_set_surface_properties" node="set_surface_properties">
+    <output name="out" type="integer" />
+    <output name="nonlocal_out__surface__specular_roughness" type="float" />
+  </nodedef>
+  <nodegraph name="NG_set_surface_properties" nodedef="ND_set_surface_properties">
+    <output name="nonlocal_out__surface__specular_roughness" type="float" value="1" />
+    <output name="out" type="integer" value="0" />
+  </nodegraph>
+  <set_surface_properties name="node4" type="multioutput">
+    <output name="nonlocal_out__surface__specular_roughness" type="float" />
+    <output name="out" type="integer" />
+  </set_surface_properties>
+</materialx>

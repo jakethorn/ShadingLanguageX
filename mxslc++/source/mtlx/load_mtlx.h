@@ -11,6 +11,6 @@
 
 void load_library(const mx::DocumentPtr &doc);
 void load_library(const fs::path& filepath);
-void load_materialx_library(const string& version);
+mx::DocumentPtr get_materialx_library(const string& version);
 
 #endif //FENNEC_LOAD_MTLX_H

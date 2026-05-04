@@ -16,16 +16,20 @@ public:
 
     Scope& scope();
     MtlXSerializer& serializer();
+    mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
     void enter_scope();
     void exit_scope();
 
-    static Runtime& create();
+    static Runtime& create(const string& version);
     static Runtime& get();
 
 private:
+    void load_materialx_library(const string& version);
+
     ScopePtr scope_;
     MtlXSerializer serializer_;
+    mx::DocumentPtr mtlx_lib_;
 
     static unique_ptr<Runtime> instance_;
 };

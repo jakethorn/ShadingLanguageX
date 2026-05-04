@@ -16,6 +16,7 @@ add_library(mxslc_lib
         runtime/Field.cpp
         runtime/ModifierList.cpp
         runtime/Variable.cpp
+        runtime/InputVariable.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp
@@ -26,6 +27,8 @@ add_library(mxslc_lib
         expressions/IndexingExpression.cpp
         expressions/DotExpression.cpp
         expressions/VariableDefinitionExpression.cpp
+        expressions/dot_accessors/PortAccessor.cpp
+        expressions/dot_accessors/FieldAccessor.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp

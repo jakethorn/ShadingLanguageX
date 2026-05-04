@@ -12,18 +12,16 @@ string get_port_name(const string& port_name, const size_t i)
     return port_name + "__" + str(i);
 }
 
-void add_input(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name)
+mx::InputPtr add_or_get_input(const mx::NodePtr& node, const string& type, const string& name)
 {
-    if (type->has_fields())
-    {
-        for (size_t i = 0; i < type->field_count(); ++i)
-            add_input(node_def, type->field_type(i), get_port_name(name, i));
-    }
-    else
-    {
-        if (node_def->getInput(name) == nullptr)
-            node_def->addInput(name, type->name());
-    }
+    if (mx::InputPtr input = node->getInput(name); input != nullptr)
+        return input;
+    return node->addInput(name, type);
+}
+
+mx::InputPtr add_or_get_input(const mx::NodePtr& node, const TypePtr& type, const string& name)
+{
+    return add_or_get_input(node, type->name(), name);
 }
 
 mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const TypePtr& type, const string& name)

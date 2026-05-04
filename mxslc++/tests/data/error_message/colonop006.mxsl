@@ -1,0 +1,2 @@
+string surface = "standard_surface";
+surface.base_color = randomcolor();

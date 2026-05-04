@@ -4,6 +4,7 @@
 
 #include "Runtime.h"
 #include "Scope.h"
+#include "mtlx/load_mtlx.h"
 
 std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
@@ -36,15 +37,22 @@ void Runtime::exit_scope()
     scope_ = scope_->exit();
 }
 
-Runtime& Runtime::create()
+Runtime& Runtime::create(const string& version)
 {
     instance_ = std::make_unique<Runtime>();
+    instance_->load_materialx_library(version);
     return *instance_;
 }
 
 Runtime& Runtime::get()
 {
     if (instance_ == nullptr)
-        instance_ = std::make_unique<Runtime>();
+        throw CompileError{"Runtime not created"s};
     return *instance_;
+}
+
+void Runtime::load_materialx_library(const string& version)
+{
+    mtlx_lib_ = get_materialx_library(version);
+    load_library(mtlx_lib_);
 }

@@ -13,9 +13,8 @@ InterfaceValue::InterfaceValue(TypePtr type, string name)
 
 }
 
-void InterfaceValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
+void InterfaceValue::set_as_node_input(const mx::InputPtr& input) const
 {
-    const mx::InputPtr input = node->addInput(input_name, type_->name());
     set_interface(input, name_);
 }
 

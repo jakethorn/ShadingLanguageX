@@ -58,6 +58,11 @@ VarPtr Scope::get_variable(const string& name) const
     throw CompileError{"Variable not defined: " + name};
 }
 
+bool Scope::has_variable(const string& name) const
+{
+    return contains(variables_, name) or (parent_ and parent_->has_variable(name));
+}
+
 bool Scope::is_variable_local(const VarPtr& var) const
 {
     VarPtr tmp = var;
@@ -69,16 +74,21 @@ bool Scope::is_variable_local(const VarPtr& var) const
 bool Scope::is_variable_local(const string& name) const
 {
     if (contains(variables_, name))
-    {
         return true;
-    }
 
     if (parent_)
-    {
         return parent_->is_variable_local(name) and is_inline();
-    }
 
     throw CompileError{"Variable not defined: " + name};
+}
+
+Scope& Scope::get_defining_scope(const VarPtr& var)
+{
+    if (contains(variables_, var->name()))
+        return *this;
+    if (parent_)
+        return parent_->get_defining_scope(var);
+    throw CompileError{"Variable not defined: " + var->name()};
 }
 
 void Scope::add_function(FuncPtr func)

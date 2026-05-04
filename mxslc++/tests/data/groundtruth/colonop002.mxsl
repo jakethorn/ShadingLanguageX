@@ -1,0 +1,10 @@
+vec3 n = normal();
+surfaceshader surface = standard_surface(0.5);
+surface.base_color = randomcolor();
+
+void set_surface_properties()
+{
+    surface.specular_roughness = 1.0;
+}
+
+set_surface_properties();

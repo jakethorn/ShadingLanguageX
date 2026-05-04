@@ -11,11 +11,11 @@
 BasicValue::BasicValue(primitive_t val) : Value{std::make_shared<Type>(val)}, val_{std::move(val)} { }
 BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, val_{std::move(val)} { }
 
-void BasicValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
+void BasicValue::set_as_node_input(const mx::InputPtr& input) const
 {
     std::visit(
-        [this, &node, &input_name](const auto& v) {
-            node->setInputValue(input_name, v, type_->name());
+        [this, &input](const auto& v) {
+            input->setValue(v, type_->name());
         },
         val_
     );

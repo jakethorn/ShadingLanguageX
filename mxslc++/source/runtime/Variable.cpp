@@ -79,6 +79,11 @@ bool Variable::is_temporary() const
     return name_.empty();
 }
 
+bool Variable::is_local()
+{
+    return Runtime::get().scope().is_variable_local(shared_from_this());
+}
+
 bool Variable::has_parent() const
 {
     return parent_.lock() != nullptr;
@@ -106,19 +111,24 @@ VarPtr Variable::child(const string& field_name)
 
 bool Variable::has_value() const
 {
-    return value_ != nullptr;
+    return value_impl() != nullptr;
 }
 
 ValuePtr Variable::value()
 {
     if (is_temporary() or is_local())
     {
-        return value_;
+        return value_impl();
     }
     else
     {
         return Runtime::get().serializer().write_node_def_input(shared_from_this());
     }
+}
+
+ValuePtr Variable::raw_value() const
+{
+    return value_impl();
 }
 
 void Variable::copy_value(const VarPtr& other)
@@ -150,21 +160,21 @@ void Variable::uninitialize()
     }
 }
 
+Scope& Variable::defining_scope()
+{
+    return Runtime::get().scope().get_defining_scope(shared_from_this());
+}
+
 void Variable::add_to_scope(string name)
 {
     Runtime::get().scope().add_variable(std::move(name), shared_from_this());
-}
-
-bool Variable::is_local()
-{
-    return Runtime::get().scope().is_variable_local(shared_from_this());
 }
 
 string Variable::str() const
 {
     if (has_value())
     {
-        return value_->str();
+        return value_impl()->str();
     }
     else
     {
@@ -233,7 +243,7 @@ void Variable::set_value(ValuePtr value)
 {
     if (is_temporary() or is_local())
     {
-        value_ = std::move(value);
+        set_value_impl(std::move(value));
     }
     else
     {

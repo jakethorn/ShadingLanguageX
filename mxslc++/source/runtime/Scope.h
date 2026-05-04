@@ -32,8 +32,10 @@ public:
 
     void add_variable(string name, VarPtr var);
     VarPtr get_variable(const string& name) const;
+    bool has_variable(const string& name) const;
     bool is_variable_local(const VarPtr& var) const;
     bool is_variable_local(const string& name) const;
+    Scope& get_defining_scope(const VarPtr& var);
 
     /*
      * functions

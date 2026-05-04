@@ -5,10 +5,16 @@
 #include "DotExpression.h"
 
 #include "Identifier.h"
+#include "dot_accessors/FieldAccessor.h"
+#include "dot_accessors/PortAccessor.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "values/Value.h"
+
+DotExpression::DotExpression(ExprPtr expr, Token property) : Expression{std::move(property)}, expr_{std::move(expr)}
+{
+
+}
 
 ExprPtr DotExpression::instantiate_template_types(const TypePtr& template_type) const
 {
@@ -21,12 +27,25 @@ void DotExpression::init_subexpressions(const vector<TypePtr>& types)
     expr_->init();
 }
 
+void DotExpression::init_impl(const vector<TypePtr>& types)
+{
+    VarPtr var = expr_->evaluate();
+    if (var->has_value())
+    {
+        accessor_ = std::make_shared<PortAccessor>(std::move(var), token_.lexeme());
+    }
+    else
+    {
+        accessor_= std::make_shared<FieldAccessor>(std::move(var), token_.lexeme());
+    }
+}
+
 TypePtr DotExpression::type_impl() const
 {
-    return expr_->type()->field_type(property());
+    return accessor_->type();
 }
 
 VarPtr DotExpression::evaluate_impl() const
 {
-    return expr_->evaluate()->child(property());
+    return accessor_->evaluate();
 }

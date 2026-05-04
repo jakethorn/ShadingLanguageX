@@ -132,7 +132,7 @@ StmtPtr Parser::statement()
     {
         mods.validate();
 
-        if (peek(1) == '=' or peek(1) == '.' or peek(1) == '[')
+        if (peek(1) == '=' or peek(1) == '[' or peek(1) == '.')
         {
             return variable_assignment();
         }

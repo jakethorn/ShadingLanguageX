@@ -4,17 +4,19 @@
 
 #include "NodeValue.h"
 
+#include <cassert>
+
 #include "mtlx/mtlx_utils.h"
+#include "runtime/Type.h"
 
-NodeValue::NodeValue(mx::NodePtr node, TypePtr type)
-    : Value{std::move(type)}, node_{std::move(node)}
+NodeValue::NodeValue(mx::NodePtr node) : Value{std::make_shared<ResolvedTypeInfo>(node->getType())}, node_{std::move(node)}
 {
-
+    assert(not node_->isMultiOutputType());
 }
 
-void NodeValue::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
+void NodeValue::set_as_node_input(const mx::InputPtr& input) const
 {
-    node->setConnectedNode(input_name, node_);
+    input->setConnectedNode(node_);
 }
 
 void NodeValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const

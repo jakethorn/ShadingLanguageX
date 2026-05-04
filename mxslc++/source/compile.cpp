@@ -32,8 +32,8 @@ namespace
 
 void mxslc::compile_to_file(const fs::path& src_path, const fs::path& dst_path)
 {
-    Runtime& runtime = Runtime::create();
-    load_materialx_library("1.39.4"s);
+    const string mtlx_ver = "1.39.4"s;
+    Runtime& runtime = Runtime::create(mtlx_ver);
     {
         runtime.enter_scope();
         compile_mxsl_stdlib();

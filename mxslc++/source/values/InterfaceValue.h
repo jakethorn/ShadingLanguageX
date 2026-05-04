@@ -13,11 +13,10 @@ class InterfaceValue final : public Value
 public:
     InterfaceValue(TypePtr type, string name);
 
-    string str() const override;
-
-protected:
-    void set_as_node_input(const mx::NodePtr& node, const string& input_name) const override;
+    void set_as_node_input(const mx::InputPtr& input) const override;
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
+
+    string str() const override;
 
 private:
     string name_;

@@ -45,14 +45,14 @@ VarPtr ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& n
     }
     else
     {
-        ValuePtr value = std::make_shared<NodeValue>(std::move(node), std::move(type));
+        ValuePtr value = std::make_shared<NodeValue>(std::move(node));
         return Variable::create(std::move(value));
     }
 }
 
 VarPtr ValueFactory::create_node_value(mx::NodePtr node, const FuncPtr& func)
 {
-    if (func->is_defined() or func->node_def()->getOutputCount() == 1)
+    if (func->is_defined() or func->node_def()->getActiveOutputs().size() == 1)
     {
         return create_node_value(std::move(node), func->node_def(), func->return_type());
     }
@@ -150,7 +150,7 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 
     if (port->hasNodeName())
     {
-        return std::make_shared<NodeValue>(port->getConnectedNode(), std::move(type));
+        return std::make_shared<NodeValue>(port->getConnectedNode());
     }
 
     if (port->hasValue())
