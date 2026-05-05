@@ -33,12 +33,12 @@ private:
     StmtPtr print_statement();
     StmtPtr variable_definition(ModifierList mods, TypePtr type);
     StmtPtr multi_variable_definition(ModifierList mods, TypePtr type_);
-    StmtPtr variable_assignment();
+    StmtPtr variable_assignment(ExprPtr lhs);
     StmtPtr function_definition(ModifierList mods, TypePtr type);
     StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr using_declaration();
     StmtPtr for_loop();
-    StmtPtr expression_statement();
+    StmtPtr expression_statement(ExprPtr expr);
     StmtPtr block_statement();
     StmtPtr if_statement();
     StmtPtr document_attribute();
@@ -60,9 +60,10 @@ private:
     ExprPtr factor();
     ExprPtr exponent();
     ExprPtr unary();
+    ExprPtr increment();
     ExprPtr property();
     ExprPtr primary();
-    ExprPtr if_expression(ExprPtr else_expr);
+    ExprPtr if_expression(ExprPtr else_expr = nullptr);
     ExprPtr function_call();
     ExprPtr named_constructor();
     ExprPtr unnamed_constructor();
@@ -89,7 +90,7 @@ private:
         return args;
     }
 
-    bool is_variable_definition() const;
+    bool is_type() const;
     bool is_templated_function() const;
 };
 

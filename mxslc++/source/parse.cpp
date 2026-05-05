@@ -11,6 +11,7 @@
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
+#include "expressions/IncrementExpression.h"
 #include "expressions/IndexingExpression.h"
 #include "expressions/Literal.h"
 #include "expressions/VariableDefinitionExpression.h"
@@ -104,7 +105,7 @@ StmtPtr Parser::statement()
         return function_definition_modern(std::move(mods));
     }
 
-    if (peek() == '{' or (peek() == TokenType::Identifier and peek(1) == TokenType::Identifier))
+    if (is_type())
     {
         TypePtr type_ = type();
 
@@ -122,19 +123,18 @@ StmtPtr Parser::statement()
         }
     }
 
-    if (peek() == TokenType::Identifier)
+    mods.validate();
+
+    ExprPtr expr = expression();
+
+    if (peek() == '=')
     {
-        mods.validate();
+        return variable_assignment(std::move(expr));
+    }
 
-        if (peek(1) == '=' or peek(1) == '[' or peek(1) == '.')
-        {
-            return variable_assignment();
-        }
-
-        if (peek(1) == '<' or peek(1) == '(')
-        {
-            return expression_statement();
-        }
+    if (peek() == ';')
+    {
+        return expression_statement(std::move(expr));
     }
 
     throw CompileError{peek(), "Invalid statement"s};
@@ -200,9 +200,8 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
     );
 }
 
-StmtPtr Parser::variable_assignment()
+StmtPtr Parser::variable_assignment(ExprPtr lhs)
 {
-    ExprPtr lhs = expression();
     Token token = match('=');
     ExprPtr rhs;
     if (peek() == TokenType::If)
@@ -295,9 +294,8 @@ StmtPtr Parser::for_loop()
     }
 }
 
-StmtPtr Parser::expression_statement()
+StmtPtr Parser::expression_statement(ExprPtr expr)
 {
-    ExprPtr expr = function_call();
     match(';');
     return std::make_unique<ExpressionStatement>(std::move(expr));
 }
@@ -523,8 +521,24 @@ ExprPtr Parser::exponent()
 ExprPtr Parser::unary()
 {
     if (optional<Token> op = consume('!', '+', '-'))
-        return ExpressionFactory::unary(std::move(*op), property());
-    return property();
+        return ExpressionFactory::unary(std::move(*op), increment());
+    return increment();
+}
+
+ExprPtr Parser::increment()
+{
+    optional<Token> op = consume("++"s, "--"s);
+    bool prefix = op.has_value();
+
+    ExprPtr expr = property();
+
+    if (not op.has_value())
+        op = consume("++"s, "--"s);
+
+    if (op.has_value())
+        return std::make_unique<IncrementExpression>(std::move(expr), std::move(op.value()), prefix);
+    else
+        return expr;
 }
 
 ExprPtr Parser::property()
@@ -586,7 +600,7 @@ ExprPtr Parser::primary()
 
     if (peek() == TokenType::If)
     {
-        return if_expression(nullptr);
+        return if_expression();
     }
 
     throw CompileError{peek(), "Invalid expression"s};
@@ -669,7 +683,7 @@ Argument Parser::argument(const size_t i)
     const ModifierList mods = modifiers();
 
     ExprPtr expr;
-    if (is_variable_definition())
+    if (is_type())
     {
         mods.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
         expr = variable_definition_argument(mods.without(TokenType::Out));
@@ -683,7 +697,7 @@ Argument Parser::argument(const size_t i)
     return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
 }
 
-bool Parser::is_variable_definition() const
+bool Parser::is_type() const
 {
     // consume modifiers before calling this function
 

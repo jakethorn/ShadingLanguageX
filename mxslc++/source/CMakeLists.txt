@@ -31,6 +31,7 @@ add_library(mxslc_lib
         expressions/VariableDefinitionExpression.cpp
         expressions/dot_accessors/PortAccessor.cpp
         expressions/dot_accessors/FieldAccessor.cpp
+        expressions/IncrementExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp

@@ -252,6 +252,26 @@ inline boolean __not__(boolean in1)
     return not(in1);
 }
 
+inline integer __inc__(integer in1)
+{
+    return add(in1, 1);
+}
+
+inline float __inc__(float in1)
+{
+    return add(in1, 1.0);
+}
+
+inline integer __dec__(integer in1)
+{
+    return subtract(in1, 1);
+}
+
+inline float __dec__(float in1)
+{
+    return subtract(in1, 1.0);
+}
+
 //
 // conditional functions
 //
