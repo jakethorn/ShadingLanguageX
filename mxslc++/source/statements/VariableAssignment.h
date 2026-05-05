@@ -14,6 +14,8 @@ public:
     VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rhs_expr);
     ~VariableAssignment() override;
 
+    void set_attributes(AttributeList attrs) override;
+
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:

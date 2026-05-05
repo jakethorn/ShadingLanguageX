@@ -55,6 +55,7 @@ public:
         DoubleColon,
         Increment,
         Decrement,
+        DoubleAt,
         
         // Keyword
         If,
@@ -103,7 +104,7 @@ public:
 
     inline static const unordered_set CompoundSymbols {
         BangEq, EqualsEq, GreaterEq, LessEq, PlusEq, MinusEq, StarEq, SlashEq, PercentEq, CaretEq, AmpersandEq, PipeEq,
-        Arrow
+        Arrow, DoubleColon, Increment, Decrement, DoubleAt
     };
 
     inline static const unordered_set Keywords {
@@ -129,6 +130,7 @@ private:
         {"::", DoubleColon},
         {"++", Increment},
         {"--", Decrement},
+        {"@@", DoubleAt},
         {"if", If},
         {"else", Else},
         {"switch", Switch},
@@ -164,17 +166,17 @@ private:
         {"<unknown>", Unknown}
     };
 
-    static Enum to_enum_(const char c)
+    static Enum to_enum(const char c)
     {
         if (const auto e = static_cast<Enum>(c); contains(Symbols, e))
             return e;
         return Unknown;
     }
 
-    static Enum to_enum_(const string& s)
+    static Enum to_enum(const string& s)
     {
         if (s.size() == 1)
-            return to_enum_(s[0]);
+            return to_enum(s[0]);
         if (contains(lexemes_, s))
             return lexemes_.at(s);
         return Unknown;
@@ -183,8 +185,8 @@ private:
 public:
     TokenType() : enum_{Unknown} { }
     TokenType(const Enum e) : enum_{e} { }
-    TokenType(const char c) : enum_{to_enum_(c)} { }
-    TokenType(const string& s) : enum_{to_enum_(s)} { }
+    TokenType(const char c) : enum_{to_enum(c)} { }
+    TokenType(const string& s) : enum_{to_enum(s)} { }
 
     bool is_symbol() const { return contains(Symbols, enum_); }
     bool is_compound_symbol() const { return contains(CompoundSymbols, enum_); }
@@ -203,11 +205,12 @@ public:
         return string{static_cast<char>(enum_)};
     }
 
-    bool operator==(const char c) const { return enum_ == to_enum_(c); }
-    bool operator==(const string& s) const { return enum_ == to_enum_(s); }
+    bool operator==(const char c) const { return enum_ == to_enum(c); }
+    bool operator==(const string& s) const { return enum_ == to_enum(s); }
     bool operator==(const TokenType& t) const { return enum_ == t.enum_; }
     bool operator==(const Enum e) const { return enum_ == e; }
 
+    Enum value() const { return enum_; }
     size_t index() const { return enum_; }
 
 private:

@@ -4,26 +4,26 @@
 
 #include "parse.h"
 
+#include "CompileError.h"
 #include "TokenReader.h"
 #include "expressions/DotExpression.h"
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
-#include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
 #include "expressions/IndexingExpression.h"
-#include "runtime/Attribute.h"
 #include "expressions/Literal.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
 #include "runtime/ParameterList.h"
 #include "runtime/Field.h"
+#include "runtime/Attribute.h"
 #include "statements/BlockStatement.h"
+#include "statements/DocumentAttribute.h"
 #include "statements/ExpressionStatement.h"
 #include "statements/ForEachLoop.h"
 #include "statements/ForRangeLoop.h"
-#include "statements/FunctionDefinition.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/IfStatement.h"
 #include "statements/MultiVariableDefinition.h"
@@ -51,7 +51,15 @@ vector<StmtPtr> Parser::parse()
         while (not empty())
         {
             debug_info = peek();
-            statements.push_back(statement());
+
+            if (consume(TokenType::Break))
+                match(';');
+
+            AttributeList attrs = attributes();
+            StmtPtr stmt = statement();
+            stmt->set_attributes(std::move(attrs));
+
+            statements.push_back(std::move(stmt));
         }
 
         return statements;
@@ -62,25 +70,11 @@ vector<StmtPtr> Parser::parse()
     }
 }
 
-Attribute Parser::attribute()
-{
-    match('@');
-    optional<string> elem = std::nullopt;
-    if (peek(1) == '.')
-    {
-        elem = match(TokenType::Identifier).lexeme();
-        match('.');
-    }
-    string name = match(TokenType::Identifier).lexeme();
-    string val = std::get<string>(match(TokenType::String).literal());
-    return Attribute{std::move(elem), std::move(name), std::move(val)};
-}
-
 StmtPtr Parser::statement()
 {
-    if (consume(TokenType::Break))
+    if (peek() == "@@"s)
     {
-        match(';');
+        return document_attribute();
     }
 
     if (peek() == TokenType::Print)
@@ -343,6 +337,34 @@ StmtPtr Parser::if_statement()
     return std::make_unique<IfStatement>(std::move(token), std::move(cond_expr), std::move(then_block), std::move(else_block));
 }
 
+StmtPtr Parser::document_attribute()
+{
+    Token token = match("@@"s);
+    Attribute attr = attribute();
+    return std::make_unique<DocumentAttribute>(std::move(token), std::move(attr));
+}
+
+Attribute Parser::attribute()
+{
+    string child = ""s;
+    if (peek(1) == '.')
+    {
+        child = match_identifier_or_keyword().lexeme();
+        match('.');
+    }
+    string name = match_identifier_or_keyword().lexeme();
+    string value = std::get<string>(match(TokenType::String).literal());
+    return Attribute{std::move(child), std::move(name), std::move(value)};
+}
+
+AttributeList Parser::attributes()
+{
+    vector<Attribute> result;
+    while (consume('@'))
+        result.push_back(attribute());
+    return AttributeList{result};
+}
+
 ModifierList Parser::modifiers()
 {
     const vector<Token> mod_tokens = consume_while(
@@ -376,11 +398,12 @@ Field Parser::field()
 
 Parameter Parser::parameter(const size_t index)
 {
+    AttributeList attrs = attributes();
     ModifierList mods = modifiers();
     TypePtr type_ = type();
-    Token name = match(TokenType::Identifier);
+    const Token name = match(TokenType::Identifier);
     ExprPtr expr = consume('=') ? expression() : nullptr;
-    return Parameter{std::move(mods), std::move(type_), std::move(name), std::move(expr), index};
+    return Parameter{std::move(attrs), std::move(mods), std::move(type_), name.lexeme(), std::move(expr), index};
 }
 
 vector<TypePtr> Parser::template_list()
@@ -634,6 +657,8 @@ ExprPtr Parser::variable_definition_argument(ModifierList mods)
 
 Argument Parser::argument(const size_t i)
 {
+    AttributeList attrs = attributes();
+
     string name;
     if (peek(1) == '=')
     {
@@ -655,7 +680,7 @@ Argument Parser::argument(const size_t i)
         expr = expression();
     }
 
-    return Argument{mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
+    return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
 }
 
 bool Parser::is_variable_definition() const

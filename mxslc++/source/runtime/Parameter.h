@@ -5,19 +5,20 @@
 #ifndef FENNEC_PARAMETER_H
 #define FENNEC_PARAMETER_H
 
+#include "AttributeList.h"
 #include "ModifierList.h"
 #include "utils/common.h"
 
 class Parameter
 {
 public:
-    Parameter(ModifierList mods, TypePtr type, string name, size_t index);
-    Parameter(ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
+    Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
 
     Parameter(Parameter&&) noexcept;
 
     ~Parameter();
 
+    const AttributeList& attributes() const { return attrs_; }
     const ModifierList& modifiers() const { return mods_; }
     bool is_const() const { return mods_.contains(TokenType::Const); }
     bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
@@ -36,6 +37,7 @@ public:
     string str() const;
 
 private:
+    AttributeList attrs_;
     ModifierList mods_;
     TypePtr type_;
     string name_;

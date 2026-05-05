@@ -1,0 +1,11 @@
+float foo(float a, float b)
+{
+    return a + b;
+}
+
+float f = foo(
+    @dogsdont "wearhats"
+    1.0,
+    @butcats "do"
+    2.0
+);

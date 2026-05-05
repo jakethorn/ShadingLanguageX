@@ -7,6 +7,7 @@
 
 #include "utils/common.h"
 #include "Token.h"
+#include "runtime/AttributeList.h"
 
 class MtlXSerializer;
 
@@ -15,8 +16,11 @@ class Expression
 public:
     Expression() = default;
     explicit Expression(Token token);
-
     virtual ~Expression() = default;
+
+    const Token& token() const { return token_; }
+
+    void set_attributes(AttributeList attrs) { attrs_ = std::move(attrs); }
 
     virtual ExprPtr instantiate_template_types(const TypePtr& template_type) const = 0;
 
@@ -26,7 +30,6 @@ public:
     void init(const vector<TypePtr>& types);
     bool try_init(const vector<TypePtr>& types);
 
-    const Token& token() const { return token_; }
     bool is_initialized() const { return is_initialized_; }
     TypePtr type() const;
 
@@ -44,6 +47,8 @@ protected:
     Token token_;
     bool is_initialized_ = false;
     TypePtr assigned_type_ = nullptr;
+
+    AttributeList attrs_;
 };
 
 #endif //FENNEC_EXPRESSION_H

@@ -16,12 +16,30 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
+FunctionCall::FunctionCall(Token name, TypePtr template_type, ArgumentList args, AttributeList attrs)
+    : Expression{std::move(name)}, template_type_{std::move(template_type)}, args_{std::move(args)}
+{
+    set_attributes(std::move(attrs));
+}
+
+FunctionCall::FunctionCall(Token name, TypePtr template_type, ArgumentList args)
+    : FunctionCall{std::move(name), std::move(template_type), std::move(args), AttributeList{}}
+{
+
+}
+
+FunctionCall::FunctionCall(Token name, ArgumentList args)
+    : FunctionCall{std::move(name), nullptr, std::move(args)}
+{
+
+}
+
 ExprPtr FunctionCall::instantiate_template_types(const TypePtr& template_type) const
 {
     Token name = token_.instantiate_template_types(template_type);
     TypePtr _template_type = ::instantiate_template_types(template_type_, template_type);
     ArgumentList args = args_.instantiate_template_types(template_type);
-    return std::make_unique<FunctionCall>(std::move(name), std::move(_template_type), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(name), std::move(_template_type), std::move(args), attrs_);
 }
 
 void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
@@ -79,8 +97,13 @@ VarPtr FunctionCall::evaluate_impl() const
     }
     else
     {
-        return serializer().write_node(func_, args_);
+        return serializer().write_node(func_, args_, attrs_);
     }
+}
+
+const string& FunctionCall::name() const
+{
+    return token_.lexeme();
 }
 
 namespace

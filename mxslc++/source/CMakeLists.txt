@@ -17,6 +17,8 @@ add_library(mxslc_lib
         runtime/ModifierList.cpp
         runtime/Variable.cpp
         runtime/InputVariable.cpp
+        runtime/Attribute.cpp
+        runtime/AttributeList.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp
@@ -41,6 +43,7 @@ add_library(mxslc_lib
         statements/ExpressionStatement.cpp
         statements/IfStatement.cpp
         statements/BlockStatement.cpp
+        statements/DocumentAttribute.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp

@@ -1,0 +1,10 @@
+
+float foo(
+    float a,
+    {float, float} b
+)
+{
+    return a + b[0] + b[1];
+}
+
+float f = foo(1.0, @doc "arg b" {2.0, 3.0});

@@ -24,7 +24,7 @@ namespace
         const TypePtr type = Runtime::get().scope().get_type(i->getType());
         const string& name = i->getName();
         ExprPtr expr = std::make_unique<NullExpression>();
-        return Parameter{ModifierList{}, type, name, std::move(expr), index};
+        return Parameter{AttributeList{}, ModifierList{}, type, name, std::move(expr), index};
     }
 
     ParameterList get_parameters(const mx::NodeDefPtr& nd)

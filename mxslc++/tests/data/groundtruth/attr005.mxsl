@@ -1,0 +1,7 @@
+float foo(float a, float b)
+{
+    return a + b;
+}
+
+@a.b "blah blah blah"
+float f = foo(1.0, 2.0);

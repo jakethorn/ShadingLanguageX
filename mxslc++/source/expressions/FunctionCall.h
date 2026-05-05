@@ -7,17 +7,14 @@
 
 #include "Expression.h"
 #include "utils/common.h"
-#include "Token.h"
 #include "runtime/ArgumentList.h"
 
 class FunctionCall final : public Expression
 {
 public:
-    FunctionCall(Token name, TypePtr template_type, ArgumentList args)
-        : Expression{std::move(name)}, template_type_{std::move(template_type)}, args_{std::move(args)} { }
-
-    FunctionCall(Token name, ArgumentList args)
-        : FunctionCall{std::move(name), nullptr, std::move(args)} { }
+    FunctionCall(Token name, TypePtr template_type, ArgumentList args, AttributeList attrs);
+    FunctionCall(Token name, TypePtr template_type, ArgumentList args);
+    FunctionCall(Token name, ArgumentList args);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -28,7 +25,7 @@ protected:
     VarPtr evaluate_impl() const override;
 
 private:
-    const string& name() const { return token_.lexeme(); }
+    const string& name() const;
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
     void evaluate_arguments() const;

@@ -6,12 +6,14 @@
 
 #include <MaterialXFormat/XmlIo.h>
 
+#include "CompileError.h"
 #include "mtlx_utils.h"
 #include "evaluate_mtlx.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "runtime/ArgumentList.h"
+#include "runtime/Attribute.h"
 #include "runtime/Type.h"
 #include "runtime/Function.h"
 #include "values/InterfaceValue.h"
@@ -78,7 +80,7 @@ namespace
     }
 }
 
-VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args) const
+VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const
 {
     vector<pair<const Parameter&, VarPtr>> arg_values = args.evaluate(func->parameters());
 
@@ -91,14 +93,17 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args)
 
     for (const auto& [param, arg_value] : arg_values)
     {
+        const Argument* arg = args[param];
+        AttributeList arg_attrs = arg != nullptr ? args[param]->attributes() : AttributeList{};
+
         if (param.is_in())
         {
-            write_node_input(node, param.name(), arg_value);
+            write_node_input(node, param.name(), arg_value, arg_attrs);
         }
 
         if (param.is_out())
         {
-            const VarPtr output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name());
+            const VarPtr output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name(), arg_attrs);
             arg_value->copy_value(output);
         }
     }
@@ -116,15 +121,19 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args)
         var->copy_value(nonlocal_output);
     }
 
+    attrs.add_to(node);
+
     return ValueFactory::create_node_value(node, func);
 }
 
-void MtlXSerializer::write_node_def_graph(const FuncPtr& func) const
+void MtlXSerializer::write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const
 {
     Runtime::get().enter_scope();
 
     const mx::NodeDefPtr node_def = write_node_def(func);
     write_node_graph(func, node_def);
+
+    attrs.add_to(node_def);
 
     Runtime::get().exit_scope();
 }
@@ -177,8 +186,8 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
         if (param.is_in())
         {
             // create node def input
-            const VarPtr input = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            write_node_def_input(node_def, param.name(), input);
+            const VarPtr in_var = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
+            write_node_def_input(node_def, param.name(), in_var, param.attributes());
 
             // create interface value
             const VarPtr interface = ValueFactory::create_interface_value(param.type(), param.name());
@@ -187,9 +196,9 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
         }
         else
         {
-            const VarPtr output = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            output->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
-            output->add_to_scope(param.name());
+            const VarPtr out_var = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
+            out_var->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
+            out_var->add_to_scope(param.name());
         }
     }
 
@@ -220,52 +229,65 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
         if (param.is_out())
         {
             const VarPtr out_value = Runtime::get().scope().get_variable(param.name());
-            write_node_graph_output(node_graph, "out__" + param.name(), out_value);
+            write_node_graph_output(node_graph, "out__" + param.name(), out_value, param.attributes());
         }
     }
 }
 
 void MtlXSerializer::write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var) const
 {
+    write_node_input(node, input_name, var, AttributeList{});
+}
+
+void MtlXSerializer::write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var, const AttributeList& attrs) const
+{
     if (var->has_value())
     {
         var->value()->set_as_node_input(node, input_name);
+        attrs.add_to(node, input_name);
     }
     else
     {
         for (size_t i = 0; i < var->child_count(); ++i)
         {
-            write_node_input(node, get_port_name(input_name, i), var->child(i));
+            write_node_input(node, get_port_name(input_name, i), var->child(i), attrs);
         }
     }
 }
 
 void MtlXSerializer::write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var) const
 {
+    write_node_graph_output(node_graph, output_name, var, AttributeList{});
+}
+
+void MtlXSerializer::write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var, const AttributeList& attrs) const
+{
     if (var->has_value())
     {
         var->value()->set_as_node_graph_output(node_graph, output_name);
+        attrs.add_to(node_graph->getNodeDef(), output_name);
     }
     else
     {
         for (size_t i = 0; i < var->child_count(); ++i)
         {
-            write_node_graph_output(node_graph, get_port_name(output_name, i), var->child(i));
+            write_node_graph_output(node_graph, get_port_name(output_name, i), var->child(i), attrs);
         }
     }
 }
 
-void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var) const
+void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var, const AttributeList& attrs) const
 {
     if (var->has_value())
     {
         var->value()->set_as_node_def_input(node_def, input_name);
+        attrs.add_to(node_def, input_name);
     }
     else
     {
         for (size_t i = 0; i < var->child_count(); ++i)
         {
-            write_node_def_input(node_def, get_port_name(input_name, i), var->child(i));
+            write_node_def_input(node_def, get_port_name(input_name, i), var->child(i), attrs);
         }
     }
 }

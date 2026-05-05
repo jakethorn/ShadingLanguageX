@@ -10,6 +10,7 @@
 #include "utils/common.h"
 #include "Token.h"
 #include "TokenReader.h"
+#include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
 
 class Attribute;
@@ -28,8 +29,6 @@ public:
     vector<StmtPtr> parse();
 
 private:
-    Attribute attribute();
-
     StmtPtr statement();
     StmtPtr print_statement();
     StmtPtr variable_definition(ModifierList mods, TypePtr type);
@@ -42,7 +41,10 @@ private:
     StmtPtr expression_statement();
     StmtPtr block_statement();
     StmtPtr if_statement();
+    StmtPtr document_attribute();
 
+    Attribute attribute();
+    AttributeList attributes();
     ModifierList modifiers();
     TypePtr type();
     Field field();

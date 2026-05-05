@@ -1,0 +1,12 @@
+@doc "This is a documentation comment"
+@a.doc "This is input a"
+float foo(
+    float a,
+    @doc "This is input b"
+    float b
+)
+{
+    return a + b;
+}
+
+float f = foo(1.0, 2.0);

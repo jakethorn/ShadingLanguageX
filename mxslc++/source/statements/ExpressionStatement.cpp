@@ -18,6 +18,11 @@ ExpressionStatement::ExpressionStatement(ExprPtr expr)
 
 ExpressionStatement::~ExpressionStatement() = default;
 
+void ExpressionStatement::set_attributes(AttributeList attrs)
+{
+    expr_->set_attributes(std::move(attrs));
+}
+
 StmtPtr ExpressionStatement::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr expr = expr_->instantiate_template_types(template_type);

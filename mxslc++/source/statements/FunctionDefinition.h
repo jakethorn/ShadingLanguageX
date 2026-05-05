@@ -14,6 +14,8 @@ class FunctionDefinition final : public Statement
 public:
     FunctionDefinition(ModifierList mods, TypePtr type, Token name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
 
+    void set_attributes(AttributeList attrs) override;
+
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:
@@ -31,6 +33,8 @@ private:
     ExprPtr return_expr_;
 
     vector<FuncPtr> funcs_;
+
+    AttributeList attrs_;
 };
 
 #endif //MXSLC_FUNCTIONDEFINITION_H

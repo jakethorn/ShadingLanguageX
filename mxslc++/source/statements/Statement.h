@@ -6,10 +6,11 @@
 #define FENNEC_STATEMENT_H
 
 #include "Token.h"
+#include "runtime/AttributeList.h"
 #include "utils/common.h"
 
+class Scope;
 class MtlXSerializer;
-class Runtime;
 
 class Statement
 {
@@ -18,6 +19,8 @@ public:
     virtual ~Statement() = default;
 
     const Token& token() const { return token_; }
+
+    virtual void set_attributes(AttributeList attrs) { }
 
     virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
     void execute() const;

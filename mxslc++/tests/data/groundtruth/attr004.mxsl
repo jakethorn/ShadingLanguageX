@@ -1,0 +1,7 @@
+float foo(float a, float b)
+{
+    return a + b;
+}
+
+@test "this is a test attribute"
+float f = foo(1.0, 2.0);

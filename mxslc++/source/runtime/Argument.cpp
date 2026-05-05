@@ -10,25 +10,35 @@
 #include "expressions/Expression.h"
 #include "expressions/VariableDefinitionExpression.h"
 
-Argument::Argument(ModifierList mods, string name, ExprPtr expr, const size_t index)
-    : mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
+Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)
+    : attrs_{std::move(attrs)}, mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
 {
     mods_.validate(TokenType::Ref, TokenType::Out);
     if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
         throw CompileError{"An argument cannot be both ref and out"s};
 }
 
+Argument::Argument(ModifierList mods, string name, ExprPtr expr, const size_t index)
+    : Argument{AttributeList{}, std::move(mods), std::move(name), std::move(expr), index} { }
+
 Argument::Argument(ModifierList mods, ExprPtr expr, const size_t index)
     : Argument{std::move(mods), ""s, std::move(expr), index} { }
 
 Argument::Argument(string name, ExprPtr expr, const size_t index)
-    : Argument{{}, std::move(name), std::move(expr), index} { }
+    : Argument{ModifierList{}, std::move(name), std::move(expr), index} { }
 
 Argument::Argument(ExprPtr expr, const size_t index)
-    : Argument{{}, ""s, std::move(expr), index} { }
+    : Argument{""s, std::move(expr), index} { }
 
 Argument::Argument(Argument&& other) noexcept
-    : mods_{std::move(other.mods_)}, name_{std::move(other.name_)}, expr_{std::move(other.expr_)}, index_{other.index_} { }
+    : attrs_{std::move(other.attrs_)},
+    mods_{std::move(other.mods_)},
+    name_{std::move(other.name_)},
+    expr_{std::move(other.expr_)},
+    index_{other.index_}
+{
+
+}
 
 Argument::~Argument() = default;
 

@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <limits>
 #include "utils/common.h"
-#include "CompileError.h"
 #include "Token.h"
 #include "TokenType.h"
 #include "Span.h"
@@ -63,11 +62,15 @@ public:
             return std::move(tokens_[index_++]);
         }
 
-        throw CompileError{token, "Unexpected token: "s + token.lexeme()};
+        throw_error(token, "Unexpected token: " + token.lexeme());
+        return {};
     }
+
+    Token match_identifier_or_keyword();
 
 private:
     void check_bounds(size_t n = 0) const;
+    static void throw_error(const Token& token, const string& message);
 
     vector<Token> tokens_;
     size_t index_ = 0;

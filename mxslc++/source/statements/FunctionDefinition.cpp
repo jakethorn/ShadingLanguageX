@@ -48,6 +48,11 @@ FunctionDefinition::FunctionDefinition(
     }
 }
 
+void FunctionDefinition::set_attributes(AttributeList attrs)
+{
+    attrs_ = std::move(attrs);
+}
+
 StmtPtr FunctionDefinition::instantiate_template_types(const TypePtr& template_type) const
 {
     if (is_templated())
@@ -66,7 +71,7 @@ void FunctionDefinition::execute_impl() const
     {
         func->init();
         if (not func->is_inline())
-            serializer().write_node_def_graph(func);
+            serializer().write_node_def_graph(func, attrs_);
         scope().add_function(func);
     }
 }

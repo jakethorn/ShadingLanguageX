@@ -62,13 +62,18 @@ VarPtr ValueFactory::create_node_value(mx::NodePtr node, const FuncPtr& func)
 
 VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const string& output_name)
 {
+    return create_output_value(std::move(node), std::move(type), output_name, AttributeList{});
+}
+
+VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const string& output_name, const AttributeList& attrs)
+{
     if (type->has_fields())
     {
         vector<VarPtr> field_values;
         field_values.reserve(type->field_count());
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            VarPtr field_value = create_output_value(node, type->field_type(i), get_port_name(output_name, i));
+            VarPtr field_value = create_output_value(node, type->field_type(i), get_port_name(output_name, i), attrs);
             field_values.push_back(std::move(field_value));
         }
 
@@ -77,6 +82,7 @@ VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const s
     else
     {
         ValuePtr value = std::make_shared<OutputValue>(std::move(node), output_name, std::move(type));
+        attrs.add_to(node, output_name);
         return Variable::create(std::move(value));
     }
 }

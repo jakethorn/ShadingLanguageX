@@ -10,14 +10,9 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 
-Parameter::Parameter(ModifierList mods, TypePtr type, string name, const size_t index)
-    : Parameter{std::move(mods), std::move(type), std::move(name), nullptr, index}
-{
-
-}
-
-Parameter::Parameter(ModifierList mods, TypePtr type, string name, ExprPtr expr, const size_t index)
-    : mods_{std::move(mods)},
+Parameter::Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, const size_t index)
+    : attrs_{std::move(attrs)},
+    mods_{std::move(mods)},
     type_{std::move(type)},
     name_{std::move(name)},
     expr_{std::move(expr)},
@@ -37,7 +32,8 @@ Parameter::Parameter(ModifierList mods, TypePtr type, string name, ExprPtr expr,
 }
 
 Parameter::Parameter(Parameter&& other) noexcept
-    : mods_{std::move(other.mods_)},
+    : attrs_{std::move(other.attrs_)},
+    mods_{std::move(other.mods_)},
     type_{std::move(other.type_)},
     name_{std::move(other.name_)},
     expr_{std::move(other.expr_)},
@@ -52,7 +48,7 @@ Parameter Parameter::instantiate_template_types(const TypePtr& template_type) co
 {
     TypePtr type = type_->instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
-    return Parameter{mods_, std::move(type), name_, std::move(expr), index_};
+    return Parameter{attrs_, mods_, std::move(type), name_, std::move(expr), index_};
 }
 
 void Parameter::init()

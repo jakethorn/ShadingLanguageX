@@ -41,10 +41,28 @@ Token TokenReader::consume()
     return std::move(tokens_[index_++]);
 }
 
+Token TokenReader::match_identifier_or_keyword()
+{
+    Token token = consume();
+    if (token == TokenType::Identifier or contains(TokenType::Keywords, token.type().value()))
+    {
+        return token;
+    }
+    else
+    {
+        throw CompileError{token, "Unexpected token: " + token.lexeme()};
+    }
+}
+
 void TokenReader::check_bounds(const size_t n) const
 {
     if (index_ + n >= tokens_.size())
     {
         throw CompileError{tokens_.back(), "Unexpected end of tokens"s};
     }
+}
+
+void TokenReader::throw_error(const Token& token, const string& message)
+{
+    throw CompileError{token, message};
 }

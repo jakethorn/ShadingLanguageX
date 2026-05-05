@@ -13,6 +13,8 @@ class MultiVariableDefinition final : public Statement
 public:
     MultiVariableDefinition(Token token, TypePtr type, ExprPtr expr);
 
+    void set_attributes(AttributeList attrs) override;
+
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:

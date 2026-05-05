@@ -15,6 +15,12 @@ MultiVariableDefinition::MultiVariableDefinition(Token token, TypePtr type, Expr
 
 }
 
+void MultiVariableDefinition::set_attributes(AttributeList attrs)
+{
+    if (expr_)
+        expr_->set_attributes(std::move(attrs));
+}
+
 StmtPtr MultiVariableDefinition::instantiate_template_types(const TypePtr& template_type) const
 {
     TypePtr type = type_->instantiate_template_types(template_type);

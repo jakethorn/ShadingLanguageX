@@ -10,18 +10,17 @@
 class Attribute
 {
 public:
-    Attribute(string name, string val) : Attribute{std::nullopt, std::move(name), std::move(val)} { }
-    Attribute(optional<string> elem, string name, string val) : elem_{std::move(elem)}, name_{std::move(name)}, val_{std::move(val)} { }
+    Attribute(string name, string val) : Attribute{""s, std::move(name), std::move(val)} { }
+    Attribute(string child, string name, string value) : child_{std::move(child)}, name_{std::move(name)}, value_{std::move(value)} { }
 
-    bool has_element() const { return elem_.has_value(); }
-    const string& element() const { return elem_.value(); }
-    const string& name() const { return name_; }
-    const string& value() const { return val_; }
+    void add_to(const mx::ElementPtr& element) const;
 
 private:
-    optional<string> elem_;
+    bool has_child() const { return not child_.empty(); }
+
+    string child_;
     string name_;
-    string val_;
+    string value_;
 };
 
 #endif //FENNEC_ATTRIBUTE_H

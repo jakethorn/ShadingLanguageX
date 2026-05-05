@@ -5,6 +5,7 @@
 #ifndef FENNEC_ARGUMENT_H
 #define FENNEC_ARGUMENT_H
 
+#include "AttributeList.h"
 #include "ModifierList.h"
 #include "utils/common.h"
 
@@ -13,6 +14,7 @@ class Parameter;
 class Argument
 {
 public:
+    Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, size_t index);
     Argument(ModifierList mods, string name, ExprPtr expr, size_t index);
     Argument(ModifierList mods, ExprPtr expr, size_t index);
     Argument(string name, ExprPtr expr, size_t index);
@@ -22,6 +24,8 @@ public:
 
     ~Argument();
 
+    const AttributeList& attributes() const { return attrs_; }
+    const ModifierList& modifiers() const { return mods_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
     ExprPtr expression() const { return expr_; }
@@ -38,6 +42,7 @@ public:
     void validate(const Parameter& param) const;
 
 private:
+    AttributeList attrs_;
     ModifierList mods_;
     string name_;
     ExprPtr expr_;

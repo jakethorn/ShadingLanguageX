@@ -15,6 +15,11 @@ VariableAssignment::VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rh
 
 VariableAssignment::~VariableAssignment() = default;
 
+void VariableAssignment::set_attributes(AttributeList attrs)
+{
+    rhs_expr_->set_attributes(std::move(attrs));
+}
+
 StmtPtr VariableAssignment::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr lhs = lhs_expr_->instantiate_template_types(template_type);
