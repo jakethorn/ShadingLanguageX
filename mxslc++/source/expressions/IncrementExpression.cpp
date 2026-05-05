@@ -36,7 +36,7 @@ VarPtr IncrementExpression::evaluate_impl() const
 
     Token func_name{TokenType::Identifier, increment_ ? "__inc__"s : "__dec__"s};
     ArgumentList args{expr_};
-    ExprPtr func_call = std::make_unique<FunctionCall>(func_name, std::move(args));
+    ExprPtr func_call = std::make_shared<FunctionCall>(std::move(func_name), std::move(args));
 
     func_call->init(expr_->type());
     VarPtr inc_var = func_call->evaluate();

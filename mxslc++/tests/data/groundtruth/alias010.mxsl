@@ -1,0 +1,11 @@
+vec2 a = vector2{1.0, 2.0};
+vec2 b = vec2{3.0, 4.0};
+
+inline T foo<vec2, vec3, vec4>()
+{
+    return T{1.0};
+}
+
+vec2 c = foo();
+vec3 d = foo();
+vec4 e = foo();

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine2 name="node1" type="vector2">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </combine2>
+  <combine2 name="node2" type="vector2">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="4" />
+  </combine2>
+  <convert name="node3" type="vector2">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <convert name="node4" type="vector3">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <convert name="node5" type="vector4">
+    <input name="in" type="float" value="1" />
+  </convert>
+</materialx>

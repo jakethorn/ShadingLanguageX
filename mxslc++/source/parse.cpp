@@ -14,6 +14,7 @@
 #include "expressions/IncrementExpression.h"
 #include "expressions/IndexingExpression.h"
 #include "expressions/Literal.h"
+#include "expressions/NamedConstructor.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -652,7 +653,7 @@ ExprPtr Parser::named_constructor()
 {
     Token type = match(TokenType::Identifier);
     vector<Argument> arguments = list<Argument>('{', '}', [this](const size_t i) { return argument(i); });
-    return ExpressionFactory::named_constructor(std::move(type), std::move(arguments));
+    return std::make_unique<NamedConstructor>(std::move(type), std::move(arguments));
 }
 
 ExprPtr Parser::unnamed_constructor()
