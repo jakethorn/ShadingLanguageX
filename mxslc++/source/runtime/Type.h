@@ -7,16 +7,19 @@
 
 #include <utility>
 
-#include "ModifierList.h"
 #include "Field.h"
+#include "Function.h"
 
 class Type
 {
     friend class Scope;
 
 public:
-    Type(ModifierList mods, string name, vector<Field> fields)
-        : mods_{std::move(mods)}, name_{std::move(name)}, fields_{std::move(fields)} { }
+    Type(string name, vector<Field> fields, vector<FuncPtr> methods)
+        : name_{std::move(name)}, fields_{std::move(fields)}, methods_{std::move(methods)} { }
+
+    Type(string name, vector<Field> fields)
+        : name_{std::move(name)}, fields_{std::move(fields)} { }
 
     explicit Type(string name) : name_{std::move(name)} { }
     explicit Type(vector<Field> fields) : fields_{std::move(fields)} { }
@@ -28,7 +31,6 @@ public:
             fields_.emplace_back(field);
     }
 
-    const ModifierList& modifiers() const { return mods_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
     const vector<Field>& fields() const { return fields_; }
@@ -45,6 +47,9 @@ public:
     size_t field_index(const string& name) const;
     TypePtr field_type(const size_t index) const { return field(index).type(); }
     TypePtr field_type(const string& name) const { return field(name).type(); }
+
+    void add_method(FuncPtr method) { methods_.push_back(std::move(method)); }
+    const vector<FuncPtr>& methods() const { return methods_; }
 
     template<typename T>
     bool is() const
@@ -98,9 +103,9 @@ protected:
     void set_resolved() { is_resolved_ = true; }
     
 private:
-    ModifierList mods_;
     string name_;
     vector<Field> fields_;
+    vector<FuncPtr> methods_;
 
     bool is_resolved_ = false;
 };

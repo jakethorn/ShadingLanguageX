@@ -9,12 +9,15 @@
 #include "utils/common.h"
 #include "runtime/ArgumentList.h"
 
-class FunctionCall final : public Expression
+class FunctionCall : public Expression
 {
 public:
-    FunctionCall(Token name, TypePtr template_type, ArgumentList args, AttributeList attrs);
-    FunctionCall(Token name, TypePtr template_type, ArgumentList args);
-    FunctionCall(Token name, ArgumentList args);
+    FunctionCall(string name, ArgumentList args);
+    FunctionCall(string name, ArgumentList args, Token token);
+    FunctionCall(string name, TypePtr template_type, ArgumentList args);
+    FunctionCall(string name, TypePtr template_type, ArgumentList args, Token token);
+    FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs);
+    FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs, Token token);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -24,18 +27,19 @@ protected:
     TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
+    string name_;
+    TypePtr template_type_;
+    ArgumentList args_;
+
+    FuncPtr func_ = nullptr;
+
 private:
-    const string& name() const;
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
     void evaluate_arguments() const;
     void update_out_arguments() const;
 
-    TypePtr template_type_;
-    ArgumentList args_;
-
     size_t initialized_arg_count_ = 0;
-    FuncPtr func_ = nullptr;
 };
 
 #endif //MXSLC_FUNCTIONCALL_H

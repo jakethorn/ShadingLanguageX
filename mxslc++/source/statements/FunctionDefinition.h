@@ -18,6 +18,9 @@ public:
 
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
+    const vector<FuncPtr>& functions() const { return funcs_; }
+    const AttributeList& attributes() const { return attrs_; }
+
 protected:
     void execute_impl() const override;
 

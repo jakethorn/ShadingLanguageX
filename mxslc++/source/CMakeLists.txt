@@ -10,6 +10,7 @@ add_library(mxslc_lib
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
         runtime/Function.cpp
+        runtime/function_utils.cpp
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
         runtime/Type.cpp
@@ -33,6 +34,8 @@ add_library(mxslc_lib
         expressions/dot_accessors/FieldAccessor.cpp
         expressions/IncrementExpression.cpp
         expressions/NamedConstructor.cpp
+        expressions/ThisExpression.cpp
+        expressions/MethodCall.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
@@ -46,6 +49,7 @@ add_library(mxslc_lib
         statements/IfStatement.cpp
         statements/BlockStatement.cpp
         statements/DocumentAttribute.cpp
+        statements/ClassDefinition.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp

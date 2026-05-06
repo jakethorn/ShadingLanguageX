@@ -65,6 +65,7 @@ private:
     ExprPtr primary();
     ExprPtr if_expression(ExprPtr else_expr = nullptr);
     ExprPtr function_call();
+    ExprPtr method_call(ExprPtr instance);
     ExprPtr named_constructor();
     ExprPtr unnamed_constructor();
     ExprPtr variable_definition_argument(ModifierList mods);
@@ -90,8 +91,8 @@ private:
         return args;
     }
 
-    bool is_type() const;
-    bool is_templated_function() const;
+    bool is_typed_definition() const;
+    bool is_function_call() const;
 };
 
 #endif //FENNEC_PARSE_H

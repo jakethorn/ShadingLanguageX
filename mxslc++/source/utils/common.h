@@ -40,6 +40,9 @@ using std::unordered_map;
 using std::unordered_set;
 
 // forward declarations
+class Scope;
+using ScopePtr = unique_ptr<Scope>;
+
 class Statement;
 using StmtPtr = unique_ptr<Statement>;
 
@@ -48,9 +51,6 @@ using ExprPtr = shared_ptr<Expression>;
 
 class Value;
 using ValuePtr = shared_ptr<Value>;
-
-class Scope;
-using ScopePtr = unique_ptr<Scope>;
 
 class Variable;
 using VarPtr = shared_ptr<Variable>;

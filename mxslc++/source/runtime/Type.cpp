@@ -38,7 +38,7 @@ TypePtr Type::instantiate_template_types(const TypePtr& template_type) const
 {
     string name = ::instantiate_template_types(name_, template_type);
     vector<Field> fields = ::instantiate_template_types(fields, template_type);
-    return std::make_shared<Type>(mods_, std::move(name), std::move(fields));
+    return std::make_shared<Type>(std::move(name), std::move(fields));
 }
 
 bool Type::has_field(const string& name) const

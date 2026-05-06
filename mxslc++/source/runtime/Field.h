@@ -34,7 +34,7 @@ public:
     string str() const;
 
 private:
-    mutable ModifierList mods_;
+    ModifierList mods_;
     TypePtr type_;
     string name_;
     ExprPtr initializer_;

@@ -14,7 +14,9 @@
 #include "expressions/IncrementExpression.h"
 #include "expressions/IndexingExpression.h"
 #include "expressions/Literal.h"
+#include "expressions/MethodCall.h"
 #include "expressions/NamedConstructor.h"
+#include "expressions/ThisExpression.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -84,6 +86,11 @@ StmtPtr Parser::statement()
         return print_statement();
     }
 
+    if (peek() == TokenType::Class)
+    {
+        return class_definition();
+    }
+
     if (peek() == TokenType::Using)
     {
         return using_declaration();
@@ -106,7 +113,7 @@ StmtPtr Parser::statement()
         return function_definition_modern(std::move(mods));
     }
 
-    if (is_type())
+    if (is_typed_definition())
     {
         TypePtr type_ = type();
 
@@ -556,8 +563,15 @@ ExprPtr Parser::property()
         }
         else
         {
-            Token name = match(TokenType::Identifier);
-            expr = std::make_unique<DotExpression>(std::move(expr), std::move(name));
+            if (is_function_call())
+            {
+                expr = method_call(std::move(expr));
+            }
+            else
+            {
+                Token name = match(TokenType::Identifier);
+                expr = std::make_unique<DotExpression>(std::move(expr), std::move(name));
+            }
         }
     }
 
@@ -578,9 +592,15 @@ ExprPtr Parser::primary()
         return expr;
     }
 
+    if (peek() == TokenType::This)
+    {
+        Token token = match(TokenType::This);
+        return std::make_unique<ThisExpression>(std::move(token));
+    }
+
     if (peek() == TokenType::Identifier)
     {
-        if (peek(1) == '(' or is_templated_function())
+        if (is_function_call())
         {
             return function_call();
         }
@@ -646,7 +666,20 @@ ExprPtr Parser::function_call()
         match('>');
     }
     vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
-    return std::make_unique<FunctionCall>(std::move(name), std::move(template_type), std::move(args));
+    return std::make_unique<FunctionCall>(name.lexeme(), std::move(template_type), std::move(args), std::move(name));
+}
+
+ExprPtr Parser::method_call(ExprPtr instance)
+{
+    Token name = match(TokenType::Identifier);
+    TypePtr template_type = nullptr;
+    if (consume('<'))
+    {
+        template_type = type();
+        match('>');
+    }
+    vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
+    return std::make_unique<MethodCall>(std::move(instance), name.lexeme(), std::move(template_type), std::move(args), std::move(name));
 }
 
 ExprPtr Parser::named_constructor()
@@ -684,7 +717,7 @@ Argument Parser::argument(const size_t i)
     const ModifierList mods = modifiers();
 
     ExprPtr expr;
-    if (is_type())
+    if (is_typed_definition())
     {
         mods.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
         expr = variable_definition_argument(mods.without(TokenType::Out));
@@ -698,7 +731,7 @@ Argument Parser::argument(const size_t i)
     return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
 }
 
-bool Parser::is_type() const
+bool Parser::is_typed_definition() const
 {
     // consume modifiers before calling this function
 
@@ -726,11 +759,18 @@ bool Parser::is_type() const
     return false;
 }
 
-bool Parser::is_templated_function() const
+bool Parser::is_function_call() const
 {
-    return  peek(0) == TokenType::Identifier and
-            peek(1) == '<' and
-            peek(2) == TokenType::Identifier and
-            peek(3) == '>' and
-            peek(4) == '(';
+    const bool is_func_call =
+        peek(0) == TokenType::Identifier and
+        peek(1) == '(';
+
+    const bool is_templated_func_call =
+        peek(0) == TokenType::Identifier and
+        peek(1) == '<' and
+        peek(2) == TokenType::Identifier and
+        peek(3) == '>' and
+        peek(4) == '(';
+
+    return is_func_call or is_templated_func_call;
 }
