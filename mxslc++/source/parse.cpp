@@ -41,7 +41,7 @@ vector<StmtPtr> parse(vector<Token> tokens)
     return Parser{std::move(tokens)}.parse();
 }
 
-Parser::Parser(vector<Token> tokens_) : TokenReader{std::move(tokens_)}
+Parser::Parser(vector<Token> tokens) : TokenReader{std::move(tokens)}
 {
 
 }
@@ -59,11 +59,7 @@ vector<StmtPtr> Parser::parse()
             if (consume(TokenType::Break))
                 match(';');
 
-            AttributeList attrs = attributes();
-            StmtPtr stmt = statement();
-            stmt->set_attributes(std::move(attrs));
-
-            statements.push_back(std::move(stmt));
+            statements.push_back(statement());
         }
 
         return statements;
@@ -75,6 +71,14 @@ vector<StmtPtr> Parser::parse()
 }
 
 StmtPtr Parser::statement()
+{
+    AttributeList attrs = attributes();
+    StmtPtr stmt = bare_statement();
+    stmt->set_attributes(std::move(attrs));
+    return stmt;
+}
+
+StmtPtr Parser::bare_statement()
 {
     if (peek() == "@@"s)
     {
@@ -257,6 +261,24 @@ StmtPtr Parser::function_definition_modern(ModifierList mods)
     );
 }
 
+StmtPtr Parser::class_definition()
+{
+    Token token = match(TokenType::Class);
+    string name = match(TokenType::Identifier).lexeme();
+    vector<TypePtr> template_types = template_list();
+    TypePtr parent = consume(':') ? type() : nullptr;
+
+    match('{');
+    vector<StmtPtr> body;
+    while (not consume('}'))
+    {
+        body.push_back(statement());
+    }
+
+    consume(';');
+    return std::make_unique<ClassDefinition>(std::move(name), std::move(template_types), std::move(parent), std::move(body), std::move(token));
+}
+
 StmtPtr Parser::using_declaration()
 {
     Token token = match(TokenType::Using);
@@ -399,7 +421,7 @@ Field Parser::field()
     ModifierList mods = modifiers();
     TypePtr type_ = type();
     const optional<Token> name = consume(TokenType::Identifier);
-    return Field{std::move(mods), std::move(type_), Token::to_string(name), nullptr};
+    return Field{std::move(mods), std::move(type_), Token::to_string(name)};
 }
 
 Parameter Parser::parameter(const size_t index)

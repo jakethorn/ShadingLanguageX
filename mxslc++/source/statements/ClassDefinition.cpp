@@ -6,6 +6,7 @@
 
 #include "CompileError.h"
 #include "FunctionDefinition.h"
+#include "VariableDefinition.h"
 #include "mtlx/MtlXSerializer.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
@@ -13,19 +14,18 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
-ClassDefinition::ClassDefinition(string name, string parent, vector<TypePtr> template_types, vector<Field> fields, vector<StmtPtr> func_defs)
-    : ClassDefinition{std::move(name), std::move(parent), std::move(template_types), std::move(fields), std::move(func_defs), Token{}}
+ClassDefinition::ClassDefinition(string name, vector<TypePtr> template_types, TypePtr parent, vector<StmtPtr> body)
+    : ClassDefinition{std::move(name), std::move(template_types), std::move(parent), std::move(body), Token{}}
 {
 
 }
 
-ClassDefinition::ClassDefinition(string name, string parent, vector<TypePtr> template_types, vector<Field> fields, vector<StmtPtr> func_defs, Token token)
+ClassDefinition::ClassDefinition(string name, vector<TypePtr> template_types, TypePtr parent, vector<StmtPtr> body, Token token)
     : Statement{std::move(token)},
     name_{std::move(name)},
-    parent_{std::move(parent)},
     template_types_{std::move(template_types)},
-    fields_{std::move(fields)},
-    func_defs_{std::move(func_defs)}
+    parent_{ std::move(parent) },
+    body_{std::move(body)}
 {
 
 }
@@ -50,7 +50,7 @@ void ClassDefinition::execute_impl() const
     const VarPtr this_ = ValueFactory::create_default_value(type);
     scope().add_variable("__this__"s, std::move(this_));
 
-    for (const StmtPtr& stmt : func_defs_)
+    for (const StmtPtr& stmt : body_)
     {
         if (const FunctionDefinition* func_def = dynamic_cast<FunctionDefinition*>(stmt.get()))
         {
@@ -61,6 +61,10 @@ void ClassDefinition::execute_impl() const
                     serializer().write_node_def_graph(func, func_def->attributes());
                 type->add_method(func);
             }
+        }
+        else if (const VariableDefinition* var_def = dynamic_cast<VariableDefinition*>(stmt.get()))
+        {
+            // move field init here
         }
         else
         {

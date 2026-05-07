@@ -24,18 +24,20 @@ vector<StmtPtr> parse(vector<Token> tokens);
 class Parser final : protected TokenReader
 {
 public:
-    explicit Parser(vector<Token> tokens_);
+    explicit Parser(vector<Token> tokens);
 
     vector<StmtPtr> parse();
 
 private:
     StmtPtr statement();
+    StmtPtr bare_statement();
     StmtPtr print_statement();
     StmtPtr variable_definition(ModifierList mods, TypePtr type);
     StmtPtr multi_variable_definition(ModifierList mods, TypePtr type_);
     StmtPtr variable_assignment(ExprPtr lhs);
     StmtPtr function_definition(ModifierList mods, TypePtr type);
     StmtPtr function_definition_modern(ModifierList mods);
+    StmtPtr class_definition();
     StmtPtr using_declaration();
     StmtPtr for_loop();
     StmtPtr expression_statement(ExprPtr expr);
