@@ -17,6 +17,7 @@ public:
 
     ScopePtr exit()
     {
+        parent_->is_youngest_ = true;
         return std::move(parent_);
     }
 
@@ -69,6 +70,7 @@ public:
 
 private:
     ScopePtr parent_;
+    bool is_youngest_ = true;
 
     unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;

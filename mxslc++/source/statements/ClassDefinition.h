@@ -6,7 +6,6 @@
 #define MXSLC_CLASSDEFINITION_H
 
 #include "Statement.h"
-#include "runtime/Field.h"
 
 class ClassDefinition final : public Statement
 {
@@ -21,6 +20,9 @@ protected:
 
 private:
     bool is_templated() const { return not template_types_.empty(); }
+    void validate_body() const;
+    void add_fields(const TypePtr& type) const;
+    void add_methods(const TypePtr& type) const;
 
     string name_;
     vector<TypePtr> template_types_;

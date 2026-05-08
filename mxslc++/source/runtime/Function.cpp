@@ -10,6 +10,7 @@
 #include "Scope.h"
 #include "Type.h"
 #include "CompileError.h"
+#include "Variable.h"
 
 Function::Function(
     ModifierList mods,

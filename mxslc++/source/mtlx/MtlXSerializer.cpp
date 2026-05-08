@@ -71,11 +71,15 @@ namespace
 
     string nonlocal_out_name(const VarPtr& var)
     {
+        if (var->name() == "__this__"s)
+            return "this__out__"s;
         return "nonlocal_out__" + var->name();
     }
 
     string nonlocal_in_name(const VarPtr& var)
     {
+        if (var->name() == "__this__"s)
+            return "this__in__"s;
         return "nonlocal_in__" + var->name();
     }
 }

@@ -9,11 +9,21 @@
 #include "utils/common.h"
 
 bool is_matching_function(
-    const FuncPtr& funcs,
+    const FuncPtr& func,
+    const string& name
+);
+
+bool is_matching_function(
+    const FuncPtr& func,
     const vector<TypePtr>& return_types,
     const string& name,
     const TypePtr& template_type,
     const ArgumentList& args
+);
+
+vector<FuncPtr> get_matching_functions(
+    const vector<FuncPtr>& funcs,
+    const string& name
 );
 
 vector<FuncPtr> get_matching_functions(

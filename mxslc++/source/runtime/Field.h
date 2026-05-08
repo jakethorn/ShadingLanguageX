@@ -27,7 +27,6 @@ public:
     TypePtr type() const { return type_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
-    ExprPtr initializer() const { return initializer_; }
 
     Field instantiate_template_types(const TypePtr& template_type) const;
 

@@ -4,7 +4,9 @@
 
 #include "MethodCall.h"
 
+#include "runtime/Function.h"
 #include "runtime/function_utils.h"
+#include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 
@@ -34,9 +36,10 @@ MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr templa
 
 void MethodCall::init_impl(const vector<TypePtr>& types)
 {
+    instance_expr_->init();
     const VarPtr instance = instance_expr_->evaluate();
 
-    func_ = get_matching_function(instance->type()->methods(), types, name_, template_type_, args_);
+    func_ = get_matching_function(lock(instance->type()->methods()), types, name_, template_type_, args_);
 
     for (const Argument& arg : args_)
         arg.validate(func_->parameters()[arg]);
@@ -53,6 +56,7 @@ void MethodCall::set_this() const
     const VarPtr instance = instance_expr_->evaluate();
     for (const auto& [_, nonlocal_input] : func_->nonlocal_inputs())
     {
+        // name doesnt match when using expression like sphere.radius because it brings it radius, not sphere
         if (nonlocal_input->name() == "__this__"s)
             nonlocal_input->copy_value(instance);
     }
@@ -61,4 +65,6 @@ void MethodCall::set_this() const
         if (nonlocal_output->name() == "__this__"s)
             nonlocal_output->copy_value(instance);
     }
+    VarPtr instance_copy = Variable::create(instance);
+    scope().add_variable("__this__"s, std::move(instance_copy));
 }

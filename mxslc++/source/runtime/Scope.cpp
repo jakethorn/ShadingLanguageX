@@ -9,6 +9,7 @@
 #include "ArgumentList.h"
 #include "CompileError.h"
 #include "Function.h"
+#include "function_utils.h"
 #include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"
@@ -18,6 +19,7 @@ Scope::Scope() = default;
 
 Scope::Scope(ScopePtr parent) : parent_{std::move(parent)}
 {
+    parent_->is_youngest_ = false;
     graph_ = parent_->graph_;
     func_ = parent_->func_;
 }
@@ -98,41 +100,6 @@ void Scope::add_function(FuncPtr func)
 
 namespace
 {
-    bool is_match(
-        const Function& func,
-        const vector<TypePtr>& return_types,
-        const string& name,
-        const TypePtr& template_type,
-        const ArgumentList& args
-    )
-    {
-        if (name != func.name())
-            return false;
-
-        if (not return_types.empty() and not func.return_type()->is_compatible(return_types))
-            return false;
-
-        if (template_type)
-        {
-            if (not func.has_template_type())
-                return false;
-            if (not template_type->is_compatible(func.template_type()))
-                return false;
-        }
-
-        if (args.size() > func.max_arity() or args.size() < func.min_arity())
-            return false;
-
-        for (const Argument& arg : args)
-        {
-            TypePtr param_type = func.parameters()[arg].type();
-            if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
-                return false;
-        }
-
-        return true;
-    }
-
     vector<FuncPtr> default_functions(const vector<FuncPtr>& funcs)
     {
         vector<FuncPtr> def_funcs;
@@ -153,17 +120,12 @@ vector<FuncPtr> Scope::get_functions(
     const ArgumentList& args
 ) const
 {
-    vector<FuncPtr> funcs;
-    for (const FuncPtr& func : functions_)
-    {
-        if (is_match(*func, return_types, name, template_type, args))
-            funcs.push_back(func);
-    }
+    vector<FuncPtr> funcs = get_matching_functions(functions_, return_types, name, template_type, args);
 
     if (funcs.empty() and parent_)
         funcs = parent_->get_functions(return_types, name, template_type, args);
 
-    if (funcs.empty())
+    if (funcs.empty() and is_youngest_)
     {
         throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
     }

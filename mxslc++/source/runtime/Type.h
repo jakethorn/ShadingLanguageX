@@ -8,14 +8,13 @@
 #include <utility>
 
 #include "Field.h"
-#include "Function.h"
 
 class Type
 {
     friend class Scope;
 
 public:
-    Type(string name, vector<Field> fields, vector<FuncPtr> methods)
+    Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods)
         : name_{std::move(name)}, fields_{std::move(fields)}, methods_{std::move(methods)} { }
 
     Type(string name, vector<Field> fields)
@@ -37,10 +36,10 @@ public:
 
     TypePtr instantiate_template_types(const TypePtr& template_type) const;
 
+    void add_field(Field field) { fields_.push_back(std::move(field)); }
     size_t field_count() const { return fields_.size(); }
     bool has_fields() const { return field_count() > 0; }
     bool has_field(const string& name) const;
-
     const Field& field(size_t index) const;
     const Field& field(const string& name) const;
     const string& field_name(const size_t index) const { return field(index).name(); }
@@ -48,8 +47,15 @@ public:
     TypePtr field_type(const size_t index) const { return field(index).type(); }
     TypePtr field_type(const string& name) const { return field(name).type(); }
 
-    void add_method(FuncPtr method) { methods_.push_back(std::move(method)); }
-    const vector<FuncPtr>& methods() const { return methods_; }
+    void add_method(weak_ptr<Function> method)
+    {
+        methods_.push_back(std::move(method));
+    }
+
+    const vector<weak_ptr<Function>>& methods() const
+    {
+        return methods_;
+    }
 
     template<typename T>
     bool is() const
@@ -105,7 +111,7 @@ protected:
 private:
     string name_;
     vector<Field> fields_;
-    vector<FuncPtr> methods_;
+    vector<weak_ptr<Function>> methods_;
 
     bool is_resolved_ = false;
 };

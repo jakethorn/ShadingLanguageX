@@ -24,6 +24,7 @@
 #include "runtime/Field.h"
 #include "runtime/Attribute.h"
 #include "statements/BlockStatement.h"
+#include "statements/ClassDefinition.h"
 #include "statements/DocumentAttribute.h"
 #include "statements/ExpressionStatement.h"
 #include "statements/ForEachLoop.h"
@@ -185,20 +186,20 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
 {
     vector<Field> fields;
     Token name = match(TokenType::Identifier);
-    fields.emplace_back(std::move(mods), std::move(type_), std::move(name), nullptr);
+    fields.emplace_back(std::move(mods), std::move(type_), std::move(name));
     while (consume(','))
     {
         if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '='))
         {
             name = match(TokenType::Identifier);
-            fields.emplace_back(fields.back().modifiers(), fields.back().type(), std::move(name), nullptr);
+            fields.emplace_back(fields.back().modifiers(), fields.back().type(), std::move(name));
         }
         else
         {
             mods = modifiers();
             type_ = type();
             name = match(TokenType::Identifier);
-            fields.emplace_back(std::move(mods), std::move(type_), std::move(name), nullptr);
+            fields.emplace_back(std::move(mods), std::move(type_), std::move(name));
         }
     }
     Token token = match('=');
@@ -651,7 +652,7 @@ ExprPtr Parser::primary()
 
 ExprPtr Parser::if_expression(ExprPtr else_expr)
 {
-    match(TokenType::If);
+    Token token = match(TokenType::If);
     match('(');
     ExprPtr cond_expr = expression();
     match(')');
@@ -675,7 +676,7 @@ ExprPtr Parser::if_expression(ExprPtr else_expr)
     if (else_expr == nullptr)
         throw CompileError{peek(), "Missing else branch in if-expression"s};
 
-    return ExpressionFactory::if_expression(std::move(cond_expr), std::move(then_expr), std::move(else_expr));
+    return ExpressionFactory::if_expression(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
 }
 
 ExprPtr Parser::function_call()
@@ -688,7 +689,7 @@ ExprPtr Parser::function_call()
         match('>');
     }
     vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
-    return std::make_unique<FunctionCall>(name.lexeme(), std::move(template_type), std::move(args), std::move(name));
+    return std::make_unique<FunctionCall>(string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
 }
 
 ExprPtr Parser::method_call(ExprPtr instance)
@@ -701,7 +702,7 @@ ExprPtr Parser::method_call(ExprPtr instance)
         match('>');
     }
     vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
-    return std::make_unique<MethodCall>(std::move(instance), name.lexeme(), std::move(template_type), std::move(args), std::move(name));
+    return std::make_unique<MethodCall>(std::move(instance), string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
 }
 
 ExprPtr Parser::named_constructor()
