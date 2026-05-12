@@ -14,6 +14,7 @@ class Scope
 public:
     Scope();
     explicit Scope(ScopePtr parent);
+    Scope(string name, ScopePtr parent);
 
     ScopePtr exit()
     {
@@ -74,6 +75,7 @@ public:
     TypePtr get_type(const string& name) const;
 
 private:
+    string name_;
     ScopePtr parent_;
     bool is_youngest_ = true;
 

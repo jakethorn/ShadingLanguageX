@@ -23,6 +23,7 @@ protected:
     FuncPtr get_matching_function(const vector<TypePtr>& return_types) const override;
 
 private:
+    string full_name() const;
     void set_this() const;
 
     ExprPtr instance_expr_;

@@ -41,7 +41,8 @@ public:
     bool has_value() const;
     ValuePtr value();
     ValuePtr raw_value() const;
-    void copy_value(const VarPtr& other);
+
+    void copy(const VarPtr& other);
 
     void uninitialize();
 
@@ -70,10 +71,10 @@ public:
 
 protected:
     virtual ValuePtr value_impl() const { return value_; }
-    virtual void set_value_impl(ValuePtr value) { value_ = std::move(value); }
+    virtual void copy_value_impl(ValuePtr value) { value_ = std::move(value); }
 
 private:
-    void set_value(ValuePtr value);
+    void copy_value(ValuePtr value);
     void copy_children(const vector<VarPtr>& children);
 
     static void throw_error(const string& message);

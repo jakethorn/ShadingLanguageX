@@ -110,7 +110,7 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args,
         if (param.is_out())
         {
             const VarPtr output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name(), arg_attrs);
-            arg_value->copy_value(output);
+            arg_value->copy(output);
         }
     }
 
@@ -124,7 +124,7 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args,
     for (const VarPtr& var : func->nonlocal_outputs())
     {
         const VarPtr nonlocal_output = ValueFactory::create_output_value(node, var->type(), nonlocal_out_name(var));
-        var->copy_value(nonlocal_output);
+        var->copy(nonlocal_output);
     }
 
     attrs.add_to(node);

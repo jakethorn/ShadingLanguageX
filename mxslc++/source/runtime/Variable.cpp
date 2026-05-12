@@ -149,7 +149,7 @@ ValuePtr Variable::raw_value() const
     return value_impl();
 }
 
-void Variable::copy_value(const VarPtr& other)
+void Variable::copy(const VarPtr& other)
 {
     if (is_initialized_)
     {
@@ -161,7 +161,7 @@ void Variable::copy_value(const VarPtr& other)
 
     if (other->has_value())
     {
-        set_value(other->value());
+        copy_value(other->value());
     }
     else
     {
@@ -215,14 +215,14 @@ VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<VarPtr>& c
 VarPtr Variable::create(ModifierList mods, TypePtr type, ValuePtr value)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-    var->set_value(std::move(value));
+    var->copy_value(std::move(value));
     return var;
 }
 
 VarPtr Variable::create(ModifierList mods, TypePtr type, const VarPtr& value)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-    var->copy_value(value);
+    var->copy(value);
     return var;
 }
 
@@ -252,11 +252,11 @@ VarPtr Variable::create(const VarPtr& value)
     return create(ModifierList{}, value->type(), value);
 }
 
-void Variable::set_value(ValuePtr value)
+void Variable::copy_value(ValuePtr value)
 {
     if (is_temporary() or is_local())
     {
-        set_value_impl(std::move(value));
+        copy_value_impl(std::move(value));
     }
     else
     {

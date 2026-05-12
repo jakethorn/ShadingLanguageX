@@ -44,7 +44,7 @@ void MethodCall::init_subexpressions(const vector<TypePtr>& types)
 
 VarPtr MethodCall::evaluate_impl() const
 {
-    Runtime::get().enter_scope();
+    Runtime::get().enter_scope(full_name());
     set_this();
     VarPtr return_value = FunctionCall::evaluate_impl();
     Runtime::get().exit_scope();
@@ -53,14 +53,17 @@ VarPtr MethodCall::evaluate_impl() const
 
 vector<FuncPtr> MethodCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    const string method_name = instance_->type()->name() + "__" + name_;
-    return ::get_matching_functions(lock(instance_->type()->methods()), return_types, method_name, template_type_, args_);
+    return ::get_matching_functions(lock(instance_->type()->methods()), return_types, full_name(), template_type_, args_);
 }
 
 FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
-    const string method_name = instance_->type()->name() + "__" + name_;
-    return ::get_matching_function(lock(instance_->type()->methods()), return_types, method_name, template_type_, args_);
+    return ::get_matching_function(lock(instance_->type()->methods()), return_types, full_name(), template_type_, args_);
+}
+
+string MethodCall::full_name() const
+{
+    return instance_->type()->name() + "__" + name_;
 }
 
 namespace
@@ -79,7 +82,7 @@ namespace
 
 void MethodCall::set_this() const
 {
-    scope().set_this(Variable::create(instance_));
+    scope().set_this(instance_);
 
     for (const VarPtr& nonlocal_input : func_->nonlocal_inputs())
     {
@@ -89,7 +92,7 @@ void MethodCall::set_this() const
             for (const size_t index : ancestral_path(nonlocal_input))
                 var = var->child(index);
             nonlocal_input->uninitialize();
-            nonlocal_input->copy_value(var);
+            nonlocal_input->copy(var);
         }
     }
     for (const VarPtr& nonlocal_output : func_->nonlocal_outputs())
@@ -100,7 +103,7 @@ void MethodCall::set_this() const
             for (const size_t index : ancestral_path(nonlocal_output))
                 var = var->child(index);
             nonlocal_output->uninitialize();
-            nonlocal_output->copy_value(var);
+            nonlocal_output->copy(var);
         }
     }
 }

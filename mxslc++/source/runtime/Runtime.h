@@ -20,7 +20,7 @@ public:
     MtlXSerializer& serializer();
     mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
-    void enter_scope();
+    void enter_scope(string name = ""s);
     void exit_scope();
 
     static Runtime& create(const string& version);

@@ -216,7 +216,7 @@ void FunctionCall::update_out_arguments() const
         {
             const VarPtr nonlocal = args_.evaluate(param);
             const VarPtr local = Runtime::get().scope().get_variable(param.name());
-            nonlocal->copy_value(local);
+            nonlocal->copy(local);
         }
     }
 }

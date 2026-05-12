@@ -39,7 +39,7 @@ VarPtr IncrementExpression::evaluate_impl() const
 
     func_call->init(expr_->type());
     VarPtr inc_var = func_call->evaluate();
-    var->copy_value(inc_var);
+    var->copy(inc_var);
 
     if (prefix_)
         return inc_var;

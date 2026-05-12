@@ -33,5 +33,5 @@ void VariableAssignment::execute_impl() const
     rhs_expr_->init(lhs_expr_->type());
     const VarPtr lhs = lhs_expr_->evaluate();
     const VarPtr rhs = rhs_expr_->evaluate();
-    lhs->copy_value(rhs);
+    lhs->copy(rhs);
 }

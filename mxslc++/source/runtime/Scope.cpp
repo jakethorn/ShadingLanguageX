@@ -17,8 +17,14 @@
 
 Scope::Scope() = default;
 
-Scope::Scope(ScopePtr parent) : parent_{std::move(parent)}
+Scope::Scope(ScopePtr parent) : Scope{""s, std::move(parent)}
 {
+
+}
+
+Scope::Scope(string name, ScopePtr parent) : parent_{std::move(parent)}
+{
+    name_ = std::move(name);
     parent_->is_youngest_ = false;
     graph_ = parent_->graph_;
     func_ = parent_->func_;
@@ -66,20 +72,15 @@ bool Scope::has_variable(const string& name) const
 
 bool Scope::is_variable_local(const VarPtr& var) const
 {
-    VarPtr tmp = var;
-    while (tmp->parent())
-        tmp = tmp->parent();
-    return is_variable_local(tmp->name());
+    return is_variable_local(var->oldest()->name());
 }
 
 bool Scope::is_variable_local(const string& name) const
 {
     if (contains(variables_, name))
         return true;
-
     if (parent_)
         return parent_->is_variable_local(name) and is_inline();
-
     throw CompileError{"Variable not defined: " + name};
 }
 
