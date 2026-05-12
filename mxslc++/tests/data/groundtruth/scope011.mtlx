@@ -15,8 +15,8 @@
     <input name="in2" type="float" value="6" />
   </multiply>
   <some_func name="node2" type="multioutput">
-    <output name="nonlocal_out__p__0" type="float" />
     <output name="nonlocal_out__b__0" type="float" />
+    <output name="nonlocal_out__p__0" type="float" />
     <output name="out" type="float" />
   </some_func>
   <multiply name="node3" type="float">

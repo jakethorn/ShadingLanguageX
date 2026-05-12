@@ -70,7 +70,7 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
     size_t initialized_arg_count = initialized_arg_count_;
     while (initialized_arg_count < args_.size())
     {
-        vector<FuncPtr> matching_funcs = scope().get_functions(types, name_, template_type_, args_);
+        vector<FuncPtr> matching_funcs = get_matching_functions(types);
         assert(not matching_funcs.empty());
 
         const size_t prev_initialized_arg_count = initialized_arg_count;
@@ -79,7 +79,7 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
         if (initialized_arg_count == prev_initialized_arg_count)
         {
             // init failed, try to init with a default function...
-            FuncPtr default_func = scope().get_function(types, name_, template_type_, args_);
+            FuncPtr default_func = get_matching_function(types);
             initialized_arg_count = try_init_arguments(vector<FuncPtr>{std::move(default_func)});
 
             if (initialized_arg_count == prev_initialized_arg_count)
@@ -90,8 +90,7 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
 
 void FunctionCall::init_impl(const vector<TypePtr>& types)
 {
-    func_ = scope().get_function(types, name_, template_type_, args_);
-
+    func_ = get_matching_function(types);
     for (const Argument& arg : args_)
         arg.validate(func_->parameters()[arg]);
 }
@@ -116,6 +115,16 @@ VarPtr FunctionCall::evaluate_impl() const
     {
         return serializer().write_node(func_, args_, attrs_);
     }
+}
+
+vector<FuncPtr> FunctionCall::get_matching_functions(const vector<TypePtr>& return_types) const
+{
+    return scope().get_functions(return_types, name_, template_type_, args_);
+}
+
+FuncPtr FunctionCall::get_matching_function(const vector<TypePtr>& return_types) const
+{
+    return scope().get_function(return_types, name_, template_type_, args_);
 }
 
 namespace

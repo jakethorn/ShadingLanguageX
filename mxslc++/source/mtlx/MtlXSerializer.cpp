@@ -71,16 +71,18 @@ namespace
 
     string nonlocal_out_name(const VarPtr& var)
     {
-        if (var->name() == "__this__"s)
-            return "this__out__"s;
-        return "nonlocal_out__" + var->name();
+        if (var->oldest()->is_this())
+            return var->name();
+        else
+            return "nonlocal_out__" + var->name();
     }
 
     string nonlocal_in_name(const VarPtr& var)
     {
-        if (var->name() == "__this__"s)
-            return "this__in__"s;
-        return "nonlocal_in__" + var->name();
+        if (var->oldest()->is_this())
+            return var->name();
+        else
+            return "nonlocal_in__" + var->name();
     }
 }
 
@@ -113,15 +115,15 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args,
     }
 
     // inputs from nonlocal variables
-    for (const auto& [input_name, var] : func->nonlocal_inputs())
+    for (const VarPtr& var : func->nonlocal_inputs())
     {
-        write_node_input(node, input_name, var);
+        write_node_input(node, nonlocal_in_name(var), var);
     }
 
     // outputs to nonlocal variables
-    for (const auto& [output_name, var] : func->nonlocal_outputs())
+    for (const VarPtr& var : func->nonlocal_outputs())
     {
-        const VarPtr nonlocal_output = ValueFactory::create_output_value(node, var->type(), output_name);
+        const VarPtr nonlocal_output = ValueFactory::create_output_value(node, var->type(), nonlocal_out_name(var));
         var->copy_value(nonlocal_output);
     }
 
@@ -157,7 +159,7 @@ ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
 
     const string input_name = nonlocal_in_name(var);
     add_inputs_to_node_def(node_graph->getNodeDef(), var->type(), input_name);
-    func->add_nonlocal_input(input_name, var);
+    func->add_nonlocal_input(var);
     return std::make_shared<InterfaceValue>(var->type(), input_name);
 }
 
@@ -166,7 +168,7 @@ void MtlXSerializer::write_node_def_output(const VarPtr& var, const ValuePtr& va
     const auto& [node_graph, func] = Runtime::get().scope().node_graph();
     const string output_name = nonlocal_out_name(var);
     value->set_as_node_graph_output(node_graph, output_name);
-    func->add_nonlocal_output(output_name, var);
+    func->add_nonlocal_output(var);
 }
 
 string MtlXSerializer::xml() const

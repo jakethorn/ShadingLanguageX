@@ -48,12 +48,8 @@ void ClassDefinition::execute_impl() const
     scope().add_type(type);
 
     Runtime::get().enter_scope();
-
-    VarPtr this_ = ValueFactory::create_default_value(type);
-    scope().add_variable("__this__"s, std::move(this_));
-
+    scope().set_this(ValueFactory::create_default_value(type));
     add_methods(type);
-
     Runtime::get().exit_scope();
 }
 
@@ -90,10 +86,11 @@ void ClassDefinition::add_methods(const TypePtr& type) const
         {
             for (const FuncPtr& func : func_def->functions())
             {
+                func->set_name(type->name() + "__" + func->name());
                 func->init();
                 if (not func->is_inline())
                     serializer().write_node_def_graph(func, func_def->attributes());
-                scope().add_function(func);
+                scope().parent().add_function(func);
                 type->add_method(func);
             }
         }

@@ -1,1 +1,10 @@
-errmsg010.mxsl, line 11: No functions found with the name 'foo'
+errmsg010.mxsl, line 11: No matching overload for function 'foo'
+Potential matches:
+float foo(integer a, float b)
+    Too few arguments
+    Parameter 'b' was given an argument of the wrong type
+
+float foo(vector2 a, float b)
+    Too few arguments
+    Parameter 'b' was given an argument of the wrong type
+

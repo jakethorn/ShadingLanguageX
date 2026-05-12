@@ -27,6 +27,9 @@ protected:
     TypePtr type_impl() const override;
     VarPtr evaluate_impl() const override;
 
+    virtual vector<FuncPtr> get_matching_functions(const vector<TypePtr>& return_types) const;
+    virtual FuncPtr get_matching_function(const vector<TypePtr>& return_types) const;
+
     string name_;
     TypePtr template_type_;
     ArgumentList args_;

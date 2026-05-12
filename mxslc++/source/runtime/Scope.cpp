@@ -92,6 +92,17 @@ Scope& Scope::get_defining_scope(const VarPtr& var)
     throw CompileError{"Variable not defined: " + var->name()};
 }
 
+void Scope::set_this(const VarPtr& var)
+{
+    VarPtr copy = Variable::create(var);
+    add_variable("this"s, std::move(copy));
+}
+
+VarPtr Scope::get_this() const
+{
+    return get_variable("this"s);
+}
+
 void Scope::add_function(FuncPtr func)
 {
     assert(func->is_initialized());

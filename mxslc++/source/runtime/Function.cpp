@@ -134,11 +134,6 @@ VarPtr Function::invoke() const
     }
 }
 
-string Function::nonlocal_name(const Parameter& param) const
-{
-    return name_ + "_" + (template_type_ ? template_type_->name() : ""s) + "__" + param.name();
-}
-
 string Function::str() const
 {
     string result;

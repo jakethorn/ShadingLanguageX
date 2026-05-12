@@ -21,6 +21,8 @@ public:
         return std::move(parent_);
     }
 
+    Scope& parent() const { return *parent_; }
+
     mx::GraphElementPtr graph() const { return graph_; }
     pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
     void set_graph(mx::GraphElementPtr graph, FuncPtr func) { graph_ = std::move(graph); func_ = std::move(func); }
@@ -36,6 +38,9 @@ public:
     bool is_variable_local(const VarPtr& var) const;
     bool is_variable_local(const string& name) const;
     Scope& get_defining_scope(const VarPtr& var);
+
+    void set_this(const VarPtr& var);
+    VarPtr get_this() const;
 
     /*
      * functions

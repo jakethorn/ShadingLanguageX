@@ -16,13 +16,17 @@ public:
     MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, ArgumentList args, AttributeList attrs, Token token);
 
 protected:
-    void init_impl(const vector<TypePtr>& types) override;
+    void init_subexpressions(const vector<TypePtr>& types) override;
     VarPtr evaluate_impl() const override;
+
+    vector<FuncPtr> get_matching_functions(const vector<TypePtr>& return_types) const override;
+    FuncPtr get_matching_function(const vector<TypePtr>& return_types) const override;
 
 private:
     void set_this() const;
 
     ExprPtr instance_expr_;
+    VarPtr instance_;
 };
 
 #endif //MXSLC_METHODCALL_H

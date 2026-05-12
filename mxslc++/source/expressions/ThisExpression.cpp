@@ -14,7 +14,7 @@ ExprPtr ThisExpression::instantiate_template_types(const TypePtr &template_type)
 
 void ThisExpression::init_impl(const vector<TypePtr>& types)
 {
-    this_ = scope().get_variable("__this__"s);
+    this_ = scope().get_this();
 }
 
 TypePtr ThisExpression::type_impl() const

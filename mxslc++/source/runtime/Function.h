@@ -48,6 +48,8 @@ public:
     mx::NodeDefPtr node_def() const { return node_def_; }
     bool is_initialized() const { return is_initialized_; }
 
+    void set_name(string name) { name_ = std::move(name); }
+
     void set_node_def(mx::NodeDefPtr node_def);
     vector<string> output_names() const;
 
@@ -55,11 +57,10 @@ public:
 
     VarPtr invoke() const;
 
-    void add_nonlocal_input(const string& name, const VarPtr& var) { nonlocal_inputs_[name] = var; }
-    void add_nonlocal_output(const string& name, const VarPtr& var) { nonlocal_outputs_[name] = var; }
-    const unordered_map<string, VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
-    const unordered_map<string, VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
-    string nonlocal_name(const Parameter& param) const;
+    void add_nonlocal_input(VarPtr var) { nonlocal_inputs_.push_back(std::move(var)); }
+    void add_nonlocal_output(VarPtr var) { nonlocal_outputs_.push_back(std::move(var)); }
+    const vector<VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
+    const vector<VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
 
     string str() const;
 
@@ -74,8 +75,8 @@ private:
     mx::NodeDefPtr node_def_;
     bool is_initialized_ = false;
 
-    unordered_map<string, VarPtr> nonlocal_inputs_;
-    unordered_map<string, VarPtr> nonlocal_outputs_;
+    vector<VarPtr> nonlocal_inputs_;
+    vector<VarPtr> nonlocal_outputs_;
 };
 
 #endif //MXSLC_FUNCTION_H

@@ -84,6 +84,11 @@ bool Variable::is_local()
     return Runtime::get().scope().is_variable_local(shared_from_this());
 }
 
+bool Variable::is_this()
+{
+    return oldest()->name() == "this"s;
+}
+
 bool Variable::has_parent() const
 {
     return parent_.lock() != nullptr;
@@ -107,6 +112,19 @@ VarPtr Variable::child(const size_t index)
 VarPtr Variable::child(const string& field_name)
 {
     return child(type_->field_index(field_name));
+}
+
+VarPtr Variable::oldest()
+{
+    if (has_parent())
+        return parent()->oldest();
+    else
+        return shared_from_this();
+}
+
+size_t Variable::sibling_index() const
+{
+    return sibling_index_;
 }
 
 bool Variable::has_value() const
@@ -234,11 +252,6 @@ VarPtr Variable::create(const VarPtr& value)
     return create(ModifierList{}, value->type(), value);
 }
 
-void Variable::set_parent(weak_ptr<Variable> parent)
-{
-    parent_ = std::move(parent);
-}
-
 void Variable::set_value(ValuePtr value)
 {
     if (is_temporary() or is_local())
@@ -259,7 +272,8 @@ void Variable::copy_children(const vector<VarPtr>& children)
     for (size_t i = 0; i < children.size(); ++i)
     {
         VarPtr child = create(type_->field(i).modifiers(), type_->field_type(i), children[i]);
-        child->set_parent(weak_from_this());
+        child->parent_ = weak_from_this();
+        child->sibling_index_ = i;
         if (not name_.empty())
             child->set_name(get_port_name(name_, i));
         children_.push_back(std::move(child));

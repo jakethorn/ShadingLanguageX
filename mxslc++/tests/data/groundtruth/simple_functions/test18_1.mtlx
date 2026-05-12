@@ -13,8 +13,8 @@
     <output name="out" type="float" nodename="node1" />
   </nodegraph>
   <foo name="node1" type="float">
-    <input name="nonlocal_in__p__1" type="float" value="2" />
     <input name="nonlocal_in__p__0" type="float" value="1" />
+    <input name="nonlocal_in__p__1" type="float" value="2" />
   </foo>
   <multiply name="node2" type="float">
     <input name="in1" type="float" nodename="node1" />

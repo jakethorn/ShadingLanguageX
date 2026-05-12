@@ -28,12 +28,15 @@ public:
     bool is_assignable() const;
     bool is_temporary() const;
     bool is_local();
+    bool is_this();
 
     bool has_parent() const;
     VarPtr parent() const;
     size_t child_count() const;
     VarPtr child(size_t index);
     VarPtr child(const string& field_name);
+    VarPtr oldest();
+    size_t sibling_index() const;
 
     bool has_value() const;
     ValuePtr value();
@@ -70,7 +73,6 @@ protected:
     virtual void set_value_impl(ValuePtr value) { value_ = std::move(value); }
 
 private:
-    void set_parent(weak_ptr<Variable> parent);
     void set_value(ValuePtr value);
     void copy_children(const vector<VarPtr>& children);
 
@@ -79,6 +81,7 @@ private:
     ModifierList mods_;
     TypePtr type_;
     weak_ptr<Variable> parent_;
+    size_t sibling_index_ = 0;
     vector<VarPtr> children_;
     ValuePtr value_;
     string name_;
