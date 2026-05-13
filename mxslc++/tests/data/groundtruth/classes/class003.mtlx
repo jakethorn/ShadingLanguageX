@@ -3,8 +3,8 @@
   <nodedef name="ND_Sphere_self" node="Sphere_self">
     <output name="out__0" type="vector3" />
     <output name="out__1" type="float" />
-    <input name="this__0" type="vector3" value="0, 0, 0" />
-    <input name="this__1" type="float" value="0" />
+    <input name="this__0" type="vector3" />
+    <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_self" nodedef="ND_Sphere_self">
     <output name="out__0" type="vector3" interfacename="this__0" />
@@ -14,8 +14,8 @@
     <output name="out__0" type="vector3" />
     <output name="out__1" type="float" />
     <input name="v" type="vector3" value="0, 0, 0" />
-    <input name="this__0" type="vector3" value="0, 0, 0" />
-    <input name="this__1" type="float" value="0" />
+    <input name="this__0" type="vector3" />
+    <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_move" nodedef="ND_Sphere_move">
     <add name="node1" type="vector3">
@@ -27,8 +27,8 @@
   </nodegraph>
   <nodedef name="ND_Sphere_area" node="Sphere_area">
     <output name="out" type="float" />
-    <input name="this__0" type="vector3" value="0, 0, 0" />
-    <input name="this__1" type="float" value="0" />
+    <input name="this__0" type="vector3" />
+    <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_area" nodedef="ND_Sphere_area">
     <multiply name="node1" type="float">

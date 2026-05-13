@@ -41,6 +41,7 @@ public:
     ValuePtr raw_value() const;
 
     void copy(const VarPtr& other);
+    bool equals(const VarPtr& other) const;
 
     void uninitialize();
 

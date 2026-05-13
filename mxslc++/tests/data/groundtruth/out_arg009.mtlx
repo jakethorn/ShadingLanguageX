@@ -12,7 +12,7 @@
     <output name="out" type="float" nodename="node1" />
     <output name="out__x" type="float" value="0" />
   </nodegraph>
-  <foo1 name="node1" type="float">
+  <foo1 name="node1" type="multioutput">
     <output name="out__x" type="float" />
     <output name="out" type="float" />
   </foo1>

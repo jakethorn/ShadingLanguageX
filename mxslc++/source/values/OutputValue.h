@@ -14,6 +14,8 @@ public:
     OutputValue(mx::OutputPtr output, TypePtr type);
     OutputValue(const mx::NodePtr& node, const string& output_name, TypePtr type);
 
+    bool equals(const ValuePtr& other) const override;
+
     void set_as_node_input(const mx::InputPtr& input) const override;
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
 

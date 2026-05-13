@@ -8,7 +8,7 @@
     <output name="out" type="integer" value="0" />
     <output name="out__x" type="float" value="3" />
   </nodegraph>
-  <foo name="node1" type="integer">
+  <foo name="node1" type="multioutput">
     <output name="out__x" type="float" />
     <output name="out" type="integer" />
   </foo>

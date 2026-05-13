@@ -13,6 +13,13 @@ InterfaceValue::InterfaceValue(TypePtr type, string name)
 
 }
 
+bool InterfaceValue::equals(const ValuePtr& other) const
+{
+    if (const shared_ptr<InterfaceValue> other_interface = std::dynamic_pointer_cast<InterfaceValue>(other))
+        return name_ == other_interface->name_;
+    return false;
+}
+
 void InterfaceValue::set_as_node_input(const mx::InputPtr& input) const
 {
     set_interface(input, name_);

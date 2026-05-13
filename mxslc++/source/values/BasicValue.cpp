@@ -12,6 +12,13 @@
 BasicValue::BasicValue(primitive_t val) : Value{std::make_shared<Type>(val)}, val_{std::move(val)} { }
 BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, val_{std::move(val)} { }
 
+bool BasicValue::equals(const ValuePtr& other) const
+{
+    if (const shared_ptr<BasicValue> other_basic = std::dynamic_pointer_cast<BasicValue>(other))
+        return val_ == other_basic->val_;
+    return false;
+}
+
 void BasicValue::set_as_node_input(const mx::InputPtr& input) const
 {
     std::visit(

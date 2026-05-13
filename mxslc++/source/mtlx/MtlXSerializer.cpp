@@ -4,6 +4,7 @@
 
 #include "MtlXSerializer.h"
 
+#include <cassert>
 #include <MaterialXFormat/XmlIo.h>
 
 #include "CompileError.h"
@@ -32,7 +33,7 @@ namespace
 
     string serialize_type(const FuncPtr& func)
     {
-        if (not func->nonlocal_outputs().empty())
+        if (func->node_def()->getActiveOutputs().size() > 1)
             return Type::MultiOutput;
         return serialize_type(func->return_type());
     }
@@ -123,9 +124,17 @@ VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, c
         }
     }
 
-    if (instance)
+    if (instance != nullptr)
     {
+        assert(instance->type() == func->class_type());
+
         write_node_input(node, "this"s, instance);
+
+        if (func->mutates_instance())
+        {
+            const VarPtr output = ValueFactory::create_output_value(node, instance->type(), "out_this"s);
+            instance->copy(output);
+        }
     }
 
     // inputs from nonlocal variables
@@ -197,7 +206,7 @@ void MtlXSerializer::save(const fs::path& filepath) const
 
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
 {
-    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), node_name(func));
+    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), Type::Int, node_name(func));
     node_def->removeOutput("out"s);
     add_outputs_to_node_def(node_def, func->return_type());
 
@@ -233,12 +242,15 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
 
     Runtime::get().scope().set_graph(node_graph, func);
 
+    VarPtr original_instance = nullptr;
     if (func->has_class_type())
     {
-        const VarPtr in_var = ValueFactory::create_default_value(func->class_type());
-        write_node_def_input(node_def, "this"s, in_var);
+        write_node_def_input(node_def, "this"s, func->class_type());
 
-        VarPtr instance = ValueFactory::create_interface_value(func->class_type(), "this"s);
+        original_instance = ValueFactory::create_interface_value(func->class_type(), "this"s);
+
+        VarPtr instance = Variable::create(original_instance);
+        instance->set_modifiers(ModifierList{TokenType::Mutable});
         Runtime::get().scope().add_variable("this"s, std::move(instance));
     }
 
@@ -260,6 +272,14 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
             const VarPtr out_value = Runtime::get().scope().get_variable(param.name());
             write_node_graph_output(node_graph, "out__" + param.name(), out_value, param.attributes());
         }
+    }
+
+    if (func->has_class_type())
+    {
+        const VarPtr instance = Runtime::get().scope().get_variable("this"s);
+        func->set_mutates_instance(not instance->equals(original_instance));
+        if (func->mutates_instance())
+            write_node_graph_output(node_graph, "out__this"s, instance);
     }
 }
 

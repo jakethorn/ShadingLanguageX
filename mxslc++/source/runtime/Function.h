@@ -64,6 +64,9 @@ public:
     void set_class_type(weak_ptr<Type> type) { class_type_ = std::move(type); }
     bool has_class_type() const { return not class_type_.expired(); }
 
+    bool mutates_instance() const { return mutates_instance_; }
+    void set_mutates_instance(const bool value) { mutates_instance_ = value; }
+
     string str() const;
 
 private:
@@ -81,6 +84,7 @@ private:
     vector<VarPtr> nonlocal_outputs_;
 
     weak_ptr<Type> class_type_;
+    bool mutates_instance_ = false;
 };
 
 #endif //MXSLC_FUNCTION_H

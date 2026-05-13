@@ -12,7 +12,7 @@
     <output name="out" type="integer" value="0" />
     <output name="out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo1 name="node1" type="integer">
+  <foo1 name="node1" type="multioutput">
     <output name="out__x" type="float" />
     <output name="out" type="integer" />
   </foo1>
@@ -28,7 +28,7 @@
     <output name="out" type="integer" value="0" />
     <output name="out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo2 name="node2" type="integer">
+  <foo2 name="node2" type="multioutput">
     <output name="out__x" type="float" />
     <output name="out" type="integer" />
   </foo2>
@@ -44,7 +44,7 @@
     <output name="out" type="integer" value="0" />
     <output name="out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo3 name="node3" type="integer">
+  <foo3 name="node3" type="multioutput">
     <output name="out__x" type="float" />
     <output name="out" type="integer" />
   </foo3>

@@ -1,0 +1,14 @@
+class Sphere
+{
+    vec2 center_;
+    float radius_;
+
+    float get_radius() { return this.radius_; }
+    void set_radius(float r) { this.radius_ = r; }
+}
+
+mutable Sphere s = {vec2{0.0, 0.0}, 3.0};
+float a = s.get_radius();
+s.set_radius(4.0);
+float b = s.get_radius();
+print a * b;

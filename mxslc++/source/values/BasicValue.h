@@ -14,6 +14,8 @@ public:
     explicit BasicValue(primitive_t val);
     BasicValue(primitive_t val, TypePtr type);
 
+    bool equals(const ValuePtr& other) const override;
+
     void set_as_node_input(const mx::InputPtr& input) const override;
     void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
     void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override;

@@ -159,6 +159,30 @@ void Variable::copy(const VarPtr& other)
     }
 }
 
+bool Variable::equals(const VarPtr& other) const
+{
+    if (has_value() != other->has_value())
+        return false;
+
+    if (has_value())
+    {
+        return value_impl()->equals(other->value_impl());
+    }
+    else
+    {
+        if (child_count() != other->child_count())
+            return false;
+
+        for (size_t i = 0; i < child_count(); i++)
+        {
+            if (not children_[i]->equals(other->children_[i]))
+                return false;
+        }
+
+        return true;
+    }
+}
+
 void Variable::uninitialize()
 {
     is_initialized_ = false;

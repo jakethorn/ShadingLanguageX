@@ -1,0 +1,1 @@
+class010.mxsl, line 13: Cannot assign value to non-mutable variable 's'

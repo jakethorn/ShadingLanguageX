@@ -18,6 +18,13 @@ OutputValue::OutputValue(const mx::NodePtr& node, const string& output_name, Typ
     }
 }
 
+bool OutputValue::equals(const ValuePtr& other) const
+{
+    if (const shared_ptr<OutputValue> other_output = std::dynamic_pointer_cast<OutputValue>(other))
+        return output_ == other_output->output_;
+    return false;
+}
+
 void OutputValue::set_as_node_input(const mx::InputPtr& input) const
 {
     input->setConnectedOutput(output_);

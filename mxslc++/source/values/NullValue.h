@@ -12,6 +12,11 @@ class NullValue final : public Value
 public:
     explicit NullValue(TypePtr type) : Value{std::move(type)} { }
 
+    bool equals(const ValuePtr& other) const override
+    {
+        return std::dynamic_pointer_cast<NullValue>(other) != nullptr;
+    }
+
     void set_as_node_input(const mx::InputPtr& input) const override
     {
         input->getParent()->removeChild(input->getName());
