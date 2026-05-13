@@ -44,66 +44,27 @@ void MethodCall::init_subexpressions(const vector<TypePtr>& types)
 
 VarPtr MethodCall::evaluate_impl() const
 {
-    Runtime::get().enter_scope(full_name());
-    set_this();
-    VarPtr return_value = FunctionCall::evaluate_impl();
-    Runtime::get().exit_scope();
-    return return_value;
+    if (func_->is_inline())
+    {
+        Runtime::get().enter_scope();
+        evaluate_arguments();
+        VarPtr return_value = func_->invoke();
+        update_out_arguments();
+        Runtime::get().exit_scope();
+        return return_value;
+    }
+    else
+    {
+        return serializer().write_node(instance_, func_, args_, attrs_);
+    }
 }
 
 vector<FuncPtr> MethodCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    return ::get_matching_functions(lock(instance_->type()->methods()), return_types, full_name(), template_type_, args_);
+    return ::get_matching_functions(instance_->type()->methods(), return_types, name_, template_type_, args_);
 }
 
 FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
-    return ::get_matching_function(lock(instance_->type()->methods()), return_types, full_name(), template_type_, args_);
-}
-
-string MethodCall::full_name() const
-{
-    return instance_->type()->name() + "__" + name_;
-}
-
-namespace
-{
-    vector<size_t> ancestral_path(VarPtr child)
-    {
-        vector<size_t> indices;
-        while (child->has_parent())
-        {
-            indices.insert(indices.cbegin(), child->sibling_index());
-            child = child->parent();
-        }
-        return indices;
-    }
-}
-
-void MethodCall::set_this() const
-{
-    scope().set_this(instance_);
-
-    for (const VarPtr& nonlocal_input : func_->nonlocal_inputs())
-    {
-        if (nonlocal_input->oldest()->is_this())
-        {
-            VarPtr var = instance_;
-            for (const size_t index : ancestral_path(nonlocal_input))
-                var = var->child(index);
-            nonlocal_input->uninitialize();
-            nonlocal_input->copy(var);
-        }
-    }
-    for (const VarPtr& nonlocal_output : func_->nonlocal_outputs())
-    {
-        if (nonlocal_output->oldest()->is_this())
-        {
-            VarPtr var = instance_;
-            for (const size_t index : ancestral_path(nonlocal_output))
-                var = var->child(index);
-            nonlocal_output->uninitialize();
-            nonlocal_output->copy(var);
-        }
-    }
+    return ::get_matching_function(instance_->type()->methods(), return_types, name_, template_type_, args_);
 }

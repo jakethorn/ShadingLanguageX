@@ -30,6 +30,9 @@ protected:
     virtual vector<FuncPtr> get_matching_functions(const vector<TypePtr>& return_types) const;
     virtual FuncPtr get_matching_function(const vector<TypePtr>& return_types) const;
 
+    void evaluate_arguments() const;
+    void update_out_arguments() const;
+
     string name_;
     TypePtr template_type_;
     ArgumentList args_;
@@ -39,8 +42,6 @@ protected:
 private:
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
-    void evaluate_arguments() const;
-    void update_out_arguments() const;
 
     size_t initialized_arg_count_ = 0;
 };

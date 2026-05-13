@@ -13,7 +13,6 @@
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "runtime/ArgumentList.h"
-#include "runtime/Attribute.h"
 #include "runtime/Type.h"
 #include "runtime/Function.h"
 #include "values/InterfaceValue.h"
@@ -38,22 +37,6 @@ namespace
         return serialize_type(func->return_type());
     }
 
-    void add_inputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name)
-    {
-        if (type->has_fields())
-        {
-            for (size_t i = 0; i < type->field_count(); ++i)
-            {
-                add_inputs_to_node_def(node_def, type->field_type(i), get_port_name(name, i));
-            }
-        }
-        else
-        {
-            if (node_def->getInput(name) == nullptr)
-                node_def->addInput(name, serialize_type(type));
-        }
-    }
-
     void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name = "out"s)
     {
         if (type->has_fields())
@@ -69,24 +52,50 @@ namespace
         }
     }
 
+    string node_name(const FuncPtr& func)
+    {
+        if (not func->is_defined())
+            return func->name();
+
+        string result = ""s;
+        const Scope* scope = &Runtime::get().scope().get_defining_scope(func);
+        while (true)
+        {
+            if (not scope->is_inline())
+            {
+                const FuncPtr& defining_func = scope->node_graph().second;
+                result += node_name(defining_func) + "_";
+                break;
+            }
+            if (not scope->has_parent())
+                break;
+            scope = &scope->parent();
+        }
+        if (func->has_class_type())
+            result += func->class_type()->name() + "_";
+        result += func->name();
+        if (func->has_template_type())
+            result += "_" + func->template_type()->name();
+        return result;
+    }
+
     string nonlocal_out_name(const VarPtr& var)
     {
-        if (var->oldest()->is_this())
-            return var->name();
-        else
-            return "nonlocal_out__" + var->name();
+        return "nonlocal_out__" + var->name();
     }
 
     string nonlocal_in_name(const VarPtr& var)
     {
-        if (var->oldest()->is_this())
-            return var->name();
-        else
-            return "nonlocal_in__" + var->name();
+        return "nonlocal_in__" + var->name();
     }
 }
 
 VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const
+{
+    return write_node(nullptr, func, args, attrs);
+}
+
+VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const
 {
     vector<pair<const Parameter&, VarPtr>> arg_values = args.evaluate(func->parameters());
 
@@ -95,7 +104,7 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args,
         return value;
 
     const mx::GraphElementPtr& graph = Runtime::get().scope().graph();
-    const mx::NodePtr node = graph->addNode(func->name(), mx::EMPTY_STRING, serialize_type(func));
+    const mx::NodePtr node = graph->addNode(node_name(func), mx::EMPTY_STRING, serialize_type(func));
 
     for (const auto& [param, arg_value] : arg_values)
     {
@@ -112,6 +121,11 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args,
             const VarPtr output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name(), arg_attrs);
             arg_value->copy(output);
         }
+    }
+
+    if (instance)
+    {
+        write_node_input(node, "this"s, instance);
     }
 
     // inputs from nonlocal variables
@@ -158,7 +172,7 @@ ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
     }
 
     const string input_name = nonlocal_in_name(var);
-    add_inputs_to_node_def(node_graph->getNodeDef(), var->type(), input_name);
+    write_node_def_input(node_graph->getNodeDef(), input_name, var->type());
     func->add_nonlocal_input(var);
     return std::make_shared<InterfaceValue>(var->type(), input_name);
 }
@@ -183,7 +197,7 @@ void MtlXSerializer::save(const fs::path& filepath) const
 
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
 {
-    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), func->name());
+    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), serialize_type(func), node_name(func));
     node_def->removeOutput("out"s);
     add_outputs_to_node_def(node_def, func->return_type());
 
@@ -218,6 +232,15 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
     node_graph->setNodeDef(node_def);
 
     Runtime::get().scope().set_graph(node_graph, func);
+
+    if (func->has_class_type())
+    {
+        const VarPtr in_var = ValueFactory::create_default_value(func->class_type());
+        write_node_def_input(node_def, "this"s, in_var);
+
+        VarPtr instance = ValueFactory::create_interface_value(func->class_type(), "this"s);
+        Runtime::get().scope().add_variable("this"s, std::move(instance));
+    }
 
     const VarPtr return_value = func->invoke();
     if (func->is_void())
@@ -282,6 +305,27 @@ void MtlXSerializer::write_node_graph_output(const mx::NodeGraphPtr& node_graph,
     }
 }
 
+void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const TypePtr& type) const
+{
+    if (type->has_fields())
+    {
+        for (size_t i = 0; i < type->field_count(); ++i)
+        {
+            write_node_def_input(node_def, get_port_name(input_name, i), type->field_type(i));
+        }
+    }
+    else
+    {
+        if (node_def->getInput(input_name) == nullptr)
+            node_def->addInput(input_name, serialize_type(type));
+    }
+}
+
+void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var) const
+{
+    write_node_def_input(node_def, input_name, var, AttributeList{});
+}
+
 void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var, const AttributeList& attrs) const
 {
     if (var->has_value())
@@ -300,16 +344,10 @@ void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const 
 
 string MtlXSerializer::node_def_name(const FuncPtr& func) const
 {
-    string name = "ND_" + func->name();
-    if (func->has_template_type() and func->template_type()->has_name())
-        name += "_" + func->template_type()->name();
-    return doc_->createValidChildName(std::move(name));
+    return doc_->createValidChildName("ND_" + node_name(func));
 }
 
 string MtlXSerializer::node_graph_name(const FuncPtr& func) const
 {
-    string name = "NG_" + func->name();
-    if (func->has_template_type() and func->template_type()->has_name())
-        name += "_" + func->template_type()->name();
-    return doc_->createValidChildName(std::move(name));
+    return doc_->createValidChildName("NG_" + node_name(func));
 }

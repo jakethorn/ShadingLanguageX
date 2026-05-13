@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_Sphere__self" node="Sphere__self">
+  <nodedef name="ND_Sphere_self" node="Sphere_self">
     <output name="out__0" type="vector3" />
     <output name="out__1" type="float" />
-    <input name="this__0" type="vector3" />
-    <input name="this__1" type="float" />
+    <input name="this__0" type="vector3" value="0, 0, 0" />
+    <input name="this__1" type="float" value="0" />
   </nodedef>
-  <nodegraph name="NG_Sphere__self" nodedef="ND_Sphere__self">
+  <nodegraph name="NG_Sphere_self" nodedef="ND_Sphere_self">
     <output name="out__0" type="vector3" interfacename="this__0" />
     <output name="out__1" type="float" interfacename="this__1" />
   </nodegraph>
-  <nodedef name="ND_Sphere__move" node="Sphere__move">
+  <nodedef name="ND_Sphere_move" node="Sphere_move">
     <output name="out__0" type="vector3" />
     <output name="out__1" type="float" />
     <input name="v" type="vector3" value="0, 0, 0" />
-    <input name="this__0" type="vector3" />
-    <input name="this__1" type="float" />
+    <input name="this__0" type="vector3" value="0, 0, 0" />
+    <input name="this__1" type="float" value="0" />
   </nodedef>
-  <nodegraph name="NG_Sphere__move" nodedef="ND_Sphere__move">
+  <nodegraph name="NG_Sphere_move" nodedef="ND_Sphere_move">
     <add name="node1" type="vector3">
       <input name="in1" type="vector3" interfacename="this__0" />
       <input name="in2" type="vector3" interfacename="v" />
@@ -25,11 +25,12 @@
     <output name="out__0" type="vector3" nodename="node1" />
     <output name="out__1" type="float" interfacename="this__1" />
   </nodegraph>
-  <nodedef name="ND_Sphere__area" node="Sphere__area">
+  <nodedef name="ND_Sphere_area" node="Sphere_area">
     <output name="out" type="float" />
-    <input name="this__1" type="float" />
+    <input name="this__0" type="vector3" value="0, 0, 0" />
+    <input name="this__1" type="float" value="0" />
   </nodedef>
-  <nodegraph name="NG_Sphere__area" nodedef="ND_Sphere__area">
+  <nodegraph name="NG_Sphere_area" nodedef="ND_Sphere_area">
     <multiply name="node1" type="float">
       <input name="in1" type="float" value="4" />
       <input name="in2" type="float" value="3.14159" />
@@ -49,10 +50,12 @@
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <Sphere__area name="node2" type="float">
+  <Sphere_area name="node2" type="float">
+    <input name="this__0" type="vector3" nodename="node1" />
     <input name="this__1" type="float" value="1" />
-  </Sphere__area>
-  <Sphere__area name="node3" type="float">
+  </Sphere_area>
+  <Sphere_area name="node3" type="float">
+    <input name="this__0" type="vector3" nodename="node1" />
     <input name="this__1" type="float" value="2" />
-  </Sphere__area>
+  </Sphere_area>
 </materialx>

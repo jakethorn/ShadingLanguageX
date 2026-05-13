@@ -48,8 +48,6 @@ public:
     mx::NodeDefPtr node_def() const { return node_def_; }
     bool is_initialized() const { return is_initialized_; }
 
-    void set_name(string name) { name_ = std::move(name); }
-
     void set_node_def(mx::NodeDefPtr node_def);
     vector<string> output_names() const;
 
@@ -61,6 +59,10 @@ public:
     void add_nonlocal_output(VarPtr var) { nonlocal_outputs_.push_back(std::move(var)); }
     const vector<VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
     const vector<VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
+
+    TypePtr class_type() const { return class_type_.lock(); }
+    void set_class_type(weak_ptr<Type> type) { class_type_ = std::move(type); }
+    bool has_class_type() const { return not class_type_.expired(); }
 
     string str() const;
 
@@ -77,6 +79,8 @@ private:
 
     vector<VarPtr> nonlocal_inputs_;
     vector<VarPtr> nonlocal_outputs_;
+
+    weak_ptr<Type> class_type_;
 };
 
 #endif //MXSLC_FUNCTION_H

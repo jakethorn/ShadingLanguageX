@@ -127,6 +127,41 @@ FuncPtr FunctionCall::get_matching_function(const vector<TypePtr>& return_types)
     return scope().get_function(return_types, name_, template_type_, args_);
 }
 
+// inline only
+void FunctionCall::evaluate_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
+        if (param.is_in())
+        {
+            const VarPtr arg_value = args_.evaluate(param);
+            const VarPtr arg_value_copy = Variable::create(std::move(mods), param.type(), arg_value);
+            arg_value_copy->add_to_scope(param.name());
+        }
+        else
+        {
+            const VarPtr default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
+            default_value->set_modifiers(std::move(mods));
+            default_value->add_to_scope(param.name());
+        }
+    }
+}
+
+// inline only
+void FunctionCall::update_out_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        if (param.is_out())
+        {
+            const VarPtr nonlocal = args_.evaluate(param);
+            const VarPtr local = Runtime::get().scope().get_variable(param.name());
+            nonlocal->copy(local);
+        }
+    }
+}
+
 namespace
 {
     vector<TypePtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
@@ -184,39 +219,4 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     }
 
     return initialized_arg_count;
-}
-
-// inline only
-void FunctionCall::evaluate_arguments() const
-{
-    for (const Parameter& param : func_->parameters())
-    {
-        ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
-        if (param.is_in())
-        {
-            const VarPtr arg_value = args_.evaluate(param);
-            const VarPtr arg_value_copy = Variable::create(std::move(mods), param.type(), arg_value);
-            arg_value_copy->add_to_scope(param.name());
-        }
-        else
-        {
-            const VarPtr default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            default_value->set_modifiers(std::move(mods));
-            default_value->add_to_scope(param.name());
-        }
-    }
-}
-
-// inline only
-void FunctionCall::update_out_arguments() const
-{
-    for (const Parameter& param : func_->parameters())
-    {
-        if (param.is_out())
-        {
-            const VarPtr nonlocal = args_.evaluate(param);
-            const VarPtr local = Runtime::get().scope().get_variable(param.name());
-            nonlocal->copy(local);
-        }
-    }
 }

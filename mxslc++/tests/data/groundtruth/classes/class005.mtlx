@@ -1,37 +1,37 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_Point__extent" node="Point__extent">
+  <nodedef name="ND_Point_extent" node="Point_extent">
     <output name="out" type="float" />
-    <input name="this__0" type="float" />
-    <input name="this__1" type="float" />
+    <input name="this__0" type="float" value="0" />
+    <input name="this__1" type="float" value="0" />
   </nodedef>
-  <nodegraph name="NG_Point__extent" nodedef="ND_Point__extent">
+  <nodegraph name="NG_Point_extent" nodedef="ND_Point_extent">
     <max name="node1" type="float">
       <input name="in1" type="float" interfacename="this__0" />
       <input name="in2" type="float" interfacename="this__1" />
     </max>
     <output name="out" type="float" nodename="node1" />
   </nodegraph>
-  <nodedef name="ND_Sphere__extent" node="Sphere__extent">
+  <nodedef name="ND_Sphere_extent" node="Sphere_extent">
     <output name="out" type="float" />
     <input name="p__0" type="float" value="0" />
     <input name="p__1" type="float" value="0" />
-    <input name="this__0" type="float" />
+    <input name="this__0" type="float" value="0" />
   </nodedef>
-  <nodegraph name="NG_Sphere__extent" nodedef="ND_Sphere__extent">
-    <Point__extent name="node1" type="float">
+  <nodegraph name="NG_Sphere_extent" nodedef="ND_Sphere_extent">
+    <Point_extent name="node1" type="float">
       <input name="this__0" type="float" interfacename="p__0" />
       <input name="this__1" type="float" interfacename="p__1" />
-    </Point__extent>
+    </Point_extent>
     <add name="node2" type="float">
       <input name="in1" type="float" nodename="node1" />
       <input name="in2" type="float" interfacename="this__0" />
     </add>
     <output name="out" type="float" nodename="node2" />
   </nodegraph>
-  <Sphere__extent name="node1" type="float">
+  <Sphere_extent name="node1" type="float">
     <input name="p__0" type="float" value="1" />
     <input name="p__1" type="float" value="2" />
     <input name="this__0" type="float" value="3" />
-  </Sphere__extent>
+  </Sphere_extent>
 </materialx>

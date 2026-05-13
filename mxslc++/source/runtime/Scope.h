@@ -22,6 +22,7 @@ public:
         return std::move(parent_);
     }
 
+    bool has_parent() const { return parent_ != nullptr; }
     Scope& parent() const { return *parent_; }
 
     mx::GraphElementPtr graph() const { return graph_; }
@@ -40,9 +41,6 @@ public:
     bool is_variable_local(const string& name) const;
     Scope& get_defining_scope(const VarPtr& var);
 
-    void set_this(const VarPtr& var);
-    VarPtr get_this() const;
-
     /*
      * functions
      */
@@ -60,7 +58,7 @@ public:
         const TypePtr& template_type,
         const ArgumentList& args
     ) const;
-    vector<FuncPtr> get_all_functions(const string& name) const;
+    Scope& get_defining_scope(const FuncPtr& func);
 
     /*
      * types
@@ -75,6 +73,8 @@ public:
     TypePtr get_type(const string& name) const;
 
 private:
+    vector<FuncPtr> get_all_functions(const string& name) const;
+
     string name_;
     ScopePtr parent_;
     bool is_youngest_ = true;

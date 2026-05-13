@@ -13,7 +13,6 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "utils/instantiate_template_types_utils.h"
-#include "values/ValueFactory.h"
 
 ClassDefinition::ClassDefinition(string name, vector<TypePtr> template_types, TypePtr parent, vector<StmtPtr> body)
     : ClassDefinition{std::move(name), std::move(template_types), std::move(parent), std::move(body), Token{}}
@@ -46,11 +45,7 @@ void ClassDefinition::execute_impl() const
     const TypePtr type = std::make_shared<Type>(name_);
     add_fields(type);
     scope().add_type(type);
-
-    Runtime::get().enter_scope();
-    scope().set_this(ValueFactory::create_default_value(type));
     add_methods(type);
-    Runtime::get().exit_scope();
 }
 
 void ClassDefinition::validate_body() const
@@ -86,12 +81,14 @@ void ClassDefinition::add_methods(const TypePtr& type) const
         {
             for (const FuncPtr& func : func_def->functions())
             {
-                func->set_name(type->name() + "__" + func->name());
+                type->add_method(func);
+                func->set_class_type(type);
+
                 func->init();
+                scope().add_function(func);
+
                 if (not func->is_inline())
                     serializer().write_node_def_graph(func, func_def->attributes());
-                scope().parent().add_function(func);
-                type->add_method(func);
             }
         }
     }

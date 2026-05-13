@@ -84,11 +84,6 @@ bool Variable::is_local()
     return Runtime::get().scope().is_variable_local(shared_from_this());
 }
 
-bool Variable::is_this()
-{
-    return oldest()->name() == "this"s;
-}
-
 bool Variable::has_parent() const
 {
     return parent_.lock() != nullptr;
@@ -120,11 +115,6 @@ VarPtr Variable::oldest()
         return parent()->oldest();
     else
         return shared_from_this();
-}
-
-size_t Variable::sibling_index() const
-{
-    return sibling_index_;
 }
 
 bool Variable::has_value() const
@@ -273,7 +263,6 @@ void Variable::copy_children(const vector<VarPtr>& children)
     {
         VarPtr child = create(type_->field(i).modifiers(), type_->field_type(i), children[i]);
         child->parent_ = weak_from_this();
-        child->sibling_index_ = i;
         if (not name_.empty())
             child->set_name(get_port_name(name_, i));
         children_.push_back(std::move(child));

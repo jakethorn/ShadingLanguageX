@@ -52,9 +52,9 @@ public:
         methods_.push_back(std::move(method));
     }
 
-    const vector<weak_ptr<Function>>& methods() const
+    vector<FuncPtr> methods() const
     {
-        return methods_;
+        return lock(methods_);
     }
 
     template<typename T>

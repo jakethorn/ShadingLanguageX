@@ -28,7 +28,6 @@ public:
     bool is_assignable() const;
     bool is_temporary() const;
     bool is_local();
-    bool is_this();
 
     bool has_parent() const;
     VarPtr parent() const;
@@ -36,7 +35,6 @@ public:
     VarPtr child(size_t index);
     VarPtr child(const string& field_name);
     VarPtr oldest();
-    size_t sibling_index() const;
 
     bool has_value() const;
     ValuePtr value();
@@ -82,7 +80,6 @@ private:
     ModifierList mods_;
     TypePtr type_;
     weak_ptr<Variable> parent_;
-    size_t sibling_index_ = 0;
     vector<VarPtr> children_;
     ValuePtr value_;
     string name_;

@@ -93,17 +93,6 @@ Scope& Scope::get_defining_scope(const VarPtr& var)
     throw CompileError{"Variable not defined: " + var->name()};
 }
 
-void Scope::set_this(const VarPtr& var)
-{
-    VarPtr copy = Variable::create(var);
-    add_variable("this"s, std::move(copy));
-}
-
-VarPtr Scope::get_this() const
-{
-    return get_variable("this"s);
-}
-
 void Scope::add_function(FuncPtr func)
 {
     assert(func->is_initialized());
@@ -167,22 +156,13 @@ FuncPtr Scope::get_function(
     return funcs[0];
 }
 
-vector<FuncPtr> Scope::get_all_functions(const string& name) const
+Scope& Scope::get_defining_scope(const FuncPtr& func)
 {
-    vector<FuncPtr> funcs;
-    for (const FuncPtr& func : functions_)
-    {
-        if (name == func->name())
-            funcs.push_back(func);
-    }
-
+    if (contains(functions_, func))
+        return *this;
     if (parent_)
-    {
-        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
-        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
-    }
-
-    return funcs;
+        return parent_->get_defining_scope(func);
+    throw CompileError{"Function not defined: " + func->name()};
 }
 
 void Scope::add_type(TypePtr type)
@@ -249,4 +229,22 @@ TypePtr Scope::get_type(const string& name) const
     if (parent_)
         return parent_->get_type(name);
     throw CompileError{"Type '" + name + "' not defined"};
+}
+
+vector<FuncPtr> Scope::get_all_functions(const string& name) const
+{
+    vector<FuncPtr> funcs;
+    for (const FuncPtr& func : functions_)
+    {
+        if (name == func->name())
+            funcs.push_back(func);
+    }
+
+    if (parent_)
+    {
+        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
+        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
+    }
+
+    return funcs;
 }

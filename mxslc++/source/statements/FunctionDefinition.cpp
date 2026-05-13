@@ -70,8 +70,9 @@ void FunctionDefinition::execute_impl() const
     for (const FuncPtr& func : funcs_)
     {
         func->init();
+        scope().add_function(func);
+
         if (not func->is_inline())
             serializer().write_node_def_graph(func, attrs_);
-        scope().add_function(func);
     }
 }
