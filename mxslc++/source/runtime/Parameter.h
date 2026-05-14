@@ -24,12 +24,12 @@ public:
     bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
     bool is_in() const { return not mods_.contains(TokenType::Out); }
     bool is_out() const { return mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out); }
+    TypePtr type() const;
     const string& name() const { return name_; }
     size_t index() const { return index_; }
 
     Parameter instantiate_template_types(const TypePtr& template_type) const;
     void init();
-    TypePtr type() const;
 
     bool has_default_value() const { return expr_ != nullptr; }
     VarPtr evaluate() const;

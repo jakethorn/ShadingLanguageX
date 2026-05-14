@@ -28,7 +28,6 @@ public:
 
     vector<StmtPtr> parse();
 
-private:
     StmtPtr statement();
     StmtPtr bare_statement();
     StmtPtr print_statement();
@@ -38,6 +37,7 @@ private:
     StmtPtr function_definition(ModifierList mods, TypePtr type);
     StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr class_definition();
+    StmtPtr constructor_definition();
     StmtPtr using_declaration();
     StmtPtr for_loop();
     StmtPtr expression_statement(ExprPtr expr);
@@ -95,6 +95,7 @@ private:
 
     bool is_typed_definition() const;
     bool is_function_call() const;
+    bool is_constructor_definition() const;
 };
 
 #endif //FENNEC_PARSE_H

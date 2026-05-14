@@ -23,7 +23,8 @@ public:
     virtual void set_attributes(AttributeList attrs) { }
 
     virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
-    void execute() const;
+    virtual void init() { }
+    void execute();
 
 protected:
     virtual void execute_impl() const = 0;
@@ -32,6 +33,7 @@ protected:
     static MtlXSerializer& serializer();
 
     Token token_;
+    bool is_initialized_ = false;
 };
 
 #endif //FENNEC_STATEMENT_H

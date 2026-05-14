@@ -14,14 +14,38 @@
 FunctionDefinition::FunctionDefinition(
     ModifierList mods,
     TypePtr type,
-    Token name,
+    string name,
     vector<TypePtr> template_types,
     ParameterList params,
     StmtPtr body,
     ExprPtr return_expr
-) : Statement{std::move(name)},
+) : FunctionDefinition{
+    std::move(mods),
+    std::move(type),
+    std::move(name),
+    std::move(template_types),
+    std::move(params),
+    std::move(body),
+    std::move(return_expr),
+    Token{}
+}
+{
+
+}
+
+FunctionDefinition::FunctionDefinition(
+    ModifierList mods,
+    TypePtr type,
+    string name,
+    vector<TypePtr> template_types,
+    ParameterList params,
+    StmtPtr body,
+    ExprPtr return_expr,
+    Token token
+) : Statement{std::move(token)},
     mods_{std::move(mods)},
     type_{std::move(type)},
+    name_{std::move(name)},
     template_types_{std::move(template_types)},
     params_{std::move(params)},
     body_{std::move(body)},
@@ -36,14 +60,14 @@ FunctionDefinition::FunctionDefinition(
             body = body_->instantiate_template_types(template_type);
             return_expr = ::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
-                mods_, std::move(type), FunctionDefinition::name(), template_type, std::move(params), std::move(body), std::move(return_expr)
+                mods_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr)
             ));
         }
     }
     else
     {
         funcs_.push_back(std::make_shared<Function>(
-            std::move(mods_), std::move(type_), FunctionDefinition::name(), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
+            std::move(mods_), std::move(type_), std::move(name_), nullptr, std::move(params_), std::move(body_), std::move(return_expr_)
         ));
     }
 }
@@ -62,7 +86,7 @@ StmtPtr FunctionDefinition::instantiate_template_types(const TypePtr& template_t
     ParameterList params = params_.instantiate_template_types(template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
     ExprPtr return_expr = ::instantiate_template_types(return_expr_, template_type);
-    return std::make_unique<FunctionDefinition>(mods_, std::move(type), token_, template_types_, std::move(params), std::move(body), std::move(return_expr));
+    return std::make_unique<FunctionDefinition>(mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr), token_);
 }
 
 void FunctionDefinition::execute_impl() const

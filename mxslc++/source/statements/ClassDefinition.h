@@ -7,6 +7,9 @@
 
 #include "Statement.h"
 
+class FunctionDefinition;
+class ConstructorDefinition;
+
 class ClassDefinition final : public Statement
 {
 public:
@@ -22,7 +25,9 @@ private:
     bool is_templated() const { return not template_types_.empty(); }
     void validate_body() const;
     void add_fields(const TypePtr& type) const;
-    void add_methods(const TypePtr& type) const;
+    void add_methods_and_constructors(const TypePtr& type) const;
+    void add_method(const TypePtr& type, FunctionDefinition* func_def) const;
+    void add_constructor(const TypePtr& type, ConstructorDefinition* ctor_def) const;
 
     string name_;
     vector<TypePtr> template_types_;

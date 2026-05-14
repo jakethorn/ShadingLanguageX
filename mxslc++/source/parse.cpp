@@ -25,6 +25,7 @@
 #include "runtime/Attribute.h"
 #include "statements/BlockStatement.h"
 #include "statements/ClassDefinition.h"
+#include "statements/ConstructorDefinition.h"
 #include "statements/DocumentAttribute.h"
 #include "statements/ExpressionStatement.h"
 #include "statements/ForEachLoop.h"
@@ -234,11 +235,12 @@ StmtPtr Parser::function_definition(ModifierList mods, TypePtr type)
     return std::make_unique<FunctionDefinition>(
         std::move(mods),
         std::move(type),
-        std::move(name),
+        string{name.lexeme()},
         std::move(template_types),
         std::move(params),
         std::move(body),
-        std::move(return_expr)
+        std::move(return_expr),
+        std::move(name)
     );
 }
 
@@ -254,11 +256,12 @@ StmtPtr Parser::function_definition_modern(ModifierList mods)
     return std::make_unique<FunctionDefinition>(
         std::move(mods),
         std::move(type_),
-        std::move(name),
+        string{name.lexeme()},
         std::move(template_types),
         std::move(params),
         std::move(body),
-        std::move(return_expr)
+        std::move(return_expr),
+        std::move(name)
     );
 }
 
@@ -273,11 +276,29 @@ StmtPtr Parser::class_definition()
     vector<StmtPtr> body;
     while (not consume('}'))
     {
-        body.push_back(statement());
+        if (is_constructor_definition())
+            body.push_back(constructor_definition());
+        else
+            body.push_back(statement());
     }
 
     consume(';');
     return std::make_unique<ClassDefinition>(std::move(name), std::move(template_types), std::move(parent), std::move(body), std::move(token));
+}
+
+StmtPtr Parser::constructor_definition()
+{
+    ModifierList mods = modifiers();
+    Token class_name = match(TokenType::Identifier);
+    ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
+    StmtPtr body = block_statement();
+    return std::make_unique<ConstructorDefinition>(
+        std::move(mods),
+        string{class_name.lexeme()},
+        std::move(params),
+        std::move(body),
+        std::move(class_name)
+    );
 }
 
 StmtPtr Parser::using_declaration()
@@ -796,4 +817,11 @@ bool Parser::is_function_call() const
         peek(4) == '(';
 
     return is_func_call or is_templated_func_call;
+}
+
+bool Parser::is_constructor_definition() const
+{
+    return
+    (peek(0) == TokenType::Identifier and peek(1) == '(') or
+    (peek(0) == TokenType::Inline and peek(1) == TokenType::Identifier and peek(2) == '(');
 }

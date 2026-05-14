@@ -12,24 +12,24 @@
 class FunctionDefinition final : public Statement
 {
 public:
-    FunctionDefinition(ModifierList mods, TypePtr type, Token name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
+    FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
+    FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr, Token token);
 
     void set_attributes(AttributeList attrs) override;
 
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
     const vector<FuncPtr>& functions() const { return funcs_; }
-    const AttributeList& attributes() const { return attrs_; }
 
 protected:
     void execute_impl() const override;
 
 private:
-    const string& name() const { return token_.lexeme(); }
     bool is_templated() const { return not template_types_.empty(); }
 
     ModifierList mods_;
     TypePtr type_;
+    string name_;
     vector<TypePtr> template_types_;
     ParameterList params_;
     StmtPtr body_;

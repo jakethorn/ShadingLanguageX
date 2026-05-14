@@ -5,6 +5,7 @@
 #include "ClassDefinition.h"
 
 #include "CompileError.h"
+#include "ConstructorDefinition.h"
 #include "FunctionDefinition.h"
 #include "VariableDefinition.h"
 #include "mtlx/MtlXSerializer.h"
@@ -45,7 +46,7 @@ void ClassDefinition::execute_impl() const
     const TypePtr type = std::make_shared<Type>(name_);
     add_fields(type);
     scope().add_type(type);
-    add_methods(type);
+    add_methods_and_constructors(type);
 }
 
 void ClassDefinition::validate_body() const
@@ -54,9 +55,10 @@ void ClassDefinition::validate_body() const
     {
         const bool is_var_def = dynamic_cast<VariableDefinition*>(stmt.get());
         const bool is_func_def = dynamic_cast<FunctionDefinition*>(stmt.get());
-        if (not (is_var_def or is_func_def))
+        const bool is_ctor_def = dynamic_cast<ConstructorDefinition*>(stmt.get());
+        if (not (is_var_def or is_func_def or is_ctor_def))
         {
-            throw CompileError{"Only fields and methods are allowed in class definitions"s};
+            throw CompileError{"Only fields, methods and constructors are allowed in class definitions"s};
         }
     }
 }
@@ -73,23 +75,35 @@ void ClassDefinition::add_fields(const TypePtr& type) const
     }
 }
 
-void ClassDefinition::add_methods(const TypePtr& type) const
+void ClassDefinition::add_methods_and_constructors(const TypePtr& type) const
 {
     for (const StmtPtr& stmt : body_)
     {
-        if (const FunctionDefinition* func_def = dynamic_cast<FunctionDefinition*>(stmt.get()))
+        if (FunctionDefinition* func_def = dynamic_cast<FunctionDefinition*>(stmt.get()))
         {
-            for (const FuncPtr& func : func_def->functions())
-            {
-                type->add_method(func);
-                func->set_class_type(type);
-
-                func->init();
-                scope().add_function(func);
-
-                if (not func->is_inline())
-                    serializer().write_node_def_graph(func, func_def->attributes());
-            }
+            add_method(type, func_def);
+        }
+        else if (ConstructorDefinition* ctor_def = dynamic_cast<ConstructorDefinition*>(stmt.get()))
+        {
+            add_constructor(type, ctor_def);
         }
     }
+}
+
+void ClassDefinition::add_method(const TypePtr& type, FunctionDefinition* func_def) const
+{
+    for (const FuncPtr& func : func_def->functions())
+    {
+        type->add_method(func);
+        func->set_class_type(type);
+    }
+
+    func_def->execute();
+}
+
+void ClassDefinition::add_constructor(const TypePtr& type, ConstructorDefinition* ctor_def) const
+{
+    if (type->name() != ctor_def->class_name())
+        throw CompileError{"Constructor name does not match class name"s};
+    ctor_def->execute();
 }
