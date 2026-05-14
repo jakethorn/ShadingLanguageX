@@ -139,6 +139,11 @@ ValuePtr Variable::raw_value() const
     return value_impl();
 }
 
+VarPtr Variable::copy()
+{
+    return create(shared_from_this());
+}
+
 void Variable::copy(const VarPtr& other)
 {
     if (is_initialized_)
@@ -199,7 +204,19 @@ Scope& Variable::defining_scope()
 
 void Variable::add_to_scope(string name)
 {
-    Runtime::get().scope().add_variable(std::move(name), shared_from_this());
+    Runtime::get().scope().add_variable(name, shared_from_this());
+
+    if (name == "this"s)
+    {
+        // also bring in children
+        for (size_t i = 0; i < child_count(); ++i)
+        {
+            const string& child_name = type()->field_name(i);
+            if (Runtime::get().scope().has_variable(child_name))
+                continue;
+            child(i)->add_to_scope(child_name);
+        }
+    }
 }
 
 string Variable::str() const

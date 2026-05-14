@@ -1,0 +1,21 @@
+class A
+{
+    float a;
+
+    inline float get_a(float m) { return this.a * m; }
+};
+
+class B
+{
+    float b;
+
+    inline float get_b() { return this.b * 3.0; }
+
+    inline float get_a_b(A a) { return a.get_a(this.get_b()); }
+};
+
+A x = {randomfloat()};
+B y = {randomfloat()};
+
+float z = y.get_a_b(x);
+print z;

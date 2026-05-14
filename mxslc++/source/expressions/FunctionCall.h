@@ -31,6 +31,7 @@ protected:
     virtual FuncPtr get_matching_function(const vector<TypePtr>& return_types) const;
 
     void evaluate_arguments() const;
+    VarPtr inline_invoke() const;
     void update_out_arguments() const;
 
     string name_;
@@ -43,7 +44,11 @@ private:
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
 
+    VarPtr evaluate_as_method() const;
+
     size_t initialized_arg_count_ = 0;
+
+    ExprPtr method_call_ = nullptr;
 };
 
 #endif //MXSLC_FUNCTIONCALL_H

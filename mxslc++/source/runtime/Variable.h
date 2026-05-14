@@ -40,6 +40,7 @@ public:
     ValuePtr value();
     ValuePtr raw_value() const;
 
+    VarPtr copy();
     void copy(const VarPtr& other);
     bool equals(const VarPtr& other) const;
 

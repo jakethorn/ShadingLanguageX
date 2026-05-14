@@ -32,7 +32,7 @@ TypePtr IncrementExpression::type_impl() const
 VarPtr IncrementExpression::evaluate_impl() const
 {
     const VarPtr var = expr_->evaluate();
-    VarPtr pre_var = Variable::create(var);
+    VarPtr pre_var = var->copy();
 
     ArgumentList args{expr_};
     const ExprPtr func_call = std::make_shared<FunctionCall>(increment_ ? "__inc__"s : "__dec__"s, std::move(args));

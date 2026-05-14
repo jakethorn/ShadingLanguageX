@@ -7,6 +7,8 @@
 #include <cassert>
 
 #include "CompileError.h"
+#include "MethodCall.h"
+#include "ThisExpression.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
@@ -93,6 +95,13 @@ void FunctionCall::init_impl(const vector<TypePtr>& types)
     func_ = get_matching_function(types);
     for (const Argument& arg : args_)
         arg.validate(func_->parameters()[arg]);
+
+    if (func_->has_class_type() and method_call_ == nullptr)
+    {
+        ExprPtr instance = std::make_unique<ThisExpression>(token_);
+        method_call_ = std::make_shared<MethodCall>(std::move(instance), std::move(name_), std::move(template_type_), std::move(args_), std::move(attrs_), std::move(token_));
+        method_call_->init();
+    }
 }
 
 TypePtr FunctionCall::type_impl() const
@@ -102,11 +111,16 @@ TypePtr FunctionCall::type_impl() const
 
 VarPtr FunctionCall::evaluate_impl() const
 {
+    if (func_->has_class_type())
+    {
+        return evaluate_as_method();
+    }
+
     if (func_->is_inline())
     {
         Runtime::get().enter_scope();
         evaluate_arguments();
-        VarPtr return_value = func_->invoke();
+        VarPtr return_value = inline_invoke();
         update_out_arguments();
         Runtime::get().exit_scope();
         return return_value;
@@ -146,6 +160,15 @@ void FunctionCall::evaluate_arguments() const
             default_value->add_to_scope(param.name());
         }
     }
+}
+
+// inline only
+VarPtr FunctionCall::inline_invoke() const
+{
+    const VarPtr return_value = func_->invoke();
+    if (return_value == nullptr)
+        return nullptr;
+    return return_value->copy();
 }
 
 // inline only
@@ -219,4 +242,9 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     }
 
     return initialized_arg_count;
+}
+
+VarPtr FunctionCall::evaluate_as_method() const
+{
+    return method_call_->evaluate();
 }

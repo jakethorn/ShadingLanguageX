@@ -58,10 +58,8 @@ VarPtr Scope::get_variable(const string& name) const
 {
     if (contains(variables_, name))
         return variables_.at(name);
-
     if (parent_)
         return parent_->get_variable(name);
-
     throw CompileError{"Variable not defined: " + name};
 }
 

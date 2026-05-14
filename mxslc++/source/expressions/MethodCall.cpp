@@ -42,14 +42,23 @@ void MethodCall::init_subexpressions(const vector<TypePtr>& types)
     FunctionCall::init_subexpressions(types);
 }
 
+void MethodCall::init_impl(const vector<TypePtr> &types)
+{
+    func_ = get_matching_function(types);
+    for (const Argument& arg : args_)
+        arg.validate(func_->parameters()[arg]);
+}
+
 VarPtr MethodCall::evaluate_impl() const
 {
     if (func_->is_inline())
     {
         Runtime::get().enter_scope();
         evaluate_arguments();
-        VarPtr return_value = func_->invoke();
+        const VarPtr local_instance = copy_instance_to_scope();
+        VarPtr return_value = inline_invoke();
         update_out_arguments();
+        update_instance(local_instance);
         Runtime::get().exit_scope();
         return return_value;
     }
@@ -67,4 +76,18 @@ vector<FuncPtr> MethodCall::get_matching_functions(const vector<TypePtr>& return
 FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
     return ::get_matching_function(instance_->type()->methods(), return_types, name_, template_type_, args_);
+}
+
+VarPtr MethodCall::copy_instance_to_scope() const
+{
+    VarPtr instance_copy = instance_->copy();
+    instance_copy->set_modifiers(ModifierList{TokenType::Mutable});
+    instance_copy->add_to_scope("this"s);
+    return instance_copy;
+}
+
+void MethodCall::update_instance(const VarPtr& local_copy) const
+{
+    if (not instance_->equals(local_copy))
+        instance_->copy(local_copy);
 }

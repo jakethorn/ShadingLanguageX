@@ -124,6 +124,7 @@ VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, c
         }
     }
 
+    // inputs from and outputs to instance
     if (instance != nullptr)
     {
         assert(instance->type() == func->class_type());
@@ -214,11 +215,9 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
     {
         if (param.is_in())
         {
-            // create node def input
             const VarPtr in_var = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
             write_node_def_input(node_def, param.name(), in_var, param.attributes());
 
-            // create interface value
             const VarPtr interface = ValueFactory::create_interface_value(param.type(), param.name());
             interface->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
             interface->add_to_scope(param.name());
@@ -231,6 +230,8 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
         }
     }
 
+    add_instance_to_scope(func, node_def);
+
     func->set_node_def(node_def);
     return node_def;
 }
@@ -242,17 +243,7 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
 
     Runtime::get().scope().set_graph(node_graph, func);
 
-    VarPtr original_instance = nullptr;
-    if (func->has_class_type())
-    {
-        write_node_def_input(node_def, "this"s, func->class_type());
-
-        original_instance = ValueFactory::create_interface_value(func->class_type(), "this"s);
-
-        VarPtr instance = Variable::create(original_instance);
-        instance->set_modifiers(ModifierList{TokenType::Mutable});
-        Runtime::get().scope().add_variable("this"s, std::move(instance));
-    }
+    const VarPtr instance_copy = copy_instance(func);
 
     const VarPtr return_value = func->invoke();
     if (func->is_void())
@@ -274,6 +265,31 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
         }
     }
 
+    update_instance(func, node_graph, instance_copy);
+}
+
+void MtlXSerializer::add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const
+{
+    if (func->has_class_type())
+    {
+        write_node_def_input(node_def, "this"s, func->class_type());
+
+        const VarPtr instance = ValueFactory::create_interface_value(func->class_type(), "this"s);
+        instance->set_modifiers(ModifierList{TokenType::Mutable});
+        instance->add_to_scope("this"s);
+    }
+}
+
+VarPtr MtlXSerializer::copy_instance(const FuncPtr& func) const
+{
+    if (func->has_class_type())
+        return Runtime::get().scope().get_variable("this"s)->copy();
+    else
+        return nullptr;
+}
+
+void MtlXSerializer::update_instance(const FuncPtr& func, const mx::NodeGraphPtr& node_graph, const VarPtr& original_instance) const
+{
     if (func->has_class_type())
     {
         const VarPtr instance = Runtime::get().scope().get_variable("this"s);

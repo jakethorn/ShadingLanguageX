@@ -1,0 +1,28 @@
+class Sphere
+{
+    vec3 position;
+    float radius;
+
+    Sphere self()
+    {
+        return this;
+    }
+
+    Sphere move(vec3 v)
+    {
+        return {position + v, radius};
+    }
+
+    float area()
+    {
+        return 4.0 * 3.14159 * radius * this.radius;
+    }
+}
+
+mutable Sphere s = {vec3{0.0, 0.0, 0.0}, 1.0};
+
+print s.radius;
+print s.area();
+s.radius = 2.0;
+print s.radius;
+print s.area();

@@ -17,13 +17,15 @@ public:
 
 protected:
     void init_subexpressions(const vector<TypePtr>& types) override;
+    void init_impl(const vector<TypePtr>& types) override;
     VarPtr evaluate_impl() const override;
 
     vector<FuncPtr> get_matching_functions(const vector<TypePtr>& return_types) const override;
     FuncPtr get_matching_function(const vector<TypePtr>& return_types) const override;
 
 private:
-    void set_this() const;
+    VarPtr copy_instance_to_scope() const;
+    void update_instance(const VarPtr& local_copy) const;
 
     ExprPtr instance_expr_;
     VarPtr instance_;
