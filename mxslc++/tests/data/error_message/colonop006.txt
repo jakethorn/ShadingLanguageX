@@ -1,1 +1,1 @@
-colonop006.mxsl, line 2: The colon operator can only be used on values representing MaterialX nodes
+colonop006.mxsl, line 2: The port access (dot) operator can only be used on values representing MaterialX nodes

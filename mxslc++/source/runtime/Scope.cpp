@@ -9,6 +9,7 @@
 #include "ArgumentList.h"
 #include "CompileError.h"
 #include "Function.h"
+#include "function_utils.h"
 #include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"
@@ -16,8 +17,15 @@
 
 Scope::Scope() = default;
 
-Scope::Scope(ScopePtr parent) : parent_{std::move(parent)}
+Scope::Scope(ScopePtr parent) : Scope{""s, std::move(parent)}
 {
+
+}
+
+Scope::Scope(string name, ScopePtr parent) : parent_{std::move(parent)}
+{
+    name_ = std::move(name);
+    parent_->is_youngest_ = false;
     graph_ = parent_->graph_;
     func_ = parent_->func_;
 }
@@ -50,10 +58,8 @@ VarPtr Scope::get_variable(const string& name) const
 {
     if (contains(variables_, name))
         return variables_.at(name);
-
     if (parent_)
         return parent_->get_variable(name);
-
     throw CompileError{"Variable not defined: " + name};
 }
 
@@ -64,20 +70,15 @@ bool Scope::has_variable(const string& name) const
 
 bool Scope::is_variable_local(const VarPtr& var) const
 {
-    VarPtr tmp = var;
-    while (tmp->parent())
-        tmp = tmp->parent();
-    return is_variable_local(tmp->name());
+    return is_variable_local(var->oldest()->name());
 }
 
 bool Scope::is_variable_local(const string& name) const
 {
     if (contains(variables_, name))
         return true;
-
     if (parent_)
         return parent_->is_variable_local(name) and is_inline();
-
     throw CompileError{"Variable not defined: " + name};
 }
 
@@ -98,41 +99,6 @@ void Scope::add_function(FuncPtr func)
 
 namespace
 {
-    bool is_match(
-        const Function& func,
-        const vector<TypePtr>& return_types,
-        const string& name,
-        const TypePtr& template_type,
-        const ArgumentList& args
-    )
-    {
-        if (name != func.name())
-            return false;
-
-        if (not return_types.empty() and not func.return_type()->is_compatible(return_types))
-            return false;
-
-        if (template_type)
-        {
-            if (not func.has_template_type())
-                return false;
-            if (not template_type->is_compatible(func.template_type()))
-                return false;
-        }
-
-        if (args.size() > func.max_arity() or args.size() < func.min_arity())
-            return false;
-
-        for (const Argument& arg : args)
-        {
-            TypePtr param_type = func.parameters()[arg].type();
-            if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
-                return false;
-        }
-
-        return true;
-    }
-
     vector<FuncPtr> default_functions(const vector<FuncPtr>& funcs)
     {
         vector<FuncPtr> def_funcs;
@@ -153,17 +119,12 @@ vector<FuncPtr> Scope::get_functions(
     const ArgumentList& args
 ) const
 {
-    vector<FuncPtr> funcs;
-    for (const FuncPtr& func : functions_)
-    {
-        if (is_match(*func, return_types, name, template_type, args))
-            funcs.push_back(func);
-    }
+    vector<FuncPtr> funcs = get_matching_functions(functions_, return_types, name, template_type, args);
 
     if (funcs.empty() and parent_)
         funcs = parent_->get_functions(return_types, name, template_type, args);
 
-    if (funcs.empty())
+    if (funcs.empty() and is_youngest_)
     {
         throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
     }
@@ -193,22 +154,13 @@ FuncPtr Scope::get_function(
     return funcs[0];
 }
 
-vector<FuncPtr> Scope::get_all_functions(const string& name) const
+Scope& Scope::get_defining_scope(const FuncPtr& func)
 {
-    vector<FuncPtr> funcs;
-    for (const FuncPtr& func : functions_)
-    {
-        if (name == func->name())
-            funcs.push_back(func);
-    }
-
+    if (contains(functions_, func))
+        return *this;
     if (parent_)
-    {
-        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
-        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
-    }
-
-    return funcs;
+        return parent_->get_defining_scope(func);
+    throw CompileError{"Function not defined: " + func->name()};
 }
 
 void Scope::add_type(TypePtr type)
@@ -275,4 +227,22 @@ TypePtr Scope::get_type(const string& name) const
     if (parent_)
         return parent_->get_type(name);
     throw CompileError{"Type '" + name + "' not defined"};
+}
+
+vector<FuncPtr> Scope::get_all_functions(const string& name) const
+{
+    vector<FuncPtr> funcs;
+    for (const FuncPtr& func : functions_)
+    {
+        if (name == func->name())
+            funcs.push_back(func);
+    }
+
+    if (parent_)
+    {
+        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
+        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
+    }
+
+    return funcs;
 }

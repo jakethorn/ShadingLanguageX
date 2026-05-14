@@ -13,8 +13,8 @@
     <input name="in2" type="float" value="6" />
   </multiply>
   <some_func name="node2" type="float">
-    <input name="nonlocal_in__b__1" type="float" value="6" />
     <input name="nonlocal_in__b__0" type="float" value="5" />
+    <input name="nonlocal_in__b__1" type="float" value="6" />
   </some_func>
   <multiply name="node3" type="float">
     <input name="in1" type="float" value="5" />

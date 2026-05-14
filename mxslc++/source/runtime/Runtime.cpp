@@ -29,9 +29,9 @@ MtlXSerializer& Runtime::serializer()
     return serializer_;
 }
 
-void Runtime::enter_scope()
+void Runtime::enter_scope(string name)
 {
-    scope_ = std::make_unique<Scope>(std::move(scope_));
+    scope_ = std::make_unique<Scope>(std::move(name), std::move(scope_));
 }
 
 void Runtime::exit_scope()

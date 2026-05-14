@@ -7,7 +7,6 @@
 
 #include <utility>
 
-#include "ModifierList.h"
 #include "Field.h"
 
 class Type
@@ -15,8 +14,11 @@ class Type
     friend class Scope;
 
 public:
-    Type(ModifierList mods, string name, vector<Field> fields)
-        : mods_{std::move(mods)}, name_{std::move(name)}, fields_{std::move(fields)} { }
+    Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods)
+        : name_{std::move(name)}, fields_{std::move(fields)}, methods_{std::move(methods)} { }
+
+    Type(string name, vector<Field> fields)
+        : name_{std::move(name)}, fields_{std::move(fields)} { }
 
     explicit Type(string name) : name_{std::move(name)} { }
     explicit Type(vector<Field> fields) : fields_{std::move(fields)} { }
@@ -28,23 +30,32 @@ public:
             fields_.emplace_back(field);
     }
 
-    const ModifierList& modifiers() const { return mods_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
     const vector<Field>& fields() const { return fields_; }
 
     TypePtr instantiate_template_types(const TypePtr& template_type) const;
 
+    void add_field(Field field) { fields_.push_back(std::move(field)); }
     size_t field_count() const { return fields_.size(); }
     bool has_fields() const { return field_count() > 0; }
     bool has_field(const string& name) const;
-
     const Field& field(size_t index) const;
     const Field& field(const string& name) const;
     const string& field_name(const size_t index) const { return field(index).name(); }
     size_t field_index(const string& name) const;
     TypePtr field_type(const size_t index) const { return field(index).type(); }
     TypePtr field_type(const string& name) const { return field(name).type(); }
+
+    void add_method(weak_ptr<Function> method)
+    {
+        methods_.push_back(std::move(method));
+    }
+
+    vector<FuncPtr> methods() const
+    {
+        return lock(methods_);
+    }
 
     template<typename T>
     bool is() const
@@ -98,9 +109,9 @@ protected:
     void set_resolved() { is_resolved_ = true; }
     
 private:
-    ModifierList mods_;
     string name_;
     vector<Field> fields_;
+    vector<weak_ptr<Function>> methods_;
 
     bool is_resolved_ = false;
 };

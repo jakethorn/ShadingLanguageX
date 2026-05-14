@@ -20,6 +20,16 @@ vector<Dst> cast_vector(const vector<Src>& src)
 }
 
 template<typename T>
+vector<shared_ptr<T>> lock(const vector<weak_ptr<T>>& src)
+{
+    vector<shared_ptr<T>> dst;
+    dst.reserve(src.size());
+    for (const weak_ptr<T>& t : src)
+        dst.push_back(t.lock());
+    return dst;
+}
+
+template<typename T>
 optional<T> as_optional(const bool pred, const T& value)
 {
     if (pred)

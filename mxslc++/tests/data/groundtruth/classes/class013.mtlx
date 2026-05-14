@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="node1" type="float" />
+  <randomfloat name="node2" type="float" />
+  <multiply name="node3" type="float">
+    <input name="in1" type="float" nodename="node2" />
+    <input name="in2" type="float" value="3" />
+  </multiply>
+  <multiply name="node4" type="float">
+    <input name="in1" type="float" nodename="node1" />
+    <input name="in2" type="float" nodename="node3" />
+  </multiply>
+</materialx>

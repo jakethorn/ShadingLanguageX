@@ -23,12 +23,6 @@ void UnnamedConstructor::init_subexpressions(const vector<TypePtr>& types)
     if (expressions_are_initialized())
         return;
 
-    if (exprs_.size() == 1)
-    {
-        exprs_.at(0)->init(types);
-        return;
-    }
-
     while (initialized_expr_count_ < exprs_.size())
     {
         const size_t prev_initialized_expr_count = initialized_expr_count_;

@@ -24,8 +24,7 @@ ExprPtr NamedConstructor::instantiate_template_types(const TypePtr& template_typ
 void NamedConstructor::init_impl(const vector<TypePtr>& types)
 {
     const TypePtr type = scope().get_type(token_.lexeme());
-    Token func_name{TokenType::Identifier, "__" + type->name() + "__"};
-    func_call_ = std::make_shared<FunctionCall>(std::move(func_name), std::move(args_));
+    func_call_ = std::make_shared<FunctionCall>("__" + type->name() + "__", std::move(args_));
     func_call_->init(type);
 }
 

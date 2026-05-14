@@ -1,0 +1,35 @@
+class Point
+{
+    float x;
+    float y;
+
+    float extent()
+    {
+        return max(this.x, this.y);
+    }
+}
+
+class Sphere
+{
+    float radius;
+
+    float extent(Point p)
+    {
+        float pe1 = p.extent();
+        float pe2 = p.extent();
+        return pe1 + pe2 + this.radius;
+    }
+
+    vec2 extent2d(Point p)
+    {
+        float x = this.extent(p) + p.x;
+        float y = this.extent(p) + p.y;
+        return vec2{x, y};
+    }
+}
+
+Point p = {1.0, 2.0};
+mutable Sphere s = {3.0};
+s.extent(p);
+s.radius = 6.0;
+s.extent2d({4.0, 5.0});

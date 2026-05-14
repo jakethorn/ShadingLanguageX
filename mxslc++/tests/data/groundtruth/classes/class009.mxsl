@@ -1,0 +1,15 @@
+class Sphere
+{
+    vec2 center;
+    float radius;
+
+    void expand(float amount)
+    {
+        this.radius = this.radius + amount;
+    }
+}
+
+mutable Sphere s = {vec2{0.0, 0.0}, 3.0};
+s.expand(1.0);
+print s.radius;
+print s.center * s.radius;

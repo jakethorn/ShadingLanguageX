@@ -20,12 +20,14 @@ public:
 
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
+    const ModifierList& modifiers() const { return mods_; }
+    TypePtr type() const;
+    const string& name() const;
+
 protected:
     void execute_impl() const override;
 
 private:
-    const string& name() const { return token_.lexeme(); }
-
     ModifierList mods_;
     TypePtr type_;
     ExprPtr expr_;

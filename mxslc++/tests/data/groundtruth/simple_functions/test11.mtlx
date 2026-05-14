@@ -12,7 +12,7 @@
     <output name="out__p__0" type="float" value="5" />
     <output name="out__p__1" type="float" interfacename="p__0" />
   </nodegraph>
-  <foo name="node1" type="integer">
+  <foo name="node1" type="multioutput">
     <input name="p__0" type="float" value="1" />
     <input name="p__1" type="float" value="2" />
     <output name="out__p__0" type="float" />

@@ -34,11 +34,15 @@ public:
     size_t child_count() const;
     VarPtr child(size_t index);
     VarPtr child(const string& field_name);
+    VarPtr oldest();
 
     bool has_value() const;
     ValuePtr value();
     ValuePtr raw_value() const;
-    void copy_value(const VarPtr& other);
+
+    VarPtr copy();
+    void copy(const VarPtr& other);
+    bool equals(const VarPtr& other) const;
 
     void uninitialize();
 
@@ -67,11 +71,10 @@ public:
 
 protected:
     virtual ValuePtr value_impl() const { return value_; }
-    virtual void set_value_impl(ValuePtr value) { value_ = std::move(value); }
+    virtual void copy_value_impl(ValuePtr value) { value_ = std::move(value); }
 
 private:
-    void set_parent(weak_ptr<Variable> parent);
-    void set_value(ValuePtr value);
+    void copy_value(ValuePtr value);
     void copy_children(const vector<VarPtr>& children);
 
     static void throw_error(const string& message);

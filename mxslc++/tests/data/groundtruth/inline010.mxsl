@@ -1,0 +1,8 @@
+inline float foo()
+{
+    float x = 7.0;
+    return x;
+}
+
+float a = foo();
+float b = a * randomfloat();

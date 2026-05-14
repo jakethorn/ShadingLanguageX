@@ -32,6 +32,16 @@ StmtPtr VariableDefinition::instantiate_template_types(const TypePtr& template_t
     return std::make_unique<VariableDefinition>(mods_, std::move(type), token_, std::move(expr));
 }
 
+TypePtr VariableDefinition::type() const
+{
+    return scope().resolve_type(type_);
+}
+
+const string& VariableDefinition::name() const
+{
+    return token_.lexeme();
+}
+
 void VariableDefinition::execute_impl() const
 {
     const TypePtr type = scope().resolve_type(type_);

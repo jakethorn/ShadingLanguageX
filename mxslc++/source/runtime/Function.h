@@ -55,11 +55,17 @@ public:
 
     VarPtr invoke() const;
 
-    void add_nonlocal_input(const string& name, const VarPtr& var) { nonlocal_inputs_[name] = var; }
-    void add_nonlocal_output(const string& name, const VarPtr& var) { nonlocal_outputs_[name] = var; }
-    const unordered_map<string, VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
-    const unordered_map<string, VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
-    string nonlocal_name(const Parameter& param) const;
+    void add_nonlocal_input(VarPtr var) { nonlocal_inputs_.push_back(std::move(var)); }
+    void add_nonlocal_output(VarPtr var) { nonlocal_outputs_.push_back(std::move(var)); }
+    const vector<VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
+    const vector<VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
+
+    TypePtr class_type() const { return class_type_.lock(); }
+    void set_class_type(weak_ptr<Type> type) { class_type_ = std::move(type); }
+    bool has_class_type() const { return not class_type_.expired(); }
+
+    bool mutates_instance() const { return mutates_instance_; }
+    void set_mutates_instance(const bool value) { mutates_instance_ = value; }
 
     string str() const;
 
@@ -74,8 +80,11 @@ private:
     mx::NodeDefPtr node_def_;
     bool is_initialized_ = false;
 
-    unordered_map<string, VarPtr> nonlocal_inputs_;
-    unordered_map<string, VarPtr> nonlocal_outputs_;
+    vector<VarPtr> nonlocal_inputs_;
+    vector<VarPtr> nonlocal_outputs_;
+
+    weak_ptr<Type> class_type_;
+    bool mutates_instance_ = false;
 };
 
 #endif //MXSLC_FUNCTION_H

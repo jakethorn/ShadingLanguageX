@@ -1,0 +1,29 @@
+class Point
+{
+    float x;
+    float y;
+
+    float extent(float offset)
+    {
+        float max_dim()
+        {
+            return max(this.x, this.y);
+        }
+
+        return max_dim() - offset;
+    }
+}
+
+class Sphere
+{
+    float radius;
+
+    float extent(Point p)
+    {
+        return p.extent(this.radius);
+    }
+}
+
+Point p = {1.0, 2.0};
+Sphere s = {3.0};
+s.extent(p);

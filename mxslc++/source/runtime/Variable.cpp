@@ -109,6 +109,14 @@ VarPtr Variable::child(const string& field_name)
     return child(type_->field_index(field_name));
 }
 
+VarPtr Variable::oldest()
+{
+    if (has_parent())
+        return parent()->oldest();
+    else
+        return shared_from_this();
+}
+
 bool Variable::has_value() const
 {
     return value_impl() != nullptr;
@@ -131,7 +139,12 @@ ValuePtr Variable::raw_value() const
     return value_impl();
 }
 
-void Variable::copy_value(const VarPtr& other)
+VarPtr Variable::copy()
+{
+    return create(shared_from_this());
+}
+
+void Variable::copy(const VarPtr& other)
 {
     if (is_initialized_)
     {
@@ -143,11 +156,35 @@ void Variable::copy_value(const VarPtr& other)
 
     if (other->has_value())
     {
-        set_value(other->value());
+        copy_value(other->value());
     }
     else
     {
         copy_children(other->children_);
+    }
+}
+
+bool Variable::equals(const VarPtr& other) const
+{
+    if (has_value() != other->has_value())
+        return false;
+
+    if (has_value())
+    {
+        return value_impl()->equals(other->value_impl());
+    }
+    else
+    {
+        if (child_count() != other->child_count())
+            return false;
+
+        for (size_t i = 0; i < child_count(); i++)
+        {
+            if (not children_[i]->equals(other->children_[i]))
+                return false;
+        }
+
+        return true;
     }
 }
 
@@ -167,7 +204,19 @@ Scope& Variable::defining_scope()
 
 void Variable::add_to_scope(string name)
 {
-    Runtime::get().scope().add_variable(std::move(name), shared_from_this());
+    Runtime::get().scope().add_variable(name, shared_from_this());
+
+    if (name == "this"s)
+    {
+        // also bring in children
+        for (size_t i = 0; i < child_count(); ++i)
+        {
+            const string& child_name = type()->field_name(i);
+            if (Runtime::get().scope().has_variable(child_name))
+                continue;
+            child(i)->add_to_scope(child_name);
+        }
+    }
 }
 
 string Variable::str() const
@@ -197,14 +246,14 @@ VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<VarPtr>& c
 VarPtr Variable::create(ModifierList mods, TypePtr type, ValuePtr value)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-    var->set_value(std::move(value));
+    var->copy_value(std::move(value));
     return var;
 }
 
 VarPtr Variable::create(ModifierList mods, TypePtr type, const VarPtr& value)
 {
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-    var->copy_value(value);
+    var->copy(value);
     return var;
 }
 
@@ -234,16 +283,11 @@ VarPtr Variable::create(const VarPtr& value)
     return create(ModifierList{}, value->type(), value);
 }
 
-void Variable::set_parent(weak_ptr<Variable> parent)
-{
-    parent_ = std::move(parent);
-}
-
-void Variable::set_value(ValuePtr value)
+void Variable::copy_value(ValuePtr value)
 {
     if (is_temporary() or is_local())
     {
-        set_value_impl(std::move(value));
+        copy_value_impl(std::move(value));
     }
     else
     {
@@ -259,7 +303,7 @@ void Variable::copy_children(const vector<VarPtr>& children)
     for (size_t i = 0; i < children.size(); ++i)
     {
         VarPtr child = create(type_->field(i).modifiers(), type_->field_type(i), children[i]);
-        child->set_parent(weak_from_this());
+        child->parent_ = weak_from_this();
         if (not name_.empty())
             child->set_name(get_port_name(name_, i));
         children_.push_back(std::move(child));

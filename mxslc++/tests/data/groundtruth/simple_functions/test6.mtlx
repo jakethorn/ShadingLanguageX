@@ -13,7 +13,7 @@
     <output name="out" type="integer" value="0" />
     <output name="out__y" type="float" nodename="node1" />
   </nodegraph>
-  <foo name="node1" type="integer">
+  <foo name="node1" type="multioutput">
     <input name="x" type="float" value="1" />
     <output name="out__y" type="float" />
     <output name="out" type="integer" />

@@ -19,7 +19,7 @@ ValuePtr InputVariable::value_impl() const
     return ValueFactory::copy_value_from_port(input_);
 }
 
-void InputVariable::set_value_impl(const ValuePtr value)
+void InputVariable::copy_value_impl(const ValuePtr value)
 {
     value->set_as_node_input(input_);
 }

@@ -7,10 +7,12 @@
 #include "CompileError.h"
 #include "runtime/Runtime.h"
 
-void Statement::execute() const
+void Statement::execute()
 {
     try
     {
+        if (not is_initialized_)
+            init();
         execute_impl();
     }
     catch (const CompileError& e)

@@ -15,7 +15,7 @@
     <output name="out__y__0" type="float" interfacename="x" />
     <output name="out__y__1" type="float" value="7" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="node1" type="multioutput">
     <input name="x" type="float" value="3" />
     <output name="out__y__0" type="float" />
     <output name="out__y__1" type="float" />

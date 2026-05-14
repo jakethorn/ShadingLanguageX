@@ -10,6 +10,7 @@
 #include "Scope.h"
 #include "Type.h"
 #include "CompileError.h"
+#include "Variable.h"
 
 Function::Function(
     ModifierList mods,
@@ -131,11 +132,6 @@ VarPtr Function::invoke() const
         return_expr_->init(return_type_);
         return return_expr_->evaluate();
     }
-}
-
-string Function::nonlocal_name(const Parameter& param) const
-{
-    return name_ + "_" + (template_type_ ? template_type_->name() : ""s) + "__" + param.name();
 }
 
 string Function::str() const

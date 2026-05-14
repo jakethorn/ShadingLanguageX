@@ -5,7 +5,6 @@
 #include "ExpressionFactory.h"
 #include "utils/common.h"
 #include "FunctionCall.h"
-#include "FunctionCall.h"
 #include "runtime/ArgumentList.h"
 
 ExprPtr ExpressionFactory::binary(ExprPtr left, Token op, ExprPtr right)
@@ -27,10 +26,9 @@ ExprPtr ExpressionFactory::binary(ExprPtr left, Token op, ExprPtr right)
         {"|"s, "__or__"},
     };
 
-    op.set_lexeme(op_names.at(op.type()));
-
+    string dunder_name = op_names.at(op.type());
     ArgumentList args{std::move(left), std::move(right)};
-    return std::make_unique<FunctionCall>(std::move(op), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(dunder_name), std::move(args), std::move(op));
 }
 
 ExprPtr ExpressionFactory::ternary_relational(ExprPtr left, Token op1, ExprPtr middle, Token op2, ExprPtr right)
@@ -44,11 +42,9 @@ ExprPtr ExpressionFactory::ternary_relational(ExprPtr left, Token op1, ExprPtr m
         {"<="s, "le"},
     };
 
-    const string s = "__" + op_names.at(op1.type()) + "_" + op_names.at(op2.type()) + "__";
-    op1.set_lexeme(s);
-
+    string dunder_name = "__" + op_names.at(op1.type()) + "_" + op_names.at(op2.type()) + "__";
     ArgumentList args{std::move(left), std::move(middle), std::move(right)};
-    return std::make_unique<FunctionCall>(std::move(op1), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(dunder_name), std::move(args), std::move(op1));
 }
 
 ExprPtr ExpressionFactory::unary(Token op, ExprPtr right)
@@ -59,14 +55,13 @@ ExprPtr ExpressionFactory::unary(Token op, ExprPtr right)
         {'!', "__not__"},
     };
 
-    op.set_lexeme(op_names.at(op.type()));
-
+    string dunder_name = op_names.at(op.type());
     ArgumentList args{std::move(right)};
-    return std::make_unique<FunctionCall>(std::move(op), std::move(args));
+    return std::make_unique<FunctionCall>(std::move(dunder_name), std::move(args), std::move(op));
 }
 
-ExprPtr ExpressionFactory::if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr)
+ExprPtr ExpressionFactory::if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr, Token token)
 {
     ArgumentList args{std::move(cond_expr), std::move(then_expr), std::move(else_expr)};
-    return std::make_shared<FunctionCall>(Token{TokenType::Identifier, "__if__"s}, std::move(args));
+    return std::make_shared<FunctionCall>("__if__"s, std::move(args), std::move(token));
 }

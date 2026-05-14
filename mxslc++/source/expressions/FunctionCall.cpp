@@ -7,6 +7,8 @@
 #include <cassert>
 
 #include "CompileError.h"
+#include "MethodCall.h"
+#include "ThisExpression.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
@@ -16,30 +18,47 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
-FunctionCall::FunctionCall(Token name, TypePtr template_type, ArgumentList args, AttributeList attrs)
-    : Expression{std::move(name)}, template_type_{std::move(template_type)}, args_{std::move(args)}
+FunctionCall::FunctionCall(string name, ArgumentList args)
+    : FunctionCall{std::move(name), std::move(args), Token{}}
+{
+
+}
+
+FunctionCall::FunctionCall(string name, ArgumentList args, Token token)
+    : FunctionCall{std::move(name), nullptr, std::move(args), std::move(token)}
+{
+
+}
+
+FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args)
+    : FunctionCall{std::move(name), std::move(template_type), std::move(args), Token{}}
+{
+
+}
+
+FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args, Token token)
+    : FunctionCall{std::move(name), std::move(template_type), std::move(args), AttributeList{}, std::move(token)}
+{
+
+}
+
+FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs)
+    : FunctionCall{std::move(name), std::move(template_type), std::move(args), std::move(attrs), Token{}}
+{
+
+}
+
+FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs, Token token)
+    : Expression{std::move(token)}, name_{std::move(name)}, template_type_{std::move(template_type)}, args_{std::move(args)}
 {
     set_attributes(std::move(attrs));
 }
 
-FunctionCall::FunctionCall(Token name, TypePtr template_type, ArgumentList args)
-    : FunctionCall{std::move(name), std::move(template_type), std::move(args), AttributeList{}}
-{
-
-}
-
-FunctionCall::FunctionCall(Token name, ArgumentList args)
-    : FunctionCall{std::move(name), nullptr, std::move(args)}
-{
-
-}
-
 ExprPtr FunctionCall::instantiate_template_types(const TypePtr& template_type) const
 {
-    Token name = token_.instantiate_template_types(template_type);
     TypePtr _template_type = ::instantiate_template_types(template_type_, template_type);
     ArgumentList args = args_.instantiate_template_types(template_type);
-    return std::make_unique<FunctionCall>(std::move(name), std::move(_template_type), std::move(args), attrs_);
+    return std::make_unique<FunctionCall>(name_, std::move(_template_type), std::move(args), attrs_, token_);
 }
 
 void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
@@ -53,7 +72,7 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
     size_t initialized_arg_count = initialized_arg_count_;
     while (initialized_arg_count < args_.size())
     {
-        vector<FuncPtr> matching_funcs = scope().get_functions(types, name(), template_type_, args_);
+        vector<FuncPtr> matching_funcs = get_matching_functions(types);
         assert(not matching_funcs.empty());
 
         const size_t prev_initialized_arg_count = initialized_arg_count;
@@ -62,7 +81,7 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
         if (initialized_arg_count == prev_initialized_arg_count)
         {
             // init failed, try to init with a default function...
-            FuncPtr default_func = scope().get_function(types, name(), template_type_, args_);
+            FuncPtr default_func = get_matching_function(types);
             initialized_arg_count = try_init_arguments(vector<FuncPtr>{std::move(default_func)});
 
             if (initialized_arg_count == prev_initialized_arg_count)
@@ -73,10 +92,16 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
 
 void FunctionCall::init_impl(const vector<TypePtr>& types)
 {
-    func_ = Runtime::get().scope().get_function(types, name(), template_type_, args_);
-
+    func_ = get_matching_function(types);
     for (const Argument& arg : args_)
         arg.validate(func_->parameters()[arg]);
+
+    if (func_->has_class_type() and method_call_ == nullptr)
+    {
+        ExprPtr instance = std::make_unique<ThisExpression>(token_);
+        method_call_ = std::make_shared<MethodCall>(std::move(instance), std::move(name_), std::move(template_type_), std::move(args_), std::move(attrs_), std::move(token_));
+        method_call_->init();
+    }
 }
 
 TypePtr FunctionCall::type_impl() const
@@ -86,11 +111,16 @@ TypePtr FunctionCall::type_impl() const
 
 VarPtr FunctionCall::evaluate_impl() const
 {
+    if (func_->has_class_type())
+    {
+        return evaluate_as_method();
+    }
+
     if (func_->is_inline())
     {
         Runtime::get().enter_scope();
         evaluate_arguments();
-        VarPtr return_value = func_->invoke();
+        VarPtr return_value = inline_invoke();
         update_out_arguments();
         Runtime::get().exit_scope();
         return return_value;
@@ -101,9 +131,58 @@ VarPtr FunctionCall::evaluate_impl() const
     }
 }
 
-const string& FunctionCall::name() const
+vector<FuncPtr> FunctionCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    return token_.lexeme();
+    return scope().get_functions(return_types, name_, template_type_, args_);
+}
+
+FuncPtr FunctionCall::get_matching_function(const vector<TypePtr>& return_types) const
+{
+    return scope().get_function(return_types, name_, template_type_, args_);
+}
+
+// inline only
+void FunctionCall::evaluate_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
+        if (param.is_in())
+        {
+            const VarPtr arg_value = args_.evaluate(param);
+            const VarPtr arg_value_copy = Variable::create(std::move(mods), param.type(), arg_value);
+            arg_value_copy->add_to_scope(param.name());
+        }
+        else
+        {
+            const VarPtr default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
+            default_value->set_modifiers(std::move(mods));
+            default_value->add_to_scope(param.name());
+        }
+    }
+}
+
+// inline only
+VarPtr FunctionCall::inline_invoke() const
+{
+    const VarPtr return_value = func_->invoke();
+    if (return_value == nullptr)
+        return nullptr;
+    return return_value->copy();
+}
+
+// inline only
+void FunctionCall::update_out_arguments() const
+{
+    for (const Parameter& param : func_->parameters())
+    {
+        if (param.is_out())
+        {
+            const VarPtr nonlocal = args_.evaluate(param);
+            const VarPtr local = Runtime::get().scope().get_variable(param.name());
+            nonlocal->copy(local);
+        }
+    }
 }
 
 namespace
@@ -165,37 +244,7 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     return initialized_arg_count;
 }
 
-// inline only
-void FunctionCall::evaluate_arguments() const
+VarPtr FunctionCall::evaluate_as_method() const
 {
-    for (const Parameter& param : func_->parameters())
-    {
-        ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
-        if (param.is_in())
-        {
-            const VarPtr arg_value = args_.evaluate(param);
-            const VarPtr arg_value_copy = Variable::create(std::move(mods), param.type(), arg_value);
-            arg_value_copy->add_to_scope(param.name());
-        }
-        else
-        {
-            const VarPtr default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
-            default_value->set_modifiers(std::move(mods));
-            default_value->add_to_scope(param.name());
-        }
-    }
-}
-
-// inline only
-void FunctionCall::update_out_arguments() const
-{
-    for (const Parameter& param : func_->parameters())
-    {
-        if (param.is_out())
-        {
-            const VarPtr nonlocal = args_.evaluate(param);
-            const VarPtr local = Runtime::get().scope().get_variable(param.name());
-            nonlocal->copy_value(local);
-        }
-    }
+    return method_call_->evaluate();
 }

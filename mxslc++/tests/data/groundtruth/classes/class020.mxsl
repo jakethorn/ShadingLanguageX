@@ -1,0 +1,36 @@
+class A
+{
+    float a;
+
+    float foo()
+    {
+        return this.a * randomfloat(1);
+    }
+
+    inline float inline_foo()
+    {
+        return this.a * randomfloat(2);
+    }
+
+    float foo2()
+    {
+        return a * randomfloat(3);
+    }
+
+    inline float inline_foo2()
+    {
+        return a * randomfloat(4);
+    }
+}
+
+A x = {10.0};
+print x.foo();
+print x.inline_foo();
+print x.foo2();
+print x.inline_foo2();
+
+A y = {20.0};
+print y.foo();
+print y.inline_foo();
+print y.foo2();
+print y.inline_foo2();

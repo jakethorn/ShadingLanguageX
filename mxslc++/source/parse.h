@@ -24,18 +24,20 @@ vector<StmtPtr> parse(vector<Token> tokens);
 class Parser final : protected TokenReader
 {
 public:
-    explicit Parser(vector<Token> tokens_);
+    explicit Parser(vector<Token> tokens);
 
     vector<StmtPtr> parse();
 
-private:
     StmtPtr statement();
+    StmtPtr bare_statement();
     StmtPtr print_statement();
     StmtPtr variable_definition(ModifierList mods, TypePtr type);
     StmtPtr multi_variable_definition(ModifierList mods, TypePtr type_);
     StmtPtr variable_assignment(ExprPtr lhs);
     StmtPtr function_definition(ModifierList mods, TypePtr type);
     StmtPtr function_definition_modern(ModifierList mods);
+    StmtPtr class_definition();
+    StmtPtr constructor_definition();
     StmtPtr using_declaration();
     StmtPtr for_loop();
     StmtPtr expression_statement(ExprPtr expr);
@@ -65,6 +67,7 @@ private:
     ExprPtr primary();
     ExprPtr if_expression(ExprPtr else_expr = nullptr);
     ExprPtr function_call();
+    ExprPtr method_call(ExprPtr instance);
     ExprPtr named_constructor();
     ExprPtr unnamed_constructor();
     ExprPtr variable_definition_argument(ModifierList mods);
@@ -90,8 +93,9 @@ private:
         return args;
     }
 
-    bool is_type() const;
-    bool is_templated_function() const;
+    bool is_typed_definition() const;
+    bool is_function_call() const;
+    bool is_constructor_definition() const;
 };
 
 #endif //FENNEC_PARSE_H

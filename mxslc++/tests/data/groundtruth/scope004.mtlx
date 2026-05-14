@@ -13,9 +13,9 @@
     <output name="out" type="float" value="0" />
   </nodegraph>
   <foo name="node1" type="multioutput">
-    <output name="nonlocal_out__c" type="float" />
-    <output name="nonlocal_out__b" type="float" />
     <output name="nonlocal_out__a" type="float" />
+    <output name="nonlocal_out__b" type="float" />
+    <output name="nonlocal_out__c" type="float" />
     <output name="out" type="float" />
   </foo>
   <divide name="node2" type="float">

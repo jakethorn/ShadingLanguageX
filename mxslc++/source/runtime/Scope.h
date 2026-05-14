@@ -14,11 +14,16 @@ class Scope
 public:
     Scope();
     explicit Scope(ScopePtr parent);
+    Scope(string name, ScopePtr parent);
 
     ScopePtr exit()
     {
+        parent_->is_youngest_ = true;
         return std::move(parent_);
     }
+
+    bool has_parent() const { return parent_ != nullptr; }
+    Scope& parent() const { return *parent_; }
 
     mx::GraphElementPtr graph() const { return graph_; }
     pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
@@ -53,7 +58,7 @@ public:
         const TypePtr& template_type,
         const ArgumentList& args
     ) const;
-    vector<FuncPtr> get_all_functions(const string& name) const;
+    Scope& get_defining_scope(const FuncPtr& func);
 
     /*
      * types
@@ -68,7 +73,11 @@ public:
     TypePtr get_type(const string& name) const;
 
 private:
+    vector<FuncPtr> get_all_functions(const string& name) const;
+
+    string name_;
     ScopePtr parent_;
+    bool is_youngest_ = true;
 
     unordered_map<string, VarPtr> variables_;
     vector<FuncPtr> functions_;

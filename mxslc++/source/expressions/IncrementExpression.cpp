@@ -31,16 +31,15 @@ TypePtr IncrementExpression::type_impl() const
 
 VarPtr IncrementExpression::evaluate_impl() const
 {
-    VarPtr var = expr_->evaluate();
-    VarPtr pre_var = Variable::create(var);
+    const VarPtr var = expr_->evaluate();
+    VarPtr pre_var = var->copy();
 
-    Token func_name{TokenType::Identifier, increment_ ? "__inc__"s : "__dec__"s};
     ArgumentList args{expr_};
-    ExprPtr func_call = std::make_shared<FunctionCall>(std::move(func_name), std::move(args));
+    const ExprPtr func_call = std::make_shared<FunctionCall>(increment_ ? "__inc__"s : "__dec__"s, std::move(args));
 
     func_call->init(expr_->type());
     VarPtr inc_var = func_call->evaluate();
-    var->copy_value(inc_var);
+    var->copy(inc_var);
 
     if (prefix_)
         return inc_var;

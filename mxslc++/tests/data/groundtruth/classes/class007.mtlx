@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_Point_extent" node="Point_extent">
+    <output name="out" type="float" />
+    <input name="this__0" type="float" />
+    <input name="this__1" type="float" />
+  </nodedef>
+  <nodegraph name="NG_Point_extent" nodedef="ND_Point_extent">
+    <max name="node1" type="float">
+      <input name="in1" type="float" interfacename="this__0" />
+      <input name="in2" type="float" interfacename="this__1" />
+    </max>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_Sphere_extent" node="Sphere_extent">
+    <output name="out" type="float" />
+    <input name="p__0" type="float" value="0" />
+    <input name="p__1" type="float" value="0" />
+    <input name="this__0" type="float" />
+  </nodedef>
+  <nodegraph name="NG_Sphere_extent" nodedef="ND_Sphere_extent">
+    <Point_extent name="node1" type="float">
+      <input name="this__0" type="float" interfacename="p__0" />
+      <input name="this__1" type="float" interfacename="p__1" />
+    </Point_extent>
+    <Point_extent name="node2" type="float">
+      <input name="this__0" type="float" interfacename="p__0" />
+      <input name="this__1" type="float" interfacename="p__1" />
+    </Point_extent>
+    <add name="node3" type="float">
+      <input name="in1" type="float" nodename="node1" />
+      <input name="in2" type="float" nodename="node2" />
+    </add>
+    <add name="node4" type="float">
+      <input name="in1" type="float" nodename="node3" />
+      <input name="in2" type="float" interfacename="this__0" />
+    </add>
+    <output name="out" type="float" nodename="node4" />
+  </nodegraph>
+  <nodedef name="ND_Sphere_extent2d" node="Sphere_extent2d">
+    <output name="out" type="vector2" />
+    <input name="p__0" type="float" value="0" />
+    <input name="p__1" type="float" value="0" />
+    <input name="this__0" type="float" />
+  </nodedef>
+  <nodegraph name="NG_Sphere_extent2d" nodedef="ND_Sphere_extent2d">
+    <Sphere_extent name="node1" type="float">
+      <input name="p__0" type="float" interfacename="p__0" />
+      <input name="p__1" type="float" interfacename="p__1" />
+      <input name="this__0" type="float" interfacename="this__0" />
+    </Sphere_extent>
+    <add name="node2" type="float">
+      <input name="in1" type="float" nodename="node1" />
+      <input name="in2" type="float" interfacename="p__0" />
+    </add>
+    <Sphere_extent name="node3" type="float">
+      <input name="p__0" type="float" interfacename="p__0" />
+      <input name="p__1" type="float" interfacename="p__1" />
+      <input name="this__0" type="float" interfacename="this__0" />
+    </Sphere_extent>
+    <add name="node4" type="float">
+      <input name="in1" type="float" nodename="node3" />
+      <input name="in2" type="float" interfacename="p__1" />
+    </add>
+    <combine2 name="node5" type="vector2">
+      <input name="in1" type="float" nodename="node2" />
+      <input name="in2" type="float" nodename="node4" />
+    </combine2>
+    <output name="out" type="vector2" nodename="node5" />
+  </nodegraph>
+  <Sphere_extent name="node1" type="float">
+    <input name="p__0" type="float" value="1" />
+    <input name="p__1" type="float" value="2" />
+    <input name="this__0" type="float" value="3" />
+  </Sphere_extent>
+  <Sphere_extent2d name="node2" type="vector2">
+    <input name="p__0" type="float" value="4" />
+    <input name="p__1" type="float" value="5" />
+    <input name="this__0" type="float" value="6" />
+  </Sphere_extent2d>
+</materialx>

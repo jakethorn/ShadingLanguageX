@@ -1,0 +1,15 @@
+class Circle
+{
+    vec2 position;
+    float radius;
+
+    Circle(float radius = 1.0)
+    {
+        position = vec2{0.0, 0.0};
+        this.radius = radius;
+    }
+}
+
+Circle c = Circle{3.0};
+Circle d = Circle{4.0};
+print c.radius * d.radius;
