@@ -62,6 +62,7 @@ public:
     ExprPtr factor();
     ExprPtr exponent();
     ExprPtr unary();
+    ExprPtr compound();
     ExprPtr increment();
     ExprPtr property();
     ExprPtr primary();

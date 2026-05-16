@@ -577,6 +577,20 @@ ExprPtr Parser::unary()
     return increment();
 }
 
+ExprPtr Parser::compound()
+{
+    ExprPtr lhs = increment();
+    if (optional<Token> op = consume("+="s, "-="s, "*="s, "/="s, "%="s, "^="s, "&="s, "|="s))
+    {
+        ExprPtr rhs = expression();
+        return std::make_unique<CompoundExpression>(std::move(lhs), std::move(*op), rhs);
+    }
+    else
+    {
+        return lhs;
+    }
+}
+
 ExprPtr Parser::increment()
 {
     optional<Token> op = consume("++"s, "--"s);
