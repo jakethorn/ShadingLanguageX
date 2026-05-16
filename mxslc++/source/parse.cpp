@@ -6,6 +6,7 @@
 
 #include "CompileError.h"
 #include "TokenReader.h"
+#include "expressions/CompoundExpression.h"
 #include "expressions/DotExpression.h"
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
@@ -573,8 +574,8 @@ ExprPtr Parser::exponent()
 ExprPtr Parser::unary()
 {
     if (optional<Token> op = consume('!', '+', '-'))
-        return ExpressionFactory::unary(std::move(*op), increment());
-    return increment();
+        return ExpressionFactory::unary(std::move(*op), compound());
+    return compound();
 }
 
 ExprPtr Parser::compound()
@@ -583,7 +584,7 @@ ExprPtr Parser::compound()
     if (optional<Token> op = consume("+="s, "-="s, "*="s, "/="s, "%="s, "^="s, "&="s, "|="s))
     {
         ExprPtr rhs = expression();
-        return std::make_unique<CompoundExpression>(std::move(lhs), std::move(*op), rhs);
+        return std::make_unique<CompoundExpression>(std::move(lhs), std::move(*op), std::move(rhs));
     }
     else
     {

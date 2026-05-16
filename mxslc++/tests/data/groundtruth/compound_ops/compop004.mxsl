@@ -1,0 +1,8 @@
+mutable float i = 5.0;
+inline float foo(float i)
+{
+    return i;
+}
+
+float j = foo(i ^= 2.0);
+float k = i * j;

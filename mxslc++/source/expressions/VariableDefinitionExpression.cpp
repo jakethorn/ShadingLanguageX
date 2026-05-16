@@ -4,9 +4,9 @@
 
 #include "VariableDefinitionExpression.h"
 
+#include "statements/VariableDefinition.h"
 #include "Identifier.h"
 #include "runtime/Variable.h"
-#include "statements/VariableDefinition.h"
 
 VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name)
     : VariableDefinitionExpression{

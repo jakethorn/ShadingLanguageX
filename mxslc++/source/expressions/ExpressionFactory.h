@@ -6,8 +6,8 @@
 #define FENNEC_EXPRESSIONFACTORY_H
 
 #include "utils/common.h"
-#include "runtime/Argument.h"
-#include "Token.h"
+
+class Token;
 
 class ExpressionFactory
 {

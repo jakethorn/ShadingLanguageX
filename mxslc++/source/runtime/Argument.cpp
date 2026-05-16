@@ -4,10 +4,8 @@
 
 #include "Argument.h"
 
-#include "statements/Statement.h"
 #include "CompileError.h"
 #include "Parameter.h"
-#include "expressions/Expression.h"
 #include "expressions/VariableDefinitionExpression.h"
 
 Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)

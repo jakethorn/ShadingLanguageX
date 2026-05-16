@@ -1,0 +1,10 @@
+int foo()
+{
+    return 0;
+}
+mutable int i = foo();
+i += 1 + 1;
+1 + i += 1;
+
+i += (1 + 1);
+1 + (i += 1);

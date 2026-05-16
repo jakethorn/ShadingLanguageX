@@ -3,7 +3,6 @@
 //
 
 #include "ExpressionFactory.h"
-#include "utils/common.h"
 #include "FunctionCall.h"
 #include "runtime/ArgumentList.h"
 
@@ -22,8 +21,8 @@ ExprPtr ExpressionFactory::binary(ExprPtr left, Token op, ExprPtr right)
         {'<', "__lt__"},
         {">="s, "__ge__"},
         {"<="s, "__le__"},
-        {"&"s, "__and__"},
-        {"|"s, "__or__"},
+        {'&', "__and__"},
+        {'|', "__or__"},
     };
 
     string dunder_name = op_names.at(op.type());

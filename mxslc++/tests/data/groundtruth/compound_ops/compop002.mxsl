@@ -1,0 +1,8 @@
+mutable float i = 5.0;
+void foo()
+{
+    i *= 2.0;
+}
+
+foo();
+float k = i * 10.0;

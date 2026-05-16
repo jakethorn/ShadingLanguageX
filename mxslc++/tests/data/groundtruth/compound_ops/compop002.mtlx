@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="integer" />
+    <input name="nonlocal_in__i" type="float" />
+    <output name="nonlocal_out__i" type="float" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <multiply name="node1" type="float">
+      <input name="in1" type="float" interfacename="nonlocal_in__i" />
+      <input name="in2" type="float" value="2" />
+    </multiply>
+    <output name="nonlocal_out__i" type="float" nodename="node1" />
+    <output name="out" type="integer" value="0" />
+  </nodegraph>
+  <foo name="node1" type="multioutput">
+    <input name="nonlocal_in__i" type="float" value="5" />
+    <output name="nonlocal_out__i" type="float" />
+    <output name="out" type="integer" />
+  </foo>
+  <multiply name="node2" type="float">
+    <input name="in1" type="float" output="nonlocal_out__i" nodename="node1" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+</materialx>

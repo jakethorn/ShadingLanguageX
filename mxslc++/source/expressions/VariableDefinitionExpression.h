@@ -6,7 +6,8 @@
 #define MXSLC_VARIABLEDEFINITIONEXPRESSION_H
 
 #include "Expression.h"
-#include "runtime/ModifierList.h"
+
+class ModifierList;
 
 class VariableDefinitionExpression final : public Expression
 {
@@ -24,8 +25,8 @@ protected:
 private:
     const string& name() const { return token_.lexeme(); }
 
-    StmtPtr var_def_ = nullptr;
-    ExprPtr identifier_ = nullptr;
+    StmtPtr var_def_;
+    ExprPtr identifier_;
 };
 
 #endif //MXSLC_VARIABLEDEFINITIONEXPRESSION_H

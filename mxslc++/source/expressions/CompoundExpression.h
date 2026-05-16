@@ -1,16 +1,16 @@
 //
-// Created by jaket on 05/05/2026.
+// Created by jaket on 15/05/2026.
 //
 
-#ifndef MXSLC_INCREMENTEXPRESSION_H
-#define MXSLC_INCREMENTEXPRESSION_H
+#ifndef MXSLC_COMPOUNDEXPRESSION_H
+#define MXSLC_COMPOUNDEXPRESSION_H
 
 #include "Expression.h"
 
-class IncrementExpression final : public Expression
+class CompoundExpression final : public Expression
 {
 public:
-    IncrementExpression(ExprPtr lhs_expr, Token op, bool prefix);
+    CompoundExpression(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -21,9 +21,9 @@ protected:
 
 private:
     ExprPtr lhs_expr_;
-    bool prefix_;
-    bool increment_;
+    ExprPtr rhs_expr_;
+
+    ExprPtr func_call_;
 };
 
-
-#endif //MXSLC_INCREMENTEXPRESSION_H
+#endif //MXSLC_COMPOUNDEXPRESSION_H

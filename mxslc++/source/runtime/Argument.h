@@ -5,9 +5,9 @@
 #ifndef FENNEC_ARGUMENT_H
 #define FENNEC_ARGUMENT_H
 
+#include "utils/common.h"
 #include "AttributeList.h"
 #include "ModifierList.h"
-#include "utils/common.h"
 
 class Parameter;
 
