@@ -12,12 +12,7 @@
     <output name="nonlocal_out__c" type="float" value="3" />
     <output name="out" type="float" value="0" />
   </nodegraph>
-  <foo name="node1" type="multioutput">
-    <output name="nonlocal_out__a" type="float" />
-    <output name="nonlocal_out__b" type="float" />
-    <output name="nonlocal_out__c" type="float" />
-    <output name="out" type="float" />
-  </foo>
+  <foo name="node1" type="multioutput" />
   <divide name="node2" type="float">
     <input name="in1" type="float" output="nonlocal_out__a" nodename="node1" />
     <input name="in2" type="float" output="nonlocal_out__b" nodename="node1" />

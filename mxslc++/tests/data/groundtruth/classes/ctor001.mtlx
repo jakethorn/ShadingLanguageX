@@ -15,13 +15,9 @@
   </nodegraph>
   <__Circle__ name="node1" type="multioutput">
     <input name="radius" type="float" value="3" />
-    <output name="out__0" type="vector2" />
-    <output name="out__1" type="float" />
   </__Circle__>
   <__Circle__ name="node2" type="multioutput">
     <input name="radius" type="float" value="4" />
-    <output name="out__0" type="vector2" />
-    <output name="out__1" type="float" />
   </__Circle__>
   <multiply name="node3" type="float">
     <input name="in1" type="float" output="out__1" nodename="node1" />

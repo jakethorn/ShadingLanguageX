@@ -25,8 +25,6 @@
   <foo name="node2" type="multioutput">
     <input name="x" type="float" value="1" />
     <input name="y" type="float" value="2" />
-    <output name="nonlocal_out__f" type="float" />
-    <output name="out" type="float" />
   </foo>
   <multiply name="node3" type="float">
     <input name="in1" type="float" output="nonlocal_out__f" nodename="node2" />

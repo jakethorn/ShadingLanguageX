@@ -15,8 +15,6 @@
   </nodegraph>
   <my_function name="node1" type="multioutput">
     <input name="z" type="float" value="2" />
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
   </my_function>
   <multiply name="node2" type="float">
     <input name="in1" type="float" output="out__0" nodename="node1" />

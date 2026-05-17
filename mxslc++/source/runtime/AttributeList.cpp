@@ -12,5 +12,6 @@ void AttributeList::add_to(const mx::ElementPtr& element) const
 
 void AttributeList::add_to(const mx::ElementPtr& element, const string& child_name) const
 {
-    add_to(element->getChild(child_name));
+    if (const mx::ElementPtr child = element->getChild(child_name))
+        add_to(child);
 }

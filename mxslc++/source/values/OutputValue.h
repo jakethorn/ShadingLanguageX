@@ -11,8 +11,7 @@
 class OutputValue final : public Value
 {
 public:
-    OutputValue(mx::OutputPtr output, TypePtr type);
-    OutputValue(const mx::NodePtr& node, const string& output_name, TypePtr type);
+    OutputValue(TypePtr type, mx::NodePtr node, string output_name);
 
     bool equals(const ValuePtr& other) const override;
 
@@ -22,7 +21,8 @@ public:
     string str() const override;
 
 private:
-    mx::OutputPtr output_;
+    mx::NodePtr node_;
+    string output_name_;
 };
 
 #endif //MXSLC_OUTPUTVALUE_H

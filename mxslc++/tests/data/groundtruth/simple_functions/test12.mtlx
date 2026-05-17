@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="out" type="integer" />
     <input name="p__0" type="float" value="0" />
     <input name="p__1" type="float" value="0" />
     <input name="p__2" type="float" value="0" />
@@ -11,7 +10,6 @@
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <randomfloat name="node1" type="float" />
-    <output name="out" type="integer" value="0" />
     <output name="out__p__0" type="float" nodename="node1" />
     <output name="out__p__1" type="float" interfacename="p__0" />
     <output name="out__p__2" type="float" nodename="node1" />
@@ -20,10 +18,6 @@
     <input name="p__0" type="float" value="1" />
     <input name="p__1" type="float" value="2" />
     <input name="p__2" type="float" value="3" />
-    <output name="out__p__0" type="float" />
-    <output name="out__p__1" type="float" />
-    <output name="out__p__2" type="float" />
-    <output name="out" type="integer" />
   </foo>
   <multiply name="node2" type="float">
     <input name="in1" type="float" output="out__p__0" nodename="node1" />

@@ -22,24 +22,22 @@
 
 namespace
 {
-    string serialize_type(const TypePtr& type)
-    {
-        if (type->has_fields())
-            return Type::MultiOutput;
-        if (type == Type::Void)
-            return Type::Int;
-        return type->name();
-    }
-
     string serialize_type(const FuncPtr& func)
     {
-        if (func->node_def()->getActiveOutputs().size() > 1)
+        const vector<mx::OutputPtr> outputs = func->node_def()->getActiveOutputs();
+        assert(not outputs.empty());
+        if (outputs.size() == 1)
+            return outputs[0]->getType();
+        if (outputs.size() > 1)
             return Type::MultiOutput;
-        return serialize_type(func->return_type());
+        throw CompileError{"Unable to serialize function type"s};
     }
 
     void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name = "out"s)
     {
+        if (type == Type::Void)
+            return;
+
         if (type->has_fields())
         {
             for (size_t i = 0; i < type->field_count(); ++i)
@@ -49,7 +47,7 @@ namespace
         }
         else
         {
-            node_def->addOutput(name, serialize_type(type));
+            node_def->addOutput(name, type->name());
         }
     }
 
@@ -88,6 +86,16 @@ namespace
     string nonlocal_in_name(const VarPtr& var)
     {
         return "nonlocal_in__" + var->name();
+    }
+
+    void write_default_output(const mx::NodeDefPtr& node_def, const mx::NodeGraphPtr& node_graph)
+    {
+        // this happens if the function is void, has no out or ref parameters and doesn't mutate a nonlocal variable
+        if (node_def->getActiveOutputs().empty())
+        {
+            node_def->addOutput("out"s, Type::Int);
+            node_graph->addOutput("out"s, Type::Int)->setValueString("0"s);
+        }
     }
 }
 
@@ -242,16 +250,10 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
     node_graph->setNodeDef(node_def);
 
     Runtime::get().scope().set_graph(node_graph, func);
-
     const VarPtr instance_copy = copy_instance(func);
-
     const VarPtr return_value = func->invoke();
-    if (func->is_void())
-    {
-        const VarPtr default_value = ValueFactory::create_default_value<int>();
-        write_node_graph_output(node_graph, "out"s, default_value);
-    }
-    else
+
+    if (not func->is_void())
     {
         write_node_graph_output(node_graph, "out"s, return_value);
     }
@@ -266,6 +268,7 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
     }
 
     update_instance(func, node_graph, instance_copy);
+    write_default_output(node_def, node_graph);
 }
 
 void MtlXSerializer::add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const
@@ -353,7 +356,7 @@ void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const 
     else
     {
         if (node_def->getInput(input_name) == nullptr)
-            node_def->addInput(input_name, serialize_type(type));
+            node_def->addInput(input_name, type->name());
     }
 }
 

@@ -81,8 +81,8 @@ VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const s
     }
     else
     {
-        ValuePtr value = std::make_shared<OutputValue>(std::move(node), output_name, std::move(type));
         attrs.add_to(node, output_name);
+        ValuePtr value = std::make_shared<OutputValue>(std::move(type), std::move(node), output_name);
         return Variable::create(std::move(value));
     }
 }
@@ -149,7 +149,7 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 
     if (port->hasOutputString())
     {
-        return std::make_shared<OutputValue>(port->getConnectedOutput(), std::move(type));
+        return std::make_shared<OutputValue>(std::move(type), port->getConnectedNode(), port->getOutputString());
     }
 
     if (port->hasNodeName())

@@ -9,7 +9,6 @@
     <output name="out" type="float" interfacename="this__1" />
   </nodegraph>
   <nodedef name="ND_Sphere_set_radius" node="Sphere_set_radius">
-    <output name="out" type="integer" />
     <input name="r" type="float" value="0" />
     <input name="this__0" type="vector2" />
     <input name="this__1" type="float" />
@@ -17,7 +16,6 @@
     <output name="out__this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_set_radius" nodedef="ND_Sphere_set_radius">
-    <output name="out" type="integer" value="0" />
     <output name="out__this__0" type="vector2" interfacename="this__0" />
     <output name="out__this__1" type="float" interfacename="r" />
   </nodegraph>
@@ -33,9 +31,6 @@
     <input name="r" type="float" value="4" />
     <input name="this__0" type="vector2" nodename="node1" />
     <input name="this__1" type="float" value="3" />
-    <output name="out_this__0" type="vector2" />
-    <output name="out_this__1" type="float" />
-    <output name="out" type="integer" />
   </Sphere_set_radius>
   <Sphere_get_radius name="node4" type="float">
     <input name="this__0" type="vector2" output="out_this__0" nodename="node3" />

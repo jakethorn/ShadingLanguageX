@@ -30,19 +30,11 @@
     <input name="xy__1" type="float" value="2" />
     <input name="z" type="float" value="3" />
     <input name="space" type="string" value="world" />
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
-    <output name="out__2" type="float" />
-    <output name="out__3" type="string" />
   </foo>
   <foo name="node2" type="multioutput">
     <input name="xy__0" type="float" value="4" />
     <input name="xy__1" type="float" value="5" />
     <input name="z" type="float" value="6" />
     <input name="space" type="string" value="object" />
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
-    <output name="out__2" type="float" />
-    <output name="out__3" type="string" />
   </foo>
 </materialx>

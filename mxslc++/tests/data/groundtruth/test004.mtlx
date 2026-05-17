@@ -14,8 +14,6 @@
   </combine2>
   <separate2 name="node4" type="multioutput">
     <input name="in" type="vector2" nodename="node3" />
-    <output name="outx" type="float" />
-    <output name="outy" type="float" />
   </separate2>
   <divide name="node5" type="float">
     <input name="in1" type="float" output="outx" nodename="node4" />

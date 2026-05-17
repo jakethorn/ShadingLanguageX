@@ -6,7 +6,5 @@
   </combine2>
   <separate2 name="node2" type="multioutput">
     <input name="in" type="vector2" nodename="node1" />
-    <output name="outx" type="float" />
-    <output name="outy" type="float" />
   </separate2>
 </materialx>

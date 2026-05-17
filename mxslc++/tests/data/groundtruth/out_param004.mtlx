@@ -17,9 +17,6 @@
   </nodegraph>
   <foo name="node1" type="multioutput">
     <input name="x" type="float" value="3" />
-    <output name="out__y__0" type="float" />
-    <output name="out__y__1" type="float" />
-    <output name="out" type="float" />
   </foo>
   <multiply name="node2" type="float">
     <input name="in1" type="float" output="out" nodename="node1" />
