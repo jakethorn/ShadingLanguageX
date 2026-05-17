@@ -51,12 +51,14 @@ add_library(mxslc_lib
         statements/BlockStatement.cpp
         statements/DocumentAttribute.cpp
         statements/ClassDefinition.cpp
+        statements/class_def_utils.cpp
         statements/ConstructorDefinition.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp
         utils/error_utils.cpp
         utils/instantiate_template_types_utils.cpp
+        utils/parse_utils.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
