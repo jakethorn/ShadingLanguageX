@@ -11,10 +11,10 @@
 FuncPtr parse_function(const string& code)
 {
     vector<Token> tokens = sscan(code);
-    vector<StmtPtr> stmts = parse(std::move(tokens));
+    const vector<StmtPtr> stmts = parse(std::move(tokens));
     if (stmts.size() != 1)
         throw CompileError{"Too many statements"s};
-    FunctionDefinition* func_def = dynamic_cast<FunctionDefinition*>(stmts[0].get());
+    const FunctionDefinition* func_def = dynamic_cast<FunctionDefinition*>(stmts[0].get());
     if (func_def == nullptr)
         throw CompileError{"Incorrect statement"s};
     if (func_def->functions().size() != 1)

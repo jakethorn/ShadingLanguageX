@@ -7,6 +7,6 @@
 
 #include "utils/common.h"
 
-void generate_if_function(const TypePtr& type);
+FuncPtr generate_if_function(const TypePtr& type);
 
 #endif //MXSLC_CLASS_DEF_UTILS_H

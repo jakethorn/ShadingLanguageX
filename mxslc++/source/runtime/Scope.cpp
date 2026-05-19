@@ -9,7 +9,7 @@
 #include "ArgumentList.h"
 #include "CompileError.h"
 #include "Function.h"
-#include "function_utils.h"
+#include "FunctionQuery.h"
 #include "Type.h"
 #include "Variable.h"
 #include "utils/error_utils.h"
@@ -97,62 +97,98 @@ void Scope::add_function(FuncPtr func)
     functions_.push_back(std::move(func));
 }
 
-namespace
+FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail) const
 {
-    vector<FuncPtr> default_functions(const vector<FuncPtr>& funcs)
-    {
-        vector<FuncPtr> def_funcs;
-        for (const FuncPtr& func : funcs)
-        {
-            if (func->is_default())
-                def_funcs.push_back(func);
-        }
-
-        return def_funcs;
-    }
+    FuncPtr func = query.get_match(functions_, false);
+    if (func)
+        return func;
+    if (parent_)
+        return parent_->get_function(query, throw_on_fail);
+    if (throw_on_fail)
+        throw CompileError{"Function not defined"s};
+    else
+        return nullptr;
 }
 
-vector<FuncPtr> Scope::get_functions(
-    const vector<TypePtr>& return_types,
-    const string& name,
-    const TypePtr& template_type,
-    const ArgumentList& args
-) const
+vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool throw_on_fail) const
 {
-    vector<FuncPtr> funcs = get_matching_functions(functions_, return_types, name, template_type, args);
-
-    if (funcs.empty() and parent_)
-        funcs = parent_->get_functions(return_types, name, template_type, args);
-
-    if (funcs.empty() and is_youngest_)
-    {
-        throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
-    }
-
-    return funcs;
+    vector<FuncPtr> funcs = query.get_matches(functions_);
+    if (not funcs.empty())
+        return funcs;
+    if (parent_)
+        return parent_->get_functions(query, throw_on_fail);
+    if (throw_on_fail)
+        throw CompileError{"Functions not defined"s};
+    else
+        return vector<FuncPtr>{};
 }
 
-FuncPtr Scope::get_function(
-    const vector<TypePtr>& return_types,
-    const string& name,
-    const TypePtr& template_type,
-    const ArgumentList& args
-) const
-{
-    const vector<FuncPtr> funcs = get_functions(return_types, name, template_type, args);
-    assert(not funcs.empty());
-
-    if (funcs.size() > 1)
-    {
-        const vector<FuncPtr> def_funcs = default_functions(funcs);
-        if (def_funcs.size() == 1)
-            return def_funcs[0];
-
-        throw CompileError{ambiguous_overload_error(funcs)};
-    }
-
-    return funcs[0];
-}
+//namespace
+//{
+//    vector<FuncPtr> default_functions(const vector<FuncPtr>& funcs)
+//    {
+//        vector<FuncPtr> def_funcs;
+//        for (const FuncPtr& func : funcs)
+//        {
+//            if (func->is_default())
+//                def_funcs.push_back(func);
+//        }
+//
+//        return def_funcs;
+//    }
+//}
+//
+//vector<FuncPtr> Scope::get_functions(
+//    const vector<TypePtr>& return_types,
+//    const string& name,
+//    const TypePtr& template_type,
+//    const ArgumentList& args
+//) const
+//{
+//    vector<FuncPtr> funcs = get_matching_functions(functions_, return_types, name, template_type, args);
+//
+//    if (funcs.empty() and parent_)
+//        funcs = parent_->get_functions(return_types, name, template_type, args);
+//
+//    if (funcs.empty() and is_youngest_)
+//    {
+//        throw CompileError{missing_overload_error(get_all_functions(name), return_types, name, template_type, args)};
+//    }
+//
+//    return funcs;
+//}
+//
+//FuncPtr Scope::get_function(
+//    const vector<TypePtr>& return_types,
+//    const string& name,
+//    const TypePtr& template_type,
+//    const ArgumentList& args
+//) const
+//{
+//    const vector<FuncPtr> funcs = get_functions(return_types, name, template_type, args);
+//    assert(not funcs.empty());
+//
+//    if (funcs.size() > 1)
+//    {
+//        const vector<FuncPtr> def_funcs = default_functions(funcs);
+//        if (def_funcs.size() == 1)
+//            return def_funcs[0];
+//
+//        throw CompileError{ambiguous_overload_error(funcs)};
+//    }
+//
+//    return funcs[0];
+//}
+//
+//bool Scope::has_function(const string& name, const TypePtr& template_type) const
+//{
+//    vector<FuncPtr> funcs = get_matching_functions(functions_, name, template_type);
+//    if (not funcs.empty())
+//        return true;
+//    if (parent_)
+//        return parent_->has_function(name, template_type);
+//    return false;
+//}
 
 Scope& Scope::get_defining_scope(const FuncPtr& func)
 {

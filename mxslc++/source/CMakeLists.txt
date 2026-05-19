@@ -10,7 +10,7 @@ add_library(mxslc_lib
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
         runtime/Function.cpp
-        runtime/function_utils.cpp
+        runtime/FunctionQuery.cpp
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
         runtime/Type.cpp

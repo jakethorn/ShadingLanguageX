@@ -4,7 +4,7 @@
 
 #include "class_def_utils.h"
 
-void generate_if_function(const TypePtr& type)
+FuncPtr generate_if_function(const TypePtr& type)
 {
-
+    return nullptr;
 }
