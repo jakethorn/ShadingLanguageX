@@ -48,19 +48,6 @@ public:
     void add_function(FuncPtr func);
     FuncPtr get_function(const FunctionQuery& query, bool throw_on_fail = true) const;
     vector<FuncPtr> get_functions(const FunctionQuery& query, bool throw_on_fail = true) const;
-    //vector<FuncPtr> get_functions(
-    //    const vector<TypePtr>& return_types,
-    //    const string& name,
-    //    const TypePtr& template_type,
-    //    const ArgumentList& args
-    //) const;
-    //FuncPtr get_function(
-    //    const vector<TypePtr>& return_types,
-    //    const string& name,
-    //    const TypePtr& template_type,
-    //    const ArgumentList& args
-    //) const;
-    //bool has_function(const string& name, const TypePtr& template_type) const;
     Scope& get_defining_scope(const FuncPtr& func);
 
     /*
