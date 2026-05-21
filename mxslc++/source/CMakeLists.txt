@@ -51,7 +51,6 @@ add_library(mxslc_lib
         statements/BlockStatement.cpp
         statements/DocumentAttribute.cpp
         statements/ClassDefinition.cpp
-        statements/class_def_utils.cpp
         statements/ConstructorDefinition.cpp
         utils/io_utils.cpp
         utils/str_utils.cpp
