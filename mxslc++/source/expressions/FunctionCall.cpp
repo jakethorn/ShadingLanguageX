@@ -10,6 +10,7 @@
 #include "MethodCall.h"
 #include "ThisExpression.h"
 #include "runtime/Function.h"
+#include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
@@ -133,12 +134,12 @@ VarPtr FunctionCall::evaluate_impl() const
 
 vector<FuncPtr> FunctionCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    return scope().get_functions(return_types, name_, template_type_, args_);
+    return scope().get_functions({return_types, name_, template_type_, args_});
 }
 
 FuncPtr FunctionCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
-    return scope().get_function(return_types, name_, template_type_, args_);
+    return scope().get_function({return_types, name_, template_type_, args_});
 }
 
 // inline only

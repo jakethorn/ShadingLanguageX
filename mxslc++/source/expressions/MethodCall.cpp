@@ -5,7 +5,7 @@
 #include "MethodCall.h"
 
 #include "runtime/Function.h"
-#include "runtime/function_utils.h"
+#include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
@@ -70,12 +70,12 @@ VarPtr MethodCall::evaluate_impl() const
 
 vector<FuncPtr> MethodCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    return ::get_matching_functions(instance_->type()->methods(), return_types, name_, template_type_, args_);
+    return scope().get_functions({instance_->type(), return_types, name_, template_type_, args_});
 }
 
 FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
-    return ::get_matching_function(instance_->type()->methods(), return_types, name_, template_type_, args_);
+    return scope().get_function({instance_->type(), return_types, name_, template_type_, args_});
 }
 
 VarPtr MethodCall::copy_instance_to_scope() const

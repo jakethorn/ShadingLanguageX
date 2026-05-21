@@ -10,7 +10,7 @@ add_library(mxslc_lib
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
         runtime/Function.cpp
-        runtime/function_utils.cpp
+        runtime/FunctionQuery.cpp
         runtime/Parameter.cpp
         runtime/ParameterList.cpp
         runtime/Type.cpp
@@ -57,6 +57,7 @@ add_library(mxslc_lib
         utils/parse_args.cpp
         utils/error_utils.cpp
         utils/instantiate_template_types_utils.cpp
+        utils/parse_utils.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
