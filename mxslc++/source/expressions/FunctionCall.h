@@ -12,6 +12,7 @@
 class FunctionCall : public Expression
 {
 public:
+    explicit FunctionCall(Token token);
     FunctionCall(string name, ArgumentList args);
     FunctionCall(string name, ArgumentList args, Token token);
     FunctionCall(string name, TypePtr template_type, ArgumentList args);
@@ -43,8 +44,6 @@ protected:
 private:
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
-
-    VarPtr evaluate_as_method() const;
 
     size_t initialized_arg_count_ = 0;
 

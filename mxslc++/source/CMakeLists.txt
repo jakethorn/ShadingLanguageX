@@ -37,6 +37,7 @@ add_library(mxslc_lib
         expressions/ThisExpression.cpp
         expressions/MethodCall.cpp
         expressions/CompoundExpression.cpp
+        expressions/IfExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
