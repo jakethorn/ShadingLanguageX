@@ -108,7 +108,8 @@ compiles to:
 ```
 ![](../examples/screenshots/toon.png)
 
-> ### <span style="color: red;">Not yet supported in mxslc++</span>
+> [!WARNING]
+> ### Not yet supported in mxslc++
 > ShadingLanguageX shaders can also be executed with a designated entry function like in GLSL. If the shader contains
 > a function called `main`, this function will be the entry into the shader. For example:
 > ```
@@ -185,8 +186,9 @@ In this document we will typically use the aliased version for the sake of brevi
 `vector3` ➔ `vec3`  
 `vector4` ➔ `vec4`
 
+> [!WARNING]
+> ### Not yet supported in mxslc++
 > ## Auto
-> ### <span style="color: red;">Not yet supported in mxslc++</span>
 >
 > Variables and functions can also be declared using the `auto` keyword when the type can be inferred from the right-hand
 > expression, or return expression in the case of function declarations.
@@ -221,8 +223,9 @@ filename p = "my_image.exr"; // implicit string ➔ filename
 color3 c = color3{1.0};      // explicit float ➔ color3
 ```
 
+> [!TIP]
+> ### New in mxslc++!
 > ## User Defined Types
-> ### <span style="color: green;">New in mxslc++!</span>
 >
 > ShadingLanguageX supports user-defined types through
 > [Unnamed structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-structs),
@@ -407,14 +410,16 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
   is equivalent to `vec3{} * 2.0`.
 * The `extract` example above for the indexing operator only applies to vector and color types and not custom data types.
 
+> [!WARNING]
+> ### Not yet supported in mxslc++
 > ## Ternary Relational Operator
-> ### <span style="color: red;">Not yet supported in mxslc++</span>
 > 
 > ShadingLanguageX supports the Ternary Relational Operator, for example: `a < x < b` which is equivalent to `a < x and x < b`.
 > This form can be used with any of the relational operators (i.e., `<` `<=` `>` `>=`).
 
+> [!WARNING]
+> ### Not yet supported in mxslc++
 > ## Swizzle Operator
-> ### <span style="color: red;">Not yet supported in mxslc++</span>
 > 
 > The Swizzle Operator allows
 > users to access vector components using any of `x` `y` `z` `w` or color channels using `r` `g` `b` `a` after a period `.`.
@@ -477,11 +482,12 @@ type name = initial-value;
 
 ShadingLanguageX supports three modifiers for variable declarations: `mutable`, `const` and `global`.
 
+> [!TIP]
+> ### New in mxslc++!
 > ### Mutable
-> ### <span style="color: green;">New in mxslc++!</span>
 > 
 > By default, variables in ShadingLanguageX are immutable (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/VariableMutability.md) for my reasoning behind this decision). To be able to change a variable after its initial definition, 
-> the `mutable` modifier must be used.
+> use the `mutable` modifier.
 > 
 > ```
 > int x = 1;
@@ -500,12 +506,12 @@ const int x = 1;
 x = 2; // Error
 ```
 
-As variables are immutable by default in ShadingLanguageX, this isn't particularly useful for primitive data types (except to improve readability of the code), but has some use cases
+This isn't particularly useful for primitive data types (except to improve readability of the code) as variables are immutable by default in ShadingLanguageX, but it has some use cases
 when defining and using custom data types.
 
-
+> [!WARNING]
+> ### Not yet supported in mxslc++
 > ### Global
-> ### <span style="color: red;">Not yet supported in mxslc++</span>
 > 
 > The global keyword operates similarly to `uniform` from GLSL. Global variables do not require an initial value and are instead initialized by user-defined values passed to the compiler. For example:
 > ```
