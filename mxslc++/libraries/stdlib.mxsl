@@ -436,6 +436,13 @@ inline vector4 __vector4__(vector2 xy, float z, float w)
     return combine4(x, y, z, w);
 }
 
+inline vector4 __vector4__(vector2 xy, vector2 zw)
+{
+    float x, y = separate2(xy);
+    float z, w = separate2(zw);
+    return combine4(x, y, z, w);
+}
+
 inline vector4 __vector4__<vector3, color3>(float x, T yzw)
 {
     float y, z, w = separate3(yzw);

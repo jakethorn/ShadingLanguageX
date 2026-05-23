@@ -471,7 +471,7 @@ print (1 + 1 + (i += (1 + 1)));
 # Variable Definitions
 
 ```
-modifier-list? type name = initial-value;
+modifier-list type name = initial-value;
 ```   
 
 `modifier-list` is a list of zero or more modifiers.  
@@ -583,7 +583,7 @@ when defining and using custom data types.
 > float x, y = randompoint();
 > ```
 > 
-> This works with any custom data types that are defined as an unnamed struct, with the `using` statement or `class` definition.
+> This works with any custom data types defined as an unnamed struct, with the `using` statement or `class` definition.
 
 # Variable Assignments
 
@@ -653,22 +653,56 @@ surfaceshader s = standard_surface(base_color=randomcolor());
 s.specular_roughness = randomfloat();
 ```
 
-## Compound Assignment
+> [!TIP]
+> ### New in mxslc++!
+> ## Increment/Decrement Operator
+> 
+> | Operation | Expands to                            |
+> |-----------|---------------------------------------|
+> | `i++;`    | Increase `i` by one after evaluation  |
+> | `i--;`    | Decrease `i` by one after evaluation  |
+> | `++i;`    | Increase `i` by one before evaluation |
+> | `--i;`    | Decrease `i` by one before evaluation |
+> 
+> ### Example
+> 
+> ```
+> int i = 0;
+> print i++; // prints 0, then increases i by 1
+> 
+> int j = 0;
+> print ++j; // increases j by 1, then prints 1
+> ```
 
-| Assignment  | Expands to     |
-|-------------|----------------|
-| `a += b;`   | `a = a + b;`   |
-| `a -= b;`   | `a = a - b;`   |
-| `a *= b;`   | `a = a * b;`   |
-| `a /= b;`   | `a = a / b;`   |
-| `a %= b;`   | `a = a % b;`   |
-| `a ^= b;`   | `a = a ^ b;`   |
-| `a &= b;`   | `a = a & b;`   |
-| `a \|= b;`  | `a = a \| b;`  |
+## Compound Assignment Operator
+
+| Operation  | Expands to     |
+|------------|----------------|
+| `a += b;`  | `a = a + b;`   |
+| `a -= b;`  | `a = a - b;`   |
+| `a *= b;`  | `a = a * b;`   |
+| `a /= b;`  | `a = a / b;`   |
+| `a %= b;`  | `a = a % b;`   |
+| `a ^= b;`  | `a = a ^ b;`   |
+| `a &= b;`  | `a = a & b;`   |
+| `a \|= b;` | `a = a \| b;`  |
+
+Increment, Decrement and Compound Assignment Operators are expressions, not statements. This means you can use them anywhere you could normally use
+an expression, such as an argument to a function. Compound Assignment Operators evaluate in the same order as prefix Increment/Decrement Operators,
+i.e., they increase the value of the variable first, and then return the value.
+
+```
+int i = 0;
+float a = randomfloat(seed = i+=10); // seed = 10
+float b = randomfloat(seed = i+=10); // seed = 20
+```
 
 # Constructors
 
-`type(...)`  
+```
+type{...}
+```
+
 `type` can be `bool` `int` `float` `vec2` `vec3` `vec4` `color3` `color4`.
 
 The constructor has the same name as the type itself and accepts zero or more arguments.
@@ -684,11 +718,11 @@ In the case that no arguments are passed to the constructor a default value will
 | `bool`    | `false`                      |
 | `int`     | `0`                          |
 | `float`   | `0.0`                        |
-| `vec2`    | `vec2(0.0, 0.0)`             |
-| `vec3`    | `vec3(0.0, 0.0, 0.0)`        |
-| `vec4`    | `vec4(0.0, 0.0, 0.0, 1.0)`   |
-| `color3`  | `color3(0.0, 0.0, 0.0)`      |
-| `color4`  | `color4(0.0, 0.0, 0.0, 1.0)` |
+| `vec2`    | `vec2{0.0, 0.0}`             |
+| `vec3`    | `vec3{0.0, 0.0, 0.0}`        |
+| `vec4`    | `vec4{0.0, 0.0, 0.0, 1.0}`   |
+| `color3`  | `color3{0.0, 0.0, 0.0}`      |
+| `color4`  | `color4{0.0, 0.0, 0.0, 1.0}` |
 
 ## One Argument
 
@@ -698,29 +732,33 @@ see the MaterialX Standard Node document.
 
 ### Example
 
-`float shadow = float(x > y);`  
-`color3 white = color3(1.0);`  
-`color3 v_debug = color3(viewdirection());`
+`float is_shadow = float{x > y};`  
+`color3 white = color3{1.0};`  
+`color3 v_debug = color3{viewdirection()};`
 
 ## Two Or More Arguments
 
-Two or more arguments has the following behaviour. It will take components from incoming arguments until all of its own
-components have been filled and then discard the rest. If not enough components were provided, then the remaining will be `0.0`.
+For two or more arguments has, the constructor builds the target type using the arguments in the order they are provided. 
+If not enough arguments are provided, the remaining components will be zero.
 
 ### Example
 
-`vec2 a = vec2(1.0, 2.0);`  
-`vec3 b = vec3(a, 3.0); // will be vec3(1.0, 2.0, 3.0)`  
-`vec4 c = vec4(4.0, a); // will be vec4(4.0, 1.0, 2.0, 0.0)`
+`vec2 a = vec2{1.0, 2.0};`  
+`vec3 b = vec3{a, 3.0}; // will be vec3{1.0, 2.0, 3.0}`  
+`vec4 c = vec4{4.0, a}; // will be vec4{4.0, 1.0, 2.0, 0.0}`  
+`color3 d = color3{g=1.0}; // will be color3{0.0, 1.0, 0.0}`
 
 # If Expressions
 
-Unlike most languages, ShaderLanguageX does not support if statements, but instead uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
-ternary operators (`cond ? then : else`) than true if statements that control the logic of the program. This makes if expressions better suited for compiling to MaterialX nodes than if statements.
+Unlike most languages, ShaderLanguageX has limited support for If Statements, but instead mainly uses If Expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
+ternary operators (`cond ? then : else`) than true If Statements that control the logic of the program. This makes If Expressions better suited for compiling to MaterialX nodes than If Statements.
 
-`if (condition) { value_if_true } else { value_if_false }`  
+```
+if (condition) { value_if_true } else { value_if_false }
+```
+
 `condition` can be any expression that evaluates to a bool type.  
-The if expression will evaluate to `value_if_true` if the condition is true, otherwise `value_if_false`.
+The If Expression will evaluate to `value_if_true` if the condition is true, otherwise `value_if_false`.
 
 The syntax `if (condition) { value_if_true }` can be used during an assignment statement. In this case, if the condition
 evaluates to false, the variable will retain its original value.
@@ -730,59 +768,87 @@ are expected to evaluate to the same type.
 
 ### Example
 
-`float a = if (x > y) { 0.05 } else { 0.07 };`  
-`a = if (z > x) { 0.09 };` equivalent to `a = if (z > x) { 0.09 } else { a };`
+```
+mutable float a = if (x > y) { 0.5 } else { 0.7 };
+
+a = if (z > x) { 0.9 }; // keeps original value if z <= x
+```  
 
 ```
 vec3 upaxis = if (target_platform == UNREAL) 
 { 
-    vec3(0.0, 0.0, 1.0) 
+    vec3{0.0, 0.0, 1.0} 
 } 
 else 
 { 
-    vec3(0.0, 1.0, 0.0) 
+    vec3{0.0, 1.0, 0.0}
 };
 ```
 
-## If-Else Expressions
+## Else If Expressions
 
-If else expressions are also possible. You can include any number of `if else` clauses in the expression.
+Chained Else If Expressions are also possible. You can include any number of `else if` clauses in the expression.
 ```
 float x = if (cond1) { val1 } else if (cond2) { val2 } else { val3 };
 ```
-Once again you do not need to include the final `else` branch during a variable assignment:
+Once again you do not need to include the final `else` branch during a variable assignment. If none of the conditions evaluate
+to true, then the variable will retain its previous value.
 ```
 float x = 0.0;
 x = if (cond1) { val1 } else if (cond2) { val2 };
 ```
 
-# Switch Expressions
-
-ShaderLanguageX also does not support switch statements, but instead uses switch expressions, for the same reasons as if
-expressions above. They are similar to switch expressions found in the C# programming language.
-
-`switch (which) { in1, in2, in3 }`  
-`which` can be any expression that evaluates to either an `int` or `float` type.  
-The switch expression will evaluate to either `in1`, `in2`, `in3`, or a default value depending on the value of `which`.
-See the `switch` node in the MaterialX Standard Node document for more information.
-
 ### Example
 
 ```
-color3 albedo = switch (wall_id)
-{
-    image("left_wall.png", texcoord=uv),
-    image("right_wall.png", texcoord=uv),
-    image("back_wall.png", texcoord=uv),
-    image("ceiling.png", texcoord=uv),
-    image("floor.png", texcoord=uv)
+vec3 upaxis = if (target_platform == UNREAL) 
+{ 
+    vec3{0.0, 0.0, 1.0} 
+} 
+else if (target_platform == ABSOLUTELY_NO_ONE)
+{ 
+    vec3{1.0, 0.0, 0.0}
 }
+else 
+{ 
+    vec3{0.0, 1.0, 0.0}
+};
 ```
 
-# For Loops
+> [!WARNING]
+> ### Not yet supported in mxslc++
+> # Switch Expressions
+> 
+> ShaderLanguageX also does not support switch statements, but instead uses switch expressions, for the same reasons as if
+> expressions above. They are similar to switch expressions found in the C# programming language.
+> 
+> ```
+> switch (which) { in1, in2, in3 }
+> ```
+> 
+> `which` can be any expression that evaluates to either an `int` or `float` type.  
+> The switch expression will evaluate to either `in1`, `in2`, `in3`, or a default value depending on the value of `which`.
+> See the `switch` node in the MaterialX Standard Node document for more information.
+> 
+> ### Example
+> 
+> ```
+> color3 albedo = switch (wall_id)
+> {
+>     image("left_wall.png", texcoord=uv),
+>     image("right_wall.png", texcoord=uv),
+>     image("back_wall.png", texcoord=uv),
+>     image("ceiling.png", texcoord=uv),
+>     image("floor.png", texcoord=uv)
+> }
+> ```
+
+# For Loop
 
 Unlike if and switch expressions, loops are compiled as statements in ShadingLanguageX, with the caveat that the number of
 loop iterations must be known at compile time.
+
+## For Range Loop
 
 ```
 for (type name = start-value:end-value)
@@ -790,27 +856,59 @@ for (type name = start-value:end-value)
     statement*
 }
 ```
+
 `type` can either be `int` or `float`.  
 `name` can be any valid identifier.  
 `start-value` is the value that the iteration value will start from.  
-`end-value` is the value that the iteration value will stop at. It is included in the loop.  
+`end-value` is the value that the iteration value will stop at.  
 For example, `0:3` will iterate through the values `0` `1` `2` `3`.
 
-For loops can also be declared with an incremement value. Instead of increasing the iteration value by
-`1` each loop, it will be increased by the value of the specified increment instead. The syntax in this case looks like
-this: `start-value:increment-value:end-value`. For example, `0:2:6` would result in the following sequence: `0` `2` `4` `6`.
+For range loops can also be declared with an increment value. Instead of increasing the iteration value by
+`1` each loop, it will be increased by the value of the specified increment instead. For example, `0:2:6` would result in the following sequence: `0` `2` `4` `6`.
+Reverse iterators are also possible using this syntax, for example, `9:-1:0` would start at `9` and end at `0`.
+```
+for (type name = start-value:increment-value:end-value)
+{
+    statement*
+}
+```
 
 ### Example
 
 ```
 // render 10 randomly sized white circles
-color3 c = color3(0.0);
+color3 c = color3{0.0};
 for (int i = 0:9)
 {
-    vec2 center = vec2(randomfloat(in=0, seed=i), randomfloat(in=1, seed=i));
+    vec2 center = vec2{randomfloat(in=0, seed=i), randomfloat(in=1, seed=i)};
     c = if (distance(center, texcoord()) < randomfloat(in=2, max=0.1, seed=i)) { color3(1.0) };
 }
 standard_surface(base_color=c);
+```
+
+## For Each Loop
+
+```
+for (modifier-list type name = value)
+{
+    statement*
+}
+```
+
+`modifier-list` is a list of zero or more modifiers.  
+`type` can be any primitive or custom data type.  
+`name` can be any valid identifier.  
+`value` can be any valid expression.
+
+### Example
+
+```
+{float, float, float} values = {1.0, 2.0, 3.0};
+
+for (float f = values)
+{
+    print f;
+}
 ```
 
 # User Functions
