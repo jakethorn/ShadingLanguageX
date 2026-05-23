@@ -471,12 +471,28 @@ print (1 + 1 + (i += (1 + 1)));
 # Variable Definitions
 
 ```
-type name = initial-value;
+modifier-list? type name = initial-value;
 ```   
 
+`modifier-list` is a list of zero or more modifiers.  
 `type` can be any primitive or custom data type.  
 `name` can be any valid identifier.  
 `initial-value` can be any valid expression that evaluates to `type`. It is optional.
+
+### Example
+
+`float a = 1.0;`  
+`float b = a;`  
+`float c;`  
+`bool half_chance = randomfloat() > 0.5;`  
+`int uv_channel = 3;`  
+`vec2 uv = 1.0 - texcoord(uv_channel);`  
+`string space = "world";`  
+`surfaceshader surface = standard_surface();`
+
+`mutable int i = 0;`  
+`const float PI = 3.14;`  
+`global int iter_count = 500;`
 
 ## Modifiers
 
@@ -542,30 +558,99 @@ when defining and using custom data types.
 > </materialx>
 > ```
 
-### Example
-
-`float a = 1.0;`  
-`float b = a;`  
-`bool is_positive = b > 0.0;`  
-`int uv_channel = 3;`  
-`vec2 uv = 1.0 - texcoord(uv_channel);`  
-`string space = "world";`  
-`surfaceshader surface = standard_surface();`  
-`mutable int i = 0;`  
-`const float PI = 3.14;`  
-`global float loop_n = 500.0;`
+> [!TIP]
+> ### New in mxslc++!
+> ## Multi-Variable Definition
+> 
+> When returning a custom data type from a function, the variable can either be bound to a single variable of the custom
+> data type or split into its individual components. For example:
+> 
+> ```
+> using Point = {float, float};
+> 
+> Point randompoint()
+> {
+>     return {randomfloat(), randomfloat()}; 
+> }
+> 
+> 
+> Point p = randompoint();
+> 
+> // OR
+> float x, float y = randompoint();
+> 
+> // OR (if x and y share the same type)
+> float x, y = randompoint();
+> ```
+> 
+> This works with any custom data types that are defined as an unnamed struct, with the `using` statement or `class` definition.
 
 # Variable Assignments
 
-`name = value;`  
+```
+name = value;
+```  
 `name` must be the name of a previously declared variable.  
 `value` can be any valid expression that evaluates to the type of `name`.
+```
+name[i] = value;
+```
+`i` must be an integer. It must be known at compile time if accessing fields of a custom data type.
+```
+name.property = value;
+```
+`property` can either be the name of a field if `name` has a custom data type or the name of an input port if `name` 
+represents a MaterialX node.  
 
 ### Example
 
 ```
-color3 albedo = image("albedo.png");
+mutable color3 albedo = image("albedo.png");
+
 albedo = 1.0 - albedo;
+```
+```
+using Point = {mutable float, mutable float};
+
+// Note: p does not need to be declared mutable because the fields are already mutable.
+Point p = {1.0, 2.0};
+
+p[0] = 3.0; // OK
+p[1] = 4.0; // OK
+
+p[2] = 5.0; // Error: index out of range
+
+int i = geompropvalue("i");
+p[i] = 6.0; // Error: index not known at compile time
+
+// Bonus
+p = {7.0, 8.0}; // Error: p is not mutable, only its fields.
+```
+```
+using Point = {float x, float y};
+
+mutable Point p = {1.0, 2.0};
+
+p.x = 3.0; // OK
+p.y = 4.0; // OK
+
+p.z = 5.0; // Error: invalid field name
+
+// Bonus
+p[0] = 6.0; // OK: indexing operator is still valid here, it will access the first field in the definition (x).
+p = {7.0, 8.0}; // OK: both p and its fields can be assigned to because p is mutable.
+```
+```
+surfaceshader s = standard_surface();
+s.base_color = randomcolor();
+s.specular_roughness = randomfloat();
+
+// Equivalent to
+surfaceshader s = standard_surface(base_color=randomcolor(), specular_roughness=randomfloat());
+
+// Or
+surfaceshader s = standard_surface(base_color=randomcolor());
+s.specular_roughness = randomfloat();
 ```
 
 ## Compound Assignment
