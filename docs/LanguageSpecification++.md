@@ -697,7 +697,7 @@ float a = randomfloat(seed = i+=10); // seed = 10
 float b = randomfloat(seed = i+=10); // seed = 20
 ```
 
-# Constructors
+# Named Constructors
 
 ```
 type{...}
@@ -711,7 +711,7 @@ but will always return a variable of the corresponding type.
 
 ## Zero Arguments
 
-In the case that no arguments are passed to the constructor a default value will be returned.
+In the case that no arguments are passed to the constructor, a default value will be returned.
 
 | Data Type | Default Value                |
 |-----------|------------------------------|
@@ -726,7 +726,7 @@ In the case that no arguments are passed to the constructor a default value will
 
 ## One Argument
 
-With a single argument, the constructor will convert the argument to the type of the constructor.
+With a single argument, the constructor will convert the argument to the target type.
 Currently, this simply compiles to the `convert` node. For information regarding supported conversions,
 see the MaterialX Standard Node document.
 
@@ -738,7 +738,7 @@ see the MaterialX Standard Node document.
 
 ## Two Or More Arguments
 
-For two or more arguments has, the constructor builds the target type using the arguments in the order they are provided. 
+For two or more arguments, the constructor builds the target type using the arguments in the order they are provided. 
 If not enough arguments are provided, the remaining components will be zero.
 
 ### Example
@@ -888,6 +888,8 @@ standard_surface(base_color=c);
 
 ## For Each Loop
 
+For each loops iterate over a variables fields.
+
 ```
 for (modifier-list type name = value)
 {
@@ -911,28 +913,36 @@ for (float f = values)
 }
 ```
 
-# User Functions
+# Functions
+
+## Function Definition
 
 Users can declare their own functions in ShadingLanguageX using the following syntax:
 ```
-type name(out? param1_type param1_name, out? param2_type param2_name...)
+modifier-list type name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...)
 {
     statement*
-    return value;
+}
+
+OR
+
+modifier-list function name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...) -> type
+{
+    statement*
 }
 ```
-`type` can be any supported data type. It can also be `void` to indicate that function does not return a value.
-In this case, the return statement should also be omitted.  
+
+`modifier-list` is a list of zero or more modifiers.  
+`type` can be any primitive or custom data type. It can also be `void` to indicate that function does not return a value.
+In this case, the return statement in the body of the function should also be omitted.  
 `name` can be any valid identifier.  
-`paramN_type` can be any supported data type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.  
-Including the `out` keyword before a parameter turns it into an out parameter. See below for more information.  
-In addition to return values and out parameters, functions can also access and update variables from enclosing scopes.
+`paramN_type` can be any primitive or custom data type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.   
 
 ## Calling Functions
 
-`name(arg1, arg2...)`  
+`name(arg1, arg2, ...)`  
 `name` is the name of function to be invoked.  
-`argN` is N number of expressions whose data types exactly match those in the function signature.
+`argN` is N number of expressions whose data types match those in the function signature.
 
 ### Example
 
@@ -1007,7 +1017,7 @@ In this case, the call to `texcoord()` will invoke the first function because it
 
 Function parameters can be declared with a default value. In this case, the user is not required to provide a value for that parameter when calling the function.
 ```
-float azimuth(string space="world", vec3 origin=vec3(1.0, 0.0, 0.0))
+float azimuth(string space = "world", vec3 origin = vec3{1.0, 0.0, 0.0})
 {
     return dotproduct(normal(space), origin);
 }
@@ -1019,8 +1029,8 @@ float theta = azimuth();
 
 Function arguments can be named to target specific parameters.
 ```
-float theta = azimuth(origin=vec3(0.0, 0.0, 1.0);
-color3 albedo = image("albedo.png", texcoord=geompropvalue("uv4"));
+float theta = azimuth(origin = vec3{0.0, 0.0, 1.0});
+color3 albedo = image("albedo.png", texcoord = geompropvalue("uv4"));
 ```
 
 ## Templated Functions
@@ -1057,7 +1067,7 @@ T one_minus<float, vec2, vec3, vec4, color3, color4>(T v)
 In this case, the reserved keyword data type `T` is a placeholder for the data types specified in the template. `T` can be used anywhere in the function signature and inside the body of the function wherever a standard
 data type could be used. For example:
 ```
-T image_mult<vec3, color3>(filename img_path, T mult = T(1.0))
+T image_mult<vec3, color3>(filename img_path, T mult = T{1.0})
 {
     T img = image<T>(img_path);
     return img * mult;
@@ -1072,53 +1082,82 @@ T one_minus<float, vec2, vec3, vec4, color3, color4>(T v)
 }
 
 vec2 uv = texcoord();
-vec2 inv_uv = one_minus<vec2>(uv);
+
+vec2 inv_uv = one_minus(uv); // <vec2> is inferred from return type
+vec2 inv_uv = one_minus<vec2>(uv); // <vec2> can still be included for clarity
 ```
 
-## Out Parameters
+## Parameter Modifiers
 
-Including the `out` keyword before a parameter turns it into an out parameter. These parameters can then be set inside the function
-and the value will be accessible when the function is called, similar to a return value. For example:
+Parameters (like variables) can be declared as `mutable` or `const`. They can also be declared as `out` or `ref`.
+
+### Out Parameters
+
+Including the `out` keyword before a parameter turns it into an out parameter. These parameters can then be assigned within the function, 
+and the value will be accessible to the caller, similar to a return value. For example:
+
 ```
-void sincos(float r, out float s, out float c)
+void sincos(const float r, out float s, out float c)
 {
     s = sin(r);
     c = cos(r);
 }
 
-float s = 0.0;
-float c = 0.0;
+mutable float s = 0.0;
+mutable float c = 0.0;
+
 sincos(3.14, s, c);
-float x = min(s, c);
+
+// OR
+sincos(3.14, out s, out c);
 ```
+
+The `out` modifier can also be placed before the argument in the function call, but it's not required. If an argument is declared `out`, but the
+corresponding parameter is not, the compiler will throw an error. You will also notice that I did not have to declare the out
+parameters as `mutable`, `out` parameters are mutable by default.
+
 To compliment out parameters, variables can be declared as part of the function call (these are called variable declaration
-expressions). This means we don't need to separately declare the variables above the function. For example, the above shader
+expressions), meaning we don't need to separately declare the variables above the function. Variable declaration 
+expressions do not need to be declared as `mutable`, unless you plan to modify them after the function call. For example, the above shader
 can be rewritten as:
+
 ```
-void sincos(float r, out float s, out float c)
+void sincos(const float r, out float s, out float c)
 {
     s = sin(r);
     c = cos(r);
 }
 
 sincos(3.14, float s, float c);
-float x = min(s, c);
+
+// OR
+sincos(3.14, out float s, out float c);
 ```
 
+### Ref Parameters
 
-### Notes
+`ref` parameters operate similarly to `out` parameters, but they also they retain the value of the variable passed into
+the function, while `out` parameters always set the initial value to zero (or to the initial value of the parameter if provided).
 
-* Functions can be declared inside other functions.
-* Functions must be declared prior to being called.
-* Recursion is not possible in ShadingLanguageX.
-* MaterialX standard library nodes with multiple outputs (such as the separate nodes) use out parameters to return their
-  values. The out parameters always come first in the function signature, e.g.: `void separate2(out float outx, out float outy, vec2 in)`
+```
+void foo(out int x, ref int y)
+{
+    x *= 2;
+    y *= 2;
+}
 
-# Statement Modifiers
+mutable int x = 1;
+mutable int y = 1;
 
-## Inline
+foo(x, y);
 
-Functions and loops in ShadingLanguageX will normally compile to a `NodeDef`/`NodeGraph` pair. For example:
+// x == 0
+// y == 2
+```
+
+## Inline Functions
+
+Functions in ShadingLanguageX will normally compile to a `NodeDef`/`NodeGraph` pair. For example:
 ```
 float add_one(float in)
 {
@@ -1150,7 +1189,7 @@ Compiles to the following:
 ```
 This can create a lot of overhead for small functions or functions you only plan to call once, or might be incompatible
 with certain applications. The `inline` keyword instead forces the statements in a function to be created directly in the enclosing
-scope at each point that the function is called. For example, inlining the function from earlier, like so:
+scope. For example, inlining the function from earlier, like this:
 ```
 inline float add_one(float in)
 {
@@ -1160,7 +1199,7 @@ inline float add_one(float in)
 float x = add_one(2.0);
 float y = add_one(5.0);
 ```
-Instead directly compiles to:
+Instead, directly compiles to:
 ```xml
 <add name="x" type="float">
     <input name="in1" type="float" value="2" />
@@ -1172,7 +1211,182 @@ Instead directly compiles to:
 </add>
 ```
 
-`inline` can also be added to the for loop statement and has the same effect as with functions.
+### Notes
+
+* Functions can be declared inside other functions.
+* Functions must be declared prior to being called.
+* Recursion is not possible in ShadingLanguageX.
+* MaterialX standard library nodes with multiple outputs (such as the separate nodes) return their values in an unnamed struct. For example:
+```
+// Signature: {float outx, float outy} separate2(const vec2 in)
+float u, v = separate2(texcoord());
+```
+
+# Custom Data Types
+
+## Unnamed Struct
+
+The simplest custom data type is the unnamed struct. It allows the user to declare a list of variables (known as fields) that are held inside a single container.
+Field modifiers and types are declared the same way as a standard variable, but the name is optional. 
+
+```
+{modifier-list field_type1 field_name1?, modifier-list field_type2 field_name2?, ...}
+```
+
+`modifier-list` is a list of zero or more modifiers.  
+`field_typeN` can be any primitive or custom data type.  
+`field_nameN` can be any valid identifier. It is optional.  
+Unnamed structs can declare any number of fields.
+
+Unnamed struct fields can be accessed using the indexing operator:
+
+```
+mutable {float, float} a = {1.0, 2.0};
+print a[0];
+print a[1];
+a[0] = 3.0;
+a[1] = 4.0;
+```
+
+If names are provided, they can be accessed using either the indexing and dot operator:
+
+```
+mutable {float x, float y} a = {1.0, 2.0};
+print a[0];
+print a.y;
+a[0] = 3.0;
+a.y = 4.0;
+```
+
+### Modifiers
+
+Field modifiers work the same way as for variables:
+
+```
+{const float x, mutable float y} a = {1.0, 2.0};
+a.x = 3.0; // Error: a.x is const
+a.y = 4.0; // OK: x.y is mutable
+a = {5.0, 6.0}; // Error: a is const (by default)
+```
+
+This is where `const` can be useful. If you have a field that you always want to be immutable, regardless of the status
+of its container, you can declare it as `const` which overrides the mutability of its container, for example:
+
+```
+mutable {float x, const float y} a = {1.0, 2.0};
+a.x = 3.0; // OK: x inherits its mutability from its container
+a.y = 4.0; // Error: y is declared const, overriding `a`s mutability
+```
+
+The rule is that a field of a container will inherit the mutability of the container itself, unless overridden as part of that fields declaration.
+This applies to unnamed structs, `using` statements and `class` definitions.
+
+### Assignment and Function Passing
+
+When assigning one unnamed struct to another, passing an unnamed struct as an argument to a function, or returning an
+unnamed struct from a function, only the number of fields and field types are required to match. Field modifiers and names can be different
+between the two unnamed structs. For example:
+
+```
+{float x, float y} a = {1.0, 2.0};
+{float s, float t} b = a;
+
+{float, float} foo({float u, float v} c)
+{
+    return {c.u * 2.0, c.v * 2.0};
+}
+
+{float i, float j} d = foo(b);
+
+{vec3, string} e = d; // Error: types do not match
+```
+
+### Example
+
+```
+{vec2, float, color3} user_values = {
+    geompropvalue("center"),
+    geompropvalue("radius"),
+    geompropvalue("color"),
+};
+
+color3 c = circle(center = user_values[0], radius = user_values[1]) * user_values[2];
+```
+
+```
+vec3 get_end_of_ray({vec3 orig, vec3 dir} ray, float d)
+{
+    return ray.orig + ray.dir * d;
+}
+
+{vec3 orig, vec3 dir} ray = {vec3{0, 0, 0}, vec3{0, 0, 1}};
+
+vec3 p = get_end_of_ray(ray, 10);
+```
+
+## Using Statement
+
+Repeatedly typing out unnamed structs can be tedious and error-prone. `using` statements allow the user to create an alias
+for an unnamed struct, which can be used in its place. For example:
+
+```
+using Ray = {vec3 orig, vec3 dir};
+
+vec3 get_end_of_ray(Ray ray, float d)
+{
+    return ray.orig + ray.dir * d;
+}
+
+Ray ray = {vec3{0, 0, 0}, vec3{0, 0, 1}};
+
+vec3 p = get_end_of_ray(ray, 10);
+```
+
+## Class Definition
+
+```
+class name
+{
+    // fields
+    modifier-list field_type1 field_name1;
+    
+    // methods
+    modifier-list type method_name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...)
+    {
+        statement*
+    }
+    
+    // constructors
+    name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...)
+}
+```
+
+### Example
+
+```
+class Ray
+{
+    // constructor
+    Ray(vec3 orig, vec3 dir)
+    {
+        this.orig = orig;
+        this.dir = dir;
+    }
+    
+    // method
+    vec3 end_of_ray(float d)
+    {
+        return orig + dir * d;
+    }
+    
+    // fields
+    vec3 orig;
+    vec3 dir;
+}
+
+Ray ray = Ray{vec3{0, 0, 0}, vec3{0, 0, 1}};
+vec3 p = ray.end_of_ray(10);
+```
 
 # Attributes
 
