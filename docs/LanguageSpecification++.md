@@ -32,7 +32,6 @@
 24. [Standard Library](#standard-library)
 25. [Scope](#scope)
 26. [Preprocessor Directives](#preprocessor-directives)
-27. [mxslc++](#mxslc++)
 
 # Introduction
 
@@ -44,7 +43,7 @@ ShadingLanguageX is a simple, yet powerful language for writing complex Material
 
 A core aim of ShadingLanguageX is to maximize portability. At the time of writing, many renderers and frameworks only support
 a subset of the MaterialX specification. To ensure that ShaderLanguageX is compatible with as many platforms as possible,
-it compiles only to standard node elements. As of _version 0.5-beta_, functions and for loops compile to NodeDef/NodeGraphs
+it compiles only to standard node elements. Additionally, functions compile to NodeDef/NodeGraphs
 for better cohesion with the main MaterialX specification. As support for MaterialX becomes more
 mature and as we continue to work on ShadingLanguageX more features will become utilised.
 
@@ -1344,6 +1343,12 @@ vec3 p = get_end_of_ray(ray, 10);
 
 ## Class Definition
 
+Classes give the most customisation when creating custom data types. Users can define fields, methods and constructors 
+within class definitions, with field and method definitions follow the same rules as variable and function definitions.
+The only difference being that fields do not need to be defined above a method for the method to be able to access them.
+However, methods still need to be defined above another method in order to be called. Constructors follow a similar syntax
+to C++ where the constructor name is the same as the class name.
+
 ```
 class name
 {
@@ -1358,6 +1363,34 @@ class name
     
     // constructors
     name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...)
+}
+```
+
+## This
+
+Class methods can access the class instance using the `this` keyword. They can also access the class instances fields directly. For example:
+
+```
+class Sphere
+{
+    vec2 center;
+    float radius;
+    
+    float area()
+    {
+        return 4.0 * PI * radius * radius;
+        // OR
+        return 4.0 * PI * this.radius * this.radius;
+    }
+    
+    Sphere grow(float amount)
+    {
+        // copy instance
+        Sphere result = this;
+        
+        result.radius += amount;
+        return result;
+    }
 }
 ```
 
@@ -1388,6 +1421,37 @@ Ray ray = Ray{vec3{0, 0, 0}, vec3{0, 0, 1}};
 vec3 p = ray.end_of_ray(10);
 ```
 
+> [!TIP]
+> ### New in mxslc++!
+> # Print Statement
+> 
+> Print statements are used to output data to the console. They can be used to debug expression values during the compilation
+> of the shader.
+> 
+> ```
+> print "hello world";
+>     > hello world
+>     
+> print 1 + 1;
+>     > 2
+>     
+> print randomcolor();
+>     > <randomcolor name="node1" type="color3" />
+>     
+> float u, v = separate2(texcoord());
+> print u;
+>     > <output name="outx" type="float" />
+> ```
+> 
+> Multiple expressions can be passed, with each printing on a new line:
+> 
+> ```
+> print 1 + 1, 2 + 2, 3 + 3;
+>     > 2
+>     > 4
+>     > 6
+> ```
+
 # Attributes
 
 Attributes can be defined above statements or parameters and are added to the element that the statement compiles into. For example,
@@ -1414,7 +1478,7 @@ float add_one(float in)
 </nodegraph>
 ```
 Attributes can also be added to the input/output elements of a NodeDef by specifying the name of the port before the attribute
-name. Outputs are called `out` by default in MaterialX.
+name. Return values are called `out` to match the default in MaterialX.
 ```
 @nodegroup "math"
 @doc "adds one to in"
@@ -1458,6 +1522,14 @@ attributes will be added to the node that these statements compile into.
 @doc "an image of a butterfly"
 @file.colorspace "srgb_texture"
 color3 c = image("butterfly1.png");
+
+// OR
+
+@doc "an image of a butterfly"
+color3 c = image(
+    @colorspace "srgb_texture"
+    "butterfly1.png"
+);
 ```
 ```xml
 <image name="c" type="color3" doc="an image of a butterfly">
@@ -1465,83 +1537,145 @@ color3 c = image("butterfly1.png");
 </image>
 ```
 
-# Node Constructors
+> [!TIP]
+> ### New in mxslc++!
+> ## Document Attributes
+> 
+> To apply attributes at the document level, use `@@` instead of `@`.
+> 
+> ```
+> @@madewith "shadinglanguagex"
+> 
+> standard_surface(base_color = randomcolor());
+> ```
+> 
+> ```xml
+> <?xml version="1.0"?>
+> <materialx version="1.39" madewith="shadinglanguagex">
+>   <randomcolor name="node1" type="color3" />
+>   <standard_surface name="node2" type="surfaceshader">
+>     <input name="base_color" type="color3" nodename="node1" />
+>   </standard_surface>
+> </materialx>
+> 
+> ```
 
-Node constructors are a unique expression to ShadingLanguageX, but provide crucial functionality.
-
-`{string, type: input1=value1, input2=value2...}`  
-`string` can be any valid string value.    
-`type` can be any supported data type.  
-`inputN` can be any valid identifier.
-`valueN` can be any valid expression.
-
-Node constructors compile to the node element specified by `string` and the type specified by `type`. Node inputs are compiled from
-the list of inputs that come after the colon `:`.
-
-Node constructors give developers the ability to define any node that they want, regardless of whether it is implemented
-in ShadingLanguageX or not. For example, the `normalmap` node from the MaterialX Standard Node specification changed signature
-in v1.39. However, many renderers are still using the v1.38 signature. Node constructors can be used to create node elements
-with an old input signature to ensure compatability with as many renderers as possible, or to declare nodes that are not defined
-in the MaterialX specification, such as renderer specific nodes.
-
-### Example
-
-#### Normalmap compatability
-```
-vec normals = image("normals.png");
-
-// v1.38 normalmap
-vec3 nm = {"normalmap", vec3: in=normals, space="tangent", scale=0.1};
-```
-compiles to:
-```
-<normalmap name="nm" type="vector3">
-  <input name="in" type="vector3" nodename="normals" />
-  <input name="space" type="string" value="tangent" />
-  <input name="scale" type="float" value="0.1" />
-</normalmap>
-...
-```
-
-#### Renderer-specific nodes
-```
-// Houdini bias node
-float bias = {"hmtlxbias", float: in=0.0, bias=0.5};
-```
-
-### Notes
-
-Unlike the rest of ShadingLanguageX, node constructors do not perform any type checking. In fact, the data type of the inputs
-is determined by the values that are passed to them.
+> [!WARNING]
+> ### Not yet supported in mxslc++
+> # Node Constructors
+> 
+> Node constructors are a unique expression to ShadingLanguageX.
+> 
+> `{string, type: input1=value1, input2=value2...}`  
+> `string` can be any valid string value.    
+> `type` can be any supported data type.  
+> `inputN` can be any valid identifier.
+> `valueN` can be any valid expression.
+> 
+> Node constructors compile to the node element specified by `string` and the type specified by `type`. Node inputs are compiled from
+> the list of inputs that come after the colon `:`.
+> 
+> Node constructors give developers the ability to define any node that they want, regardless of whether it is implemented
+> in ShadingLanguageX or not. For example, the `normalmap` node from the MaterialX Standard Node specification changed signature
+> in v1.39. However, many renderers are still using the v1.38 signature. Node constructors can be used to create node elements
+> with an old input signature to ensure compatability with as many renderers as possible, or to declare nodes that are not defined
+> in the MaterialX specification, such as renderer specific nodes.
+> 
+> ### Example
+> 
+> #### Normalmap compatability
+> ```
+> vec3 normals = image("normals.png");
+> 
+> // v1.38 normalmap
+> vec3 nm = {"normalmap", vec3: in=normals, space="tangent", scale=0.1};
+> ```
+> compiles to:
+> ```
+> <normalmap name="nm" type="vector3">
+>   <input name="in" type="vector3" nodename="normals" />
+>   <input name="space" type="string" value="tangent" />
+>   <input name="scale" type="float" value="0.1" />
+> </normalmap>
+> ...
+> ```
+> 
+> #### Renderer-specific nodes
+> ```
+> // Houdini bias node
+> float bias = {"hmtlxbias", float: in=0.0, bias=0.5};
+> ```
+> 
+> ### Notes
+> 
+> Unlike the rest of ShadingLanguageX, node constructors do not perform any type checking. In fact, the data type of the inputs
+> is determined by the values that are passed to them.
 
 # Null Expression
 
-MaterialX defines default values for all node inputs in the standard library. To use these defaults instead of having to provide your own, you can use the `null` keyword.
+MaterialX defines default values for all node inputs in the standard library. To use these defaults instead of 
+having to provide your own, you can use the `null` keyword. Essentially the `null` value will either not create or even delete the input port
+from the node, so the MaterialX default is used instead.
+
 ```
-string layer = if (use_custom_layer) { geompropvalue("custom_layer") } else { null };
-color3 c = image("image.png", layer=layer);
+surfaceshader s = standard_surface(base = 0.8, base_color = color3{1, 0, 0});
+
+print s;
+    > <standard_surface name="node2" type="surfaceshader">
+    >   <input name="base" type="float" value="0.8" />
+    >   <input name="base_color" type="color3" value="1, 0, 0" />
+    > </standard_surface>
+  
+s.base_color = null;
+
+print s;
+    > <standard_surface name="node2" type="surfaceshader">
+    >   <input name="base" type="float" value="0.8" />
+    > </standard_surface>
+  
 ```
 
 Null expressions are also useful as default parameter values where it makes sense to use the default MaterialX behaviour.
 ```
-float randomfloat<float, int>(T in=null, float min=null, float max=null, int seed=null)
+{float, float} randompoint(float in=null, float min=null, float max=null)
 {
-    return {"randomfloat", float: in=in, min=min, max=max, seed=seed);
+    return {
+        randomfloat(in=in, min=min, max=max, seed=1),
+        randomfloat(in=in, min=min, max=max, seed=2),
+    };
 }
 ```
 
 # Standard Library
 
 ShadingLanguageX provides access to the nodes specified in the [MaterialX Data Library](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/libraries) as a standard library of functions.
-More information about these nodes can be found the in the MaterialX StandardNodes, PBRSpec and NPRSpec [documents](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/documents/Specification).
-They are included automatically by the compiler and don't need to be manually included with the `#include` directive.
-Functions have the same signature (name, input types and output type) as their respective nodes in the MaterialX specification. Most of them are templated where appropriate and use the `null` expression
-to fall back to the default MaterialX behaviour when a parameter is not set.
+More information about these nodes can be found in the MaterialX StandardNodes, PBRSpec and NPRSpec [documents](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/documents/Specification).
+They are included automatically by the compiler and don't need to be manually included with the `#include` directive. For example:
+
+```
+vec3 i = viewdirection();
+color3 c = randomcolor();
+```
+
+Function templates are added based on the name of the NodeDef, for example, the `texcoord` node has two NodeDefs:
+`ND_texcoord_vector2` and `ND_texcoord_vector3`, which provide the two functions:
+
+```
+auto uv = texcoord<vec2>();
+auto uvw = texcoord<vec3>();
+```
+
+Finally, any standard library functions that return multiple values, like `separate2`, return all values in an unnamed struct:
+
+```
+vec2 uv = texcoord();
+float u, v = separate2(uv);
+```
 
 # Scope
 
 ShadingLanguageX follows the same scoping rules as most C-based languages. Scopes are denoted by a pair of curly braces `{` `}` like in function declarations or for loops.
-Variables are only accessible inside their own scope as well as any nested scopes.
+Variables can be accessed and modified inside their own scope as well as any nested scopes.
 ```
 float a = 0.0;
 void do_something()
@@ -1557,166 +1691,109 @@ void do_something()
 In the previous example, `a` is part of the global scope and is accessible everywhere, `b` is accessible only inside the `do_something`
 function and the for loop, and `c` is accessible only within the for loop.
 
-# Preprocessor Directives
-
-ShadingLanguageX supports many of the C preprocessor directives:
-* File inclusion (`#include`)
-* Macro definition (`#define` `#undef`)
-* Conditional compilation (`#if` `#ifdef` `#ifndef` `#elif` `#else` `#endif`)
-
-## File Inclusion
-
-The `#include` directive allows users to include other `.mxsl` or `.mtlx` files in the current compilation, giving them access to
-any Nodes or NodeDefs defined in those files. The directive also supports inclusion of directories as well as specific files. All files
-with the extension `.mxsl` or `.mtlx` inside the directory will be included. The search is not recursive, i.e., it does not include
-files from subdirectories. Files are not included in any particular order; if the order of included files is important,
-then the user should include each file individually in the necessary order.
-
-When including a file, paths may be absolute or relative. If the path is relative, ShadingLanguageX will look for the file in
-the following directories in order:
-1. Any additional directories passed to the compiler (see Command Line Options below)
-2. The parent directory of the `.mxsl` file currently being compiled.
-3. The parent directory of the mxslc executable.
-
-### Example
-
-_color_enums.mxsl_:
-```
-const color3 RED = color3(1.0, 0.0, 0.0)
-const color3 GREEN = color3(0.0, 1.0, 0.0)
-const color3 BLUE = color3(0.0, 0.0, 1.0)
-```
-
-_file_incl_example.mxsl_:
-```
-#include "color_enums.mxsl"
-vec2 uv = texcoord();
-color3 c = mix(mix(RED, GREEN, uv.x), BLUE, uv.y);
-standard_surface(base_color=c);
-```
-
-## Loadlib
-
-The `#loadlib` directive looks for NodeDef elements in specified `.mtlx` or `.mxsl` files and allows users to call them
-from the source file being compiled. The NodeDefs are __not__ included in the compiled file, similar
-to how the MaterialX Standard Nodes are not included in compiled SLX files.
-
-The `#loadlib` directive follows the same rules as the `#include` directive when searching for files (see above).
-
-The directive takes an optional list of function names after the specified path. When included, the compiler will only
-load functions with the specified names.
-
-```
-// loads all functions from colors.mxsl
-#loadlib "colors.mxsl"
-
-// loads only mad and pi from math.mtlx
-#loadlib "math.mtlx" (mad, pi)
-```
-
-## Macro Definition
-
-Macros are more limited in ShadingLanguageX than in C. Only flag- and object-like macros are supported, e.g.,
-`#define USE_FFT` and `#define PI 3.14159`. Function-like macros as well as macro stringification and token pasting are not supported.
-
-There is currently one macro pre-defined during shader compilation:
-* `__MAIN__` is defined during compilation of the file originally given to the compiler.
-
-`> ./mxslc.exe macro_def_example.mxsl`
-```
-// macro_def_example.mxsl
-#ifdef __MAIN__ // will be defined in this context
-#include "macro_def_incl.mxsl"
-#endif
-```
-```
-// macro_def_incl.mxsl
-#ifdef __MAIN__ // will not be defined in this context
-...
-#endif
-```
-
-## Conditional Compilation
-
-Conditional compilations directives operate as they do in C with no notable changes.
-
-## Version
-
-The `#version` directive can be used to tell the compiler which version of MaterialX it should target when loading the standard
-library and validating the compiled .mtlx file. It also sets the version string of the compiled .mtlx file. You can
-specify the full version number, e.g., `#version 1.38.10`, or simply specify the major and minor version numbers,
-e.g., `#version 1.38`, in which case the most recent patch number will be added.
-
-### Notes
-
-* You can omit the `#version` directive, in which case the compiler will use the most recent version of MaterialX (currently 1.39.3).
-* The `#version` directive is ignored if the file is being imported using the `#include` directive.
-* The version can also be specified as a compiler option. The compiler option overrides the `#version` directive if the two
-  versions do not match.
-
-### Example
-
-```
-#version 1.38
-
-// deprecated swizzle node
-vec2 vu = swizzle(texcoord<vec2>(), "yx");
-```
-
-# mxslc
-
-mxslc is the open-source compiler for ShadingLanguageX. It can be downloaded from the GitHub repository [releases](https://github.com/jakethorn/ShadingLanguageX/releases) section or installed using `pip install mxslc`.
-It can be run either using the compiled executable or with the Python API.
-
-## Executable
-
-The executable is a compiled version of the Python API with some added argument parsing functionality.
-
-### Command Line Options
-
-```
-positional arguments:
-  mxsl_path                        Input path to mxsl file or containing folder
-
-options:
-  -h, --help                       show this help message and exit
-  -o, --output-path OUTPUT_PATH    Output path of generated mtlx file or containing folder
-  -v, --version VERSION            Target MaterialX version
-  -m, --main-func MAIN_FUNC        Name of main entry function into the program
-  -a, --main-args MAIN_ARGS        Arguments to be passed to the main function
-  -i, --include-dirs INCLUDE_DIRS  Additional directories to search when including files
-  -d, --define MACROS              Additional macro definitions
-  --validate                       Validate the output MaterialX file
-```
-
-### Example
-
-```
-material color_shader(float r, float g, float b)
-{
-    return surfacematerial(
-        standard_surface(base_color=color3(r, g, b))
-    );
-}
-```
-`> ./mxslc.exe example.mxsl -o cyan.mtlx -m color_shader -a 0.0 1.0, 1.0`
-
-![]()
-
-```
-material main()
-{
-    color3 c = image("albedo.png");
-#ifdef SRGB
-    c ^= GAMMA;
-#endif
-    return surfacematerial(
-        standard_surface(base_color=c)
-    );
-}
-```
-`> ./mxslc.exe example.mxsl -d SRGB -d GAMMA 2.2`
-
-## Python API
-
-See [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/PythonAPI.md) for the mxslc Python API documentation.
+> [!WARNING]
+> ### Not yet supported in mxslc++
+> # Preprocessor Directives
+> 
+> ShadingLanguageX supports many of the C preprocessor directives:
+> * File inclusion (`#include`)
+> * Macro definition (`#define` `#undef`)
+> * Conditional compilation (`#if` `#ifdef` `#ifndef` `#elif` `#else` `#endif`)
+> 
+> ## File Inclusion
+> 
+> The `#include` directive allows users to include other `.mxsl` or `.mtlx` files in the current compilation, giving them access to
+> any Nodes or NodeDefs defined in those files. The directive also supports inclusion of directories as well as specific files. All files
+> with the extension `.mxsl` or `.mtlx` inside the directory will be included. The search is not recursive, i.e., it does not include
+> files from subdirectories. Files are not included in any particular order; if the order of included files is important,
+> then the user should include each file individually in the necessary order.
+> 
+> When including a file, paths may be absolute or relative. If the path is relative, ShadingLanguageX will look for the file in
+> the following directories in order:
+> 1. Any additional directories passed to the compiler (see Command Line Options below)
+> 2. The parent directory of the `.mxsl` file currently being compiled.
+> 3. The parent directory of the mxslc executable.
+> 
+> ### Example
+> 
+> _color_enums.mxsl_:
+> ```
+> const color3 RED = color3(1.0, 0.0, 0.0)
+> const color3 GREEN = color3(0.0, 1.0, 0.0)
+> const color3 BLUE = color3(0.0, 0.0, 1.0)
+> ```
+> 
+> _file_incl_example.mxsl_:
+> ```
+> #include "color_enums.mxsl"
+> vec2 uv = texcoord();
+> color3 c = mix(mix(RED, GREEN, uv.x), BLUE, uv.y);
+> standard_surface(base_color=c);
+> ```
+> 
+> ## Loadlib
+> 
+> The `#loadlib` directive looks for NodeDef elements in specified `.mtlx` or `.mxsl` files and allows users to call them
+> from the source file being compiled. The NodeDefs are __not__ included in the compiled file, similar
+> to how the MaterialX Standard Nodes are not included in compiled SLX files.
+> 
+> The `#loadlib` directive follows the same rules as the `#include` directive when searching for files (see above).
+> 
+> The directive takes an optional list of function names after the specified path. When included, the compiler will only
+> load functions with the specified names.
+> 
+> ```
+> // loads all functions from colors.mxsl
+> #loadlib "colors.mxsl"
+> 
+> // loads only mad and pi from math.mtlx
+> #loadlib "math.mtlx" (mad, pi)
+> ```
+> 
+> ## Macro Definition
+> 
+> Macros are more limited in ShadingLanguageX than in C. Only flag- and object-like macros are supported, e.g.,
+> `#define USE_FFT` and `#define PI 3.14159`. Function-like macros as well as macro stringification and token pasting are not supported.
+> 
+> There is currently one macro pre-defined during shader compilation:
+> * `__MAIN__` is defined during compilation of the file originally given to the compiler.
+> 
+> `> ./mxslc.exe macro_def_example.mxsl`
+> ```
+> // macro_def_example.mxsl
+> #ifdef __MAIN__ // will be defined in this context
+> #include "macro_def_incl.mxsl"
+> #endif
+> ```
+> ```
+> // macro_def_incl.mxsl
+> #ifdef __MAIN__ // will not be defined in this context
+> ...
+> #endif
+> ```
+> 
+> ## Conditional Compilation
+> 
+> Conditional compilations directives operate as they do in C with no notable changes.
+> 
+> ## Version
+> 
+> The `#version` directive can be used to tell the compiler which version of MaterialX it should target when loading the standard
+> library and validating the compiled .mtlx file. It also sets the version string of the compiled .mtlx file. You can
+> specify the full version number, e.g., `#version 1.38.10`, or simply specify the major and minor version numbers,
+> e.g., `#version 1.38`, in which case the most recent patch number will be added.
+> 
+> ### Notes
+> 
+> * You can omit the `#version` directive, in which case the compiler will use the most recent version of MaterialX (currently 1.39.3).
+> * The `#version` directive is ignored if the file is being imported using the `#include` directive.
+> * The version can also be specified as a compiler option. The compiler option overrides the `#version` directive if the two versions do not match.
+> 
+> ### Example
+> 
+> ```
+> #version 1.38
+> 
+> // deprecated swizzle node
+> vec2 vu = swizzle(texcoord<vec2>(), "yx");
+> ```
