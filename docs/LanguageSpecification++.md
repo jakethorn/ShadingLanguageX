@@ -17,10 +17,11 @@
 9. [Whitespace](#whitespace)
 10. [Comments](#comments)
 11. [Operators](#operators)
-12. [Variable Definitions](#variable-definitions)
-13. [Variable Assignments](#variable-assignments)
-14. [Constructors](#constructors)
-15. [If Expressions](#if-expressions)
+12. [Variable Definition](#variable-definition)
+13. [Variable Assignment](#variable-assignment)
+14. [Named Constructor](#named-constructor)
+15. [If Expression](#if-expression)
+16. [If Statement](#if-statement)
 16. [Switch Expressions](#switch-expressions)
 17. [For Loops](#for-loops)
 18. [User Functions](#user-functions)
@@ -47,7 +48,7 @@ it compiles only to standard node elements. Additionally, functions compile to N
 for better cohesion with the main MaterialX specification. As support for MaterialX becomes more
 mature and as we continue to work on ShadingLanguageX more features will become utilised.
 
-At the end of the day, ShadingLanguageX is based on the MaterialX specification and we've striven for equavilency as much
+At the end of the day, ShadingLanguageX is based on the MaterialX specification and we've striven for equivalency as much
 as possible. As such, if anything is omitted from this document, you can assume that the behaviour is the same as what is
 described in the official MaterialX [specification](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.Specification.md). For example, we don't specify in this document what is the return
 type of a `vector3` multiplied by a `float`, as it is already described in the MaterialX Standard Node [document](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.StandardNodes.md).
@@ -71,7 +72,7 @@ material toon_material = surfacematerial(surface);
 `> ./mxslc++.exe my_shader.mxsl`
 
 compiles to:
-```
+```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
   <viewdirection name="node1" type="vector3" />
@@ -127,7 +128,7 @@ compiles to:
 >
 >
 > Otherwise, an entry function name can be passed
-> to the compiler as an additional argument (see [mxslc++](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#mxslc) section below for more information). If the entry function accepts any arguments, these can also
+> to the compiler as an additional argument. If the entry function accepts any arguments, these can also
 > be passed to the compiler. For example:
 > ```
 > inline void my_function(float r, float g, float b, float roughness, float metalness)
@@ -149,7 +150,7 @@ compiles to:
 
 Supported data types match the ones found in the MaterialX specification, with the exception of arrays.
 
-## Supported Data Types
+## Primitive Data Types
 
 | Data Type            | Example                       |
 |----------------------|-------------------------------|
@@ -183,7 +184,9 @@ In this document we will typically use the aliased version for the sake of brevi
 `integer` ➔ `int`  
 `vector2` ➔ `vec2`  
 `vector3` ➔ `vec3`  
-`vector4` ➔ `vec4`
+`vector4` ➔ `vec4`  
+`matrix33` ➔ `mat3`  
+`matrix44` ➔ `mat4`
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -214,7 +217,8 @@ In this document we will typically use the aliased version for the sake of brevi
 ## Type Conversions
 
 ShadingLanguageX supports a limited number of implicit conversions. Integers are implicitly converted to floats and
-strings to filenames. Otherwise variables will need to be explicitly converted using a [Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors).
+strings to filenames. Otherwise, variables will need to be explicitly converted using a 
+[Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#named-constructor).
 
 ```
 float x = 0;                 // implicit int ➔ float
@@ -227,9 +231,9 @@ color3 c = color3{1.0};      // explicit float ➔ color3
 > ## User Defined Types
 >
 > ShadingLanguageX supports user-defined types through
-> [Unnamed structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-structs),
-> [Using Statements](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#using-statements) and
-> [Class Definitions](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#class-definitions). For example:
+> [Unnamed Structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-struct),
+> [Using Statements](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#using-statement) and
+> [Class Definitions](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#class-definition). For example:
 > ```
 > // unnamed struct
 > {float, float} random_point()
@@ -240,7 +244,7 @@ color3 c = color3{1.0};      // explicit float ➔ color3
 > // using statement
 > using Point = {float x, float y};
 > 
-> float my_dot(Point a, Point b)
+> float dotproduct(Point a, Point b)
 > {
 >     return a.x * b.x + a.y * b.y;
 > }
@@ -268,8 +272,9 @@ in its own section. The following table gives a quick overview of all the expres
 | Binary Operator                 | `a + b`                              |
 | Unary Operator                  | `-a`                                 |
 | Ternary Relational Operator     | `x < a < y`                          |
-| Property Access (Dot) Operator  | `s.radius`                           |
+| Field Access Operator           | `s.radius`                           |
 | Swizzle Operator                | `c.rgb`                              |
+| Port Access Operator            | `s.base_color`                       |
 | Indexing Operator               | `a[0]`                               |
 | Literal                         | `3.14`                               |
 | Identifier                      | `i`                                  |
@@ -300,13 +305,13 @@ the statements supported by ShadingLanguageX.
 | Variable Assignment       | `a = 1.0;`                                  |
 | Function Definition       | `{float, float} zeros() { return {0, 0}; }` |
 | Multi-Variable Definition | `float a, b = zeros();`                     |
-| For Range Loop            | `for (int i = 0:10) { a += 1.0; }`          |
+| If Statement              | `if (true) { ... } else { ... }`            |
+| For Range Loop            | `for (int i = 0:9) { a++; }`                |
 | For Each Loop             | `for (int i = {1, 5, 3}) { a += i; }`       |
-| Expression Statement      | `standard_surface(base_color=color3(a));`   |
+| Expression Statement      | `standard_surface(base=1.0);`               |
 | Using Statement           | `using Point = {float x, float y};`         |
 | Class Statement           | `class Point { float x; float y; }`         |
 | Print Statement           | `print a;`                                  |
-| If Statement              | `if (true) { ... } else { ... }`            |
 
 # Literals
 
@@ -315,15 +320,15 @@ Literals represent the fundamental data used by the system.
 | Data Type  | Examples                               |
 |------------|----------------------------------------|
 | `boolean`  | `true` `false`                         |
-| `integer`  | `79`                                   |
+| `integer`  | `1` `79` `1000000`                      |
 | `float`    | `0.5` `2.` `.9` `2.5e6` `2.e3` `.9e-3` |
 | `string`   | `"tangent"` `"my_image.png"`           |
 
 See 
-[Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors) 
+[Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructor) 
 and
-[Unnamed Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-constructors)
-for information on how to initialise vectors, colors and custom data types.
+[Unnamed Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-constructor)
+for information on how to initialise vectors, colors and user-defined data types.
 
 # Identifiers
 
@@ -338,7 +343,7 @@ MaterialX element names and temporary variables/functions.
 ```
 int i = 0;
 int _i = i + 1;
-vec3 UP = vec3(0.0, 1.0, 0.0);
+vec3 UP = vec3{0.0, 1.0, 0.0};
 float n_angle = dotproduct(UP, normal());
 float pi2 = 3.14 * 2.0;
 ```
@@ -350,7 +355,7 @@ The following identifiers have a special meaning in ShadingLanguageX and cannot 
 `if` `else` `switch` `for` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
 `global` `default` `function` `using` `class` `this` `print` `break`
 
-### Notes
+### Note
 
 ShadingLanguageX is an evolving language. Keywords might be added in each update which might cause shaders to break which
 were previously working correctly. In general, try not to use identifiers that are popular keywords in similar
@@ -378,6 +383,8 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
 
 # Operators
 
+## Binary Operators
+
 | Operation | MaterialX Node(s)   |
 |-----------|---------------------|
 | `a + b`   | `add`               |
@@ -394,12 +401,14 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
 | `a != b`  | `ifequal`+`not`     |
 | `a & b`   | `and`               |
 | `a \| b`  | `or`                |
+
+## Unary Operators
+
+| Operation | MaterialX Node(s)   |
+|-----------|---------------------|
 | `!a`      | `not`               |
 | `-a`      | `subtract`          |
 | `+a`      |                     |
-| `a[1]`    | `extract`           |
-| `a.xy`    | `extract`+`combine` |
-| `(a)`     |                     |
 
 ### Notes
 
@@ -407,18 +416,48 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
 * The MaterialX arithmetic nodes specify that vectors/colors must be the first input if paired with a float, however, this
   is not the case in ShadingLanguageX, a vector/color can be either the left or right value, for example, `2.0 * vec3{}`
   is equivalent to `vec3{} * 2.0`.
-* The `extract` example above for the indexing operator only applies to vector and color types and not custom data types.
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
 > ## Ternary Relational Operator
 > 
-> ShadingLanguageX supports the Ternary Relational Operator, for example: `a < x < b` which is equivalent to `a < x and x < b`.
+> ShadingLanguageX supports the Ternary Relational Operator, for example: `a < x < b` which is equivalent to `a < x & x < b`.
 > This form can be used with any of the relational operators (i.e., `<` `<=` `>` `>=`).
+
+## Dot Operator
+
+The dot operator is used to either access the fields or methods of a variable, perform a swizzle operation
+or access an underlying node port. Which of these operations is performed is determined by the type of the variable and its
+underlying value.
+
+> [!TIP]
+> ### New in mxslc++!
+> ### Field Access Operator
+> 
+> If the variable is a user-defined type, the dot operator can be used to access the fields or methods of that variable. For example:
+> 
+> ```
+> class Point
+> {
+>     float x;
+>     float y;
+>     
+>     float distance_to(Point other)
+>     {
+>         return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+>     }
+> }
+> 
+> Point p = {1.0, 2.0};
+> Point q = {3.0, 4.0};
+> float d = p.distance_to(q);
+> ```
+
+See [User-Defined Types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#user-defined-types) for more information.
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
-> ## Swizzle Operator
+> ### Swizzle Operator
 > 
 > The Swizzle Operator allows
 > users to access vector components using any of `x` `y` `z` `w` or color channels using `r` `g` `b` `a` after a period `.`.
@@ -431,30 +470,45 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
 > Finally, vector swizzles will always return a vector or `float` type variable, the specific type is dependent on the swizzle, for example
 > `a.xy` return a `vec2`, while `a.zyzy` returns a `vec4`. Appropriately, color swizzles only return color or `float` type variables.
 > 
-> ### Example
-> 
-> `float alpha = image("alpha_mask.png").a;`  
-> `vec2 left_wall_uv = position().yz;`  
-> `color3 all_red = randomcolor().rrr;`
+> ```
+> float alpha = image("alpha_mask.png").a;  
+> vec2 left_wall_uv = position().yz;
+> color3 all_red = randomcolor().rrr;
+> ```
 
-## Precendence
+### Port Access Operator
 
-| Order of Precendence (higher operations evaluate first)                  |
-|--------------------------------------------------------------------------|
-| `(a)`                                                                    |
-| `a.b` `a[b]`                                                             |
-| `a++` `a--` `++a` `--a`                                                  |
+The port access operator either returns the value already assigned to a node port or assigns a value to that node port (only for input ports).
+This is primarily useful for complex nodes such as `standard_surface` which have many inputs.
+
+```
+surfaceshader s = standard_surface();
+s.base_color = color3{1, 0, 0};
+s.specular_roughness = 0.2;
+```
+
+## Indexing Operator
+
+TODO
+
+## Precedence
+
+| Order of Precedence (higher operations evaluate first)                  |
+|-------------------------------------------------------------------------|
+| `(a)`                                                                   |
+| `a.b` `a[b]`                                                            |
+| `a++` `a--` `++a` `--a`                                                 |
 | `a += b` `a -= b` `a *= b` `a /= b` `a ^= b` `a %= b` `a &= b` `a \|= b` |
-| `-a` `+a` `!a`                                                           |
-| `a ^ b`                                                                  |
-| `a * b` `a / b` `a % b`                                                  |
-| `a + b` `a - b`                                                          |
-| `a > b` `a >= b` `a < b` `a <= b`                                        |
-| `a == b` `a != b`                                                        |
-| `a & b` `a \| b`                                                         |
+| `-a` `+a` `!a`                                                          |
+| `a ^ b`                                                                 |
+| `a * b` `a / b` `a % b`                                                 |
+| `a + b` `a - b`                                                         |
+| `a > b` `a >= b` `a < b` `a <= b`                                       |
+| `a == b` `a != b`                                                       |
+| `a & b` `a \| b`                                                        |
 
-When two operators with equal precedence are used, the leftmost operator with evaluate first.  
-As shown in the table above, precendence can be controlled using the Grouping Operator `(a)`. For example, in the expression
+When two operators with equal precedence are used, the leftmost operator will evaluate first.  
+As shown in the table above, precendence can be controlled using the grouping operator `(a)`. For example, in the expression
 `a + b * c`, the `b * c` will evaluate first, however, in the expression `(a + b) * c`, the `a + b` will evaluate first.
 
 The order of precedence of compound assignment operator (`a += b`, `a -= b`, etc.) only applies to the left hand side of 
@@ -467,31 +521,33 @@ print 1 + 1 + i += 1 + 1;
 print (1 + 1 + (i += (1 + 1)));
 ```
 
-# Variable Definitions
+# Variable Definition
 
 ```
 modifier-list type name = initial-value;
 ```   
 
 `modifier-list` is a list of zero or more modifiers.  
-`type` can be any primitive or custom data type.  
+`type` can be any primitive or user-defined data type.  
 `name` can be any valid identifier.  
 `initial-value` can be any valid expression that evaluates to `type`. It is optional.
 
-### Example
+### Examples
 
-`float a = 1.0;`  
-`float b = a;`  
-`float c;`  
-`bool half_chance = randomfloat() > 0.5;`  
-`int uv_channel = 3;`  
-`vec2 uv = 1.0 - texcoord(uv_channel);`  
-`string space = "world";`  
-`surfaceshader surface = standard_surface();`
+```
+float a = 1.0;
+float b = a;
+float c;
+bool half_chance = randomfloat() > 0.5;
+int uv_channel = 3;
+vec2 uv = 1.0 - texcoord(uv_channel);
+string space = "world";
+surfaceshader surface = standard_surface(
 
-`mutable int i = 0;`  
-`const float PI = 3.14;`  
-`global int iter_count = 500;`
+mutable int i = 0;
+const float PI = 3.14;
+global int iter_count = 50
+```
 
 ## Modifiers
 
@@ -522,7 +578,7 @@ x = 2; // Error
 ```
 
 This isn't particularly useful for primitive data types (except to improve readability of the code) as variables are immutable by default in ShadingLanguageX, but it has some use cases
-when defining and using custom data types.
+with [user-defined types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#user-defined-types).
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -561,7 +617,7 @@ when defining and using custom data types.
 > ### New in mxslc++!
 > ## Multi-Variable Definition
 > 
-> When returning a custom data type from a function, the variable can either be bound to a single variable of the custom
+> When returning a variable with a user-defined type from a function, the variable can either be bound to a single variable of the custom
 > data type or split into its individual components. For example:
 > 
 > ```
@@ -578,28 +634,19 @@ when defining and using custom data types.
 > // OR
 > float x, float y = randompoint();
 > 
-> // OR (if x and y share the same type)
+> // OR (only if x and y share the same type)
 > float x, y = randompoint();
 > ```
-> 
-> This works with any custom data types defined as an unnamed struct, with the `using` statement or `class` definition.
 
-# Variable Assignments
+# Variable Assignment
 
 ```
 name = value;
+name[i] = value;
+name.property = value;
 ```  
 `name` must be the name of a previously declared variable.  
-`value` can be any valid expression that evaluates to the type of `name`.
-```
-name[i] = value;
-```
-`i` must be an integer. It must be known at compile time if accessing fields of a custom data type.
-```
-name.property = value;
-```
-`property` can either be the name of a field if `name` has a custom data type or the name of an input port if `name` 
-represents a MaterialX node.  
+`value` can be any valid expression that evaluates to the type of `name`.  
 
 ### Example
 
@@ -611,7 +658,6 @@ albedo = 1.0 - albedo;
 ```
 using Point = {mutable float, mutable float};
 
-// Note: p does not need to be declared mutable because the fields are already mutable.
 Point p = {1.0, 2.0};
 
 p[0] = 3.0; // OK
@@ -686,6 +732,8 @@ s.specular_roughness = randomfloat();
 | `a &= b;`  | `a = a & b;`   |
 | `a \|= b;` | `a = a \| b;`  |
 
+### Note
+
 Increment, Decrement and Compound Assignment Operators are expressions, not statements. This means you can use them anywhere you could normally use
 an expression, such as an argument to a function. Compound Assignment Operators evaluate in the same order as prefix Increment/Decrement Operators,
 i.e., they increase the value of the variable first, and then return the value.
@@ -696,7 +744,7 @@ float a = randomfloat(seed = i+=10); // seed = 10
 float b = randomfloat(seed = i+=10); // seed = 20
 ```
 
-# Named Constructors
+# Named Constructor
 
 ```
 type{...}
@@ -731,9 +779,11 @@ see the MaterialX Standard Node document.
 
 ### Example
 
-`float is_shadow = float{x > y};`  
-`color3 white = color3{1.0};`  
-`color3 v_debug = color3{viewdirection()};`
+```
+float is_shadow = float{x > y};
+color3 white = color3{1.0};
+color3 v_debug = color3{viewdirection()};
+```
 
 ## Two Or More Arguments
 
@@ -747,25 +797,23 @@ If not enough arguments are provided, the remaining components will be zero.
 `vec4 c = vec4{4.0, a}; // will be vec4{4.0, 1.0, 2.0, 0.0}`  
 `color3 d = color3{g=1.0}; // will be color3{0.0, 1.0, 0.0}`
 
-# If Expressions
+# If Expression
 
-Unlike most languages, ShaderLanguageX has limited support for If Statements, but instead mainly uses If Expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
-ternary operators (`cond ? then : else`) than true If Statements that control the logic of the program. This makes If Expressions better suited for compiling to MaterialX nodes than If Statements.
+Unlike most languages, ShaderLanguageX has limited support for if statements but instead mainly uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
+ternary operators (`cond ? then : else`) than true if statements that control the logic of the program. 
+This makes if expressions better suited for compiling to MaterialX nodes than if statements.
 
 ```
 if (condition) { value_if_true } else { value_if_false }
 ```
 
 `condition` can be any expression that evaluates to a bool type.  
-The If Expression will evaluate to `value_if_true` if the condition is true, otherwise `value_if_false`.
+The expression will evaluate to `value_if_true` if the condition is true, otherwise `value_if_false`.
 
 The syntax `if (condition) { value_if_true }` can be used during an assignment statement. In this case, if the condition
 evaluates to false, the variable will retain its original value.
 
-As mentioned earlier, ShadingLanguageX does not support implicit type conversions. As such, both sides of the if expression
-are expected to evaluate to the same type.
-
-### Example
+### Examples
 
 ```
 mutable float a = if (x > y) { 0.5 } else { 0.7 };
@@ -786,7 +834,7 @@ else
 
 ## Else If Expressions
 
-Chained Else If Expressions are also possible. You can include any number of `else if` clauses in the expression.
+Chained else if expressions are also possible. You can include any number of `else if` clauses in the expression.
 ```
 float x = if (cond1) { val1 } else if (cond2) { val2 } else { val3 };
 ```
@@ -814,9 +862,50 @@ else
 };
 ```
 
+# If Statement
+
+ShadingLanguageX does support if statements; however, the condition must be evaluated at compile time, making them far less
+powerful than if statements in other languages.
+
+```
+if (condition)
+{
+    statement*
+}
+else if (condition)
+{
+    statement*
+}
+else
+{
+    statement*
+}
+```
+
+### Example
+
+```
+if (true)
+{
+    // do something
+}
+else
+{
+    // do something else
+}
+```
+
+```
+float a = geompropvalue("a");
+if (a > 0.5) // Error: runtime condition
+{
+    // do something
+}
+```
+
 > [!WARNING]
 > ### Not yet supported in mxslc++
-> # Switch Expressions
+> # Switch Expression
 > 
 > ShaderLanguageX also does not support switch statements, but instead uses switch expressions, for the same reasons as if
 > expressions above. They are similar to switch expressions found in the C# programming language.
@@ -841,6 +930,28 @@ else
 >     image("floor.png", texcoord=uv)
 > }
 > ```
+
+# Compile-Time Evaluation
+
+Some expressions can be evaluated at compile-time given that all arguments are also known at compile-time. For example,
+instead of `1 + 1` evaluating to an `add` node, it will just evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
+is not possible at compile-time because the user value is not known until render-time. The following list shows the compile-time expression evaluations that
+have currently been implemented.
+
+| Expression      |
+|-----------------|
+| `float + float` |
+| `float + int`   |
+| `int + float`   |
+| `int + int`     |
+
+This also means that expressions or statements that require compile-time values such as if statements, for loops and 
+indexing operators can use these expressions and not just literals. For example:
+
+```
+{float, float} x = {1.0, 2.0};
+print x[1+1]; // OK: 1+1 is evaluated at compile-time
+```
 
 # For Loop
 
@@ -1210,6 +1321,42 @@ Instead, directly compiles to:
 </add>
 ```
 
+> [!TIP]
+> ### New in mxslc++!
+> ## Default Functions
+> 
+> Functions can be declared as `default` to break ties when a function call could match two potential function overrides.
+> This was mainly implemented to make it more convenient to call some nodes from the MaterialX Standard Node library such as `randomfloat` and `randomcolor`
+> which have overrides with very similar signatures.
+> 
+> ```
+> vec3 foo(float in = 0.0)
+> {
+>     return vec3{in};
+> }
+> 
+> vec3 foo(int in = 0)
+> {
+>     return vec3{float{in}};
+> }
+> 
+> vec3 v = foo(); // Error: ambiguous function call
+> ```
+> 
+> ```
+> default vec3 foo(float in = 0.0)
+> {
+>     return vec3{in};
+> }
+> 
+> vec3 foo(int in = 0)
+> {
+>     return vec3{float{in}};
+> }
+> 
+> vec3 v = foo(); // OK: the default function is called
+> ```
+
 ### Notes
 
 * Functions can be declared inside other functions.
@@ -1221,7 +1368,7 @@ Instead, directly compiles to:
 float u, v = separate2(texcoord());
 ```
 
-# Custom Data Types
+# User-Defined Types
 
 ## Unnamed Struct
 
@@ -1421,6 +1568,79 @@ Ray ray = Ray{vec3{0, 0, 0}, vec3{0, 0, 1}};
 vec3 p = ray.end_of_ray(10);
 ```
 
+# Unnamed Constructors
+
+As you've seen throughout this document, custom data types can be initialised using the unnamed constructor, compared to primitive types
+which are initialised using the named constructor. Class types can be initialised using either.
+
+A named constructor is a specific, defined function, either one that has been defined as part of a class definition,
+or, in the case of primitive types, is defined in the ShadingLanguageX Standard Library. While an unnamed constructor simply
+evaluates the arguments passed to it, assuming the number of arguments and their types match the target type.
+
+```
+{float, float} x = {1.0, 2.0}; // OK: unnamed constructor evaluates to {float, float}, matching the target type
+
+class Point
+{
+    float x;
+    float y;
+}
+
+Point p = {3.0, 4.0}; // OK: unnamed constructor matches Points field structure
+
+Point q = {"hello", "world"}; // Error: unnamed constructor does not match Points field structure
+```
+
+# Operator Overloading
+
+Operators can be overloaded for all custom data types including unnamed structs, aliases and class types.
+Operator overload functions are defined outside of class definitions.
+
+| Operation | Function Name       |
+|-----------|---------------------|
+| `a + b`   | `__add__`           |
+| `a - b`   | `__sub__`           |
+| `a * b`   | `__mul__`           |
+| `a / b`   | `__div__`           |
+| `a % b`   | `__mod__`           |
+| `a ^ b`   | `__pow__`           |
+| `a > b`   | `__gt__`            |
+| `a >= b`  | `__ge__`            |
+| `a < b`   | `__lt__`            |
+| `a <= b`  | `__le__`            |
+| `a == b`  | `__eq__`            |
+| `a != b`  | `__ne__`            |
+| `a & b`   | `__and__`           |
+| `a \| b`  | `__or__`            |
+| `!a`      | `__not__`           |
+| `-a`      | `__neg__`           |
+| `+a`      | `__pos__`            |
+
+```
+using Point = {float x, float y};
+
+
+Point p = {1.0, 2.0};
+Point q = {3.0, 4.0};
+Point r = p + q; // Error: __add__ not defined for Points
+
+
+Point __add__(Point a, Point b)
+{
+    return {a.x + b.x, a.y + b.y};
+}
+
+Point r = p + q; // OK
+
+
+Point __add__(Point a, float b)
+{
+    return {a.x + b, a.y + b};
+}
+
+r += 10.0; // OK
+``` 
+
 > [!TIP]
 > ### New in mxslc++!
 > # Print Statement
@@ -1566,7 +1786,9 @@ color3 c = image(
 > 
 > Node constructors are a unique expression to ShadingLanguageX.
 > 
-> `{string, type: input1=value1, input2=value2...}`  
+> ```
+> {string, type: input1=value1, input2=value2...}
+> ```  
 > `string` can be any valid string value.    
 > `type` can be any supported data type.  
 > `inputN` can be any valid identifier.
