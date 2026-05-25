@@ -560,7 +560,7 @@ ShadingLanguageX supports three modifiers for variable declarations: `mutable`, 
 > ### New in mxslc++!
 > ### Mutable
 > 
-> By default, variables in ShadingLanguageX are immutable (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/VariableMutability.md) for my reasoning behind this decision). To be able to change a variable after its initial definition, 
+> By default, variables in ShadingLanguageX are immutable (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/VariableMutability.md) for my reasoning behind this decision). To be able to change a variable after its initial definition, 
 > use the `mutable` modifier.
 > 
 > ```
