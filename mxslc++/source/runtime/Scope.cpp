@@ -105,7 +105,7 @@ FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail
     if (parent_)
         return parent_->get_function(query, throw_on_fail);
     if (throw_on_fail)
-        throw CompileError{"Function not defined"s};
+        throw CompileError{"Function not defined: " + *query.name};
     else
         return nullptr;
 }
@@ -118,7 +118,7 @@ vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool thro
     if (parent_)
         return parent_->get_functions(query, throw_on_fail);
     if (throw_on_fail)
-        throw CompileError{"Functions not defined"s};
+        throw CompileError{"Functions not defined: " + *query.name};
     else
         return vector<FuncPtr>{};
 }

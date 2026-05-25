@@ -22,17 +22,20 @@
 14. [Named Constructor](#named-constructor)
 15. [If Expression](#if-expression)
 16. [If Statement](#if-statement)
-16. [Switch Expressions](#switch-expressions)
-17. [For Loops](#for-loops)
-18. [User Functions](#user-functions)
-19. [Class Definitions](#class-definitions)
-20. [Statement Modifiers](#statement-modifiers)
-21. [Attributes](#attributes)
-22. [Node Constructors](#node-constructors)
-23. [Null Expression](#null-expression)
-24. [Standard Library](#standard-library)
-25. [Scope](#scope)
-26. [Preprocessor Directives](#preprocessor-directives)
+17. [Switch Expression](#switch-expression)
+18. [Compile-Time Evaluation](#compile-time-evaluation)
+19. [For Loop](#for-loop)
+20. [Functions](#functions)
+21. [User-Defined Types](#user-defined-types)
+22. [Unnamed Constructor](#unnamed-constructor)
+23. [Operator Overloading](#operator-overloading)
+24. [Print Statement](#print-statement)
+25. [Attributes](#attributes)
+26. [Node Constructor](#node-constructor)
+27. [Null Expression](#null-expression)
+28. [Standard Library](#standard-library)
+29. [Scope](#scope)
+30. [Preprocessor Directives](#preprocessor-directives)
 
 # Introduction
 
@@ -218,7 +221,7 @@ In this document we will typically use the aliased version for the sake of brevi
 
 ShadingLanguageX supports a limited number of implicit conversions. Integers are implicitly converted to floats and
 strings to filenames. Otherwise, variables will need to be explicitly converted using a 
-[Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#named-constructor).
+[Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#named-constructor).
 
 ```
 float x = 0;                 // implicit int ➔ float
@@ -231,9 +234,9 @@ color3 c = color3{1.0};      // explicit float ➔ color3
 > ## User Defined Types
 >
 > ShadingLanguageX supports user-defined types through
-> [Unnamed Structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-struct),
-> [Using Statements](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#using-statement) and
-> [Class Definitions](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#class-definition). For example:
+> [Unnamed Structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#unnamed-struct),
+> [Using Statements](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#using-statement) and
+> [Class Definitions](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#class-definition). For example:
 > ```
 > // unnamed struct
 > {float, float} random_point()
@@ -325,9 +328,9 @@ Literals represent the fundamental data used by the system.
 | `string`   | `"tangent"` `"my_image.png"`           |
 
 See 
-[Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructor) 
+[Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#named-constructor) 
 and
-[Unnamed Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#unnamed-constructor)
+[Unnamed Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#unnamed-constructor)
 for information on how to initialise vectors, colors and user-defined data types.
 
 # Identifiers
@@ -453,7 +456,7 @@ underlying value.
 > float d = p.distance_to(q);
 > ```
 
-See [User-Defined Types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#user-defined-types) for more information.
+See [User-Defined Types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#user-defined-types) for more information.
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -578,7 +581,7 @@ x = 2; // Error
 ```
 
 This isn't particularly useful for primitive data types (except to improve readability of the code) as variables are immutable by default in ShadingLanguageX, but it has some use cases
-with [user-defined types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#user-defined-types).
+with [user-defined types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#user-defined-types).
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -862,52 +865,54 @@ else
 };
 ```
 
-# If Statement
-
-ShadingLanguageX does support if statements; however, the condition must be evaluated at compile time, making them far less
-powerful than if statements in other languages.
-
-```
-if (condition)
-{
-    statement*
-}
-else if (condition)
-{
-    statement*
-}
-else
-{
-    statement*
-}
-```
-
-### Example
-
-```
-if (true)
-{
-    // do something
-}
-else
-{
-    // do something else
-}
-```
-
-```
-float a = geompropvalue("a");
-if (a > 0.5) // Error: runtime condition
-{
-    // do something
-}
-```
+> [!TIP]
+> ### New in mxslc++!
+> # If Statement
+> 
+> ShadingLanguageX does support if statements; however, conditions must be evaluated at compile time, making them far less
+> powerful than if statements in other languages.
+> 
+> ```
+> if (condition)
+> {
+>     statement*
+> }
+> else if (condition)
+> {
+>     statement*
+> }
+> else
+> {
+>     statement*
+> }
+> ```
+> 
+> ### Example
+> 
+> ```
+> if (true)
+> {
+>     // do something
+> }
+> else
+> {
+>     // do something else
+> }
+> ```
+> 
+> ```
+> float a = geompropvalue("a");
+> if (a > 0.5) // Error: runtime condition
+> {
+>     // do something
+> }
+> ```
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
 > # Switch Expression
 > 
-> ShaderLanguageX also does not support switch statements, but instead uses switch expressions, for the same reasons as if
+> ShaderLanguageX does not support switch statements, but instead uses switch expressions, for the same reasons as if
 > expressions above. They are similar to switch expressions found in the C# programming language.
 > 
 > ```
@@ -934,7 +939,7 @@ if (a > 0.5) // Error: runtime condition
 # Compile-Time Evaluation
 
 Some expressions can be evaluated at compile-time given that all arguments are also known at compile-time. For example,
-instead of `1 + 1` evaluating to an `add` node, it will just evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
+instead of `1 + 1` evaluating to an `add` node, it will simply evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
 is not possible at compile-time because the user value is not known until render-time. The following list shows the compile-time expression evaluations that
 have currently been implemented.
 
@@ -949,14 +954,14 @@ This also means that expressions or statements that require compile-time values 
 indexing operators can use these expressions and not just literals. For example:
 
 ```
-{float, float} x = {1.0, 2.0};
+{float, float, float} x = {1.0, 2.0, 3.0};
 print x[1+1]; // OK: 1+1 is evaluated at compile-time
 ```
 
 # For Loop
 
 Unlike if and switch expressions, loops are compiled as statements in ShadingLanguageX, with the caveat that the number of
-loop iterations must be known at compile time.
+loop iterations must be known at compile-time.
 
 ## For Range Loop
 
@@ -987,11 +992,11 @@ for (type name = start-value:increment-value:end-value)
 
 ```
 // render 10 randomly sized white circles
-color3 c = color3{0.0};
+mutable color3 c = color3{0.0};
 for (int i = 0:9)
 {
     vec2 center = vec2{randomfloat(in=0, seed=i), randomfloat(in=1, seed=i)};
-    c = if (distance(center, texcoord()) < randomfloat(in=2, max=0.1, seed=i)) { color3(1.0) };
+    c = if (distance(center, texcoord()) < randomfloat(in=2, max=0.1, seed=i)) { color3{1.0} };
 }
 standard_surface(base_color=c);
 ```
@@ -1017,9 +1022,9 @@ for (modifier-list type name = value)
 ```
 {float, float, float} values = {1.0, 2.0, 3.0};
 
-for (float f = values)
+for (float v = values)
 {
-    print f;
+    print v;
 }
 ```
 
@@ -1046,7 +1051,7 @@ modifier-list function name(modifier-list param1_type param1_name, modifier-list
 `type` can be any primitive or custom data type. It can also be `void` to indicate that function does not return a value.
 In this case, the return statement in the body of the function should also be omitted.  
 `name` can be any valid identifier.  
-`paramN_type` can be any primitive or custom data type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.   
+`paramN_type` can be any primitive or user-defined type and `paramN_name` can be any valid identifier. Functions can declare any number of parameters.   
 
 ## Calling Functions
 
@@ -1087,6 +1092,27 @@ void incr_i()
 incr_i(); // i == 1.0
 incr_i(); // i == 2.0
 ```
+
+## Function Scope
+
+As well as the variables within them, functions can also access and modify variables from enclosing scopes,
+as you saw in the previous example.
+
+```
+float a = 0.0;
+void do_something()
+{
+    float b = 1.0;
+    for (int i = 0:9)
+    {
+        float c = 2.0;
+        a += b / c;
+    }
+}
+```
+
+In the above example, `a` is part of the global scope and is accessible everywhere, `b` is accessible only inside the `do_something`
+function and the for loop, and `c` is accessible only within the for loop.
 
 ## Overloading Functions
 
@@ -1193,7 +1219,7 @@ T one_minus<float, vec2, vec3, vec4, color3, color4>(T v)
 
 vec2 uv = texcoord();
 
-vec2 inv_uv = one_minus(uv); // <vec2> is inferred from return type
+vec2 inv_uv = one_minus(uv); // <vec2> is inferred from return and parameter types
 vec2 inv_uv = one_minus<vec2>(uv); // <vec2> can still be included for clarity
 ```
 
@@ -1224,7 +1250,7 @@ sincos(3.14, out s, out c);
 
 The `out` modifier can also be placed before the argument in the function call, but it's not required. If an argument is declared `out`, but the
 corresponding parameter is not, the compiler will throw an error. You will also notice that I did not have to declare the out
-parameters as `mutable`, `out` parameters are mutable by default.
+parameters as `mutable` in the function definition, `out` parameters are mutable by default.
 
 To compliment out parameters, variables can be declared as part of the function call (these are called variable declaration
 expressions), meaning we don't need to separately declare the variables above the function. Variable declaration 
@@ -1372,7 +1398,7 @@ float u, v = separate2(texcoord());
 
 ## Unnamed Struct
 
-The simplest custom data type is the unnamed struct. It allows the user to declare a list of variables (known as fields) that are held inside a single container.
+The simplest user-defined type is the unnamed struct. It allows the user to declare a list of variables (known as fields) that are held inside a single container.
 Field modifiers and types are declared the same way as a standard variable, but the name is optional. 
 
 ```
@@ -1380,7 +1406,7 @@ Field modifiers and types are declared the same way as a standard variable, but 
 ```
 
 `modifier-list` is a list of zero or more modifiers.  
-`field_typeN` can be any primitive or custom data type.  
+`field_typeN` can be any primitive or user-defined type.  
 `field_nameN` can be any valid identifier. It is optional.  
 Unnamed structs can declare any number of fields.
 
@@ -1491,7 +1517,7 @@ vec3 p = get_end_of_ray(ray, 10);
 ## Class Definition
 
 Classes give the most customisation when creating custom data types. Users can define fields, methods and constructors 
-within class definitions, with field and method definitions follow the same rules as variable and function definitions.
+within the class definition, with field and method definitions following the same rules as variable and function definitions.
 The only difference being that fields do not need to be defined above a method for the method to be able to access them.
 However, methods still need to be defined above another method in order to be called. Constructors follow a similar syntax
 to C++ where the constructor name is the same as the class name.
@@ -1510,34 +1536,6 @@ class name
     
     // constructors
     name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...)
-}
-```
-
-## This
-
-Class methods can access the class instance using the `this` keyword. They can also access the class instances fields directly. For example:
-
-```
-class Sphere
-{
-    vec2 center;
-    float radius;
-    
-    float area()
-    {
-        return 4.0 * PI * radius * radius;
-        // OR
-        return 4.0 * PI * this.radius * this.radius;
-    }
-    
-    Sphere grow(float amount)
-    {
-        // copy instance
-        Sphere result = this;
-        
-        result.radius += amount;
-        return result;
-    }
 }
 ```
 
@@ -1568,9 +1566,37 @@ Ray ray = Ray{vec3{0, 0, 0}, vec3{0, 0, 1}};
 vec3 p = ray.end_of_ray(10);
 ```
 
-# Unnamed Constructors
+## This
 
-As you've seen throughout this document, custom data types can be initialised using the unnamed constructor, compared to primitive types
+Class methods can access the class instance using the `this` keyword. They can also access the class instances fields directly. For example:
+
+```
+class Sphere
+{
+    vec2 center;
+    float radius;
+    
+    float area()
+    {
+        return 4.0 * PI * radius * radius;
+        // OR
+        return 4.0 * PI * this.radius * this.radius;
+    }
+    
+    Sphere grow(float amount)
+    {
+        // copy instance
+        Sphere result = this;
+        
+        result.radius += amount;
+        return result;
+    }
+}
+```
+
+# Unnamed Constructor
+
+As you've seen throughout this document, user-defined types can be initialised using the unnamed constructor, compared to primitive types
 which are initialised using the named constructor. Class types can be initialised using either.
 
 A named constructor is a specific, defined function, either one that has been defined as part of a class definition,
@@ -1593,7 +1619,7 @@ Point q = {"hello", "world"}; // Error: unnamed constructor does not match Point
 
 # Operator Overloading
 
-Operators can be overloaded for all custom data types including unnamed structs, aliases and class types.
+Operators can be overloaded for all user-defined types, including unnamed structs, aliases and class types.
 Operator overload functions are defined outside of class definitions.
 
 | Operation | Function Name       |
@@ -1737,7 +1763,7 @@ float add_one(
 }
 ```
 Finally, attributes can also be defined above variable declarations, variable assignments and expression statements. These
-attributes will be added to the node that these statements compile into.
+attributes will be added to the nodes that these statements compile into.
 ```
 @doc "an image of a butterfly"
 @file.colorspace "srgb_texture"
@@ -1782,7 +1808,7 @@ color3 c = image(
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
-> # Node Constructors
+> # Node Constructor
 > 
 > Node constructors are a unique expression to ShadingLanguageX.
 > 
@@ -1828,7 +1854,7 @@ color3 c = image(
 > float bias = {"hmtlxbias", float: in=0.0, bias=0.5};
 > ```
 > 
-> ### Notes
+> ### Note
 > 
 > Unlike the rest of ShadingLanguageX, node constructors do not perform any type checking. In fact, the data type of the inputs
 > is determined by the values that are passed to them.
@@ -1911,7 +1937,40 @@ void do_something()
 }
 ```
 In the previous example, `a` is part of the global scope and is accessible everywhere, `b` is accessible only inside the `do_something`
-function and the for loop, and `c` is accessible only within the for loop.
+function and the for loop, and `c` is accessible only within the for loop.  
+It's also possible to hide variables or functions from outer scopes by defining them again inside a nested scope.
+```
+float a = 1.0;
+float b = 2.0;
+float foo(float a = 3.0)
+{
+    float b = 4.0;
+    print a, b;
+        > 3.0 // nonlocal hidden by parameter a
+        > 4.0 // nonlocal hidden by local variable b
+}
+```
+
+```
+void foo()
+{
+    print "foo";
+}
+
+void bar()
+{
+    void foo()
+    {
+        print "cooler foo";
+    }
+    
+    foo();
+        > "cooler foo";
+}
+```
+
+Variable and function hiding can be used to override the functionality of standard library functions as they are defined in a 
+scope above the global document scope.
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -1925,7 +1984,7 @@ function and the for loop, and `c` is accessible only within the for loop.
 > ## File Inclusion
 > 
 > The `#include` directive allows users to include other `.mxsl` or `.mtlx` files in the current compilation, giving them access to
-> any Nodes or NodeDefs defined in those files. The directive also supports inclusion of directories as well as specific files. All files
+> any Nodes or NodeDefs defined in those files. The directive also supports the inclusion of directories as well as specific files. All files
 > with the extension `.mxsl` or `.mtlx` inside the directory will be included. The search is not recursive, i.e., it does not include
 > files from subdirectories. Files are not included in any particular order; if the order of included files is important,
 > then the user should include each file individually in the necessary order.

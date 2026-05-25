@@ -110,7 +110,7 @@ compiles to:
 
 However, ShadingLanguageX shaders can also be executed with a designated entry function like in C. If the shader contains
 a function called `main`, this function will be the entry into the shader. Otherwise, an entry function name can be passed
-to the compiler as an additional argument (see [mxslc](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#mxslc) section below for more information). If the entry function accepts any arguments, these can also
+to the compiler as an additional argument (see [mxslc](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc/LanguageSpecification.md#mxslc) section below for more information). If the entry function accepts any arguments, these can also
 be passed to the compiler. For example:
 ```
 material my_function(float r, float g, float b, float roughness, float metalness)
@@ -178,7 +178,7 @@ expression, or return expression in the case of function declarations.
 ## Type Conversions
 
 ShadingLanguageX supports a limited number of implicit conversions. Integers are implicitly converted to floats and 
-strings to filenames. Otherwise variables will need to be explicitly converted using a [Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors).
+strings to filenames. Otherwise variables will need to be explicitly converted using a [Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc/LanguageSpecification.md#constructors).
 
 ```
 float x = 0;                 // implicit int ➔ float
@@ -254,7 +254,7 @@ Literals represent the fundamental data used by the system.
 | `float`    | `0.5` `2.` `.9` `2.5e6` `2.e3` `.9e-3` |
 | `string`   | `"tangent"` `"my_image.png"`           |
 
-See [Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#constructors) for information on how to initialise vectors and colors.
+See [Constructors](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc/LanguageSpecification.md#constructors) for information on how to initialise vectors and colors.
 
 # Identifiers
 
