@@ -37,8 +37,12 @@ void Expression::init(const vector<TypePtr>& types)
     TRY_START
 
     if (not try_init(types))
-        throw CompileError{"Cannot initialize expression of type " + type_impl()->str() + " with " + Type::to_string(types)};
-
+    {
+        if (error_message_.empty())
+            throw CompileError{"Cannot initialize expression of type " + type_impl()->str() + " with " + Type::to_string(types)};
+        else
+            throw CompileError{error_message_};
+    }
     TRY_END
 }
 
@@ -49,8 +53,16 @@ bool Expression::try_init(const vector<TypePtr>& types)
     for (const TypePtr& type : types)
         assert(type->is_resolved());
 
-    init_subexpressions(types);
-    init_impl(types);
+    try
+    {
+        init_subexpressions(types);
+        init_impl(types);
+    }
+    catch (const CompileError& e)
+    {
+        error_message_ = e.what();
+        return false;
+    }
 
     const TypePtr type = type_impl();
     assert(type->is_resolved());
