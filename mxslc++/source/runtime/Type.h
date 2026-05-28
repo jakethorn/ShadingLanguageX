@@ -75,6 +75,7 @@ public:
     }
 
     bool is_primitive() const { return has_name() and not has_fields(); }
+    bool is_vector() const;
     bool is_resolved() const { return is_resolved_; }
     bool is_compatible(const TypePtr& other) const;
     bool is_compatible(const vector<TypePtr>& types) const;

@@ -6,13 +6,12 @@
 #define MXSLC_DOTEXPRESSION_H
 
 #include "Expression.h"
+#include "accessors/Accessor.h"
 
-class DotAccessor;
-
-class DotExpression final : public Expression
+class DotOperator final : public Expression
 {
 public:
-    DotExpression(ExprPtr expr, Token property);
+    DotOperator(ExprPtr expr, Token property);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -24,7 +23,7 @@ protected:
 
 private:
     ExprPtr expr_;
-    shared_ptr<DotAccessor> accessor_;
+    AccessorPtr accessor_;
 };
 
 #endif //MXSLC_DOTEXPRESSION_H

@@ -27,16 +27,18 @@ add_library(mxslc_lib
         expressions/ExpressionFactory.cpp
         expressions/NullExpression.cpp
         expressions/UnnamedConstructor.cpp
-        expressions/IndexingExpression.cpp
-        expressions/DotExpression.cpp
+        expressions/IndexingOperator.cpp
+        expressions/DotOperator.cpp
         expressions/VariableDefinitionExpression.cpp
-        expressions/dot_accessors/PortAccessor.cpp
-        expressions/dot_accessors/FieldAccessor.cpp
-        expressions/IncrementExpression.cpp
+        expressions/accessors/PortAccessor.cpp
+        expressions/accessors/FieldAccessor.cpp
+        expressions/accessors/ComponentAccessor.cpp
+        expressions/IncrementOperator.cpp
         expressions/NamedConstructor.cpp
         expressions/ThisExpression.cpp
         expressions/MethodCall.cpp
-        expressions/CompoundExpression.cpp
+        expressions/CompoundAssignment.cpp
+        expressions/RuntimeExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
@@ -66,6 +68,7 @@ add_library(mxslc_lib
         mtlx/node_evaluators/separate.cpp
         mtlx/node_evaluators/convert.cpp
         mtlx/node_evaluators/combine.cpp
+        mtlx/node_evaluators/extract.cpp
         values/Value.cpp
         values/ValueFactory.cpp
         values/NodeValue.cpp

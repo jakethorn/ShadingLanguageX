@@ -6,14 +6,14 @@
 
 #include "CompileError.h"
 #include "TokenReader.h"
-#include "expressions/CompoundExpression.h"
-#include "expressions/DotExpression.h"
+#include "expressions/CompoundAssignment.h"
+#include "expressions/DotOperator.h"
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
-#include "expressions/IncrementExpression.h"
-#include "expressions/IndexingExpression.h"
+#include "expressions/IncrementOperator.h"
+#include "expressions/IndexingOperator.h"
 #include "expressions/Literal.h"
 #include "expressions/MethodCall.h"
 #include "expressions/NamedConstructor.h"
@@ -584,7 +584,7 @@ ExprPtr Parser::compound()
     if (optional<Token> op = consume("+="s, "-="s, "*="s, "/="s, "%="s, "^="s, "&="s, "|="s))
     {
         ExprPtr rhs = expression();
-        return std::make_unique<CompoundExpression>(std::move(lhs), std::move(*op), std::move(rhs));
+        return std::make_unique<CompoundAssignment>(std::move(lhs), std::move(*op), std::move(rhs));
     }
     else
     {
@@ -603,7 +603,7 @@ ExprPtr Parser::increment()
         op = consume("++"s, "--"s);
 
     if (op.has_value())
-        return std::make_unique<IncrementExpression>(std::move(expr), std::move(op.value()), prefix);
+        return std::make_unique<IncrementOperator>(std::move(expr), std::move(op.value()), prefix);
     else
         return expr;
 }
@@ -617,7 +617,7 @@ ExprPtr Parser::property()
         if (next == '[')
         {
             ExprPtr index = expression();
-            expr = std::make_unique<IndexingExpression>(std::move(expr), std::move(index));
+            expr = std::make_unique<IndexingOperator>(std::move(expr), std::move(index));
             match(']');
         }
         else
@@ -629,7 +629,7 @@ ExprPtr Parser::property()
             else
             {
                 Token name = match(TokenType::Identifier);
-                expr = std::make_unique<DotExpression>(std::move(expr), std::move(name));
+                expr = std::make_unique<DotOperator>(std::move(expr), std::move(name));
             }
         }
     }

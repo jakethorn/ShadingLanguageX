@@ -2,13 +2,13 @@
 // Created by jaket on 15/05/2026.
 //
 
-#include "CompoundExpression.h"
+#include "CompoundAssignment.h"
 
 #include "FunctionCall.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/Variable.h"
 
-CompoundExpression::CompoundExpression(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr)
+CompoundAssignment::CompoundAssignment(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr)
     : Expression{std::move(op)}, lhs_expr_{std::move(lhs_expr)}, rhs_expr_{std::move(rhs_expr)}
 {
     static const unordered_map<TokenType, string> op_names {
@@ -27,24 +27,24 @@ CompoundExpression::CompoundExpression(ExprPtr lhs_expr, Token op, ExprPtr rhs_e
     func_call_ = std::make_shared<FunctionCall>(dunder_name, std::move(args));
 }
 
-ExprPtr CompoundExpression::instantiate_template_types(const TypePtr& template_type) const
+ExprPtr CompoundAssignment::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr lhs_expr = lhs_expr_->instantiate_template_types(template_type);
     ExprPtr rhs_expr = rhs_expr_->instantiate_template_types(template_type);
-    return std::make_unique<CompoundExpression>(std::move(lhs_expr), token_, std::move(rhs_expr));
+    return std::make_unique<CompoundAssignment>(std::move(lhs_expr), token_, std::move(rhs_expr));
 }
 
-void CompoundExpression::init_subexpressions(const vector<TypePtr>& types)
+void CompoundAssignment::init_subexpressions(const vector<TypePtr>& types)
 {
     func_call_->init(types);
 }
 
-TypePtr CompoundExpression::type_impl() const
+TypePtr CompoundAssignment::type_impl() const
 {
     return func_call_->type();
 }
 
-VarPtr CompoundExpression::evaluate_impl() const
+VarPtr CompoundAssignment::evaluate_impl() const
 {
     VarPtr value = func_call_->evaluate();
     lhs_expr_->evaluate()->copy(value);

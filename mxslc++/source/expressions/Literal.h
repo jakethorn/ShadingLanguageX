@@ -12,6 +12,7 @@ class Literal final : public Expression
 {
 public:
     explicit Literal(Token token) : Expression{token}, value_{token.literal()} { }
+    explicit Literal(primitive_t value) : value_{std::move(value)} { }
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 

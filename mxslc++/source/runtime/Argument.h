@@ -19,6 +19,8 @@ public:
     Argument(ModifierList mods, ExprPtr expr, size_t index);
     Argument(string name, ExprPtr expr, size_t index);
     Argument(ExprPtr expr, size_t index);
+    Argument(VarPtr value, size_t index);
+    Argument(primitive_t value, size_t index);
 
     Argument(Argument&& other) noexcept;
 
@@ -28,7 +30,6 @@ public:
     const ModifierList& modifiers() const { return mods_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
-    ExprPtr expression() const { return expr_; }
     size_t index() const { return index_; }
 
     Argument instantiate_template_types(const TypePtr& template_type) const;

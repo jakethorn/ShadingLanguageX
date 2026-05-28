@@ -10,6 +10,7 @@
 #include "node_evaluators/binary_ops.h"
 #include "node_evaluators/combine.h"
 #include "node_evaluators/convert.h"
+#include "node_evaluators/extract.h"
 #include "node_evaluators/separate.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
@@ -29,7 +30,8 @@ namespace
         {"separate2"s, evaluate_separate2},
         {"separate3"s, evaluate_separate3},
         {"separate4"s, evaluate_separate4},
-        {"convert"s, evaluate_convert}
+        {"convert"s, evaluate_convert},
+        {"extract"s, evaluate_extract}
     };
 
     bool is_constexpr(const string& node_name, const ParameterValues& input_values, vector<BasicValuePtr>& values)

@@ -7,10 +7,10 @@
 
 #include "Expression.h"
 
-class CompoundExpression final : public Expression
+class CompoundAssignment final : public Expression
 {
 public:
-    CompoundExpression(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr);
+    CompoundAssignment(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 

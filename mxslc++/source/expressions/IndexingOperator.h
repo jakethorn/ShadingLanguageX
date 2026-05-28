@@ -6,12 +6,13 @@
 #define MXSLC_INDEXINGEXPRESSION_H
 
 #include "Expression.h"
+#include "accessors/Accessor.h"
 
-class IndexingExpression final : public Expression
+class IndexingOperator final : public Expression
 {
 public:
-    IndexingExpression(ExprPtr expr, ExprPtr index_expr)
-        : Expression{index_expr->token()}, expr_{std::move(expr)}, index_expr_{std::move(index_expr)} { }
+    IndexingOperator(ExprPtr value_expr, ExprPtr index_expr)
+        : Expression{index_expr->token()}, value_expr_{std::move(value_expr)}, index_expr_{std::move(index_expr)} { }
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -22,9 +23,10 @@ protected:
     VarPtr evaluate_impl() const override;
 
 private:
-    ExprPtr expr_;
+    ExprPtr value_expr_;
     ExprPtr index_expr_;
-    size_t index_ = 0;
+
+    AccessorPtr accessor_;
 };
 
 #endif //MXSLC_INDEXINGEXPRESSION_H

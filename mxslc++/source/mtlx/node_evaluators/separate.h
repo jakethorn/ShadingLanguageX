@@ -7,8 +7,8 @@
 
 #include "utils/common.h"
 
-VarPtr evaluate_separate2(const TypePtr&, const vector<BasicValuePtr>& values);
-VarPtr evaluate_separate3(const TypePtr&, const vector<BasicValuePtr>& values);
-VarPtr evaluate_separate4(const TypePtr&, const vector<BasicValuePtr>& values);
+VarPtr evaluate_separate2(const TypePtr& type, const vector<BasicValuePtr>& values);
+VarPtr evaluate_separate3(const TypePtr& type, const vector<BasicValuePtr>& values);
+VarPtr evaluate_separate4(const TypePtr& type, const vector<BasicValuePtr>& values);
 
 #endif //MXSLC_SEPARATE_H

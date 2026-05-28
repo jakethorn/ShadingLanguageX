@@ -67,6 +67,9 @@ using TypePtr = shared_ptr<Type>;
 class Parameter;
 using ParameterValues = vector<pair<const Parameter&, VarPtr>>;
 
+class Accessor;
+using AccessorPtr = unique_ptr<Accessor>;
+
 // type aliases
 using primitive_t = variant<
     bool,
