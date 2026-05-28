@@ -6,6 +6,7 @@ mxslc/notes.txt
 mxslc++/examples/
 mxslc++/main.rsp
 mxslc++/gdb_printers.py
+mxslc++/reduce_rsp.py
 mxslc++/todo.txt
 mxslc++/notes.txt
 
