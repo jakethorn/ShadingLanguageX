@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="node1" type="integer">
+    <input name="in1" type="integer" value="72" />
+    <input name="in2" type="integer" value="2784" />
+  </add>
+  <convert name="node2" type="float">
+    <input name="in" type="integer" nodename="node1" />
+  </convert>
+  <randomfloat name="node3" type="float" />
+  <multiply name="node4" type="float">
+    <input name="in1" type="float" nodename="node2" />
+    <input name="in2" type="float" nodename="node3" />
+  </multiply>
+</materialx>

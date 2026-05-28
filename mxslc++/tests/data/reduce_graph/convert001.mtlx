@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine4 name="node1" type="vector4">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+    <input name="in4" type="float" value="4" />
+  </combine4>
+  <randomfloat name="node2" type="float" />
+  <multiply name="node3" type="vector4">
+    <input name="in1" type="vector4" nodename="node1" />
+    <input name="in2" type="float" nodename="node2" />
+  </multiply>
+  <convert name="node4" type="color3">
+    <input name="in" type="vector4" nodename="node1" />
+  </convert>
+  <randomfloat name="node5" type="float" />
+  <multiply name="node6" type="color3">
+    <input name="in1" type="color3" nodename="node4" />
+    <input name="in2" type="float" nodename="node5" />
+  </multiply>
+  <convert name="node7" type="vector2">
+    <input name="in" type="color3" nodename="node4" />
+  </convert>
+  <randomfloat name="node8" type="float" />
+  <multiply name="node9" type="vector2">
+    <input name="in1" type="vector2" nodename="node7" />
+    <input name="in2" type="float" nodename="node8" />
+  </multiply>
+  <convert name="node10" type="color4">
+    <input name="in" type="vector2" nodename="node7" />
+  </convert>
+  <randomfloat name="node11" type="float" />
+  <multiply name="node12" type="color4">
+    <input name="in1" type="color4" nodename="node10" />
+    <input name="in2" type="float" nodename="node11" />
+  </multiply>
+  <ifequal name="node13" type="boolean">
+    <input name="value1" type="float" value="1" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <randomfloat name="node14" type="float">
+    <input name="in" type="integer" value="1" />
+  </randomfloat>
+  <randomfloat name="node15" type="float">
+    <input name="in" type="integer" value="2" />
+  </randomfloat>
+  <ifequal name="node16" type="float">
+    <input name="value1" type="boolean" nodename="node13" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" nodename="node14" />
+    <input name="in2" type="float" nodename="node15" />
+  </ifequal>
+</materialx>

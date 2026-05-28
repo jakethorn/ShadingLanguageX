@@ -14,6 +14,7 @@ Runtime::Runtime() : Runtime{std::make_unique<Scope>(), MtlXSerializer{}}
 {
 
 }
+
 Runtime::Runtime(ScopePtr scope, MtlXSerializer serializer) : scope_{std::move(scope)}, serializer_{std::move(serializer)}
 {
     scope_->set_graph(serializer_.document(), nullptr);
@@ -39,9 +40,10 @@ void Runtime::exit_scope()
     scope_ = scope_->exit();
 }
 
-Runtime& Runtime::create(const string& version)
+Runtime& Runtime::create(const string& version, const bool reduce_graph)
 {
     instance_ = std::make_unique<Runtime>();
+    instance_->serializer_.set_reduce_graph(reduce_graph);
     instance_->load_materialx_library(version);
     return *instance_;
 }

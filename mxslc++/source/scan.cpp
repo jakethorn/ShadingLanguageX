@@ -153,7 +153,7 @@ namespace
     }
 }
 
-vector<Token> sscan(string_view text)
+vector<Token> scan_string(string_view text)
 {
     vector<Token> tokens;
     size_t line = 1;
@@ -180,11 +180,11 @@ vector<Token> sscan(string_view text)
     return tokens;
 }
 
-vector<Token> fscan(const fs::path& filepath)
+vector<Token> scan_file(const fs::path& src_path)
 {
-    const string text = read_file(filepath);
-    vector<Token> tokens = sscan(text);
-    const string filename = filepath.filename().string();
+    const string text = read_file(src_path);
+    vector<Token> tokens = scan_string(text);
+    const string filename = src_path.filename().string();
     for (Token& token : tokens)
     {
         token.set_filename(filename);

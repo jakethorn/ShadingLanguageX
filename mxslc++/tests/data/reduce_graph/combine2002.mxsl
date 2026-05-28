@@ -1,0 +1,6 @@
+vec4 v1 = vec4{vec3{1.0, 2.0, 3.0}, 4.0} + combine2(vec3{5.0, 6.0, 7.0}, 8.0);
+vec4 OUT1 = v1 * randomfloat();
+
+color4 v2 = color4{color3{1.0, 2.0, 3.0}, 4.0} + combine2(color3{5.0, 6.0, 7.0}, 8.0);
+color4 OUT2 = v2 * randomfloat();
+

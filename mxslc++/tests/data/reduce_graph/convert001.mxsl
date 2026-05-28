@@ -1,0 +1,15 @@
+vec4 a = vec4{1.0, 2.0, 3.0, 4.0};
+a * randomfloat();
+
+color3 b = color3{a};
+b * randomfloat();
+
+vec2 c = vec2{b};
+c * randomfloat();
+
+color4 d = color4{c};
+d * randomfloat();
+
+bool e = bool{1.0};
+
+float f = if (e) { randomfloat(1) } else {randomfloat(2) };

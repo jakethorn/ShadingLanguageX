@@ -1,0 +1,2 @@
+float f = add(70.0, 80.0);
+float OUT = f * randomfloat();

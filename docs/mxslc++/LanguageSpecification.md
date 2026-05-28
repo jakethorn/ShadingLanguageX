@@ -938,17 +938,24 @@ else
 
 # Compile-Time Evaluation
 
-Some expressions can be evaluated at compile-time given that all arguments are also known at compile-time. For example,
+Some expressions can be evaluated at compile-time if it's the case that all arguments are also known at compile-time. For example,
 instead of `1 + 1` evaluating to an `add` node, it will simply evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
-is not possible at compile-time because the user value is not known until render-time. The following list shows the compile-time expression evaluations that
-have currently been implemented.
+is not possible at compile-time because the user value is not known until render-time. The following list shows the MaterialX Nodes that
+are currently optimised to evaluate at compile-time, if possible.
 
-| Expression      |
-|-----------------|
-| `float + float` |
-| `float + int`   |
-| `int + float`   |
-| `int + int`     |
+| Nodes       |
+|-------------|
+| `add`       |
+| `subtract`  |
+| `multiply`  |
+| `divide`    |
+| `combine2`  |
+| `combine3`  |
+| `combine4`  |
+| `separate2` |
+| `separate3` |
+| `separate4` |
+| `convert`   |
 
 This also means that expressions or statements that require compile-time values such as if statements, for loops and 
 indexing operators can use these expressions and not just literals. For example:

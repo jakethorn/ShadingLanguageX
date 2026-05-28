@@ -8,6 +8,7 @@ add_executable(mxslc_tests
         groundtruth_tests.cpp
         failure_tests.cpp
         error_message_tests.cpp
+        reduce_graph_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

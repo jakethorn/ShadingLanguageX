@@ -25,6 +25,7 @@ void Literal::init_impl(const vector<TypePtr>& types)
         const TypePtr float_type = scope().get_type(Type::Float);
         if (not int_type->is_in(types) and float_type->is_in(types))
         {
+            value_ = static_cast<float>(std::get<int>(value_));
             type_ = float_type;
         }
     }

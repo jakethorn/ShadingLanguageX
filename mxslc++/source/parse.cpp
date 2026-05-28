@@ -205,12 +205,13 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
         }
     }
     Token token = match('=');
+    type_ = std::make_unique<Type>(std::move(fields));
     ExprPtr expr = expression();
     match(';');
 
     return std::make_unique<MultiVariableDefinition>(
         std::move(token),
-        std::make_unique<Type>(std::move(fields)),
+        std::move(type_),
         std::move(expr)
     );
 }

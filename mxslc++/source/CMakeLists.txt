@@ -62,6 +62,10 @@ add_library(mxslc_lib
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
         mtlx/evaluate_mtlx.cpp
+        mtlx/node_evaluators/binary_ops.cpp
+        mtlx/node_evaluators/separate.cpp
+        mtlx/node_evaluators/convert.cpp
+        mtlx/node_evaluators/combine.cpp
         values/Value.cpp
         values/ValueFactory.cpp
         values/NodeValue.cpp

@@ -1,0 +1,6 @@
+vec2 v1 = vec2{1, 2.0} + combine2(3.0, 4);
+vec2 OUT1 = v1 * randomfloat();
+
+vec4 v2 = vec4{vec2{5.0, 6.0}, vec2{7.0, 8.0}} + combine2(vec2{9.0, 0.0}, vec2{1.0, 2.0});
+vec4 OUT2 = v2 * randomfloat();
+

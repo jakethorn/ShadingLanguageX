@@ -19,25 +19,22 @@ using groundtruth_tests = testing::TestWithParam<fs::path>;
 
 TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
 {
-    fs::path path = GetParam();
-    const fs::path input_path = path;
-    const fs::path actual_path = path.replace_extension(".tmp");
-    const fs::path expected_path = path.replace_extension(".mtlx");
+    const fs::path& input_path = GetParam();
+    fs::path expected_path = input_path;
+    expected_path.replace_extension(".mtlx");
 
-    ASSERT_NO_THROW(mxslc::compile_to_file(input_path, actual_path))
-        << "\nFailed to compile: " << input_path << "\n\n" << read_file(input_path);
+    const mxslc::CompileOptions opts{.reduce_graph = false};
+    const string actual_output = mxslc::compile_to_string(input_path, opts);
 
-    const string actual_output = read_file(actual_path);
-    if (overwrite_data_files())
-    {
+    if constexpr (overwrite_data_files())
         write_file(expected_path, actual_output);
-    }
+
     const string expected_output = read_file(expected_path);
+    const bool passed = actual_output == expected_output;
 
-    print_debug_info(input_path, actual_output, expected_output);
-    EXPECT_EQ(actual_output, expected_output);
-
-    fs::remove(actual_path);
+    EXPECT_TRUE(passed);
+    if (not passed)
+        print_debug_info(input_path, actual_output, expected_output);
 }
 
 vector<fs::path> get_groundtruth_files()

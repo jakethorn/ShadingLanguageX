@@ -272,10 +272,30 @@ VarPtr Variable::create(TypePtr type, const VarPtr& value)
     return create(ModifierList{}, std::move(type), value);
 }
 
+VarPtr Variable::create(const vector<VarPtr>& children)
+{
+    vector<TypePtr> fields;
+    fields.reserve(children.size());
+    for (const VarPtr& child : children)
+        fields.push_back(child->type());
+
+    TypePtr type = Runtime::get().scope().resolve_type(
+        std::make_shared<Type>(std::move(fields))
+    );
+
+    return create(ModifierList{}, std::move(type), children);
+}
+
 VarPtr Variable::create(ValuePtr value)
 {
     TypePtr type = value->type();
     return create(ModifierList{}, std::move(type), std::move(value));
+}
+
+VarPtr Variable::create(primitive_t value)
+{
+    ValuePtr basic_value = std::make_shared<BasicValue>(std::move(value));
+    return create(std::move(basic_value));
 }
 
 VarPtr Variable::create(const VarPtr& value)

@@ -52,6 +52,9 @@ using ExprPtr = shared_ptr<Expression>;
 class Value;
 using ValuePtr = shared_ptr<Value>;
 
+class BasicValue;
+using BasicValuePtr = shared_ptr<BasicValue>;
+
 class Variable;
 using VarPtr = shared_ptr<Variable>;
 
@@ -60,6 +63,9 @@ using FuncPtr = shared_ptr<Function>;
 
 class Type;
 using TypePtr = shared_ptr<Type>;
+
+class Parameter;
+using ParameterValues = vector<pair<const Parameter&, VarPtr>>;
 
 // type aliases
 using primitive_t = variant<

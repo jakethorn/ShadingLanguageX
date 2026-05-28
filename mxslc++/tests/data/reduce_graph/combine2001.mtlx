@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine2 name="node1" type="vector2">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </combine2>
+  <combine2 name="node2" type="vector2">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="4" />
+  </combine2>
+  <add name="node3" type="vector2">
+    <input name="in1" type="vector2" nodename="node1" />
+    <input name="in2" type="vector2" nodename="node2" />
+  </add>
+  <randomfloat name="node4" type="float" />
+  <multiply name="node5" type="vector2">
+    <input name="in1" type="vector2" nodename="node3" />
+    <input name="in2" type="float" nodename="node4" />
+  </multiply>
+  <combine2 name="node6" type="vector2">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" value="6" />
+  </combine2>
+  <combine2 name="node7" type="vector2">
+    <input name="in1" type="float" value="7" />
+    <input name="in2" type="float" value="8" />
+  </combine2>
+  <combine2 name="node8" type="vector4">
+    <input name="in1" type="vector2" nodename="node6" />
+    <input name="in2" type="vector2" nodename="node7" />
+  </combine2>
+  <combine2 name="node9" type="vector2">
+    <input name="in1" type="float" value="9" />
+    <input name="in2" type="float" value="0" />
+  </combine2>
+  <combine2 name="node10" type="vector2">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </combine2>
+  <combine2 name="node11" type="vector4">
+    <input name="in1" type="vector2" nodename="node9" />
+    <input name="in2" type="vector2" nodename="node10" />
+  </combine2>
+  <add name="node12" type="vector4">
+    <input name="in1" type="vector4" nodename="node8" />
+    <input name="in2" type="vector4" nodename="node11" />
+  </add>
+  <randomfloat name="node13" type="float" />
+  <multiply name="node14" type="vector4">
+    <input name="in1" type="vector4" nodename="node12" />
+    <input name="in2" type="float" nodename="node13" />
+  </multiply>
+</materialx>

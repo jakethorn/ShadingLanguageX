@@ -19,15 +19,15 @@ using failure_tests = testing::TestWithParam<fs::path>;
 
 TEST_P(failure_tests, compiler_throws_compile_error)
 {
-    fs::path path = GetParam();
-    const fs::path input_path = path;
-    const fs::path actual_path = path.replace_extension(".tmp");
+    const fs::path& input_path = GetParam();
+    fs::path expected_path = input_path;
+    expected_path.replace_extension(".mtlx");
 
     EXPECT_THROW(
         {
             try
             {
-                mxslc::compile_to_file(input_path, actual_path);
+                mxslc::compile_to_string(input_path);
             }
             catch(const mxslc::CompileError& e)
             {
@@ -37,9 +37,6 @@ TEST_P(failure_tests, compiler_throws_compile_error)
         },
         mxslc::CompileError
     ) << "\nFailed to throw CompileError: " << input_path << "\n\n" << read_file(input_path);
-
-    if (fs::exists(actual_path))
-        fs::remove(actual_path);
 }
 
 vector<fs::path> get_failure_files()

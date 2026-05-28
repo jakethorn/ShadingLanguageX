@@ -11,13 +11,13 @@ using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 
-string read_file(const fs::path& filepath)
+string read_file(const fs::path& src_path)
 {
-    ifstream file{filepath};
+    ifstream file{src_path};
 
     if (not file.is_open())
     {
-        throw CompileError{"Cannot read file: " + filepath.string()};
+        throw CompileError{"Cannot read file: " + src_path.string()};
     }
 
     ostringstream buffer;
@@ -25,13 +25,13 @@ string read_file(const fs::path& filepath)
     return buffer.str();
 }
 
-void save_file(const fs::path& filepath, const string& text)
+void save_file(const fs::path& dst_path, const string& text)
 {
-    ofstream file{filepath};
+    ofstream file{dst_path};
 
     if (not file.is_open())
     {
-        throw CompileError{"Cannot save file: " + filepath.string()};
+        throw CompileError{"Cannot save file: " + dst_path.string()};
     }
 
     file << text;

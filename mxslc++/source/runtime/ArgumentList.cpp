@@ -36,7 +36,7 @@ VarPtr ArgumentList::evaluate(const Parameter& param) const
     return value;
 }
 
-vector<pair<const Parameter&, VarPtr>> ArgumentList::evaluate(const ParameterList& params) const
+ParameterValues ArgumentList::evaluate(const ParameterList& params) const
 {
     vector<pair<const Parameter&, VarPtr>> result;
     result.reserve(params.size());

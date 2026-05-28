@@ -1,0 +1,2 @@
+float f = 1010.25 + 1010.13;
+float OUT = f * randomfloat();
