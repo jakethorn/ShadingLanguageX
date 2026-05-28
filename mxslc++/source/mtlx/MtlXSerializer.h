@@ -18,6 +18,8 @@ public:
     MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
     explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
+    void set_reduce_graph(const bool value) { reduce_graph_ = value; }
+
     VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
     VarPtr write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
 
@@ -28,7 +30,7 @@ public:
 
     mx::DocumentPtr document() const { return doc_; }
     string xml() const;
-    void save(const fs::path& filepath) const;
+    void save(const fs::path& dst_path) const;
 
 private:
     mx::NodeDefPtr write_node_def(const FuncPtr& func) const;
@@ -50,6 +52,7 @@ private:
     string node_graph_name(const FuncPtr& func) const;
 
     mx::DocumentPtr doc_;
+    bool reduce_graph_ = true;
 };
 
 #endif //FENNEC_MTLXSERIALIZER_H

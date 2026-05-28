@@ -12,7 +12,7 @@
 
 TokenType Token::init_type(const string& lexeme)
 {
-    const vector<Token> tokens = sscan(lexeme);
+    const vector<Token> tokens = scan_file(lexeme);
     assert(tokens.size() == 1);
     return tokens[0].type();
 }

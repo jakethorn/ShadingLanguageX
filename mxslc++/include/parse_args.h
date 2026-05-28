@@ -6,22 +6,22 @@
 #define MXSLC_PARSE_ARGS_H
 
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <vector>
 
+#include "CompileOptions.h"
+
 namespace mxslc
 {
-    struct CompileOptions
+    struct CommandLineArgs
     {
         std::filesystem::path input_file;
-        std::optional<std::filesystem::path> output_file = std::nullopt;
-        std::optional<std::string> version = std::nullopt;
-        bool is_valid = false;
+        CompileOptions options;
+        bool is_valid = true;
     };
 
-    CompileOptions parse_args(int argc, char* argv[]);
-    CompileOptions parse_args(const std::vector<std::string>& argv);
+    CommandLineArgs parse_args(int argc, char* argv[]);
+    CommandLineArgs parse_args(const std::vector<std::string>& argv);
 }
 
 #endif //MXSLC_PARSE_ARGS_H

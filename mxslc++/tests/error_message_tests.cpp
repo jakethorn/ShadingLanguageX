@@ -20,17 +20,16 @@ using error_message_tests = testing::TestWithParam<fs::path>;
 
 TEST_P(error_message_tests, error_message_matches_groundtruth)
 {
-    fs::path path = GetParam();
-    const fs::path input_path = path;
-    const fs::path actual_path = path.replace_extension(".tmp");
-    const fs::path expected_path = path.replace_extension(".txt");
+    const fs::path& input_path = GetParam();
+    fs::path expected_path = input_path;
+    expected_path.replace_extension(".txt");
 
     string actual_output;
     EXPECT_THROW(
         {
             try
             {
-                mxslc::compile_to_file(input_path, actual_path);
+                mxslc::compile_to_string(input_path);
             }
             catch(const mxslc::CompileError& e)
             {
@@ -40,19 +39,17 @@ TEST_P(error_message_tests, error_message_matches_groundtruth)
             }
         },
         mxslc::CompileError
-    ) << "Failed to throw CompileError: " << input_path;
+    ) << "\nFailed to throw CompileError: " << input_path;
 
-    if (overwrite_data_files())
-    {
+    if constexpr (overwrite_data_files())
         write_file(expected_path, actual_output);
-    }
+
     const string expected_output = read_file(expected_path);
+    const bool passed = actual_output == expected_output;
 
-    print_debug_info(input_path, actual_output, expected_output);
-    EXPECT_EQ(actual_output, expected_output);
-
-    if (fs::exists(actual_path))
-        fs::remove(actual_path);
+    EXPECT_TRUE(passed);
+    if (not passed)
+        print_debug_info(input_path, actual_output, expected_output);
 }
 
 vector<fs::path> get_error_message_files()

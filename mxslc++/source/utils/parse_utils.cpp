@@ -10,7 +10,7 @@
 
 FuncPtr parse_function(const string& code)
 {
-    vector<Token> tokens = sscan(code);
+    vector<Token> tokens = scan_string(code);
     const vector<StmtPtr> stmts = parse(std::move(tokens));
     if (stmts.size() != 1)
         throw CompileError{"Too many statements"s};

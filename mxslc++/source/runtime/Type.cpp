@@ -37,7 +37,7 @@ Type::Type(const primitive_t& val)
 TypePtr Type::instantiate_template_types(const TypePtr& template_type) const
 {
     string name = ::instantiate_template_types(name_, template_type);
-    vector<Field> fields = ::instantiate_template_types(fields, template_type);
+    vector<Field> fields = ::instantiate_template_types(fields_, template_type);
     return std::make_shared<Type>(std::move(name), std::move(fields));
 }
 
@@ -120,7 +120,7 @@ bool Type::is_compatible(const vector<TypePtr>& types) const
     return false;
 }
 
-bool Type::is_equal(const TypePtr &other) const
+bool Type::is_equal(const TypePtr& other) const
 {
     assert(is_resolved_);
     assert(other->is_resolved_);
@@ -142,7 +142,7 @@ bool Type::is_equal(const TypePtr &other) const
     return true;
 }
 
-bool Type::is_in(const vector<TypePtr> &types) const
+bool Type::is_in(const vector<TypePtr>& types) const
 {
     for (const TypePtr& type : types)
     {

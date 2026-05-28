@@ -49,7 +49,7 @@ namespace
             }
         )";
 
-        vector<Token> tokens = sscan(std::move(code));
+        vector<Token> tokens = scan_string(std::move(code));
         Parser parser(std::move(tokens));
         return parser.function_body();
     }

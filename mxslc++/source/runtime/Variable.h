@@ -66,7 +66,9 @@ public:
     static VarPtr create(TypePtr type, const vector<VarPtr>& children);
     static VarPtr create(TypePtr type, ValuePtr value);
     static VarPtr create(TypePtr type, const VarPtr& value);
+    static VarPtr create(const vector<VarPtr>& children);
     static VarPtr create(ValuePtr value);
+    static VarPtr create(primitive_t value);
     static VarPtr create(const VarPtr& value);
 
 protected:

@@ -28,6 +28,12 @@ public:
         return std::holds_alternative<T>(val_);
     }
 
+    template<typename T0, typename T1>
+    bool is() const
+    {
+        return std::holds_alternative<T0>(val_) or std::holds_alternative<T1>(val_);
+    }
+
     template<typename T>
     T get() const
     {

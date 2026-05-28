@@ -7,8 +7,8 @@
 
 #include "common.h"
 
-string read_file(const fs::path& filepath);
-void save_file(const fs::path& filepath, const string& text);
+string read_file(const fs::path& src_path);
+void save_file(const fs::path& dst_path, const string& text);
 fs::path get_libraries_dir();
 
 #endif //FENNEC_IO_UTILS_H

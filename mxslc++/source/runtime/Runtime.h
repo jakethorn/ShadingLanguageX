@@ -23,7 +23,7 @@ public:
     void enter_scope(string name = ""s);
     void exit_scope();
 
-    static Runtime& create(const string& version);
+    static Runtime& create(const string& version, bool reduce_graph);
     static Runtime& get();
 
 private:

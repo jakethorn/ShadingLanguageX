@@ -4,11 +4,15 @@
   <randomfloat name="node2" type="float" />
   <randomfloat name="node3" type="float" />
   <add name="node4" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </add>
+  <add name="node5" type="float">
     <input name="in1" type="float" nodename="node1" />
     <input name="in2" type="float" nodename="node2" />
   </add>
-  <add name="node5" type="float">
-    <input name="in1" type="float" nodename="node4" />
+  <add name="node6" type="float">
+    <input name="in1" type="float" nodename="node5" />
     <input name="in2" type="float" nodename="node3" />
   </add>
 </materialx>

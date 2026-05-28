@@ -106,29 +106,31 @@ VarPtr MtlXSerializer::write_node(const FuncPtr& func, const ArgumentList& args,
 
 VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const
 {
-    vector<pair<const Parameter&, VarPtr>> arg_values = args.evaluate(func->parameters());
+    ParameterValues input_values = args.evaluate(func->parameters());
 
-    // evaluate at compile-time if possible
-    if (VarPtr value = evaluate_now(func->name(), arg_values))
-        return value;
+    if (reduce_graph_)
+    {
+        if (VarPtr value = evaluate_now(func->return_type(), func->name(), input_values))
+            return value;
+    }
 
     const mx::GraphElementPtr& graph = Runtime::get().scope().graph();
     const mx::NodePtr node = graph->addNode(node_name(func), mx::EMPTY_STRING, serialize_type(func));
 
-    for (const auto& [param, arg_value] : arg_values)
+    for (const auto& [param, input_value] : input_values)
     {
         const Argument* arg = args[param];
-        AttributeList arg_attrs = arg != nullptr ? args[param]->attributes() : AttributeList{};
+        AttributeList input_attrs = arg != nullptr ? args[param]->attributes() : AttributeList{};
 
         if (param.is_in())
         {
-            write_node_input(node, param.name(), arg_value, arg_attrs);
+            write_node_input(node, param.name(), input_value, input_attrs);
         }
 
         if (param.is_out())
         {
-            const VarPtr output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name(), arg_attrs);
-            arg_value->copy(output);
+            const VarPtr output = ValueFactory::create_output_value(node, param.type(), "out__" + param.name(), input_attrs);
+            input_value->copy(output);
         }
     }
 
@@ -208,9 +210,9 @@ string MtlXSerializer::xml() const
     return mx::writeToXmlString(doc_);
 }
 
-void MtlXSerializer::save(const fs::path& filepath) const
+void MtlXSerializer::save(const fs::path& dst_path) const
 {
-    save_file(filepath, xml());
+    save_file(dst_path, xml());
 }
 
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const

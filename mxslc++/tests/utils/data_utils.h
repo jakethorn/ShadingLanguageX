@@ -17,9 +17,9 @@ namespace fs = std::filesystem;
 
 using namespace std::string_literals;
 
-inline bool overwrite_data_files()
+constexpr bool overwrite_data_files()
 {
-    return false;
+    return true;
 }
 
 inline fs::path get_test_data_dir()
@@ -32,9 +32,9 @@ inline fs::path get_test_data(const string& relative_filepath)
     return get_test_data_dir() / relative_filepath;
 }
 
-inline string read_file(const fs::path& filepath)
+inline string read_file(const fs::path& src_path)
 {
-    const std::ifstream file{filepath};
+    const std::ifstream file{src_path};
     std::ostringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();

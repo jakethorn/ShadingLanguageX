@@ -8,27 +8,35 @@
   </nodegraph>
   <foo name="node1" type="integer" />
   <add name="node2" type="integer">
-    <input name="in1" type="integer" nodename="node1" />
-    <input name="in2" type="integer" value="2" />
-  </add>
-  <add name="node3" type="integer">
-    <input name="in1" type="integer" nodename="node2" />
+    <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
+  <add name="node3" type="integer">
+    <input name="in1" type="integer" nodename="node1" />
+    <input name="in2" type="integer" nodename="node2" />
+  </add>
   <add name="node4" type="integer">
-    <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" nodename="node3" />
+    <input name="in1" type="integer" nodename="node3" />
+    <input name="in2" type="integer" value="1" />
   </add>
   <add name="node5" type="integer">
-    <input name="in1" type="integer" nodename="node3" />
-    <input name="in2" type="integer" value="2" />
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" nodename="node4" />
   </add>
   <add name="node6" type="integer">
-    <input name="in1" type="integer" nodename="node5" />
+    <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
   <add name="node7" type="integer">
-    <input name="in1" type="integer" value="1" />
+    <input name="in1" type="integer" nodename="node4" />
     <input name="in2" type="integer" nodename="node6" />
+  </add>
+  <add name="node8" type="integer">
+    <input name="in1" type="integer" nodename="node7" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="node9" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" nodename="node8" />
   </add>
 </materialx>
