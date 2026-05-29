@@ -2,34 +2,34 @@
 // Created by jaket on 05/05/2026.
 //
 
-#include "IncrementExpression.h"
+#include "IncrementOperator.h"
 
 #include "FunctionCall.h"
 #include "runtime/Variable.h"
 
-IncrementExpression::IncrementExpression(ExprPtr lhs_expr, Token op, const bool prefix)
+IncrementOperator::IncrementOperator(ExprPtr lhs_expr, Token op, const bool prefix)
     : Expression{std::move(op)}, lhs_expr_{std::move(lhs_expr)}, prefix_{prefix}
 {
     increment_ = token_ == TokenType::Increment;
 }
 
-ExprPtr IncrementExpression::instantiate_template_types(const TypePtr& template_type) const
+ExprPtr IncrementOperator::instantiate_template_types(const TypePtr& template_type) const
 {
     ExprPtr lhs_expr = lhs_expr_->instantiate_template_types(template_type);
-    return std::make_unique<IncrementExpression>(std::move(lhs_expr), token_, prefix_);
+    return std::make_unique<IncrementOperator>(std::move(lhs_expr), token_, prefix_);
 }
 
-void IncrementExpression::init_subexpressions(const vector<TypePtr>& types)
+void IncrementOperator::init_subexpressions(const vector<TypePtr>& types)
 {
     lhs_expr_->init(types);
 }
 
-TypePtr IncrementExpression::type_impl() const
+TypePtr IncrementOperator::type_impl() const
 {
     return lhs_expr_->type();
 }
 
-VarPtr IncrementExpression::evaluate_impl() const
+VarPtr IncrementOperator::evaluate_impl() const
 {
     const VarPtr lhs = lhs_expr_->evaluate();
     VarPtr original_lhs = lhs->copy();

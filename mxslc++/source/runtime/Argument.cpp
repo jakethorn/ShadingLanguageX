@@ -6,6 +6,8 @@
 
 #include "CompileError.h"
 #include "Parameter.h"
+#include "expressions/Literal.h"
+#include "expressions/RuntimeExpression.h"
 #include "expressions/VariableDefinitionExpression.h"
 
 Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)
@@ -27,6 +29,12 @@ Argument::Argument(string name, ExprPtr expr, const size_t index)
 
 Argument::Argument(ExprPtr expr, const size_t index)
     : Argument{""s, std::move(expr), index} { }
+
+Argument::Argument(VarPtr value, const size_t index)
+    : Argument{std::make_shared<RuntimeExpression>(std::move(value)), index} { }
+
+Argument::Argument(primitive_t value, const size_t index)
+    : Argument{std::make_shared<Literal>(std::move(value)), index} { }
 
 Argument::Argument(Argument&& other) noexcept
     : attrs_{std::move(other.attrs_)},

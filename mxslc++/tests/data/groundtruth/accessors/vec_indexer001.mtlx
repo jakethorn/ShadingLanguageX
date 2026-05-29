@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine2 name="node1" type="vector2">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </combine2>
+  <extract name="node2" type="float">
+    <input name="in" type="vector2" nodename="node1" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <combine3 name="node3" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+  </combine3>
+  <extract name="node4" type="float">
+    <input name="in" type="vector3" nodename="node3" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <combine4 name="node5" type="vector4">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+    <input name="in4" type="float" value="4" />
+  </combine4>
+  <add name="node6" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <extract name="node7" type="float">
+    <input name="in" type="vector4" nodename="node5" />
+    <input name="index" type="integer" nodename="node6" />
+  </extract>
+  <combine3 name="node8" type="color3">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <extract name="node9" type="float">
+    <input name="in" type="color3" nodename="node8" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <combine4 name="node10" type="color4">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" value="1" />
+    <input name="in4" type="float" value="1" />
+  </combine4>
+  <add name="node11" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="node12" type="integer">
+    <input name="in1" type="integer" nodename="node11" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <extract name="node13" type="float">
+    <input name="in" type="color4" nodename="node10" />
+    <input name="index" type="integer" nodename="node12" />
+  </extract>
+</materialx>

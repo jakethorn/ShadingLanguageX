@@ -5,10 +5,10 @@
 #ifndef MXSLC_PORTACCESSOR_H
 #define MXSLC_PORTACCESSOR_H
 
-#include "DotAccessor.h"
+#include "Accessor.h"
 #include "utils/common.h"
 
-class PortAccessor final : public DotAccessor
+class PortAccessor final : public Accessor
 {
 public:
     PortAccessor(VarPtr node_var, string input_name);

@@ -81,7 +81,12 @@ size_t Type::field_index(const string& name) const
         ++i;
     }
 
-    throw CompileError{"Expression of type " + str() + " does not have a field with the name "};
+    throw CompileError{"Expression of type " + str() + " does not have a field with the name " + name};
+}
+
+bool Type::is_vector() const
+{
+    return is<mx::Vector2>() or is<mx::Vector3>() or is<mx::Vector4>() or is<mx::Color3>() or is<mx::Color4>();
 }
 
 bool Type::is_compatible(const TypePtr& other) const

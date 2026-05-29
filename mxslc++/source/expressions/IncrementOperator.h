@@ -7,10 +7,10 @@
 
 #include "Expression.h"
 
-class IncrementExpression final : public Expression
+class IncrementOperator final : public Expression
 {
 public:
-    IncrementExpression(ExprPtr lhs_expr, Token op, bool prefix);
+    IncrementOperator(ExprPtr lhs_expr, Token op, bool prefix);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
