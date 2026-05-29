@@ -1,7 +1,7 @@
 
 
 ## Status of mxslc
-A new C++ version of mxslc is currently under development, please follow the links to check out the
+A new C++ version of mxslc (called mxslc++) is currently under development, please follow the links to check out the
 [code](https://github.com/jakethorn/ShadingLanguageX/blob/main/mxslc++)
 and [documentation](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md).
 In the meantime, the python version can still be used, but no more updates are planned. The C++ version has more features such as support for tuples and classes, but is not as robust as the python version. I suggest sticking with the python version for now, unless you require any of the new features in the C++ version.
