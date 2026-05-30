@@ -1058,7 +1058,7 @@ function and the for loop, and `c` is accessible only within the for loop.
 # Preprocessor Directives
 
 ShadingLanguageX supports many of the C preprocessor directives:
-* File inclusion (`#include`)
+* File inclusion (`#include` `#loadlib`)
 * Macro definition (`#define` `#undef`) 
 * Conditional compilation (`#if` `#ifdef` `#ifndef` `#elif` `#else` `#endif`)
 
