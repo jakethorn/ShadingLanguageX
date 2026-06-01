@@ -1,0 +1,7 @@
+{float, float, float, float} foo()
+{
+    return {1.0, 2.0, 3.0, 4.0};
+}
+
+color4 a = foo();
+float OUT = a[0] * a[1] * a[2] * a[3];

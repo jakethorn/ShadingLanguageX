@@ -14,7 +14,10 @@ class ParameterList;
 class ArgumentList
 {
 public:
-    ArgumentList(vector<Argument> args) : args_{std::move(args)} { }
+    ArgumentList(vector<Argument> args);
+    ArgumentList(const VarPtr& value);
+    ArgumentList(const vector<VarPtr>& values);
+    ArgumentList(const vector<ExprPtr>& exprs);
 
     template <typename... Exprs>
     explicit ArgumentList(Exprs&&... exprs)

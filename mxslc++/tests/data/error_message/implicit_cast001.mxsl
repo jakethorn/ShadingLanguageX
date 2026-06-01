@@ -1,0 +1,7 @@
+void foo(out {float, float} a)
+{
+
+}
+
+mutable vec2 v;
+foo(v);

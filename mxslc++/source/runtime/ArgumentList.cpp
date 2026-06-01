@@ -10,6 +10,28 @@
 #include "Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 
+ArgumentList::ArgumentList(vector<Argument> args) : args_{std::move(args)}
+{
+
+}
+
+ArgumentList::ArgumentList(const VarPtr& value)
+{
+    args_.emplace_back(value, 0);
+}
+
+ArgumentList::ArgumentList(const vector<VarPtr>& values)
+{
+    for (size_t i = 0; i < values.size(); ++i)
+        args_.emplace_back(values[i], i);
+}
+
+ArgumentList::ArgumentList(const vector<ExprPtr>& exprs)
+{
+    for (size_t i = 0; i < exprs.size(); ++i)
+        args_.emplace_back(exprs[i], i);
+}
+
 ArgumentList ArgumentList::instantiate_template_types(const TypePtr& template_type) const
 {
     return ::instantiate_template_types(args_, template_type);

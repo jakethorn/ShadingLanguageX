@@ -34,6 +34,20 @@ Type::Type(const primitive_t& val)
     set_resolved();
 }
 
+Type::Type(const vector<TypePtr>& fields)
+{
+    fields_.reserve(fields.size());
+    for (const TypePtr& field : fields)
+        fields_.emplace_back(field);
+}
+
+Type::Type(const TypePtr& field_type, const size_t field_count)
+{
+    fields_.reserve(field_count);
+    for (size_t i = 0; i < field_count; ++i)
+        fields_.emplace_back(field_type);
+}
+
 TypePtr Type::instantiate_template_types(const TypePtr& template_type) const
 {
     string name = ::instantiate_template_types(name_, template_type);
@@ -84,34 +98,63 @@ size_t Type::field_index(const string& name) const
     throw CompileError{"Expression of type " + str() + " does not have a field with the name " + name};
 }
 
+size_t Type::component_count() const
+{
+    assert(is_vector());
+    if (is<mx::Vector2>()) return 2;
+    if (is<mx::Vector3>()) return 3;
+    if (is<mx::Vector4>()) return 4;
+    if (is<mx::Color3>()) return 3;
+    if (is<mx::Color4>()) return 4;
+    return 0;
+}
+
 bool Type::is_vector() const
 {
     return is<mx::Vector2>() or is<mx::Vector3>() or is<mx::Vector4>() or is<mx::Color3>() or is<mx::Color4>();
 }
 
+namespace
+{
+    bool is_compatible(const Type& vec, const Type& struct_)
+    {
+        for (size_t i = 0; i < struct_.field_count(); i++)
+        {
+            if (not struct_.field_type(i)->is<float>())
+                return false;
+        }
+
+        return vec.component_count() == struct_.field_count();
+    }
+}
+
 bool Type::is_compatible(const TypePtr& other) const
 {
+    if (other == nullptr)
+        return false;
+
     assert(is_resolved_);
     assert(other->is_resolved_);
 
-    if (has_name() and other->has_name())
-    {
-        return name_ == other->name_;
-    }
-
-    if (has_fields() and other->has_fields())
-    {
-        if (field_count() != other->field_count())
-            return false;
-        for (size_t i = 0; i < field_count(); i++)
-        {
-            if (not field_type(i)->is_compatible(other->field_type(i)))
-                return false;
-        }
+    if (is_vector() and other->has_fields() and ::is_compatible(*this, *other))
         return true;
+
+    if (has_fields() and other->is_vector() and ::is_compatible(*other, *this))
+        return true;
+
+    if (has_name() and other->has_name())
+        return name_ == other->name_;
+
+    if (field_count() != other->field_count())
+        return false;
+
+    for (size_t i = 0; i < field_count(); i++)
+    {
+        if (not field_type(i)->is_compatible(other->field_type(i)))
+            return false;
     }
 
-    return false;
+    return true;
 }
 
 bool Type::is_compatible(const vector<TypePtr>& types) const
@@ -125,22 +168,25 @@ bool Type::is_compatible(const vector<TypePtr>& types) const
     return false;
 }
 
-bool Type::is_equal(const TypePtr& other) const
+bool Type::is_equal(const TypePtr& other, const bool field_names) const
 {
+    if (other == nullptr)
+        return false;
+
     assert(is_resolved_);
     assert(other->is_resolved_);
 
     if (name_ != other->name_)
-    {
         return false;
-    }
 
     if (field_count() != other->field_count())
         return false;
 
     for (size_t i = 0; i < field_count(); i++)
     {
-        if (not field_type(i)->is_equal(other->field_type(i)))
+        if (not field_type(i)->is_equal(other->field_type(i), field_names))
+            return false;
+        if (field_names and field_name(i) != other->field_name(i))
             return false;
     }
 
@@ -160,19 +206,17 @@ bool Type::is_in(const vector<TypePtr>& types) const
 
 TypePtr Type::find_unique_compatible(const vector<TypePtr>& types) const
 {
-    TypePtr compatible = nullptr;
+    vector<TypePtr> compatibles;
     for (const TypePtr& type : types)
     {
+        if (is_equal(type))
+            return type;
+
         if (is_compatible(type))
-        {
-            if (compatible == nullptr)
-                compatible = type;
-            else
-                return nullptr;
-        }
+            compatibles.push_back(type);
     }
 
-    return compatible;
+    return compatibles.size() == 1 ? compatibles[0] : nullptr;
 }
 
 string Type::str() const

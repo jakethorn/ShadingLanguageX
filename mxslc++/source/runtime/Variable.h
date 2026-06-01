@@ -31,6 +31,7 @@ public:
 
     bool has_parent() const;
     VarPtr parent() const;
+    const vector<VarPtr>& children() const;
     size_t child_count() const;
     VarPtr child(size_t index);
     VarPtr child(const string& field_name);

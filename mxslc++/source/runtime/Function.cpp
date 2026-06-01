@@ -11,6 +11,7 @@
 #include "Type.h"
 #include "CompileError.h"
 #include "Variable.h"
+#include "utils/type_cast.h"
 
 Function::Function(
     ModifierList mods,
@@ -130,7 +131,7 @@ VarPtr Function::invoke() const
     else
     {
         return_expr_->init(return_type_);
-        return return_expr_->evaluate();
+        return type_cast(return_type_, return_expr_->evaluate(), true);
     }
 }
 

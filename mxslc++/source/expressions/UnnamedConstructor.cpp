@@ -49,7 +49,7 @@ VarPtr UnnamedConstructor::evaluate_impl() const
     values.reserve(exprs_.size());
     for (const ExprPtr& expr : exprs_)
         values.push_back(expr->evaluate());
-    return Variable::create(type(), values);
+    return Variable::create(values);
 }
 
 bool UnnamedConstructor::expressions_are_initialized()
@@ -82,10 +82,34 @@ void UnnamedConstructor::try_init_expressions(const vector<TypePtr>& types)
     }
 }
 
+namespace
+{
+    vector<TypePtr> with_compatible_types(const vector<TypePtr>& types)
+    {
+        vector<TypePtr> result;
+        for (const TypePtr& type : types)
+        {
+            result.push_back(type);
+
+            if (type->is_vector())
+            {
+                TypePtr float_struct = std::make_shared<Type>(
+                    Runtime::get().scope().get_type(Type::Float),
+                    type->component_count()
+                );
+                result.push_back(float_struct);
+            }
+        }
+
+        return result;
+    }
+}
+
 vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, const size_t index) const
 {
-    vector<TypePtr> index_types;
-    for (const TypePtr& type : types)
+    vector<TypePtr> result;
+
+    for (const TypePtr& type : with_compatible_types(types))
     {
         bool is_compatible = true;
 
@@ -103,8 +127,8 @@ vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, co
         }
 
         if (is_compatible)
-            index_types.push_back(type->field_type(index));
+            result.push_back(type->field_type(index));
     }
 
-    return index_types;
+    return result;
 }

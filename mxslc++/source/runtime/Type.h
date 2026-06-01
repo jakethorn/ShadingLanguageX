@@ -23,12 +23,8 @@ public:
     explicit Type(string name) : name_{std::move(name)} { }
     explicit Type(vector<Field> fields) : fields_{std::move(fields)} { }
     explicit Type(const primitive_t& val);
-    explicit Type(const vector<TypePtr>& fields)
-    {
-        fields_.reserve(fields.size());
-        for (const TypePtr& field : fields)
-            fields_.emplace_back(field);
-    }
+    explicit Type(const vector<TypePtr>& fields);
+    Type(const TypePtr& field_type, size_t field_count);
 
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }
@@ -57,6 +53,8 @@ public:
         return lock(methods_);
     }
 
+    size_t component_count() const;
+
     template<typename T>
     bool is() const
     {
@@ -79,7 +77,7 @@ public:
     bool is_resolved() const { return is_resolved_; }
     bool is_compatible(const TypePtr& other) const;
     bool is_compatible(const vector<TypePtr>& types) const;
-    bool is_equal(const TypePtr& other) const;
+    bool is_equal(const TypePtr& other, bool field_names = false) const;
     bool is_in(const vector<TypePtr>& types) const;
 
     TypePtr find_unique_compatible(const vector<TypePtr>& types) const;

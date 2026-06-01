@@ -47,7 +47,7 @@ protected:
     Token token_;
 
     bool is_initialized_ = false;
-    TypePtr assigned_type_ = nullptr;
+    TypePtr target_type_ = nullptr;
     string error_message_ = ""s;
 
     AttributeList attrs_;

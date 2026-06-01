@@ -1,0 +1,1 @@
+implicit_cast001.mxsl, line 7: Temporary variable being passed to ref or out parameter 'a'

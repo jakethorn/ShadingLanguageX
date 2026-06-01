@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <input name="a" type="vector2" value="0, 0" />
+    <input name="b" type="integer" value="0" />
+    <output name="out" type="integer" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="integer" value="0" />
+  </nodegraph>
+  <nodedef name="ND_foo2" node="foo">
+    <input name="a" type="vector2" value="0, 0" />
+    <input name="b" type="string" value="" />
+    <output name="out" type="integer" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <output name="out" type="integer" value="0" />
+  </nodegraph>
+  <constant name="node1" type="vector2" />
+  <foo name="node2" type="integer">
+    <input name="a" type="vector2" nodename="node1" />
+    <input name="b" type="integer" value="1" />
+  </foo>
+  <constant name="node3" type="vector2" />
+  <foo name="node4" type="integer">
+    <input name="a" type="vector2" nodename="node3" />
+    <input name="b" type="string" value="hello" />
+  </foo>
+  <combine2 name="node5" type="vector2">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </combine2>
+  <foo name="node6" type="integer">
+    <input name="a" type="vector2" nodename="node5" />
+    <input name="b" type="integer" value="1" />
+  </foo>
+  <combine2 name="node7" type="vector2">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </combine2>
+  <foo name="node8" type="integer">
+    <input name="a" type="vector2" nodename="node7" />
+    <input name="b" type="string" value="hello" />
+  </foo>
+</materialx>

@@ -94,6 +94,11 @@ VarPtr Variable::parent() const
     return parent_.lock();
 }
 
+const vector<VarPtr>& Variable::children() const
+{
+    return children_;
+}
+
 size_t Variable::child_count() const
 {
     return children_.size();

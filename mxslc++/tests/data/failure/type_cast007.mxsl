@@ -1,0 +1,14 @@
+void foo({float, float} a, vec2 b)
+{
+
+}
+
+void foo(vec2 a, {float, float} b)
+{
+
+}
+
+foo({1.0, 2.0}, vec2{});
+foo(vec2{}, {1.0, 2.0});
+foo({1.0, 2.0}, {1.0, 2.0});
+foo(vec2{}, vec2{});

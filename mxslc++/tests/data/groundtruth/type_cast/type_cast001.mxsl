@@ -1,0 +1,4 @@
+{float, float} a = {1.0, 2.0};
+vec2 b = a;
+mutable vec2 c = b * 2.0;
+c *= 2.0;

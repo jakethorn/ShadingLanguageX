@@ -15,6 +15,24 @@ ParameterList::ParameterList(vector<Parameter> params) : params_{std::move(param
                 throw CompileError{"Multiple parameters with the name '" + params_[j].name() + "'"};
 }
 
+bool ParameterList::contains(const string& s) const
+{
+    for (const Parameter& param : params_)
+    {
+        if (param.name() == s)
+            return true;
+    }
+    return false;
+}
+
+bool ParameterList::contains(const Argument& arg) const
+{
+    if (arg.has_name())
+        return contains(arg.name());
+    else
+        return arg.index() < params_.size();
+}
+
 const Parameter& ParameterList::operator[](const Argument& arg) const
 {
     if (arg.has_name())

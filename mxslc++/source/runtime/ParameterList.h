@@ -29,6 +29,9 @@ public:
     size_t size() const { return params_.size(); }
     bool empty() const { return params_.empty(); }
 
+    bool contains(const string& s) const;
+    bool contains(const Argument& arg) const;
+
     const Parameter& operator[](const size_t i) const { return params_.at(i); }
     const Parameter& operator[](const string& s) const
     {

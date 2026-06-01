@@ -1,0 +1,18 @@
+vec3 foo()
+{
+    return {1, 0, 0};
+}
+
+color3 foo()
+{
+    return {0, 1, 0};
+}
+
+{float, float, float} foo()
+{
+    return {0, 0, 1};
+}
+
+vec3 a = foo();
+color3 b = foo();
+float x, y, z = foo();
