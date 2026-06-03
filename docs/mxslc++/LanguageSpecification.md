@@ -26,7 +26,7 @@
 18. [Compile-Time Evaluation](#compile-time-evaluation)
 19. [For Loop](#for-loop)
 20. [Functions](#functions)
-21. [User-Defined Types](#user-defined-types)
+21. [User-Defined Types](#user-defined-types-1)
 22. [Unnamed Constructor](#unnamed-constructor)
 23. [Operator Overloading](#operator-overloading)
 24. [Print Statement](#print-statement)
@@ -219,8 +219,24 @@ In this document we will typically use the aliased version for the sake of brevi
 
 ## Type Conversions
 
-ShadingLanguageX supports a limited number of implicit conversions. Integers are implicitly converted to floats and
-strings to filenames. Otherwise, variables will need to be explicitly converted using a 
+ShadingLanguageX supports a limited number of implicit conversions. Integer and string literals can be implicitly converted to floats and filenames, respectively.
+
+Vectors can also be implicitly converted to and from unnamed structs with the appropriate number of float fields. For example:
+```
+vec2 uv = {1.0, 2.0};
+
+{float, float} uv2 = uv;
+float u, v = uv;
+
+{float, float} foo(vec2 v)
+{
+    return v * 2.0;
+}
+
+vec2 v2 = foo({3.0, 4.0});
+```
+
+Otherwise, variables will need to be explicitly converted using a 
 [Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#named-constructor).
 
 ```
@@ -231,7 +247,7 @@ color3 c = color3{1.0};      // explicit float ➔ color3
 
 > [!TIP]
 > ### New in mxslc++!
-> ## User Defined Types
+> ## User-Defined Types
 >
 > ShadingLanguageX supports user-defined types through
 > [Unnamed Structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#unnamed-struct),
