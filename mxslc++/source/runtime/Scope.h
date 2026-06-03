@@ -62,7 +62,6 @@ public:
     TypePtr get_type(const string& name) const;
 
 private:
-    vector<FuncPtr> get_all_functions(const string& name) const;
     void resolve_fields(const TypePtr& type) const;
 
     string name_;

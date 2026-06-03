@@ -4,8 +4,6 @@
 
 #include "FunctionCall.h"
 
-#include <cassert>
-
 #include "CompileError.h"
 #include "MethodCall.h"
 #include "ThisExpression.h"
@@ -80,12 +78,12 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
 
         if (initialized_arg_count == prev_initialized_arg_count)
         {
-            // init failed, try to init with a default function...
+            // no progress made, try to init with the default function...
             FuncPtr default_func = get_matching_function(types);
-            initialized_arg_count = try_init_arguments(vector<FuncPtr>{std::move(default_func)});
+            initialized_arg_count = try_init_arguments(std::move(default_func));
 
             if (initialized_arg_count == prev_initialized_arg_count)
-                throw CompileError{ambiguous_overload_error(matching_funcs)};
+                throw ambiguous_function_error(name_, matching_funcs);
         }
     }
 }
@@ -240,4 +238,9 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     }
 
     return initialized_arg_count;
+}
+
+size_t FunctionCall::try_init_arguments(const FuncPtr &func)
+{
+    return try_init_arguments(vector<FuncPtr>{func});
 }

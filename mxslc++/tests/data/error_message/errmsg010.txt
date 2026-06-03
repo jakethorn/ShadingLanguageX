@@ -1,1 +1,4 @@
-errmsg010.mxsl, line 11: Functions not defined: foo
+errmsg010.mxsl, line 11: Matching definition could not be found for function 'foo'
+Possible matches:
+float foo(integer a, float b)
+float foo(vector2 a, float b)

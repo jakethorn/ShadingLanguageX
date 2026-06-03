@@ -1,0 +1,16 @@
+void foo(string s)
+{
+
+}
+
+void foo(int i, string s = "")
+{
+
+}
+
+void foo(int i, float f = 3.14)
+{
+
+}
+
+bar();

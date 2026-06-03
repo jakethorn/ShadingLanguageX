@@ -1,0 +1,1 @@
+funcquery007.mxsl, line 6: Variable not defined: something

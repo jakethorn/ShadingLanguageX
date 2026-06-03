@@ -103,9 +103,11 @@ FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail
     if (func)
         return func;
     if (parent_)
-        return parent_->get_function(query, throw_on_fail);
+        func = parent_->get_function(query, false);
+    if (func)
+        return func;
     if (throw_on_fail)
-        throw CompileError{"Function not defined: " + *query.name};
+        throw ambiguous_function_error(*query.name, get_functions(FunctionQuery{*query.name}, false));
     else
         return nullptr;
 }
@@ -116,9 +118,11 @@ vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool thro
     if (not funcs.empty())
         return funcs;
     if (parent_)
-        return parent_->get_functions(query, throw_on_fail);
+        funcs = parent_->get_functions(query, false);
+    if (not funcs.empty())
+        return funcs;
     if (throw_on_fail)
-        throw CompileError{"Functions not defined: " + *query.name};
+        throw ambiguous_function_error(*query.name, get_functions(FunctionQuery{*query.name}, false));
     else
         return vector<FuncPtr>{};
 }
@@ -193,24 +197,6 @@ TypePtr Scope::get_type(const string& name) const
     if (parent_)
         return parent_->get_type(name);
     throw CompileError{"Type '" + name + "' not defined"};
-}
-
-vector<FuncPtr> Scope::get_all_functions(const string& name) const
-{
-    vector<FuncPtr> funcs;
-    for (const FuncPtr& func : functions_)
-    {
-        if (name == func->name())
-            funcs.push_back(func);
-    }
-
-    if (parent_)
-    {
-        vector<FuncPtr> parent_funcs = parent_->get_all_functions(name);
-        funcs.insert(funcs.cend(), parent_funcs.begin(), parent_funcs.end());
-    }
-
-    return funcs;
 }
 
 void Scope::resolve_fields(const TypePtr& type) const

@@ -1,0 +1,5 @@
+funcquery004.mxsl, line 16: Matching definition could not be found for function 'foo'
+Possible matches:
+void foo(string s)
+void foo(integer i, string s)
+void foo(integer i, float f)

@@ -43,6 +43,7 @@ protected:
 private:
     bool arguments_are_initialized();
     size_t try_init_arguments(const vector<FuncPtr>& funcs);
+    size_t try_init_arguments(const FuncPtr& func);
 
     size_t initialized_arg_count_ = 0;
 

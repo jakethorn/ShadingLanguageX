@@ -1,0 +1,3 @@
+funcquery001.mxsl, line 17: Matching definition could not be found for function 'foo'
+Possible matches:
+void foo(A a)

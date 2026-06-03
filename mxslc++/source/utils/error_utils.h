@@ -6,26 +6,8 @@
 #define MXSLC_ERROR_UTILS_H
 
 #include "common.h"
+#include "CompileError.h"
 
-class ArgumentList;
-class Token;
-
-string missing_overload_error(
-    const FuncPtr& func,
-    const vector<TypePtr>& return_types,
-    const string& name,
-    const TypePtr& template_type,
-    const ArgumentList& args
-);
-
-string missing_overload_error(
-    const vector<FuncPtr>& funcs,
-    const vector<TypePtr>& return_types,
-    const string& name,
-    const TypePtr& template_type,
-    const ArgumentList& args
-);
-
-string ambiguous_overload_error(const vector<FuncPtr>& funcs);
+CompileError ambiguous_function_error(const string& func_name, const vector<FuncPtr>& funcs);
 
 #endif //MXSLC_ERROR_UTILS_H

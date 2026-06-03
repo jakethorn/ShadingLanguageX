@@ -1,0 +1,6 @@
+int foo(int i)
+{
+    return i;
+}
+
+int i = foo(something);

@@ -1,0 +1,17 @@
+class A
+{
+	int x;
+}
+
+class B
+{
+    int x;
+}
+
+void foo(A a)
+{
+
+}
+
+B b;
+foo(b);

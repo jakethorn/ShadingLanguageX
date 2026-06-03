@@ -1,0 +1,1 @@
+funcquery005.mxsl, line 16: Definition could not be found for function 'bar'

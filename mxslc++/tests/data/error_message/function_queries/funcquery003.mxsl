@@ -1,0 +1,11 @@
+void foo(string s)
+{
+
+}
+
+void foo(int i, string s)
+{
+
+}
+
+foo(1);

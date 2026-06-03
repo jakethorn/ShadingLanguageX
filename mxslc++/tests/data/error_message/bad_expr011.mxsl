@@ -1,0 +1,6 @@
+inline void foo()
+{
+
+}
+
+string s = foo();
