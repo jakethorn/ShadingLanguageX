@@ -7,9 +7,10 @@
 #include <cassert>
 
 #include "mtlx/mtlx_utils.h"
+#include "runtime/Runtime.h"
 #include "runtime/Type.h"
 
-NodeValue::NodeValue(mx::NodePtr node) : Value{std::make_shared<ResolvedTypeInfo>(node->getType())}, node_{std::move(node)}
+NodeValue::NodeValue(mx::NodePtr node) : Value{Type::of(node)}, node_{std::move(node)}
 {
     assert(not node_->isMultiOutputType());
 }

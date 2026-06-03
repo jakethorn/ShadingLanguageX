@@ -11,7 +11,8 @@
 class NamedConstructor final : public Expression
 {
 public:
-    NamedConstructor(Token name, ArgumentList args);
+    NamedConstructor(string name, ArgumentList args);
+    NamedConstructor(string name, ArgumentList args, Token token);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -21,6 +22,7 @@ protected:
     VarPtr evaluate_impl() const override;
 
 private:
+    string name_;
     ArgumentList args_;
 
     ExprPtr func_call_;

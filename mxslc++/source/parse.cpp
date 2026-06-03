@@ -422,12 +422,7 @@ ModifierList Parser::modifiers()
         TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Ref, TokenType::Out
     );
 
-    vector<TokenType> mods;
-    mods.reserve(mod_tokens.size());
-    for (const Token& mod : mod_tokens)
-        mods.push_back(mod.type());
-
-    return ModifierList{std::move(mods)};
+    return ModifierList{mod_tokens};
 }
 
 TypePtr Parser::type()

@@ -59,14 +59,14 @@ PortAccessor::PortAccessor(VarPtr node_var, string input_name) : node_var_{std::
 
 TypePtr PortAccessor::type() const
 {
-    return Runtime::get().scope().get_type(input_->getType());
+    return scope().get_type(input_->getType());
 }
 
 VarPtr PortAccessor::evaluate() const
 {
     string input_var_name = node_var_->name() + "__" + input_name_;
-    if (Runtime::get().scope().has_variable(input_var_name))
-        return Runtime::get().scope().get_variable(input_var_name);
+    if (scope().has_variable(input_var_name))
+        return scope().get_variable(input_var_name);
     VarPtr input_var = std::make_shared<InputVariable>(input_);
     node_var_->defining_scope().add_variable(std::move(input_var_name), input_var);
     return input_var;

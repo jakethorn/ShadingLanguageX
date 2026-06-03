@@ -4,12 +4,19 @@
 
 #include "ModifierList.h"
 
+#include "Token.h"
 #include "CompileError.h"
 
-ModifierList::ModifierList(vector<TokenType> mods)
+ModifierList::ModifierList(const TokenType::Enum mod)
 {
-    for (const TokenType mod : mods)
+    add(mod);
+}
+
+ModifierList::ModifierList(const vector<Token>& mods)
+{
+    for (const Token token : mods)
     {
+        const TokenType mod = token.type();
         if (not contains(mod))
             add(mod);
         else
@@ -23,9 +30,4 @@ string ModifierList::str() const
     for (TokenType mod : mods_)
         result += mod.str() + " ";
     return result;
-}
-
-void ModifierList::throw_error(const string& message)
-{
-    throw CompileError{message};
 }

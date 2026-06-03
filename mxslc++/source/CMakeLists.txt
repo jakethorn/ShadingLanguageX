@@ -6,6 +6,7 @@ add_library(mxslc_lib
         compile.cpp
         CompileError.cpp
         runtime/Runtime.cpp
+        runtime/RuntimeAccessor.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
@@ -60,6 +61,7 @@ add_library(mxslc_lib
         utils/error_utils.cpp
         utils/instantiate_template_types_utils.cpp
         utils/parse_utils.cpp
+        utils/type_cast.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp

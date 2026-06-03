@@ -10,28 +10,34 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "utils/str_utils.h"
 
-Type::Type(const primitive_t& val)
+#define type_def(t) TypePtr Type::t = resolve(TypeName::t);
+type_def(Bool)
+type_def(Int)
+type_def(Float)
+type_def(String)
+type_def(Filename)
+type_def(Vec2)
+type_def(Vec3)
+type_def(Vec4)
+type_def(Color3)
+type_def(Color4)
+type_def(Mat3)
+type_def(Mat4)
+type_def(Void)
+#undef type_def
+
+Type::Type(const vector<TypePtr>& fields)
 {
-#define START_INIT if constexpr (false) { }
-#define INIT_PRIM(t, n) else if (std::holds_alternative<t>(val)) name_ = n;
+    fields_.reserve(fields.size());
+    for (const TypePtr& field : fields)
+        fields_.emplace_back(field);
+}
 
-    START_INIT
-    INIT_PRIM(bool, Bool)
-    INIT_PRIM(int, Int)
-    INIT_PRIM(float, Float)
-    INIT_PRIM(string, String)
-    INIT_PRIM(mx::Vector2, Vec2)
-    INIT_PRIM(mx::Vector3, Vec3)
-    INIT_PRIM(mx::Vector4, Vec4)
-    INIT_PRIM(mx::Color3, Color3)
-    INIT_PRIM(mx::Color4, Color4)
-    INIT_PRIM(mx::Matrix33, Mat33)
-    INIT_PRIM(mx::Matrix44, Mat44)
-
-#undef INIT_PRIM
-#undef START_INIT
-
-    set_resolved();
+Type::Type(const TypePtr& field_type, const size_t field_count)
+{
+    fields_.reserve(field_count);
+    for (size_t i = 0; i < field_count; ++i)
+        fields_.emplace_back(field_type);
 }
 
 TypePtr Type::instantiate_template_types(const TypePtr& template_type) const
@@ -84,34 +90,66 @@ size_t Type::field_index(const string& name) const
     throw CompileError{"Expression of type " + str() + " does not have a field with the name " + name};
 }
 
-bool Type::is_vector() const
+size_t Type::component_count() const
 {
-    return is<mx::Vector2>() or is<mx::Vector3>() or is<mx::Vector4>() or is<mx::Color3>() or is<mx::Color4>();
+    assert(is_vector());
+    if (is<mx::Vector2>()) return 2;
+    if (is<mx::Vector3>()) return 3;
+    if (is<mx::Vector4>()) return 4;
+    if (is<mx::Color3>()) return 3;
+    if (is<mx::Color4>()) return 4;
+    return 0;
+}
+
+namespace
+{
+    bool is_vector_compatible(const Type& vec_type, const Type& type)
+    {
+        assert(vec_type.is_vector());
+
+        if (type.has_name())
+            return false;
+
+        if (not type.has_fields())
+            return false;
+
+        for (size_t i = 0; i < type.field_count(); i++)
+        {
+            if (not type.field_type(i)->is<float>())
+                return false;
+        }
+
+        return vec_type.component_count() == type.field_count();
+    }
 }
 
 bool Type::is_compatible(const TypePtr& other) const
 {
+    if (other == nullptr)
+        return false;
+
     assert(is_resolved_);
     assert(other->is_resolved_);
 
-    if (has_name() and other->has_name())
-    {
-        return name_ == other->name_;
-    }
-
-    if (has_fields() and other->has_fields())
-    {
-        if (field_count() != other->field_count())
-            return false;
-        for (size_t i = 0; i < field_count(); i++)
-        {
-            if (not field_type(i)->is_compatible(other->field_type(i)))
-                return false;
-        }
+    if (is_vector() and is_vector_compatible(*this, *other))
         return true;
+
+    if (other->is_vector() and is_vector_compatible(*other, *this))
+        return true;
+
+    if (has_name() and other->has_name())
+        return name_ == other->name_;
+
+    if (field_count() != other->field_count())
+        return false;
+
+    for (size_t i = 0; i < field_count(); i++)
+    {
+        if (not field_type(i)->is_compatible(other->field_type(i)))
+            return false;
     }
 
-    return false;
+    return true;
 }
 
 bool Type::is_compatible(const vector<TypePtr>& types) const
@@ -125,22 +163,25 @@ bool Type::is_compatible(const vector<TypePtr>& types) const
     return false;
 }
 
-bool Type::is_equal(const TypePtr& other) const
+bool Type::is_equal(const TypePtr& other, const bool field_names) const
 {
+    if (other == nullptr)
+        return false;
+
     assert(is_resolved_);
     assert(other->is_resolved_);
 
     if (name_ != other->name_)
-    {
         return false;
-    }
 
     if (field_count() != other->field_count())
         return false;
 
     for (size_t i = 0; i < field_count(); i++)
     {
-        if (not field_type(i)->is_equal(other->field_type(i)))
+        if (not field_type(i)->is_equal(other->field_type(i), field_names))
+            return false;
+        if (field_names and field_name(i) != other->field_name(i))
             return false;
     }
 
@@ -160,19 +201,17 @@ bool Type::is_in(const vector<TypePtr>& types) const
 
 TypePtr Type::find_unique_compatible(const vector<TypePtr>& types) const
 {
-    TypePtr compatible = nullptr;
+    vector<TypePtr> compatibles;
     for (const TypePtr& type : types)
     {
+        if (is_equal(type))
+            return type;
+
         if (is_compatible(type))
-        {
-            if (compatible == nullptr)
-                compatible = type;
-            else
-                return nullptr;
-        }
+            compatibles.push_back(type);
     }
 
-    return compatible;
+    return compatibles.size() == 1 ? compatibles[0] : nullptr;
 }
 
 string Type::str() const
@@ -192,6 +231,50 @@ string Type::str() const
 
     result += "}";
     return result;
+}
+
+TypePtr Type::of(const primitive_t& val)
+{
+#define type_of(t, p) if (std::holds_alternative<t>(val)) return p;
+    type_of(bool, Bool);
+    type_of(int, Int);
+    type_of(float, Float);
+    type_of(string, String);
+    type_of(mx::Vector2, Vec2);
+    type_of(mx::Vector3, Vec3);
+    type_of(mx::Vector4, Vec4);
+    type_of(mx::Color3, Color3);
+    type_of(mx::Color4, Color4);
+    type_of(mx::Matrix33, Mat3);
+    type_of(mx::Matrix44, Mat4);
+#undef type_of
+    throw std::runtime_error{"Invalid primitive value"};
+}
+
+TypePtr Type::of(const mx::TypedElementPtr& val)
+{
+    return resolve(val->getType());
+}
+
+TypePtr Type::unnamed_struct(TypePtr field_type, const size_t field_count)
+{
+    assert(field_type->is_resolved());
+    assert(field_count > 0);
+
+    vector<Field> fields;
+    fields.reserve(field_count);
+    for (size_t i = 0; i < field_count; ++i)
+        fields.emplace_back(field_type);
+    TypePtr type = std::make_shared<Type>(std::move(fields));
+    type->set_resolved();
+    return type;
+}
+
+TypePtr Type::resolve(const string& name)
+{
+    TypePtr type = std::make_shared<Type>(name);
+    type->set_resolved();
+    return type;
 }
 
 string Type::to_string(const vector<TypePtr>& types)

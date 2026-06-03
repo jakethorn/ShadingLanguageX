@@ -20,13 +20,3 @@ void Statement::execute()
         throw CompileError{token_, e};
     }
 }
-
-Scope& Statement::scope()
-{
-    return Runtime::get().scope();
-}
-
-MtlXSerializer& Statement::serializer()
-{
-    return Runtime::get().serializer();
-}

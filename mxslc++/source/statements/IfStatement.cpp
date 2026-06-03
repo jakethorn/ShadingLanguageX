@@ -26,7 +26,7 @@ void IfStatement::execute_impl() const
     cond_expr_->init(Type::Bool);
     const VarPtr cond = cond_expr_->evaluate();
 
-    Runtime::get().enter_scope();
+    runtime().enter_scope();
     if (cond->value_as<bool>())
     {
         then_body_->execute();
@@ -35,5 +35,5 @@ void IfStatement::execute_impl() const
     {
         else_body_->execute();
     }
-    Runtime::get().exit_scope();
+    runtime().exit_scope();
 }

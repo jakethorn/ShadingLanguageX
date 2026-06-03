@@ -4,11 +4,12 @@
 
 #include "InputVariable.h"
 
+#include "Runtime.h"
 #include "Type.h"
 #include "values/ValueFactory.h"
 
 InputVariable::InputVariable(mx::InputPtr input)
-    : Variable{ModifierList{TokenType::Mutable}, std::make_shared<ResolvedTypeInfo>(input->getType())},
+    : Variable{TokenType::Mutable, Type::of(input)},
     input_{std::move(input)}
 {
 

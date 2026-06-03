@@ -2,16 +2,16 @@
 // Created by jaket on 30/03/2026.
 //
 
-#ifndef MXSLC_FORLOOP_H
-#define MXSLC_FORLOOP_H
+#ifndef MXSLC_FORRANGELOOP_H
+#define MXSLC_FORRANGELOOP_H
 
 #include "Statement.h"
 #include "Token.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/ModifierList.h"
-#include "runtime/Scope.h"
 #include "runtime/Variable.h"
+#include "runtime/Type.h"
 
 class ForRangeLoop final : public Statement
 {
@@ -27,7 +27,7 @@ private:
     template<typename T>
     void execute_with() const
     {
-        const TypePtr type = scope().resolve_type(type_);
+        const TypePtr type = Type::of<T>();
 
         lower_expr_->init(type);
         if (step_expr_)
@@ -40,11 +40,10 @@ private:
 
         while (lower <= upper)
         {
-            Runtime::get().enter_scope();
-            VarPtr var = Variable::create(mods_, type, std::make_shared<BasicValue>(lower));
-            scope().add_variable(name_, std::move(var));
+            runtime().enter_scope();
+            Variable::create(mods_, lower)->add_to_scope(name_);
             body_->execute();
-            Runtime::get().exit_scope();
+            runtime().exit_scope();
             lower += step;
         }
     }
@@ -58,4 +57,4 @@ private:
     StmtPtr body_;
 };
 
-#endif //MXSLC_FORLOOP_H
+#endif //MXSLC_FORRANGELOOP_H

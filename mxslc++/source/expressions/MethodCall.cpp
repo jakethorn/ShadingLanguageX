@@ -53,13 +53,13 @@ VarPtr MethodCall::evaluate_impl() const
 {
     if (func_->is_inline())
     {
-        Runtime::get().enter_scope();
+        runtime().enter_scope();
         evaluate_arguments();
         const VarPtr local_instance = copy_instance_to_scope();
         VarPtr return_value = inline_invoke();
         update_out_arguments();
         update_instance(local_instance);
-        Runtime::get().exit_scope();
+        runtime().exit_scope();
         return return_value;
     }
     else
@@ -81,8 +81,8 @@ FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) c
 VarPtr MethodCall::copy_instance_to_scope() const
 {
     VarPtr instance_copy = instance_->copy();
-    instance_copy->set_modifiers(ModifierList{TokenType::Mutable});
-    instance_copy->add_to_scope("this"s);
+    instance_copy->set_modifiers(TokenType::Mutable);
+    instance_copy->add_to_scope("this");
     return instance_copy;
 }
 

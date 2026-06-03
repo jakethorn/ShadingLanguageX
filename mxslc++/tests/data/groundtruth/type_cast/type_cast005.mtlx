@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="vector3" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <combine3 name="node1" type="vector3">
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="0" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <output name="out" type="vector3" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_foo2" node="foo">
+    <output name="out" type="color3" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <combine3 name="node1" type="color3">
+      <input name="in1" type="float" value="0" />
+      <input name="in2" type="float" value="1" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <output name="out" type="color3" nodename="node1" />
+  </nodegraph>
+  <foo name="node1" type="vector3" />
+  <foo name="node2" type="color3" />
+</materialx>

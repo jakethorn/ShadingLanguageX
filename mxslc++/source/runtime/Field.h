@@ -2,8 +2,8 @@
 // Created by jaket on 18/01/2026.
 //
 
-#ifndef MXSLC_FIELDINFO_H
-#define MXSLC_FIELDINFO_H
+#ifndef MXSLC_FIELD_H
+#define MXSLC_FIELD_H
 
 #include "utils/common.h"
 #include "ModifierList.h"
@@ -38,4 +38,4 @@ private:
     string name_;
 };
 
-#endif //MXSLC_FIELDINFO_H
+#endif //MXSLC_FIELD_H

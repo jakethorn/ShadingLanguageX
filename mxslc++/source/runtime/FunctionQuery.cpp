@@ -31,24 +31,23 @@ FunctionQuery::FunctionQuery(const TypePtr& class_type, const vector<TypePtr>& r
     
 }
 
-bool FunctionQuery::is_match(const FuncPtr& func) const
+FunctionQuery::Result FunctionQuery::is_match(const FuncPtr& func) const
 {
-    return class_type_matches(func) and
-            return_type_matches(func) and
-            name_matches(func) and
-            template_type_matches(func) and
-            arguments_match(func);
+    const Result class_type_result = class_type_matches(func);
+    const Result return_type_result = return_type_matches(func);
+    const Result name_result = name_matches(func);
+    const Result template_type_result = template_type_matches(func);
+    const Result arguments_result = arguments_match(func);
+    const Result final_result = class_type_result & return_type_result & name_result & template_type_result & arguments_result;
+    return final_result;
 }
 
-bool FunctionQuery::has_match(const vector<FuncPtr>& funcs) const
+FunctionQuery::Result FunctionQuery::has_match(const vector<FuncPtr>& funcs) const
 {
+    Result result = Result::NoMatch;
     for (const FuncPtr& func : funcs)
-    {
-        if (is_match(func))
-            return true;
-    }
-
-    return false;
+        result |= is_match(func);
+    return result;
 }
 
 FuncPtr FunctionQuery::get_match(const vector<FuncPtr>& funcs, const bool throw_on_fail) const
@@ -84,61 +83,83 @@ FuncPtr FunctionQuery::get_match(const vector<FuncPtr>& funcs, const bool throw_
 
 vector<FuncPtr> FunctionQuery::get_matches(const vector<FuncPtr>& funcs) const
 {
+    Result best_result = Result::Default;
     vector<FuncPtr> matches;
     for (const FuncPtr& func : funcs)
     {
-        if (is_match(func))
+        Result result = is_match(func);
+        if (result > best_result)
+        {
+            best_result = result;
+            matches.clear();
+        }
+        if (result == best_result)
+        {
             matches.push_back(func);
+        }
     }
     return matches;
 }
 
-bool FunctionQuery::class_type_matches(const FuncPtr& func) const
+FunctionQuery::Result FunctionQuery::class_type_matches(const FuncPtr& func) const
 {
     if (class_type == nullptr)
-        return true;
+        return Result::Ignore;
     return func->class_type() == *class_type;
 }
 
-bool FunctionQuery::return_type_matches(const FuncPtr& func) const
+FunctionQuery::Result FunctionQuery::return_type_matches(const FuncPtr& func) const
 {
     // empty means any type
     if (return_types == nullptr or return_types->empty())
-        return true;
-    return func->return_type()->is_compatible(*return_types);
+        return Result::Ignore;
+    if (func->return_type()->is_in(*return_types))
+        return Result{Result::Match, 1};
+    if (func->return_type()->is_compatible(*return_types))
+        return Result::Match;
+    return Result::NoMatch;
 }
 
-bool FunctionQuery::name_matches(const FuncPtr& func) const
+FunctionQuery::Result FunctionQuery::name_matches(const FuncPtr& func) const
 {
     if (name == nullptr)
-        return true;
-    return func->name() == *name;
+        return Result::Ignore;
+    const Result result = func->name() == *name;
+    return result;
 }
 
-bool FunctionQuery::template_type_matches(const FuncPtr& func) const
+FunctionQuery::Result FunctionQuery::template_type_matches(const FuncPtr& func) const
 {
     // nullptr means any type
     if (template_type == nullptr or *template_type == nullptr)
-        return true;
+        return Result::Ignore;
     return func->template_type() == *template_type;
 }
 
-bool FunctionQuery::arguments_match(const FuncPtr& func) const
+FunctionQuery::Result FunctionQuery::arguments_match(const FuncPtr& func) const
 {
     if (args == nullptr)
-        return true;
+        return Result::Ignore;
 
     if (args->size() > func->max_arity() or args->size() < func->min_arity())
-        return false;
+        return Result::NoMatch;
 
+    Result result = Result::Match;
+    const ParameterList& params = func->parameters();
     for (const Argument& arg : *args)
     {
-        TypePtr param_type = func->parameters()[arg].type();
-        if (arg.is_initialized() and not param_type->is_compatible(arg.type()))
-            return false;
+        if (not arg.is_initialized())
+            continue;
+        if (not params.contains(arg))
+            return Result::NoMatch;
+        const TypePtr param_type = params[arg].type();
+        if (not param_type->is_compatible(arg.type()))
+            return Result::NoMatch;
+        if (param_type->is_equal(arg.type()))
+            result.score++;
     }
 
-    return true;
+    return result;
 }
 
 vector<FuncPtr> FunctionQuery::get_default_functions(const vector<FuncPtr>& funcs) const

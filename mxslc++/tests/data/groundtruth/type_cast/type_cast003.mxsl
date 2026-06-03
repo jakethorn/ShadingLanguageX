@@ -1,0 +1,6 @@
+{float u, float v} a = texcoord();
+float OUT1 = a.u * a.v;
+
+float u, v, w = texcoord();
+float OUT2 = u * v * w;
+

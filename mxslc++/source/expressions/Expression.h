@@ -8,15 +8,15 @@
 #include "utils/common.h"
 #include "Token.h"
 #include "runtime/AttributeList.h"
+#include "runtime/RuntimeAccessor.h"
 
-class MtlXSerializer;
-
-class Expression
+class Expression : protected RuntimeAccessor
 {
 public:
     Expression() = default;
     explicit Expression(Token token);
-    virtual ~Expression() = default;
+
+    ~Expression() override = default;
 
     const Token& token() const { return token_; }
 
@@ -41,13 +41,10 @@ protected:
     virtual TypePtr type_impl() const = 0;
     virtual VarPtr evaluate_impl() const = 0;
 
-    static Scope& scope();
-    static MtlXSerializer& serializer();
-
     Token token_;
 
     bool is_initialized_ = false;
-    TypePtr assigned_type_ = nullptr;
+    TypePtr target_type_ = nullptr;
     string error_message_ = ""s;
 
     AttributeList attrs_;

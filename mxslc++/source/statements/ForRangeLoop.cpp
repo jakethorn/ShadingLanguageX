@@ -44,5 +44,5 @@ void ForRangeLoop::execute_impl() const
     else if (type->is<float>())
         execute_with<float>();
     else
-        throw CompileError{"Unsupported loop iterator type"s};
+        throw CompileError{"Loop iterators must be either int or float"s};
 }

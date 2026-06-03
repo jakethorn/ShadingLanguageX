@@ -9,7 +9,7 @@
 #include "mtlx/mtlx_utils.h"
 #include "mtlx/mtlx_type_ostream_ops.h"
 
-BasicValue::BasicValue(primitive_t val) : Value{std::make_shared<Type>(val)}, val_{std::move(val)} { }
+BasicValue::BasicValue(primitive_t val) : Value{Type::of(val)}, val_{std::move(val)} { }
 BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, val_{std::move(val)} { }
 
 bool BasicValue::equals(const ValuePtr& other) const
@@ -63,7 +63,7 @@ string BasicValue::str() const
     );
 }
 
-void BasicValue::throw_type_error(const char* type_name) const
+string BasicValue::type_name() const
 {
-    throw CompileError{"Trying to access a value of type " + type_->str() + " as a " + type_name};
+    return type_->name();
 }

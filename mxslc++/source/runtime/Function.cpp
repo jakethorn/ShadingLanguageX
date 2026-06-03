@@ -6,11 +6,11 @@
 
 #include "expressions/Expression.h"
 #include "statements/Statement.h"
-#include "Runtime.h"
 #include "Scope.h"
 #include "Type.h"
 #include "CompileError.h"
 #include "Variable.h"
+#include "utils/type_cast.h"
 
 Function::Function(
     ModifierList mods,
@@ -46,9 +46,9 @@ Function::Function(
 {
     mods_.validate(TokenType::Inline, TokenType::Default);
 
-    if (return_type_ == Type::Void and return_expr_ != nullptr)
+    if (return_type_->is_void() and return_expr_ != nullptr)
         throw CompileError{"Void function '" + name_ + "' has a return statement"s};
-    if (return_type_ != Type::Void and return_expr_ == nullptr)
+    if (not return_type_->is_void() and return_expr_ == nullptr)
         throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"s};
 }
 
@@ -72,7 +72,7 @@ Function::~Function() = default;
 
 bool Function::is_void() const
 {
-    return return_type_ == Type::Void;
+    return return_type_->is_void();
 }
 
 size_t Function::min_arity() const
@@ -106,13 +106,10 @@ vector<string> Function::output_names() const
 
 void Function::init()
 {
-    if (return_type_ == Type::Void)
-        return_type_ = std::make_shared<ResolvedTypeInfo>(Type::Void);
-    else
-        return_type_ = Runtime::get().scope().resolve_type(return_type_);
+    return_type_ = scope().resolve_type(return_type_);
 
     if (template_type_)
-        template_type_ = Runtime::get().scope().resolve_type(template_type_);
+        template_type_ = scope().resolve_type(template_type_);
 
     params_.init();
 
@@ -130,7 +127,7 @@ VarPtr Function::invoke() const
     else
     {
         return_expr_->init(return_type_);
-        return return_expr_->evaluate();
+        return type_cast(return_type_, return_expr_->evaluate(), true);
     }
 }
 

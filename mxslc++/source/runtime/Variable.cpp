@@ -5,9 +5,9 @@
 #include "Variable.h"
 
 #include "CompileError.h"
-#include "Runtime.h"
 #include "Scope.h"
 #include "Type.h"
+#include "mtlx/MtlXSerializer.h"
 #include "mtlx/mtlx_utils.h"
 
 Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
@@ -81,7 +81,7 @@ bool Variable::is_temporary() const
 
 bool Variable::is_local()
 {
-    return Runtime::get().scope().is_variable_local(shared_from_this());
+    return scope().is_variable_local(shared_from_this());
 }
 
 bool Variable::has_parent() const
@@ -92,6 +92,11 @@ bool Variable::has_parent() const
 VarPtr Variable::parent() const
 {
     return parent_.lock();
+}
+
+const vector<VarPtr>& Variable::children() const
+{
+    return children_;
 }
 
 size_t Variable::child_count() const
@@ -130,7 +135,7 @@ ValuePtr Variable::value()
     }
     else
     {
-        return Runtime::get().serializer().write_node_def_input(shared_from_this());
+        return serializer().write_node_def_input(shared_from_this());
     }
 }
 
@@ -199,12 +204,12 @@ void Variable::uninitialize()
 
 Scope& Variable::defining_scope()
 {
-    return Runtime::get().scope().get_defining_scope(shared_from_this());
+    return scope().get_defining_scope(shared_from_this());
 }
 
 void Variable::add_to_scope(string name)
 {
-    Runtime::get().scope().add_variable(name, shared_from_this());
+    scope().add_variable(name, shared_from_this());
 
     if (name == "this"s)
     {
@@ -212,7 +217,7 @@ void Variable::add_to_scope(string name)
         for (size_t i = 0; i < child_count(); ++i)
         {
             const string& child_name = type()->field_name(i);
-            if (Runtime::get().scope().has_variable(child_name))
+            if (scope().has_variable(child_name))
                 continue;
             child(i)->add_to_scope(child_name);
         }
@@ -257,6 +262,18 @@ VarPtr Variable::create(ModifierList mods, TypePtr type, const VarPtr& value)
     return var;
 }
 
+VarPtr Variable::create(ModifierList mods, ValuePtr value)
+{
+    TypePtr type = value->type();
+    return create(std::move(mods), std::move(type), std::move(value));
+}
+
+VarPtr Variable::create(ModifierList mods, primitive_t value)
+{
+    ValuePtr basic_value = std::make_shared<BasicValue>(std::move(value));
+    return create(std::move(mods), std::move(basic_value));
+}
+
 VarPtr Variable::create(TypePtr type, const vector<VarPtr>& children)
 {
     return create(ModifierList{}, std::move(type), children);
@@ -279,7 +296,7 @@ VarPtr Variable::create(const vector<VarPtr>& children)
     for (const VarPtr& child : children)
         fields.push_back(child->type());
 
-    TypePtr type = Runtime::get().scope().resolve_type(
+    TypePtr type = scope().resolve_type(
         std::make_shared<Type>(std::move(fields))
     );
 
@@ -311,7 +328,7 @@ void Variable::copy_value(ValuePtr value)
     }
     else
     {
-        Runtime::get().serializer().write_node_def_output(shared_from_this(), value);
+        serializer().write_node_def_output(shared_from_this(), value);
     }
 
     is_initialized_ = true;
@@ -330,9 +347,4 @@ void Variable::copy_children(const vector<VarPtr>& children)
     }
 
     is_initialized_ = true;
-}
-
-void Variable::throw_error(const string& message)
-{
-    throw CompileError{message};
 }

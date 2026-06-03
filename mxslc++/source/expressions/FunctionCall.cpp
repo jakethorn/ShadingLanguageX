@@ -74,7 +74,6 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
     while (initialized_arg_count < args_.size())
     {
         vector<FuncPtr> matching_funcs = get_matching_functions(types);
-        assert(not matching_funcs.empty());
 
         const size_t prev_initialized_arg_count = initialized_arg_count;
         initialized_arg_count = try_init_arguments(matching_funcs);
@@ -113,17 +112,15 @@ TypePtr FunctionCall::type_impl() const
 VarPtr FunctionCall::evaluate_impl() const
 {
     if (func_->has_class_type())
-    {
-        return evaluate_as_method();
-    }
+        return method_call_->evaluate();
 
     if (func_->is_inline())
     {
-        Runtime::get().enter_scope();
+        runtime().enter_scope();
         evaluate_arguments();
         VarPtr return_value = inline_invoke();
         update_out_arguments();
-        Runtime::get().exit_scope();
+        runtime().exit_scope();
         return return_value;
     }
     else
@@ -180,7 +177,7 @@ void FunctionCall::update_out_arguments() const
         if (param.is_out())
         {
             const VarPtr nonlocal = args_.evaluate(param);
-            const VarPtr local = Runtime::get().scope().get_variable(param.name());
+            const VarPtr local = scope().get_variable(param.name());
             nonlocal->copy(local);
         }
     }
@@ -243,9 +240,4 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
     }
 
     return initialized_arg_count;
-}
-
-VarPtr FunctionCall::evaluate_as_method() const
-{
-    return method_call_->evaluate();
 }

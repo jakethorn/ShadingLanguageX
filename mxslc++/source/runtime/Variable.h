@@ -6,14 +6,17 @@
 #define MXSLC_VARIABLE_H
 
 #include "utils/common.h"
-#include "ModifierList.h"
+#include "utils/TypeName.h"
 #include "values/BasicValue.h"
+#include "ModifierList.h"
+#include "CompileError.h"
+#include "RuntimeAccessor.h"
 
-class Variable : public std::enable_shared_from_this<Variable>
+class Variable : public std::enable_shared_from_this<Variable>, protected RuntimeAccessor
 {
 public:
     Variable(ModifierList mods, TypePtr type);
-    virtual ~Variable() = default;
+    ~Variable() override = default;
 
     bool is_const() const;
     bool is_mutable() const;
@@ -31,6 +34,7 @@ public:
 
     bool has_parent() const;
     VarPtr parent() const;
+    const vector<VarPtr>& children() const;
     size_t child_count() const;
     VarPtr child(size_t index);
     VarPtr child(const string& field_name);
@@ -56,13 +60,14 @@ public:
     {
         if (const shared_ptr<BasicValue>& value = std::dynamic_pointer_cast<BasicValue>(value_))
             return value->get<T>();
-        throw_error("Value is not a compile-time "s + typeid(T).name());
-        return T{};
+        throw CompileError{"Value is not a compile-time "s + TypeName::get<T>()};
     }
 
     static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
     static VarPtr create(ModifierList mods, TypePtr type, ValuePtr value);
     static VarPtr create(ModifierList mods, TypePtr type, const VarPtr& value);
+    static VarPtr create(ModifierList mods, ValuePtr value);
+    static VarPtr create(ModifierList mods, primitive_t value);
     static VarPtr create(TypePtr type, const vector<VarPtr>& children);
     static VarPtr create(TypePtr type, ValuePtr value);
     static VarPtr create(TypePtr type, const VarPtr& value);
@@ -78,8 +83,6 @@ protected:
 private:
     void copy_value(ValuePtr value);
     void copy_children(const vector<VarPtr>& children);
-
-    static void throw_error(const string& message);
 
     ModifierList mods_;
     TypePtr type_;

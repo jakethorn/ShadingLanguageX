@@ -1,0 +1,16 @@
+
+void foo(vec2 a, int b)
+{
+
+}
+
+void foo(vec2 a, string b)
+{
+
+}
+
+foo(vec2{}, 1);
+foo(vec2{}, "hello");
+
+foo({1.0, 2.0}, 1);
+foo({1.0, 2.0}, "hello");

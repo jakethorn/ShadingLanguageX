@@ -58,8 +58,8 @@ namespace
 void ConstructorDefinition::init()
 {
     inner_ctor_ = std::make_shared<Function>(
-        ModifierList{TokenType::Inline},
-        std::make_shared<Type>(Type::Void),
+        TokenType::Inline,
+        Type::Void,
         "__ctor__"s,
         nullptr, // template_type
         duplicate_parameters(params_),
