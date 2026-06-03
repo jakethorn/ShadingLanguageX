@@ -171,6 +171,9 @@ bool Scope::has_type(const string& name) const
 
 TypePtr Scope::resolve_type(const TypePtr& type) const
 {
+    if (type->is_void())
+        return Type::Void;
+
     if (type->has_name())
     {
         return get_type(type->name());
@@ -181,12 +184,6 @@ TypePtr Scope::resolve_type(const TypePtr& type) const
         type->set_resolved();
         return type;
     }
-}
-
-void Scope::resolve_fields(const TypePtr& type) const
-{
-    for (Field& field : type->fields_)
-        field.type_ = resolve_type(field.type_);
 }
 
 TypePtr Scope::get_type(const string& name) const
@@ -214,4 +211,10 @@ vector<FuncPtr> Scope::get_all_functions(const string& name) const
     }
 
     return funcs;
+}
+
+void Scope::resolve_fields(const TypePtr& type) const
+{
+    for (Field& field : type->fields_)
+        field.type_ = resolve_type(field.type_);
 }

@@ -93,11 +93,9 @@ namespace
 
             if (type->is_vector())
             {
-                TypePtr float_struct = std::make_shared<Type>(
-                    Runtime::get().scope().get_type(Type::Float),
-                    type->component_count()
+                result.push_back(
+                    Type::unnamed_struct(Type::Float, type->component_count())
                 );
-                result.push_back(float_struct);
             }
         }
 

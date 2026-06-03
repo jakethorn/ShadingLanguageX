@@ -110,15 +110,5 @@ VarPtr Expression::evaluate() const
     TRY_END
 }
 
-Scope& Expression::scope()
-{
-    return Runtime::get().scope();
-}
-
-MtlXSerializer& Expression::serializer()
-{
-    return Runtime::get().serializer();
-}
-
 #undef TRY_START
 #undef TRY_END

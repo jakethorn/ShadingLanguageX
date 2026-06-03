@@ -140,16 +140,14 @@ VarPtr ValueFactory::create_default_value(TypePtr type)
 
 ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 {
-    TypePtr type = std::make_shared<ResolvedTypeInfo>(port->getType());
-
     if (port->hasInterfaceName())
     {
-        return std::make_shared<InterfaceValue>(std::move(type), port->getInterfaceName());
+        return std::make_shared<InterfaceValue>(Type::of(port), port->getInterfaceName());
     }
 
     if (port->hasOutputString())
     {
-        return std::make_shared<OutputValue>(std::move(type), port->getConnectedNode(), port->getOutputString());
+        return std::make_shared<OutputValue>(Type::of(port), port->getConnectedNode(), port->getOutputString());
     }
 
     if (port->hasNodeName())

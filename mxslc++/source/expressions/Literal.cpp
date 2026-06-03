@@ -16,28 +16,24 @@ ExprPtr Literal::instantiate_template_types(const TypePtr& template_type) const
 
 void Literal::init_impl(const vector<TypePtr>& types)
 {
-    type_ = std::make_shared<Type>(value_);
+    type_ = Type::of(value_);
 
     // implicit cast from int to float
     if (std::holds_alternative<int>(value_))
     {
-        const TypePtr int_type = scope().get_type(Type::Int);
-        const TypePtr float_type = scope().get_type(Type::Float);
-        if (not int_type->is_in(types) and float_type->is_in(types))
+        if (not Type::Int->is_in(types) and Type::Float->is_in(types))
         {
             value_ = static_cast<float>(std::get<int>(value_));
-            type_ = float_type;
+            type_ = Type::Float;
         }
     }
 
     // implicit cast from string to filename
     if (std::holds_alternative<string>(value_))
     {
-        const TypePtr string_type = scope().get_type(Type::String);
-        const TypePtr filename_type = scope().get_type(Type::Filename);
-        if (not string_type->is_in(types) and filename_type->is_in(types))
+        if (not Type::String->is_in(types) and Type::Filename->is_in(types))
         {
-            type_ = filename_type;
+            type_ = Type::Filename;
         }
     }
 }

@@ -29,13 +29,13 @@ namespace
         if (outputs.size() == 1)
             return outputs[0]->getType();
         if (outputs.size() > 1)
-            return Type::MultiOutput;
+            return "multioutput";
         throw CompileError{"Unable to serialize function type"s};
     }
 
-    void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name = "out"s)
+    void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const TypePtr& type, const string& name = "out")
     {
-        if (type == Type::Void)
+        if (type->is_void())
             return;
 
         if (type->has_fields())
@@ -56,7 +56,7 @@ namespace
         if (not func->is_defined())
             return func->name();
 
-        string result = ""s;
+        string result = "";
         const Scope* scope = &Runtime::get().scope().get_defining_scope(func);
         while (true)
         {
@@ -93,8 +93,8 @@ namespace
         // this happens if the function is void, has no out or ref parameters and doesn't mutate a nonlocal variable
         if (node_def->getActiveOutputs().empty())
         {
-            node_def->addOutput("out"s, Type::Int);
-            node_graph->addOutput("out"s, Type::Int)->setValueString("0"s);
+            node_def->addOutput("out", TypeName::Int);
+            node_graph->addOutput("out", TypeName::Int)->setValueString("0");
         }
     }
 }
@@ -139,11 +139,11 @@ VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, c
     {
         assert(instance->type() == func->class_type());
 
-        write_node_input(node, "this"s, instance);
+        write_node_input(node, "this", instance);
 
         if (func->mutates_instance())
         {
-            const VarPtr output = ValueFactory::create_output_value(node, instance->type(), "out_this"s);
+            const VarPtr output = ValueFactory::create_output_value(node, instance->type(), "out_this");
             instance->copy(output);
         }
     }
@@ -217,8 +217,8 @@ void MtlXSerializer::save(const fs::path& dst_path) const
 
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
 {
-    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), Type::Int, node_name(func));
-    node_def->removeOutput("out"s);
+    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), TypeName::Int, node_name(func));
+    node_def->removeOutput("out");
     add_outputs_to_node_def(node_def, func->return_type());
 
     for (const Parameter& param : func->parameters())
@@ -257,7 +257,7 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
 
     if (not func->is_void())
     {
-        write_node_graph_output(node_graph, "out"s, return_value);
+        write_node_graph_output(node_graph, "out", return_value);
     }
 
     for (const Parameter& param : func->parameters())
@@ -277,18 +277,18 @@ void MtlXSerializer::add_instance_to_scope(const FuncPtr& func, const mx::NodeDe
 {
     if (func->has_class_type())
     {
-        write_node_def_input(node_def, "this"s, func->class_type());
+        write_node_def_input(node_def, "this", func->class_type());
 
-        const VarPtr instance = ValueFactory::create_interface_value(func->class_type(), "this"s);
-        instance->set_modifiers(ModifierList{TokenType::Mutable});
-        instance->add_to_scope("this"s);
+        const VarPtr instance = ValueFactory::create_interface_value(func->class_type(), "this");
+        instance->set_modifiers(TokenType::Mutable);
+        instance->add_to_scope("this");
     }
 }
 
 VarPtr MtlXSerializer::copy_instance(const FuncPtr& func) const
 {
     if (func->has_class_type())
-        return Runtime::get().scope().get_variable("this"s)->copy();
+        return Runtime::get().scope().get_variable("this")->copy();
     else
         return nullptr;
 }
@@ -297,10 +297,10 @@ void MtlXSerializer::update_instance(const FuncPtr& func, const mx::NodeGraphPtr
 {
     if (func->has_class_type())
     {
-        const VarPtr instance = Runtime::get().scope().get_variable("this"s);
+        const VarPtr instance = Runtime::get().scope().get_variable("this");
         func->set_mutates_instance(not instance->equals(original_instance));
         if (func->mutates_instance())
-            write_node_graph_output(node_graph, "out__this"s, instance);
+            write_node_graph_output(node_graph, "out__this", instance);
     }
 }
 

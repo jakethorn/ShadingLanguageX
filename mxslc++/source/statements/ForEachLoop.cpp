@@ -47,10 +47,9 @@ void ForEachLoop::execute_impl() const
         if (not next_value->type()->is_compatible(type))
             throw CompileError{"Field value does not match loop iterator type"s};
 
-        Runtime::get().enter_scope();
-        VarPtr var = Variable::create(mods_, type, next_value);
-        scope().add_variable(name_, std::move(var));
+        runtime().enter_scope();
+        Variable::create(mods_, type, next_value)->add_to_scope(name_);
         body_->execute();
-        Runtime::get().exit_scope();
+        runtime().exit_scope();
     }
 }

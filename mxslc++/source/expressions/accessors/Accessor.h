@@ -5,13 +5,14 @@
 #ifndef MXSLC_ACCESSOR_H
 #define MXSLC_ACCESSOR_H
 
+#include "runtime/RuntimeAccessor.h"
 #include "utils/common.h"
 
-class Accessor
+class Accessor : protected RuntimeAccessor
 {
 public:
     Accessor() = default;
-    virtual ~Accessor() = default;
+    ~Accessor() override = default;
 
     virtual TypePtr type() const = 0;
     virtual VarPtr evaluate() const = 0;

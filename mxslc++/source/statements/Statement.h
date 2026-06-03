@@ -7,16 +7,14 @@
 
 #include "Token.h"
 #include "runtime/AttributeList.h"
+#include "runtime/RuntimeAccessor.h"
 #include "utils/common.h"
 
-class Scope;
-class MtlXSerializer;
-
-class Statement
+class Statement : protected RuntimeAccessor
 {
 public:
     explicit Statement(Token token) : token_{std::move(token)} { }
-    virtual ~Statement() = default;
+    ~Statement() override = default;
 
     const Token& token() const { return token_; }
 
@@ -28,9 +26,6 @@ public:
 
 protected:
     virtual void execute_impl() const = 0;
-
-    static Scope& scope();
-    static MtlXSerializer& serializer();
 
     Token token_;
     bool is_initialized_ = false;

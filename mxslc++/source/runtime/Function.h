@@ -7,8 +7,9 @@
 
 #include "ModifierList.h"
 #include "ParameterList.h"
+#include "RuntimeAccessor.h"
 
-class Function
+class Function : protected RuntimeAccessor
 {
 public:
     Function(
@@ -32,7 +33,7 @@ public:
 
     Function(Function&& other) noexcept;
 
-    ~Function();
+    ~Function() override;
 
     bool is_inline() const { return mods_.contains(TokenType::Inline); }
     bool is_default() const { return mods_.contains(TokenType::Default); }

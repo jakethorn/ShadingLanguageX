@@ -59,11 +59,11 @@ public:
     void add_alias(const string& name, TypePtr type);
     bool has_type(const string& name) const;
     TypePtr resolve_type(const TypePtr& type) const;
-    void resolve_fields(const TypePtr& type) const;
     TypePtr get_type(const string& name) const;
 
 private:
     vector<FuncPtr> get_all_functions(const string& name) const;
+    void resolve_fields(const TypePtr& type) const;
 
     string name_;
     ScopePtr parent_;
