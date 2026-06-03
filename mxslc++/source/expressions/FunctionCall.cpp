@@ -74,7 +74,6 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
     while (initialized_arg_count < args_.size())
     {
         vector<FuncPtr> matching_funcs = get_matching_functions(types);
-        assert(not matching_funcs.empty());
 
         const size_t prev_initialized_arg_count = initialized_arg_count;
         initialized_arg_count = try_init_arguments(matching_funcs);

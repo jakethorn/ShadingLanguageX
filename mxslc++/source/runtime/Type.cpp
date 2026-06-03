@@ -103,15 +103,23 @@ size_t Type::component_count() const
 
 namespace
 {
-    bool is_compatible(const Type& vec, const Type& struct_)
+    bool is_vector_compatible(const Type& vec_type, const Type& type)
     {
-        for (size_t i = 0; i < struct_.field_count(); i++)
+        assert(vec_type.is_vector());
+
+        if (type.has_name())
+            return false;
+
+        if (not type.has_fields())
+            return false;
+
+        for (size_t i = 0; i < type.field_count(); i++)
         {
-            if (not struct_.field_type(i)->is<float>())
+            if (not type.field_type(i)->is<float>())
                 return false;
         }
 
-        return vec.component_count() == struct_.field_count();
+        return vec_type.component_count() == type.field_count();
     }
 }
 
@@ -123,10 +131,10 @@ bool Type::is_compatible(const TypePtr& other) const
     assert(is_resolved_);
     assert(other->is_resolved_);
 
-    if (is_vector() and other->has_fields() and ::is_compatible(*this, *other))
+    if (is_vector() and is_vector_compatible(*this, *other))
         return true;
 
-    if (has_fields() and other->is_vector() and ::is_compatible(*other, *this))
+    if (other->is_vector() and is_vector_compatible(*other, *this))
         return true;
 
     if (has_name() and other->has_name())
