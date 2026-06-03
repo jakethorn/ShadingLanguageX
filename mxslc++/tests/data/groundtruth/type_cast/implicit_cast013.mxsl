@@ -1,0 +1,16 @@
+class A
+{
+	float x;
+	float y;
+	int z;
+	string w;
+};
+
+A a = {1.0, 2.0, 3, "4"};
+
+void foo(A a)
+{
+
+}
+
+foo(a);
