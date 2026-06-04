@@ -29,15 +29,24 @@ target_link_libraries(mtlx_lib INTERFACE
 add_subdirectory(source)
 
 # -------- python bindings --------
-pybind11_add_module(mxslc_py python_bindings.cpp)
+pybind11_add_module(_mxslc python_bindings.cpp)
 
-target_include_directories(mxslc_py PRIVATE
+target_include_directories(_mxslc PRIVATE
         "${CMAKE_SOURCE_DIR}/include"
 )
 
-target_link_libraries(mxslc_py PRIVATE
+target_link_libraries(_mxslc PRIVATE
         mtlx_lib
         mxslc_lib
+)
+
+install(TARGETS _mxslc
+        LIBRARY DESTINATION mxslc
+        RUNTIME DESTINATION mxslc
+)
+
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries"
+        DESTINATION mxslc
 )
 
 # -------- main --------

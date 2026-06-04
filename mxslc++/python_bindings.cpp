@@ -14,7 +14,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(mxslc_py, m)
+PYBIND11_MODULE(_mxslc, m)
 {
     m.doc() = "Python bindings for mxslc";
 

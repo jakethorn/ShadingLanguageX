@@ -1,0 +1,56 @@
+[build-system]
+requires = [
+    "scikit-build-core>=0.10",
+    "pybind11>=2.12"
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "mxslc"
+version = "0.1.0"
+description = "Python bindings for mxslc"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Jacob Thorn", email="jakethorn1.1@gmail.com" }
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/jakethorn/ShadingLanguageX"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.28"
+build-dir = "build/{wheel_tag}"
+
+wheel.packages = ["python/mxslc"]
+
+sdist.exclude = [
+    ".venv",
+    ".venv/**",
+    ".test-venv",
+    ".test-venv/**",
+    "build",
+    "build/**",
+    "cmake-build-*",
+    "cmake-build-*/**",
+    "dist",
+    "dist/**",
+    ".git",
+    ".git/**",
+    ".idea",
+    ".idea/**",
+]
+
+[tool.cibuildwheel]
+build = "cp39-* cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux_*"
+
+test-command = "python -c \"import mxslc; mxslc.compile_string_to_string('');\""

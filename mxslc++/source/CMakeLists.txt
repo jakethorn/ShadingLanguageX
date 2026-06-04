@@ -91,3 +91,9 @@ target_include_directories(mxslc_lib
 target_link_libraries(mxslc_lib
         PUBLIC mtlx_lib
 )
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(mxslc_lib
+            PUBLIC dl
+    )
+endif()
