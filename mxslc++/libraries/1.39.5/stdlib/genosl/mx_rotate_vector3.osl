@@ -1,0 +1,13 @@
+void mx_rotate_vector3(vector _in, float amount, vector axis, output vector result)
+{
+    // Based on https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula, where the
+    // Wikipedia formula follows v' = M * v and MaterialX follows v' = v * M, thus the
+    // order of parameters to cross are reversed.
+
+    vector nAxis = normalize(axis);
+    float rotationRadians = radians(amount);
+    float s = sin(rotationRadians);
+    float c = cos(rotationRadians);
+    float oc = 1.0 - c;
+    result = _in * c + cross(_in, nAxis) * s + nAxis * dot(nAxis, _in) * oc;
+}

@@ -16,22 +16,25 @@ public:
     Runtime();
     Runtime(ScopePtr scope, MtlXSerializer serializer);
 
-    Scope& scope();
-    MtlXSerializer& serializer();
+    static Runtime& create(const optional<fs::path>& src_path, const string& version, bool reduce_graph);
+    static Runtime& get();
+
+    const vector<fs::path>& include_directories() { return include_dirs_; }
+
+    void load_materialx_library(const string& version);
     mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
+    Scope& scope();
     void enter_scope(string name = ""s);
     void exit_scope();
 
-    static Runtime& create(const string& version, bool reduce_graph);
-    static Runtime& get();
+    MtlXSerializer& serializer();
 
 private:
-    void load_materialx_library(const string& version);
-
+    vector<fs::path> include_dirs_;
+    mx::DocumentPtr mtlx_lib_;
     ScopePtr scope_;
     MtlXSerializer serializer_;
-    mx::DocumentPtr mtlx_lib_;
 
     static unique_ptr<Runtime> instance_;
 };

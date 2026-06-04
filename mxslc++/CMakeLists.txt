@@ -42,6 +42,15 @@ target_link_libraries(mxslc PRIVATE
         mxslc_lib
 )
 
+# -------- Copy libraries directory --------
+add_custom_command(
+        TARGET mxslc POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/libraries"
+        "$<TARGET_FILE_DIR:mxslc>/libraries"
+        COMMENT "Copying libraries directory"
+)
+
 # -------- tests --------
 enable_testing()
 add_subdirectory(tests)

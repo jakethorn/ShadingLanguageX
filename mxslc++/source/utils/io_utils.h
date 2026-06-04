@@ -9,6 +9,6 @@
 
 string read_file(const fs::path& src_path);
 void save_file(const fs::path& dst_path, const string& text);
-fs::path get_libraries_dir();
+fs::path get_executable_dir();
 
 #endif //FENNEC_IO_UTILS_H

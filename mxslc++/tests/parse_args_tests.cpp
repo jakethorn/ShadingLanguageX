@@ -12,7 +12,7 @@ using namespace std::string_literals;
 namespace fs = std::filesystem;
 
 #define EXECUTABLE "mxslc"s
-#define DEFAULT_MTLX_VERSION "1.39.4"s
+#define DEFAULT_MTLX_VERSION "1.39.5"s
 
 TEST(parse_args_tests, test_input_filepath)
 {
@@ -79,13 +79,13 @@ TEST(parse_args_tests, test_options_002)
     const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
     const fs::path output_filepath = get_test_data("parse_args_tests/001.mtlx"s);
 
-    const vector argv{ EXECUTABLE, input_filepath.string(), "--output-file"s, output_filepath.string(), "-v"s, "1.39.4"s };
+    const vector argv{ EXECUTABLE, input_filepath.string(), "--output-file"s, output_filepath.string(), "-v"s, "1.38.10"s };
     const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
 
     ASSERT_TRUE(args.is_valid);
     ASSERT_EQ(args.input_file, input_filepath);
     ASSERT_EQ(args.options.output_file, output_filepath);
-    ASSERT_EQ(args.options.version, "1.39.4"s);
+    ASSERT_EQ(args.options.version, "1.38.10"s);
     ASSERT_TRUE(args.options.reduce_graph);
 }
 
@@ -93,13 +93,13 @@ TEST(parse_args_tests, test_options_003)
 {
     const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
 
-    const vector argv{ EXECUTABLE, input_filepath.string(), "--version"s, "1.39.4"s };
+    const vector argv{ EXECUTABLE, input_filepath.string(), "--version"s, "1.38.10"s };
     const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
 
     ASSERT_TRUE(args.is_valid);
     ASSERT_EQ(args.input_file, input_filepath);
     ASSERT_FALSE(args.options.output_file);
-    ASSERT_EQ(args.options.version, "1.39.4"s);
+    ASSERT_EQ(args.options.version, "1.38.10"s);
     ASSERT_TRUE(args.options.reduce_graph);
 }
 
@@ -113,7 +113,7 @@ TEST(parse_args_tests, test_options_004)
     ASSERT_TRUE(args.is_valid);
     ASSERT_EQ(args.input_file, input_filepath);
     ASSERT_FALSE(args.options.output_file);
-    ASSERT_EQ(args.options.version, "1.39.4"s);
+    ASSERT_EQ(args.options.version, DEFAULT_MTLX_VERSION);
     ASSERT_FALSE(args.options.reduce_graph);
 }
 
@@ -143,16 +143,6 @@ TEST(parse_args_tests, test_bad_options_003)
     const fs::path output_filepath = get_test_data("parse_args_tests/001.mtlx"s);
 
     const vector argv{ EXECUTABLE, input_filepath.string(), output_filepath.string(), "-v"s, "1.39.4"s };
-    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
-
-    ASSERT_FALSE(args.is_valid);
-}
-
-TEST(parse_args_tests, test_bad_version)
-{
-    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
-
-    const vector argv{ EXECUTABLE, input_filepath.string(), "-v"s, "1.38.10"s };
     const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
 
     ASSERT_FALSE(args.is_valid);

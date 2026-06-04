@@ -103,12 +103,23 @@ void load_library(const fs::path& filepath)
 
 mx::DocumentPtr get_materialx_library(const string& version)
 {
-    const mx::FilePathVec fpv{version};
-    const fs::path lib_dir = get_libraries_dir();
-    const mx::FileSearchPath fsp{lib_dir.string()};
-    const mx::DocumentPtr doc = mx::createDocument();
-    const mx::StringSet loaded = mx::loadLibraries(fpv, fsp, doc);
-    if (loaded.empty())
-        throw CompileError{"MaterialX version '" + version + "' is not supported"};
-    return doc;
+    string searched_dirs;
+
+    for (fs::path include_dir : Runtime::get().include_directories())
+    {
+        const fs::path lib_dir = include_dir / "libraries";
+        searched_dirs += lib_dir.string() + "\n";
+
+        if (not fs::is_directory(lib_dir))
+            continue;
+
+        const mx::FilePathVec fpv{version};
+        const mx::FileSearchPath fsp{lib_dir.string()};
+        const mx::DocumentPtr doc = mx::createDocument();
+        const mx::StringSet loaded = mx::loadLibraries(fpv, fsp, doc);
+        if (not loaded.empty())
+            return doc;
+    }
+
+    throw CompileError{"MaterialX version " + version + " libraries could not be found.\nSearched directories:\n" + searched_dirs};
 }

@@ -38,13 +38,28 @@ namespace
 
     void compile_mxsl_stdlib()
     {
-        const fs::path stdlib_path = get_libraries_dir() / "stdlib.mxsl";
-        compile_file(stdlib_path);
+        string searched_dirs;
+
+        for (fs::path include_dir : Runtime::get().include_directories())
+        {
+            const fs::path lib_dir = include_dir / "libraries";
+            searched_dirs += lib_dir.string() + "\n";
+
+            const fs::path stdlib_path = lib_dir / "stdlib.mxsl";
+
+            if (not fs::is_regular_file(stdlib_path))
+                continue;
+
+            compile_file(stdlib_path);
+            return;
+        }
+
+        throw CompileError{"ShadingLanguageX standard library could not be found.\nSearched directories:\n" + searched_dirs};
     }
 
-    mx::DocumentPtr compile_to_document(vector<Token> tokens, const CompileOptions& opts)
+    mx::DocumentPtr compile_to_document(vector<Token> tokens, const optional<fs::path>& src_path, const CompileOptions& opts)
     {
-        Runtime& runtime = Runtime::create(opts.version, opts.reduce_graph);
+        Runtime& runtime = Runtime::create(src_path, opts.version, opts.reduce_graph);
         {
             runtime.enter_scope();
             compile_mxsl_stdlib();
@@ -76,7 +91,7 @@ mx::DocumentPtr mxslc::compile_to_document(const fs::path& src_path)
 
 mx::DocumentPtr mxslc::compile_to_document(const fs::path& src_path, const CompileOptions& opts)
 {
-    return ::compile_to_document(scan_file(src_path), opts);
+    return ::compile_to_document(scan_file(src_path), src_path, opts);
 }
 
 std::string mxslc::compile_to_string(const fs::path& src_path)
@@ -115,7 +130,7 @@ mx::DocumentPtr mxslc::compile_to_document(const string& source)
 
 mx::DocumentPtr mxslc::compile_to_document(const string& source, const CompileOptions& opts)
 {
-    return ::compile_to_document(scan_string(source), opts);
+    return ::compile_to_document(scan_string(source), std::nullopt, opts);
 }
 
 std::string mxslc::compile_to_string(const string& source)

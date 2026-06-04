@@ -14,7 +14,7 @@ namespace mxslc
     struct CompileOptions
     {
         std::optional<std::filesystem::path> output_file = std::nullopt;
-        std::string version = "1.39.4";
+        std::string version = "1.39.5";
         bool reduce_graph = true;
     };
 }

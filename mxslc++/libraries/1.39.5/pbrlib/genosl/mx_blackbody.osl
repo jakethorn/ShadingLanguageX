@@ -1,0 +1,10 @@
+void mx_blackbody(float temp, output color color_value)
+{
+    // Use OSL's built-in blackbody() function, which implements Planck's law
+    // over the full physically meaningful range (including below 1667K down to
+    // the Draper point ~800K). Normalize by luminance to return chromaticity
+    // at unit brightness, matching the GLSL implementation's convention.
+    color out = blackbody(temp);
+    float lum = luminance(out);
+    color_value = (lum > 0.0) ? out / lum : color(1.0);
+}

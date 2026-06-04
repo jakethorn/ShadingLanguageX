@@ -76,7 +76,7 @@ options:
 
     void parse_input_file(Span<string>& argv, CommandLineArgs& clargs)
     {
-        clargs.input_file = fs::absolute(argv.pop_front());
+        clargs.input_file = fs::absolute(argv.pop_front()).lexically_normal();
         clargs.is_valid = fs::is_regular_file(clargs.input_file);
         if (not clargs.is_valid)
             print_error("Invalid input file path: " + clargs.input_file.string());
@@ -110,10 +110,6 @@ options:
         }
 
         clargs.options.version = argv.pop_front();
-        const vector supported_versions = {"1.39.4"s};
-        clargs.is_valid = contains(supported_versions, clargs.options.version);
-        if (not clargs.is_valid)
-            print_error("Unsupported MaterialX version: " + clargs.options.version + "\nSupported versions are: 1.39.4");
     }
 
     void parse_no_reduce_graph(Span<string>&, CommandLineArgs& clargs)

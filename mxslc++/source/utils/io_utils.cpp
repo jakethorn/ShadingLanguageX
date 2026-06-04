@@ -5,6 +5,14 @@
 #include "io_utils.h"
 
 #include <fstream>
+
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+    #include <limits.h>
+#endif
+
 #include "CompileError.h"
 
 using std::ifstream;
@@ -37,7 +45,18 @@ void save_file(const fs::path& dst_path, const string& text)
     file << text;
 }
 
-fs::path get_libraries_dir()
+fs::path get_executable_dir()
 {
-    return fs::current_path() / "libraries";
+#ifdef _WIN32
+    wchar_t path[MAX_PATH];
+    GetModuleFileNameW(NULL, path, MAX_PATH);
+    return fs::path{path};
+#else
+    char path[PATH_MAX];
+    const ssize_t count = readlink("/proc/self/exe", path, PATH_MAX - 1);
+    if (count == -1)
+        throw CompileError{"Cannot determine executable path"s};
+    path[count] = '\0';
+    return fs::path{path}.parent_path();
+#endif
 }
