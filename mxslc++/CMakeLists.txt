@@ -4,6 +4,9 @@ project(mxslc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# -------- pybind11 --------
+find_package(pybind11 CONFIG REQUIRED)
+
 # -------- MaterialX --------
 set(MTLX_ROOT "/home/jaket/projects/MaterialX-1.39.4/cmake-build-debug/installed")
 set(MTLX_INCLUDE_DIR "${MTLX_ROOT}/include")
@@ -24,6 +27,18 @@ target_link_libraries(mtlx_lib INTERFACE
 
 # -------- source --------
 add_subdirectory(source)
+
+# -------- python bindings --------
+pybind11_add_module(mxslc_py python_bindings.cpp)
+
+target_include_directories(mxslc_py PRIVATE
+        "${CMAKE_SOURCE_DIR}/include"
+)
+
+target_link_libraries(mxslc_py PRIVATE
+        mtlx_lib
+        mxslc_lib
+)
 
 # -------- main --------
 add_executable(mxslc main.cpp)
