@@ -5,12 +5,14 @@
 #include "io_utils.h"
 
 #include <fstream>
+#include <sstream>
 
 #ifdef _WIN32
     #include <windows.h>
 #else
     #include <unistd.h>
     #include <limits.h>
+    #include <dlfcn.h>
 #endif
 
 #include "CompileError.h"
@@ -50,7 +52,7 @@ fs::path get_executable_dir()
 #ifdef _WIN32
     wchar_t path[MAX_PATH];
     GetModuleFileNameW(NULL, path, MAX_PATH);
-    return fs::path{path};
+    return fs::path{path}.parent_path();
 #else
     char path[PATH_MAX];
     const ssize_t count = readlink("/proc/self/exe", path, PATH_MAX - 1);
@@ -58,5 +60,37 @@ fs::path get_executable_dir()
         throw CompileError{"Cannot determine executable path"s};
     path[count] = '\0';
     return fs::path{path}.parent_path();
+#endif
+}
+
+fs::path get_python_module_dir()
+{
+#ifdef _WIN32
+    HMODULE module = nullptr;
+
+    const BOOL ok = GetModuleHandleExW(
+        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        reinterpret_cast<LPCWSTR>(&get_python_module_dir),
+        &module
+    );
+
+    if (!ok || module == nullptr)
+        throw CompileError{"Cannot determine python module path"s};
+
+    wchar_t path[MAX_PATH];
+    const DWORD count = GetModuleFileNameW(module, path, MAX_PATH);
+
+    if (count == 0 || count == MAX_PATH)
+        throw CompileError{"Cannot determine python module path"s};
+
+    return fs::path{path}.parent_path();
+#else
+    Dl_info info;
+
+    if (dladdr(reinterpret_cast<void*>(&get_python_module_dir), &info) == 0 || info.dli_fname == nullptr)
+        throw CompileError{"Cannot determine python module path"s};
+
+    return fs::path{info.dli_fname}.parent_path();
 #endif
 }

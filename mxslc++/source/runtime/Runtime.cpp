@@ -29,6 +29,7 @@ namespace
         if (src_path)
             dirs.push_back(src_path->parent_path());
         dirs.push_back(fs::current_path());
+        dirs.push_back(get_python_module_dir());
         dirs.push_back(get_executable_dir());
         return dirs;
     }

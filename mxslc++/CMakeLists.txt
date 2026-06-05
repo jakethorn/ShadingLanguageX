@@ -4,12 +4,29 @@ project(mxslc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# -------- pybind11 --------
+find_package(pybind11 CONFIG REQUIRED)
+
 # -------- MaterialX --------
-set(MTLX_ROOT "/home/jaket/projects/MaterialX-1.39.4/cmake-build-debug/installed")
+set(MTLX_ROOT "" CACHE PATH "Path to installed MaterialX directory")
+message(STATUS "MTLX_ROOT = ${MTLX_ROOT}")
+
+if(NOT MTLX_ROOT)
+        message(FATAL_ERROR
+                "MTLX_ROOT is not set. Please configure with "
+                "-DMTLX_ROOT=/path/to/MaterialX/install"
+        )
+endif()
+
 set(MTLX_INCLUDE_DIR "${MTLX_ROOT}/include")
 set(MTLX_LIB_DIR "${MTLX_ROOT}/lib")
+message(STATUS "MTLX_INCLUDE_DIR = ${MTLX_INCLUDE_DIR}")
+message(STATUS "MTLX_LIB_DIR = ${MTLX_LIB_DIR}")
+
 find_library(MTLX_CORE_LIB MaterialXCore PATHS "${MTLX_LIB_DIR}" REQUIRED)
 find_library(MTLX_FORMAT_LIB MaterialXFormat PATHS "${MTLX_LIB_DIR}" REQUIRED)
+message(STATUS "MTLX_CORE_LIB = ${MTLX_CORE_LIB}")
+message(STATUS "MTLX_FORMAT_LIB = ${MTLX_FORMAT_LIB}")
 
 add_library(mtlx_lib INTERFACE)
 
@@ -24,6 +41,27 @@ target_link_libraries(mtlx_lib INTERFACE
 
 # -------- source --------
 add_subdirectory(source)
+
+# -------- python bindings --------
+pybind11_add_module(_mxslc python_bindings.cpp)
+
+target_include_directories(_mxslc PRIVATE
+        "${CMAKE_SOURCE_DIR}/include"
+)
+
+target_link_libraries(_mxslc PRIVATE
+        mtlx_lib
+        mxslc_lib
+)
+
+install(TARGETS _mxslc
+        LIBRARY DESTINATION mxslc
+        RUNTIME DESTINATION mxslc
+)
+
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries"
+        DESTINATION mxslc
+)
 
 # -------- main --------
 add_executable(mxslc main.cpp)
@@ -52,5 +90,8 @@ add_custom_command(
 )
 
 # -------- tests --------
-enable_testing()
-add_subdirectory(tests)
+include(CTest)
+
+if(BUILD_TESTING)
+        add_subdirectory(tests)
+endif()
