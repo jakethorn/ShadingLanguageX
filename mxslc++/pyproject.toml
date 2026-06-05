@@ -6,9 +6,9 @@ requires = [
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "mxslc"
+name = "mxslcxx"
 version = "0.1.0"
-description = "Python bindings for mxslc"
+description = "Python bindings for mxslc++"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
