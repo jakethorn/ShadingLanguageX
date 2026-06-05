@@ -52,7 +52,7 @@ sdist.exclude = [
 ]
 
 [tool.cibuildwheel]
-build = "cp39-* cp310-* cp311-* cp312-* cp313-*"
+build = "cp312-*"
 skip = "*-musllinux_*"
 
 test-command = "python -c \"import mxslc; print(mxslc.__file__); mxslc.compile_string_to_string('float f = randomfloat() + 1.0;')\""
