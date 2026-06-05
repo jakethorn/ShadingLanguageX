@@ -6,6 +6,7 @@
 #define FENNEC_COMMON_H
 
 // includes
+#include <ciso646>
 #include <memory>
 #include <optional>
 #include <variant>
