@@ -142,7 +142,7 @@ jobs:
         working-directory: mxslc++
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_CONFIG_SETTINGS_WINDOWS: "cmake.define.MTLX_ROOT=${{ github.workspace }}/mxslc++/external/MaterialX/install;cmake.define.BUILD_TESTING=OFF"
+          CMAKE_ARGS: "-DMTLX_ROOT=${{ github.workspace }}/mxslc++/external/MaterialX/install -DBUILD_TESTING=OFF"
 
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4
