@@ -15,6 +15,13 @@
 using std::ifstream;
 using std::function;
 
+CommandLineArgs CommandLineArgs::invalid()
+{
+    CommandLineArgs clargs;
+    clargs.is_valid = false;
+    return clargs;
+}
+
 namespace
 {
     void print_help()
@@ -54,14 +61,14 @@ options:
         if (not fs::is_regular_file(response_file))
         {
             print_error("Invalid response file path: " + response_file.string());
-            return CommandLineArgs{.is_valid = false};
+            return CommandLineArgs::invalid();
         }
 
         ifstream file{response_file};
         if (not file.is_open())
         {
             print_error("Failed to open response file: " + response_file.string());
-            return CommandLineArgs{.is_valid = false};
+            return CommandLineArgs::invalid();
         }
 
         vector argv{"mxslc"s};
@@ -160,7 +167,7 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
     {
         print_error("Input file path not specified"s);
         print_help();
-        return CommandLineArgs{.is_valid = false};
+        return CommandLineArgs::invalid();
     }
 
     if (args[0][0] == '@')

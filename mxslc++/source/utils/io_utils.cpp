@@ -5,6 +5,7 @@
 #include "io_utils.h"
 
 #include <fstream>
+#include <sstream>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -70,7 +71,7 @@ fs::path get_python_module_dir()
     const BOOL ok = GetModuleHandleExW(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
         GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-        reinterpret_cast<LPCWSTR>(&get_module_dir),
+        reinterpret_cast<LPCWSTR>(&get_python_module_dir),
         &module
     );
 

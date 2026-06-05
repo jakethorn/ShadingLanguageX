@@ -18,6 +18,8 @@ namespace mxslc
         std::filesystem::path input_file;
         CompileOptions options;
         bool is_valid = true;
+
+        static CommandLineArgs invalid();
     };
 
     CommandLineArgs parse_args(int argc, char* argv[]);

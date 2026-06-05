@@ -120,7 +120,10 @@ fs::path mxslc::compile_to_file(const fs::path& src_path, const CompileOptions& 
 
 fs::path mxslc::compile_to_file(const fs::path& src_path, const fs::path& dst_path)
 {
-    return compile_to_file(src_path, CompileOptions{.output_file = dst_path});
+    CompileOptions opts;
+    opts.output_file = dst_path;
+
+    return compile_to_file(src_path, opts);
 }
 
 mx::DocumentPtr mxslc::compile_to_document(const string& source)
@@ -155,5 +158,8 @@ fs::path mxslc::compile_to_file(const string& source, const CompileOptions& opts
 
 fs::path mxslc::compile_to_file(const string& source, const fs::path& dst_path)
 {
-    return compile_to_file(source, CompileOptions{.output_file = dst_path});
+    CompileOptions opts;
+    opts.output_file = dst_path;
+
+    return compile_to_file(source, opts);
 }

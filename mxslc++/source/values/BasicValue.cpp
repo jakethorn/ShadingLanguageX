@@ -4,6 +4,8 @@
 
 #include "BasicValue.h"
 
+#include <sstream>
+
 #include "CompileError.h"
 #include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
