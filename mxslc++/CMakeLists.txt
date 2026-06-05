@@ -78,5 +78,8 @@ add_custom_command(
 )
 
 # -------- tests --------
-enable_testing()
-add_subdirectory(tests)
+include(CTest)
+
+if(BUILD_TESTING)
+        add_subdirectory(tests)
+endif()
