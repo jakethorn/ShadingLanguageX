@@ -1,0 +1,65 @@
+name: Build wheels
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: Check out mxslc
+        uses: actions/checkout@v4
+
+      - name: Set up Python for cibuildwheel
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip cibuildwheel
+
+      - name: Check out MaterialX
+        uses: actions/checkout@v4
+        with:
+          repository: AcademySoftwareFoundation/MaterialX
+          ref: v1.39.4
+          path: external/MaterialX
+
+      - name: Configure MaterialX
+        run: >
+          cmake
+          -S external/MaterialX
+          -B external/MaterialX/build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/external/MaterialX/install
+          -DMATERIALX_BUILD_PYTHON=OFF
+          -DMATERIALX_BUILD_VIEWER=OFF
+          -DMATERIALX_BUILD_GRAPH_EDITOR=OFF
+          -DMATERIALX_BUILD_TESTS=OFF
+
+      - name: Build and install MaterialX
+        run: cmake --build external/MaterialX/build --config Release --target install --parallel
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CMAKE_ARGS: "-DMTLX_ROOT=${{ github.workspace }}/external/MaterialX/install"
+
+      - name: Upload wheel artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl

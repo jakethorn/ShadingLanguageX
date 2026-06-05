@@ -8,9 +8,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(pybind11 CONFIG REQUIRED)
 
 # -------- MaterialX --------
-set(MTLX_ROOT "/home/jaket/projects/MaterialX-1.39.4/cmake-build-debug/installed")
+set(MTLX_ROOT "" CACHE PATH "Path to installed MaterialX directory")
+
 set(MTLX_INCLUDE_DIR "${MTLX_ROOT}/include")
 set(MTLX_LIB_DIR "${MTLX_ROOT}/lib")
+
 find_library(MTLX_CORE_LIB MaterialXCore PATHS "${MTLX_LIB_DIR}" REQUIRED)
 find_library(MTLX_FORMAT_LIB MaterialXFormat PATHS "${MTLX_LIB_DIR}" REQUIRED)
 
