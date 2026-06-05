@@ -131,12 +131,18 @@ jobs:
         if: runner.os == 'Windows'
         run: cmake --build mxslc++/external/MaterialX/build --config Release --target install --parallel
 
+      - name: Inspect MaterialX install on Windows
+        if: runner.os == 'Windows'
+        run: |
+          Write-Host "MaterialX install tree:"
+          Get-ChildItem -Recurse "${{ github.workspace }}/mxslc++/external/MaterialX/install" | Select-Object FullName
+
       - name: Build wheels on Windows
         if: runner.os == 'Windows'
         working-directory: mxslc++
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-          CMAKE_ARGS: "-DMTLX_ROOT=${{ github.workspace }}/mxslc++/external/MaterialX/install -DBUILD_TESTING=OFF"
+          CIBW_CONFIG_SETTINGS_WINDOWS: "cmake.define.MTLX_ROOT=${{ github.workspace }}/mxslc++/external/MaterialX/install;cmake.define.BUILD_TESTING=OFF"
 
       - name: Upload wheel artifacts
         uses: actions/upload-artifact@v4

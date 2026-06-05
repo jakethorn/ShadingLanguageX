@@ -9,12 +9,24 @@ find_package(pybind11 CONFIG REQUIRED)
 
 # -------- MaterialX --------
 set(MTLX_ROOT "" CACHE PATH "Path to installed MaterialX directory")
+message(STATUS "MTLX_ROOT = ${MTLX_ROOT}")
+
+if(NOT MTLX_ROOT)
+        message(FATAL_ERROR
+                "MTLX_ROOT is not set. Please configure with "
+                "-DMTLX_ROOT=/path/to/MaterialX/install"
+        )
+endif()
 
 set(MTLX_INCLUDE_DIR "${MTLX_ROOT}/include")
 set(MTLX_LIB_DIR "${MTLX_ROOT}/lib")
+message(STATUS "MTLX_INCLUDE_DIR = ${MTLX_INCLUDE_DIR}")
+message(STATUS "MTLX_LIB_DIR = ${MTLX_LIB_DIR}")
 
 find_library(MTLX_CORE_LIB MaterialXCore PATHS "${MTLX_LIB_DIR}" REQUIRED)
 find_library(MTLX_FORMAT_LIB MaterialXFormat PATHS "${MTLX_LIB_DIR}" REQUIRED)
+message(STATUS "MTLX_CORE_LIB = ${MTLX_CORE_LIB}")
+message(STATUS "MTLX_FORMAT_LIB = ${MTLX_FORMAT_LIB}")
 
 add_library(mtlx_lib INTERFACE)
 
