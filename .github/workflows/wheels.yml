@@ -55,6 +55,7 @@ jobs:
         run: cmake --build external/MaterialX/build --config Release --target install --parallel
 
       - name: Build wheels
+        working-directory: mxslc++
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CMAKE_ARGS: "-DMTLX_ROOT=${{ github.workspace }}/external/MaterialX/install"
@@ -63,4 +64,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}
-          path: wheelhouse/*.whl
+          path: mxslc++/wheelhouse/*.whl
