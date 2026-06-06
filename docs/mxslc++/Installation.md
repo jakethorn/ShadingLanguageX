@@ -1,16 +1,33 @@
 # Installation
 
 1. [Executable](#executable)
-2. [C++](#c++)
+2. [C++](#c)
 3. [Python](#python)
 
 ## Executable
 
+mxslc++ does not currently have any pre-built binaries. Follow these steps to build them from source:  
+  
+Requirements:
+* Git
+* CMake >= 3.28
+* C++17 compiler
+* MaterialX installed locally
+```bash
+git clone https://github.com/jakethorn/ShadingLanguageX.git
+cd ShadingLanguageX
+cd mxslc++
+cmake -S . -B build -DMTLX_ROOT=/path/to/MaterialX/install -DBUILD_TESTING=OFF
+cmake --build build --config Release
+```
+
 ## C++
+
+The above instructions to build the executable also builds the mxslc_lib library.
 
 ## Python
 
-Python bindings can be installed using pip:
+Python bindings can be downloaded using pip:
 ```
 pip install mxslcxx
 ```
