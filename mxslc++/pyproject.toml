@@ -55,4 +55,8 @@ sdist.exclude = [
 build = "cp312-*"
 skip = "*-musllinux_* *-win32"
 
-test-command = "python -c \"import mxslc; print(mxslc.__file__); print(mxslc.compile_string_to_string('float f = randomfloat() + 1.0;'));\""
+test-requires = [
+    "pytest",
+]
+
+test-command = "python -m pytest {project}/python_tests"
