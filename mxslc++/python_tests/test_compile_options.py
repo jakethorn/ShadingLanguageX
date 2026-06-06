@@ -1,7 +1,7 @@
 import mxslc
 import pytest
 
-from python_tests.groundtruth import STANDARD_OUTPUT, REDUCED_OUTPUT
+from groundtruth import STANDARD_OUTPUT, REDUCED_OUTPUT
 
 
 def test_compile_options_output_file_defaults_to_none():
