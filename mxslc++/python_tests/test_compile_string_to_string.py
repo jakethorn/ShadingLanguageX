@@ -1,19 +1,9 @@
 import mxslc
 import pytest
 
+from groundtruth import RANDOMFLOAT_OUTPUT
 
-RANDOMFLOAT_OUTPUT = """<?xml version="1.0"?>
-<materialx version="1.39">
-  <randomfloat name="node1" type="float" />
-  <add name="node2" type="float">
-    <input name="in1" type="float" nodename="node1" />
-    <input name="in2" type="float" value="1" />
-  </add>
-</materialx>
-"""
-
-
-def test_compile_string_to_string_randomfloat():
+def test_compile_string_to_string():
     result = mxslc.compile_string_to_string("float f = randomfloat() + 1.0;")
 
     assert isinstance(result, str)

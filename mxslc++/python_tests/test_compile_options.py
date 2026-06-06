@@ -1,20 +1,7 @@
 import mxslc
 import pytest
 
-
-STANDARD_OUTPUT = """<?xml version="1.0"?>
-<materialx version="1.39">
-  <add name="node1" type="float">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="1" />
-  </add>
-</materialx>
-"""
-
-
-REDUCED_OUTPUT = """<?xml version="1.0"?>
-<materialx version="1.39" />
-"""
+from python_tests.groundtruth import STANDARD_OUTPUT, REDUCED_OUTPUT
 
 
 def test_compile_options_output_file_defaults_to_none():
@@ -58,6 +45,5 @@ def test_compile_options_with_invalid_version():
     options = mxslc.CompileOptions()
     options.version = "bad_version_string"
 
-
-    with pytest.raises(RuntimeError, match="MaterialX version bad_version_string libraries could not be found"):
+    with pytest.raises(RuntimeError, match=f"MaterialX version {options.version} libraries could not be found"):
         mxslc.compile_string_to_string("float f = 1.0 + 1.0;", options)
