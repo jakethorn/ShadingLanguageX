@@ -1,3 +1,28 @@
+# (mxslc++) Version 0.1.2
+
+Updated Python bindings to supprt 3.9, 3.10, 3.11, 3.12, and 3.13.  
+
+
+# (mxslc++) Version 0.1.1
+
+Python bindings uploaded to PyPI as `mxslcxx` but using the old `mxslc` module name.  
+```
+pip install mxslcxx
+```
+```
+import mxslc
+mtlx = mxslc.compile_string_to_string('float f = 1.0 + 1.0;')
+```  
+
+
+# (mxslc++) Version 0.1.0
+
+Initial release  
+
+
+----
+
+
 # Version 0.6-beta
 ## Added
 * __If-Else Expressions ([docs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#if-else-expressions))__  
