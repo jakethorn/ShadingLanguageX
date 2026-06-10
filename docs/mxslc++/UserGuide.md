@@ -1,11 +1,34 @@
 <h1 align="center">User Guide</h1>
 
 1. [What is ShadingLanguageX?](#what-is-shadinglanguagex)
-2. [Installation](#installation)
-3. [Getting Started](#getting-started)
-3. [API Documentation](#api-documentation)
+2. [Useful Features](#useful-features)
+3. [Installation](#installation)
+4. [Getting Started](#getting-started)
+5. [API Documentation](#api-documentation)
 
 # What is ShadingLanguageX?
+
+ShadingLanguageX is a high level programming language that can be used to create complex MaterialX shaders. Statements
+and expressions are compiled down to native MaterialX elements, like Nodes and NodeDefs. For example, 
+`int i = 2 + 2;` would compile to:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="node1" type="int">
+    <input name="in1" type="int" value="2" />
+    <input name="in2" type="int" value="2" />
+  </add>
+</materialx>
+```
+
+ShadingLanguageX is most useful for complex shaders, providing features such as loops, functions, classes. It also
+supports preprocessor directives like `#include` to re-use code across shaders and `#define` `#if` `#ifdef` to create 
+shader variants.
+You can see more in-depth examples [here]() and the language specification [here]().  
+ShadingLanguageX files are compiled to .mtlx files using the `mxslc` compiler. See below for details on how to install
+and get started using `mxslc`.
+
+# Useful Features
 
 TODO
 
