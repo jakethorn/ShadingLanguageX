@@ -8,24 +8,10 @@
 
 1. [What is ShadingLanguageX?](#what-is-shadinglanguagex)
 2. [Useful Features](#useful-features)
-   1. [MaterialX Version](#materialx-version)
-   2. [Attributes](#attributes)
-   3. [Decompiler](#decompiler)
-   4. [Loops](#loops)
-   5. [User-Defined Types](#user-defined-types)
-   6. [Compile-Time Operations](#compile-time-operations)
 3. [Installation](#installation)
-   1. [Executable](#installation)
-   2. [C++ Library](#installation)
-   3. [Python](#installation)
-   4. [Build from Source](#build-from-source)
 4. [Getting Started](#getting-started)
 5. [API Documentation](#api-documentation)
-   1. [C++](#api-documentation)
-   2. [Python](#api-documentation)
 6. [MaterialX Libraries](#materialx-libraries)
-   1. [`libraries` Folder](#libraries-folder)
-   2. [Adding Support for a MaterialX Version](#adding-support-for-a-materialx-version)
 
 # What is ShadingLanguageX?
 
@@ -82,7 +68,7 @@ Attributes can be added to Nodes (as above), NodeDefs and at the document level 
 @@madewith "ShadingLanguageX"
 standard_surface(base_color = randomcolor());
 ```
-```
+```xml
 <?xml version="1.0"?>
 <materialx version="1.39" madewith="ShadingLanguageX">
   <randomcolor name="node1" type="color3" />
