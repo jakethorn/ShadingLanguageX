@@ -1,5 +1,11 @@
 <h1 align="center">User Guide</h1>
 
+<p align="center">
+  <img src="https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/screenshots/combined.png" />
+</p>
+
+# Table of Contents
+
 1. [What is ShadingLanguageX?](#what-is-shadinglanguagex)
 2. [Useful Features](#useful-features)
    1. [MaterialX Version](#materialx-version)
