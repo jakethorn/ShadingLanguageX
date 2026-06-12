@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 name = "mxslcxx"
 version = "0.1.2"
 description = "Python bindings for mxslc++"
-readme = "README.md"
+readme = "README_PYPI.md"
 requires-python = ">=3.9"
 authors = [
     { name = "Jacob Thorn", email="jakethorn1.1@gmail.com" }
@@ -28,6 +28,7 @@ Homepage = "https://github.com/jakethorn/ShadingLanguageX"
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.28"
+cmake.define = { BUILD_TESTING = "OFF" }
 build-dir = "build/{wheel_tag}"
 
 wheel.packages = ["python/mxslc"]

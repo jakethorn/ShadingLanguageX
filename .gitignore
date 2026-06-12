@@ -4,6 +4,7 @@ mxslc/LICENSE
 mxslc/pyproject.toml
 mxslc/notes.txt
 mxslc++/examples/
+mxslc++/tests/gtest_lib/
 mxslc++/main.rsp
 mxslc++/gdb_printers.py
 mxslc++/reduce_rsp.py

@@ -4,9 +4,6 @@ project(mxslc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# -------- pybind11 --------
-find_package(pybind11 CONFIG REQUIRED)
-
 # -------- MaterialX --------
 set(MTLX_ROOT "" CACHE PATH "Path to installed MaterialX directory")
 message(STATUS "MTLX_ROOT = ${MTLX_ROOT}")
@@ -43,25 +40,29 @@ target_link_libraries(mtlx_lib INTERFACE
 add_subdirectory(source)
 
 # -------- python bindings --------
-pybind11_add_module(_mxslc python_bindings.cpp)
+if(DEFINED SKBUILD)
+        find_package(pybind11 CONFIG REQUIRED)
 
-target_include_directories(_mxslc PRIVATE
-        "${CMAKE_SOURCE_DIR}/include"
-)
+        pybind11_add_module(_mxslc python_bindings.cpp)
 
-target_link_libraries(_mxslc PRIVATE
-        mtlx_lib
-        mxslc_lib
-)
+        target_include_directories(_mxslc PRIVATE
+                "${CMAKE_SOURCE_DIR}/include"
+        )
 
-install(TARGETS _mxslc
-        LIBRARY DESTINATION mxslc
-        RUNTIME DESTINATION mxslc
-)
+        target_link_libraries(_mxslc PRIVATE
+                mtlx_lib
+                mxslc_lib
+        )
 
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries"
-        DESTINATION mxslc
-)
+        install(TARGETS _mxslc
+                LIBRARY DESTINATION mxslc
+                RUNTIME DESTINATION mxslc
+        )
+
+        install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries"
+                DESTINATION mxslc
+        )
+endif()
 
 # -------- main --------
 add_executable(mxslc main.cpp)

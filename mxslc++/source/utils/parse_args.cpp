@@ -36,11 +36,6 @@ options:
   -o, --output-file OUTPUT_FILE    Output path of .mtlx file
   -v, --version VERSION            Target MaterialX version (default: 1.39.4)
   --no-reduce-graph                Always create graph nodes instead of evaluating logic at compile-time
-  -m, --main-func MAIN_FUNC        Name of main entry function into the program
-  -a, --main-args MAIN_ARGS        Arguments to be passed to the main function
-  -i, --include-dirs INCLUDE_DIRS  Additional directories to search when including files
-  -d, --define MACROS              Additional macro definitions
-  --validate                       Validate the output MaterialX file
 )";
 
         std::cout << help_message;
