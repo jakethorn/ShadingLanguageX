@@ -1,5 +1,5 @@
 # include gtest headers
-add_subdirectory(lib)
+add_subdirectory(gtest_lib)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 add_executable(mxslc_tests
