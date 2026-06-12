@@ -109,7 +109,7 @@ compiles to:
   </surfacematerial>
 </materialx>
 ```
-![](../examples/screenshots/toon.png)
+![](../../examples/screenshots/toon.png)
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -147,7 +147,7 @@ compiles to:
 > ```
 > `> ./mxslc++.exe my_shader.mxsl -m my_function -a 1.0 0.72 0.315 0.02 1.0`
 
-![](../examples/screenshots/gold.png)
+![](../../examples/screenshots/gold.png)
 
 # Data Types
 

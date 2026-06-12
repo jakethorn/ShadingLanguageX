@@ -106,7 +106,7 @@ compiles to:
   </surfacematerial>
 </materialx>
 ```
-![](../examples/screenshots/toon.png)
+![](../../examples/screenshots/toon.png)
 
 However, ShadingLanguageX shaders can also be executed with a designated entry function like in C. If the shader contains
 a function called `main`, this function will be the entry into the shader. Otherwise, an entry function name can be passed
@@ -126,7 +126,7 @@ material my_function(float r, float g, float b, float roughness, float metalness
 ```
 `> ./mxslc.exe my_shader.mxsl -m my_function -a 1.0 0.72 0.315 0.02 1.0`  
   
-![](../examples/screenshots/gold.png)
+![](../../examples/screenshots/gold.png)
 
 When executing a shader in this manner, all global variables and functions will be defined before the entry function is called.
 

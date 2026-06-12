@@ -28,6 +28,7 @@ Homepage = "https://github.com/jakethorn/ShadingLanguageX"
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.28"
+cmake.define = { BUILD_TESTING = "OFF" }
 build-dir = "build/{wheel_tag}"
 
 wheel.packages = ["python/mxslc"]
