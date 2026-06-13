@@ -25,7 +25,15 @@ void BasicValue::set_as_node_input(const mx::InputPtr& input) const
 {
     std::visit(
         [this, &input](const auto& v) {
-            input->setValue(v, type_->name());
+            using ValueType = std::decay_t<decltype(v)>;
+            if constexpr (std::is_same_v<ValueType, fs::path>)
+            {
+                input->setValue(v.string(), TypeName::Filename);
+            }
+            else
+            {
+                input->setValue(v, type_->name());
+            }
         },
         val_
     );
@@ -36,7 +44,15 @@ void BasicValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, co
     const mx::OutputPtr output = add_or_get_output(node_graph, type_, output_name);
     std::visit(
         [this, &output](const auto& v) {
-            output->setValue(v, type_->name());
+            using ValueType = std::decay_t<decltype(v)>;
+            if constexpr (std::is_same_v<ValueType, fs::path>)
+            {
+                output->setValue(v.string(), TypeName::Filename);
+            }
+            else
+            {
+                output->setValue(v, type_->name());
+            }
         },
         val_
     );
@@ -47,7 +63,15 @@ void BasicValue::set_as_node_def_input(const mx::NodeDefPtr& node_def, const str
     mx::InputPtr input = node_def->addInput(input_name, type_->name());
     std::visit(
         [this, &input](const auto& v) {
-            input->setValue(v, type_->name());
+            using ValueType = std::decay_t<decltype(v)>;
+            if constexpr (std::is_same_v<ValueType, fs::path>)
+            {
+                input->setValue(v.string(), TypeName::Filename);
+            }
+            else
+            {
+                input->setValue(v, type_->name());
+            }
         },
         val_
     );

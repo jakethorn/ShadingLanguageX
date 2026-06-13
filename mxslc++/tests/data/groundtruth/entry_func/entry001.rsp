@@ -1,0 +1,2 @@
+examples/entry001.mxsl --func my_main
+--no-reduce-graph

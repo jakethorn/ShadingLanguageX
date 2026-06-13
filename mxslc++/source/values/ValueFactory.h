@@ -5,6 +5,7 @@
 #ifndef MXSLC_VALUEFACTORY_H
 #define MXSLC_VALUEFACTORY_H
 
+#include "primitive_t.h"
 #include "runtime/AttributeList.h"
 #include "utils/common.h"
 

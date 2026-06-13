@@ -24,6 +24,8 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/jakethorn/ShadingLanguageX"
+Repository = "https://github.com/jakethorn/ShadingLanguageX"
+Issues = "https://github.com/jakethorn/ShadingLanguageX/issues"
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
@@ -36,6 +38,8 @@ wheel.packages = ["python/mxslc"]
 sdist.exclude = [
     ".venv",
     ".venv/**",
+    ".build-venv",
+    ".build-venv/**",
     ".test-venv",
     ".test-venv/**",
     "build",
@@ -60,4 +64,4 @@ test-requires = [
     "pytest",
 ]
 
-test-command = "python -m pytest {project}/python_tests"
+test-command = "python -m pytest {project}/python/tests"

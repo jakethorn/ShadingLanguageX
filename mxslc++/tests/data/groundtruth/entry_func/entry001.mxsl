@@ -1,0 +1,9 @@
+inline void not_main()
+{
+    float f = randomfloat() + 2.0;
+}
+
+inline void my_main()
+{
+    float f = randomfloat() + 3.0;
+}

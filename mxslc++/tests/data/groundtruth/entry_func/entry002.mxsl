@@ -1,0 +1,7 @@
+material my_main(float in1)
+{
+    float f = randomfloat() + in1;
+    return surfacematerial(
+        standard_surface(base_color = color3{f})
+    );
+}

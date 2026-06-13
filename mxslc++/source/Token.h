@@ -5,6 +5,7 @@
 #ifndef FENNEC_TOKEN_H
 #define FENNEC_TOKEN_H
 
+#include "primitive_t.h"
 #include "utils/common.h"
 #include "TokenType.h"
 

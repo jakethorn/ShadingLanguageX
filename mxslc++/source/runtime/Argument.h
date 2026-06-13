@@ -8,6 +8,7 @@
 #include "utils/common.h"
 #include "AttributeList.h"
 #include "ModifierList.h"
+#include "primitive_t.h"
 
 class Parameter;
 

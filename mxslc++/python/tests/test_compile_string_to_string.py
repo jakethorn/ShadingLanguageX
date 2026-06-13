@@ -3,6 +3,7 @@ import pytest
 
 from groundtruth import RANDOMFLOAT_OUTPUT
 
+
 def test_compile_string_to_string():
     result = mxslc.compile_string_to_string("float f = randomfloat() + 1.0;")
 

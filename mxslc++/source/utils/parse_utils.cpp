@@ -21,3 +21,23 @@ FuncPtr parse_function(const string& code)
         throw CompileError{"Templated functions not supported"s};
     return func_def->functions()[0];
 }
+
+primitive_t parse_literal(const string& code)
+{
+    const vector<Token> tokens = scan_string(code);
+    if (tokens.size() == 1)
+        return tokens[0].literal();
+    if (tokens.size() == 2)
+    {
+        const primitive_t value = tokens[1].literal();
+        if (tokens[0] == '-')
+        {
+            if (std::holds_alternative<int>(value))
+                return -std::get<int>(value);
+            if (std::holds_alternative<float>(value))
+                return -std::get<float>(value);
+        }
+    }
+
+    throw CompileError{"Invalid literal: " + code};
+}

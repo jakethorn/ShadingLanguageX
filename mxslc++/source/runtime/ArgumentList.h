@@ -15,9 +15,10 @@ class ArgumentList
 {
 public:
     ArgumentList(vector<Argument> args);
-    ArgumentList(const VarPtr& value);
-    ArgumentList(const vector<VarPtr>& values);
     ArgumentList(const vector<ExprPtr>& exprs);
+    ArgumentList(const vector<VarPtr>& values);
+    ArgumentList(const vector<primitive_t>& values);
+    ArgumentList(const VarPtr& value);
 
     template <typename... Exprs>
     explicit ArgumentList(Exprs&&... exprs)

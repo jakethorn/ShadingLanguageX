@@ -8,6 +8,7 @@
 #include <fstream>
 #include <functional>
 
+#include "parse_utils.h"
 #include "utils/common.h"
 #include "utils/template_utils.h"
 #include "Span.h"
@@ -29,13 +30,15 @@ namespace
         const string help_message =
 R"(
 positional arguments:
-  input-file                        Input path to .mxsl file
+  input-file                    Input path to .mxsl file
 
 options:
-  -h, --help                       Show this help message and exit
-  -o, --output-file OUTPUT_FILE    Output path of .mtlx file
-  -v, --version VERSION            Target MaterialX version (default: 1.39.4)
-  --no-reduce-graph                Always create graph nodes instead of evaluating logic at compile-time
+  -h, --help                    Show this help message and exit
+  -o, --output-file OUTPUT_FILE Output path of .mtlx file
+  -v, --version VERSION         Target MaterialX version (default: 1.39.5)
+  -f, --func FUNC               Name of entry function into the program
+  -a, --args ARGS               Arguments to be passed to the entry function
+  --no-reduce-graph             Always create graph nodes instead of evaluating logic at compile-time
 )";
 
         std::cout << help_message;
@@ -51,29 +54,44 @@ options:
         std::cerr << "Warning: " << message << std::endl;
     }
 
-    CommandLineArgs parse_response_file(const fs::path& response_file)
+    vector<string> get_response_file_args(std::istream& file)
     {
-        if (not fs::is_regular_file(response_file))
-        {
-            print_error("Invalid response file path: " + response_file.string());
-            return CommandLineArgs::invalid();
-        }
-
-        ifstream file{response_file};
-        if (not file.is_open())
-        {
-            print_error("Failed to open response file: " + response_file.string());
-            return CommandLineArgs::invalid();
-        }
-
         vector argv{"mxslc"s};
+
+        bool in_quotes = false;
         string arg;
-        while (file >> arg)
+        char c;
+        while (file.get(c))
         {
-            argv.push_back(std::move(arg));
+            if (c == '"')
+            {
+                arg += c;
+                in_quotes = not in_quotes;
+            }
+            else if (std::isspace(static_cast<unsigned char>(c)) and not in_quotes)
+            {
+                if (not arg.empty())
+                {
+                    argv.push_back(std::move(arg));
+                    arg.clear();
+                }
+            }
+            else
+            {
+                arg += c;
+            }
         }
 
-        return parse_args(argv);
+        if (not arg.empty())
+            argv.push_back(std::move(arg));
+
+        if (in_quotes)
+        {
+            print_error("Unterminated string in response file");
+            return {};
+        }
+
+        return argv;
     }
 
     void parse_input_file(Span<string>& argv, CommandLineArgs& clargs)
@@ -114,6 +132,41 @@ options:
         clargs.options.version = argv.pop_front();
     }
 
+    void parse_function_name(Span<string>& argv, CommandLineArgs& clargs)
+    {
+        if (argv.empty())
+        {
+            clargs.is_valid = false;
+            print_error("Empty -f/--func option"s);
+            return;
+        }
+
+        clargs.options.func_name = argv.pop_front();
+    }
+
+    bool more_args(const Span<string>& argv)
+    {
+        if (argv.empty())
+            return false;
+
+        const string& arg = argv.front();
+
+        if (arg.size() < 2)
+            return true;
+
+        const bool is_next_option = arg[0] == '-' and (std::isalpha(arg[1]) or arg[1] == '-');
+        return not is_next_option;
+    }
+
+    void parse_function_args(Span<string>& argv, CommandLineArgs& clargs)
+    {
+        while (more_args(argv))
+        {
+            primitive_t value = parse_literal(argv.pop_front());
+            clargs.options.func_args.push_back(value);
+        }
+    }
+
     void parse_no_reduce_graph(Span<string>&, CommandLineArgs& clargs)
     {
         clargs.options.reduce_graph = false;
@@ -130,6 +183,10 @@ options:
             {"--output-file", parse_output_file},
             {"-v", parse_version},
             {"--version", parse_version},
+            {"-f", parse_function_name},
+            {"--func", parse_function_name},
+            {"-a", parse_function_args},
+            {"--args", parse_function_args},
             {"--no-reduce-graph", parse_no_reduce_graph},
         };
 
@@ -169,7 +226,7 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
     {
         if (args.size() > 2)
             print_warning("Ignoring arguments after response file"s);
-        return parse_response_file(args[0].substr(1));
+        return parse_args(args[0].substr(1));
     }
 
     CommandLineArgs clargs;
@@ -186,4 +243,29 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
         parse_arg(args, clargs);
 
     return clargs;
+}
+
+CommandLineArgs mxslc::parse_args(const fs::path& response_path)
+{
+    if (not fs::is_regular_file(response_path))
+    {
+        print_error("Invalid response file path: " + response_path.string());
+        return CommandLineArgs::invalid();
+    }
+
+    ifstream file{response_path};
+    if (not file.is_open())
+    {
+        print_error("Failed to open response file: " + response_path.string());
+        return CommandLineArgs::invalid();
+    }
+
+    const vector argv = get_response_file_args(file);
+    if (argv.empty())
+    {
+        print_error("Error occurred while parsing response file: " + response_path.string());
+        return CommandLineArgs::invalid();
+    }
+
+    return parse_args(argv);
 }

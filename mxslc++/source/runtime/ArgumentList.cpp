@@ -15,9 +15,10 @@ ArgumentList::ArgumentList(vector<Argument> args) : args_{std::move(args)}
 
 }
 
-ArgumentList::ArgumentList(const VarPtr& value)
+ArgumentList::ArgumentList(const vector<ExprPtr>& exprs)
 {
-    args_.emplace_back(value, 0);
+    for (size_t i = 0; i < exprs.size(); ++i)
+        args_.emplace_back(exprs[i], i);
 }
 
 ArgumentList::ArgumentList(const vector<VarPtr>& values)
@@ -26,10 +27,15 @@ ArgumentList::ArgumentList(const vector<VarPtr>& values)
         args_.emplace_back(values[i], i);
 }
 
-ArgumentList::ArgumentList(const vector<ExprPtr>& exprs)
+ArgumentList::ArgumentList(const vector<primitive_t>& values)
 {
-    for (size_t i = 0; i < exprs.size(); ++i)
-        args_.emplace_back(exprs[i], i);
+    for (size_t i = 0; i < values.size(); ++i)
+        args_.emplace_back(values[i], i);
+}
+
+ArgumentList::ArgumentList(const VarPtr& value)
+{
+    args_.emplace_back(value, 0);
 }
 
 ArgumentList ArgumentList::instantiate_template_types(const TypePtr& template_type) const

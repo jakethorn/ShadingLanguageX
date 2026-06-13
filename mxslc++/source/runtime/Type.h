@@ -7,6 +7,7 @@
 
 #include <utility>
 
+#include "primitive_t.h"
 #include "Field.h"
 #include "utils/TypeName.h"
 

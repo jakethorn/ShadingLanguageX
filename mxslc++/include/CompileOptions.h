@@ -9,13 +9,19 @@
 #include <filesystem>
 #include <string>
 
+#include "primitive_t.h"
+
 namespace mxslc
 {
     struct CompileOptions
     {
         std::optional<std::filesystem::path> output_file = std::nullopt;
-        std::string version = "1.39.5";
-        bool reduce_graph = true;
+        std::string version{"1.39.5"};
+        std::optional<std::string> func_name = std::nullopt;
+        std::vector<primitive_t> func_args{};
+        bool reduce_graph{true};
+
+        bool has_function() const { return func_name.has_value(); }
     };
 }
 

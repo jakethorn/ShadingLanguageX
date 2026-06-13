@@ -7,6 +7,7 @@ add_library(mxslc_lib
         CompileError.cpp
         runtime/Runtime.cpp
         runtime/RuntimeAccessor.cpp
+        runtime/RuntimeUtils.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
         runtime/ArgumentList.cpp

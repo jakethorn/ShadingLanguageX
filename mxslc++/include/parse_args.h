@@ -24,6 +24,7 @@ namespace mxslc
 
     CommandLineArgs parse_args(int argc, char* argv[]);
     CommandLineArgs parse_args(const std::vector<std::string>& argv);
+    CommandLineArgs parse_args(const std::filesystem::path& response_path);
 }
 
 #endif //MXSLC_PARSE_ARGS_H
