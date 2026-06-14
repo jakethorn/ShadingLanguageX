@@ -1,0 +1,6 @@
+int foo(int a, int b)
+{
+    return a + b;
+}
+
+int c = foo(a = 1, c = 2);

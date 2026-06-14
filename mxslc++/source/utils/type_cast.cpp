@@ -9,6 +9,7 @@
 #include "str_utils.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/NamedConstructor.h"
+#include "runtime/RuntimeUtils.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 
@@ -25,15 +26,11 @@ VarPtr type_cast(const TypePtr& type, const VarPtr& value, const bool force)
     VarPtr cast_value;
     if (type->is_vector())
     {
-        const ExprPtr constructor = std::make_shared<NamedConstructor>(type->name(), value->children());
-        constructor->init(type);
-        cast_value = constructor->evaluate();
+        cast_value = RuntimeUtils::invoke_constructor(type, value->children());
     }
     else
     {
-        const ExprPtr separator = std::make_shared<FunctionCall>("separate" + str(type->field_count()), value);
-        separator->init(type);
-        cast_value = separator->evaluate();
+        cast_value = RuntimeUtils::invoke_function("separate" + str(type->field_count()), value, type);
     }
 
     assert(cast_value->type()->is_equal(type));

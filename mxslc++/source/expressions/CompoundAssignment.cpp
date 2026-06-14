@@ -6,6 +6,7 @@
 
 #include "FunctionCall.h"
 #include "runtime/ArgumentList.h"
+#include "runtime/RuntimeUtils.h"
 #include "runtime/Variable.h"
 
 CompoundAssignment::CompoundAssignment(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr)
@@ -34,7 +35,8 @@ void CompoundAssignment::init_impl(const vector<TypePtr>& types)
                 {"|="s, "__or__"},
             };
 
-    func_call_ = std::make_shared<FunctionCall>(op_names.at(token_.type()), ArgumentList{lhs_expr_, rhs_expr_});
+    string dunder_name = op_names.at(token_.type());
+    func_call_ = RuntimeUtils::function_call(std::move(dunder_name), ArgumentList{lhs_expr_, rhs_expr_});
     func_call_->init(types);
 }
 

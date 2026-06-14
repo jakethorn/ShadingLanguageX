@@ -5,6 +5,7 @@
 #include "IncrementOperator.h"
 
 #include "FunctionCall.h"
+#include "runtime/RuntimeUtils.h"
 #include "runtime/Variable.h"
 
 IncrementOperator::IncrementOperator(ExprPtr lhs_expr, Token op, const bool prefix)
@@ -34,8 +35,8 @@ VarPtr IncrementOperator::evaluate_impl() const
     const VarPtr lhs = lhs_expr_->evaluate();
     VarPtr original_lhs = lhs->copy();
 
-    ArgumentList args{lhs_expr_};
-    const ExprPtr func_call = std::make_shared<FunctionCall>(increment_ ? "__inc__"s : "__dec__"s, std::move(args));
+    string dunder_name = increment_ ? "__inc__" : "__dec__";
+    const ExprPtr func_call = RuntimeUtils::function_call(std::move(dunder_name), ArgumentList{lhs_expr_});
 
     func_call->init(lhs_expr_->type());
     VarPtr incremented_lhs = func_call->evaluate();

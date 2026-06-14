@@ -4,7 +4,6 @@
 
 #include "compile.h"
 
-#include <iostream>
 #include <MaterialXFormat/XmlIo.h>
 
 #include "CompileError.h"

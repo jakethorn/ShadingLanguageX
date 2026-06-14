@@ -9,4 +9,4 @@ def get_data_path(filename: str = None) -> Path:
 
 
 def get_data(filename: str) -> str:
-    return (get_data_path() / filename).read_text()
+    return (get_data_path(filename)).read_text()

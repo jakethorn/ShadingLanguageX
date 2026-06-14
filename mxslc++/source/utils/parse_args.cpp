@@ -37,7 +37,7 @@ options:
   -o, --output-file OUTPUT_FILE Output path of .mtlx file
   -v, --version VERSION         Target MaterialX version (default: 1.39.5)
   -f, --func FUNC               Name of entry function into the program
-  -a, --args ARGS               Arguments to be passed to the entry function
+  -a, --args ARGS*              Arguments to be passed to the entry function
   --no-reduce-graph             Always create graph nodes instead of evaluating logic at compile-time
 )";
 
@@ -144,7 +144,7 @@ options:
         clargs.options.func_name = argv.pop_front();
     }
 
-    bool more_args(const Span<string>& argv)
+    bool has_more_args(const Span<string>& argv)
     {
         if (argv.empty())
             return false;
@@ -160,7 +160,7 @@ options:
 
     void parse_function_args(Span<string>& argv, CommandLineArgs& clargs)
     {
-        while (more_args(argv))
+        while (has_more_args(argv))
         {
             primitive_t value = parse_literal(argv.pop_front());
             clargs.options.func_args.push_back(value);
