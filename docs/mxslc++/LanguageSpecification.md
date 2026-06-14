@@ -72,7 +72,7 @@ surface.base_color = c;
 surface.specular_roughness = 1.0;
 material toon_material = surfacematerial(surface);
 ```
-`> ./mxslc++.exe my_shader.mxsl`
+`> ./mxslc my_shader.mxsl`
 
 compiles to:
 ```xml
@@ -111,41 +111,47 @@ compiles to:
 ```
 ![](../../examples/screenshots/toon.png)
 
-> [!WARNING]
-> ### Not yet supported in mxslc++
-> ShadingLanguageX shaders can also be executed with a designated entry function like in GLSL. If the shader contains
-> a function called `main`, this function will be the entry into the shader. For example:
-> ```
-> inline void main()
-> {
->     surfacematerial(
->         standard_surface(
->             base_color = color3(1.0, 0.72, 0.315),
->             specular_roughness = 0.02,
->             metalness = 1.0
->         )
->     );
-> }
-> ```
-> `> ./mxslc++.exe my_shader.mxsl`
->
->
-> Otherwise, an entry function name can be passed
-> to the compiler as an additional argument. If the entry function accepts any arguments, these can also
-> be passed to the compiler. For example:
-> ```
-> inline void my_function(float r, float g, float b, float roughness, float metalness)
-> {
->     surfacematerial(
->         standard_surface(
->             base_color = color3(r, g, b),
->             specular_roughness = roughness,
->             metalness = metalness
->         )
->     );
-> }
-> ```
-> `> ./mxslc++.exe my_shader.mxsl -m my_function -a 1.0 0.72 0.315 0.02 1.0`
+ShadingLanguageX shaders can also be compiled with a designated entry function. The function name needs
+to be passed to the compiler, either using the `-f/--func` option in the command line, or using the `CompileOptions`
+struct in C++/Python (see the [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md) for more details). 
+For example:
+```
+inline void main()
+{
+    surfacematerial(
+        standard_surface(
+            base_color = color3(1.0, 0.72, 0.315),
+            specular_roughness = 0.02,
+            metalness = 1.0
+        )
+    );
+}
+```
+`> ./mxslc my_shader.mxsl -f main`
+
+
+If the entry function accepts any arguments, these can also be passed to the compiler using the `-a/--args` option or the `CompileOptions` struct. For example:
+```
+inline void my_function(color3 c, float r, float m)
+{
+    surfacematerial(
+        standard_surface(
+            base_color = c,
+            specular_roughness = r,
+            metalness = m
+        )
+    );
+}
+```
+```python
+import MaterialX as mx
+import mxslc
+from pathlib import Path
+
+src_path = Path("my_shader.mxsl")
+opts = mxslc.CompileOptions(func_name="my_function", func_args=[mx.Color3(1.0, 0.72, 0.315), 0.02, 1.0])
+mxslc.compile_file_to_file(src_path, opts)
+```
 
 ![](../../examples/screenshots/gold.png)
 
@@ -2062,7 +2068,7 @@ scope above the global document scope.
 > There is currently one macro pre-defined during shader compilation:
 > * `__MAIN__` is defined during compilation of the file originally given to the compiler.
 > 
-> `> ./mxslc.exe macro_def_example.mxsl`
+> `> ./mxslc macro_def_example.mxsl`
 > ```
 > // macro_def_example.mxsl
 > #ifdef __MAIN__ // will be defined in this context

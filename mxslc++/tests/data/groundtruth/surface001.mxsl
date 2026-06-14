@@ -1,0 +1,3 @@
+standard_surface(
+    normal = vec3{1, 0, 0}
+);

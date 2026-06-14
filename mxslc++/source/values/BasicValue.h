@@ -6,6 +6,7 @@
 #define FENNEC_BASICVALUE_H
 
 #include "CompileError.h"
+#include "primitive_t.h"
 #include "Value.h"
 #include "utils/common.h"
 #include "utils/TypeName.h"

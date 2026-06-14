@@ -7,7 +7,7 @@
 # Table of Contents
 
 1. [What is ShadingLanguageX?](#what-is-shadinglanguagex)
-2. [Useful Features](#useful-features)
+2. [Language Features](#language-features)
 3. [Installation](#installation)
 4. [Getting Started](#getting-started)
 5. [API Documentation](#api-documentation)
@@ -35,7 +35,7 @@ You can see more in-depth examples [here](https://github.com/jakethorn/ShadingLa
 ShadingLanguageX files are compiled to .mtlx files using the `mxslc` compiler. See below for details on how to install
 and get started using `mxslc`.
 
-# Useful Features
+# Language Features
 
 ## MaterialX Version
 
@@ -77,10 +77,6 @@ standard_surface(base_color = randomcolor());
   </standard_surface>
 </materialx>
 ```
-
-## Decompiler
-
-TODO
 
 ## Loops
 
@@ -245,10 +241,16 @@ python -c "import mxslc; print(mxslc.compile_string_to_string('float f = randomf
 
 # Getting Started
 
-ShadingLanguageX strives to provide simple and familiar syntax for creating shaders.
+ShadingLanguageX files are compiled using `mxslc`. The compiler is available as an executable, C++ library or Python 
+module. The following examples demonstrate `mxslc` by calling the executable from the command line, but the 
+same functionality and options are available in the C++ and Python APIs (see below).
 
-_example.mxsl:_
+The following is a typical ShadingLanguageX file, which uses functions generated from the MaterialX standard library,
+such as `texcoord`, `floor` and `randcomcolor`. Finally it creates a material using the `surfacematerial` function. 
+
 ```
+// example.mxsl
+
 float u, v = texcoord() * 10.0;
 float seed = floor(u) + floor(v) * 10.0;
 color3 c = randomcolor(seed);
@@ -258,38 +260,193 @@ surfacematerial(
 );
 ```
 
+The following command will compile `example.mxsl` and create a file called `example.mtlx` in the same location as the source file.
+
 ```bash
-> mxslc example.mxsl
+> ./mxslc example.mxsl
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="node1" type="vector2" />
+  <multiply name="node2" type="vector2">
+    <input name="in1" type="vector2" nodename="node1" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <separate2 name="node3" type="multioutput">
+    <input name="in" type="vector2" nodename="node2" />
+  </separate2>
+  <floor name="node4" type="float">
+    <input name="in" type="float" output="outx" nodename="node3" />
+  </floor>
+  <floor name="node5" type="float">
+    <input name="in" type="float" output="outy" nodename="node3" />
+  </floor>
+  <multiply name="node6" type="float">
+    <input name="in1" type="float" nodename="node5" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <add name="node7" type="float">
+    <input name="in1" type="float" nodename="node4" />
+    <input name="in2" type="float" nodename="node6" />
+  </add>
+  <randomcolor name="node8" type="color3">
+    <input name="in" type="float" nodename="node7" />
+  </randomcolor>
+  <standard_surface name="node9" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node8" />
+  </standard_surface>
+  <surfacematerial name="node10" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="node9" />
+  </surfacematerial>
+</materialx>
 ```
 
 ![](../../examples/screenshots/squares.png)
 
-In the above example, `mxslc` created a file called `example.mtlx`, to specifiy the output file name, use the `-o` flag:
+## Compile Options
+
+### Output File
+
+To specifiy the output file name, use the `-o/--output-file` option:
 
 ```bash
-> mxslc example.mxsl -o output_file.mtlx
+> ./mxslc example.mxsl -o output_file.mtlx
 ```
 
-Use the `-h` flag to see all available options:
+### MaterialX Version
+
+To specify the MaterialX library version, use the `-v/--version` option:
 
 ```bash
-> mxslc -h
+> ./mxslc example.mxsl -v 1.38.10
 ```
+
+The compiler can only use MaterialX library versions that it can find locally. See [below](#materialx-libraries) for more 
+information.
+
+### Entry Function
+
+An optional entry function can be specified using the `-f/--func` option.
+
+```
+inline void red()
+{
+    surfacematerial(
+        standard_surface(base_color=color3{1,0,0})
+    );
+}
+
+inline void green()
+{
+    surfacematerial(
+        standard_surface(base_color=color3{0,1,0})
+    );
+}
+
+inline void blue()
+{
+    surfacematerial(
+        standard_surface(base_color=color3{0,0,1})
+    );
+}
+```
+
+```bash
+> ./mxslc example.mxsl -f blue
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <standard_surface name="node1" type="surfaceshader">
+    <input name="base_color" type="color3" value="0, 0, 1" />
+  </standard_surface>
+  <surfacematerial name="node2" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="node1" />
+  </surfacematerial>
+</materialx>
+```
+
+Arguments can also be passed to the entry function using the `-a/--args` option.
+
+```
+inline void main(float r, float g, float b)
+{
+    surfacematerial(
+        standard_surface(base_color=color3{r,g,b})
+    );
+}
+```
+
+```bash
+> ./mxslc example.mxsl -f main -a 1 0 0
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <standard_surface name="node1" type="surfaceshader">
+    <input name="base_color" type="color3" value="1, 0, 0" />
+  </standard_surface>
+  <surfacematerial name="node2" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="node1" />
+  </surfacematerial>
+</materialx>
+```
+
+The command line options are limited to passing booleans, integers, floats and strings; however, the C++ and Python APIs
+allow vectors, colors and matrices to be passed as well.
+
+## Help
+
+Use the `-h/--help` option to see all available options:
+
+```bash
+> ./mxslc -h
+```
+
+## Response File
 
 It's also possible to use a response file instead of manually passing options.
 
-_example.rsp:_
 ```
+# example.rsp
 example.mxsl -o output_file.mtlx -v 1.38.10 --no-reduce-graph
+--func main
+--args 1 0 0 "world"
 ```
 
 ```bash
-> mxslc @example.rsp
+> ./mxslc @example.rsp
 ```
 
 # API Documentation
 
 ## C++
+
+### Types
+
+```c++
+namespace mxslc
+{
+    using primitive_t = std::variant<
+        bool,
+        int,
+        float,
+        string,
+        fs::path,
+        MaterialX::Vector2,
+        MaterialX::Vector3,
+        MaterialX::Vector4,
+        MaterialX::Color3,
+        MaterialX::Color4,
+        MaterialX::Matrix33,
+        MaterialX::Matrix44
+    >;
+}
+```
 
 ### Structs
 
@@ -304,6 +461,12 @@ namespace mxslc
         // MaterialX version to compile against.
         string version = "1.39.5";
         
+        // Name of entry function into the program
+        optional<string> func_name = std::nullopt;
+        
+        // Arguments to be passed to the entry function
+        vector<primitive_t> func_args{};
+        
         // If true, pre-computes some operations during compilation.
         bool reduce_graph = true;
     };
@@ -314,6 +477,8 @@ namespace mxslc
 mxslc::CompileOptions opts;
 opts.output_file = fs::path{"example.mtlx"};
 opts.version = "1.39.4";
+opts.func_name = "main";
+opts.func_args = {1.0f, MaterialX::Vector3{1, 0, 0}};
 opts.reduce_graph = false;
 ```
 
@@ -361,6 +526,12 @@ Save location of the compiled MaterialX file. Defaults to `None`.
 #### `CompileOptions.version: str`
 MaterialX version to compile against. Defaults to `"1.39.5"`.
 
+#### `CompileOptions.func_name: str`
+Name of entry function into the program. Defaults to `None`.
+
+#### `CompileOptions.func_args: list`
+Arguments to be passed to the entry function. Defaults to `[]`.
+
 #### `CompileOptions.reduce_graph: bool`
 If true, pre-computes certain operations during compilation when possible. Defaults to `True`.
 
@@ -369,6 +540,8 @@ If true, pre-computes certain operations during compilation when possible. Defau
 opts = mxslc.CompileOptions()
 opts.output_file = pathlib.Path("example.mtlx")
 opts.version = "1.39.4"
+opts.func_name = "main"
+opts.func_args = [1.0, (1, 0, 0)]
 opts.reduce_graph = False
 ```
 
@@ -403,7 +576,7 @@ dst_path = mxslc.compile_file_to_file(src_path)
 ## `libraries` Folder
 
 In order to use standard MaterialX nodes, `mxslc` needs access to [MaterialX libraries](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/libraries).
-It looks for them in the `libraries` folder, followed by the name of the MaterialX version the library belongs to, 
+It looks for them next to the executable, in the `libraries` folder, followed by the name of the MaterialX version the library belongs to, 
 for example, `/libraries/1.39.5`.
 
 By default, the `libraries` folder found [here](https://github.com/jakethorn/ShadingLanguageX/tree/main/mxslc%2B%2B/libraries) is copied next to the executable during the build. Make sure to always move the libraries 

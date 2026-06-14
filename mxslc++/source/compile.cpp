@@ -11,7 +11,9 @@
 #include "parse.h"
 #include "scan.h"
 #include "Token.h"
+#include "expressions/FunctionCall.h"
 #include "runtime/Runtime.h"
+#include "runtime/RuntimeUtils.h"
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 
@@ -40,7 +42,7 @@ namespace
     {
         string searched_dirs;
 
-        for (fs::path include_dir : Runtime::get().include_directories())
+        for (const fs::path& include_dir : Runtime::get().include_directories())
         {
             const fs::path lib_dir = include_dir / "libraries";
             searched_dirs += lib_dir.string() + "\n";
@@ -66,6 +68,8 @@ namespace
             {
                 runtime.enter_scope();
                 compile_tokens(std::move(tokens));
+                if (opts.has_function())
+                    RuntimeUtils::invoke_function(*opts.func_name, opts.func_args);
                 runtime.exit_scope();
             }
             runtime.exit_scope();

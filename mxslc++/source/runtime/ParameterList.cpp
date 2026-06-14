@@ -33,6 +33,15 @@ bool ParameterList::contains(const Argument& arg) const
         return arg.index() < params_.size();
 }
 
+const Parameter& ParameterList::operator[](const string& s) const
+{
+    for (const Parameter& param : params_)
+        if (param.name() == s)
+            return param;
+
+    throw CompileError{"Parameter not found: " + s};
+}
+
 const Parameter& ParameterList::operator[](const Argument& arg) const
 {
     if (arg.has_name())

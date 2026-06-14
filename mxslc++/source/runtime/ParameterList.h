@@ -33,14 +33,7 @@ public:
     bool contains(const Argument& arg) const;
 
     const Parameter& operator[](const size_t i) const { return params_.at(i); }
-    const Parameter& operator[](const string& s) const
-    {
-        for (const Parameter& param : params_)
-            if (param.name() == s)
-                return param;
-
-        throw std::out_of_range{"Parameter not found:" + s};
-    }
+    const Parameter& operator[](const string& s) const;
     const Parameter& operator[](const Argument& arg) const;
 
     auto begin() { return params_.begin(); }

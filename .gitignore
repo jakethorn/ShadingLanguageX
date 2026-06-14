@@ -10,6 +10,7 @@ mxslc++/gdb_printers.py
 mxslc++/reduce_rsp.py
 mxslc++/todo.txt
 mxslc++/notes.txt
+mxslc++/build_python.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -143,6 +144,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.build-env
+.build-venv
 .test-env
 .test-venv
 env/

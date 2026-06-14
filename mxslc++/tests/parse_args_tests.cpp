@@ -215,3 +215,39 @@ TEST(parse_args_tests, test_bad_response_file)
 
     ASSERT_FALSE(args.is_valid);
 }
+
+TEST(parse_args_tests, test_options_005)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+    const fs::path output_filepath = get_test_data("parse_args_tests/001.mtlx"s);
+
+    const vector argv{ EXECUTABLE, input_filepath.string(), "--func"s, "main"s, "--args"s, "3.4"s };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+    ASSERT_EQ(args.options.func_name, "main"s);
+    ASSERT_EQ(args.options.func_args.size(), 1);
+    ASSERT_TRUE(std::holds_alternative<float>(args.options.func_args[0]));
+    ASSERT_FLOAT_EQ(std::get<float>(args.options.func_args[0]), 3.4);
+}
+
+TEST(parse_args_tests, test_response_file_005)
+{
+    const fs::path response_filepath = get_test_data("parse_args_tests/005.rsp"s);
+
+    const vector argv{ EXECUTABLE, "@"s + response_filepath.string() };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+
+    ASSERT_EQ(args.options.func_args.size(), 3);
+
+    ASSERT_TRUE(std::holds_alternative<string>(args.options.func_args[0]));
+    ASSERT_EQ(std::get<string>(args.options.func_args[0]), "hello world");
+
+    ASSERT_TRUE(std::holds_alternative<float>(args.options.func_args[1]));
+    ASSERT_FLOAT_EQ(std::get<float>(args.options.func_args[1]), -3.4);
+
+    ASSERT_TRUE(std::holds_alternative<int>(args.options.func_args[2]));
+    ASSERT_EQ(std::get<int>(args.options.func_args[2]), 123);
+}
