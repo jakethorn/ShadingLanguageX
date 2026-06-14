@@ -31,7 +31,7 @@ namespace
     {
         vector<Parameter> params;
         params.reserve(nd->getInputCount());
-        for (const mx::InputPtr& i : nd->getInputs())
+        for (const mx::InputPtr& i : nd->getActiveInputs())
             params.push_back(to_parameter(i, params.size()));
 
         return ParameterList{std::move(params)};
