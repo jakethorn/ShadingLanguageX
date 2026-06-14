@@ -5,6 +5,7 @@
 #ifndef MXSLC_PYTHON_COMMON_H
 #define MXSLC_PYTHON_COMMON_H
 
+#include <ciso646>
 #include <memory>
 #include <optional>
 #include <variant>
