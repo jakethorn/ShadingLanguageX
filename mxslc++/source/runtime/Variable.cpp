@@ -399,8 +399,6 @@ bool Variable::contains_auto(const TypePtr& type)
     return false;
 }
 
-// check what happens if auto is used in a using statement
-
 TypePtr Variable::remove_auto(const TypePtr& original_type, const TypePtr& value_type)
 {
     if (original_type->is_auto())

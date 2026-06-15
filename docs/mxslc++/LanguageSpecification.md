@@ -197,31 +197,32 @@ In this document we will typically use the aliased version for the sake of brevi
 `matrix33` ➔ `mat3`  
 `matrix44` ➔ `mat4`
 
-> [!WARNING]
-> ### Not yet supported in mxslc++
-> ## Auto
->
-> Variables and functions can also be declared using the `auto` keyword when the type can be inferred from the right-hand
-> expression, or return expression in the case of function declarations.
->
-> ### Example
->
-> ```
-> auto pi = 3.14;  
-> auto red = color3{1.0, 0.0, 0.0};
-> auto uv = texcoord<vec2>();
-> 
-> auto add_one(float x)
-> {
->     return x + 1.0;
-> }
-> 
-> auto randomvector<vec2, vec3, vec4>()
-> {
->     float r = randomfloat();
->     return T{r};
-> }
-> ```
+## Auto
+
+Variables can also be declared using the `auto` keyword when the type can be inferred from the right-hand
+expression.
+
+### Example
+
+```
+auto pi = 3.14;                        // float
+auto red = color3{1.0, 0.0, 0.0};      // color3
+auto data = {3.14, "world"};           // {float, string}
+auto list = 0:3;                       // {int, int, int, int}
+auto uv = texcoord<vec2>();            // vec2
+auto uv = texcoord();                  // Error: Ambiguous between vec2 or vec3
+```
+
+```
+using Area = {auto, float};    // OK
+Area area_2d = {vec2{}, 1.0};  // {vec2, float}
+Area area_3d = {vec3{}, 1.0};  // {vec3, float}
+
+vec3 foo(auto space = "world") // OK: vec3 foo(string)
+{
+    // do something
+}
+```
 
 ## Type Conversions
 
@@ -287,6 +288,34 @@ color3 c = color3{1.0};      // explicit float ➔ color3
 > }
 > ```
 
+## `typeof` Operator
+
+If you are ever unsure about the type of a variable you can use the `typeof` operator.
+
+```
+auto x = 2 + vec3{1.0} * 2.0;
+print typeof(x).name; // "vector3"
+```
+
+The `typeof` operator returns an unnamed struct with two fields: `name` which holds the type name (or empty if the variable
+was an unnamed struct), and `str` which holds a string representation of the type.
+
+```
+auto x = {1, vec2{}, "world"};
+print typeof(x).name; // ""
+print typeof(x).str;  // "{int, vector2, string}"
+```
+
+Because the value returned by `typeof` is also a valid ShadingLanguageX variable, you can even call `typeof` on it.
+
+```
+float f = 1.0;
+auto t1 = typeof(f);
+auto t2 = typeof(t1);
+print t2.name; // ""
+print t2.str;  // "{string name, string str}"
+```
+
 # Expressions
 
 Expressions are pieces of code that evaluate to a value, such as `1.0 + 1.0`. This document will cover each expression in detail
@@ -311,11 +340,13 @@ in its own section. The following table gives a quick overview of all the expres
 | Function Call                   | `my_function(a, b)`                  |
 | Method Call                     | `my_obj.my_function(a, b)`           |
 | Constructor Call                | `vec3{0, 1, 0}`                      |
-| Unnamed Constructor Call        | `{a, b}`                             |
+| Unnamed Constructor Call        | `{a, b, c}`                          |
+| Range Operator                  | `0:3`                                |
 | Node Constructor                | `{"mix", color3: bg=a, fg=b, mix=c}` |
 | Variable Declaration Expression | `foo(out float out_arg)`             |
 | This                            | `this`                               |
 | Null                            | `null`                               |
+| Typeof Operator                 | `typeof(a)`                          |
 
 # Statements
 
@@ -377,8 +408,8 @@ float pi2 = 3.14 * 2.0;
 
 The following identifiers have a special meaning in ShadingLanguageX and cannot be used for user-defined variables or functions.
 
-`if` `else` `switch` `for` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
-`global` `default` `function` `using` `class` `this` `print` `break`
+`if` `else` `switch` `for` `from` `to` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
+`global` `default` `function` `using` `class` `this` `print` `typeof` `break`
 
 ### Note
 
@@ -457,7 +488,7 @@ underlying value.
 
 > [!TIP]
 > ### New in mxslc++!
-> ### Field Access Operator
+> ### Field Access
 > 
 > If the variable is a user-defined type, the dot operator can be used to access the fields or methods of that variable. For example:
 > 
@@ -482,7 +513,7 @@ See [User-Defined Types](https://github.com/jakethorn/ShadingLanguageX/blob/main
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
-> ### Swizzle Operator
+> ### Swizzle
 > 
 > The Swizzle Operator allows
 > users to access vector components using any of `x` `y` `z` `w` or color channels using `r` `g` `b` `a` after a period `.`.
@@ -501,7 +532,7 @@ See [User-Defined Types](https://github.com/jakethorn/ShadingLanguageX/blob/main
 > color3 all_red = randomcolor().rrr;
 > ```
 
-### Port Access Operator
+### Port Access
 
 The port access operator either returns the value already assigned to a node port or assigns a value to that node port (only for input ports).
 This is primarily useful for complex nodes such as `standard_surface` which have many inputs.
@@ -514,23 +545,100 @@ s.specular_roughness = 0.2;
 
 ## Indexing Operator
 
-TODO
+The indexing operator is used to either access the fields of a variable or access the components of a vector/color type 
+variable.
+
+### Field Access
+
+If the variable is a user-defined type, the indexing operator can be used to access the fields of that variable based
+on the order in which they were defined. For example:
+
+```
+{vec3, string} x = {vec3{0, 1, 0}, "world"};
+float theta = dotproduct(x[0], normal(x[1]));
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <normal name="node1" type="vector3">
+    <input name="space" type="string" value="world" />
+  </normal>
+  <dotproduct name="node2" type="float">
+    <input name="in1" type="vector3" value="0, 1, 0" />
+    <input name="in2" type="vector3" nodename="node1" />
+  </dotproduct>
+</materialx>
+```
+
+In this form, it's also possible to access the fields in reverse order, by using negative integers.
+
+```
+auto x = {0, 1, 2, 3, 4};
+print x[-1]; // "4"
+print x[-2]; // "3"
+// etc...
+```
+
+### Component Access
+
+When used with a vector/color type variable, the indexing operator can be used to access the components of that 
+variable, basically evaluating to the `extract` node from the MaterialX standard nodes specification.
+For example:
+
+```
+vec2 uv = texcoord();
+float u = uv[0];
+float v = uv[1];
+```
+
+## Range Operator
+
+The range operator is used to create a range of values. It is mostly used with loops to control and monitor the number 
+of iterations of that loop.
+
+```
+auto nums = 0:7;
+print nums; // "{0, 1, 2, 3, 4, 5, 6, 7}"
+
+for (int n from nums)
+{
+    // do something
+}
+```
+
+You can optionally specify the step size of the range.
+
+```
+auto nums = 10:5:20;
+print nums; // "{10, 15, 20}"
+```
+
+Lastly, a more human readable format is available using the `to` keyword.
+
+```
+for (int i from 1 to 100)
+{
+    // do something
+}
+```
 
 ## Precedence
 
-| Order of Precedence (higher operations evaluate first)                  |
-|-------------------------------------------------------------------------|
-| `(a)`                                                                   |
-| `a.b` `a[b]`                                                            |
-| `a++` `a--` `++a` `--a`                                                 |
+| Order of Precedence (higher operations evaluate first)                   |
+|--------------------------------------------------------------------------|
+| `(a)`                                                                    |
+| `a.b` `a[b]`                                                             |
+| `a++` `a--` `++a` `--a`                                                  |
 | `a += b` `a -= b` `a *= b` `a /= b` `a ^= b` `a %= b` `a &= b` `a \|= b` |
-| `-a` `+a` `!a`                                                          |
-| `a ^ b`                                                                 |
-| `a * b` `a / b` `a % b`                                                 |
-| `a + b` `a - b`                                                         |
-| `a > b` `a >= b` `a < b` `a <= b`                                       |
-| `a == b` `a != b`                                                       |
-| `a & b` `a \| b`                                                        |
+| `-a` `+a` `!a`                                                           |
+| `a ^ b`                                                                  |
+| `a * b` `a / b` `a % b`                                                  |
+| `a + b` `a - b`                                                          |
+| `a:b` `a:b:c` `a to b`                                                   |
+| `a > b` `a >= b` `a < b` `a <= b`                                        |
+| `a == b` `a != b`                                                        |
+| `a & b` `a \| b`                                                         |
 
 When two operators with equal precedence are used, the leftmost operator will evaluate first.  
 As shown in the table above, precendence can be controlled using the grouping operator `(a)`. For example, in the expression
@@ -992,50 +1100,10 @@ print x[1+1]; // OK: 1+1 is evaluated at compile-time
 Unlike if and switch expressions, loops are compiled as statements in ShadingLanguageX, with the caveat that the number of
 loop iterations must be known at compile-time.
 
-## For Range Loop
+For loops iterate over the fields in a given variable.
 
 ```
-for (type name = start-value:end-value)
-{
-    statement*
-}
-```
-
-`type` can either be `int` or `float`.  
-`name` can be any valid identifier.  
-`start-value` is the value that the iteration value will start from.  
-`end-value` is the value that the iteration value will stop at.  
-For example, `0:3` will iterate through the values `0` `1` `2` `3`.
-
-For range loops can also be declared with an increment value. Instead of increasing the iteration value by
-`1` each loop, it will be increased by the value of the specified increment instead. For example, `0:2:6` would result in the following sequence: `0` `2` `4` `6`.
-Reverse iterators are also possible using this syntax, for example, `9:-1:0` would start at `9` and end at `0`.
-```
-for (type name = start-value:increment-value:end-value)
-{
-    statement*
-}
-```
-
-### Example
-
-```
-// render 10 randomly sized white circles
-mutable color3 c = color3{0.0};
-for (int i = 0:9)
-{
-    vec2 center = vec2{randomfloat(in=0, seed=i), randomfloat(in=1, seed=i)};
-    c = if (distance(center, texcoord()) < randomfloat(in=2, max=0.1, seed=i)) { color3{1.0} };
-}
-standard_surface(base_color=c);
-```
-
-## For Each Loop
-
-For each loops iterate over a variables fields.
-
-```
-for (modifier-list type name = value)
+for (modifier-list type name from value)
 {
     statement*
 }
@@ -1046,15 +1114,39 @@ for (modifier-list type name = value)
 `name` can be any valid identifier.  
 `value` can be any valid expression.
 
-### Example
+The two most common ways to do this are using unnamed structs and ranges.
+
+### Unnamed Structs
 
 ```
-{float, float, float} values = {1.0, 2.0, 3.0};
+{int, int, int, int} nums = {50, 61, 78, 2};
 
-for (float v = values)
+for (int n from nums)
 {
-    print v;
+    print n;
 }
+```
+
+```
+for (auto x from {1, vec2{}, "world"})
+{
+    print x;
+}
+```
+
+### Ranges
+
+See [Range Operator](#range-operator) for more information.
+
+```
+// render 10 randomly sized white circles
+mutable color3 c = color3{0.0};
+for (int i from 0:9)
+{
+    vec2 center = vec2{randomfloat(in=0, seed=i), randomfloat(in=1, seed=i)};
+    c = if (distance(center, texcoord()) < randomfloat(in=2, max=0.1, seed=i)) { color3{1.0} };
+}
+standard_surface(base_color=c);
 ```
 
 # Functions
