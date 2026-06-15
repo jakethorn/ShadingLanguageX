@@ -59,14 +59,28 @@ options:
         vector argv{"mxslc"s};
 
         bool in_quotes = false;
+        bool in_comment = false;
         string arg;
         char c;
         while (file.get(c))
         {
-            if (c == '"')
+            if (in_comment)
+            {
+                in_comment = c != '\n';
+            }
+            else if (c == '"')
             {
                 arg += c;
                 in_quotes = not in_quotes;
+            }
+            else if (c == '#' and not in_quotes)
+            {
+                if (not arg.empty())
+                {
+                    argv.push_back(std::move(arg));
+                    arg.clear();
+                }
+                in_comment = true;
             }
             else if (std::isspace(static_cast<unsigned char>(c)) and not in_quotes)
             {

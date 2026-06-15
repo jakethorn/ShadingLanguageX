@@ -251,3 +251,24 @@ TEST(parse_args_tests, test_response_file_005)
     ASSERT_TRUE(std::holds_alternative<int>(args.options.func_args[2]));
     ASSERT_EQ(std::get<int>(args.options.func_args[2]), 123);
 }
+
+TEST(parse_args_tests, test_response_file_006)
+{
+    const fs::path response_filepath = get_test_data("parse_args_tests/006.rsp"s);
+
+    const vector argv{ EXECUTABLE, "@"s + response_filepath.string() };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+
+    ASSERT_EQ(args.options.func_args.size(), 3);
+
+    ASSERT_TRUE(std::holds_alternative<string>(args.options.func_args[0]));
+    ASSERT_EQ(std::get<string>(args.options.func_args[0]), "hello world");
+
+    ASSERT_TRUE(std::holds_alternative<float>(args.options.func_args[1]));
+    ASSERT_FLOAT_EQ(std::get<float>(args.options.func_args[1]), -3.4);
+
+    ASSERT_TRUE(std::holds_alternative<int>(args.options.func_args[2]));
+    ASSERT_EQ(std::get<int>(args.options.func_args[2]), 123);
+}
