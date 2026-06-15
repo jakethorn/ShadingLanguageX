@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_to" node="to">
+  <nodedef name="ND_atob" node="atob">
     <output name="out__0" type="float" />
     <output name="out__1" type="float" />
     <input name="a__0" type="float" value="0" />
@@ -8,7 +8,7 @@
     <input name="b__0" type="float" value="0" />
     <input name="b__1" type="float" value="0" />
   </nodedef>
-  <nodegraph name="NG_to" nodedef="ND_to">
+  <nodegraph name="NG_atob" nodedef="ND_atob">
     <subtract name="node1" type="float">
       <input name="in1" type="float" interfacename="b__0" />
       <input name="in2" type="float" interfacename="a__0" />
@@ -20,12 +20,12 @@
     <output name="out__0" type="float" nodename="node1" />
     <output name="out__1" type="float" nodename="node2" />
   </nodegraph>
-  <to name="node1" type="multioutput">
+  <atob name="node1" type="multioutput">
     <input name="a__0" type="float" value="0" />
     <input name="a__1" type="float" value="0" />
     <input name="b__0" type="float" value="1" />
     <input name="b__1" type="float" value="1" />
-  </to>
+  </atob>
   <combine2 name="node2" type="vector2">
     <input name="in1" type="float" output="out__0" nodename="node1" />
     <input name="in2" type="float" output="out__1" nodename="node1" />

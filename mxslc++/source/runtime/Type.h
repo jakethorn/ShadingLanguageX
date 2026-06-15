@@ -59,6 +59,7 @@ public:
     template<typename T>
     bool is() const { return name_ == TypeName::get<T>(); }
     bool is_void() const { return name_ == TypeName::Void; }
+    bool is_auto() const { return name_ == TypeName::Auto; }
     bool is_primitive() const { return has_name() and not has_fields(); }
     bool is_vector() const { return TypeName::is_vector(name_); }
 
@@ -89,6 +90,7 @@ public:
     static TypePtr Mat3;
     static TypePtr Mat4;
     static TypePtr Void;
+    static TypePtr Auto;
 
     template<typename T>
     static TypePtr of() { return resolve(TypeName::get<T>()); }

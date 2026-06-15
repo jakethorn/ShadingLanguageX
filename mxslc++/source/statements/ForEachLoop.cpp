@@ -36,6 +36,7 @@ void ForEachLoop::execute_impl() const
 {
     const TypePtr type = scope().resolve_type(type_);
 
+    iter_expr_->set_subexpression_type(type);
     iter_expr_->init();
     if (not iter_expr_->type()->has_fields())
         throw CompileError{"Value not iterable"s};

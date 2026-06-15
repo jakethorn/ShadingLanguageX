@@ -1,0 +1,4 @@
+for (int i from 0:5:10)
+{
+    texcoord<vec2>(i);
+}

@@ -111,7 +111,7 @@ FunctionQuery::Result FunctionQuery::class_type_matches(const FuncPtr& func) con
 FunctionQuery::Result FunctionQuery::return_type_matches(const FuncPtr& func) const
 {
     // empty means any type
-    if (return_types == nullptr or return_types->empty())
+    if (return_types == nullptr or return_types->empty() or (return_types->size() == 1 and (*return_types)[0]->is_auto()))
         return Result::Ignore;
     if (func->return_type()->is_in(*return_types))
         return Result{Result::Match, 1};

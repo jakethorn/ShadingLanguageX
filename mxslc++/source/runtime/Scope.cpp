@@ -178,6 +178,9 @@ TypePtr Scope::resolve_type(const TypePtr& type) const
     if (type->is_void())
         return Type::Void;
 
+    if (type->is_auto())
+        return Type::Auto;
+
     if (type->has_name())
     {
         return get_type(type->name());

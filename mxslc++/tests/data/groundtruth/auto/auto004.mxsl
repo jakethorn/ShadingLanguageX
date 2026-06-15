@@ -1,0 +1,6 @@
+auto stuff = {1, 2.0, "world", vec2{}};
+
+for (auto thing from stuff)
+{
+    print thing;
+}

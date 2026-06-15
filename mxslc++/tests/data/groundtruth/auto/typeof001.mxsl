@@ -1,0 +1,26 @@
+string a = typeof(1 + 1).name;
+string b = typeof(texcoord<vec2>()).name;
+string c = typeof("world").name;
+string d = typeof(true).name;
+string e = typeof({1.0, 2.0}).name;
+
+class Point
+{
+    float x;
+    float y;
+
+    Point(float x, float y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+string f = typeof(Point{3.0, 4.0}).name;
+
+position(a);
+position(b);
+position(c);
+position(d);
+position(e);
+position(f);

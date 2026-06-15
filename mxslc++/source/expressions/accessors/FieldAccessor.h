@@ -12,7 +12,7 @@ class FieldAccessor final : public Accessor
 {
 public:
     FieldAccessor(VarPtr var, const string& property);
-    FieldAccessor(VarPtr var, size_t index);
+    FieldAccessor(VarPtr var, int index);
 
     TypePtr type() const override;
     VarPtr evaluate() const override;

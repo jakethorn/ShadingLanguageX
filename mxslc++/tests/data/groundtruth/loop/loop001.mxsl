@@ -1,0 +1,14 @@
+for (int i from {1, 2, 3})
+{
+    print i;
+}
+
+for (int i from 4:6)
+{
+     print i;
+}
+
+for (int i from 7:1:9)
+{
+    print i;
+}

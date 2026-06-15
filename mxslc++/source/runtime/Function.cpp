@@ -47,9 +47,9 @@ Function::Function(
     mods_.validate(TokenType::Inline, TokenType::Default);
 
     if (return_type_->is_void() and return_expr_ != nullptr)
-        throw CompileError{"Void function '" + name_ + "' has a return statement"s};
+        throw CompileError{"Void function '" + name_ + "' has a return statement"};
     if (not return_type_->is_void() and return_expr_ == nullptr)
-        throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"s};
+        throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"};
 }
 
 Function::Function(Function&& other) noexcept

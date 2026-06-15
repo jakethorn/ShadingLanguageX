@@ -6,9 +6,7 @@
 
 #include "runtime/Scope.h"
 #include "expressions/Expression.h"
-#include "runtime/Runtime.h"
 #include "runtime/Variable.h"
-#include "values/Value.h"
 #include "values/ValueFactory.h"
 
 VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, Token name, ExprPtr expr)
@@ -44,7 +42,7 @@ const string& VariableDefinition::name() const
 
 void VariableDefinition::execute_impl() const
 {
-    const TypePtr type = scope().resolve_type(type_);
+    TypePtr type = scope().resolve_type(type_);
 
     VarPtr value;
     if (expr_)
@@ -57,6 +55,6 @@ void VariableDefinition::execute_impl() const
         value = ValueFactory::create_default_value(type);
     }
 
-    const VarPtr var = Variable::create(mods_, type, value);
+    const VarPtr var = Variable::create(mods_, std::move(type), value);
     var->add_to_scope(name());
 }

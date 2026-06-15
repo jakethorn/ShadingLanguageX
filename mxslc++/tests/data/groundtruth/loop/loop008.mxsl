@@ -1,0 +1,4 @@
+for (float i from 1 to 10)
+{
+	float n = noise2d<float>(pivot=i);
+}

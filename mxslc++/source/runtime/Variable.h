@@ -64,6 +64,7 @@ public:
     }
 
     static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
+    static VarPtr create(ModifierList mods, TypePtr type, const vector<primitive_t>& children);
     static VarPtr create(ModifierList mods, TypePtr type, ValuePtr value);
     static VarPtr create(ModifierList mods, TypePtr type, const VarPtr& value);
     static VarPtr create(ModifierList mods, ValuePtr value);
@@ -72,6 +73,7 @@ public:
     static VarPtr create(TypePtr type, ValuePtr value);
     static VarPtr create(TypePtr type, const VarPtr& value);
     static VarPtr create(const vector<VarPtr>& children);
+    static VarPtr create(const vector<primitive_t>& children);
     static VarPtr create(ValuePtr value);
     static VarPtr create(primitive_t value);
     static VarPtr create(const VarPtr& value);
@@ -83,6 +85,10 @@ protected:
 private:
     void copy_value(ValuePtr value);
     void copy_children(const vector<VarPtr>& children);
+
+    static TypePtr type_of(const vector<VarPtr>& children);
+    static bool contains_auto(const TypePtr& type);
+    static TypePtr remove_auto(const TypePtr& original_type, const TypePtr& value_type);
 
     ModifierList mods_;
     TypePtr type_;

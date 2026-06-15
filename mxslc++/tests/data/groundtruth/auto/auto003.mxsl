@@ -1,0 +1,10 @@
+using auto_t = auto;
+
+auto_t a = 1;
+auto_t b = "world";
+auto_t c = vec2{};
+
+int foo(auto a = 1)
+{
+    return a;
+}

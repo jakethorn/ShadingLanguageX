@@ -24,9 +24,10 @@ public:
 
     virtual ExprPtr instantiate_template_types(const TypePtr& template_type) const = 0;
 
+    void set_subexpression_type(TypePtr type) { subexpr_type_ = std::move(type); }
+
     void init();
     void init(const TypePtr& type);
-    void init(const string& type_name);
     void init(const vector<TypePtr>& types);
     bool try_init(const vector<TypePtr>& types);
 
@@ -44,6 +45,7 @@ protected:
     Token token_;
 
     bool is_initialized_ = false;
+    TypePtr subexpr_type_ = nullptr;
     TypePtr target_type_ = nullptr;
     string error_message_ = ""s;
 

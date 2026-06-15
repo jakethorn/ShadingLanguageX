@@ -62,8 +62,9 @@ public:
         Else,
         Switch,
         For,
+        From,
+        To,
         Return,
-        Auto,
         Null,
         Ref,
         Out,
@@ -82,6 +83,7 @@ public:
         Varying,
         Namespace,
         Print,
+        Typeof,
         Break,
 
         // Dynamic
@@ -109,8 +111,8 @@ public:
     };
 
     inline static const unordered_set Keywords {
-        If, Else, Switch, For, Return, Auto, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
-        Function, Typedef, Using, Class, This, Uniform, Varying, Namespace, Print, Break
+        If, Else, Switch, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
+        Function, Typedef, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
     };
 
 private:
@@ -136,8 +138,9 @@ private:
         {"else", Else},
         {"switch", Switch},
         {"for", For},
+        {"from", From},
+        {"to", To},
         {"return", Return},
-        {"auto", Auto},
         {"null", Null},
         {"ref", Ref},
         {"out", Out},
@@ -156,6 +159,7 @@ private:
         {"varying", Varying},
         {"namespace", Namespace},
         {"print", Print},
+        {"typeof", Typeof},
         {"break", Break},
         {"<identifier>", Identifier},
         {"<bool>", Bool},

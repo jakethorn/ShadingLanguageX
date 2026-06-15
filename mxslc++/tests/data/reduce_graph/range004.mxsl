@@ -1,0 +1,6 @@
+auto x = 7 to 11;
+
+for (int i from x[0] to x[-1])
+{
+    texcoord<vec2>(i);
+}

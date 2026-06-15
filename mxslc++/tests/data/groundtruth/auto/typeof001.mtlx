@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="node1" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <texcoord name="node2" type="vector2" />
+  <nodedef name="ND___Point__" node="__Point__">
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+    <input name="x" type="float" value="0" />
+    <input name="y" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG___Point__" nodedef="ND___Point__">
+    <output name="out__0" type="float" interfacename="x" />
+    <output name="out__1" type="float" interfacename="y" />
+  </nodegraph>
+  <__Point__ name="node3" type="multioutput">
+    <input name="x" type="float" value="3" />
+    <input name="y" type="float" value="4" />
+  </__Point__>
+  <position name="node4" type="vector3">
+    <input name="space" type="string" value="integer" />
+  </position>
+  <position name="node5" type="vector3">
+    <input name="space" type="string" value="vector2" />
+  </position>
+  <position name="node6" type="vector3">
+    <input name="space" type="string" value="string" />
+  </position>
+  <position name="node7" type="vector3">
+    <input name="space" type="string" value="boolean" />
+  </position>
+  <position name="node8" type="vector3">
+    <input name="space" type="string" value="" />
+  </position>
+  <position name="node9" type="vector3">
+    <input name="space" type="string" value="Point" />
+  </position>
+</materialx>

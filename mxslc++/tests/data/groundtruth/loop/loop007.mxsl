@@ -1,0 +1,5 @@
+for (float i from 1:3:10)
+{
+	print i;
+	float n = noise2d<float>(pivot=i);
+}

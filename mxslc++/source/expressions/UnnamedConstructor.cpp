@@ -105,6 +105,9 @@ namespace
 
 vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, const size_t index) const
 {
+    if (subexpr_type_)
+        return {subexpr_type_};
+
     vector<TypePtr> result;
 
     for (const TypePtr& type : with_compatible_types(types))

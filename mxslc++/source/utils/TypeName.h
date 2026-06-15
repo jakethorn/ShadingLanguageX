@@ -23,6 +23,7 @@ public:
     inline static string Mat3 = "matrix33";
     inline static string Mat4 = "matrix44";
     inline static string Void = "void";
+    inline static string Auto = "auto";
 
     template<typename T>
     static const string& get()

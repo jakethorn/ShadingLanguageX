@@ -102,6 +102,9 @@ VarPtr ValueFactory::create_output_values(mx::NodePtr node, TypePtr type, const 
 
 VarPtr ValueFactory::create_default_value(TypePtr type)
 {
+    if (type->is_auto())
+        throw CompileError{"Cannot create default value for variable of type auto"s};
+
     if (type->has_fields())
     {
         vector<VarPtr> fields_values;

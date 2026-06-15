@@ -17,7 +17,9 @@
 #include "expressions/Literal.h"
 #include "expressions/MethodCall.h"
 #include "expressions/NamedConstructor.h"
+#include "expressions/RangeExpression.h"
 #include "expressions/ThisExpression.h"
+#include "expressions/TypeOfOperator.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -30,7 +32,6 @@
 #include "statements/DocumentAttribute.h"
 #include "statements/ExpressionStatement.h"
 #include "statements/ForEachLoop.h"
-#include "statements/ForRangeLoop.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/IfStatement.h"
 #include "statements/MultiVariableDefinition.h"
@@ -319,32 +320,11 @@ StmtPtr Parser::for_loop()
     ModifierList mods = modifiers();
     TypePtr type_ = type();
     Token name = match(TokenType::Identifier);
-    match('=');
-    ExprPtr expr1 = expression();
-    if (consume(':'))
-    {
-        ExprPtr expr2 = expression();
-        ExprPtr expr3 = nullptr;
-        if (consume(':'))
-        {
-            expr3 = expression();
-        }
-        else
-        {
-            expr3 = std::move(expr2);
-            expr2 = nullptr;
-        }
-
-        match(')');
-        StmtPtr body = block_statement();
-        return std::make_unique<ForRangeLoop>(std::move(token), std::move(mods), std::move(type_), std::move(name), std::move(expr1), std::move(expr2), std::move(expr3), std::move(body));
-    }
-    else
-    {
-        match(')');
-        StmtPtr body = block_statement();
-        return std::make_unique<ForEachLoop>(std::move(token), std::move(mods), std::move(type_), std::move(name), std::move(expr1), std::move(body));
-    }
+    match(TokenType::From);
+    ExprPtr range_expr = expression();
+    match(')');
+    StmtPtr body = block_statement();
+    return std::make_unique<ForEachLoop>(std::move(token), std::move(mods), std::move(type_), std::move(name), std::move(range_expr), std::move(body));
 }
 
 StmtPtr Parser::expression_statement(ExprPtr expr)
@@ -512,22 +492,49 @@ ExprPtr Parser::equality()
 
 ExprPtr Parser::relational()
 {
-    ExprPtr left = term();
+    ExprPtr left = range();
     optional<Token> op1;
     ExprPtr middle;
     optional<Token> op2;
     ExprPtr right;
 
     if ((op1 = consume('>', ">="s, '<', "<="s)))
-        middle = term();
+        middle = range();
     if ((op2 = consume('>', ">="s, '<', "<="s)))
-        right = term();
+        right = range();
 
     if (right)
         return ExpressionFactory::ternary_relational(std::move(left), std::move(*op1), std::move(middle), std::move(*op2), std::move(right));
     if (middle)
         return ExpressionFactory::binary(std::move(left), std::move(*op1), std::move(middle));
     return left;
+}
+
+ExprPtr Parser::range()
+{
+    ExprPtr expr1 = term();
+    if (optional<Token> to = consume(TokenType::To))
+    {
+        ExprPtr expr2 = term();
+        return std::make_unique<RangeExpression>(std::move(expr1), std::move(expr2), std::move(*to));
+    }
+    else if (optional<Token> colon = consume(':'))
+    {
+        ExprPtr expr2 = term();
+        if (consume(':'))
+        {
+            ExprPtr expr3 = term();
+            return std::make_unique<RangeExpression>(std::move(expr1), std::move(expr2), std::move(expr3), std::move(*colon));
+        }
+        else
+        {
+            return std::make_unique<RangeExpression>(std::move(expr1), std::move(expr2), std::move(*colon));
+        }
+    }
+    else
+    {
+        return expr1;
+    }
 }
 
 ExprPtr Parser::term()
@@ -678,6 +685,11 @@ ExprPtr Parser::primary()
         return if_expression();
     }
 
+    if (peek() == TokenType::Typeof)
+    {
+        return typeof_operator();
+    }
+
     throw CompileError{peek(), "Invalid expression"s};
 }
 
@@ -755,6 +767,15 @@ ExprPtr Parser::variable_definition_argument(ModifierList mods)
     TypePtr type_ = type();
     Token name = match(TokenType::Identifier);
     return std::make_unique<VariableDefinitionExpression>(std::move(mods), std::move(type_), std::move(name));
+}
+
+ExprPtr Parser::typeof_operator()
+{
+    Token token = match(TokenType::Typeof);
+    match('(');
+    ExprPtr expr = expression();
+    match(')');
+    return std::make_unique<TypeOfOperator>(std::move(expr), std::move(token));
 }
 
 Argument Parser::argument(const size_t i)

@@ -24,6 +24,7 @@ type_def(Color4)
 type_def(Mat3)
 type_def(Mat4)
 type_def(Void)
+type_def(Auto)
 #undef type_def
 
 Type::Type(const vector<TypePtr>& fields)
@@ -130,6 +131,9 @@ bool Type::is_compatible(const TypePtr& other) const
 
     assert(is_resolved_);
     assert(other->is_resolved_);
+
+    if (is_auto() or other->is_auto())
+        return true;
 
     if (is_vector() and is_vector_compatible(*this, *other))
         return true;

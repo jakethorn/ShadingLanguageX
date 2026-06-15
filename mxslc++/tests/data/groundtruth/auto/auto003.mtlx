@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="node1" type="vector2" />
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="integer" />
+    <input name="a" type="integer" value="1" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="auto" interfacename="a" />
+  </nodegraph>
+</materialx>

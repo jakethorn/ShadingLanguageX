@@ -41,6 +41,8 @@ add_library(mxslc_lib
         expressions/MethodCall.cpp
         expressions/CompoundAssignment.cpp
         expressions/RuntimeExpression.cpp
+        expressions/TypeOfOperator.cpp
+        expressions/RangeExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
@@ -48,7 +50,6 @@ add_library(mxslc_lib
         statements/MultiVariableDefinition.cpp
         statements/UsingDeclaration.cpp
         statements/VariableAssignment.cpp
-        statements/ForRangeLoop.cpp
         statements/ForEachLoop.cpp
         statements/ExpressionStatement.cpp
         statements/IfStatement.cpp

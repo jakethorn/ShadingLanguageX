@@ -1,0 +1,7 @@
+auto f = 1.0 + 1.0;
+auto g = f * 2.0;
+
+auto a = {3.0, 4, "world"};
+
+float b = a[0] / float{a[1]};
+vec3 n = normal(a[2]);

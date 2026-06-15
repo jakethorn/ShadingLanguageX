@@ -12,9 +12,12 @@ FieldAccessor::FieldAccessor(VarPtr var, const string& property) : var_{std::mov
     index_ = var_->type()->field_index(property);
 }
 
-FieldAccessor::FieldAccessor(VarPtr var, const size_t index) : var_{std::move(var)}, index_{index}
+FieldAccessor::FieldAccessor(VarPtr var, const int index) : var_{std::move(var)}
 {
-
+    if (index >= 0)
+        index_ = index;
+    else
+        index_ = var_->type()->field_count() + index;
 }
 
 TypePtr FieldAccessor::type() const

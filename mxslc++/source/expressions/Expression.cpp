@@ -8,7 +8,6 @@
 
 #include "CompileError.h"
 #include "runtime/Runtime.h"
-#include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "utils/type_cast.h"
@@ -25,13 +24,7 @@ void Expression::init()
 
 void Expression::init(const TypePtr& type)
 {
-    init(vector{type});
-}
-
-void Expression::init(const string& type_name)
-{
-    const TypePtr type = scope().get_type(type_name);
-    init(type);
+    init(vector<TypePtr>{type});
 }
 
 void Expression::init(const vector<TypePtr>& types)
@@ -60,13 +53,18 @@ bool Expression::try_init(const vector<TypePtr>& types)
     init_subexpressions(types);
     init_impl(types);
 
+    if (types.empty() or (types.size() == 1 and types[0]->is_auto()))
+    {
+        is_initialized_ = true;
+        return true;
+    }
+
     const TypePtr type = type_impl();
     assert(type->is_resolved());
 
     target_type_ = type->find_unique_compatible(types);
 
-    // empty means any type
-    is_initialized_ = target_type_ != nullptr || types.empty();
+    is_initialized_ = target_type_ != nullptr;
     return is_initialized_;
 
     TRY_END

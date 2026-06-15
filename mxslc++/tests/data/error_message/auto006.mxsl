@@ -1,0 +1,1 @@
+auto x = if (true) { "world" } else { 1.0 };

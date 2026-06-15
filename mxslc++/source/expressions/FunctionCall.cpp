@@ -79,8 +79,8 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
         if (initialized_arg_count == prev_initialized_arg_count)
         {
             // no progress made, try to init with the default function...
-            FuncPtr default_func = get_matching_function(types);
-            initialized_arg_count = try_init_arguments(std::move(default_func));
+            const FuncPtr default_func = get_matching_function(types);
+            initialized_arg_count = try_init_arguments(default_func);
 
             if (initialized_arg_count == prev_initialized_arg_count)
                 throw ambiguous_function_error(name_, matching_funcs);

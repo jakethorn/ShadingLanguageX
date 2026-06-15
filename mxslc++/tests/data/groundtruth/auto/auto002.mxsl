@@ -1,0 +1,7 @@
+{auto a, float b} x = {1.0, 2.0};
+{auto a, float b} y = {"world", 3.0};
+{auto a, auto b} z = {vec2{}, vec3{}};
+
+float f = x.a + x.b + y.b;
+vec3 g = vec3{z.a} + z.b;
+vec3 n = normal(y.a);

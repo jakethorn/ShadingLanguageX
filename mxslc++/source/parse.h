@@ -58,6 +58,7 @@ public:
     ExprPtr logical();
     ExprPtr equality();
     ExprPtr relational();
+    ExprPtr range();
     ExprPtr term();
     ExprPtr factor();
     ExprPtr exponent();
@@ -72,6 +73,7 @@ public:
     ExprPtr named_constructor();
     ExprPtr unnamed_constructor();
     ExprPtr variable_definition_argument(ModifierList mods);
+    ExprPtr typeof_operator();
 
     Argument argument(size_t i);
 

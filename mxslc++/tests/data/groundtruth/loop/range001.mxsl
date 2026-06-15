@@ -1,0 +1,7 @@
+auto x = 7 to 11;
+print typeof(x);
+texcoord<vec2>(x[0]);
+texcoord<vec2>(x[1]);
+texcoord<vec2>(x[2]);
+texcoord<vec2>(x[3]);
+texcoord<vec2>(x[4]);

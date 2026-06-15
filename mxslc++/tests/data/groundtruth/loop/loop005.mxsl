@@ -1,0 +1,5 @@
+for (int i from 1:3)
+{
+	print(i);
+	texcoord<vec2>(i);
+}

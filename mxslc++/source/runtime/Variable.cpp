@@ -9,6 +9,7 @@
 #include "Type.h"
 #include "mtlx/MtlXSerializer.h"
 #include "mtlx/mtlx_utils.h"
+#include "utils/str_utils.h"
 
 Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
 {
@@ -233,23 +234,41 @@ string Variable::str() const
     else
     {
         string result = "{";
-        for (const VarPtr& child : children_)
+        for (size_t i = 0; i < children_.size(); ++i)
         {
-            result += "\n\t" + child->str() + "\n";
+            const string field_name = type_->field(i).has_name() ? type_->field_name(i) : "field_" + ::str(i);
+            const VarPtr& child = children_[i];
+            result += "\n\t" + field_name + ": " + child->str();
         }
-        return result + "}";
+        return result + "\n}";
     }
 }
 
 VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<VarPtr>& children)
 {
+    if (contains_auto(type))
+        type = remove_auto(type, type_of(children));
+
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
     var->copy_children(children);
     return var;
 }
 
+VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<primitive_t>& children)
+{
+    vector<VarPtr> vars;
+    vars.reserve(children.size());
+    for (const primitive_t& child : children)
+        vars.push_back(create(child));
+
+    return create(std::move(mods), std::move(type), vars);
+}
+
 VarPtr Variable::create(ModifierList mods, TypePtr type, ValuePtr value)
 {
+    if (contains_auto(type))
+        type = remove_auto(type, value->type());
+
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
     var->copy_value(std::move(value));
     return var;
@@ -257,6 +276,9 @@ VarPtr Variable::create(ModifierList mods, TypePtr type, ValuePtr value)
 
 VarPtr Variable::create(ModifierList mods, TypePtr type, const VarPtr& value)
 {
+    if (contains_auto(type))
+        type = remove_auto(type, value->type());
+
     VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
     var->copy(value);
     return var;
@@ -291,16 +313,17 @@ VarPtr Variable::create(TypePtr type, const VarPtr& value)
 
 VarPtr Variable::create(const vector<VarPtr>& children)
 {
-    vector<TypePtr> fields;
-    fields.reserve(children.size());
-    for (const VarPtr& child : children)
-        fields.push_back(child->type());
+    return create(ModifierList{}, type_of(children), children);
+}
 
-    TypePtr type = scope().resolve_type(
-        std::make_shared<Type>(std::move(fields))
-    );
+VarPtr Variable::create(const vector<primitive_t>& children)
+{
+    vector<VarPtr> vars;
+    vars.reserve(children.size());
+    for (const primitive_t& child : children)
+        vars.push_back(create(child));
 
-    return create(ModifierList{}, std::move(type), children);
+    return create(vars);
 }
 
 VarPtr Variable::create(ValuePtr value)
@@ -347,4 +370,55 @@ void Variable::copy_children(const vector<VarPtr>& children)
     }
 
     is_initialized_ = true;
+}
+
+TypePtr Variable::type_of(const vector<VarPtr>& children)
+{
+    vector<TypePtr> fields;
+    fields.reserve(children.size());
+    for (const VarPtr& child : children)
+        fields.push_back(child->type());
+
+    return scope().resolve_type(
+        std::make_shared<Type>(std::move(fields))
+    );
+}
+
+bool Variable::contains_auto(const TypePtr& type)
+{
+    if (type->is_auto())
+        return true;
+    if (type->has_fields())
+    {
+        for (const Field& field : type->fields())
+        {
+            if (contains_auto(field.type()))
+                return true;
+        }
+    }
+    return false;
+}
+
+// check what happens if auto is used in a using statement
+
+TypePtr Variable::remove_auto(const TypePtr& original_type, const TypePtr& value_type)
+{
+    if (original_type->is_auto())
+        return value_type;
+    if (original_type->has_fields())
+    {
+        vector<Field> fields;
+        fields.reserve(original_type->field_count());
+        for (size_t i = 0; i < original_type->field_count(); ++i)
+        {
+            Field original_field = original_type->field(i);
+            fields.emplace_back(
+                original_field.modifiers(),
+                remove_auto(original_field.type(), value_type->field_type(i)),
+                original_field.name()
+            );
+        }
+        return std::make_shared<Type>(original_type->name(), std::move(fields));
+    }
+    return original_type;
 }
