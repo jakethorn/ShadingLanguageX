@@ -1,0 +1,159 @@
+surfaceshader slx_standard_surface(
+    float base = 1,
+    color3 base_color = {0.8, 0.8, 0.8},
+    float diffuse_roughness = 0,
+    float metalness = 0,
+    float specular = 1,
+    color3 specular_color = {1, 1, 1},
+    float specular_roughness = 0.2,
+    float specular_IOR = 1.5,
+    float specular_anisotropy = 0,
+    float specular_rotation = 0,
+    float transmission = 0,
+    color3 transmission_color = {1, 1, 1},
+    float transmission_depth = 0,
+    color3 transmission_scatter = {0, 0, 0},
+    float transmission_scatter_anisotropy = 0,
+    float transmission_dispersion = 0,
+    float transmission_extra_roughness = 0,
+    float subsurface = 0,
+    color3 subsurface_color = {1, 1, 1},
+    color3 subsurface_radius = {1, 1, 1},
+    float subsurface_scale = 1,
+    float subsurface_anisotropy = 0,
+    float sheen = 0,
+    color3 sheen_color = {1, 1, 1},
+    float sheen_roughness = 0.3,
+    float coat = 0,
+    color3 coat_color = {1, 1, 1},
+    float coat_roughness = 0.1,
+    float coat_anisotropy = 0,
+    float coat_rotation = 0,
+    float coat_IOR = 1.5,
+    @defaultgeomprop "Nworld"
+    vec3 coat_normal,
+    float coat_affect_color = 0,
+    float coat_affect_roughness = 0,
+    float thin_film_thickness = 0,
+    float thin_film_IOR = 1.5,
+    float emission = 0,
+    color3 emission_color = {1, 1, 1},
+    color3 opacity = {1, 1, 1},
+    bool thin_walled = false,
+    @defaultgeomprop "Nworld"
+    vec3 normal,
+    @defaultgeomprop "Tworld"
+    vec3 tangent,
+)
+{
+    // Roughness influence by coat
+    // Calculate main specular roughness
+    float coat_affect_roughness_combined = coat_affect_roughness * coat * coat_roughness;
+    float coat_affected_roughness = mix(1.0, specular_roughness, coat_affect_roughness_combined);
+    vec2 main_roughness = roughness_anisotropy(coat_affected_roughness, specular_anisotropy);
+
+    // Calculate transmission roughness
+    float transmission_roughness_clamped = clamp(specular_roughness + transmission_extra_roughness);
+    float coat_affected_transmission_roughness = mix(1.0, transmission_roughness_clamped, coat_affect_roughness_combined);
+    vec2 transmission_roughness = roughness_anisotropy(coat_affected_transmission_roughness, specular_anisotropy);
+
+    // Tangent rotation
+    vec3 tangent_rotate = rotate3d(tangent, specular_rotation * 360.0, normal);
+    vec3 tangent_rotate_normalize = normalize(tangent_rotate);
+    vec3 main_tangent = if (specular_anisotropy > 0.0) { tangent_rotate_normalize } else { tangent };
+
+    // Coat tangent rotation
+    vec3 coat_tangent_rotate = rotate3d(tangent, coat_rotation * 360.0, coat_normal);
+    vec3 coat_tangent_rotate_normalize = normalize(coat_tangent_rotate);
+    vec3 coat_tangent = if (coat_anisotropy > 0.0) { coat_tangent_rotate_normalize } else { tangent };
+
+    // Colors influenced by coat ("coat gamma")
+    float coat_gamma = clamp(coat) * coat_affect_color + 1.0;
+    color3 coat_affected_diffuse_color = max(base_color, 0.0) ^ coat_gamma;
+    color3 coat_affected_subsurface_color = max(subsurface_color, 0.0) ^ coat_gamma;
+
+    // Diffuse/Subsurface Layer
+    BSDF diffuse_bsdf = oren_nayar_diffuse_bsdf(base, coat_affected_diffuse_color, diffuse_roughness, normal);
+    BSDF translucent_bsdf = translucent_bsdf(1.0, coat_affected_subsurface_color, normal);
+    BSDF subsurface_bsdf = subsurface_bsdf(1.0, coat_affected_subsurface_color, subsurface_radius * subsurface_scale, subsurface_anisotropy, normal);
+    BSDF selected_subsurface_bsdf = mix(translucent_bsdf, subsurface_bsdf, float{thin_walled});
+    BSDF subsurface_mix = mix(selected_subsurface_bsdf, diffuse_bsdf, subsurface);
+
+    // Sheen Layer
+    BSDF sheen_bsdf = sheen_bsdf(sheen, sheen_color, sheen_roughness, normal);
+    BSDF sheen_layer = layer(sheen_bsdf, subsurface_mix);
+
+    // Transmission Layer
+    BSDF transmission_bsdf = dielectric_bsdf(
+        weight = 1.0,
+        tint = transmission_color,
+        ior = specular_IOR,
+        roughness = transmission_roughness,
+        normal = normal,
+        tangent = main_tangent,
+        distribution = "ggx",
+        scatter_mode = "T",
+    );
+    BSDF transmission_mix = mix(transmission_bsdf, sheen_layer, transmission);
+
+    // Specular Layer
+    BSDF specular_bsdf = dielectric_bsdf(
+        weight = specular,
+        tint = specular_color,
+        ior = specular_IOR,
+        roughness = main_roughness,
+        normal = normal,
+        tangent = main_tangent,
+        distribution = "ggx",
+        scatter_mode = "R",
+        thinfilm_thickness = thin_film_thickness,
+        thinfilm_ior = thin_film_IOR,
+    );
+    BSDF specular_layer = layer(specular_bsdf, transmission_mix);
+
+    // Metal Layer
+    color3 metal_reflectivity = base_color * base;
+    color3 metal_edgecolor = specular_color * specular;
+    {color3 ior, color3 extinction} artistic_ior = artistic_ior(metal_reflectivity, metal_edgecolor);
+    BSDF metal_bsdf = conductor_bsdf(
+        weight = 1.0,
+        ior = artistic_ior.ior,
+        extinction = artistic_ior.extinction,
+        roughness = main_roughness,
+        normal = normal,
+        tangent = main_tangent,
+        distribution = "ggx",
+        thinfilm_thickness = thin_film_thickness,
+        thinfilm_ior = thin_film_IOR,
+    );
+    BSDF metalness_mix = mix(metal_bsdf, specular_layer, metalness);
+
+    // Coat Layer
+    color3 coat_attenuation = mix(coat_color, color3{1.0}, coat);
+    BSDF thin_film_layer_attenuated = metalness_mix * coat_attenuation;
+    vec2 coat_roughness_vector = roughness_anisotropy(coat_roughness, coat_anisotropy);
+    BSDF coat_bsdf = dielectric_bsdf(
+        weight = coat,
+        tint = color3{1.0},
+        ior = coat_IOR,
+        roughness = coat_roughness_vector,
+        normal = coat_normal,
+        tangent = coat_tangent,
+        distribution = "ggx",
+        scatter_mode = "R",
+    );
+    BSDF coat_layer = layer(coat_bsdf, thin_film_layer_attenuated);
+
+    // Emission Layer
+    float coat_ior_to_F0_sqrt = (1.0 - coat_IOR) / (1.0 + coat_IOR);
+    float coat_ior_to_F0 = coat_ior_to_F0_sqrt * coat_ior_to_F0_sqrt;
+    EDF emission_edf = uniform_edf(emission_color * emission);
+    EDF coat_tinted_emission_edf = emission_edf * coat_color;
+    color3 emission_color0 = color3{1.0 - coat_ior_to_F0};
+    EDF coat_emission_edf = generalized_schlick_edf(emission_color0, color3{0.0}, 5.0, coat_tinted_emission_edf);
+    EDF blended_coat_emission_edf = mix(coat_emission_edf, emission_edf, coat);
+
+    // Surface construction with opacity
+    // Node <surface> only supports monochromatic opacity so use the luminance of input opacity color
+    return surface(coat_layer, blended_coat_emission_edf, luminance(opacity)[0]);
+}
