@@ -148,10 +148,10 @@ FunctionQuery::Result FunctionQuery::arguments_match(const FuncPtr& func) const
     const ParameterList& params = func->parameters();
     for (const Argument& arg : *args)
     {
-        if (not arg.is_initialized())
-            continue;
         if (not params.contains(arg))
             return Result::NoMatch;
+        if (not arg.is_initialized())
+            continue;
         const TypePtr param_type = params[arg].type();
         if (not param_type->is_compatible(arg.type()))
             return Result::NoMatch;

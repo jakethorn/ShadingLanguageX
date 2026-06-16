@@ -1,0 +1,12 @@
+mutable float a = 1.0;
+
+inline void foo(float b = a)
+{
+    a = b + 1;
+}
+
+foo();
+foo();
+foo();
+foo();
+foo();

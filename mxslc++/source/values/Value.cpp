@@ -15,6 +15,11 @@ Value::Value(TypePtr type) : type_{std::move(type)}
     assert(type_->is_primitive());
 }
 
+void Value::set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const
+{
+    mx::InputPtr input = node_def->addInput(input_name, type_->name());
+}
+
 void Value::set_as_node_input(const mx::NodePtr& node, const string& input_name) const
 {
     const mx::InputPtr input = add_or_get_input(node, type_->name(), input_name);

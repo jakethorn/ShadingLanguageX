@@ -13,6 +13,11 @@ ExprPtr RuntimeUtils::function_call(string func_name, ArgumentList args)
     return std::make_unique<FunctionCall>(std::move(func_name), std::move(args));
 }
 
+ExprPtr RuntimeUtils::function_call(string func_name, ArgumentList args, Token token)
+{
+    return std::make_unique<FunctionCall>(std::move(func_name), std::move(args), std::move(token));
+}
+
 ExprPtr RuntimeUtils::named_constructor(string ctor_name, ArgumentList args)
 {
     return std::make_unique<NamedConstructor>(std::move(ctor_name), std::move(args));

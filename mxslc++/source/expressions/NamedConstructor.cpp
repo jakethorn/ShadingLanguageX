@@ -32,7 +32,7 @@ ExprPtr NamedConstructor::instantiate_template_types(const TypePtr& template_typ
 void NamedConstructor::init_impl(const vector<TypePtr>& types)
 {
     const TypePtr type = scope().get_type(name_);
-    func_call_ = RuntimeUtils::function_call("__" + type->name() + "__", std::move(args_));
+    func_call_ = RuntimeUtils::function_call("__" + type->name() + "__", std::move(args_), token_);
     func_call_->init(type);
 }
 

@@ -750,9 +750,9 @@ ExprPtr Parser::method_call(ExprPtr instance)
 
 ExprPtr Parser::named_constructor()
 {
-    Token type = match(TokenType::Identifier);
+    Token type_name = match(TokenType::Identifier);
     vector<Argument> arguments = list<Argument>('{', '}', [this](const size_t i) { return argument(i); });
-    return std::make_unique<NamedConstructor>(std::move(type), std::move(arguments));
+    return std::make_unique<NamedConstructor>(string{type_name.lexeme()}, std::move(arguments), std::move(type_name));
 }
 
 ExprPtr Parser::unnamed_constructor()

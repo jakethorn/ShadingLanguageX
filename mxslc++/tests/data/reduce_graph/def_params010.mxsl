@@ -1,0 +1,7 @@
+float foo(vec2 v = {1, 0})
+{
+    return v[0] + v[1];
+}
+
+float f1 = foo();
+float f2 = foo({0, 1});

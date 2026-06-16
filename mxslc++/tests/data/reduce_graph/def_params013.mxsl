@@ -1,0 +1,14 @@
+mutable float a = 1.0;
+
+inline float foo(vec2 v = {a, 0})
+{
+    return v[0] + v[1];
+}
+
+float f1 = foo();
+float f2 = foo({0, a});
+a = 2.0;
+float f3 = foo();
+float f4 = foo({0, a});
+randomfloat(min=f1, max=f2);
+randomfloat(min=f3, max=f4);

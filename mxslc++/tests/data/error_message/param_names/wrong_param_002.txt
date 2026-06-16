@@ -1,1 +1,3 @@
-wrong_param_002.mxsl, line 6: Parameter not found: c
+wrong_param_002.mxsl, line 6: Matching definition could not be found for function 'foo'
+Possible matches:
+integer foo(integer a, integer b)

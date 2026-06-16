@@ -27,7 +27,7 @@ void IndexingOperator::init_impl(const vector<TypePtr>& types)
 {
     if (value_expr_->type()->is_primitive())
     {
-        accessor_ = std::make_unique<ComponentAccessor>(std::move(value_expr_), std::move(index_expr_));
+        accessor_ = std::make_unique<ComponentAccessor>(value_expr_, index_expr_);
     }
     else
     {
