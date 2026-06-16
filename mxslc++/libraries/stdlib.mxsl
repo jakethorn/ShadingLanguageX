@@ -34,6 +34,11 @@ inline T __add__<vector2, vector3, vector4, color3, color4, matrix33, matrix44>(
     return add(in2, in1);
 }
 
+inline T __add__<BSDF, EDF, VDF>(T in1, T in2)
+{
+    return add(in1, in2);
+}
+
 //
 // __sub__
 //
@@ -97,6 +102,16 @@ inline integer __mul__(integer in1, integer in2)
     float f_in1 = convert(in1);
     float f_in2 = convert(in2);
     return round(multiply(f_in1, f_in2));
+}
+
+inline T __mul__<BSDF, VDF, EDF>(T in1, float in2)
+{
+    return multiply(in1, in2);
+}
+
+inline T __mul__<BSDF, VDF, EDF>(T in1, color3 in2)
+{
+    return multiply(in1, in2);
 }
 
 //
