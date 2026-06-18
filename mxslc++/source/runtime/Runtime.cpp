@@ -7,16 +7,17 @@
 #include "Scope.h"
 #include "mtlx/load_mtlx.h"
 #include "CompileError.h"
+#include "Variable.h"
 #include "utils/io_utils.h"
 
 std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-Runtime::Runtime() : Runtime{std::make_unique<Scope>(), MtlXSerializer{}}
+Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, std::make_unique<Scope>(), MtlXSerializer{}}
 {
 
 }
 
-Runtime::Runtime(ScopePtr scope, MtlXSerializer serializer) : scope_{std::move(scope)}, serializer_{std::move(serializer)}
+Runtime::Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer) : opts_{opts}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
 {
     scope_->set_graph(serializer_.document(), nullptr);
 }
@@ -35,12 +36,12 @@ namespace
     }
 }
 
-Runtime& Runtime::create(const optional<fs::path>& src_path, const string& version, const bool reduce_graph)
+Runtime& Runtime::create(const optional<fs::path>& src_path, const CompileOptions& opts)
 {
-    instance_ = std::make_unique<Runtime>();
+    instance_ = std::make_unique<Runtime>(opts);
     instance_->include_dirs_ = get_include_directories(src_path);
-    instance_->serializer_.set_reduce_graph(reduce_graph);
-    instance_->load_materialx_library(version);
+    instance_->serializer_.set_reduce_graph(opts.reduce_graph);
+    instance_->load_materialx_library(opts.version);
     return *instance_;
 }
 
@@ -49,6 +50,21 @@ Runtime& Runtime::get()
     if (instance_ == nullptr)
         throw CompileError{"Runtime not created"s};
     return *instance_;
+}
+
+VarPtr Runtime::global(const string& name) const
+{
+    for (const mxslc::Variable& global : opts_.globals)
+    {
+        if (global.name() == name)
+        {
+            used_globals.push_back(name);
+            return Variable::create(global);
+        }
+    }
+    if (opts_.error_on_missing_globals)
+        throw CompileError{"Missing global variable: " + name};
+    return nullptr;
 }
 
 void Runtime::load_materialx_library(const string& version)
@@ -75,4 +91,16 @@ void Runtime::exit_scope()
 MtlXSerializer& Runtime::serializer()
 {
     return serializer_;
+}
+
+void Runtime::destroy() const
+{
+    if (not opts_.error_on_unused_globals)
+        return;
+
+    for (const mxslc::Variable& global : opts_.globals)
+    {
+        if (not contains(used_globals, global.name()))
+            throw CompileError{"Unused global variable: " + global.name()};
+    }
 }

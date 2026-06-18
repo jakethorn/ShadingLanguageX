@@ -39,8 +39,8 @@ using std::variant;
 using std::unordered_map;
 using std::unordered_set;
 
+namespace fs = std::filesystem;
 namespace py = pybind11;
-
 namespace mx = MaterialX;
 
 #endif //MXSLC_PYTHON_COMMON_H

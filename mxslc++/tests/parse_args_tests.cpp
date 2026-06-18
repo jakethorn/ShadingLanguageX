@@ -72,6 +72,8 @@ TEST(parse_args_tests, test_options_001)
     ASSERT_EQ(args.options.output_file, output_filepath);
     ASSERT_EQ(args.options.version, DEFAULT_MTLX_VERSION);
     ASSERT_TRUE(args.options.reduce_graph);
+    ASSERT_TRUE(args.options.error_on_missing_globals);
+    ASSERT_TRUE(args.options.error_on_unused_globals);
 }
 
 TEST(parse_args_tests, test_options_002)
@@ -87,6 +89,8 @@ TEST(parse_args_tests, test_options_002)
     ASSERT_EQ(args.options.output_file, output_filepath);
     ASSERT_EQ(args.options.version, "1.38.10"s);
     ASSERT_TRUE(args.options.reduce_graph);
+    ASSERT_TRUE(args.options.error_on_missing_globals);
+    ASSERT_TRUE(args.options.error_on_unused_globals);
 }
 
 TEST(parse_args_tests, test_options_003)
@@ -101,6 +105,8 @@ TEST(parse_args_tests, test_options_003)
     ASSERT_FALSE(args.options.output_file);
     ASSERT_EQ(args.options.version, "1.38.10"s);
     ASSERT_TRUE(args.options.reduce_graph);
+    ASSERT_TRUE(args.options.error_on_missing_globals);
+    ASSERT_TRUE(args.options.error_on_unused_globals);
 }
 
 TEST(parse_args_tests, test_options_004)
@@ -115,6 +121,8 @@ TEST(parse_args_tests, test_options_004)
     ASSERT_FALSE(args.options.output_file);
     ASSERT_EQ(args.options.version, DEFAULT_MTLX_VERSION);
     ASSERT_FALSE(args.options.reduce_graph);
+    ASSERT_TRUE(args.options.error_on_missing_globals);
+    ASSERT_TRUE(args.options.error_on_unused_globals);
 }
 
 TEST(parse_args_tests, test_bad_options_001)
@@ -219,7 +227,6 @@ TEST(parse_args_tests, test_bad_response_file)
 TEST(parse_args_tests, test_options_005)
 {
     const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
-    const fs::path output_filepath = get_test_data("parse_args_tests/001.mtlx"s);
 
     const vector argv{ EXECUTABLE, input_filepath.string(), "--func"s, "main"s, "--args"s, "3.4"s };
     const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
@@ -271,4 +278,71 @@ TEST(parse_args_tests, test_response_file_006)
 
     ASSERT_TRUE(std::holds_alternative<int>(args.options.func_args[2]));
     ASSERT_EQ(std::get<int>(args.options.func_args[2]), 123);
+}
+
+TEST(parse_args_tests, test_global_options)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "-g", "x", "1.0", "y", "\"hello\"", "--globals", "z", "2.0", "w", "\"world\"", "-g", "u", "10" };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+
+    ASSERT_TRUE(args.options.error_on_missing_globals);
+    ASSERT_TRUE(args.options.error_on_unused_globals);
+
+    ASSERT_EQ(args.options.globals.size(), 5);
+    ASSERT_EQ(args.options.globals[0].name(), "x");
+    ASSERT_EQ(args.options.globals[1].name(), "y");
+    ASSERT_EQ(args.options.globals[2].name(), "z");
+    ASSERT_EQ(args.options.globals[3].name(), "w");
+    ASSERT_EQ(args.options.globals[4].name(), "u");
+
+    ASSERT_TRUE(std::holds_alternative<float>(args.options.globals[0].value()));
+    ASSERT_FLOAT_EQ(std::get<float>(args.options.globals[0].value()), 1.0);
+
+    ASSERT_TRUE(std::holds_alternative<string>(args.options.globals[1].value()));
+    ASSERT_EQ(std::get<string>(args.options.globals[1].value()), "hello");
+
+    ASSERT_TRUE(std::holds_alternative<float>(args.options.globals[2].value()));
+    ASSERT_FLOAT_EQ(std::get<float>(args.options.globals[2].value()), 2.0);
+
+    ASSERT_TRUE(std::holds_alternative<string>(args.options.globals[3].value()));
+    ASSERT_EQ(std::get<string>(args.options.globals[3].value()), "world");
+
+    ASSERT_TRUE(std::holds_alternative<int>(args.options.globals[4].value()));
+    ASSERT_EQ(std::get<int>(args.options.globals[4].value()), 10);
+}
+
+TEST(parse_args_tests, test_global_error_options)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "--missing-globals-ok", "--unused-globals-ok" };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+    ASSERT_FALSE(args.options.error_on_missing_globals);
+    ASSERT_FALSE(args.options.error_on_unused_globals);
+}
+
+TEST(parse_args_tests, test_bad_global_options_1)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "-g", "x", "-f", "main" };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_FALSE(args.is_valid);
+}
+
+TEST(parse_args_tests, test_bad_global_options_2)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "-g", "x", "_" };
+    const mxslc::CommandLineArgs args = mxslc::parse_args(argv);
+
+    ASSERT_FALSE(args.is_valid);
 }

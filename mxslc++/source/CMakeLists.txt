@@ -79,6 +79,7 @@ add_library(mxslc_lib
         values/InterfaceValue.cpp
         values/OutputValue.cpp
         values/BasicValue.cpp
+        interface/Variable.cpp
 )
 
 set_target_properties(mxslc_lib PROPERTIES

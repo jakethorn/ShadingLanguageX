@@ -57,7 +57,7 @@ public:
     size_t component_count() const;
 
     template<typename T>
-    bool is() const { return name_ == TypeName::get<T>(); }
+    bool is() const { return name_ == TypeName::of<T>(); }
     bool is_void() const { return name_ == TypeName::Void; }
     bool is_auto() const { return name_ == TypeName::Auto; }
     bool is_primitive() const { return has_name() and not has_fields(); }
@@ -93,9 +93,10 @@ public:
     static TypePtr Auto;
 
     template<typename T>
-    static TypePtr of() { return resolve(TypeName::get<T>()); }
-    static TypePtr of(const primitive_t& val);
-    static TypePtr of(const mx::TypedElementPtr& val);
+    static TypePtr of() { return resolve(TypeName::of<T>()); }
+    static TypePtr of(const primitive_t& value) { return resolve(TypeName::of(value)); }
+    static TypePtr of(const mx::TypedElementPtr& value);
+    static TypePtr of(const mxslc::Variable& var);
     static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
     static string to_string(const vector<TypePtr>& types);
 

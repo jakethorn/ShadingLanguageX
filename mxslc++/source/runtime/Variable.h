@@ -20,6 +20,7 @@ public:
 
     bool is_const() const;
     bool is_mutable() const;
+    bool is_global() const;
     const ModifierList& modifiers() const;
     void set_modifiers(ModifierList mods);
 
@@ -60,7 +61,7 @@ public:
     {
         if (const shared_ptr<BasicValue>& value = std::dynamic_pointer_cast<BasicValue>(value_))
             return value->get<T>();
-        throw CompileError{"Value is not a compile-time "s + TypeName::get<T>()};
+        throw CompileError{"Value is not a compile-time "s + TypeName::of<T>()};
     }
 
     static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
@@ -77,6 +78,8 @@ public:
     static VarPtr create(ValuePtr value);
     static VarPtr create(primitive_t value);
     static VarPtr create(const VarPtr& value);
+
+    static VarPtr create(const mxslc::Variable& var);
 
 protected:
     virtual ValuePtr value_impl() const { return value_; }

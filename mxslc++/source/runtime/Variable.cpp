@@ -26,6 +26,11 @@ bool Variable::is_mutable() const
     return mods_.contains(TokenType::Mutable);
 }
 
+bool Variable::is_global() const
+{
+    return mods_.contains(TokenType::Global);
+}
+
 const ModifierList& Variable::modifiers() const
 {
     return mods_;
@@ -341,6 +346,18 @@ VarPtr Variable::create(primitive_t value)
 VarPtr Variable::create(const VarPtr& value)
 {
     return create(ModifierList{}, value->type(), value);
+}
+
+VarPtr Variable::create(const mxslc::Variable& var)
+{
+    if (var.has_value())
+        return create(var.value());
+    vector<VarPtr> children;
+    children.reserve(var.children().size());
+    for (const mxslc::VariablePtr& child : var.children())
+        children.emplace_back(create(*child));
+    TypePtr type = scope().resolve_type(Type::of(var));
+    return create(std::move(type), children);
 }
 
 void Variable::copy_value(ValuePtr value)

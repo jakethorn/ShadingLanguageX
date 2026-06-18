@@ -180,8 +180,9 @@ StmtPtr Parser::variable_definition(ModifierList mods, TypePtr type)
     return std::make_unique<VariableDefinition>(
         std::move(mods),
         std::move(type),
-        std::move(name),
-        std::move(expr)
+        string{name.lexeme()},
+        std::move(expr),
+        std::move(name)
     );
 }
 
@@ -189,30 +190,31 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
 {
     vector<Field> fields;
     Token name = match(TokenType::Identifier);
-    fields.emplace_back(std::move(mods), std::move(type_), std::move(name));
+    Token token{name};
+    fields.emplace_back(std::move(mods), std::move(type_), std::move(name), /*can_be_global*/true);
     while (consume(','))
     {
-        if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '='))
+        if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '=' or peek(1) == ';'))
         {
             name = match(TokenType::Identifier);
-            fields.emplace_back(fields.back().modifiers(), fields.back().type(), std::move(name));
+            fields.emplace_back(fields.back().modifiers(), fields.back().type(), std::move(name), /*can_be_global*/true);
         }
         else
         {
             mods = modifiers();
             type_ = type();
             name = match(TokenType::Identifier);
-            fields.emplace_back(std::move(mods), std::move(type_), std::move(name));
+            fields.emplace_back(std::move(mods), std::move(type_), std::move(name), /*can_be_global*/true);
         }
     }
-    Token token = match('=');
-    ExprPtr expr = expression();
+
+    ExprPtr expr = consume('=') ? expression() : nullptr;
     match(';');
 
     return std::make_unique<MultiVariableDefinition>(
-        std::move(token),
         std::make_unique<Type>(std::move(fields)),
-        std::move(expr)
+        std::move(expr),
+        std::move(token)
     );
 }
 

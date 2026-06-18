@@ -13,28 +13,34 @@
 class Runtime
 {
 public:
-    Runtime();
-    Runtime(ScopePtr scope, MtlXSerializer serializer);
+    explicit Runtime(const CompileOptions& opts);
+    Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer);
 
-    static Runtime& create(const optional<fs::path>& src_path, const string& version, bool reduce_graph);
+    static Runtime& create(const optional<fs::path>& src_path, const CompileOptions& opts);
     static Runtime& get();
 
-    const vector<fs::path>& include_directories() { return include_dirs_; }
+    VarPtr global(const string& name) const;
+    const vector<fs::path>& include_directories() const { return include_dirs_; }
 
     void load_materialx_library(const string& version);
     mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
     Scope& scope();
-    void enter_scope(string name = ""s);
+    void enter_scope(string name = "");
     void exit_scope();
 
     MtlXSerializer& serializer();
 
+    void destroy() const;
+
 private:
+    const CompileOptions& opts_;
     vector<fs::path> include_dirs_;
     mx::DocumentPtr mtlx_lib_;
     ScopePtr scope_;
     MtlXSerializer serializer_;
+
+    mutable vector<string> used_globals;
 
     static unique_ptr<Runtime> instance_;
 };

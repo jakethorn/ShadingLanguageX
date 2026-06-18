@@ -11,7 +11,8 @@
 class MultiVariableDefinition final : public Statement
 {
 public:
-    MultiVariableDefinition(Token token, TypePtr type, ExprPtr expr);
+    MultiVariableDefinition(TypePtr type, ExprPtr expr);
+    MultiVariableDefinition(TypePtr type, ExprPtr expr, Token token);
 
     void set_attributes(AttributeList attrs) override;
 

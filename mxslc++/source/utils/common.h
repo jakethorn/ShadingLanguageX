@@ -18,14 +18,23 @@
 #include <filesystem>
 #include <MaterialXCore/Node.h>
 
+#include "CompileError.h"
+#include "CompileOptions.h"
+#include "parse_args.h"
+#include "primitive_t.h"
+#include "Span.h"
+
+using mxslc::CompileError;
+using mxslc::CompileOptions;
+using mxslc::CommandLineArgs;
+using mxslc::primitive_t;
+using mxslc::Span;
+
 // namespaces
 namespace fs = std::filesystem;
 namespace mx = MaterialX;
 
 using namespace std::string_literals;
-
-namespace mxslc { }
-using namespace mxslc;
 
 using std::unique_ptr;
 using std::shared_ptr;

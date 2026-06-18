@@ -13,10 +13,19 @@ class Field
     friend class Scope;
 
 public:
-    Field(ModifierList mods, TypePtr type, string name)
+    Field(TypePtr type, string name)
+        : type_{std::move(type)}, name_{std::move(name)}
+    {
+
+    }
+
+    Field(ModifierList mods, TypePtr type, string name, bool can_be_global = false)
         : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}
     {
-        mods_.validate(TokenType::Const, TokenType::Mutable);
+        if (can_be_global)
+            mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global);
+        else
+            mods_.validate(TokenType::Const, TokenType::Mutable);
     }
 
     explicit Field(TypePtr type) : Field{ModifierList{}, std::move(type), ""s} { }
@@ -24,6 +33,7 @@ public:
     const ModifierList& modifiers() const { return mods_; }
     bool is_const() const { return mods_.contains(TokenType::Const); }
     bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
+    bool is_global() const { return mods_.contains(TokenType::Global); }
     TypePtr type() const { return type_; }
     bool has_name() const { return not name_.empty(); }
     const string& name() const { return name_; }

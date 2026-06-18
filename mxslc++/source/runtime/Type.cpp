@@ -237,27 +237,21 @@ string Type::str() const
     return result;
 }
 
-TypePtr Type::of(const primitive_t& val)
+TypePtr Type::of(const mx::TypedElementPtr& value)
 {
-#define type_of(t, p) if (std::holds_alternative<t>(val)) return p;
-    type_of(bool, Bool);
-    type_of(int, Int);
-    type_of(float, Float);
-    type_of(string, String);
-    type_of(mx::Vector2, Vec2);
-    type_of(mx::Vector3, Vec3);
-    type_of(mx::Vector4, Vec4);
-    type_of(mx::Color3, Color3);
-    type_of(mx::Color4, Color4);
-    type_of(mx::Matrix33, Mat3);
-    type_of(mx::Matrix44, Mat4);
-#undef type_of
-    throw std::runtime_error{"Invalid primitive value"};
+    return resolve(value->getType());
 }
 
-TypePtr Type::of(const mx::TypedElementPtr& val)
+TypePtr Type::of(const mxslc::Variable& var)
 {
-    return resolve(val->getType());
+    if (var.has_type())
+        return std::make_shared<Type>(var.type());
+    vector<Field> fields;
+    fields.reserve(var.children().size());
+    for (const mxslc::VariablePtr& child : var.children())
+        fields.emplace_back(of(*child), child->name());
+    TypePtr type = std::make_shared<Type>(std::move(fields));
+    return type;
 }
 
 TypePtr Type::unnamed_struct(TypePtr field_type, const size_t field_count)

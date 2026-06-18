@@ -42,7 +42,7 @@ public:
     {
         if (is<T>())
             return std::get<T>(val_);
-        throw CompileError{"Trying to access a value of type " + type_name() + " as a " + TypeName::get<T>()};
+        throw CompileError{"Trying to access a value of type " + type_name() + " as a " + TypeName::of<T>()};
     }
 
 private:
