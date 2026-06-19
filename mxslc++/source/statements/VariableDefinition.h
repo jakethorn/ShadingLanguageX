@@ -13,7 +13,8 @@
 class VariableDefinition final : public Statement
 {
 public:
-    VariableDefinition(ModifierList mods, TypePtr type, Token name, ExprPtr expr);
+    VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr);
+    VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token);
     ~VariableDefinition() override;
 
     void set_attributes(AttributeList attrs) override;
@@ -30,6 +31,7 @@ protected:
 private:
     ModifierList mods_;
     TypePtr type_;
+    string name_;
     ExprPtr expr_;
 };
 

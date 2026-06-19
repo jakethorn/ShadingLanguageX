@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="node1" type="vector3">
+    <input name="space" type="string" value="world" />
+  </position>
+  <subtract name="node2" type="vector3">
+    <input name="in1" type="vector3" value="0, 10, 0" />
+    <input name="in2" type="vector3" nodename="node1" />
+  </subtract>
+  <normalize name="node3" type="vector3">
+    <input name="in" type="vector3" nodename="node2" />
+  </normalize>
+  <normalize name="node4" type="vector3">
+    <input name="in" type="vector3" value="0, -1, 0" />
+  </normalize>
+  <dotproduct name="node5" type="float">
+    <input name="in1" type="vector3" nodename="node3" />
+    <input name="in2" type="vector3" nodename="node4" />
+  </dotproduct>
+  <convert name="node6" type="color3">
+    <input name="in" type="float" nodename="node5" />
+  </convert>
+</materialx>

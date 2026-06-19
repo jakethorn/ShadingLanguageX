@@ -6,11 +6,19 @@
 
 #include "runtime/Scope.h"
 #include "expressions/Expression.h"
+#include "expressions/RuntimeExpression.h"
+#include "runtime/Runtime.h"
 #include "runtime/Variable.h"
 #include "values/ValueFactory.h"
 
-VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, Token name, ExprPtr expr)
-    : Statement{std::move(name)}, mods_{std::move(mods)}, type_{std::move(type)}, expr_{std::move(expr)}
+VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr)
+    : VariableDefinition{std::move(mods), std::move(type), std::move(name), std::move(expr), Token{}}
+{
+
+}
+
+VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token)
+    : Statement{std::move(token)}, mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, expr_{std::move(expr)}
 {
 
 }
@@ -27,7 +35,7 @@ StmtPtr VariableDefinition::instantiate_template_types(const TypePtr& template_t
 {
     TypePtr type = type_->instantiate_template_types(template_type);
     ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
-    return std::make_unique<VariableDefinition>(mods_, std::move(type), token_, std::move(expr));
+    return std::make_unique<VariableDefinition>(mods_, std::move(type), name_, std::move(expr), token_);
 }
 
 TypePtr VariableDefinition::type() const
@@ -37,24 +45,37 @@ TypePtr VariableDefinition::type() const
 
 const string& VariableDefinition::name() const
 {
-    return token_.lexeme();
+    return name_;
 }
 
 void VariableDefinition::execute_impl() const
 {
     TypePtr type = scope().resolve_type(type_);
-
     VarPtr value;
-    if (expr_)
+
+    if (mods_.contains(TokenType::Global))
     {
-        expr_->init(type);
-        value = expr_->evaluate();
+        if (VarPtr global = runtime().global(name_))
+        {
+            const ExprPtr value_expr = std::make_shared<RuntimeExpression>(std::move(global));
+            value_expr->init(type);
+            value = value_expr->evaluate();
+        }
     }
-    else
+
+    if (value == nullptr)
     {
-        value = ValueFactory::create_default_value(type);
+        if (expr_)
+        {
+            expr_->init(type);
+            value = expr_->evaluate();
+        }
+        else
+        {
+            value = ValueFactory::create_default_value(type);
+        }
     }
 
     const VarPtr var = Variable::create(mods_, std::move(type), value);
-    var->add_to_scope(name());
+    var->add_to_scope(name_);
 }

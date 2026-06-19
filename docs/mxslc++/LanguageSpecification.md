@@ -244,7 +244,7 @@ vec2 v2 = foo({3.0, 4.0});
 ```
 
 Otherwise, variables will need to be explicitly converted using a 
-[Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#named-constructor).
+[Named Constructor](#named-constructor).
 
 ```
 float x = 0;                 // implicit int ➔ float
@@ -257,9 +257,9 @@ color3 c = color3{1.0};      // explicit float ➔ color3
 > ## User-Defined Types
 >
 > ShadingLanguageX supports user-defined types through
-> [Unnamed Structs](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#unnamed-struct),
-> [Using Statements](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#using-statement) and
-> [Class Definitions](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#class-definition). For example:
+> [Unnamed Structs](#unnamed-struct),
+> [Using Statements](#using-statement) and
+> [Class Definitions](#class-definition). For example:
 > ```
 > // unnamed struct
 > {float, float} random_point()
@@ -381,9 +381,9 @@ Literals represent the fundamental data used by the system.
 | `string`   | `"tangent"` `"my_image.png"`           |
 
 See 
-[Named Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#named-constructor) 
+[Named Constructor](#named-constructor) 
 and
-[Unnamed Constructor](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#unnamed-constructor)
+[Unnamed Constructor](#unnamed-constructor)
 for information on how to initialise vectors, colors and user-defined data types.
 
 # Identifiers
@@ -486,30 +486,28 @@ The dot operator is used to either access the fields or methods of a variable, p
 or access an underlying node port. Which of these operations is performed is determined by the type of the variable and its
 underlying value.
 
-> [!TIP]
-> ### New in mxslc++!
-> ### Field Access
-> 
-> If the variable is a user-defined type, the dot operator can be used to access the fields or methods of that variable. For example:
-> 
-> ```
-> class Point
-> {
->     float x;
->     float y;
->     
->     float distance_to(Point other)
->     {
->         return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
->     }
-> }
-> 
-> Point p = {1.0, 2.0};
-> Point q = {3.0, 4.0};
-> float d = p.distance_to(q);
-> ```
+### Field Access
 
-See [User-Defined Types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#user-defined-types) for more information.
+If the variable is a user-defined type, the dot operator can be used to access the fields or methods of that variable. For example:
+
+```
+class Point
+{
+    float x;
+    float y;
+    
+    float distance_to(Point other)
+    {
+        return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    }
+}
+
+Point p = {1.0, 2.0};
+Point q = {3.0, 4.0};
+float d = p.distance_to(q);
+```
+
+See [User-Defined Types](#user-defined-types) for more information.
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -711,65 +709,138 @@ x = 2; // Error
 ```
 
 This isn't particularly useful for primitive data types (except to improve readability of the code) as variables are immutable by default in ShadingLanguageX, but it has some use cases
-with [user-defined types](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md#user-defined-types).
+with [user-defined types](#user-defined-types).
 
-> [!WARNING]
-> ### Not yet supported in mxslc++
-> ### Global
-> 
-> The global keyword operates similarly to `uniform` from GLSL. Global variables do not require an initial value and are instead initialized by user-defined values passed to the compiler. For example:
-> ```
-> global filename albedo_path;
-> global color3 tint;
-> auto c = image<color3>(albedo_path) * tint;
-> ```
-> ```python
-> from pathlib import Path
-> import MaterialX as mx
-> import mxslc
-> globals = {
->     "albedo_path": Path(r"../brick.png"),
->     "tint": mx.Color3(1.0, 0.0, 0.0)
-> }
-> mxslc.compile_file("globals_example.mxsl", globals=globals)
-> ```
-> ```xml
-> <?xml version="1.0"?>
-> <materialx version="1.39">
->     <image name="node11" type="color3">
->         <input name="file" type="filename" value="..\brick.png" />
->     </image>
->     <multiply name="c" type="color3">
->         <input name="in1" type="color3" nodename="node11" />
->         <input name="in2" type="color3" value="1, 0, 0" />
->     </multiply>
-> </materialx>
-> ```
+### Global
 
-> [!TIP]
-> ### New in mxslc++!
-> ## Multi-Variable Definition
-> 
-> When returning a variable with a user-defined type from a function, the variable can either be bound to a single variable of the custom
-> data type or split into its individual components. For example:
-> 
-> ```
-> using Point = {float, float};
-> 
-> Point randompoint()
-> {
->     return {randomfloat(), randomfloat()}; 
-> }
-> 
-> 
-> Point p = randompoint();
-> 
-> // OR
-> float x, float y = randompoint();
-> 
-> // OR (only if x and y share the same type)
-> float x, y = randompoint();
-> ```
+The global modifier operates similarly to `uniform` from GLSL. Essentially, they allow users to pass values into 
+ShadingLanguageX as the code is being compiled, either from the command line or the C++/Python APIs (see the 
+[User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/UserGuide.md) for more information). For example:
+
+### Example 1
+
+```
+global filename albedo_path;
+global color3 tint;
+color3 c = image(albedo_path) * tint;
+```
+```python
+from pathlib import Path
+import MaterialX as mx
+import mxslc
+
+opts = mxslc.CompileOptions(globals = [
+    mxslc.Variable("albedo_path", Path("../brick.png")),
+    mxslc.Variable("tint", mx.Color3(1, 0, 0))
+])
+
+mxslc.compile_file_to_file("example_1.mxsl", opts)
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+    <image name="node1" type="color3">
+        <input name="file" type="filename" value="..\brick.png" />
+    </image>
+    <multiply name="node2" type="color3">
+        <input name="in1" type="color3" nodename="node1" />
+        <input name="in2" type="color3" value="1, 0, 0" />
+    </multiply>
+</materialx>
+```
+
+### Example 2
+
+```
+global {
+    vec3 pos,
+    vec3 dir,
+    string space
+} light0;
+
+vec3 to_light = normalize(light0.pos - position(light0.space));
+float intensity = dotproduct(to_light, normalize(light0.dir));
+color3 c = color3{intensity};
+```
+```python
+import MaterialX as mx
+import mxslc
+
+pos = mxslc.Variable("pos", mx.Vector3(0, 10, 0))
+dir = mxslc.Variable("dir", mx.Vector3(0, -1, 0))
+space = mxslc.Variable("space", "world")
+light0 = mxslc.Variable("light0", [pos, dir, space]) 
+
+opts = mxslc.CompileOptions(globals = [light0])
+
+mxslc.compile_file_to_file("example_2.mxsl", opts)
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="node1" type="vector3">
+    <input name="space" type="string" value="world" />
+  </position>
+  <subtract name="node2" type="vector3">
+    <input name="in1" type="vector3" value="0, 10, 0" />
+    <input name="in2" type="vector3" nodename="node1" />
+  </subtract>
+  <normalize name="node3" type="vector3">
+    <input name="in" type="vector3" nodename="node2" />
+  </normalize>
+  <normalize name="node4" type="vector3">
+    <input name="in" type="vector3" value="0, -1, 0" />
+  </normalize>
+  <dotproduct name="node5" type="float">
+    <input name="in1" type="vector3" nodename="node3" />
+    <input name="in2" type="vector3" nodename="node4" />
+  </dotproduct>
+  <convert name="node6" type="color3">
+    <input name="in" type="float" nodename="node5" />
+  </convert>
+</materialx>
+```
+
+## Multi-Variable Definition
+
+Multiple variables can be defined in a single statement. For example:
+
+```
+float a, int b, string c;
+```
+
+Use the following syntax to also initialise them:
+
+```
+float a, int b, string c = {1.0, 2, "hello"};
+```
+
+If all variables share the same modifiers and type, the syntax can be simplified to:
+
+```
+float a, b, c = {1.0, 2.0, 3.0};
+```
+
+Functions that return multiple variables can also be used for initialisation:
+
+```
+float u, v = separate2(texcoord());
+```
+
+```
+using Point = {float, float};
+
+Point randompoint()
+{
+    return {randomfloat(), randomfloat()}; 
+}
+
+Point p = randompoint();
+// OR
+float x, float y = randompoint();
+// OR
+float x, y = randompoint();
+```
 
 # Variable Assignment
 

@@ -1,0 +1,2 @@
+types010.mxsl, line 1: Either all type fields must be named or none them
+Type: {float a, b, string c}

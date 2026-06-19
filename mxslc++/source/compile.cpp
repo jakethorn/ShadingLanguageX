@@ -61,7 +61,7 @@ namespace
 
     mx::DocumentPtr compile_to_document(vector<Token> tokens, const optional<fs::path>& src_path, const CompileOptions& opts)
     {
-        Runtime& runtime = Runtime::create(src_path, opts.version, opts.reduce_graph);
+        Runtime& runtime = Runtime::create(src_path, opts);
         {
             runtime.enter_scope();
             compile_mxsl_stdlib();

@@ -26,7 +26,7 @@ public:
     inline static string Auto = "auto";
 
     template<typename T>
-    static const string& get()
+    static const string& of()
     {
         if constexpr (std::is_same_v<T, bool>) return Bool;
         if constexpr (std::is_same_v<T, int>) return Int;
@@ -41,6 +41,25 @@ public:
         if constexpr (std::is_same_v<T, mx::Matrix44>) return Mat4;
         if constexpr (std::is_same_v<T, void>) return Void;
         throw std::runtime_error("Unknown type");
+    }
+
+    static const string& of(const primitive_t& value)
+    {
+#define type_of(t, p) if (std::holds_alternative<t>(value)) return p;
+        type_of(bool, Bool);
+        type_of(int, Int);
+        type_of(float, Float);
+        type_of(string, String);
+        type_of(fs::path, Filename);
+        type_of(mx::Vector2, Vec2);
+        type_of(mx::Vector3, Vec3);
+        type_of(mx::Vector4, Vec4);
+        type_of(mx::Color3, Color3);
+        type_of(mx::Color4, Color4);
+        type_of(mx::Matrix33, Mat3);
+        type_of(mx::Matrix44, Mat4);
+#undef type_of
+        throw std::runtime_error{"Invalid primitive value"};
     }
 
     static bool is_primitive(const string& type_name)

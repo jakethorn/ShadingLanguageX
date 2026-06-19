@@ -40,6 +40,7 @@ target_link_libraries(mtlx_lib INTERFACE
 add_subdirectory(source)
 
 # -------- python bindings --------
+set(SKBUILD ON)
 if(DEFINED SKBUILD)
         add_subdirectory(python)
 endif()

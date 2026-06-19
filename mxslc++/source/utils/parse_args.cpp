@@ -30,15 +30,18 @@ namespace
         const string help_message =
 R"(
 positional arguments:
-  input-file                    Input path to .mxsl file
+  input-file                     Input path to .mxsl file
 
 options:
-  -h, --help                    Show this help message and exit
-  -o, --output-file OUTPUT_FILE Output path of .mtlx file
-  -v, --version VERSION         Target MaterialX version (default: 1.39.5)
-  -f, --func FUNC               Name of entry function into the program
-  -a, --args ARGS*              Arguments to be passed to the entry function
-  --no-reduce-graph             Always create graph nodes instead of evaluating logic at compile-time
+  -h, --help                     Show this help message and exit
+  -o, --output-file OUTPUT_FILE  Output path of .mtlx file
+  -v, --version VERSION          Target MaterialX version (default: 1.39.5)
+  -f, --func FUNC                Name of entry function into the program
+  -a, --args ARGS*               Arguments to be passed to the entry function
+  -g, --globals NAME VALUE*      Values to be assigned to `global` variables
+  --missing-globals-ok           Allow `global` variables to be missing
+  --unused-globals-ok            Allow `global` variables to be unused
+  --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
 )";
 
         std::cout << help_message;
@@ -108,6 +111,18 @@ options:
         return argv;
     }
 
+    optional<primitive_t> parse_literal(const string& str)
+    {
+        try
+        {
+            return ::parse_literal(str);
+        }
+        catch (const CompileError&)
+        {
+            return std::nullopt;
+        }
+    }
+
     void parse_input_file(Span<string>& argv, CommandLineArgs& clargs)
     {
         clargs.input_file = fs::absolute(argv.pop_front()).lexically_normal();
@@ -121,7 +136,7 @@ options:
         if (argv.empty())
         {
             clargs.is_valid = false;
-            print_error("Empty -o/--output-file option"s);
+            print_error("Empty -o/--output-file option");
             return;
         }
 
@@ -139,7 +154,7 @@ options:
         if (argv.empty())
         {
             clargs.is_valid = false;
-            print_error("Empty -v/--version option"s);
+            print_error("Empty -v/--version option");
             return;
         }
 
@@ -151,7 +166,7 @@ options:
         if (argv.empty())
         {
             clargs.is_valid = false;
-            print_error("Empty -f/--func option"s);
+            print_error("Empty -f/--func option");
             return;
         }
 
@@ -176,14 +191,57 @@ options:
     {
         while (has_more_args(argv))
         {
-            primitive_t value = parse_literal(argv.pop_front());
-            clargs.options.func_args.push_back(value);
+            string front = argv.pop_front();
+            optional<primitive_t> value = parse_literal(front);
+            if (not value)
+            {
+                print_error("Invalid value in -a/--args option: " + front);
+                clargs.is_valid = false;
+                return;
+            }
+
+            clargs.options.func_args.push_back(*value);
+        }
+    }
+
+    void parse_globals(Span<string>& argv, CommandLineArgs& clargs)
+    {
+        while (has_more_args(argv))
+        {
+            string name = argv.pop_front();
+            if (not has_more_args(argv))
+            {
+                print_error("Missing value for -g/--globals option.");
+                clargs.is_valid = false;
+                return;
+            }
+
+            string front = argv.pop_front();
+            optional<primitive_t> value = parse_literal(front);
+            if (not value)
+            {
+                print_error("Invalid value in -g/--globals option: " + front);
+                clargs.is_valid = false;
+                return;
+            }
+
+            clargs.options.globals.emplace_back(name, *value);
         }
     }
 
     void parse_no_reduce_graph(Span<string>&, CommandLineArgs& clargs)
     {
         clargs.options.reduce_graph = false;
+    }
+
+    void parse_missing_globals_ok(Span<string>&, CommandLineArgs& clargs)
+    {
+        clargs.options.error_on_missing_globals = false;
+    }
+
+    void parse_unused_globals_ok(Span<string>&, CommandLineArgs& clargs)
+    {
+        clargs.options.error_on_unused_globals = false;
     }
 
     void parse_arg(Span<string>& argv, CommandLineArgs& clargs)
@@ -201,7 +259,11 @@ options:
             {"--func", parse_function_name},
             {"-a", parse_function_args},
             {"--args", parse_function_args},
-            {"--no-reduce-graph", parse_no_reduce_graph},
+            {"-g", parse_globals},
+            {"--globals", parse_globals},
+            {"--missing-globals-ok", parse_missing_globals_ok},
+            {"--unused-globals-ok", parse_unused_globals_ok},
+            {"--no-reduce-graph", parse_no_reduce_graph}
         };
 
         if (contains(parse_map, arg0))
@@ -231,7 +293,7 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
 
     if (args.empty())
     {
-        print_error("Input file path not specified"s);
+        print_error("Input file path not specified");
         print_help();
         return CommandLineArgs::invalid();
     }
@@ -239,7 +301,7 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
     if (args[0][0] == '@')
     {
         if (args.size() > 2)
-            print_warning("Ignoring arguments after response file"s);
+            print_warning("Ignoring arguments after response file");
         return parse_args(args[0].substr(1));
     }
 

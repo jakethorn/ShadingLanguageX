@@ -1,0 +1,7 @@
+global {
+    vec3,
+    float
+} x;
+
+color3 c = color3{x[0] + x[1]};
+standard_surface(base_color = c);

@@ -16,15 +16,11 @@ class Type
     friend class Scope;
 
 public:
-    Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods)
-        : name_{std::move(name)}, fields_{std::move(fields)}, methods_{std::move(methods)} { }
-
-    Type(string name, vector<Field> fields)
-        : name_{std::move(name)}, fields_{std::move(fields)} { }
-
-    explicit Type(string name) : name_{std::move(name)} { }
-    explicit Type(vector<Field> fields) : fields_{std::move(fields)} { }
+    explicit Type(string name);
+    explicit Type(vector<Field> fields);
     explicit Type(const vector<TypePtr>& fields);
+    Type(string name, vector<Field> fields);
+    Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods);
     Type(const TypePtr& field_type, size_t field_count);
 
     bool has_name() const { return not name_.empty(); }
@@ -32,7 +28,7 @@ public:
 
     TypePtr instantiate_template_types(const TypePtr& template_type) const;
 
-    void add_field(Field field) { fields_.push_back(std::move(field)); }
+    void add_field(Field field);
     size_t field_count() const { return fields_.size(); }
     bool has_fields() const { return field_count() > 0; }
     bool has_field(const string& name) const;
@@ -57,7 +53,7 @@ public:
     size_t component_count() const;
 
     template<typename T>
-    bool is() const { return name_ == TypeName::get<T>(); }
+    bool is() const { return name_ == TypeName::of<T>(); }
     bool is_void() const { return name_ == TypeName::Void; }
     bool is_auto() const { return name_ == TypeName::Auto; }
     bool is_primitive() const { return has_name() and not has_fields(); }
@@ -93,9 +89,10 @@ public:
     static TypePtr Auto;
 
     template<typename T>
-    static TypePtr of() { return resolve(TypeName::get<T>()); }
-    static TypePtr of(const primitive_t& val);
-    static TypePtr of(const mx::TypedElementPtr& val);
+    static TypePtr of() { return resolve(TypeName::of<T>()); }
+    static TypePtr of(const primitive_t& value) { return resolve(TypeName::of(value)); }
+    static TypePtr of(const mx::TypedElementPtr& value);
+    static TypePtr of(const mxslc::Variable& var);
     static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
     static string to_string(const vector<TypePtr>& types);
 
@@ -108,6 +105,8 @@ private:
 
     void set_resolved() { is_resolved_ = true; }
     static TypePtr resolve(const string& name);
+
+    void validate() const;
 };
 
 inline bool operator==(const TypePtr& type, const string& other)

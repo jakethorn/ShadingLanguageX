@@ -10,6 +10,7 @@
 #include <string>
 
 #include "primitive_t.h"
+#include "Variable.h"
 
 namespace mxslc
 {
@@ -19,6 +20,9 @@ namespace mxslc
         std::string version{"1.39.5"};
         std::optional<std::string> func_name = std::nullopt;
         std::vector<primitive_t> func_args{};
+        std::vector<Variable> globals{};
+        bool error_on_missing_globals{true};
+        bool error_on_unused_globals{true};
         bool reduce_graph{true};
 
         bool has_function() const { return func_name.has_value(); }

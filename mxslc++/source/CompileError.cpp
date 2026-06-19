@@ -22,7 +22,7 @@ string mxslc::CompileError::format(const Token& debug_info, const string& messag
     return debug_info.filename() + ", line " + str(debug_info.line()) + ": " + message;
 }
 
-std::string CompileError::format(const Token& debug_info, const CompileError& error)
+std::string mxslc::CompileError::format(const Token& debug_info, const CompileError& error)
 {
     if (error.has_debug_info())
         return error.what();
