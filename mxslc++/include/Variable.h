@@ -5,6 +5,7 @@
 #ifndef MXSLC_INTERFACE_VARIABLE_H
 #define MXSLC_INTERFACE_VARIABLE_H
 
+#include <ciso646>
 #include <memory>
 #include <string>
 #include <vector>
