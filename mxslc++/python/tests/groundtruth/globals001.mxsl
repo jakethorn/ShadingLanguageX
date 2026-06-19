@@ -1,0 +1,3 @@
+global filename albedo_path;
+global color3 tint;
+color3 c = image<color3>(albedo_path) * tint;

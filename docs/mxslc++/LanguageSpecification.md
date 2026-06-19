@@ -486,28 +486,26 @@ The dot operator is used to either access the fields or methods of a variable, p
 or access an underlying node port. Which of these operations is performed is determined by the type of the variable and its
 underlying value.
 
-> [!TIP]
-> ### New in mxslc++!
-> ### Field Access
-> 
-> If the variable is a user-defined type, the dot operator can be used to access the fields or methods of that variable. For example:
-> 
-> ```
-> class Point
-> {
->     float x;
->     float y;
->     
->     float distance_to(Point other)
->     {
->         return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
->     }
-> }
-> 
-> Point p = {1.0, 2.0};
-> Point q = {3.0, 4.0};
-> float d = p.distance_to(q);
-> ```
+### Field Access
+
+If the variable is a user-defined type, the dot operator can be used to access the fields or methods of that variable. For example:
+
+```
+class Point
+{
+    float x;
+    float y;
+    
+    float distance_to(Point other)
+    {
+        return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    }
+}
+
+Point p = {1.0, 2.0};
+Point q = {3.0, 4.0};
+float d = p.distance_to(q);
+```
 
 See [User-Defined Types](#user-defined-types) for more information.
 

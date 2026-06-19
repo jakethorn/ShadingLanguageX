@@ -1,0 +1,9 @@
+global {
+    vec3 pos,
+    vec3 dir,
+    string space
+} light0;
+
+vec3 to_light = normalize(light0.pos - position(light0.space));
+float intensity = dotproduct(to_light, normalize(light0.dir));
+color3 c = color3{intensity};

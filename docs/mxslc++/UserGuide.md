@@ -399,12 +399,107 @@ inline void main(float r, float g, float b)
 The command line options are limited to passing booleans, integers, floats and strings; however, the C++ and Python APIs
 allow vectors, colors and matrices to be passed as well.
 
+### Globals
+
+Certain variables in the shader can also be assigned a value from the command line using the `-g--/globals` option, similar to passing arguments to the 
+entry function. These are called global variables.
+
+```
+global float metalness;
+global float roughness;
+
+standard_surface(
+    base_color=randomcolor(), 
+    metalness=metalness, 
+    specular_roughness=roughness
+);
+```
+
+```bash
+> ./mxslc example.mxsl -g metalness 1.0 roughness 0.2
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomcolor name="node1" type="color3" />
+  <standard_surface name="node2" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node1" />
+    <input name="metalness" type="float" value="1" />
+    <input name="specular_roughness" type="float" value="0.2" />
+  </standard_surface>
+</materialx>
+```
+
+Once again, the command line options are limited to passing basic types; however, the C++ and Python APIs
+allow vectors, colors, matrices as well as user-defined types to be passed as well (see below).
+
+There are two additional options that are related to globals, `--missing-globals-ok` and `--unused-globals-ok`, which 
+suppress compile errors either if a global variable is not provided a value or if a global value is provided, but never used.
+
+### No Reduce Graph
+
+The `--no-reduce-graph` option stops the compiler from trying to optimise operations at compile-time and instead 
+computes everything using MaterialX nodes, including variable constructors.
+
+Take the following code for example:
+
+```
+standard_surface(base_color = color3{1, 0, 0.5} * 0.5);
+```
+
+Compiled without `--no-reduce-graph`:
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+    <standard_surface name="node1" type="surfaceshader">
+        <input name="base_color" type="color3" value="0.5, 0, 0.25" />
+    </standard_surface>
+</materialx>
+```
+
+Compiled with `--no-reduce-graph`:
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+    <combine3 name="node1" type="color3">
+        <input name="in1" type="float" value="1" />
+        <input name="in2" type="float" value="0" />
+        <input name="in3" type="float" value="0.5" />
+    </combine3>
+    <multiply name="node2" type="color3">
+        <input name="in1" type="color3" nodename="node1" />
+        <input name="in2" type="float" value="0.5" />
+    </multiply>
+    <standard_surface name="node3" type="surfaceshader">
+        <input name="base_color" type="color3" nodename="node2" />
+    </standard_surface>
+</materialx>
+```
+
 ## Help
 
 Use the `-h/--help` option to see all available options:
 
 ```bash
 > ./mxslc -h
+```
+```
+positional arguments:
+  input-file                     Input path to .mxsl file
+
+options:
+  -h, --help                     Show this help message and exit
+  -o, --output-file OUTPUT_FILE  Output path of .mtlx file
+  -v, --version VERSION          Target MaterialX version (default: 1.39.5)
+  -f, --func FUNC                Name of entry function into the program
+  -a, --args ARGS*               Arguments to be passed to the entry function
+  -g, --globals NAME VALUE*      Values to be assigned to `global` variables
+  --missing-globals-ok           Allow `global` variables to be missing
+  --unused-globals-ok            Allow `global` variables to be unused
+  --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
 ```
 
 ## Response File
@@ -428,6 +523,8 @@ example.mxsl -o output_file.mtlx -v 1.38.10 --no-reduce-graph
 
 ### Types
 
+#### mxslc::primitive_t
+
 ```c++
 namespace mxslc
 {
@@ -448,7 +545,33 @@ namespace mxslc
 }
 ```
 
-### Structs
+### Classes and Structs
+
+#### mxslc::Variable
+
+```c++
+namespace mxslc
+{
+    class Variable;
+    using VariablePtr = std::shared_ptr<Variable>;
+
+    class Variable
+    {
+    public:
+        Variable(primitive_t value);
+        Variable(const std::vector<primitive_t>& children);
+        Variable(std::vector<VariablePtr> children);
+        Variable(std::string name, primitive_t value);
+        Variable(std::string name, const std::vector<primitive_t>& children);
+        Variable(std::string name, std::vector<VariablePtr> children);
+        Variable(std::string type, std::string name, primitive_t value);
+        Variable(std::string type, std::string name, const std::vector<primitive_t>& children);
+        Variable(std::string type, std::string name, std::vector<VariablePtr> children);
+    };
+}
+```
+
+#### mxslc::CompileOptions
 
 ```c++
 namespace mxslc
@@ -467,8 +590,17 @@ namespace mxslc
         // Arguments to be passed to the entry function
         vector<primitive_t> func_args{};
         
+        // Values to be assigned to `global` variables
+        std::vector<Variable> globals{};
+        
+        // If true, throw an error if a `global` variables value is not provided
+        bool error_on_missing_globals{true};
+        
+        // If true, throw an error if a value is provided for a `global` variable that does not exist
+        bool error_on_unused_globals{true};
+        
         // If true, pre-computes some operations during compilation.
-        bool reduce_graph = true;
+        bool reduce_graph{true};
     };
 }
 ```
@@ -479,6 +611,7 @@ opts.output_file = fs::path{"example.mtlx"};
 opts.version = "1.39.4";
 opts.func_name = "main";
 opts.func_args = {1.0f, MaterialX::Vector3{1, 0, 0}};
+opts.globals = {mxslc::Variable{"metalness", 1.0f}, mxslc::Variable{"roughness", 0.2f}};
 opts.reduce_graph = false;
 ```
 
@@ -518,7 +651,28 @@ fs::path dst_path = mxslc::compile_to_file(src_path);
 
 ### Classes
 
+### `mxslc.Variable`
+
+
+
 ### `mxslc.CompileOptions`
+
+#### Constructor
+
+```python
+CompileOptions.__init__(
+    output_file: str | pathlib.Path | None = None,
+    version: str = "1.39.5",
+    func_name: str | None = None,
+    func_args: list = [],
+    globals: list = [],
+    error_on_missing_globals: bool = True,
+    error_on_unused_globals: bool = True,
+    reduce_graph: bool = True
+)
+```
+
+#### Properties
 
 #### `CompileOptions.output_file: pathlib.Path`
 Save location of the compiled MaterialX file. Defaults to `None`.
@@ -532,6 +686,15 @@ Name of entry function into the program. Defaults to `None`.
 #### `CompileOptions.func_args: list`
 Arguments to be passed to the entry function. Defaults to `[]`.
 
+#### `CompileOptions.globals: list`
+Values to be assigned to `global` variables. Defaults to `[]`.
+
+#### `CompileOptions.error_on_missing_globals: bool`
+If true, throw an error if a `global` variables value is not provided. Defaults to `True`.
+
+#### `CompileOptions.error_on_unused_globals: bool`
+If true, throw an error if a value is provided for a `global` variable that does not exist. Defaults to `True`.
+
 #### `CompileOptions.reduce_graph: bool`
 If true, pre-computes certain operations during compilation when possible. Defaults to `True`.
 
@@ -542,6 +705,7 @@ opts.output_file = pathlib.Path("example.mtlx")
 opts.version = "1.39.4"
 opts.func_name = "main"
 opts.func_args = [1.0, (1, 0, 0)]
+opts.globals = [mxslc.Variable("metalness", 1.0), mxslc.Variable("roughness", 0.2)];
 opts.reduce_graph = False
 ```
 

@@ -16,15 +16,11 @@ class Type
     friend class Scope;
 
 public:
-    Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods)
-        : name_{std::move(name)}, fields_{std::move(fields)}, methods_{std::move(methods)} { }
-
-    Type(string name, vector<Field> fields)
-        : name_{std::move(name)}, fields_{std::move(fields)} { }
-
-    explicit Type(string name) : name_{std::move(name)} { }
-    explicit Type(vector<Field> fields) : fields_{std::move(fields)} { }
+    explicit Type(string name);
+    explicit Type(vector<Field> fields);
     explicit Type(const vector<TypePtr>& fields);
+    Type(string name, vector<Field> fields);
+    Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods);
     Type(const TypePtr& field_type, size_t field_count);
 
     bool has_name() const { return not name_.empty(); }
@@ -32,7 +28,7 @@ public:
 
     TypePtr instantiate_template_types(const TypePtr& template_type) const;
 
-    void add_field(Field field) { fields_.push_back(std::move(field)); }
+    void add_field(Field field);
     size_t field_count() const { return fields_.size(); }
     bool has_fields() const { return field_count() > 0; }
     bool has_field(const string& name) const;
@@ -109,6 +105,8 @@ private:
 
     void set_resolved() { is_resolved_ = true; }
     static TypePtr resolve(const string& name);
+
+    void validate() const;
 };
 
 inline bool operator==(const TypePtr& type, const string& other)

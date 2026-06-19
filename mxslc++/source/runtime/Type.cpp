@@ -27,11 +27,30 @@ type_def(Void)
 type_def(Auto)
 #undef type_def
 
+Type::Type(string name) : name_{std::move(name)} { }
+
+Type::Type(vector<Field> fields) : fields_{std::move(fields)}
+{
+    validate();
+}
+
 Type::Type(const vector<TypePtr>& fields)
 {
     fields_.reserve(fields.size());
     for (const TypePtr& field : fields)
         fields_.emplace_back(field);
+}
+
+Type::Type(string name, vector<Field> fields)
+    : name_{std::move(name)}, fields_{std::move(fields)}
+{
+    validate();
+}
+
+Type::Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods)
+    : name_{std::move(name)}, fields_{std::move(fields)}, methods_{std::move(methods)}
+{
+    validate();
 }
 
 Type::Type(const TypePtr& field_type, const size_t field_count)
@@ -46,6 +65,12 @@ TypePtr Type::instantiate_template_types(const TypePtr& template_type) const
     string name = ::instantiate_template_types(name_, template_type);
     vector<Field> fields = ::instantiate_template_types(fields_, template_type);
     return std::make_shared<Type>(std::move(name), std::move(fields));
+}
+
+void Type::add_field(Field field)
+{
+    fields_.push_back(std::move(field));
+    validate();
 }
 
 bool Type::has_field(const string& name) const
@@ -292,4 +317,17 @@ string Type::to_string(const vector<TypePtr>& types)
     }
     result += ")";
     return result;
+}
+
+void Type::validate() const
+{
+    if (not has_fields())
+        return;
+
+    const bool has_names = fields_[0].has_name();
+    for (const Field& field : fields_)
+    {
+        if (field.has_name() != has_names)
+            throw CompileError{"Either all type fields must be named or none them\nType: " + str()};
+    }
 }

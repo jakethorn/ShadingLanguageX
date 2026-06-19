@@ -352,11 +352,11 @@ VarPtr Variable::create(const mxslc::Variable& var)
 {
     if (var.has_value())
         return create(var.value());
+    TypePtr type = scope().resolve_type(Type::of(var));
     vector<VarPtr> children;
     children.reserve(var.children().size());
     for (const mxslc::VariablePtr& child : var.children())
         children.emplace_back(create(*child));
-    TypePtr type = scope().resolve_type(Type::of(var));
     return create(std::move(type), children);
 }
 

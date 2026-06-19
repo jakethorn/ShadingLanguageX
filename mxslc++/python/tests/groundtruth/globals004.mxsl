@@ -1,0 +1,7 @@
+global {
+    float a,
+    float b
+} x;
+
+float i = noise2d(x.a);
+float j = noise2d(x.b);

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <standard_surface name="node1" type="surfaceshader">
+    <input name="base_color" type="color3" value="10.99, 12.99, 11.99" />
+  </standard_surface>
+</materialx>

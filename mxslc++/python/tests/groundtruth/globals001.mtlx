@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <image name="node1" type="color3">
+    <input name="file" type="filename" value="../brick.png" />
+  </image>
+  <multiply name="node2" type="color3">
+    <input name="in1" type="color3" nodename="node1" />
+    <input name="in2" type="color3" value="1, 0, 0" />
+  </multiply>
+</materialx>
