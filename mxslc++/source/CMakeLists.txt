@@ -5,6 +5,8 @@ add_library(mxslc_lib
         parse.cpp
         compile.cpp
         CompileError.cpp
+        decompile/decompile.cpp
+        decompile/Decompiler.cpp
         runtime/Runtime.cpp
         runtime/RuntimeAccessor.cpp
         runtime/RuntimeUtils.cpp
