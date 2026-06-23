@@ -101,11 +101,11 @@ void load_library(const fs::path& filepath)
     load_library(doc);
 }
 
-mx::DocumentPtr get_materialx_library(const string& version)
+mx::DocumentPtr get_materialx_library(const string& version, const vector<fs::path>& include_dirs)
 {
     string searched_dirs;
 
-    for (fs::path include_dir : Runtime::get().include_directories())
+    for (const fs::path& include_dir : include_dirs)
     {
         const fs::path lib_dir = include_dir / "libraries";
         searched_dirs += lib_dir.string() + "\n";

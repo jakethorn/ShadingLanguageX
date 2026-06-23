@@ -22,20 +22,6 @@ Runtime::Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer seri
     scope_->set_graph(serializer_.document(), nullptr);
 }
 
-namespace
-{
-    vector<fs::path> get_include_directories(const optional<fs::path>& src_path)
-    {
-        vector<fs::path> dirs;
-        if (src_path)
-            dirs.push_back(src_path->parent_path());
-        dirs.push_back(fs::current_path());
-        dirs.push_back(get_python_module_dir());
-        dirs.push_back(get_executable_dir());
-        return dirs;
-    }
-}
-
 Runtime& Runtime::create(const optional<fs::path>& src_path, const CompileOptions& opts)
 {
     instance_ = std::make_unique<Runtime>(opts);
@@ -69,7 +55,7 @@ VarPtr Runtime::global(const string& name) const
 
 void Runtime::load_materialx_library(const string& version)
 {
-    mtlx_lib_ = get_materialx_library(version);
+    mtlx_lib_ = get_materialx_library(version, include_directories());
     load_library(mtlx_lib_);
 }
 
