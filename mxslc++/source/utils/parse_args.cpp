@@ -29,6 +29,10 @@ namespace
     {
         const string help_message =
 R"(
+actions:
+  compile                        Compile the .mxsl file to .mtlx (default)
+  decompile                      Decompile the .mtlx file to .mxsl
+
 positional arguments:
   input-file                     Input path to .mxsl file
 

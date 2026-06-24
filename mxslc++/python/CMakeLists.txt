@@ -2,6 +2,11 @@ find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(_mxslc
         python_bindings.cpp
+        CompileOptions_bindings.cpp
+        Variable_bindings.cpp
+        compile_bindings.cpp
+        decompile_bindings.cpp
+        Decompiler_bindings.cpp
         utils.cpp
 )
 

@@ -11,7 +11,8 @@
 3. [Installation](#installation)
 4. [Getting Started](#getting-started)
 5. [API Documentation](#api-documentation)
-6. [MaterialX Libraries](#materialx-libraries)
+6. [Decompiler](#decompiler)
+7. [MaterialX Libraries](#materialx-libraries)
 
 # What is ShadingLanguageX?
 
@@ -479,6 +480,33 @@ Compiled with `--no-reduce-graph`:
 </materialx>
 ```
 
+## Decompile
+
+`mxslc` can also decompile MaterialX files into ShadingLanguageX source files (see [below](#decompiler) for more information).
+
+```bash
+> ./mxslc decompile example.mtlx -o example_decomped.mxsl
+```
+_example.mtlx_:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine2 name="node1" type="vector2">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+  </combine2>
+  <add name="node2" type="vector2">
+    <input name="in1" type="vector2" nodename="node1" />
+    <input name="in2" type="float" value="2" />
+  </add>
+</materialx>
+```
+_example_decomped.mxsl_:
+```
+vector2 node1 = combine2(in1 = float{0}, in2 = float{1}, );
+vector2 node2 = node1 + float{2};
+```
+
 ## Help
 
 Use the `-h/--help` option to see all available options:
@@ -487,6 +515,10 @@ Use the `-h/--help` option to see all available options:
 > ./mxslc -h
 ```
 ```
+actions:
+  compile                        Compile the .mxsl file to .mtlx (default)
+  decompile                      Decompile the .mtlx file to .mxsl
+
 positional arguments:
   input-file                     Input path to .mxsl file
 
@@ -615,7 +647,36 @@ opts.globals = {mxslc::Variable{"metalness", 1.0f}, mxslc::Variable{"roughness",
 opts.reduce_graph = false;
 ```
 
+#### mxslc::Decompiler
+
+```c++
+
+namespace mxslc
+{
+    class Decompiler
+    {
+    public:
+        Decompiler(const std::filesystem::path& src_path);
+        Decompiler(const std::string& source);
+        Decompiler(MaterialX::DocumentPtr document);
+
+        std::string decompile_document();
+        std::string decompile_node(const std::string& node_name, bool with_dependencies = false);
+        std::string decompile_node(const MaterialX::NodePtr& node, bool with_dependencies = false);
+        std::string decompile_node_def(const std::string& node_def_name, bool with_dependencies = false);
+        std::string decompile_node_def(const MaterialX::NodeDefPtr& node_def, bool with_dependencies = false);
+        std::string decompile_node_graph(const std::string& node_graph_name, bool with_dependencies = false);
+        std::string decompile_node_graph(const MaterialX::NodeGraphPtr& node_graph, bool with_dependencies = false);
+    };
+}
+```
+
+The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs that precede or are used by 
+the given element or an element preceding it in the graph.
+
 ### Functions
+
+#### mxslc::compile_to_*
 
 ```c++
 namespace mxslc 
@@ -647,25 +708,52 @@ fs::path src_path{"example.mxsl"};
 fs::path dst_path = mxslc::compile_to_file(src_path);
 ```
 
+#### mxslc::decompile_to_*
+
+```c++
+namespace mxslc
+{
+    std::string decompile_to_string(const std::filesystem::path& src_path);
+    std::string decompile_to_string(const std::string& source);
+    std::string decompile_to_string(const MaterialX::DocumentPtr& document);
+
+    std::filesystem::path decompile_to_file(const std::filesystem::path& src_path, const std::optional<std::filesystem::path>& dst_path = std::nullopt);
+    std::filesystem::path decompile_to_file(const std::filesystem::path& src_path, const std::filesystem::path& dst_path);
+    std::filesystem::path decompile_to_file(const std::string& source, const std::filesystem::path& dst_path);
+    std::filesystem::path decompile_to_file(const MaterialX::DocumentPtr& document, const std::filesystem::path& dst_path);
+}
+```
 ## Python
+
+### Types
+
+```python
+type Primitive = bool | int | float | str | tuple[float] | MaterialX.Vector2 | MaterialX.Vector3 | MaterialX.Vector4 | MaterialX.Color3 | MaterialX.Color4 | MaterialX.Matrix33 | MaterialX.Matrix44]
+```
 
 ### Classes
 
 ### `mxslc.Variable`
 
+#### Constructors
 
+```python
+Variable.__init__(                      value: Primitive | list[Primitive] | list[Variable])
+Variable.__init__(           name: str, value: Primitive | list[Primitive] | list[Variable])
+Variable.__init__(type: str, name: str, value: Primitive | list[Primitive] | list[Variable])
+```
 
 ### `mxslc.CompileOptions`
 
-#### Constructor
+#### Constructors
 
 ```python
 CompileOptions.__init__(
     output_file: str | pathlib.Path | None = None,
     version: str = "1.39.5",
     func_name: str | None = None,
-    func_args: list = [],
-    globals: list = [],
+    func_args: list[Primitive] = [],
+    globals: list[Variable] = [],
     error_on_missing_globals: bool = True,
     error_on_unused_globals: bool = True,
     reduce_graph: bool = True
@@ -674,30 +762,31 @@ CompileOptions.__init__(
 
 #### Properties
 
-#### `CompileOptions.output_file: pathlib.Path`
-Save location of the compiled MaterialX file. Defaults to `None`.
+```
+# Save location of the compiled MaterialX file. Defaults to None.
+CompileOptions.output_file: pathlib.Path
 
-#### `CompileOptions.version: str`
-MaterialX version to compile against. Defaults to `"1.39.5"`.
+# MaterialX version to compile against. Defaults to "1.39.5".
+CompileOptions.version: str
 
-#### `CompileOptions.func_name: str`
-Name of entry function into the program. Defaults to `None`.
+# Name of entry function into the program. Defaults to None.
+CompileOptions.func_name: str
 
-#### `CompileOptions.func_args: list`
-Arguments to be passed to the entry function. Defaults to `[]`.
+# Arguments to be passed to the entry function. Defaults to [].
+CompileOptions.func_args: list[Primitive]
 
-#### `CompileOptions.globals: list`
-Values to be assigned to `global` variables. Defaults to `[]`.
+# Values to be assigned to `global` variables. Defaults to [].
+CompileOptions.globals: list[Variable]
 
-#### `CompileOptions.error_on_missing_globals: bool`
-If true, throw an error if a `global` variables value is not provided. Defaults to `True`.
+# If true, throw an error if a `global` variables value is not provided. Defaults to True.
+CompileOptions.error_on_missing_globals: bool
 
-#### `CompileOptions.error_on_unused_globals: bool`
-If true, throw an error if a value is provided for a `global` variable that does not exist. Defaults to `True`.
+# If true, throw an error if a value is provided for a `global` variable that does not exist. Defaults to True.
+CompileOptions.error_on_unused_globals: bool
 
-#### `CompileOptions.reduce_graph: bool`
-If true, pre-computes certain operations during compilation when possible. Defaults to `True`.
-
+# If true, pre-computes certain operations during compilation when possible. Defaults to True.
+CompileOptions.reduce_graph: bool
+```
 ```python
 # Example
 opts = mxslc.CompileOptions()
@@ -709,7 +798,28 @@ opts.globals = [mxslc.Variable("metalness", 1.0), mxslc.Variable("roughness", 0.
 opts.reduce_graph = False
 ```
 
+### `mxslc.Decompiler`
+
+#### Constructors
+
+```python
+Decompiler.__init__(
+    source: str | pathlib.Path
+)
+```
+
+#### Methods
+
+```
+Decompiler.decompile_document() -> str
+Decompiler.decompile_node(node_name: str, with_dependencies: bool = False) -> str
+Decompiler.decompile_node_def(node_def_name: str, with_dependencies: bool = False) -> str
+Decompiler.decompile_node_graph(node_graph_name: str, with_dependencies: bool = False) -> str
+```
+
 ### Functions
+
+### `mxslc.compile_*_to_*`
 
 ```
 mxslc.compile_string_to_string(source: str) -> str
@@ -735,15 +845,214 @@ src_path = pathlib.Path("example.mtlx")
 dst_path = mxslc.compile_file_to_file(src_path)
 ```
 
+### `mxslc.decompile_*_to_*`
+
+```
+mxslc.decompile_string_to_string(source: str) -> str
+
+mxslc.decompile_file_to_string(src_path: pathlib.Path) -> str
+
+mxslc.decompile_string_to_file(source: str, dst_path: pathlib.Path) -> pathlib.Path
+
+mxslc.decompile_file_to_file(src_path: pathlib.Path) -> pathlib.Path
+mxslc.decompile_file_to_file(src_path: pathlib.Path, dst_path: pathlib.Path) -> pathlib.Path
+```
+
+# Decompiler
+
+The decompiler is a tool that can be used to decompile MaterialX files into ShadingLanguageX source files.
+It is available as part of the `mxslc` standalone executable (see [Getting Started](#decompile)) as well as the C++ and Python 
+APIs (see [API Documentation](#api-documentation)).
+
+## C++
+
+### Example 1
+
+```c++
+#include <filesystem>
+#include <decompile.h>
+
+std::filesystem::path src_path{"example1.mtlx"};
+std::string result = mxslc::decompile_to_string(src_path);
+std::cout << result << std::endl;
+```
+
+_example1.mtlx_:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+    <normal name="node1" type="vector3" />
+    <viewdirection name="node2" type="vector3" />
+    <dotproduct name="node3" type="float">
+        <input name="in1" type="vector3" nodename="node1" />
+        <input name="in2" type="vector3" nodename="node2" />
+    </dotproduct>
+</materialx>
+```
+
+_Output_:
+```
+vector3 node1 = normal();
+vector3 node2 = viewdirection();
+float node3 = dotproduct(in1 = node1, in2 = node2, );
+```
+
+### Example 2
+
+```c++
+#include <filesystem>
+#include <Decompiler.h>
+
+std::filesystem::path src_path{"example2.mtlx"};
+mxslc::Decompiler decompiler{src_path};
+std::string result = decompiler.decompile_node("node2", /*with_dependencies*/true);
+std::cout << result << std::endl;
+```
+
+_example2.mtlx_:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one">
+    <output name="out" type="float" />
+    <input name="base" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <add name="node1" type="float">
+      <input name="in1" type="float" interfacename="base" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_add_two" node="add_two">
+    <output name="out" type="float" />
+    <input name="base" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_two" nodedef="ND_add_two">
+    <add name="node1" type="float">
+      <input name="in1" type="float" interfacename="base" />
+      <input name="in2" type="float" value="2" />
+    </add>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <add_one name="node1" type="float">
+    <input name="base" type="float" value="11" />
+  </add_one>
+  <add_two name="node2" type="float">
+    <input name="base" type="float" value="12" />
+  </add_two>
+</materialx>
+```
+
+_Output_:
+```
+float add_two(float base = float{0}, )
+{
+    return node1;
+}
+
+float node2 = add_two(base = float{12}, );
+```
+
+## Python
+
+### Example 1
+
+```python
+from pathlib import Path
+import mxslc
+
+src_path = Path("example1.mtlx")
+result = mxslc.decompile_file_to_string(src_path)
+print(result)
+```
+
+_example1.mtlx_:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+    <normal name="node1" type="vector3" />
+    <viewdirection name="node2" type="vector3" />
+    <dotproduct name="node3" type="float">
+        <input name="in1" type="vector3" nodename="node1" />
+        <input name="in2" type="vector3" nodename="node2" />
+    </dotproduct>
+</materialx>
+```
+
+_Output_:
+```
+vector3 node1 = normal();
+vector3 node2 = viewdirection();
+float node3 = dotproduct(in1 = node1, in2 = node2, );
+```
+
+### Example 2
+
+```python
+from pathlib import Path
+import mxslc
+
+src_path = Path("example2.mtlx")
+decompiler = mxslc.Decompiler(src_path)
+result = decompiler.decompile_node("node2", with_dependencies=True)
+print(result)
+```
+
+_example2.mtlx_:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one">
+    <output name="out" type="float" />
+    <input name="base" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <add name="node1" type="float">
+      <input name="in1" type="float" interfacename="base" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_add_two" node="add_two">
+    <output name="out" type="float" />
+    <input name="base" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_two" nodedef="ND_add_two">
+    <add name="node1" type="float">
+      <input name="in1" type="float" interfacename="base" />
+      <input name="in2" type="float" value="2" />
+    </add>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <add_one name="node1" type="float">
+    <input name="base" type="float" value="11" />
+  </add_one>
+  <add_two name="node2" type="float">
+    <input name="base" type="float" value="12" />
+  </add_two>
+</materialx>
+```
+
+_Output_:
+```
+float add_two(float base = float{0}, )
+{
+    return node1;
+}
+
+float node2 = add_two(base = float{12}, );
+```
+
 # MaterialX Libraries
 
 ## `libraries` Folder
 
 In order to use standard MaterialX nodes, `mxslc` needs access to [MaterialX libraries](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/libraries).
-It looks for them next to the executable, in the `libraries` folder, followed by the name of the MaterialX version the library belongs to, 
+It looks for them next to the executable, in the `libraries` folder, followed by the name of the MaterialX version the library belongs to,
 for example, `/libraries/1.39.5`.
 
-By default, the `libraries` folder found [here](https://github.com/jakethorn/ShadingLanguageX/tree/main/mxslc%2B%2B/libraries) is copied next to the executable during the build. Make sure to always move the libraries 
+By default, the `libraries` folder found [here](https://github.com/jakethorn/ShadingLanguageX/tree/main/mxslc%2B%2B/libraries) is copied next to the executable during the build. Make sure to always move the libraries
 when moving the executable. Similarly, the `libraries` folder is included as part of the module when building the Python bindings.
 
 ## Adding Support for a MaterialX Version
