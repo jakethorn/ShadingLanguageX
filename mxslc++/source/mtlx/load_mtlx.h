@@ -9,8 +9,8 @@
 
 #include "utils/common.h"
 
-void load_library(const mx::DocumentPtr &doc);
+void load_library(const mx::DocumentPtr& doc);
 void load_library(const fs::path& filepath);
-mx::DocumentPtr get_materialx_library(const string& version);
+mx::DocumentPtr get_materialx_library(const string& version, const vector<fs::path>& include_dirs);
 
 #endif //FENNEC_LOAD_MTLX_H

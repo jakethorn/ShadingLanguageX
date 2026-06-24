@@ -29,6 +29,10 @@ namespace
     {
         const string help_message =
 R"(
+actions:
+  compile                        Compile the .mxsl file to .mtlx (default)
+  decompile                      Decompile the .mtlx file to .mxsl
+
 positional arguments:
   input-file                     Input path to .mxsl file
 
@@ -121,6 +125,12 @@ options:
         {
             return std::nullopt;
         }
+    }
+
+    void parse_action(Span<string>& argv, CommandLineArgs& clargs)
+    {
+        if (argv.front() == "compile" or argv.front() == "decompile")
+            clargs.action = mxslc::to_action(argv.pop_front());
     }
 
     void parse_input_file(Span<string>& argv, CommandLineArgs& clargs)
@@ -314,6 +324,7 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
             return clargs;
     }
 
+    parse_action(args, clargs);
     parse_input_file(args, clargs);
     while (clargs.is_valid and not args.empty())
         parse_arg(args, clargs);
@@ -344,4 +355,14 @@ CommandLineArgs mxslc::parse_args(const fs::path& response_path)
     }
 
     return parse_args(argv);
+}
+
+mxslc::Action mxslc::to_action(const std::string& str)
+{
+    if (str == "compile")
+        return Action::Compile;
+    else if (str == "decompile")
+        return Action::Decompile;
+    else
+        return Action::Unknown;
 }

@@ -13,29 +13,6 @@
 #include "runtime/Variable.h"
 #include "values/NodeValue.h"
 
-namespace
-{
-    mx::NodeDefPtr find_node_def(const mx::NodePtr& node)
-    {
-        mx::NodeDefPtr node_def = node->getNodeDef();
-        if (node_def != nullptr)
-            return node_def;
-
-        const mx::DocumentPtr mtlx_lib = Runtime::get().materialx_library();
-        const mx::NodePtr copy = mtlx_lib->addNode(node->getCategory());
-        copy->copyContentFrom(node);
-
-        node_def = copy->getNodeDef();
-        if (node_def != nullptr)
-        {
-            mtlx_lib->removeNode(copy->getName());
-            return node_def;
-        }
-
-        throw CompileError{"Cannot find NodeDef for " + node->getCategory()};
-    }
-}
-
 PortAccessor::PortAccessor(VarPtr node_var, string input_name) : node_var_{std::move(node_var)}, input_name_{std::move(input_name)}
 {
     if (not node_var_->has_value())
@@ -48,7 +25,7 @@ PortAccessor::PortAccessor(VarPtr node_var, string input_name) : node_var_{std::
         throw CompileError{"The port access (dot) operator can only be used on values representing MaterialX nodes"s};
 
     const mx::NodePtr node = node_value->node();
-    const mx::NodeDefPtr node_def = find_node_def(node);
+    const mx::NodeDefPtr node_def = get_node_def(node, Runtime::get().materialx_library());
 
     const mx::InputPtr input = node_def->getActiveInput(input_name_);
     if (input == nullptr)

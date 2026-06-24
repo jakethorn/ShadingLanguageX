@@ -42,3 +42,35 @@ void set_interface(const mx::PortElementPtr& port, const string& interface_name)
     port->removeAttribute("value"s);
     port->setInterfaceName(interface_name);
 }
+
+mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const mx::DocumentPtr& mtlx_lib)
+{
+    mx::NodeDefPtr node_def = node->getNodeDef();
+    if (node_def != nullptr)
+        return node_def;
+
+    const mx::NodePtr copy = mtlx_lib->addNode(node->getCategory());
+    copy->copyContentFrom(node);
+
+    node_def = copy->getNodeDef();
+    if (node_def != nullptr)
+    {
+        mtlx_lib->removeNode(copy->getName());
+        return node_def;
+    }
+
+    throw CompileError{"Cannot find NodeDef for " + node->getCategory()};
+}
+
+mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib)
+{
+    mx::NodeDefPtr node_def = node_graph->getNodeDef();
+    if (node_def != nullptr)
+        return node_def;
+
+    node_def = mtlx_lib->getNodeDef(node_graph->getNodeDefString());
+    if (node_def != nullptr)
+        return node_def;
+
+    throw CompileError{"Cannot find NodeDef for " + node_graph->getName()};
+}

@@ -25,6 +25,8 @@
 #include "compile.h"
 #include "CompileOptions.h"
 #include "primitive_t.h"
+#include "decompile.h"
+#include "Decompiler.h"
 
 using std::unique_ptr;
 using std::shared_ptr;

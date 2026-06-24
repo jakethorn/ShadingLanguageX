@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <string>
 
+#include "constants.h"
 #include "primitive_t.h"
 #include "Variable.h"
 
@@ -17,7 +18,7 @@ namespace mxslc
     struct CompileOptions
     {
         std::optional<std::filesystem::path> output_file = std::nullopt;
-        std::string version{"1.39.5"};
+        std::string version{DEFAULT_MTLX_VERSION};
         std::optional<std::string> func_name = std::nullopt;
         std::vector<primitive_t> func_args{};
         std::vector<Variable> globals{};
