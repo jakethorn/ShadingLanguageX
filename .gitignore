@@ -7,8 +7,7 @@ mxslc++/examples/
 mxslc++/tests/gtest_lib/
 mxslc++/main.rsp
 mxslc++/gdb_printers.py
-mxslc++/rsp_reduce.py
-mxslc++/rsp_decomp.py
+mxslc++/reduce_rsp.py
 mxslc++/todo.txt
 mxslc++/notes.txt
 mxslc++/build_python.sh
