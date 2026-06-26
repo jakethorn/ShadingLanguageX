@@ -56,8 +56,9 @@ namespace
         if (not func->is_defined())
             return func->name();
 
-        string result = "";
         const Scope* scope = &Runtime::get().scope().get_defining_scope(func);
+
+        string result = "";
         while (true)
         {
             if (not scope->is_inline())
@@ -91,7 +92,7 @@ namespace
     void write_default_output(const mx::NodeDefPtr& node_def, const mx::NodeGraphPtr& node_graph)
     {
         // this happens if the function is void, has no out or ref parameters and doesn't mutate a nonlocal variable
-        if (node_def->getActiveOutputs().empty())
+        if (node_def and node_def->getActiveOutputs().empty())
         {
             node_def->addOutput("out", TypeName::Int);
             node_graph->addOutput("out", TypeName::Int)->setValueString("0");
@@ -114,7 +115,7 @@ VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, c
             return value;
     }
 
-    const mx::GraphElementPtr& graph = Runtime::get().scope().graph();
+    const mx::GraphElementPtr& graph = scope().graph();
     const mx::NodePtr node = graph->addNode(node_name(func), mx::EMPTY_STRING, serialize_type(func));
 
     for (const auto& [param, input_value] : input_values)
@@ -168,19 +169,29 @@ VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, c
 
 void MtlXSerializer::write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const
 {
-    Runtime::get().enter_scope();
+    runtime().enter_scope();
 
-    const mx::NodeDefPtr node_def = write_node_def(func);
-    write_node_graph(func, node_def);
+    if (func->is_parameterless())
+    {
+        const mx::NodeGraphPtr node_graph = write_node_graph(func, nullptr);
+        attrs.add_to(node_graph);
+    }
+    else
+    {
+        const mx::NodeDefPtr node_def = write_node_def(func);
+        write_node_graph(func, node_def);
+        attrs.add_to(node_def);
+    }
 
-    attrs.add_to(node_def);
-
-    Runtime::get().exit_scope();
+    runtime().exit_scope();
 }
 
 ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
 {
-    const auto& [node_graph, func] = Runtime::get().scope().node_graph();
+    const auto& [node_graph, func] = scope().node_graph();
+
+    if (func->is_parameterless())
+        throw CompileError{"Cannot access nonlocal variables in parameterless function"};
 
     // in the case that a nonlocal variable has been assigned a local value
     // we grab that instead of nonlocal variables value
@@ -199,7 +210,11 @@ ValuePtr MtlXSerializer::write_node_def_input(const VarPtr& var) const
 
 void MtlXSerializer::write_node_def_output(const VarPtr& var, const ValuePtr& value) const
 {
-    const auto& [node_graph, func] = Runtime::get().scope().node_graph();
+    const auto& [node_graph, func] = scope().node_graph();
+
+    if (func->is_parameterless())
+        throw CompileError{"Cannot access nonlocal variables in parameterless function"};
+
     const string output_name = nonlocal_out_name(var);
     value->set_as_node_graph_output(node_graph, output_name);
     func->add_nonlocal_output(var);
@@ -246,12 +261,12 @@ mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
     return node_def;
 }
 
-void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const
+mx::NodeGraphPtr MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const
 {
     const mx::NodeGraphPtr node_graph = doc_->addNodeGraph(node_graph_name(func));
     node_graph->setNodeDef(node_def);
 
-    Runtime::get().scope().set_graph(node_graph, func);
+    scope().set_graph(node_graph, func);
     const VarPtr instance_copy = copy_instance(func);
     const VarPtr return_value = func->invoke();
 
@@ -264,18 +279,21 @@ void MtlXSerializer::write_node_graph(const FuncPtr& func, const mx::NodeDefPtr&
     {
         if (param.is_out())
         {
-            const VarPtr out_value = Runtime::get().scope().get_variable(param.name());
+            const VarPtr out_value = scope().get_variable(param.name());
             write_node_graph_output(node_graph, "out__" + param.name(), out_value, param.attributes());
         }
     }
 
     update_instance(func, node_graph, instance_copy);
     write_default_output(node_def, node_graph);
+
+    func->set_node_graph(node_graph);
+    return node_graph;
 }
 
 void MtlXSerializer::add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const
 {
-    if (func->has_class_type())
+    if (func->has_class_type() and not func->is_parameterless())
     {
         write_node_def_input(node_def, "this", func->class_type());
 
@@ -287,17 +305,17 @@ void MtlXSerializer::add_instance_to_scope(const FuncPtr& func, const mx::NodeDe
 
 VarPtr MtlXSerializer::copy_instance(const FuncPtr& func) const
 {
-    if (func->has_class_type())
-        return Runtime::get().scope().get_variable("this")->copy();
+    if (func->has_class_type() and not func->is_parameterless())
+        return scope().get_variable("this")->copy();
     else
         return nullptr;
 }
 
 void MtlXSerializer::update_instance(const FuncPtr& func, const mx::NodeGraphPtr& node_graph, const VarPtr& original_instance) const
 {
-    if (func->has_class_type())
+    if (func->has_class_type() and not func->is_parameterless())
     {
-        const VarPtr instance = Runtime::get().scope().get_variable("this");
+        const VarPtr instance = scope().get_variable("this");
         func->set_mutates_instance(not instance->equals(original_instance));
         if (func->mutates_instance())
             write_node_graph_output(node_graph, "out__this", instance);
@@ -335,7 +353,8 @@ void MtlXSerializer::write_node_graph_output(const mx::NodeGraphPtr& node_graph,
     if (var->has_value())
     {
         var->value()->set_as_node_graph_output(node_graph, output_name);
-        attrs.add_to(node_graph->getNodeDef(), output_name);
+        if (const mx::NodeDefPtr node_def = node_graph->getNodeDef())
+            attrs.add_to(node_def, output_name);
     }
     else
     {

@@ -1,0 +1,13 @@
+T one<vec2, vec3, vec4> =>
+{
+    return T{1.0};
+}
+
+T two<vec2, vec3, vec4> =>
+{
+    return T{2.0};
+}
+
+vec2 a = one + two;
+vec3 b = one<vec3> + two<vec3>;
+auto c = one<vec4> + two<vec4>;

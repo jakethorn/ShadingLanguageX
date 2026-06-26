@@ -10,26 +10,33 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
+#include "values/ValueFactory.h"
 
-MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, ArgumentList args)
+MethodCall::MethodCall(ExprPtr instance_expr, string method_name, optional<ArgumentList> args)
+    : MethodCall{std::move(instance_expr), std::move(method_name), nullptr, std::move(args)}
+{
+
+}
+
+MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args)
     : MethodCall{std::move(instance_expr), std::move(method_name), std::move(template_type), std::move(args), Token{}}
 {
 
 }
 
-MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, ArgumentList args, Token token)
+MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, Token token)
     : MethodCall{std::move(instance_expr), std::move(method_name), std::move(template_type), std::move(args), AttributeList{}, std::move(token)}
 {
 
 }
 
-MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, ArgumentList args, AttributeList attrs)
+MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs)
     : MethodCall{std::move(instance_expr), std::move(method_name), std::move(template_type), std::move(args), std::move(attrs), Token{}}
 {
 
 }
 
-MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, ArgumentList args, AttributeList attrs, Token token)
+MethodCall::MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token)
     : FunctionCall{std::move(method_name), std::move(template_type), std::move(args), std::move(attrs), std::move(token)}, instance_expr_{std::move(instance_expr)}
 {
 
@@ -64,18 +71,21 @@ VarPtr MethodCall::evaluate_impl() const
     }
     else
     {
-        return serializer().write_node(instance_, func_, args_, attrs_);
+        if (func_->is_parameterless())
+            return ValueFactory::create_node_graph_value(func_);
+        else
+            return serializer().write_node(instance_, func_, args_, attrs_);
     }
 }
 
 vector<FuncPtr> MethodCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    return scope().get_functions({instance_->type(), return_types, name_, template_type_, args_});
+    return scope().get_functions({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
 }
 
 FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
-    return scope().get_function({instance_->type(), return_types, name_, template_type_, args_});
+    return scope().get_function({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
 }
 
 VarPtr MethodCall::copy_instance_to_scope() const

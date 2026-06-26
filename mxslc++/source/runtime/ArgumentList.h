@@ -14,6 +14,7 @@ class ParameterList;
 class ArgumentList
 {
 public:
+    ArgumentList() = default;
     ArgumentList(vector<Argument> args);
     ArgumentList(const vector<ExprPtr>& exprs);
     ArgumentList(const vector<VarPtr>& values);

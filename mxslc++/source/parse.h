@@ -35,7 +35,6 @@ public:
     StmtPtr multi_variable_definition(ModifierList mods, TypePtr type_);
     StmtPtr variable_assignment(ExprPtr lhs);
     StmtPtr function_definition(ModifierList mods, TypePtr type);
-    StmtPtr function_definition_modern(ModifierList mods);
     StmtPtr class_definition();
     StmtPtr constructor_definition();
     StmtPtr using_declaration();
@@ -94,6 +93,14 @@ public:
 
         match(closer);
         return args;
+    }
+
+    template<typename T, typename TList>
+    optional<TList> optional_list(const TokenType opener, const TokenType closer, std::function<T(size_t)> func)
+    {
+        if (peek() != opener)
+            return std::nullopt;
+        return TList{list(opener, closer, func)};
     }
 
     bool is_typed_definition() const;

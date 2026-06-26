@@ -17,38 +17,42 @@
 #include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
-FunctionCall::FunctionCall(string name, ArgumentList args)
+FunctionCall::FunctionCall(string name, optional<ArgumentList> args)
     : FunctionCall{std::move(name), std::move(args), Token{}}
 {
 
 }
 
-FunctionCall::FunctionCall(string name, ArgumentList args, Token token)
+FunctionCall::FunctionCall(string name, optional<ArgumentList> args, Token token)
     : FunctionCall{std::move(name), nullptr, std::move(args), std::move(token)}
 {
 
 }
 
-FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args)
+FunctionCall::FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args)
     : FunctionCall{std::move(name), std::move(template_type), std::move(args), Token{}}
 {
 
 }
 
-FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args, Token token)
+FunctionCall::FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, Token token)
     : FunctionCall{std::move(name), std::move(template_type), std::move(args), AttributeList{}, std::move(token)}
 {
 
 }
 
-FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs)
+FunctionCall::FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs)
     : FunctionCall{std::move(name), std::move(template_type), std::move(args), std::move(attrs), Token{}}
 {
 
 }
 
-FunctionCall::FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs, Token token)
-    : Expression{std::move(token)}, name_{std::move(name)}, template_type_{std::move(template_type)}, args_{std::move(args)}
+FunctionCall::FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token)
+    : Expression{std::move(token)},
+    name_{std::move(name)},
+    template_type_{std::move(template_type)},
+    args_{std::move(args).value_or(ArgumentList{})},
+    is_argumentless_{not args.has_value()}
 {
     set_attributes(std::move(attrs));
 }
@@ -123,18 +127,21 @@ VarPtr FunctionCall::evaluate_impl() const
     }
     else
     {
-        return serializer().write_node(func_, args_, attrs_);
+        if (func_->is_parameterless())
+            return ValueFactory::create_node_graph_value(func_);
+        else
+            return serializer().write_node(func_, args_, attrs_);
     }
 }
 
 vector<FuncPtr> FunctionCall::get_matching_functions(const vector<TypePtr>& return_types) const
 {
-    return scope().get_functions({return_types, name_, template_type_, args_});
+    return scope().get_functions({return_types, name_, template_type_, args_, is_argumentless_});
 }
 
 FuncPtr FunctionCall::get_matching_function(const vector<TypePtr>& return_types) const
 {
-    return scope().get_function({return_types, name_, template_type_, args_});
+    return scope().get_function({return_types, name_, template_type_, args_, is_argumentless_});
 }
 
 // inline only

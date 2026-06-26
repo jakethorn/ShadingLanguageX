@@ -30,7 +30,7 @@ VarPtr type_cast(const TypePtr& type, const VarPtr& value, const bool force)
     }
     else
     {
-        cast_value = RuntimeUtils::invoke_function("separate" + str(type->field_count()), value, type);
+        cast_value = RuntimeUtils::invoke_function(type, "separate" + str(type->field_count()), value);
     }
 
     assert(cast_value->type()->is_equal(type));

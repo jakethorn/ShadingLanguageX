@@ -7,12 +7,13 @@
 
 #include <MaterialXCore/Document.h>
 
+#include "runtime/RuntimeAccessor.h"
 #include "utils/common.h"
 
 class ArgumentList;
 class AttributeList;
 
-class MtlXSerializer
+class MtlXSerializer : protected RuntimeAccessor
 {
 public:
     MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
@@ -34,7 +35,7 @@ public:
 
 private:
     mx::NodeDefPtr write_node_def(const FuncPtr& func) const;
-    void write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
+    mx::NodeGraphPtr write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
 
     void add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
     VarPtr copy_instance(const FuncPtr& func) const;

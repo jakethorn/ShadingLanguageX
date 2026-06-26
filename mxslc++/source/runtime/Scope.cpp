@@ -127,6 +127,16 @@ vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool thro
         return vector<FuncPtr>{};
 }
 
+bool Scope::has_function(const FuncPtr& func) const
+{
+    return contains(functions_, func) or (parent_ and parent_->has_function(func));
+}
+
+bool Scope::has_function(const FunctionQuery& query) const
+{
+    return get_function(query, false) != nullptr;
+}
+
 Scope& Scope::get_defining_scope(const FuncPtr& func)
 {
     if (contains(functions_, func))

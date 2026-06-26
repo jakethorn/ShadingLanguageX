@@ -1,4 +1,4 @@
-function foo() -> {float, color3}
+{float, color3} foo()
 {
     return {1.0, randomcolor(in=2)};
 }

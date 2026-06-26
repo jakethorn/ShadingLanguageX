@@ -13,6 +13,7 @@
 class ParameterList
 {
 public:
+    ParameterList() = default;
     ParameterList(vector<Parameter> params);
 
     ParameterList instantiate_template_types(const TypePtr& template_type) const

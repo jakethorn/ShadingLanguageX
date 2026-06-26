@@ -47,7 +47,7 @@ protected:
     bool is_initialized_ = false;
     TypePtr subexpr_type_ = nullptr;
     TypePtr target_type_ = nullptr;
-    string error_message_ = ""s;
+    string error_message_ = "";
 
     AttributeList attrs_;
 };

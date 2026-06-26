@@ -1,0 +1,14 @@
+inline T one<vec2, vec3, vec4> => { return T{1}; }
+inline T two<vec2, vec3, vec4> => { return T{2}; }
+
+{vec2 v2, vec3 v3, string s} foo =>
+{
+    auto a = one<vec2>; // template type necessary because variable type is auto
+    vec3 b = two;       // template type deduced from variable type
+    global string c;    // value assigned using the CLI/API
+    return {a, b, c};
+}
+
+vec2 x = foo.v2;
+vec3 y = foo.v3;
+string z = foo[2];

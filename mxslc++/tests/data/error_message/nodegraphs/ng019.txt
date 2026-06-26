@@ -1,0 +1,3 @@
+ng019.mxsl, line 6: Matching definition could not be found for function 'foo'
+Possible matches:
+vector3 foo [[parameterless]]

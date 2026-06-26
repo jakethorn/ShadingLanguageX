@@ -16,7 +16,7 @@ FunctionDefinition::FunctionDefinition(
     TypePtr type,
     string name,
     vector<TypePtr> template_types,
-    ParameterList params,
+    optional<ParameterList> params,
     StmtPtr body,
     ExprPtr return_expr
 ) : FunctionDefinition{
@@ -38,7 +38,7 @@ FunctionDefinition::FunctionDefinition(
     TypePtr type,
     string name,
     vector<TypePtr> template_types,
-    ParameterList params,
+    optional<ParameterList> params,
     StmtPtr body,
     ExprPtr return_expr,
     Token token
@@ -56,7 +56,7 @@ FunctionDefinition::FunctionDefinition(
         for (const TypePtr& template_type : template_types_)
         {
             type = type_->instantiate_template_types(template_type);
-            params = params_.instantiate_template_types(template_type);
+            params = ::instantiate_template_types(params_, template_type);
             body = body_->instantiate_template_types(template_type);
             return_expr = ::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
@@ -83,13 +83,13 @@ StmtPtr FunctionDefinition::instantiate_template_types(const TypePtr& template_t
         throw CompileError{"Nested templated functions is not supported"s};
 
     TypePtr type = type_->instantiate_template_types(template_type);
-    ParameterList params = params_.instantiate_template_types(template_type);
+    optional<ParameterList> params = ::instantiate_template_types(params, template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
     ExprPtr return_expr = ::instantiate_template_types(return_expr_, template_type);
     return std::make_unique<FunctionDefinition>(mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr), token_);
 }
 
-void FunctionDefinition::execute_impl() const
+void FunctionDefinition::init()
 {
     for (const FuncPtr& func : funcs_)
     {
@@ -98,5 +98,14 @@ void FunctionDefinition::execute_impl() const
 
         if (not func->is_inline())
             serializer().write_node_def_graph(func, attrs_);
+    }
+}
+
+void FunctionDefinition::execute_impl() const
+{
+    for (const FuncPtr& func : funcs_)
+    {
+        if (not scope().has_function(func))
+            scope().add_function(func);
     }
 }

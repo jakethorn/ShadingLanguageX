@@ -116,11 +116,6 @@ StmtPtr Parser::bare_statement()
 
     ModifierList mods = modifiers();
 
-    if (peek() == TokenType::Function)
-    {
-        return function_definition_modern(std::move(mods));
-    }
-
     if (is_typed_definition())
     {
         TypePtr type_ = type();
@@ -133,7 +128,7 @@ StmtPtr Parser::bare_statement()
         {
             return multi_variable_definition(std::move(mods), std::move(type_));
         }
-        if (peek(1) == '<' or peek(1) == '(')
+        if (peek(1) == '<' or peek(1) == '(' or peek(1) == TokenType::FatArrow)
         {
             return function_definition(std::move(mods), std::move(type_));
         }
@@ -234,32 +229,16 @@ StmtPtr Parser::function_definition(ModifierList mods, TypePtr type)
 {
     Token name = match(TokenType::Identifier);
     vector<TypePtr> template_types = template_list();
-    ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
+
+    optional<ParameterList> params = optional_list<Parameter, ParameterList>('(', ')', [this](const size_t i){ return parameter(i); });
+    if (not params)
+        match(TokenType::FatArrow);
+
     auto [body, return_expr] = function_body();
+
     return std::make_unique<FunctionDefinition>(
         std::move(mods),
         std::move(type),
-        string{name.lexeme()},
-        std::move(template_types),
-        std::move(params),
-        std::move(body),
-        std::move(return_expr),
-        std::move(name)
-    );
-}
-
-StmtPtr Parser::function_definition_modern(ModifierList mods)
-{
-    match(TokenType::Function);
-    Token name = match(TokenType::Identifier);
-    vector<TypePtr> template_types = template_list();
-    ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
-    match(TokenType::Arrow);
-    TypePtr type_ = type();
-    auto [body, return_expr] = function_body();
-    return std::make_unique<FunctionDefinition>(
-        std::move(mods),
-        std::move(type_),
         string{name.lexeme()},
         std::move(template_types),
         std::move(params),
@@ -733,7 +712,7 @@ ExprPtr Parser::function_call()
         template_type = type();
         match('>');
     }
-    vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
+    optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
     return std::make_unique<FunctionCall>(string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
 }
 
@@ -746,7 +725,7 @@ ExprPtr Parser::method_call(ExprPtr instance)
         template_type = type();
         match('>');
     }
-    vector<Argument> args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
+    optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
     return std::make_unique<MethodCall>(std::move(instance), string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
 }
 
@@ -849,7 +828,13 @@ bool Parser::is_function_call() const
         peek(3) == '>' and
         peek(4) == '(';
 
-    return is_func_call or is_templated_func_call;
+    const bool is_templated_paramless_func_call =
+        peek(0) == TokenType::Identifier and
+        peek(1) == '<' and
+        peek(2) == TokenType::Identifier and
+        peek(3) == '>';
+
+    return is_func_call or is_templated_paramless_func_call or is_templated_func_call;
 }
 
 bool Parser::is_constructor_definition() const

@@ -1,0 +1,11 @@
+float foo =>
+{
+    float x = 7.0;
+    float bar()
+    {
+        return x + 1.0;
+    }
+    return bar() + 2.0;
+}
+
+float theta = foo + 10.0;

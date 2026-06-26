@@ -12,7 +12,11 @@ void Statement::execute()
     try
     {
         if (not is_initialized_)
+        {
             init();
+            is_initialized_ = true;
+        }
+
         execute_impl();
     }
     catch (const CompileError& e)

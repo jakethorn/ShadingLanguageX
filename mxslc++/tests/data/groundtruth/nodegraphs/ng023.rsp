@@ -1,0 +1,4 @@
+compile
+tests/data/groundtruth/nodegraphs/ng023.mxsl
+--no-reduce-graph
+-g c "world"

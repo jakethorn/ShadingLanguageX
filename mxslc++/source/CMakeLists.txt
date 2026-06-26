@@ -66,6 +66,7 @@ add_library(mxslc_lib
         utils/instantiate_template_types_utils.cpp
         utils/parse_utils.cpp
         utils/type_cast.cpp
+        utils/InitInfo.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp
@@ -79,8 +80,10 @@ add_library(mxslc_lib
         values/ValueFactory.cpp
         values/NodeValue.cpp
         values/InterfaceValue.cpp
-        values/OutputValue.cpp
+        values/NodeOutputValue.cpp
         values/BasicValue.cpp
+        values/NodeGraphValue.cpp
+        values/NodeGraphOutputValue.cpp
         interface/Variable.cpp
 )
 

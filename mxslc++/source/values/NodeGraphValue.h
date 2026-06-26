@@ -1,17 +1,18 @@
 //
-// Created by jaket on 10/01/2026.
+// Created by jaket on 25/06/2026.
 //
 
-#ifndef MXSLC_OUTPUTVALUE_H
-#define MXSLC_OUTPUTVALUE_H
+#ifndef MXSLC_NODEGRAPHVALUE_H
+#define MXSLC_NODEGRAPHVALUE_H
 
-#include "Value.h"
 #include "utils/common.h"
+#include "Value.h"
 
-class OutputValue final : public Value
+class NodeGraphValue final : public Value
 {
 public:
-    OutputValue(TypePtr type, mx::NodePtr node, string output_name);
+    explicit NodeGraphValue(const mx::NodeGraphPtr& node_graph);
+    NodeGraphValue(TypePtr type, string node_graph_name);
 
     bool equals(const ValuePtr& other) const override;
 
@@ -21,8 +22,7 @@ public:
     string str() const override;
 
 private:
-    mx::NodePtr node_;
-    string output_name_;
+    string name_;
 };
 
-#endif //MXSLC_OUTPUTVALUE_H
+#endif //MXSLC_NODEGRAPHVALUE_H
