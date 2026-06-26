@@ -1540,7 +1540,7 @@ float viewing_angle =>
 {
     vec3 n = normal();
     vec3 i = viewdirection();
-    return normalize(dotproduct(n, i));
+    return dotproduct(n, i);
 }
 
 standard_surface(base_color = randomcolor() * viewing_angle);
