@@ -252,41 +252,39 @@ filename p = "my_image.exr"; // implicit string ➔ filename
 color3 c = color3{1.0};      // explicit float ➔ color3
 ```
 
-> [!TIP]
-> ### New in mxslc++!
-> ## User-Defined Types
->
-> ShadingLanguageX supports user-defined types through
-> [Unnamed Structs](#unnamed-struct),
-> [Using Statements](#using-statement) and
-> [Class Definitions](#class-definition). For example:
-> ```
-> // unnamed struct
-> {float, float} random_point()
-> {
->     return {randomfloat(), randomfloat()};
-> }
-> 
-> // using statement
-> using Point = {float x, float y};
-> 
-> float dotproduct(Point a, Point b)
-> {
->     return a.x * b.x + a.y * b.y;
-> }
-> 
-> // class definition
-> class Sphere
-> {
->     Point center;
->     float radius;
->     
->     float area()
->     {
->         return 4.0 * 3.14 * radius * radius;
->     }
-> }
-> ```
+## User-Defined Types
+
+ShadingLanguageX supports user-defined types through
+[Unnamed Structs](#unnamed-struct),
+[Using Statements](#using-statement) and
+[Class Definitions](#class-definition). For example:
+```
+// unnamed struct
+{float, float} random_point()
+{
+    return {randomfloat(), randomfloat()};
+}
+
+// using statement
+using Point = {float x, float y};
+
+float dotproduct(Point a, Point b)
+{
+    return a.x * b.x + a.y * b.y;
+}
+
+// class definition
+class Sphere
+{
+    Point center;
+    float radius;
+    
+    float area()
+    {
+        return 4.0 * 3.14 * radius * radius;
+    }
+}
+```
 
 ## `typeof` Operator
 
@@ -684,20 +682,18 @@ global int iter_count = 50
 
 ShadingLanguageX supports three modifiers for variable declarations: `mutable`, `const` and `global`.
 
-> [!TIP]
-> ### New in mxslc++!
-> ### Mutable
-> 
-> By default, variables in ShadingLanguageX are immutable (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/VariableMutability.md) for my reasoning behind this decision). To be able to change a variable after its initial definition, 
-> use the `mutable` modifier.
-> 
-> ```
-> int x = 1;
-> x = 2; // Error
-> 
-> mutable int y = 1;
-> y = 2; // OK
-> ```
+### Mutable
+
+By default, variables in ShadingLanguageX are immutable (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/VariableMutability.md) for my reasoning behind this decision). To be able to change a variable after its initial definition, 
+use the `mutable` modifier.
+
+```
+int x = 1;
+x = 2; // Error
+
+mutable int y = 1;
+y = 2; // OK
+```
 
 ### Const
 
@@ -739,13 +735,13 @@ mxslc.compile_file_to_file("example_1.mxsl", opts)
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-    <image name="node1" type="color3">
-        <input name="file" type="filename" value="..\brick.png" />
-    </image>
-    <multiply name="node2" type="color3">
-        <input name="in1" type="color3" nodename="node1" />
-        <input name="in2" type="color3" value="1, 0, 0" />
-    </multiply>
+  <image name="node1" type="color3">
+    <input name="file" type="filename" value="..\brick.png" />
+  </image>
+  <multiply name="node2" type="color3">
+    <input name="in1" type="color3" nodename="node1" />
+    <input name="in2" type="color3" value="1, 0, 0" />
+  </multiply>
 </materialx>
 ```
 
@@ -902,26 +898,24 @@ surfaceshader s = standard_surface(base_color=randomcolor());
 s.specular_roughness = randomfloat();
 ```
 
-> [!TIP]
-> ### New in mxslc++!
-> ## Increment/Decrement Operator
-> 
-> | Operation | Expands to                            |
-> |-----------|---------------------------------------|
-> | `i++;`    | Increase `i` by one after evaluation  |
-> | `i--;`    | Decrease `i` by one after evaluation  |
-> | `++i;`    | Increase `i` by one before evaluation |
-> | `--i;`    | Decrease `i` by one before evaluation |
-> 
-> ### Example
-> 
-> ```
-> int i = 0;
-> print i++; // prints 0, then increases i by 1
-> 
-> int j = 0;
-> print ++j; // increases j by 1, then prints 1
-> ```
+## Increment/Decrement Operator
+
+| Operation | Expands to                            |
+|-----------|---------------------------------------|
+| `i++;`    | Increase `i` by one after evaluation  |
+| `i--;`    | Decrease `i` by one after evaluation  |
+| `++i;`    | Increase `i` by one before evaluation |
+| `--i;`    | Decrease `i` by one before evaluation |
+
+### Example
+
+```
+int i = 0;
+print i++; // prints 0, then increases i by 1
+
+int j = 0;
+print ++j; // increases j by 1, then prints 1
+```
 
 ## Compound Assignment Operator
 
@@ -1066,48 +1060,46 @@ else
 };
 ```
 
-> [!TIP]
-> ### New in mxslc++!
-> # If Statement
-> 
-> ShadingLanguageX does support if statements; however, conditions must be evaluated at compile time, making them far less
-> powerful than if statements in other languages.
-> 
-> ```
-> if (condition)
-> {
->     statement*
-> }
-> else if (condition)
-> {
->     statement*
-> }
-> else
-> {
->     statement*
-> }
-> ```
-> 
-> ### Example
-> 
-> ```
-> if (true)
-> {
->     // do something
-> }
-> else
-> {
->     // do something else
-> }
-> ```
-> 
-> ```
-> float a = geompropvalue("a");
-> if (a > 0.5) // Error: runtime condition
-> {
->     // do something
-> }
-> ```
+# If Statement
+
+ShadingLanguageX does support if statements; however, conditions must be evaluated at compile time, making them far less
+powerful than if statements in other languages.
+
+```
+if (condition)
+{
+    statement*
+}
+else if (condition)
+{
+    statement*
+}
+else
+{
+    statement*
+}
+```
+
+### Example
+
+```
+if (true)
+{
+    // do something
+}
+else
+{
+    // do something else
+}
+```
+
+```
+float a = geompropvalue("a");
+if (a > 0.5) // Error: runtime condition
+{
+    // do something
+}
+```
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -1227,13 +1219,6 @@ standard_surface(base_color=c);
 Users can declare their own functions in ShadingLanguageX using the following syntax:
 ```
 modifier-list type name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...)
-{
-    statement*
-}
-
-OR
-
-modifier-list function name(modifier-list param1_type param1_name, modifier-list param2_type param2_name, ...) -> type
 {
     statement*
 }
@@ -1486,6 +1471,7 @@ foo(x, y);
 ## Inline Functions
 
 Functions in ShadingLanguageX will normally compile to a `NodeDef`/`NodeGraph` pair. For example:
+
 ```
 float add_one(float in)
 {
@@ -1498,21 +1484,24 @@ float y = add_one(5.0);
 Compiles to the following:
 ```xml
 <nodedef name="ND_add_one" node="add_one">
-    <output name="out" type="float" default="0.0" />
-    <input name="in" type="float" value="0" />
+  <output name="out" type="float" default="0.0" />
+  <input name="in" type="float" value="0" />
 </nodedef>
+
 <nodegraph name="NG_add_one" nodedef="ND_add_one">
-<add name="node3" type="float">
+  <add name="node3" type="float">
     <input name="in1" type="float" interfacename="in" />
     <input name="in2" type="float" value="1" />
-</add>
-<output name="out" type="float" nodename="node3" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
 </nodegraph>
+
 <add_one name="x" type="float">
-<input name="in" type="float" value="2" />
+  <input name="in" type="float" value="2" />
 </add_one>
+
 <add_one name="y" type="float">
-<input name="in" type="float" value="5" />
+  <input name="in" type="float" value="5" />
 </add_one>
 ```
 This can create a lot of overhead for small functions or functions you only plan to call once, or might be incompatible
@@ -1530,50 +1519,112 @@ float y = add_one(5.0);
 Instead, directly compiles to:
 ```xml
 <add name="x" type="float">
-    <input name="in1" type="float" value="2" />
-    <input name="in2" type="float" value="1" />
+  <input name="in1" type="float" value="2" />
+  <input name="in2" type="float" value="1" />
 </add>
+
 <add name="y" type="float">
-<input name="in1" type="float" value="5" />
-<input name="in2" type="float" value="1" />
+  <input name="in1" type="float" value="5" />
+  <input name="in2" type="float" value="1" />
 </add>
 ```
 
-> [!TIP]
-> ### New in mxslc++!
-> ## Default Functions
-> 
-> Functions can be declared as `default` to break ties when a function call could match two potential function overrides.
-> This was mainly implemented to make it more convenient to call some nodes from the MaterialX Standard Node library such as `randomfloat` and `randomcolor`
-> which have overrides with very similar signatures.
-> 
-> ```
-> vec3 foo(float in = 0.0)
-> {
->     return vec3{in};
-> }
-> 
-> vec3 foo(int in = 0)
-> {
->     return vec3{float{in}};
-> }
-> 
-> vec3 v = foo(); // Error: ambiguous function call
-> ```
-> 
-> ```
-> default vec3 foo(float in = 0.0)
-> {
->     return vec3{in};
-> }
-> 
-> vec3 foo(int in = 0)
-> {
->     return vec3{float{in}};
-> }
-> 
-> vec3 v = foo(); // OK: the default function is called
-> ```
+## Parameterless Functions
+
+Similar to inline functions, parameterless functions change the way functions are represented in MaterialX. In this case,
+the function is represented just as a `NodeGraph` without the `NodeDef`.  
+The syntax for parameterless functions is the same as for normal functions, except that the parameter list is replaced with
+the `=>` (fat arrow) operator during definition and the argument list is removed entirely when calling the function:
+```
+float viewing_angle =>
+{
+    vec3 n = normal();
+    vec3 i = viewdirection();
+    return normalize(dotproduct(n, i));
+}
+
+standard_surface(base_color = randomcolor() * viewing_angle);
+```
+```xml
+<nodegraph name="NG_viewing_angle">
+  <normal name="node1" type="vector3" />
+  <viewdirection name="node2" type="vector3" />
+  <dotproduct name="node3" type="float">
+    <input name="in1" type="vector3" nodename="node1" />
+    <input name="in2" type="vector3" nodename="node2" />
+  </dotproduct>
+  <output name="out" type="float" nodename="node3" />
+</nodegraph>
+
+<randomcolor name="node1" type="color3" />
+
+<multiply name="node2" type="color3">
+  <input name="in1" type="color3" nodename="node1" />
+  <input name="in2" type="float" nodegraph="NG_viewing_angle" />
+</multiply>
+
+<standard_surface name="node3" type="surfaceshader">
+  <input name="base_color" type="color3" nodename="node2" />
+</standard_surface>
+```
+
+Parameterless functions are pure functions, i.e., they are deterministic and cannot have any side effects, as such they
+cannot access nonlocal variables like regular functions. They can call other functions (parameterless or not), given 
+that those functions also do not access nonlocal variables. Otherwise, they behave just like regular functions; they share the
+same modifiers and can be declared as `inline` or `default`, can be declared as a class method, can contain `global` variables, can be templated, etc.
+
+### Example
+
+```
+inline T one<vec2, vec3, vec4> => { return T{1}; }
+inline T two<vec2, vec3, vec4> => { return T{2}; }
+
+{vec2 v2, vec3 v3, string s} foo =>
+{
+    auto a = one<vec2>; // template type necessary because variable type is auto
+    vec3 b = two;       // template type deduced from variable type
+    global string c;    // value assigned using the API
+    return {a, b, c};
+}
+
+vec2 x = foo.v2;
+vec3 y = foo.v3;
+string z = foo[2];
+```
+
+## Default Functions
+
+Functions can be declared as `default` to break ties when a function call could match two potential function overrides.
+This was mainly implemented to make it more convenient to call some nodes from the MaterialX Standard Node library such as `randomfloat` and `randomcolor`
+which have overrides with very similar signatures.
+
+```
+vec3 foo(float in = 0.0)
+{
+    return vec3{in};
+}
+
+vec3 foo(int in = 0)
+{
+    return vec3{float{in}};
+}
+
+vec3 v = foo(); // Error: ambiguous function call
+```
+
+```
+default vec3 foo(float in = 0.0)
+{
+    return vec3{in};
+}
+
+vec3 foo(int in = 0)
+{
+    return vec3{float{in}};
+}
+
+vec3 v = foo(); // OK: the default function is called
+```
 
 ### Notes
 
@@ -1904,15 +1955,15 @@ float add_one(float in)
 ```
 ```xml
 <nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
-    <output name="out" type="float" default="0.0" />
-    <input name="in" type="float" value="0" />
+  <output name="out" type="float" default="0.0" />
+  <input name="in" type="float" value="0" />
 </nodedef>
 <nodegraph name="NG_add_one" nodedef="ND_add_one">
-<add name="node3" type="float">
+  <add name="node3" type="float">
     <input name="in1" type="float" interfacename="in" />
     <input name="in2" type="float" value="1" />
-</add>
-<output name="out" type="float" nodename="node3" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
 </nodegraph>
 ```
 Attributes can also be added to the input/output elements of a NodeDef by specifying the name of the port before the attribute
@@ -1929,15 +1980,15 @@ float add_one(float in)
 ```
 ```xml
 <nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
-    <output name="out" type="float" default="0.0" doc="the incremented value" />
-    <input name="in" type="float" value="0" doc="the value to be incremented" />
+  <output name="out" type="float" default="0.0" doc="the incremented value" />
+  <input name="in" type="float" value="0" doc="the value to be incremented" />
 </nodedef>
 <nodegraph name="NG_add_one" nodedef="ND_add_one">
-<add name="node3" type="float">
+  <add name="node3" type="float">
     <input name="in1" type="float" interfacename="in" />
     <input name="in2" type="float" value="1" />
-</add>
-<output name="out" type="float" nodename="node3" />
+  </add>
+  <output name="out" type="float" nodename="node3" />
 </nodegraph>
 ```
 An alternative syntax is to place the attributes directly above parameters. This can be useful for functions with a large
@@ -1971,85 +2022,29 @@ color3 c = image(
 ```
 ```xml
 <image name="c" type="color3" doc="an image of a butterfly">
-    <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
+  <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
 </image>
 ```
 
-> [!TIP]
-> ### New in mxslc++!
-> ## Document Attributes
-> 
-> To apply attributes at the document level, use `@@` instead of `@`.
-> 
-> ```
-> @@madewith "shadinglanguagex"
-> 
-> standard_surface(base_color = randomcolor());
-> ```
-> 
-> ```xml
-> <?xml version="1.0"?>
-> <materialx version="1.39" madewith="shadinglanguagex">
->   <randomcolor name="node1" type="color3" />
->   <standard_surface name="node2" type="surfaceshader">
->     <input name="base_color" type="color3" nodename="node1" />
->   </standard_surface>
-> </materialx>
-> 
-> ```
+## Document Attributes
 
-> [!WARNING]
-> ### Not yet supported in mxslc++
-> # Node Constructor
-> 
-> Node constructors are a unique expression to ShadingLanguageX.
-> 
-> ```
-> {string, type: input1=value1, input2=value2...}
-> ```  
-> `string` can be any valid string value.    
-> `type` can be any supported data type.  
-> `inputN` can be any valid identifier.
-> `valueN` can be any valid expression.
-> 
-> Node constructors compile to the node element specified by `string` and the type specified by `type`. Node inputs are compiled from
-> the list of inputs that come after the colon `:`.
-> 
-> Node constructors give developers the ability to define any node that they want, regardless of whether it is implemented
-> in ShadingLanguageX or not. For example, the `normalmap` node from the MaterialX Standard Node specification changed signature
-> in v1.39. However, many renderers are still using the v1.38 signature. Node constructors can be used to create node elements
-> with an old input signature to ensure compatability with as many renderers as possible, or to declare nodes that are not defined
-> in the MaterialX specification, such as renderer specific nodes.
-> 
-> ### Example
-> 
-> #### Normalmap compatability
-> ```
-> vec3 normals = image("normals.png");
-> 
-> // v1.38 normalmap
-> vec3 nm = {"normalmap", vec3: in=normals, space="tangent", scale=0.1};
-> ```
-> compiles to:
-> ```
-> <normalmap name="nm" type="vector3">
->   <input name="in" type="vector3" nodename="normals" />
->   <input name="space" type="string" value="tangent" />
->   <input name="scale" type="float" value="0.1" />
-> </normalmap>
-> ...
-> ```
-> 
-> #### Renderer-specific nodes
-> ```
-> // Houdini bias node
-> float bias = {"hmtlxbias", float: in=0.0, bias=0.5};
-> ```
-> 
-> ### Note
-> 
-> Unlike the rest of ShadingLanguageX, node constructors do not perform any type checking. In fact, the data type of the inputs
-> is determined by the values that are passed to them.
+To apply attributes at the document level, use `@@` instead of `@`.
+
+```
+@@madewith "shadinglanguagex"
+
+standard_surface(base_color = randomcolor());
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39" madewith="shadinglanguagex">
+  <randomcolor name="node1" type="color3" />
+  <standard_surface name="node2" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="node1" />
+  </standard_surface>
+</materialx>
+```
 
 # Null Expression
 
