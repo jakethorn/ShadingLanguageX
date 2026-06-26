@@ -52,6 +52,7 @@ public:
         AmpersandEq,
         PipeEq,
         Arrow,
+        FatArrow,
         DoubleColon,
         Increment,
         Decrement,
@@ -74,8 +75,6 @@ public:
         Global,
         Inline,
         Default,
-        Function,
-        Typedef,
         Using,
         Class,
         This,
@@ -107,12 +106,12 @@ public:
 
     inline static const unordered_set CompoundSymbols {
         BangEq, EqualsEq, GreaterEq, LessEq, PlusEq, MinusEq, StarEq, SlashEq, PercentEq, CaretEq, AmpersandEq, PipeEq,
-        Arrow, DoubleColon, Increment, Decrement, DoubleAt
+        Arrow, FatArrow, DoubleColon, Increment, Decrement, DoubleAt
     };
 
     inline static const unordered_set Keywords {
         If, Else, Switch, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
-        Function, Typedef, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
+        Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
     };
 
 private:
@@ -130,6 +129,7 @@ private:
         {"&=", AmpersandEq},
         {"|=", PipeEq},
         {"->", Arrow},
+        {"=>", FatArrow},
         {"::", DoubleColon},
         {"++", Increment},
         {"--", Decrement},
@@ -150,8 +150,6 @@ private:
         {"global", Global},
         {"inline", Inline},
         {"default", Default},
-        {"function", Function},
-        {"typedef", Typedef},
         {"using", Using},
         {"class", Class},
         {"this", This},

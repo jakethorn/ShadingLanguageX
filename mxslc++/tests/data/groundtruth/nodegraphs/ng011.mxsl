@@ -1,0 +1,13 @@
+float foo =>
+{
+    mutable float x = 7.0;
+    void bar()
+    {
+        x = x + 1.0;
+    }
+    bar();
+    return x + 2.0;
+}
+
+float theta1 = foo + 10.0;
+float theta2 = foo + 20.0;

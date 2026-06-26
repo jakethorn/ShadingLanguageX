@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="float" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <add name="node1" type="float">
+      <input name="in1" type="float" value="7" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodegraph name="NG_foo">
+    <bar name="node1" type="float" />
+    <add name="node2" type="float">
+      <input name="in1" type="float" nodename="node1" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="node2" />
+  </nodegraph>
+  <add name="node1" type="float">
+    <input name="in1" type="float" nodegraph="NG_foo" />
+    <input name="in2" type="float" value="4" />
+  </add>
+</materialx>

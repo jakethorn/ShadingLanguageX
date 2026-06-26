@@ -19,14 +19,37 @@ FunctionQuery::FunctionQuery(const string& name, const TypePtr& template_type)
 
 }
 
-FunctionQuery::FunctionQuery(const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args)
-    : return_types{&return_types}, name{&name}, template_type{&template_type}, args{&args}
+FunctionQuery::FunctionQuery(const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless)
+    : return_types{&return_types}, name{&name}, is_parameterless{&is_parameterless}
 {
 
 }
 
-FunctionQuery::FunctionQuery(const TypePtr& class_type, const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args)
-    : class_type{&class_type}, return_types{&return_types}, name{&name}, template_type{&template_type}, args{&args}
+FunctionQuery::FunctionQuery(const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args, const bool& is_parameterless)
+    : return_types{&return_types}, name{&name}, template_type{&template_type}, args{&args}, is_parameterless{&is_parameterless}
+{
+
+}
+
+FunctionQuery::FunctionQuery(const TypePtr& class_type,const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless)
+    : class_type{&class_type}, return_types{&return_types}, name{&name}, is_parameterless{&is_parameterless}
+{
+
+}
+
+FunctionQuery::FunctionQuery(
+    const TypePtr& class_type,
+    const vector<TypePtr>& return_types,
+    const string& name,
+    const TypePtr& template_type,
+    const ArgumentList& args,
+    const bool& is_parameterless
+) : class_type{&class_type},
+    return_types{&return_types},
+    name{&name},
+    template_type{&template_type},
+    args{&args},
+    is_parameterless{&is_parameterless}
 {
     
 }
@@ -38,7 +61,8 @@ FunctionQuery::Result FunctionQuery::is_match(const FuncPtr& func) const
     const Result name_result = name_matches(func);
     const Result template_type_result = template_type_matches(func);
     const Result arguments_result = arguments_match(func);
-    const Result final_result = class_type_result & return_type_result & name_result & template_type_result & arguments_result;
+    const Result is_parameterless_result = is_parameterless_matches(func);
+    const Result final_result = class_type_result & return_type_result & name_result & template_type_result & arguments_result & is_parameterless_result;
     return final_result;
 }
 
@@ -124,8 +148,7 @@ FunctionQuery::Result FunctionQuery::name_matches(const FuncPtr& func) const
 {
     if (name == nullptr)
         return Result::Ignore;
-    const Result result = func->name() == *name;
-    return result;
+    return func->name() == *name;
 }
 
 FunctionQuery::Result FunctionQuery::template_type_matches(const FuncPtr& func) const
@@ -160,6 +183,13 @@ FunctionQuery::Result FunctionQuery::arguments_match(const FuncPtr& func) const
     }
 
     return result;
+}
+
+FunctionQuery::Result FunctionQuery::is_parameterless_matches(const FuncPtr& func) const
+{
+    if (is_parameterless == nullptr)
+        return Result::Ignore;
+    return func->is_parameterless() == *is_parameterless;
 }
 
 vector<FuncPtr> FunctionQuery::get_default_functions(const vector<FuncPtr>& funcs) const

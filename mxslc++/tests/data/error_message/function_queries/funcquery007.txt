@@ -1,1 +1,1 @@
-funcquery007.mxsl, line 6: Variable not defined: something
+funcquery007.mxsl, line 6: Variable or parameterless function not defined or ambiguous: something

@@ -26,7 +26,7 @@ public:
         TypePtr return_type,
         string name,
         TypePtr template_type,
-        ParameterList params,
+        optional<ParameterList> params,
         StmtPtr body,
         ExprPtr return_expr
     );
@@ -45,11 +45,14 @@ public:
     size_t min_arity() const;
     size_t max_arity() const { return params_.size(); }
     const ParameterList& parameters() const { return params_; }
+    bool is_parameterless() const { return is_parameterless_; }
     bool is_defined() const { return body_ != nullptr; }
     mx::NodeDefPtr node_def() const { return node_def_; }
+    mx::NodeGraphPtr node_graph() const { return node_graph_; }
     bool is_initialized() const { return is_initialized_; }
 
     void set_node_def(mx::NodeDefPtr node_def);
+    void set_node_graph(mx::NodeGraphPtr node_graph);
     vector<string> output_names() const;
 
     void init();
@@ -78,7 +81,11 @@ private:
     ParameterList params_;
     StmtPtr body_;
     ExprPtr return_expr_;
+
     mx::NodeDefPtr node_def_;
+    mx::NodeGraphPtr node_graph_;
+    bool is_parameterless_ = false;
+
     bool is_initialized_ = false;
 
     vector<VarPtr> nonlocal_inputs_;
@@ -86,6 +93,8 @@ private:
 
     weak_ptr<Type> class_type_;
     bool mutates_instance_ = false;
+
+    mutable VarPtr parameterless_cache_ = nullptr;
 };
 
 #endif //MXSLC_FUNCTION_H

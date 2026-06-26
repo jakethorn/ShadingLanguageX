@@ -1,0 +1,1 @@
+ng007.mxsl, line 5: Cannot access nonlocal variables in parameterless function

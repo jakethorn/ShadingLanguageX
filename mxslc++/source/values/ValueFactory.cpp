@@ -8,8 +8,10 @@
 
 #include "CompileError.h"
 #include "InterfaceValue.h"
+#include "NodeGraphOutputValue.h"
+#include "NodeGraphValue.h"
 #include "NodeValue.h"
-#include "OutputValue.h"
+#include "NodeOutputValue.h"
 #include "mtlx/mtlx_utils.h"
 #include "runtime/Function.h"
 #include "runtime/Type.h"
@@ -39,7 +41,7 @@ VarPtr ValueFactory::create_node_value(mx::NodePtr node, const mx::NodeDefPtr& n
 {
     if (node_def->getOutputCount() > 1)
     {
-        return create_output_value(std::move(node), std::move(type), "out"s);
+        return create_output_value(std::move(node), std::move(type), "out");
     }
     else
     {
@@ -58,6 +60,24 @@ VarPtr ValueFactory::create_node_value(mx::NodePtr node, const FuncPtr& func)
     {
         return create_output_values(std::move(node), func->return_type(), func->output_names());
     }
+}
+
+VarPtr ValueFactory::create_node_graph_value(const mx::NodeGraphPtr& node_graph, TypePtr type)
+{
+    if (node_graph->getOutputCount() > 1)
+    {
+        return create_output_value(std::move(node_graph), std::move(type), "out");
+    }
+    else
+    {
+        ValuePtr value = std::make_shared<NodeGraphValue>(std::move(node_graph));
+        return Variable::create(std::move(value));
+    }
+}
+
+VarPtr ValueFactory::create_node_graph_value(const FuncPtr& func)
+{
+    return create_node_graph_value(func->node_graph(), func->return_type());
 }
 
 VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const string& output_name)
@@ -82,7 +102,7 @@ VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const s
     else
     {
         attrs.add_to(node, output_name);
-        ValuePtr value = std::make_shared<OutputValue>(std::move(type), std::move(node), output_name);
+        ValuePtr value = std::make_shared<NodeOutputValue>(std::move(type), std::move(node), output_name);
         return Variable::create(std::move(value));
     }
 }
@@ -98,6 +118,27 @@ VarPtr ValueFactory::create_output_values(mx::NodePtr node, TypePtr type, const 
         field_values.push_back(std::move(field_value));
     }
     return Variable::create(std::move(type), field_values);
+}
+
+VarPtr ValueFactory::create_output_value(mx::NodeGraphPtr node_graph, TypePtr type, const string& output_name)
+{
+    if (type->has_fields())
+    {
+        vector<VarPtr> field_values;
+        field_values.reserve(type->field_count());
+        for (size_t i = 0; i < type->field_count(); ++i)
+        {
+            VarPtr field_value = create_output_value(node_graph, type->field_type(i), get_port_name(output_name, i));
+            field_values.push_back(std::move(field_value));
+        }
+
+        return Variable::create(std::move(type), field_values);
+    }
+    else
+    {
+        ValuePtr value = std::make_shared<NodeGraphOutputValue>(std::move(type), std::move(node_graph), output_name);
+        return Variable::create(std::move(value));
+    }
 }
 
 VarPtr ValueFactory::create_default_value(TypePtr type)
@@ -150,7 +191,7 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
 
     if (port->hasOutputString())
     {
-        return std::make_shared<OutputValue>(Type::of(port), port->getConnectedNode(), port->getOutputString());
+        return std::make_shared<NodeOutputValue>(Type::of(port), port->getConnectedNode(), port->getOutputString());
     }
 
     if (port->hasNodeName())

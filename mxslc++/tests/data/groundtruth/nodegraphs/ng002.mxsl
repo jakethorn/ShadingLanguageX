@@ -1,0 +1,6 @@
+{vec3 n, string space} foo =>
+{
+    return {normal(), "world"};
+}
+
+float theta = dotproduct(foo.n, viewdirection(foo.space));

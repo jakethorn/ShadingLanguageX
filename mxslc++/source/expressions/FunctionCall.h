@@ -12,12 +12,12 @@
 class FunctionCall : public Expression
 {
 public:
-    FunctionCall(string name, ArgumentList args);
-    FunctionCall(string name, ArgumentList args, Token token);
-    FunctionCall(string name, TypePtr template_type, ArgumentList args);
-    FunctionCall(string name, TypePtr template_type, ArgumentList args, Token token);
-    FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs);
-    FunctionCall(string name, TypePtr template_type, ArgumentList args, AttributeList attrs, Token token);
+    FunctionCall(string name, optional<ArgumentList> args);
+    FunctionCall(string name, optional<ArgumentList> args, Token token);
+    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args);
+    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, Token token);
+    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
+    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -37,6 +37,7 @@ protected:
     string name_;
     TypePtr template_type_;
     ArgumentList args_;
+    bool is_argumentless_ = false;
 
     FuncPtr func_ = nullptr;
 

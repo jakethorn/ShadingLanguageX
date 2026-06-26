@@ -116,6 +116,16 @@ size_t Type::field_index(const string& name) const
     throw CompileError{"Expression of type " + str() + " does not have a field with the name " + name};
 }
 
+void Type::add_method(weak_ptr<Function> method)
+{
+    methods_.push_back(std::move(method));
+}
+
+vector<FuncPtr> Type::methods() const
+{
+    return lock(methods_);
+}
+
 size_t Type::component_count() const
 {
     assert(is_vector());
@@ -259,6 +269,19 @@ string Type::str() const
     result.pop_back();
 
     result += "}";
+    return result;
+}
+
+TypePtr Type::of(const mx::NodeGraphPtr& node_graph)
+{
+    if (node_graph->getOutputCount() == 1)
+        return Type::of(node_graph->getOutputs()[0]);
+
+    vector<TypePtr> types;
+    for (const mx::OutputPtr& output : node_graph->getOutputs())
+        types.push_back(Type::of(output));
+    TypePtr result = std::make_shared<Type>(types);
+    result->set_resolved();
     return result;
 }
 

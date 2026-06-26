@@ -112,6 +112,9 @@ size_t Variable::child_count() const
 
 VarPtr Variable::child(const size_t index)
 {
+    if (index >= children_.size())
+        throw CompileError{"Index out of bounds: " + ::str(index)};
+
     return children_.at(index);
 }
 

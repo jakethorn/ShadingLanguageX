@@ -36,7 +36,7 @@ void DotOperator::init_impl(const vector<TypePtr>& types)
     }
     else
     {
-        accessor_ = std::make_unique<FieldAccessor>(std::move(var), token_.lexeme());
+        accessor_ = std::make_unique<FieldAccessor>(types, std::move(var), token_.lexeme());
     }
 }
 

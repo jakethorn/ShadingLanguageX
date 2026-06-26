@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <convert name="node1" type="vector2">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <convert name="node2" type="vector2">
+    <input name="in" type="float" value="2" />
+  </convert>
+  <add name="node3" type="vector2">
+    <input name="in1" type="vector2" nodename="node1" />
+    <input name="in2" type="vector2" nodename="node2" />
+  </add>
+  <convert name="node4" type="vector3">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <convert name="node5" type="vector3">
+    <input name="in" type="float" value="2" />
+  </convert>
+  <add name="node6" type="vector3">
+    <input name="in1" type="vector3" nodename="node4" />
+    <input name="in2" type="vector3" nodename="node5" />
+  </add>
+  <convert name="node7" type="vector4">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <convert name="node8" type="vector4">
+    <input name="in" type="float" value="2" />
+  </convert>
+  <add name="node9" type="vector4">
+    <input name="in1" type="vector4" nodename="node7" />
+    <input name="in2" type="vector4" nodename="node8" />
+  </add>
+</materialx>

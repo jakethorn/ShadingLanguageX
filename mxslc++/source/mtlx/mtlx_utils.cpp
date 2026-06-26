@@ -27,7 +27,7 @@ mx::InputPtr add_or_get_input(const mx::NodePtr& node, const TypePtr& type, cons
 mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const TypePtr& type, const string& name)
 {
     mx::NodeDefPtr node_def = node_graph->getNodeDef();
-    if (node_def->getOutput(name) == nullptr)
+    if (node_def and node_def->getOutput(name) == nullptr)
         node_def->addOutput(name, type->name());
 
     mx::OutputPtr output = node_graph->getOutput(name);

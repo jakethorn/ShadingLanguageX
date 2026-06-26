@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodegraph name="NG_foo">
+    <normal name="node1" type="vector3" />
+    <output name="out" type="vector3" nodename="node1" />
+  </nodegraph>
+  <nodegraph name="NG_bar">
+    <output name="out__0" type="vector3" nodegraph="NG_foo" />
+    <output name="out__1" type="string" value="world" />
+  </nodegraph>
+  <viewdirection name="node1" type="vector3">
+    <input name="space" type="string" output="out__1" nodegraph="NG_bar" />
+  </viewdirection>
+  <dotproduct name="node2" type="float">
+    <input name="in1" type="vector3" output="out__0" nodegraph="NG_bar" />
+    <input name="in2" type="vector3" nodename="node1" />
+  </dotproduct>
+</materialx>

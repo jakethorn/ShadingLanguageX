@@ -1,0 +1,16 @@
+float foo1 =>
+{
+    return 1.0;
+}
+
+float foo2 =>
+{
+    return 2.0;
+}
+
+float bar =>
+{
+    return foo1 + foo2;
+}
+
+float theta = bar + 3.0;

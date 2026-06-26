@@ -91,10 +91,22 @@ public:
     };
 
     FunctionQuery() = default;
+
     explicit FunctionQuery(const string& name);
     FunctionQuery(const string& name, const TypePtr& template_type);
-    FunctionQuery(const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args);
-    FunctionQuery(const TypePtr& class_type, const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args);
+
+    FunctionQuery(const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless);
+    FunctionQuery(const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args, const bool& is_parameterless);
+
+    FunctionQuery(const TypePtr& class_type, const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless);
+    FunctionQuery(
+        const TypePtr& class_type,
+        const vector<TypePtr>& return_types,
+        const string& name,
+        const TypePtr& template_type,
+        const ArgumentList& args,
+        const bool& is_parameterless
+    );
 
     // non-owning pointers
     const TypePtr* class_type = nullptr;
@@ -102,6 +114,7 @@ public:
     const string* name = nullptr;
     const TypePtr* template_type = nullptr;
     const ArgumentList* args = nullptr;
+    const bool* is_parameterless = nullptr;
 
     Result is_match(const FuncPtr& func) const;
     Result has_match(const vector<FuncPtr>& funcs) const;
@@ -114,6 +127,7 @@ private:
     Result name_matches(const FuncPtr& func) const;
     Result template_type_matches(const FuncPtr& func) const;
     Result arguments_match(const FuncPtr& func) const;
+    Result is_parameterless_matches(const FuncPtr& func) const;
 
     vector<FuncPtr> get_default_functions(const vector<FuncPtr>& funcs) const;
 };

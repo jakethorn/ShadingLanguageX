@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodegraph name="NG_Foo_bar">
+    <normal name="node1" type="vector3" />
+    <output name="out" type="vector3" nodename="node1" />
+  </nodegraph>
+  <viewdirection name="node1" type="vector3" />
+  <dotproduct name="node2" type="float">
+    <input name="in1" type="vector3" nodegraph="NG_Foo_bar" />
+    <input name="in2" type="vector3" nodename="node1" />
+  </dotproduct>
+</materialx>

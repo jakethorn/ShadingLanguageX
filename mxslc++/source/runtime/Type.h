@@ -40,15 +40,8 @@ public:
     TypePtr field_type(const size_t index) const { return field(index).type(); }
     TypePtr field_type(const string& name) const { return field(name).type(); }
 
-    void add_method(weak_ptr<Function> method)
-    {
-        methods_.push_back(std::move(method));
-    }
-
-    vector<FuncPtr> methods() const
-    {
-        return lock(methods_);
-    }
+    void add_method(weak_ptr<Function> method);
+    vector<FuncPtr> methods() const;
 
     size_t component_count() const;
 
@@ -91,6 +84,7 @@ public:
     template<typename T>
     static TypePtr of() { return resolve(TypeName::of<T>()); }
     static TypePtr of(const primitive_t& value) { return resolve(TypeName::of(value)); }
+    static TypePtr of(const mx::NodeGraphPtr& node_graph);
     static TypePtr of(const mx::TypedElementPtr& value);
     static TypePtr of(const mxslc::Variable& var);
     static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);

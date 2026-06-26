@@ -10,7 +10,7 @@
 class Identifier final : public Expression
 {
 public:
-    explicit Identifier(Token name) : Expression{std::move(name)} { }
+    explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -20,8 +20,7 @@ protected:
     VarPtr evaluate_impl() const override;
 
 private:
-    const string& name() const { return token_.lexeme(); }
-
+    string name_;
     VarPtr var_;
 };
 

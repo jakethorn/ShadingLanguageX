@@ -4,6 +4,8 @@
 
 #include "Function.h"
 
+#include <cassert>
+
 #include "expressions/Expression.h"
 #include "statements/Statement.h"
 #include "Scope.h"
@@ -33,16 +35,17 @@ Function::Function(
     TypePtr return_type,
     string name,
     TypePtr template_type,
-    ParameterList params,
+    optional<ParameterList> params,
     StmtPtr body,
     ExprPtr return_expr
 ) : mods_{std::move(mods)},
     return_type_{std::move(return_type)},
     name_{std::move(name)},
     template_type_{std::move(template_type)},
-    params_{std::move(params)},
+    params_{std::move(params).value_or(ParameterList{})},
     body_{std::move(body)},
-    return_expr_{std::move(return_expr)}
+    return_expr_{std::move(return_expr)},
+    is_parameterless_{not params.has_value()}
 {
     mods_.validate(TokenType::Inline, TokenType::Default);
 
@@ -50,6 +53,9 @@ Function::Function(
         throw CompileError{"Void function '" + name_ + "' has a return statement"};
     if (not return_type_->is_void() and return_expr_ == nullptr)
         throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"};
+
+    if (return_type_->is_void() and is_parameterless_)
+        throw CompileError{"Parameterless function '" + name_ + "' cannot be void"};
 }
 
 Function::Function(Function&& other) noexcept
@@ -89,7 +95,15 @@ size_t Function::min_arity() const
 
 void Function::set_node_def(mx::NodeDefPtr node_def)
 {
+    assert(node_def_ == nullptr);
+    assert(not is_parameterless_);
     node_def_ = std::move(node_def);
+}
+
+void Function::set_node_graph(mx::NodeGraphPtr node_graph)
+{
+    assert(node_graph_ == nullptr);
+    node_graph_ = std::move(node_graph);
 }
 
 vector<string> Function::output_names() const
@@ -118,6 +132,9 @@ void Function::init()
 
 VarPtr Function::invoke() const
 {
+    if (parameterless_cache_)
+        return parameterless_cache_;
+
     body_->execute();
 
     if (is_void())
@@ -127,7 +144,10 @@ VarPtr Function::invoke() const
     else
     {
         return_expr_->init(return_type_);
-        return type_cast(return_type_, return_expr_->evaluate(), true);
+        VarPtr return_value = type_cast(return_type_, return_expr_->evaluate(), true);
+        if (is_parameterless_)
+            parameterless_cache_ = return_value;
+        return return_value;
     }
 }
 
@@ -139,8 +159,15 @@ string Function::str() const
     result += " " + name_;
     if (template_type_)
         result += "<" + template_type_->str() + ">";
-    result += "(";
-    result += params_.str();
-    result += ")";
+    if (is_parameterless_)
+    {
+        result += " [[parameterless]]";
+    }
+    else
+    {
+        result += "(";
+        result += params_.str();
+        result += ")";
+    }
     return result;
 }

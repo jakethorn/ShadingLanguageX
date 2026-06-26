@@ -12,12 +12,13 @@
 class FunctionDefinition final : public Statement
 {
 public:
-    FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr);
-    FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, ParameterList params, StmtPtr body, ExprPtr return_expr, Token token);
+    FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, optional<ParameterList> params, StmtPtr body, ExprPtr return_expr);
+    FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, optional<ParameterList> params, StmtPtr body, ExprPtr return_expr, Token token);
 
     void set_attributes(AttributeList attrs) override;
 
     StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+    void init() override;
 
     const vector<FuncPtr>& functions() const { return funcs_; }
 
@@ -31,7 +32,7 @@ private:
     TypePtr type_;
     string name_;
     vector<TypePtr> template_types_;
-    ParameterList params_;
+    optional<ParameterList> params_;
     StmtPtr body_;
     ExprPtr return_expr_;
 

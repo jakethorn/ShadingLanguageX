@@ -1,0 +1,14 @@
+
+class Foo
+{
+    float x;
+    float y;
+
+    vec3 bar =>
+    {
+        return vec3{this.x, this.y, 0.0};
+    }
+}
+
+Foo foo;
+float theta = dotproduct(foo.bar, viewdirection());

@@ -11,7 +11,7 @@
 class FieldAccessor final : public Accessor
 {
 public:
-    FieldAccessor(VarPtr var, const string& property);
+    FieldAccessor(const vector<TypePtr>& types, VarPtr var, const string& property);
     FieldAccessor(VarPtr var, int index);
 
     TypePtr type() const override;
@@ -19,7 +19,7 @@ public:
 
 private:
     VarPtr var_;
-    size_t index_;
+    VarPtr field_var_;
 };
 
 #endif //MXSLC_FIELDACCESSOR_H

@@ -8,10 +8,10 @@
 #include "Value.h"
 #include "utils/common.h"
 
-class OutputValue final : public Value
+class NodeOutputValue final : public Value
 {
 public:
-    OutputValue(TypePtr type, mx::NodePtr node, string output_name);
+    NodeOutputValue(TypePtr type, mx::NodePtr node, string output_name);
 
     bool equals(const ValuePtr& other) const override;
 

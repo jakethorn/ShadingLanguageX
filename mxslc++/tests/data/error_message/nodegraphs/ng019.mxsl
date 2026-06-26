@@ -1,0 +1,6 @@
+vec3 foo =>
+{
+    return normal();
+}
+
+float theta = dotproduct(foo(), viewdirection());
