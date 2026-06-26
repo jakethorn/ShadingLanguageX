@@ -11,9 +11,8 @@
 class NodeGraphValue final : public Value
 {
 public:
-    explicit NodeGraphValue(mx::NodeGraphPtr node_graph);
-
-    mx::NodeGraphPtr node_graph() const { return node_graph_; }
+    explicit NodeGraphValue(const mx::NodeGraphPtr& node_graph);
+    NodeGraphValue(TypePtr type, string node_graph_name);
 
     bool equals(const ValuePtr& other) const override;
 
@@ -23,7 +22,7 @@ public:
     string str() const override;
 
 private:
-    mx::NodeGraphPtr node_graph_;
+    string name_;
 };
 
 #endif //MXSLC_NODEGRAPHVALUE_H

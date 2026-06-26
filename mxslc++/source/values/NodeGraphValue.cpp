@@ -10,7 +10,12 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 
-NodeGraphValue::NodeGraphValue(mx::NodeGraphPtr node_graph) : Value{Type::of(node_graph)}, node_graph_{std::move(node_graph)}
+NodeGraphValue::NodeGraphValue(const mx::NodeGraphPtr& node_graph) : NodeGraphValue{Type::of(node_graph), node_graph->getName()}
+{
+
+}
+
+NodeGraphValue::NodeGraphValue(TypePtr type, string node_graph_name) : Value{std::move(type)}, name_{std::move(node_graph_name)}
 {
 
 }
@@ -18,22 +23,22 @@ NodeGraphValue::NodeGraphValue(mx::NodeGraphPtr node_graph) : Value{Type::of(nod
 bool NodeGraphValue::equals(const ValuePtr& other) const
 {
     if (const shared_ptr<NodeGraphValue> other_node = std::dynamic_pointer_cast<NodeGraphValue>(other))
-        return node_graph_ == other_node->node_graph_;
+        return name_ == other_node->name_;
     return false;
 }
 
 void NodeGraphValue::set_as_node_input(const mx::InputPtr& input) const
 {
-    input->setNodeGraphString(node_graph_->getName());
+    input->setNodeGraphString(name_);
 }
 
 void NodeGraphValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
 {
     const mx::OutputPtr output = add_or_get_output(node_graph, type_, output_name);
-    output->setNodeGraphString(node_graph_->getName());
+    output->setNodeGraphString(name_);
 }
 
 string NodeGraphValue::str() const
 {
-    return node_graph_->asString();
+    return name_;
 }

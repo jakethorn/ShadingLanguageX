@@ -189,14 +189,24 @@ ValuePtr ValueFactory::copy_value_from_port(const mx::PortElementPtr& port)
         return std::make_shared<InterfaceValue>(Type::of(port), port->getInterfaceName());
     }
 
-    if (port->hasOutputString())
-    {
-        return std::make_shared<NodeOutputValue>(Type::of(port), port->getConnectedNode(), port->getOutputString());
-    }
-
     if (port->hasNodeName())
     {
+        if (port->hasOutputString())
+        {
+            return std::make_shared<NodeOutputValue>(Type::of(port), port->getConnectedNode(), port->getOutputString());
+        }
+
         return std::make_shared<NodeValue>(port->getConnectedNode());
+    }
+
+    if (port->hasNodeGraphString())
+    {
+        if (port->hasOutputString())
+        {
+            return std::make_shared<NodeGraphOutputValue>(Type::of(port), port->getNodeGraphString(), port->getOutputString());
+        }
+
+        return std::make_shared<NodeGraphValue>(Type::of(port), port->getNodeGraphString());
     }
 
     if (port->hasValue())

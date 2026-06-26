@@ -11,7 +11,8 @@
 class NodeGraphOutputValue final : public Value
 {
 public:
-    NodeGraphOutputValue(TypePtr type, mx::NodeGraphPtr node_graph, string output_name);
+    NodeGraphOutputValue(TypePtr type, const mx::NodeGraphPtr& node_graph, string output_name);
+    NodeGraphOutputValue(TypePtr type, string node_graph_name, string output_name);
 
     bool equals(const ValuePtr& other) const override;
 
@@ -21,7 +22,7 @@ public:
     string str() const override;
 
 private:
-    mx::NodeGraphPtr node_graph_;
+    string node_graph_name_;
     string output_name_;
 };
 
