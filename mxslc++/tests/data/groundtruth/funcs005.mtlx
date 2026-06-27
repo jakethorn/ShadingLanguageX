@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" />
+    <input name="s" type="string" value="" />
+    <input name="v" type="vector3" value="0, 0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="float" value="0" />
+  </nodegraph>
+  <nodedef name="ND_foo2" node="foo">
+    <output name="out" type="float" />
+    <input name="i" type="integer" value="0" />
+    <input name="v" type="vector2" value="0, 0" />
+  </nodedef>
+  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+    <output name="out" type="float" value="1" />
+  </nodegraph>
+  <texcoord name="node1" type="vector3" />
+  <foo name="node2" type="float">
+    <input name="s" type="string" value="world" />
+    <input name="v" type="vector3" nodename="node1" />
+  </foo>
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="float" />
+    <input name="v" type="vector3" value="0, 0, 0" />
+    <input name="s" type="string" value="" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <output name="out" type="float" value="0" />
+  </nodegraph>
+  <nodedef name="ND_bar2" node="bar">
+    <output name="out" type="float" />
+    <input name="v" type="vector2" value="0, 0" />
+    <input name="i" type="integer" value="0" />
+  </nodedef>
+  <nodegraph name="NG_bar2" nodedef="ND_bar2">
+    <output name="out" type="float" value="1" />
+  </nodegraph>
+  <texcoord name="node3" type="vector3" />
+  <bar name="node4" type="float">
+    <input name="v" type="vector3" nodename="node3" />
+    <input name="s" type="string" value="world" />
+  </bar>
+</materialx>

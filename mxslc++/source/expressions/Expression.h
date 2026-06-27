@@ -32,6 +32,9 @@ public:
     bool try_init(const vector<TypePtr>& types);
 
     bool is_initialized() const { return is_initialized_; }
+    void reset();
+    const string& error_message() const { return error_message_; }
+
     TypePtr type() const;
 
     VarPtr evaluate() const;
@@ -47,7 +50,7 @@ protected:
     bool is_initialized_ = false;
     TypePtr subexpr_type_ = nullptr;
     TypePtr target_type_ = nullptr;
-    string error_message_ = "";
+    string error_message_;
 
     AttributeList attrs_;
 };

@@ -1,1 +1,1 @@
-errmsg008.mxsl, line 3: Attempting to assign an expression of type integer to a variable of type string
+errmsg008.mxsl, line 3: Attempting to assign an expression of type integer to a variable or parameter of type string

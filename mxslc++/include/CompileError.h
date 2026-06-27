@@ -12,7 +12,7 @@ class Token;
 
 namespace mxslc
 {
-    class CompileError final : public std::runtime_error
+    class CompileError : public std::runtime_error
     {
     public:
         explicit CompileError(const std::string& message) : std::runtime_error{message}, has_debug_info_{false} { }

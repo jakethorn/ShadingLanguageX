@@ -67,6 +67,8 @@ add_library(mxslc_lib
         utils/parse_utils.cpp
         utils/type_cast.cpp
         utils/InitInfo.cpp
+        utils/ArgumentEvaluator.cpp
+        utils/AmbiguousFunctionError.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp

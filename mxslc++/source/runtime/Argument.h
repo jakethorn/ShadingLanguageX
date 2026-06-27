@@ -38,6 +38,8 @@ public:
     void init(const vector<TypePtr>& types) const;
     bool try_init(const vector<TypePtr>& types) const;
     bool is_initialized() const;
+    void reset() const;
+    const string& error_message() const;
     TypePtr type() const;
     VarPtr evaluate() const;
 

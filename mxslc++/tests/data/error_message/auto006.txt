@@ -1,3 +1,7 @@
 auto006.mxsl, line 1: Matching definition could not be found for function '__if__'
 Possible matches:
 inline float __if__<float>(boolean condition, float then_value, float else_value)
+
+Underlying errors:
+
+Attempting to assign an expression of type string to a variable or parameter of type float
