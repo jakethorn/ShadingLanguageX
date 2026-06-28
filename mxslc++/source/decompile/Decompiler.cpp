@@ -348,7 +348,7 @@ string mxslc::Decompiler::get_node_graph_signature(const mx::NodeGraphPtr& node_
     else
     {
         const string return_type = outputs_to_data_type(node_graph->getOutputs());
-        return return_type + " " + get_node_graph_identifier(node_graph);
+        return return_type + " " + get_node_graph_identifier(node_graph) + " => ";
     }
 }
 

@@ -12,6 +12,58 @@ using mat3 = matrix33;
 using mat4 = matrix44;
 
 //
+// Standard library extensions
+//
+
+//
+// min
+//
+
+inline T min<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    return min(in2, in1);
+}
+
+inline T min<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T in3)
+{
+    return min(min(in1, in2), in3);
+}
+
+inline T min<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T in3, T in4)
+{
+    return min(min(min(in1, in2), in3), in4);
+}
+
+inline T min<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T in3, T in4, T in5)
+{
+    return min(min(min(min(in1, in2), in3), in4), in5);
+}
+
+//
+// max
+//
+
+inline T max<vector2, vector3, vector4, color3, color4>(float in1, T in2)
+{
+    return max(in2, in1);
+}
+
+inline T max<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T in3)
+{
+    return max(max(in1, in2), in3);
+}
+
+inline T max<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T in3, T in4)
+{
+    return max(max(max(in1, in2), in3), in4);
+}
+
+inline T max<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T in3, T in4, T in5)
+{
+    return max(max(max(max(in1, in2), in3), in4), in5);
+}
+
+//
 // arithmetic operators
 //
 

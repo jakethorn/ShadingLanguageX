@@ -5,8 +5,6 @@
 #ifndef MXSLC_TYPE_H
 #define MXSLC_TYPE_H
 
-#include <utility>
-
 #include "primitive_t.h"
 #include "Field.h"
 #include "utils/TypeName.h"

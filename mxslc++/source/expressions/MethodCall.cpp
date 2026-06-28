@@ -51,7 +51,7 @@ void MethodCall::init_subexpressions(const vector<TypePtr>& types)
 
 void MethodCall::init_impl(const vector<TypePtr> &types)
 {
-    func_ = get_matching_function(types);
+    func_ = get_matching_function(scope(), types);
     for (const Argument& arg : args_)
         arg.validate(func_->parameters()[arg]);
 }
@@ -78,14 +78,14 @@ VarPtr MethodCall::evaluate_impl() const
     }
 }
 
-vector<FuncPtr> MethodCall::get_matching_functions(const vector<TypePtr>& return_types) const
+vector<FuncPtr> MethodCall::get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const
 {
-    return scope().get_functions({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
+    return scope.get_functions({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
 }
 
-FuncPtr MethodCall::get_matching_function(const vector<TypePtr>& return_types) const
+FuncPtr MethodCall::get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const
 {
-    return scope().get_function({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
+    return scope.get_function({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
 }
 
 VarPtr MethodCall::copy_instance_to_scope() const

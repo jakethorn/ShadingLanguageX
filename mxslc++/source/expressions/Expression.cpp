@@ -10,10 +10,11 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
+#include "../errors/AmbiguousFunctionError.h"
 #include "utils/type_cast.h"
 
 #define TRY_START try {
-#define TRY_END } catch (const CompileError& e) { throw CompileError{token_, e}; }
+#define TRY_END } catch (CompileError& e) { e.set_debug_info(token_); throw; }
 
 Expression::Expression(Token token) : token_{std::move(token)} { }
 
@@ -33,11 +34,7 @@ void Expression::init(const vector<TypePtr>& types)
 
     if (not try_init(types))
     {
-        const TypePtr type = type_impl();
-        if (type)
-            throw CompileError{"Attempting to assign an expression of type " + type->str() + " to a variable of type " + Type::to_string(types)};
-        else
-            throw CompileError{"Attempting to assign an invalid expression to a variable of type " + Type::to_string(types)};
+        throw CompileError{error_message_};
     }
 
     TRY_END
@@ -50,9 +47,18 @@ bool Expression::try_init(const vector<TypePtr>& types)
     for (const TypePtr& type : types)
         assert(type->is_resolved());
 
-    init_subexpressions(types);
-    init_impl(types);
-
+    try
+    {
+        init_subexpressions(types);
+        init_impl(types);
+    }
+    catch (const AmbiguousFunctionError& e)
+    {
+        error_message_ = e.what();
+        is_initialized_ = false;
+        return false;
+    }
+    
     if (types.empty() or (types.size() == 1 and types[0]->is_auto()))
     {
         is_initialized_ = true;
@@ -64,10 +70,19 @@ bool Expression::try_init(const vector<TypePtr>& types)
 
     target_type_ = type->find_unique_compatible(types);
 
+    if (target_type_ == nullptr)
+        error_message_ = "Attempting to assign an expression of type " + type->str() + " to a variable or parameter of type " + Type::to_string(types);
+
     is_initialized_ = target_type_ != nullptr;
     return is_initialized_;
 
     TRY_END
+}
+
+void Expression::reset()
+{
+    is_initialized_ = false;
+    target_type_ = nullptr;
 }
 
 TypePtr Expression::type() const

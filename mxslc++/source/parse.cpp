@@ -68,9 +68,10 @@ vector<StmtPtr> Parser::parse()
 
         return statements;
     }
-    catch (const CompileError& e)
+    catch (CompileError& e)
     {
-        throw CompileError{debug_info, e};
+        e.set_debug_info(debug_info);
+        throw;
     }
 }
 

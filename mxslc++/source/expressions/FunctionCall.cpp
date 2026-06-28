@@ -7,13 +7,13 @@
 #include "CompileError.h"
 #include "MethodCall.h"
 #include "ThisExpression.h"
+#include "errors/AmbiguousFunctionError.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "utils/error_utils.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
@@ -69,32 +69,37 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
     if (template_type_)
         template_type_ = scope().resolve_type(template_type_);
 
-    if (arguments_are_initialized())
-        return;
-
-    size_t initialized_arg_count = initialized_arg_count_;
-    while (initialized_arg_count < args_.size())
+    Scope* current_scope = &scope();
+    while (current_scope)
     {
-        vector<FuncPtr> matching_funcs = get_matching_functions(types);
-
-        const size_t prev_initialized_arg_count = initialized_arg_count;
-        initialized_arg_count = try_init_arguments(matching_funcs);
-
-        if (initialized_arg_count == prev_initialized_arg_count)
+        try
         {
-            // no progress made, try to init with the default function...
-            const FuncPtr default_func = get_matching_function(types);
-            initialized_arg_count = try_init_arguments(default_func);
+            init_arguments(*current_scope, types);
+            func_scope_ = current_scope;
+            current_scope = nullptr;
+        }
+        catch (const AmbiguousFunctionError&)
+        {
+            initialized_arg_count_ = 0;
+            for (const Argument& arg : args_)
+                arg.reset();
 
-            if (initialized_arg_count == prev_initialized_arg_count)
-                throw ambiguous_function_error(name_, matching_funcs);
+            if (current_scope->has_parent())
+                current_scope = &current_scope->parent();
+            else
+                current_scope = nullptr;
         }
     }
+
+    // throw the original exception
+    if (func_scope_ == nullptr)
+        init_arguments(scope(), types);
 }
 
 void FunctionCall::init_impl(const vector<TypePtr>& types)
 {
-    func_ = get_matching_function(types);
+    func_ = get_matching_function(*func_scope_, types);
+
     for (const Argument& arg : args_)
         arg.validate(func_->parameters()[arg]);
 
@@ -134,14 +139,14 @@ VarPtr FunctionCall::evaluate_impl() const
     }
 }
 
-vector<FuncPtr> FunctionCall::get_matching_functions(const vector<TypePtr>& return_types) const
+vector<FuncPtr> FunctionCall::get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const
 {
-    return scope().get_functions({return_types, name_, template_type_, args_, is_argumentless_});
+    return scope.get_functions({return_types, name_, template_type_, args_, is_argumentless_});
 }
 
-FuncPtr FunctionCall::get_matching_function(const vector<TypePtr>& return_types) const
+FuncPtr FunctionCall::get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const
 {
-    return scope().get_function({return_types, name_, template_type_, args_, is_argumentless_});
+    return scope.get_function({return_types, name_, template_type_, args_, is_argumentless_});
 }
 
 // inline only
@@ -212,7 +217,7 @@ bool FunctionCall::arguments_are_initialized()
     {
         if (arg.is_initialized())
         {
-            arg.init(arg.type());
+            arg.update();
             ++initialized_arg_count_;
         }
         else
@@ -224,8 +229,34 @@ bool FunctionCall::arguments_are_initialized()
     return result;
 }
 
+void FunctionCall::init_arguments(const Scope& scope, const vector<TypePtr>& return_types)
+{
+    if (arguments_are_initialized())
+        return;
+
+    size_t initialized_arg_count = initialized_arg_count_;
+    while (initialized_arg_count < args_.size())
+    {
+        vector<FuncPtr> matching_funcs = get_matching_functions(scope, return_types);
+
+        const size_t prev_initialized_arg_count = initialized_arg_count;
+        initialized_arg_count = try_init_arguments(matching_funcs);
+
+        if (initialized_arg_count == prev_initialized_arg_count)
+        {
+            // no progress made, try to init with the default function...
+            const FuncPtr default_func = get_matching_function(scope, return_types);
+            initialized_arg_count = try_init_arguments(default_func);
+
+            if (initialized_arg_count == prev_initialized_arg_count)
+                throw AmbiguousFunctionError{name_, matching_funcs, underlying_errors_};
+        }
+    }
+}
+
 size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
 {
+    underlying_errors_.clear();
     size_t initialized_arg_count = 0;
     for (const Argument& arg : args_)
     {
@@ -241,6 +272,10 @@ size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
         if (arg.is_initialized())
         {
             ++initialized_arg_count;
+        }
+        else
+        {
+            underlying_errors_.push_back(arg.error_message());
         }
     }
 

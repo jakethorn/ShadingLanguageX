@@ -12,7 +12,7 @@
 #include "FunctionQuery.h"
 #include "Type.h"
 #include "Variable.h"
-#include "utils/error_utils.h"
+#include "errors/AmbiguousFunctionError.h"
 #include "utils/template_utils.h"
 
 Scope::Scope() = default;
@@ -107,7 +107,7 @@ FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail
     if (func)
         return func;
     if (throw_on_fail)
-        throw ambiguous_function_error(*query.name, get_functions(FunctionQuery{*query.name}, false));
+        throw AmbiguousFunctionError{*query.name, get_functions(FunctionQuery{*query.name}, false)};
     else
         return nullptr;
 }
@@ -122,7 +122,7 @@ vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool thro
     if (not funcs.empty())
         return funcs;
     if (throw_on_fail)
-        throw ambiguous_function_error(*query.name, get_functions(FunctionQuery{*query.name}, false));
+        throw AmbiguousFunctionError{*query.name, get_functions(FunctionQuery{*query.name}, false)};
     else
         return vector<FuncPtr>{};
 }

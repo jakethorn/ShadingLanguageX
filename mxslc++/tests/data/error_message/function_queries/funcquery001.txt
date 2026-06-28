@@ -1,3 +1,7 @@
 funcquery001.mxsl, line 17: Matching definition could not be found for function 'foo'
 Possible matches:
 void foo(A a)
+
+Underlying errors:
+
+Attempting to assign an expression of type B to a variable or parameter of type A

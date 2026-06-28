@@ -1,0 +1,2 @@
+vec3 a = min(vec3{}, float{});
+vec3 b = min(float{}, vec3{});

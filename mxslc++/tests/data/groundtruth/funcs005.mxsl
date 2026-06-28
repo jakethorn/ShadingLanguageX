@@ -1,0 +1,24 @@
+float foo(string s, vec3 v)
+{
+    return 0.0;
+}
+
+float foo(int i, vec2 v)
+{
+    return 1.0;
+}
+
+float a = foo("world", texcoord());
+
+
+float bar(vec3 v, string s)
+{
+    return 0.0;
+}
+
+float bar(vec2 v, int i)
+{
+    return 1.0;
+}
+
+float b = bar(texcoord(), "world");
