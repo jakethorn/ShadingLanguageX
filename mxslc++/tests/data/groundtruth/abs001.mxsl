@@ -1,0 +1,4 @@
+float a = |-5|;
+bool b = true|false;
+vec3 c = |vec3{1,2,3}|+|vec3{4,5,6}|;
+float d = |randomfloat()| + float{true|false} + |randomfloat()|;

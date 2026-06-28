@@ -25,6 +25,7 @@ public:
     Span<Token> peek_until(TokenType type, size_t max_tokens = std::numeric_limits<size_t>::max()) const;
 
     Token consume();
+    optional<Token> consume(const vector<TokenType>& types);
 
     template<typename... Args>
     optional<Token> consume(const Args&... types)

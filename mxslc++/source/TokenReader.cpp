@@ -41,6 +41,15 @@ Token TokenReader::consume()
     return std::move(tokens_[index_++]);
 }
 
+optional<Token> TokenReader::consume(const vector<TokenType>& types)
+{
+    if (empty())
+        return std::nullopt;
+    if (contains(types, peek()))
+        return std::move(tokens_[index_++]);
+    return std::nullopt;
+}
+
 Token TokenReader::match_identifier_or_keyword()
 {
     Token token = consume();

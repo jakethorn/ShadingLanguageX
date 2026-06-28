@@ -451,7 +451,9 @@ ExprPtr Parser::expression()
 ExprPtr Parser::logical()
 {
     ExprPtr expr = equality();
-    while (optional<Token> op = consume('&', '|'))
+
+    const vector<TokenType> ops = in_abs_ ? vector<TokenType>{'&'} : vector<TokenType>{'&', '|'};
+    while (optional<Token> op = consume(ops))
     {
         ExprPtr right = equality();
         expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
@@ -633,6 +635,15 @@ ExprPtr Parser::primary()
         ExprPtr expr = expression();
         match(')');
         return expr;
+    }
+
+    if (optional<Token> token = consume('|'))
+    {
+        in_abs_ = true;
+        ExprPtr expr = expression();
+        match('|');
+        in_abs_ = false;
+        return ExpressionFactory::absolute_value(std::move(expr), std::move(*token));
     }
 
     if (peek() == TokenType::This)

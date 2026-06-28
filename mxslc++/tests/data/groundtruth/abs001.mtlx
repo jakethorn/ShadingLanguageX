@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <invert name="node1" type="float">
+    <input name="in" type="float" value="5" />
+  </invert>
+  <absval name="node2" type="float">
+    <input name="in" type="float" nodename="node1" />
+  </absval>
+  <or name="node3" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </or>
+  <combine3 name="node4" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+  </combine3>
+  <absval name="node5" type="vector3">
+    <input name="in" type="vector3" nodename="node4" />
+  </absval>
+  <combine3 name="node6" type="vector3">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="5" />
+    <input name="in3" type="float" value="6" />
+  </combine3>
+  <absval name="node7" type="vector3">
+    <input name="in" type="vector3" nodename="node6" />
+  </absval>
+  <add name="node8" type="vector3">
+    <input name="in1" type="vector3" nodename="node5" />
+    <input name="in2" type="vector3" nodename="node7" />
+  </add>
+  <randomfloat name="node9" type="float" />
+  <absval name="node10" type="float">
+    <input name="in" type="float" nodename="node9" />
+  </absval>
+  <or name="node11" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </or>
+  <convert name="node12" type="float">
+    <input name="in" type="boolean" nodename="node11" />
+  </convert>
+  <add name="node13" type="float">
+    <input name="in1" type="float" nodename="node10" />
+    <input name="in2" type="float" nodename="node12" />
+  </add>
+  <randomfloat name="node14" type="float" />
+  <absval name="node15" type="float">
+    <input name="in" type="float" nodename="node14" />
+  </absval>
+  <add name="node16" type="float">
+    <input name="in1" type="float" nodename="node13" />
+    <input name="in2" type="float" nodename="node15" />
+  </add>
+</materialx>

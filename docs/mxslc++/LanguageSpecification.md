@@ -319,32 +319,33 @@ print t2.str;  // "{string name, string str}"
 Expressions are pieces of code that evaluate to a value, such as `1.0 + 1.0`. This document will cover each expression in detail
 in its own section. The following table gives a quick overview of all the expressions supported by ShadingLanguageX.
 
-| Expression                      | Example                              |
-|---------------------------------|--------------------------------------|
-| Binary Operator                 | `a + b`                              |
-| Unary Operator                  | `-a`                                 |
-| Ternary Relational Operator     | `x < a < y`                          |
-| Field Access Operator           | `s.radius`                           |
-| Swizzle Operator                | `c.rgb`                              |
-| Port Access Operator            | `s.base_color`                       |
-| Indexing Operator               | `a[0]`                               |
-| Literal                         | `3.14`                               |
-| Identifier                      | `i`                                  |
-| Increment/Decrement Operator    | `i++`                                |
-| Compound Assignment Operator    | `i += 2`                             |
-| Grouping Expression             | `(a + b)`                            |
-| If Expression                   | `if (a < b) { x } else { y }`        |
-| Switch Expression               | `switch (a) { x, y, z }`             |
-| Function Call                   | `my_function(a, b)`                  |
-| Method Call                     | `my_obj.my_function(a, b)`           |
-| Constructor Call                | `vec3{0, 1, 0}`                      |
-| Unnamed Constructor Call        | `{a, b, c}`                          |
-| Range Operator                  | `0:3`                                |
+| Expression                      | Example                             |
+|---------------------------------|-------------------------------------|
+| Binary Operator                 | `a + b`                             |
+| Unary Operator                  | `-a`                                |
+| Ternary Relational Operator     | `x < a < y`                         |
+| Absolute Operator               | `\|a\|`                              |
+| Field Access Operator           | `s.radius`                          |
+| Swizzle Operator                | `c.rgb`                             |
+| Port Access Operator            | `s.base_color`                      |
+| Indexing Operator               | `a[0]`                              |
+| Literal                         | `3.14`                              |
+| Identifier                      | `i`                                 |
+| Increment/Decrement Operator    | `i++`                               |
+| Compound Assignment Operator    | `i += 2`                            |
+| Grouping Expression             | `(a + b)`                           |
+| If Expression                   | `if (a < b) { x } else { y }`       |
+| Switch Expression               | `switch (a) { x, y, z }`            |
+| Function Call                   | `my_function(a, b)`                 |
+| Method Call                     | `my_obj.my_function(a, b)`          |
+| Constructor Call                | `vec3{0, 1, 0}`                     |
+| Unnamed Constructor Call        | `{a, b, c}`                         |
+| Range Operator                  | `0:3`                               |
 | Node Constructor                | `{"mix", color3: bg=a, fg=b, mix=c}` |
-| Variable Declaration Expression | `foo(out float out_arg)`             |
-| This                            | `this`                               |
-| Null                            | `null`                               |
-| Typeof Operator                 | `typeof(a)`                          |
+| Variable Declaration Expression | `foo(out float out_arg)`            |
+| This                            | `this`                              |
+| Null                            | `null`                              |
+| Typeof Operator                 | `typeof(a)`                         |
 
 # Statements
 
@@ -464,12 +465,20 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
 | `-a`      | `subtract`          |
 | `+a`      |                     |
 
+## Absolute Operator
+
+| Operation | MaterialX Node(s) |
+|-----------|-------------------|
+| `\|a\|`   | `absval`          |
+
 ### Notes
 
 * The `^` operator compiles to a `power` node when used with numeric types and to an `xor` node when used with booleans.
 * The MaterialX arithmetic nodes specify that vectors/colors must be the first input if paired with a float, however, this
   is not the case in ShadingLanguageX, a vector/color can be either the left or right value, for example, `2.0 * vec3{}`
   is equivalent to `vec3{} * 2.0`.
+* The absolute operator works similarly to wrapping the expression in parentheses, but also evaluates to the absolute of the 
+  expression, i.e., `|-5| == 5`.
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -623,7 +632,7 @@ for (int i from 1 to 100)
 
 | Order of Precedence (higher operations evaluate first)                   |
 |--------------------------------------------------------------------------|
-| `(a)`                                                                    |
+| `(a)` `\|a\|`                                                            |
 | `a.b` `a[b]`                                                             |
 | `a++` `a--` `++a` `--a`                                                  |
 | `a += b` `a -= b` `a *= b` `a /= b` `a ^= b` `a %= b` `a &= b` `a \|= b` |
@@ -1865,25 +1874,26 @@ Point q = {"hello", "world"}; // Error: unnamed constructor does not match Point
 Operators can be overloaded for all user-defined types, including unnamed structs, aliases and class types.
 Operator overload functions are defined outside of class definitions.
 
-| Operation | Function Name       |
-|-----------|---------------------|
-| `a + b`   | `__add__`           |
-| `a - b`   | `__sub__`           |
-| `a * b`   | `__mul__`           |
-| `a / b`   | `__div__`           |
-| `a % b`   | `__mod__`           |
-| `a ^ b`   | `__pow__`           |
-| `a > b`   | `__gt__`            |
-| `a >= b`  | `__ge__`            |
-| `a < b`   | `__lt__`            |
-| `a <= b`  | `__le__`            |
-| `a == b`  | `__eq__`            |
-| `a != b`  | `__ne__`            |
-| `a & b`   | `__and__`           |
-| `a \| b`  | `__or__`            |
-| `!a`      | `__not__`           |
-| `-a`      | `__neg__`           |
-| `+a`      | `__pos__`            |
+| Operation | Function Name |
+|-----------|---------------|
+| `a + b`   | `__add__`     |
+| `a - b`   | `__sub__`     |
+| `a * b`   | `__mul__`     |
+| `a / b`   | `__div__`     |
+| `a % b`   | `__mod__`     |
+| `a ^ b`   | `__pow__`     |
+| `a > b`   | `__gt__`      |
+| `a >= b`  | `__ge__`      |
+| `a < b`   | `__lt__`      |
+| `a <= b`  | `__le__`      |
+| `a == b`  | `__eq__`      |
+| `a != b`  | `__ne__`      |
+| `a & b`   | `__and__`     |
+| `a \| b`  | `__or__`      |
+| `!a`      | `__not__`     |
+| `-a`      | `__neg__`     |
+| `+a`      | `__pos__`     |
+| `\|a\|`   | `__abs__`     |
 
 ```
 using Point = {float x, float y};

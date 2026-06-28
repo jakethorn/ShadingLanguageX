@@ -106,6 +106,8 @@ public:
     bool is_typed_definition() const;
     bool is_function_call() const;
     bool is_constructor_definition() const;
+
+    bool in_abs_{false};
 };
 
 #endif //FENNEC_PARSE_H
