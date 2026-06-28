@@ -7,13 +7,13 @@
 #include "CompileError.h"
 #include "MethodCall.h"
 #include "ThisExpression.h"
+#include "errors/AmbiguousFunctionError.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "utils/error_utils.h"
 #include "utils/instantiate_template_types_utils.h"
 #include "values/ValueFactory.h"
 
@@ -78,7 +78,7 @@ void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
             func_scope_ = current_scope;
             current_scope = nullptr;
         }
-        catch (const AmbiguousFunctionError& e)
+        catch (const AmbiguousFunctionError&)
         {
             initialized_arg_count_ = 0;
             for (const Argument& arg : args_)
@@ -217,7 +217,7 @@ bool FunctionCall::arguments_are_initialized()
     {
         if (arg.is_initialized())
         {
-            arg.init(arg.type());
+            arg.update();
             ++initialized_arg_count_;
         }
         else
@@ -249,7 +249,7 @@ void FunctionCall::init_arguments(const Scope& scope, const vector<TypePtr>& ret
             initialized_arg_count = try_init_arguments(default_func);
 
             if (initialized_arg_count == prev_initialized_arg_count)
-                throw ambiguous_function_error(name_, matching_funcs, underlying_errors_);
+                throw AmbiguousFunctionError{name_, matching_funcs, underlying_errors_};
         }
     }
 }

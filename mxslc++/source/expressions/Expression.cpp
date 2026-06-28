@@ -10,11 +10,11 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "utils/AmbiguousFunctionError.h"
+#include "../errors/AmbiguousFunctionError.h"
 #include "utils/type_cast.h"
 
 #define TRY_START try {
-#define TRY_END } catch (const CompileError& e) { throw CompileError{token_, e}; }
+#define TRY_END } catch (CompileError& e) { e.set_debug_info(token_); throw; }
 
 Expression::Expression(Token token) : token_{std::move(token)} { }
 

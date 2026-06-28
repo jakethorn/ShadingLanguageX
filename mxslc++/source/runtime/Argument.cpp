@@ -73,6 +73,11 @@ bool Argument::is_initialized() const
     return expr_->is_initialized();
 }
 
+void Argument::update() const
+{
+    init(type());
+}
+
 void Argument::reset() const
 {
     expr_->reset();

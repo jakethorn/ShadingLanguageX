@@ -4,7 +4,8 @@ add_library(mxslc_lib
         TokenReader.cpp
         parse.cpp
         compile.cpp
-        CompileError.cpp
+        errors/CompileError.cpp
+        errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
         decompile/Decompiler.cpp
         runtime/Runtime.cpp
@@ -62,13 +63,11 @@ add_library(mxslc_lib
         utils/io_utils.cpp
         utils/str_utils.cpp
         utils/parse_args.cpp
-        utils/error_utils.cpp
         utils/instantiate_template_types_utils.cpp
         utils/parse_utils.cpp
         utils/type_cast.cpp
         utils/InitInfo.cpp
         utils/ArgumentEvaluator.cpp
-        utils/AmbiguousFunctionError.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp
         mtlx/MtlXSerializer.cpp

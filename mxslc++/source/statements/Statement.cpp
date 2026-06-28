@@ -19,8 +19,9 @@ void Statement::execute()
 
         execute_impl();
     }
-    catch (const CompileError& e)
+    catch (CompileError& e)
     {
-        throw CompileError{token_, e};
+        e.set_debug_info(token_);
+        throw;
     }
 }

@@ -7,24 +7,36 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 class Token;
 
 namespace mxslc
 {
-    class CompileError : public std::runtime_error
+    class CompileError : public std::exception
     {
     public:
-        explicit CompileError(const std::string& message) : std::runtime_error{message}, has_debug_info_{false} { }
-        CompileError(const Token& debug_info, const std::string& message) : std::runtime_error{format(debug_info, message)}, has_debug_info_{true} { }
-        CompileError(const Token& debug_info, const CompileError& error) : std::runtime_error{format(debug_info, error)}, has_debug_info_{true} { }
+        explicit CompileError(std::string message) : message_{std::move(message)}, has_debug_info_{false} { }
+        CompileError(const Token& debug_info, const std::string& message) : message_{format(debug_info, message)}, has_debug_info_{true} { }
+
+        const char* what() const noexcept override
+        {
+            return message_.c_str();
+        }
 
         bool has_debug_info() const { return has_debug_info_; }
+        void set_debug_info(const Token& debug_info)
+        {
+            if (has_debug_info_)
+                return;
+            has_debug_info_ = true;
+            message_ = format(debug_info, message_);
+        }
 
     private:
         static std::string format(const Token& debug_info, const std::string& message);
-        static std::string format(const Token& debug_info, const CompileError& error);
 
+        std::string message_;
         bool has_debug_info_;
     };
 }
