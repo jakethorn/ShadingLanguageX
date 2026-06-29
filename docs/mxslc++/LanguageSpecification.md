@@ -319,33 +319,32 @@ print t2.str;  // "{string name, string str}"
 Expressions are pieces of code that evaluate to a value, such as `1.0 + 1.0`. This document will cover each expression in detail
 in its own section. The following table gives a quick overview of all the expressions supported by ShadingLanguageX.
 
-| Expression                      | Example                             |
-|---------------------------------|-------------------------------------|
-| Binary Operator                 | `a + b`                             |
-| Unary Operator                  | `-a`                                |
-| Ternary Relational Operator     | `x < a < y`                         |
+| Expression                      | Example                              |
+|---------------------------------|--------------------------------------|
+| Binary Operator                 | `a + b`                              |
+| Unary Operator                  | `-a`                                 |
+| Ternary Relational Operator     | `x < a < y`                          |
 | Absolute Operator               | `\|a\|`                              |
-| Field Access Operator           | `s.radius`                          |
-| Swizzle Operator                | `c.rgb`                             |
-| Port Access Operator            | `s.base_color`                      |
-| Indexing Operator               | `a[0]`                              |
-| Literal                         | `3.14`                              |
-| Identifier                      | `i`                                 |
-| Increment/Decrement Operator    | `i++`                               |
-| Compound Assignment Operator    | `i += 2`                            |
-| Grouping Expression             | `(a + b)`                           |
-| If Expression                   | `if (a < b) { x } else { y }`       |
-| Switch Expression               | `switch (a) { x, y, z }`            |
-| Function Call                   | `my_function(a, b)`                 |
-| Method Call                     | `my_obj.my_function(a, b)`          |
-| Constructor Call                | `vec3{0, 1, 0}`                     |
-| Unnamed Constructor Call        | `{a, b, c}`                         |
-| Range Operator                  | `0:3`                               |
-| Node Constructor                | `{"mix", color3: bg=a, fg=b, mix=c}` |
-| Variable Declaration Expression | `foo(out float out_arg)`            |
-| This                            | `this`                              |
-| Null                            | `null`                              |
-| Typeof Operator                 | `typeof(a)`                         |
+| Field Access Operator           | `s.radius`                           |
+| Swizzle Operator                | `c.rgb`                              |
+| Port Access Operator            | `s.base_color`                       |
+| Indexing Operator               | `a[0]`                               |
+| Literal                         | `3.14`                               |
+| Identifier                      | `i`                                  |
+| Increment/Decrement Operator    | `i++`                                |
+| Compound Assignment Operator    | `i += 2`                             |
+| Grouping Expression             | `(a + b)`                            |
+| If Expression                   | `if (a < b) { x } else { y }`        |
+| Switch Expression               | `switch (a) { x, y, z }`             |
+| Function Call                   | `my_function(a, b)`                  |
+| Method Call                     | `my_obj.my_function(a, b)`           |
+| Constructor Call                | `vec3{0, 1, 0}`                      |
+| Unnamed Constructor Call        | `{a, b, c}`                          |
+| Range Operator                  | `0:3`                                |
+| Variable Declaration Expression | `foo(out float out_arg)`             |
+| This                            | `this`                               |
+| Null                            | `null`                               |
+| Typeof Operator                 | `typeof(a)`                          |
 
 # Statements
 
@@ -465,20 +464,25 @@ Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
 | `-a`      | `subtract`          |
 | `+a`      |                     |
 
-## Absolute Operator
-
-| Operation | MaterialX Node(s) |
-|-----------|-------------------|
-| `\|a\|`   | `absval`          |
-
 ### Notes
 
 * The `^` operator compiles to a `power` node when used with numeric types and to an `xor` node when used with booleans.
 * The MaterialX arithmetic nodes specify that vectors/colors must be the first input if paired with a float, however, this
   is not the case in ShadingLanguageX, a vector/color can be either the left or right value, for example, `2.0 * vec3{}`
   is equivalent to `vec3{} * 2.0`.
-* The absolute operator works similarly to wrapping the expression in parentheses, but also evaluates to the absolute of the 
-  expression, i.e., `|-5| == 5`.
+
+## Absolute Operator
+
+| Operation | MaterialX Node(s) |
+|-----------|-------------------|
+| `\|a\|`   | `absval`          |
+
+The absolute operator works similarly to wrapping an expression in parentheses, but additionally evaluates
+to the absolute of the expression, e.g., `|-5| == 5`.
+
+### Notes
+
+* The logical or operator `|` cannot be used inside the absolute operator. 
 
 > [!WARNING]
 > ### Not yet supported in mxslc++
@@ -2116,6 +2120,21 @@ Finally, any standard library functions that return multiple values, like `separ
 vec2 uv = texcoord();
 float u, v = separate2(uv);
 ```
+
+## Extensions
+
+ShadingLanguageX provides several additional function overloads that are not part of the MaterialX Standard Library.
+
+| Return Type | Function Name | Parameter List                      |
+|-------------|---------------|-------------------------------------|
+| `T`         | `min`         | `float in1, T in2`                  |
+| `T`         | `min`         | `T in1, T in2, T in3`               |
+| `T`         | `min`         | `T in1, T in2, T in3, T in4`        |
+| `T`         | `min`         | `T in1, T in2, T in3, T in4, T in5` |
+| `T`         | `max`         | `float in1, T in2`                  |
+| `T`         | `max`         | `T in1, T in2, T in3`               |
+| `T`         | `max`         | `T in1, T in2, T in3, T in4`        |
+| `T`         | `max`         | `T in1, T in2, T in3, T in4, T in5` |
 
 # Scope
 
