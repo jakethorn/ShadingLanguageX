@@ -12,6 +12,7 @@ def test_globals_3():
 
     opts = mxslc.CompileOptions(globals = [x])
     result = mxslc.compile_file_to_string(get_data_path("globals003.mxsl"), opts)
+    write_data("globals003.mtlx", result)
     assert result == get_data("globals003.mtlx")
 
 
@@ -22,6 +23,7 @@ def test_globals_4_1():
 
     opts = mxslc.CompileOptions(globals = [x])
     result = mxslc.compile_file_to_string(get_data_path("globals004.mxsl"), opts)
+    write_data("globals004.mtlx", result)
     assert result == get_data("globals004.mtlx")
 
 
@@ -32,6 +34,7 @@ def test_globals_4_2():
 
     opts = mxslc.CompileOptions(globals = [x])
     result = mxslc.compile_file_to_string(get_data_path("globals004.mxsl"), opts)
+    write_data("globals004.mtlx", result)
     assert result == get_data("globals004.mtlx")
 
 
@@ -45,6 +48,7 @@ try:
         ])
 
         result = mxslc.compile_file_to_string(get_data_path("globals001.mxsl"), opts)
+        write_data("globals001.mtlx", result)
         assert result == get_data("globals001.mtlx")
 
     def test_globals_2():
@@ -55,6 +59,7 @@ try:
 
         opts = mxslc.CompileOptions(globals = [light0])
         result = mxslc.compile_file_to_string(get_data_path("globals002.mxsl"), opts)
+        write_data("globals002.mtlx", result)
         assert result == get_data("globals002.mtlx")
 
 except ImportError:

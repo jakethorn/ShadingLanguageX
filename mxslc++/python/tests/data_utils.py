@@ -13,4 +13,5 @@ def get_data(filename: str) -> str:
 
 
 def write_data(filename: str, content: str) -> None:
-    get_data_path(filename).write_text(content)
+    if False:
+        get_data_path(filename).write_text(content)

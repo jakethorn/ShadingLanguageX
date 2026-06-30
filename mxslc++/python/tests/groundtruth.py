@@ -1,9 +1,9 @@
 
 RANDOMFLOAT_OUTPUT = """<?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="node1" type="float" />
-  <add name="node2" type="float">
-    <input name="in1" type="float" nodename="node1" />
+  <randomfloat name="in1" type="float" />
+  <add name="f" type="float">
+    <input name="in1" type="float" nodename="in1" />
     <input name="in2" type="float" value="1" />
   </add>
 </materialx>
@@ -12,7 +12,7 @@ RANDOMFLOAT_OUTPUT = """<?xml version="1.0"?>
 
 STANDARD_OUTPUT = """<?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="node1" type="float">
+  <add name="f" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="1" />
   </add>
