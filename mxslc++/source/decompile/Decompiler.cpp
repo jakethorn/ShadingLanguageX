@@ -12,6 +12,36 @@
 #include "utils/io_utils.h"
 #include "utils/template_utils.h"
 
+namespace
+{
+    bool is_inline_node(const mx::NodePtr& node)
+    {
+        return node->getName().rfind("var__", 0) == 0;
+    }
+
+    string get_type_alias(const string& type_name)
+    {
+        static const unordered_map<string, string> type_aliases {
+            {"boolean", "bool"},
+            {"integer", "int"},
+            {"vector2", "vec2"},
+            {"vector3", "vec3"},
+            {"vector4", "vec4"},
+            {"matrix33", "mat3"},
+            {"matrix44", "mat4"},
+        };
+
+        if (contains(type_aliases, type_name))
+            return type_aliases.at(type_name);
+        return type_name;
+    }
+
+    string get_type_alias(const mx::TypedElementPtr& typed_element)
+    {
+        return get_type_alias(typed_element->getType());
+    }
+}
+
 mxslc::Decompiler::Decompiler(const fs::path& src_path)
 {
     document_ = mx::createDocument();
@@ -35,10 +65,15 @@ string mxslc::Decompiler::decompile_document()
     decompiled_nodes_.clear();
 
     for (const mx::NodeGraphPtr& node_graph : document_->getNodeGraphs())
+    {
         global_code_ += node_graph_to_function_definition(node_graph);
+    }
 
     for (const mx::NodePtr& node : document_->getNodes())
-        global_code_ += node_to_variable_definition(node);
+    {
+        if (not is_inline_node(node))
+            global_code_ += node_to_variable_definition(node);
+    }
 
     return global_code_;
 }
@@ -98,9 +133,9 @@ string mxslc::Decompiler::node_to_variable_definition(const string& node_name)
 
 string mxslc::Decompiler::node_to_variable_definition(const mx::NodePtr& node)
 {
-    if (contains(decompiled_nodes_, node->getName()))
+    if (contains(decompiled_nodes_, node))
         return "";
-    decompiled_nodes_.insert(node->getName());
+    decompiled_nodes_.insert(node);
 
     if (const mx::NodeDefPtr node_def = node->getNodeDef())
         global_code_ += node_def_to_function_definition(node_def);
@@ -108,7 +143,11 @@ string mxslc::Decompiler::node_to_variable_definition(const mx::NodePtr& node)
     const string var_type = get_node_data_type(node);
     const string var_name = node->getName();
 
-    return var_type + " " + var_name + " = " + node_to_expression(node) + ";\n";
+    string var_expr = node_to_expression(node);
+    if (var_expr.front() == '(' and var_expr.back() == ')')
+        var_expr = var_expr.substr(1, var_expr.size() - 2);
+
+    return var_type + " " + var_name + " = " + var_expr + ";\n";
 }
 
 string mxslc::Decompiler::node_def_to_function_definition(const string& node_def_name)
@@ -143,7 +182,10 @@ string mxslc::Decompiler::node_graph_to_function_definition(const mx::NodeGraphP
 
     function_code_ = "";
     for (const mx::NodePtr& node : node_graph->getNodes())
-        function_code_ += "\t" + node_to_variable_definition(node);
+    {
+        if (not is_inline_node(node))
+            function_code_ += "\t" + node_to_variable_definition(node);
+    }
     function_code_ += "\treturn " + get_node_graph_return_expression(node_graph) + ";";
 
     in_function_ = false;
@@ -171,7 +213,7 @@ string mxslc::Decompiler::node_to_expression(const mx::NodePtr& node)
     {
         const string& op = binary_op_names.at(func_name);
         const vector<mx::InputPtr> inputs = node->getInputs();
-        return port_to_expression(inputs[0]) + " " + op + " " + port_to_expression(inputs[1]);
+        return "(" + port_to_expression(inputs[0]) + " " + op + " " + port_to_expression(inputs[1]) + ")";
     }
 
     static const unordered_map<string, string> unary_op_names {
@@ -193,13 +235,15 @@ string mxslc::Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outp
 {
     if (outputs.size() == 1)
     {
-        return outputs[0]->getType();
+        return get_type_alias(outputs[0]->getType());
     }
     else
     {
         string result = "{";
         for (const mx::OutputPtr& output : outputs)
-            result += output->getType() + " " + output->getName() + ", ";
+            result += get_type_alias(output) + " " + output->getName() + ", ";
+        if (result.size() >= 2)
+            result.resize(result.size() - 2);
         return result + "}";
     }
 }
@@ -212,17 +256,16 @@ string mxslc::Decompiler::port_to_expression(const mx::PortElementPtr& port)
         return interface_name_to_identifier(port->getInterfaceName());
     if (port->hasNodeName())
     {
+        const mx::NodePtr node = port->getConnectedNode();
         if (port->hasOutputString())
-            return node_name_and_output_to_dot_op(port->getNodeName(), port->getOutputString());
-        else
-            return node_name_to_identifier(port->getNodeName());
+            return node_and_output_to_dot_op(node, port->getOutputString());
+        return is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node);
     }
     if (port->hasNodeGraphString())
     {
         if (port->hasOutputString())
             return node_graph_name_and_output_to_dot_op(port->getNodeGraphString(), port->getOutputString());
-        else
-            return node_graph_name_to_identifier(port->getNodeGraphString());
+        return node_graph_name_to_identifier(port->getNodeGraphString());
     }
     throw CompileError{"Cannot decompile PortElement: " + port->asString()};
 }
@@ -235,12 +278,17 @@ string mxslc::Decompiler::outputs_to_expression(const vector<mx::OutputPtr>& out
     string result = "{";
     for (const mx::OutputPtr& output : outputs)
         result += port_to_expression(output) + ", ";
+    if (result.size() >= 2)
+        result.resize(result.size() - 2);
     return result + "}";
 }
 
 string mxslc::Decompiler::value_to_constructor(const mx::ValuePtr& value)
 {
-    return value->getTypeString() + "{" + value->getValueString() + "}";
+    const string type_name = get_type_alias(value->getTypeString());
+    if (contains(vector{"vec2", "vec3", "vec4", "color3", "color4"}, type_name))
+        return type_name + "{" + value->getValueString() + "}";
+    return value->getValueString();
 }
 
 string mxslc::Decompiler::interface_name_to_identifier(const string& interface_name)
@@ -248,9 +296,9 @@ string mxslc::Decompiler::interface_name_to_identifier(const string& interface_n
     return interface_name;
 }
 
-string mxslc::Decompiler::node_name_and_output_to_dot_op(const string& node_name, const string& output)
+string mxslc::Decompiler::node_and_output_to_dot_op(const mx::NodePtr& node, const string& output)
 {
-    return node_name_to_identifier(node_name) + "." + output;
+    return (is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node)) + "." + output;
 }
 
 string mxslc::Decompiler::node_graph_name_and_output_to_dot_op(const string& node_graph_name, const string& output)
@@ -258,17 +306,17 @@ string mxslc::Decompiler::node_graph_name_and_output_to_dot_op(const string& nod
     return node_graph_name_to_identifier(node_graph_name) + "." + output;
 }
 
-string mxslc::Decompiler::node_name_to_identifier(const string& node_name)
+string mxslc::Decompiler::node_to_identifier(const mx::NodePtr& node)
 {
-    if (not contains(decompiled_nodes_, node_name))
+    if (not contains(decompiled_nodes_, node))
     {
-        const string code = node_to_variable_definition(node_name);
+        const string code = node_to_variable_definition(node);
         if (in_function_)
             function_code_ += "\t" + code;
         else
             global_code_ += code;
     }
-    return node_name;
+    return node->getName();
 }
 
 string mxslc::Decompiler::node_graph_name_to_identifier(const string& node_graph_name)
@@ -277,7 +325,7 @@ string mxslc::Decompiler::node_graph_name_to_identifier(const string& node_graph
         global_code_ += node_graph_to_function_definition(node_graph_name);
 
     if (node_graph_name.rfind("NG_", 0) == 0)
-        return string{node_graph_name.substr(3)};
+        return node_graph_name.substr(3);
     return node_graph_name;
 }
 
@@ -291,6 +339,8 @@ string mxslc::Decompiler::inputs_to_arguments(const vector<mx::InputPtr>& inputs
     string result;
     for (const mx::InputPtr& input : inputs)
         result += input_to_argument(input) + ", ";
+    if (result.size() >= 2)
+        result.resize(result.size() - 2);
     return result;
 }
 
@@ -307,6 +357,8 @@ string mxslc::Decompiler::inputs_to_parameters(const vector<mx::InputPtr>& input
     string result;
     for (const mx::InputPtr& input : inputs)
         result += input_to_parameter(input) + ", ";
+    if (result.size() >= 2)
+        result.resize(result.size() - 2);
     return result;
 }
 
@@ -321,7 +373,7 @@ string mxslc::Decompiler::get_node_data_type(const mx::NodePtr& node)
     }
     else
     {
-        return node->getType();
+        return get_type_alias(node);
     }
 }
 
