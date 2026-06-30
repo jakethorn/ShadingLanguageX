@@ -1,47 +1,47 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG__123_vector3">
-    <convert name="node1" type="vector3">
+    <convert name="var__0" type="vector3">
       <input name="in" type="float" value="1" />
     </convert>
-    <convert name="node2" type="vector3">
+    <convert name="var__1" type="vector3">
       <input name="in" type="float" value="2" />
     </convert>
-    <convert name="node3" type="vector3">
+    <convert name="var__2" type="vector3">
       <input name="in" type="float" value="3" />
     </convert>
-    <output name="out__0" type="vector3" nodename="node1" />
-    <output name="out__1" type="vector3" nodename="node2" />
-    <output name="out__2" type="vector3" nodename="node3" />
+    <output name="out__0" type="vector3" nodename="var__0" />
+    <output name="out__1" type="vector3" nodename="var__1" />
+    <output name="out__2" type="vector3" nodename="var__2" />
   </nodegraph>
   <nodegraph name="NG__123_vector4">
-    <convert name="node1" type="vector4">
+    <convert name="var__0" type="vector4">
       <input name="in" type="float" value="1" />
     </convert>
-    <convert name="node2" type="vector4">
+    <convert name="var__1" type="vector4">
       <input name="in" type="float" value="2" />
     </convert>
-    <convert name="node3" type="vector4">
+    <convert name="var__2" type="vector4">
       <input name="in" type="float" value="3" />
     </convert>
-    <output name="out__0" type="vector4" nodename="node1" />
-    <output name="out__1" type="vector4" nodename="node2" />
-    <output name="out__2" type="vector4" nodename="node3" />
+    <output name="out__0" type="vector4" nodename="var__0" />
+    <output name="out__1" type="vector4" nodename="var__1" />
+    <output name="out__2" type="vector4" nodename="var__2" />
   </nodegraph>
-  <add name="node1" type="vector3">
+  <add name="in1" type="vector3">
     <input name="in1" type="vector3" output="out__0" nodegraph="NG__123_vector3" />
     <input name="in2" type="vector3" output="out__1" nodegraph="NG__123_vector3" />
   </add>
-  <add name="node2" type="vector3">
-    <input name="in1" type="vector3" nodename="node1" />
+  <add name="b" type="vector3">
+    <input name="in1" type="vector3" nodename="in1" />
     <input name="in2" type="vector3" output="out__2" nodegraph="NG__123_vector3" />
   </add>
-  <add name="node3" type="vector4">
+  <add name="in2" type="vector4">
     <input name="in1" type="vector4" output="out__0" nodegraph="NG__123_vector4" />
     <input name="in2" type="vector4" output="out__1" nodegraph="NG__123_vector4" />
   </add>
-  <add name="node4" type="vector4">
-    <input name="in1" type="vector4" nodename="node3" />
+  <add name="c" type="vector4">
+    <input name="in1" type="vector4" nodename="in2" />
     <input name="in2" type="vector4" output="out__2" nodegraph="NG__123_vector4" />
   </add>
 </materialx>

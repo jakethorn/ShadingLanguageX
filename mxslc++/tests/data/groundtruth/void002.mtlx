@@ -10,8 +10,8 @@
     <output name="out" type="integer" />
   </nodedef>
   <nodegraph name="NG_bar" nodedef="ND_bar">
-    <foo name="node1" type="integer" />
+    <foo name="var__0" type="integer" />
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <bar name="node1" type="integer" />
+  <bar name="var__0" type="integer" />
 </materialx>

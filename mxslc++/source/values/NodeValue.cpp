@@ -17,6 +17,13 @@ NodeValue::NodeValue(mx::NodePtr node) : Value{Type::of(node)}, node_{std::move(
 
 void NodeValue::set_node_name(const string& name) const
 {
+    if (is_node_name_set_)
+        return;
+    is_node_name_set_ = true;
+
+    if (node_->getName() == name)
+        return;
+
     node_->setName(
         node_->getParent()->createValidChildName(name)
     );

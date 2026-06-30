@@ -4,17 +4,17 @@
     <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="out__x" type="float" nodename="node1" />
+    <output name="out__x" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="node1" type="float" />
-  <foo name="node2" type="float" />
-  <add name="node3" type="float">
-    <input name="in1" type="float" output="out__x" nodename="node1" />
-    <input name="in2" type="float" output="out__x" nodename="node2" />
+  <foo name="var__0" type="float" />
+  <foo name="var__1" type="float" />
+  <add name="HERE1" type="float">
+    <input name="in1" type="float" output="out__x" nodename="var__0" />
+    <input name="in2" type="float" output="out__x" nodename="var__1" />
   </add>
   <nodedef name="ND_foo2" node="foo2">
     <output name="out__y__0" type="float" />
@@ -24,14 +24,14 @@
     <output name="out__y__0" type="float" value="2" />
     <output name="out__y__1" type="float" value="8" />
   </nodegraph>
-  <foo2 name="node4" type="multioutput" />
-  <foo2 name="node5" type="multioutput" />
-  <add name="node6" type="float">
-    <input name="in1" type="float" output="out__y__0" nodename="node4" />
-    <input name="in2" type="float" output="out__y__0" nodename="node5" />
+  <foo2 name="var__2" type="multioutput" />
+  <foo2 name="var__3" type="multioutput" />
+  <add name="HERE2" type="float">
+    <input name="in1" type="float" output="out__y__0" nodename="var__2" />
+    <input name="in2" type="float" output="out__y__0" nodename="var__3" />
   </add>
-  <add name="node7" type="float">
-    <input name="in1" type="float" output="out__y__1" nodename="node4" />
-    <input name="in2" type="float" output="out__y__1" nodename="node5" />
+  <add name="HERE3" type="float">
+    <input name="in1" type="float" output="out__y__1" nodename="var__2" />
+    <input name="in2" type="float" output="out__y__1" nodename="var__3" />
   </add>
 </materialx>

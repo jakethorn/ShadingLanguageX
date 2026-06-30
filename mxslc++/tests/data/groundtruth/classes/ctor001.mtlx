@@ -6,21 +6,21 @@
     <input name="radius" type="float" value="1" />
   </nodedef>
   <nodegraph name="NG___Circle__" nodedef="ND___Circle__">
-    <combine2 name="node1" type="vector2">
+    <combine2 name="value__0" type="vector2">
       <input name="in1" type="float" value="0" />
       <input name="in2" type="float" value="0" />
     </combine2>
-    <output name="out__0" type="vector2" nodename="node1" />
+    <output name="out__0" type="vector2" nodename="value__0" />
     <output name="out__1" type="float" interfacename="radius" />
   </nodegraph>
-  <__Circle__ name="node1" type="multioutput">
+  <__Circle__ name="c" type="multioutput">
     <input name="radius" type="float" value="3" />
   </__Circle__>
-  <__Circle__ name="node2" type="multioutput">
+  <__Circle__ name="d" type="multioutput">
     <input name="radius" type="float" value="4" />
   </__Circle__>
-  <multiply name="node3" type="float">
-    <input name="in1" type="float" output="out__1" nodename="node1" />
-    <input name="in2" type="float" output="out__1" nodename="node2" />
+  <multiply name="var__0" type="float">
+    <input name="in1" type="float" output="out__1" nodename="c" />
+    <input name="in2" type="float" output="out__1" nodename="d" />
   </multiply>
 </materialx>

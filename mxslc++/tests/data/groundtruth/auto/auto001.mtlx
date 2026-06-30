@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="node1" type="float">
+  <add name="f" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="1" />
   </add>
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" nodename="node1" />
+  <multiply name="g" type="float">
+    <input name="in1" type="float" nodename="f" />
     <input name="in2" type="float" value="2" />
   </multiply>
-  <convert name="node3" type="float">
+  <convert name="in2" type="float">
     <input name="in" type="integer" value="4" />
   </convert>
-  <divide name="node4" type="float">
+  <divide name="b" type="float">
     <input name="in1" type="float" value="3" />
-    <input name="in2" type="float" nodename="node3" />
+    <input name="in2" type="float" nodename="in2" />
   </divide>
-  <normal name="node5" type="vector3">
+  <normal name="n" type="vector3">
     <input name="space" type="string" value="world" />
   </normal>
 </materialx>

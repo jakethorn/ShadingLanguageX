@@ -24,3 +24,8 @@ void InputVariable::copy_value_impl(const ValuePtr value)
 {
     value->set_as_node_input(input_);
 }
+
+void InputVariable::set_node_name(const string& name) const
+{
+
+}

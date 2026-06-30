@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="f" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <randomfloat name="a__0" type="float" />
+  <randomfloat name="a__1" type="float" />
+  <randomfloat name="b__one" type="float" />
+  <randomfloat name="b__two" type="float" />
+  <add name="h" type="float">
+    <input name="in1" type="float" nodename="f" />
+    <input name="in2" type="float" nodename="f" />
+  </add>
+  <nodedef name="ND___Foo__" node="__Foo__">
+    <output name="out__0" type="vector2" />
+    <output name="out__1" type="vector2" />
+    <input name="pos" type="vector2" value="0, 0" />
+    <input name="vel" type="vector2" value="0, 0" />
+  </nodedef>
+  <nodegraph name="NG___Foo__" nodedef="ND___Foo__">
+    <output name="out__0" type="vector2" interfacename="pos" />
+    <output name="out__1" type="vector2" interfacename="vel" />
+  </nodegraph>
+  <convert name="var__0" type="vector2">
+    <input name="in" type="integer" value="1" />
+  </convert>
+  <convert name="var__1" type="vector2">
+    <input name="in" type="integer" value="2" />
+  </convert>
+  <__Foo__ name="foo" type="multioutput">
+    <input name="pos" type="vector2" nodename="var__0" />
+    <input name="vel" type="vector2" nodename="var__1" />
+  </__Foo__>
+  <convert name="var__2" type="vector2">
+    <input name="in" type="integer" value="3" />
+  </convert>
+  <separate2 name="k" type="multioutput">
+    <input name="in" type="vector2" nodename="var__2" />
+  </separate2>
+  <randomfloat name="now" type="float" />
+  <randomfloat name="then" type="float" />
+  <add name="END" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" output="outy" nodename="k" />
+  </add>
+</materialx>

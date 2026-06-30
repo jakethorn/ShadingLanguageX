@@ -6,7 +6,7 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="nonlocal_out__x" type="float" value="10" />
   </nodegraph>
-  <multiply name="node1" type="float">
+  <multiply name="y" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="2" />
   </multiply>

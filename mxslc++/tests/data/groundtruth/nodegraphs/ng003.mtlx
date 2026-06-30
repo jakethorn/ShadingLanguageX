@@ -4,18 +4,18 @@
     <output name="out" type="float" value="2" />
   </nodegraph>
   <nodegraph name="NG_bar">
-    <normal name="node1" type="vector3" />
-    <output name="out__0" type="vector3" nodename="node1" />
+    <normal name="var__0" type="vector3" />
+    <output name="out__0" type="vector3" nodename="var__0" />
     <output name="out__1" type="string" value="world" />
   </nodegraph>
-  <convert name="node1" type="vector3">
+  <convert name="var__0" type="vector3">
     <input name="in" type="float" nodegraph="NG_foo" />
   </convert>
-  <viewdirection name="node2" type="vector3">
+  <viewdirection name="var__1" type="vector3">
     <input name="space" type="string" output="out__1" nodegraph="NG_bar" />
   </viewdirection>
-  <dotproduct name="node3" type="float">
-    <input name="in1" type="vector3" nodename="node1" />
-    <input name="in2" type="vector3" nodename="node2" />
+  <dotproduct name="theta" type="float">
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="vector3" nodename="var__1" />
   </dotproduct>
 </materialx>

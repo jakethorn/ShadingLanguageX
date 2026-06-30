@@ -10,6 +10,8 @@
 #include "mtlx/MtlXSerializer.h"
 #include "mtlx/mtlx_utils.h"
 #include "utils/str_utils.h"
+#include "values/NodeOutputValue.h"
+#include "values/NodeValue.h"
 
 Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
 {
@@ -59,8 +61,23 @@ void Variable::set_name(string name)
     name_ = std::move(name);
     for (size_t i = 0; i < children_.size(); ++i)
     {
-        children_[i]->set_name(get_port_name(name_, i));
+        children_[i]->set_name(name_, type(), i);
     }
+
+    set_node_name(name_);
+}
+
+void Variable::set_name(const string& name, const TypePtr& parent_type, const size_t index)
+{
+    name_ = get_port_name(name, index);
+    for (size_t i = 0; i < children_.size(); ++i)
+    {
+        children_[i]->set_name(name_, type(), i);
+    }
+
+    const Field& field = parent_type->field(index);
+    const string child_name = field.has_name() ? field.name() : ::str(index);
+    set_node_name(name + "__" + child_name);
 }
 
 bool Variable::is_assignable() const
@@ -361,6 +378,42 @@ VarPtr Variable::create(const mxslc::Variable& var)
     for (const mxslc::VariablePtr& child : var.children())
         children.emplace_back(create(*child));
     return create(std::move(type), children);
+}
+
+void Variable::set_node_name(const string& name) const
+{
+    if (const shared_ptr<NodeValue> node_value = std::dynamic_pointer_cast<NodeValue>(value_impl()))
+    {
+        node_value->set_node_name(name);
+        return;
+    }
+
+    mx::NodePtr node;
+    for (const VarPtr& child : children_)
+    {
+        ValuePtr value = child->value_impl();
+        if (const shared_ptr<NodeOutputValue> output_value = std::dynamic_pointer_cast<NodeOutputValue>(value))
+        {
+            if (node == nullptr)
+            {
+                node = output_value->node();
+            }
+            else
+            {
+                if (output_value->node() != node)
+                    return;
+            }
+        }
+    }
+
+    for (const VarPtr& child : children_)
+    {
+        ValuePtr value = child->value_impl();
+        if (const shared_ptr<NodeOutputValue> output_value = std::dynamic_pointer_cast<NodeOutputValue>(value))
+        {
+            output_value->set_node_name(name);
+        }
+    }
 }
 
 void Variable::copy_value(ValuePtr value)

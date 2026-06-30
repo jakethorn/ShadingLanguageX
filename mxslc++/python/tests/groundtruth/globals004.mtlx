@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <noise2d name="node1" type="float">
+  <noise2d name="i" type="float">
     <input name="amplitude" type="float" value="1" />
   </noise2d>
-  <noise2d name="node2" type="float">
+  <noise2d name="j" type="float">
     <input name="amplitude" type="float" value="2" />
   </noise2d>
 </materialx>

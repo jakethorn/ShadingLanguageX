@@ -1,50 +1,50 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG_one_vector2">
-    <convert name="node1" type="vector2">
+    <convert name="var__0" type="vector2">
       <input name="in" type="float" value="1" />
     </convert>
-    <output name="out" type="vector2" nodename="node1" />
+    <output name="out" type="vector2" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_one_vector3">
-    <convert name="node1" type="vector3">
+    <convert name="var__0" type="vector3">
       <input name="in" type="float" value="1" />
     </convert>
-    <output name="out" type="vector3" nodename="node1" />
+    <output name="out" type="vector3" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_one_vector4">
-    <convert name="node1" type="vector4">
+    <convert name="var__0" type="vector4">
       <input name="in" type="float" value="1" />
     </convert>
-    <output name="out" type="vector4" nodename="node1" />
+    <output name="out" type="vector4" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_two_vector2">
-    <convert name="node1" type="vector2">
+    <convert name="var__0" type="vector2">
       <input name="in" type="float" value="2" />
     </convert>
-    <output name="out" type="vector2" nodename="node1" />
+    <output name="out" type="vector2" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_two_vector3">
-    <convert name="node1" type="vector3">
+    <convert name="var__0" type="vector3">
       <input name="in" type="float" value="2" />
     </convert>
-    <output name="out" type="vector3" nodename="node1" />
+    <output name="out" type="vector3" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_two_vector4">
-    <convert name="node1" type="vector4">
+    <convert name="var__0" type="vector4">
       <input name="in" type="float" value="2" />
     </convert>
-    <output name="out" type="vector4" nodename="node1" />
+    <output name="out" type="vector4" nodename="var__0" />
   </nodegraph>
-  <add name="node1" type="vector2">
+  <add name="a" type="vector2">
     <input name="in1" type="vector2" nodegraph="NG_one_vector2" />
     <input name="in2" type="vector2" nodegraph="NG_two_vector2" />
   </add>
-  <add name="node2" type="vector3">
+  <add name="b" type="vector3">
     <input name="in1" type="vector3" nodegraph="NG_one_vector3" />
     <input name="in2" type="vector3" nodegraph="NG_two_vector3" />
   </add>
-  <add name="node3" type="vector4">
+  <add name="c" type="vector4">
     <input name="in1" type="vector4" nodegraph="NG_one_vector4" />
     <input name="in2" type="vector4" nodegraph="NG_two_vector4" />
   </add>

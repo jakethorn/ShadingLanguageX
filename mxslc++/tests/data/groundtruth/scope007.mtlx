@@ -6,12 +6,12 @@
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
     <output name="out" type="float" value="3" />
   </nodegraph>
-  <multiply name="node1" type="float">
+  <multiply name="c" type="float">
     <input name="in1" type="float" value="7" />
     <input name="in2" type="float" value="6" />
   </multiply>
-  <some_func name="node2" type="float" />
-  <multiply name="node3" type="float">
+  <some_func name="_" type="float" />
+  <multiply name="d" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="8" />
   </multiply>

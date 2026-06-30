@@ -1,0 +1,28 @@
+float f = 1.0 + 1.0;
+{float, float} a = {randomfloat(), randomfloat()};
+{float one, float two} b = {randomfloat(), randomfloat()};
+float g = f;
+float h = g + f;
+
+class Foo
+{
+    vec2 pos;
+    vec2 vel;
+
+    Foo(vec2 pos, vec2 vel)
+    {
+        this.pos = pos;
+        this.vel = vel;
+    }
+}
+
+Foo foo = Foo{vec2{1}, vec2{2}};
+
+{float i, float j} k = separate2(vec2{3});
+{float i, float j} m = k;
+
+float now, then = {randomfloat(), randomfloat()};
+
+{float i, float j} o = {1.0, k.j};
+
+float END = o.i + o.j;

@@ -5,24 +5,24 @@
     <output name="out__1" type="color3" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <randomcolor name="node1" type="color3">
+    <randomcolor name="var__0" type="color3">
       <input name="in" type="integer" value="2" />
     </randomcolor>
     <output name="out__0" type="float" value="1" />
-    <output name="out__1" type="color3" nodename="node1" />
+    <output name="out__1" type="color3" nodename="var__0" />
   </nodegraph>
-  <foo name="node1" type="multioutput" />
-  <add name="node2" type="color3">
-    <input name="in1" type="color3" output="out__1" nodename="node1" />
-    <input name="in2" type="float" output="out__0" nodename="node1" />
+  <foo name="var__0" type="multioutput" />
+  <add name="cx" type="color3">
+    <input name="in1" type="color3" output="out__1" nodename="var__0" />
+    <input name="in2" type="float" output="out__0" nodename="var__0" />
   </add>
-  <foo name="node3" type="multioutput" />
-  <add name="node4" type="float">
-    <input name="in1" type="float" output="out__0" nodename="node1" />
-    <input name="in2" type="float" output="out__0" nodename="node3" />
+  <foo name="a" type="multioutput" />
+  <add name="y" type="float">
+    <input name="in1" type="float" output="out__0" nodename="var__0" />
+    <input name="in2" type="float" output="out__0" nodename="a" />
   </add>
-  <add name="node5" type="color3">
-    <input name="in1" type="color3" output="out__1" nodename="node1" />
-    <input name="in2" type="color3" output="out__1" nodename="node3" />
+  <add name="z" type="color3">
+    <input name="in1" type="color3" output="out__1" nodename="var__0" />
+    <input name="in2" type="color3" output="out__1" nodename="a" />
   </add>
 </materialx>

@@ -16,6 +16,7 @@ public:
 protected:
     ValuePtr value_impl() const override;
     void copy_value_impl(ValuePtr value) override;
+    void set_node_name(const string& name) const override;
 
 private:
     mx::InputPtr input_;

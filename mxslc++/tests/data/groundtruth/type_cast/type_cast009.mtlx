@@ -17,22 +17,22 @@
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <constant name="node1" type="vector2" />
-  <foo name="node2" type="integer">
-    <input name="a" type="vector2" nodename="node1" />
+  <constant name="var__0" type="vector2" />
+  <foo name="var__1" type="integer">
+    <input name="a" type="vector2" nodename="var__0" />
     <input name="b" type="integer" value="1" />
   </foo>
-  <constant name="node3" type="vector2" />
-  <foo name="node4" type="integer">
-    <input name="a" type="vector2" nodename="node3" />
+  <constant name="var__2" type="vector2" />
+  <foo name="var__3" type="integer">
+    <input name="a" type="vector2" nodename="var__2" />
     <input name="b" type="string" value="hello" />
   </foo>
-  <foo name="node5" type="integer">
+  <foo name="var__4" type="integer">
     <input name="a__0" type="float" value="1" />
     <input name="a__1" type="float" value="2" />
     <input name="b" type="integer" value="1" />
   </foo>
-  <foo name="node6" type="integer">
+  <foo name="var__5" type="integer">
     <input name="a__0" type="float" value="1" />
     <input name="a__1" type="float" value="2" />
     <input name="b" type="string" value="hello" />

@@ -6,37 +6,37 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <foo name="node1" type="integer" />
-  <add name="node2" type="integer">
+  <foo name="i" type="integer" />
+  <add name="in2" type="integer">
     <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="node3" type="integer">
-    <input name="in1" type="integer" nodename="node1" />
-    <input name="in2" type="integer" nodename="node2" />
+  <add name="in1" type="integer">
+    <input name="in1" type="integer" nodename="i" />
+    <input name="in2" type="integer" nodename="in2" />
   </add>
-  <add name="node4" type="integer">
-    <input name="in1" type="integer" nodename="node3" />
+  <add name="in3" type="integer">
+    <input name="in1" type="integer" nodename="in1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="node5" type="integer">
+  <add name="var__0" type="integer">
     <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" nodename="node4" />
+    <input name="in2" type="integer" nodename="in3" />
   </add>
-  <add name="node6" type="integer">
+  <add name="in4" type="integer">
     <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="node7" type="integer">
-    <input name="in1" type="integer" nodename="node4" />
-    <input name="in2" type="integer" nodename="node6" />
+  <add name="in5" type="integer">
+    <input name="in1" type="integer" nodename="in3" />
+    <input name="in2" type="integer" nodename="in4" />
   </add>
-  <add name="node8" type="integer">
-    <input name="in1" type="integer" nodename="node7" />
+  <add name="in6" type="integer">
+    <input name="in1" type="integer" nodename="in5" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="node9" type="integer">
+  <add name="var__1" type="integer">
     <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" nodename="node8" />
+    <input name="in2" type="integer" nodename="in6" />
   </add>
 </materialx>

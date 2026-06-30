@@ -46,298 +46,298 @@
     <input name="tangent" type="vector3" value="0, 0, 0" defaultgeomprop="Tworld" />
   </nodedef>
   <nodegraph name="NG_slx_standard_surface" nodedef="ND_slx_standard_surface">
-    <multiply name="node1" type="float">
+    <multiply name="in1" type="float">
       <input name="in1" type="float" interfacename="coat_affect_roughness" />
       <input name="in2" type="float" interfacename="coat" />
     </multiply>
-    <multiply name="node2" type="float">
-      <input name="in1" type="float" nodename="node1" />
+    <multiply name="coat_affect_roughness_combined" type="float">
+      <input name="in1" type="float" nodename="in1" />
       <input name="in2" type="float" interfacename="coat_roughness" />
     </multiply>
-    <mix name="node3" type="float">
+    <mix name="coat_affected_roughness" type="float">
       <input name="fg" type="float" value="1" />
       <input name="bg" type="float" interfacename="specular_roughness" />
-      <input name="mix" type="float" nodename="node2" />
+      <input name="mix" type="float" nodename="coat_affect_roughness_combined" />
     </mix>
-    <roughness_anisotropy name="node4" type="vector2">
-      <input name="roughness" type="float" nodename="node3" />
+    <roughness_anisotropy name="main_roughness" type="vector2">
+      <input name="roughness" type="float" nodename="coat_affected_roughness" />
       <input name="anisotropy" type="float" interfacename="specular_anisotropy" />
     </roughness_anisotropy>
-    <add name="node5" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="specular_roughness" />
       <input name="in2" type="float" interfacename="transmission_extra_roughness" />
     </add>
-    <clamp name="node6" type="float">
-      <input name="in" type="float" nodename="node5" />
+    <clamp name="transmission_roughness_clamped" type="float">
+      <input name="in" type="float" nodename="var__0" />
     </clamp>
-    <mix name="node7" type="float">
+    <mix name="coat_affected_transmission_roughness" type="float">
       <input name="fg" type="float" value="1" />
-      <input name="bg" type="float" nodename="node6" />
-      <input name="mix" type="float" nodename="node2" />
+      <input name="bg" type="float" nodename="transmission_roughness_clamped" />
+      <input name="mix" type="float" nodename="coat_affect_roughness_combined" />
     </mix>
-    <roughness_anisotropy name="node8" type="vector2">
-      <input name="roughness" type="float" nodename="node7" />
+    <roughness_anisotropy name="transmission_roughness" type="vector2">
+      <input name="roughness" type="float" nodename="coat_affected_transmission_roughness" />
       <input name="anisotropy" type="float" interfacename="specular_anisotropy" />
     </roughness_anisotropy>
-    <multiply name="node9" type="float">
+    <multiply name="var__1" type="float">
       <input name="in1" type="float" interfacename="specular_rotation" />
       <input name="in2" type="float" value="360" />
     </multiply>
-    <rotate3d name="node10" type="vector3">
+    <rotate3d name="tangent_rotate" type="vector3">
       <input name="in" type="vector3" interfacename="tangent" />
-      <input name="amount" type="float" nodename="node9" />
+      <input name="amount" type="float" nodename="var__1" />
       <input name="axis" type="vector3" interfacename="normal" />
     </rotate3d>
-    <normalize name="node11" type="vector3">
-      <input name="in" type="vector3" nodename="node10" />
+    <normalize name="tangent_rotate_normalize" type="vector3">
+      <input name="in" type="vector3" nodename="tangent_rotate" />
     </normalize>
-    <ifgreater name="node12" type="boolean">
+    <ifgreater name="condition" type="boolean">
       <input name="value1" type="float" interfacename="specular_anisotropy" />
       <input name="value2" type="float" value="0" />
     </ifgreater>
-    <ifequal name="node13" type="vector3">
-      <input name="value1" type="boolean" nodename="node12" />
+    <ifequal name="main_tangent" type="vector3">
+      <input name="value1" type="boolean" nodename="condition" />
       <input name="value2" type="boolean" value="true" />
-      <input name="in1" type="vector3" nodename="node11" />
+      <input name="in1" type="vector3" nodename="tangent_rotate_normalize" />
       <input name="in2" type="vector3" interfacename="tangent" />
     </ifequal>
-    <multiply name="node14" type="float">
+    <multiply name="var__2" type="float">
       <input name="in1" type="float" interfacename="coat_rotation" />
       <input name="in2" type="float" value="360" />
     </multiply>
-    <rotate3d name="node15" type="vector3">
+    <rotate3d name="coat_tangent_rotate" type="vector3">
       <input name="in" type="vector3" interfacename="tangent" />
-      <input name="amount" type="float" nodename="node14" />
+      <input name="amount" type="float" nodename="var__2" />
       <input name="axis" type="vector3" interfacename="coat_normal" />
     </rotate3d>
-    <normalize name="node16" type="vector3">
-      <input name="in" type="vector3" nodename="node15" />
+    <normalize name="coat_tangent_rotate_normalize" type="vector3">
+      <input name="in" type="vector3" nodename="coat_tangent_rotate" />
     </normalize>
-    <ifgreater name="node17" type="boolean">
+    <ifgreater name="condition2" type="boolean">
       <input name="value1" type="float" interfacename="coat_anisotropy" />
       <input name="value2" type="float" value="0" />
     </ifgreater>
-    <ifequal name="node18" type="vector3">
-      <input name="value1" type="boolean" nodename="node17" />
+    <ifequal name="coat_tangent" type="vector3">
+      <input name="value1" type="boolean" nodename="condition2" />
       <input name="value2" type="boolean" value="true" />
-      <input name="in1" type="vector3" nodename="node16" />
+      <input name="in1" type="vector3" nodename="coat_tangent_rotate_normalize" />
       <input name="in2" type="vector3" interfacename="tangent" />
     </ifequal>
-    <clamp name="node19" type="float">
+    <clamp name="in2" type="float">
       <input name="in" type="float" interfacename="coat" />
     </clamp>
-    <multiply name="node20" type="float">
-      <input name="in1" type="float" nodename="node19" />
+    <multiply name="in3" type="float">
+      <input name="in1" type="float" nodename="in2" />
       <input name="in2" type="float" interfacename="coat_affect_color" />
     </multiply>
-    <add name="node21" type="float">
-      <input name="in1" type="float" nodename="node20" />
+    <add name="coat_gamma" type="float">
+      <input name="in1" type="float" nodename="in3" />
       <input name="in2" type="float" value="1" />
     </add>
-    <max name="node22" type="color3">
+    <max name="in4" type="color3">
       <input name="in1" type="color3" interfacename="base_color" />
       <input name="in2" type="float" value="0" />
     </max>
-    <power name="node23" type="color3">
-      <input name="in1" type="color3" nodename="node22" />
-      <input name="in2" type="float" nodename="node21" />
+    <power name="coat_affected_diffuse_color" type="color3">
+      <input name="in1" type="color3" nodename="in4" />
+      <input name="in2" type="float" nodename="coat_gamma" />
     </power>
-    <max name="node24" type="color3">
+    <max name="in5" type="color3">
       <input name="in1" type="color3" interfacename="subsurface_color" />
       <input name="in2" type="float" value="0" />
     </max>
-    <power name="node25" type="color3">
-      <input name="in1" type="color3" nodename="node24" />
-      <input name="in2" type="float" nodename="node21" />
+    <power name="coat_affected_subsurface_color" type="color3">
+      <input name="in1" type="color3" nodename="in5" />
+      <input name="in2" type="float" nodename="coat_gamma" />
     </power>
-    <oren_nayar_diffuse_bsdf name="node26" type="BSDF">
+    <oren_nayar_diffuse_bsdf name="diffuse_bsdf" type="BSDF">
       <input name="weight" type="float" interfacename="base" />
-      <input name="color" type="color3" nodename="node23" />
+      <input name="color" type="color3" nodename="coat_affected_diffuse_color" />
       <input name="roughness" type="float" interfacename="diffuse_roughness" />
       <input name="normal" type="vector3" interfacename="normal" />
     </oren_nayar_diffuse_bsdf>
-    <translucent_bsdf name="node27" type="BSDF">
+    <translucent_bsdf name="translucent_bsdf" type="BSDF">
       <input name="weight" type="float" value="1" />
-      <input name="color" type="color3" nodename="node25" />
+      <input name="color" type="color3" nodename="coat_affected_subsurface_color" />
       <input name="normal" type="vector3" interfacename="normal" />
     </translucent_bsdf>
-    <multiply name="node28" type="color3">
+    <multiply name="var__3" type="color3">
       <input name="in1" type="color3" interfacename="subsurface_radius" />
       <input name="in2" type="float" interfacename="subsurface_scale" />
     </multiply>
-    <subsurface_bsdf name="node29" type="BSDF">
+    <subsurface_bsdf name="subsurface_bsdf" type="BSDF">
       <input name="weight" type="float" value="1" />
-      <input name="color" type="color3" nodename="node25" />
-      <input name="radius" type="color3" nodename="node28" />
+      <input name="color" type="color3" nodename="coat_affected_subsurface_color" />
+      <input name="radius" type="color3" nodename="var__3" />
       <input name="anisotropy" type="float" interfacename="subsurface_anisotropy" />
       <input name="normal" type="vector3" interfacename="normal" />
     </subsurface_bsdf>
-    <convert name="node30" type="float">
+    <convert name="var__4" type="float">
       <input name="in" type="boolean" interfacename="thin_walled" />
     </convert>
-    <mix name="node31" type="BSDF">
-      <input name="fg" type="BSDF" nodename="node27" />
-      <input name="bg" type="BSDF" nodename="node29" />
-      <input name="mix" type="float" nodename="node30" />
+    <mix name="selected_subsurface_bsdf" type="BSDF">
+      <input name="fg" type="BSDF" nodename="translucent_bsdf" />
+      <input name="bg" type="BSDF" nodename="subsurface_bsdf" />
+      <input name="mix" type="float" nodename="var__4" />
     </mix>
-    <mix name="node32" type="BSDF">
-      <input name="fg" type="BSDF" nodename="node31" />
-      <input name="bg" type="BSDF" nodename="node26" />
+    <mix name="subsurface_mix" type="BSDF">
+      <input name="fg" type="BSDF" nodename="selected_subsurface_bsdf" />
+      <input name="bg" type="BSDF" nodename="diffuse_bsdf" />
       <input name="mix" type="float" interfacename="subsurface" />
     </mix>
-    <sheen_bsdf name="node33" type="BSDF">
+    <sheen_bsdf name="sheen_bsdf" type="BSDF">
       <input name="weight" type="float" interfacename="sheen" />
       <input name="color" type="color3" interfacename="sheen_color" />
       <input name="roughness" type="float" interfacename="sheen_roughness" />
       <input name="normal" type="vector3" interfacename="normal" />
     </sheen_bsdf>
-    <layer name="node34" type="BSDF">
-      <input name="top" type="BSDF" nodename="node33" />
-      <input name="base" type="BSDF" nodename="node32" />
+    <layer name="sheen_layer" type="BSDF">
+      <input name="top" type="BSDF" nodename="sheen_bsdf" />
+      <input name="base" type="BSDF" nodename="subsurface_mix" />
     </layer>
-    <dielectric_bsdf name="node35" type="BSDF">
+    <dielectric_bsdf name="transmission_bsdf" type="BSDF">
       <input name="weight" type="float" value="1" />
       <input name="tint" type="color3" interfacename="transmission_color" />
       <input name="ior" type="float" interfacename="specular_IOR" />
-      <input name="roughness" type="vector2" nodename="node8" />
+      <input name="roughness" type="vector2" nodename="transmission_roughness" />
       <input name="normal" type="vector3" interfacename="normal" />
-      <input name="tangent" type="vector3" nodename="node13" />
+      <input name="tangent" type="vector3" nodename="main_tangent" />
       <input name="distribution" type="string" value="ggx" />
       <input name="scatter_mode" type="string" value="T" />
     </dielectric_bsdf>
-    <mix name="node36" type="BSDF">
-      <input name="fg" type="BSDF" nodename="node35" />
-      <input name="bg" type="BSDF" nodename="node34" />
+    <mix name="transmission_mix" type="BSDF">
+      <input name="fg" type="BSDF" nodename="transmission_bsdf" />
+      <input name="bg" type="BSDF" nodename="sheen_layer" />
       <input name="mix" type="float" interfacename="transmission" />
     </mix>
-    <dielectric_bsdf name="node37" type="BSDF">
+    <dielectric_bsdf name="specular_bsdf" type="BSDF">
       <input name="weight" type="float" interfacename="specular" />
       <input name="tint" type="color3" interfacename="specular_color" />
       <input name="ior" type="float" interfacename="specular_IOR" />
-      <input name="roughness" type="vector2" nodename="node4" />
+      <input name="roughness" type="vector2" nodename="main_roughness" />
       <input name="thinfilm_thickness" type="float" interfacename="thin_film_thickness" />
       <input name="thinfilm_ior" type="float" interfacename="thin_film_IOR" />
       <input name="normal" type="vector3" interfacename="normal" />
-      <input name="tangent" type="vector3" nodename="node13" />
+      <input name="tangent" type="vector3" nodename="main_tangent" />
       <input name="distribution" type="string" value="ggx" />
       <input name="scatter_mode" type="string" value="R" />
     </dielectric_bsdf>
-    <layer name="node38" type="BSDF">
-      <input name="top" type="BSDF" nodename="node37" />
-      <input name="base" type="BSDF" nodename="node36" />
+    <layer name="specular_layer" type="BSDF">
+      <input name="top" type="BSDF" nodename="specular_bsdf" />
+      <input name="base" type="BSDF" nodename="transmission_mix" />
     </layer>
-    <multiply name="node39" type="color3">
+    <multiply name="metal_reflectivity" type="color3">
       <input name="in1" type="color3" interfacename="base_color" />
       <input name="in2" type="float" interfacename="base" />
     </multiply>
-    <multiply name="node40" type="color3">
+    <multiply name="metal_edgecolor" type="color3">
       <input name="in1" type="color3" interfacename="specular_color" />
       <input name="in2" type="float" interfacename="specular" />
     </multiply>
-    <artistic_ior name="node41" type="multioutput">
-      <input name="reflectivity" type="color3" nodename="node39" />
-      <input name="edge_color" type="color3" nodename="node40" />
+    <artistic_ior name="artistic_ior" type="multioutput">
+      <input name="reflectivity" type="color3" nodename="metal_reflectivity" />
+      <input name="edge_color" type="color3" nodename="metal_edgecolor" />
     </artistic_ior>
-    <conductor_bsdf name="node42" type="BSDF">
+    <conductor_bsdf name="metal_bsdf" type="BSDF">
       <input name="weight" type="float" value="1" />
-      <input name="ior" type="color3" output="ior" nodename="node41" />
-      <input name="extinction" type="color3" output="extinction" nodename="node41" />
-      <input name="roughness" type="vector2" nodename="node4" />
+      <input name="ior" type="color3" output="ior" nodename="artistic_ior" />
+      <input name="extinction" type="color3" output="extinction" nodename="artistic_ior" />
+      <input name="roughness" type="vector2" nodename="main_roughness" />
       <input name="thinfilm_thickness" type="float" interfacename="thin_film_thickness" />
       <input name="thinfilm_ior" type="float" interfacename="thin_film_IOR" />
       <input name="normal" type="vector3" interfacename="normal" />
-      <input name="tangent" type="vector3" nodename="node13" />
+      <input name="tangent" type="vector3" nodename="main_tangent" />
       <input name="distribution" type="string" value="ggx" />
     </conductor_bsdf>
-    <mix name="node43" type="BSDF">
-      <input name="fg" type="BSDF" nodename="node42" />
-      <input name="bg" type="BSDF" nodename="node38" />
+    <mix name="metalness_mix" type="BSDF">
+      <input name="fg" type="BSDF" nodename="metal_bsdf" />
+      <input name="bg" type="BSDF" nodename="specular_layer" />
       <input name="mix" type="float" interfacename="metalness" />
     </mix>
-    <mix name="node44" type="color3">
+    <mix name="coat_attenuation" type="color3">
       <input name="fg" type="color3" interfacename="coat_color" />
       <input name="bg" type="color3" value="1, 1, 1" />
       <input name="mix" type="float" interfacename="coat" />
     </mix>
-    <multiply name="node45" type="BSDF">
-      <input name="in1" type="BSDF" nodename="node43" />
-      <input name="in2" type="color3" nodename="node44" />
+    <multiply name="thin_film_layer_attenuated" type="BSDF">
+      <input name="in1" type="BSDF" nodename="metalness_mix" />
+      <input name="in2" type="color3" nodename="coat_attenuation" />
     </multiply>
-    <roughness_anisotropy name="node46" type="vector2">
+    <roughness_anisotropy name="coat_roughness_vector" type="vector2">
       <input name="roughness" type="float" interfacename="coat_roughness" />
       <input name="anisotropy" type="float" interfacename="coat_anisotropy" />
     </roughness_anisotropy>
-    <dielectric_bsdf name="node47" type="BSDF">
+    <dielectric_bsdf name="coat_bsdf" type="BSDF">
       <input name="weight" type="float" interfacename="coat" />
       <input name="tint" type="color3" value="1, 1, 1" />
       <input name="ior" type="float" interfacename="coat_IOR" />
-      <input name="roughness" type="vector2" nodename="node46" />
+      <input name="roughness" type="vector2" nodename="coat_roughness_vector" />
       <input name="normal" type="vector3" interfacename="coat_normal" />
-      <input name="tangent" type="vector3" nodename="node18" />
+      <input name="tangent" type="vector3" nodename="coat_tangent" />
       <input name="distribution" type="string" value="ggx" />
       <input name="scatter_mode" type="string" value="R" />
     </dielectric_bsdf>
-    <layer name="node48" type="BSDF">
-      <input name="top" type="BSDF" nodename="node47" />
-      <input name="base" type="BSDF" nodename="node45" />
+    <layer name="coat_layer" type="BSDF">
+      <input name="top" type="BSDF" nodename="coat_bsdf" />
+      <input name="base" type="BSDF" nodename="thin_film_layer_attenuated" />
     </layer>
-    <subtract name="node49" type="float">
+    <subtract name="in6" type="float">
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" interfacename="coat_IOR" />
     </subtract>
-    <add name="node50" type="float">
+    <add name="in7" type="float">
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" interfacename="coat_IOR" />
     </add>
-    <divide name="node51" type="float">
-      <input name="in1" type="float" nodename="node49" />
-      <input name="in2" type="float" nodename="node50" />
+    <divide name="coat_ior_to_F0_sqrt" type="float">
+      <input name="in1" type="float" nodename="in6" />
+      <input name="in2" type="float" nodename="in7" />
     </divide>
-    <multiply name="node52" type="float">
-      <input name="in1" type="float" nodename="node51" />
-      <input name="in2" type="float" nodename="node51" />
+    <multiply name="coat_ior_to_F0" type="float">
+      <input name="in1" type="float" nodename="coat_ior_to_F0_sqrt" />
+      <input name="in2" type="float" nodename="coat_ior_to_F0_sqrt" />
     </multiply>
-    <multiply name="node53" type="color3">
+    <multiply name="var__5" type="color3">
       <input name="in1" type="color3" interfacename="emission_color" />
       <input name="in2" type="float" interfacename="emission" />
     </multiply>
-    <uniform_edf name="node54" type="EDF">
-      <input name="color" type="color3" nodename="node53" />
+    <uniform_edf name="emission_edf" type="EDF">
+      <input name="color" type="color3" nodename="var__5" />
     </uniform_edf>
-    <multiply name="node55" type="EDF">
-      <input name="in1" type="EDF" nodename="node54" />
+    <multiply name="coat_tinted_emission_edf" type="EDF">
+      <input name="in1" type="EDF" nodename="emission_edf" />
       <input name="in2" type="color3" interfacename="coat_color" />
     </multiply>
-    <subtract name="node56" type="float">
+    <subtract name="in8" type="float">
       <input name="in1" type="float" value="1" />
-      <input name="in2" type="float" nodename="node52" />
+      <input name="in2" type="float" nodename="coat_ior_to_F0" />
     </subtract>
-    <convert name="node57" type="color3">
-      <input name="in" type="float" nodename="node56" />
+    <convert name="emission_color0" type="color3">
+      <input name="in" type="float" nodename="in8" />
     </convert>
-    <generalized_schlick_edf name="node58" type="EDF">
-      <input name="color0" type="color3" nodename="node57" />
+    <generalized_schlick_edf name="coat_emission_edf" type="EDF">
+      <input name="color0" type="color3" nodename="emission_color0" />
       <input name="color90" type="color3" value="0, 0, 0" />
       <input name="exponent" type="float" value="5" />
-      <input name="base" type="EDF" nodename="node55" />
+      <input name="base" type="EDF" nodename="coat_tinted_emission_edf" />
     </generalized_schlick_edf>
-    <mix name="node59" type="EDF">
-      <input name="fg" type="EDF" nodename="node58" />
-      <input name="bg" type="EDF" nodename="node54" />
+    <mix name="blended_coat_emission_edf" type="EDF">
+      <input name="fg" type="EDF" nodename="coat_emission_edf" />
+      <input name="bg" type="EDF" nodename="emission_edf" />
       <input name="mix" type="float" interfacename="coat" />
     </mix>
-    <luminance name="node60" type="color3">
+    <luminance name="var__6" type="color3">
       <input name="in" type="color3" interfacename="opacity" />
     </luminance>
-    <extract name="node61" type="float">
-      <input name="in" type="color3" nodename="node60" />
+    <extract name="var__7" type="float">
+      <input name="in" type="color3" nodename="var__6" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <surface name="node62" type="surfaceshader">
-      <input name="bsdf" type="BSDF" nodename="node48" />
-      <input name="edf" type="EDF" nodename="node59" />
-      <input name="opacity" type="float" nodename="node61" />
+    <surface name="var__8" type="surfaceshader">
+      <input name="bsdf" type="BSDF" nodename="coat_layer" />
+      <input name="edf" type="EDF" nodename="blended_coat_emission_edf" />
+      <input name="opacity" type="float" nodename="var__7" />
     </surface>
-    <output name="out" type="surfaceshader" nodename="node62" />
+    <output name="out" type="surfaceshader" nodename="var__8" />
   </nodegraph>
 </materialx>

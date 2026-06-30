@@ -7,23 +7,23 @@
     <input name="s2" type="string" value="" />
   </nodedef>
   <nodegraph name="NG_my_main" nodedef="ND_my_main">
-    <randomfloat name="node1" type="float" />
-    <add name="node2" type="float">
-      <input name="in1" type="float" nodename="node1" />
+    <randomfloat name="in1" type="float" />
+    <add name="f" type="float">
+      <input name="in1" type="float" nodename="in1" />
       <input name="in2" type="float" interfacename="in1" />
     </add>
-    <convert name="node3" type="color3">
-      <input name="in" type="float" nodename="node2" />
+    <convert name="var__0" type="color3">
+      <input name="in" type="float" nodename="f" />
     </convert>
-    <standard_surface name="node4" type="surfaceshader">
-      <input name="base_color" type="color3" nodename="node3" />
+    <standard_surface name="var__1" type="surfaceshader">
+      <input name="base_color" type="color3" nodename="var__0" />
     </standard_surface>
-    <surfacematerial name="node5" type="material">
-      <input name="surfaceshader" type="surfaceshader" nodename="node4" />
+    <surfacematerial name="var__2" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="var__1" />
     </surfacematerial>
-    <output name="out" type="material" nodename="node5" />
+    <output name="out" type="material" nodename="var__2" />
   </nodegraph>
-  <my_main name="node1" type="material">
+  <my_main name="var__0" type="material">
     <input name="in1" type="float" value="3" />
     <input name="s1" type="string" value="world" />
     <input name="s2" type="filename" value="image.png" />

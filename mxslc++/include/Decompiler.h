@@ -43,9 +43,9 @@ namespace mxslc
         std::string outputs_to_expression(const std::vector<MaterialX::OutputPtr>& outputs);
         std::string value_to_constructor(const MaterialX::ValuePtr& value);
         std::string interface_name_to_identifier(const std::string& interface_name);
-        std::string node_name_and_output_to_dot_op(const std::string& node_name, const std::string& output);
+        std::string node_and_output_to_dot_op(const MaterialX::NodePtr& node, const std::string& output);
         std::string node_graph_name_and_output_to_dot_op(const std::string& node_graph_name, const std::string& output);
-        std::string node_name_to_identifier(const std::string& node_name);
+        std::string node_to_identifier(const MaterialX::NodePtr& node);
         std::string node_graph_name_to_identifier(const std::string& node_graph_name);
         std::string input_to_argument(const MaterialX::InputPtr& input);
         std::string inputs_to_arguments(const std::vector<MaterialX::InputPtr>& inputs);
@@ -62,7 +62,7 @@ namespace mxslc
         std::string global_code_;
         std::string function_code_;
         bool in_function_{false};
-        std::unordered_set<std::string> decompiled_nodes_;
+        std::unordered_set<MaterialX::NodePtr> decompiled_nodes_;
         std::unordered_set<std::string> decompiled_node_graphs_;
     };
 }

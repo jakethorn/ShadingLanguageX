@@ -1,41 +1,41 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine3 name="node1" type="vector3">
+  <combine3 name="v1" type="vector3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <combine3 name="node2" type="vector3">
+  <combine3 name="v2" type="vector3">
     <input name="in1" type="float" value="4" />
     <input name="in2" type="float" value="5" />
     <input name="in3" type="float" value="6" />
   </combine3>
-  <multiply name="node3" type="vector3">
-    <input name="in1" type="vector3" nodename="node1" />
-    <input name="in2" type="vector3" nodename="node2" />
+  <multiply name="in1" type="vector3">
+    <input name="in1" type="vector3" nodename="v1" />
+    <input name="in2" type="vector3" nodename="v2" />
   </multiply>
-  <randomfloat name="node4" type="float" />
-  <multiply name="node5" type="vector3">
-    <input name="in1" type="vector3" nodename="node3" />
-    <input name="in2" type="float" nodename="node4" />
+  <randomfloat name="in2" type="float" />
+  <multiply name="v3" type="vector3">
+    <input name="in1" type="vector3" nodename="in1" />
+    <input name="in2" type="float" nodename="in2" />
   </multiply>
-  <combine3 name="node6" type="color3">
+  <combine3 name="c1" type="color3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <combine3 name="node7" type="color3">
+  <combine3 name="c2" type="color3">
     <input name="in1" type="float" value="4" />
     <input name="in2" type="float" value="5" />
     <input name="in3" type="float" value="6" />
   </combine3>
-  <multiply name="node8" type="color3">
-    <input name="in1" type="color3" nodename="node6" />
-    <input name="in2" type="color3" nodename="node7" />
+  <multiply name="in3" type="color3">
+    <input name="in1" type="color3" nodename="c1" />
+    <input name="in2" type="color3" nodename="c2" />
   </multiply>
-  <randomfloat name="node9" type="float" />
-  <multiply name="node10" type="color3">
-    <input name="in1" type="color3" nodename="node8" />
-    <input name="in2" type="float" nodename="node9" />
+  <randomfloat name="in4" type="float" />
+  <multiply name="c3" type="color3">
+    <input name="in1" type="color3" nodename="in3" />
+    <input name="in2" type="float" nodename="in4" />
   </multiply>
 </materialx>

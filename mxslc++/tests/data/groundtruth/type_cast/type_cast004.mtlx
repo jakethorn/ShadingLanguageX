@@ -12,39 +12,39 @@
     <output name="out__2" type="float" value="3" />
     <output name="out__3" type="float" value="4" />
   </nodegraph>
-  <foo name="node1" type="multioutput" />
-  <combine4 name="node2" type="color4">
-    <input name="in1" type="float" output="out__0" nodename="node1" />
-    <input name="in2" type="float" output="out__1" nodename="node1" />
-    <input name="in3" type="float" output="out__2" nodename="node1" />
-    <input name="in4" type="float" output="out__3" nodename="node1" />
+  <foo name="var__0" type="multioutput" />
+  <combine4 name="a" type="color4">
+    <input name="in1" type="float" output="out__0" nodename="var__0" />
+    <input name="in2" type="float" output="out__1" nodename="var__0" />
+    <input name="in3" type="float" output="out__2" nodename="var__0" />
+    <input name="in4" type="float" output="out__3" nodename="var__0" />
   </combine4>
-  <extract name="node3" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="in1" type="float">
+    <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node4" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="in2" type="float">
+    <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <multiply name="node5" type="float">
-    <input name="in1" type="float" nodename="node3" />
-    <input name="in2" type="float" nodename="node4" />
+  <multiply name="in3" type="float">
+    <input name="in1" type="float" nodename="in1" />
+    <input name="in2" type="float" nodename="in2" />
   </multiply>
-  <extract name="node6" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="in4" type="float">
+    <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <multiply name="node7" type="float">
-    <input name="in1" type="float" nodename="node5" />
-    <input name="in2" type="float" nodename="node6" />
+  <multiply name="in5" type="float">
+    <input name="in1" type="float" nodename="in3" />
+    <input name="in2" type="float" nodename="in4" />
   </multiply>
-  <extract name="node8" type="float">
-    <input name="in" type="color4" nodename="node2" />
+  <extract name="in6" type="float">
+    <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="3" />
   </extract>
-  <multiply name="node9" type="float">
-    <input name="in1" type="float" nodename="node7" />
-    <input name="in2" type="float" nodename="node8" />
+  <multiply name="OUT" type="float">
+    <input name="in1" type="float" nodename="in5" />
+    <input name="in2" type="float" nodename="in6" />
   </multiply>
 </materialx>

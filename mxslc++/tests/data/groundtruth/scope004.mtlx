@@ -12,17 +12,17 @@
     <output name="nonlocal_out__c" type="float" value="3" />
     <output name="out" type="float" value="0" />
   </nodegraph>
-  <foo name="node1" type="multioutput" />
-  <divide name="node2" type="float">
-    <input name="in1" type="float" output="nonlocal_out__a" nodename="node1" />
-    <input name="in2" type="float" output="nonlocal_out__b" nodename="node1" />
+  <foo name="var__0" type="multioutput" />
+  <divide name="in1" type="float">
+    <input name="in1" type="float" output="nonlocal_out__a" nodename="var__0" />
+    <input name="in2" type="float" output="nonlocal_out__b" nodename="var__0" />
   </divide>
-  <divide name="node3" type="float">
-    <input name="in1" type="float" nodename="node2" />
-    <input name="in2" type="float" output="nonlocal_out__c" nodename="node1" />
+  <divide name="in2" type="float">
+    <input name="in1" type="float" nodename="in1" />
+    <input name="in2" type="float" output="nonlocal_out__c" nodename="var__0" />
   </divide>
-  <divide name="node4" type="float">
-    <input name="in1" type="float" nodename="node3" />
-    <input name="in2" type="float" output="out" nodename="node1" />
+  <divide name="e" type="float">
+    <input name="in1" type="float" nodename="in2" />
+    <input name="in2" type="float" output="out" nodename="var__0" />
   </divide>
 </materialx>

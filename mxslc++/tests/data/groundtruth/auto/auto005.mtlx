@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <ifequal name="node1" type="float">
+  <ifequal name="x" type="float">
     <input name="value1" type="boolean" value="true" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="0" />

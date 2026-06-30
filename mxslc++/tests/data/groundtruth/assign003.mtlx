@@ -6,18 +6,18 @@
     <input name="z" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_my_function" nodedef="ND_my_function">
-    <subtract name="node1" type="float">
+    <subtract name="var__0" type="float">
       <input name="in1" type="float" interfacename="z" />
       <input name="in2" type="float" value="1" />
     </subtract>
     <output name="out__0" type="float" value="3" />
-    <output name="out__1" type="float" nodename="node1" />
+    <output name="out__1" type="float" nodename="var__0" />
   </nodegraph>
-  <my_function name="node1" type="multioutput">
+  <my_function name="p" type="multioutput">
     <input name="z" type="float" value="2" />
   </my_function>
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" output="out__0" nodename="node1" />
+  <multiply name="var__0" type="float">
+    <input name="in1" type="float" output="out__0" nodename="p" />
     <input name="in2" type="float" value="4" />
   </multiply>
 </materialx>

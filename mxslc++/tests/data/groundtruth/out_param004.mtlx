@@ -7,23 +7,23 @@
     <output name="out__y__1" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="9" />
       <input name="in2" type="float" value="0" />
     </multiply>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
     <output name="out__y__0" type="float" value="9" />
     <output name="out__y__1" type="float" value="0" />
   </nodegraph>
-  <foo name="node1" type="multioutput">
+  <foo name="var__0" type="multioutput">
     <input name="x" type="float" value="3" />
   </foo>
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" output="out" nodename="node1" />
-    <input name="in2" type="float" output="out__y__0" nodename="node1" />
+  <multiply name="in1" type="float">
+    <input name="in1" type="float" output="out" nodename="var__0" />
+    <input name="in2" type="float" output="out__y__0" nodename="var__0" />
   </multiply>
-  <multiply name="node3" type="float">
-    <input name="in1" type="float" nodename="node2" />
-    <input name="in2" type="float" output="out__y__1" nodename="node1" />
+  <multiply name="w" type="float">
+    <input name="in1" type="float" nodename="in1" />
+    <input name="in2" type="float" output="out__y__1" nodename="var__0" />
   </multiply>
 </materialx>

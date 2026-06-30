@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <noise2d name="node1" type="float">
+  <noise2d name="n" type="float">
     <input name="pivot" type="float" value="1" />
   </noise2d>
-  <noise2d name="node2" type="float">
+  <noise2d name="n2" type="float">
     <input name="pivot" type="float" value="4" />
   </noise2d>
-  <noise2d name="node3" type="float">
+  <noise2d name="n3" type="float">
     <input name="pivot" type="float" value="2" />
   </noise2d>
-  <noise2d name="node4" type="float">
+  <noise2d name="n4" type="float">
     <input name="pivot" type="float" value="8" />
   </noise2d>
-  <noise2d name="node5" type="float">
+  <noise2d name="n5" type="float">
     <input name="pivot" type="float" value="3" />
   </noise2d>
-  <noise2d name="node6" type="float">
+  <noise2d name="n6" type="float">
     <input name="pivot" type="float" value="5" />
   </noise2d>
-  <noise2d name="node7" type="float">
+  <noise2d name="n7" type="float">
     <input name="pivot" type="float" value="1" />
   </noise2d>
 </materialx>
