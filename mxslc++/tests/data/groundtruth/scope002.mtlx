@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <multiply name="node1" type="float">
+  <multiply name="f" type="float">
     <input name="in1" type="float" value="6.9" />
     <input name="in2" type="float" value="5" />
   </multiply>
@@ -9,16 +9,16 @@
     <input name="nonlocal_in__f" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__f" />
       <input name="in2" type="float" value="2" />
     </multiply>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="node2" type="float">
-    <input name="nonlocal_in__f" type="float" nodename="node1" />
+  <foo name="g" type="float">
+    <input name="nonlocal_in__f" type="float" nodename="f" />
   </foo>
-  <foo name="node3" type="float">
+  <foo name="h" type="float">
     <input name="nonlocal_in__f" type="float" value="6.9" />
   </foo>
 </materialx>

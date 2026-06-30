@@ -18,11 +18,11 @@
     <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_move" nodedef="ND_Sphere_move">
-    <add name="node1" type="vector3">
+    <add name="var__0" type="vector3">
       <input name="in1" type="vector3" interfacename="this__0" />
       <input name="in2" type="vector3" interfacename="v" />
     </add>
-    <output name="out__0" type="vector3" nodename="node1" />
+    <output name="out__0" type="vector3" nodename="var__0" />
     <output name="out__1" type="float" interfacename="this__1" />
   </nodegraph>
   <nodedef name="ND_Sphere_area" node="Sphere_area">
@@ -31,31 +31,31 @@
     <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_area" nodedef="ND_Sphere_area">
-    <multiply name="node1" type="float">
+    <multiply name="in1" type="float">
       <input name="in1" type="float" value="4" />
       <input name="in2" type="float" value="3.14159" />
     </multiply>
-    <multiply name="node2" type="float">
-      <input name="in1" type="float" nodename="node1" />
+    <multiply name="in2" type="float">
+      <input name="in1" type="float" nodename="in1" />
       <input name="in2" type="float" interfacename="this__1" />
     </multiply>
-    <multiply name="node3" type="float">
-      <input name="in1" type="float" nodename="node2" />
+    <multiply name="var__0" type="float">
+      <input name="in1" type="float" nodename="in2" />
       <input name="in2" type="float" interfacename="this__1" />
     </multiply>
-    <output name="out" type="float" nodename="node3" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <combine3 name="node1" type="vector3">
+  <combine3 name="s__position" type="vector3">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
-  <Sphere_area name="node2" type="float">
-    <input name="this__0" type="vector3" nodename="node1" />
+  <Sphere_area name="var__0" type="float">
+    <input name="this__0" type="vector3" nodename="s__position" />
     <input name="this__1" type="float" value="1" />
   </Sphere_area>
-  <Sphere_area name="node3" type="float">
-    <input name="this__0" type="vector3" nodename="node1" />
+  <Sphere_area name="var__1" type="float">
+    <input name="this__0" type="vector3" nodename="s__position" />
     <input name="this__1" type="float" value="2" />
   </Sphere_area>
 </materialx>

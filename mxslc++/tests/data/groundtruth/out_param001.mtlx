@@ -6,18 +6,18 @@
     <output name="out__y" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" interfacename="x" />
       <input name="in2" type="float" interfacename="x" />
     </multiply>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
     <output name="out__y" type="float" interfacename="x" />
   </nodegraph>
-  <foo name="node1" type="multioutput">
+  <foo name="var__0" type="multioutput">
     <input name="x" type="float" value="3" />
   </foo>
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" output="out" nodename="node1" />
-    <input name="in2" type="float" output="out__y" nodename="node1" />
+  <multiply name="w" type="float">
+    <input name="in1" type="float" output="out" nodename="var__0" />
+    <input name="in2" type="float" output="out__y" nodename="var__0" />
   </multiply>
 </materialx>

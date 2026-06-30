@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="node1" type="float" />
-  <multiply name="node2" type="float">
+  <randomfloat name="in2" type="float" />
+  <multiply name="f1" type="float">
     <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="node1" />
+    <input name="in2" type="float" nodename="in2" />
   </multiply>
-  <randomfloat name="node3" type="float" />
-  <multiply name="node4" type="float">
+  <randomfloat name="in3" type="float" />
+  <multiply name="f2" type="float">
     <input name="in1" type="float" value="2" />
-    <input name="in2" type="float" nodename="node3" />
+    <input name="in2" type="float" nodename="in3" />
   </multiply>
-  <randomfloat name="node5" type="float" />
-  <multiply name="node6" type="float">
+  <randomfloat name="in4" type="float" />
+  <multiply name="f3" type="float">
     <input name="in1" type="float" value="3" />
-    <input name="in2" type="float" nodename="node5" />
+    <input name="in2" type="float" nodename="in4" />
   </multiply>
-  <randomfloat name="node7" type="float" />
-  <multiply name="node8" type="float">
+  <randomfloat name="in5" type="float" />
+  <multiply name="f4" type="float">
     <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="node7" />
+    <input name="in2" type="float" nodename="in5" />
   </multiply>
-  <randomfloat name="node9" type="float" />
-  <multiply name="node10" type="float">
+  <randomfloat name="in6" type="float" />
+  <multiply name="f5" type="float">
     <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" nodename="node9" />
+    <input name="in2" type="float" nodename="in6" />
   </multiply>
 </materialx>

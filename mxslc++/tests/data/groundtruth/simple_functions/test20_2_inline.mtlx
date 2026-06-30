@@ -4,12 +4,12 @@
     <output name="nonlocal_out__p__0" type="float" />
   </nodedef>
   <nodegraph name="NG_bar" nodedef="ND_bar">
-    <randomfloat name="node1" type="float" />
-    <output name="nonlocal_out__p__0" type="float" nodename="node1" />
+    <randomfloat name="var__0" type="float" />
+    <output name="nonlocal_out__p__0" type="float" nodename="var__0" />
   </nodegraph>
-  <bar name="node1" type="float" />
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" output="nonlocal_out__p__0" nodename="node1" />
+  <bar name="var__0" type="float" />
+  <multiply name="x" type="float">
+    <input name="in1" type="float" output="nonlocal_out__p__0" nodename="var__0" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

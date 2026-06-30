@@ -12,13 +12,13 @@
     <output name="out__q__0" type="float" value="5" />
     <output name="out__q__1" type="float" value="6" />
   </nodegraph>
-  <foo name="node1" type="multioutput" />
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" output="out__p__0" nodename="node1" />
-    <input name="in2" type="float" output="out__q__0" nodename="node1" />
+  <foo name="var__0" type="multioutput" />
+  <multiply name="x" type="float">
+    <input name="in1" type="float" output="out__p__0" nodename="var__0" />
+    <input name="in2" type="float" output="out__q__0" nodename="var__0" />
   </multiply>
-  <multiply name="node3" type="float">
-    <input name="in1" type="float" output="out__p__1" nodename="node1" />
-    <input name="in2" type="float" output="out__q__1" nodename="node1" />
+  <multiply name="y" type="float">
+    <input name="in1" type="float" output="out__p__1" nodename="var__0" />
+    <input name="in2" type="float" output="out__q__1" nodename="var__0" />
   </multiply>
 </materialx>

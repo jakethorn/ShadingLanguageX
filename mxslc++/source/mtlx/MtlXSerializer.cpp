@@ -51,20 +51,20 @@ namespace
         }
     }
 
-    string node_name(const FuncPtr& func)
+    string node_category(const FuncPtr& func)
     {
         if (not func->is_defined())
             return func->name();
 
         const Scope* scope = &Runtime::get().scope().get_defining_scope(func);
 
-        string result = "";
+        string result;
         while (true)
         {
             if (not scope->is_inline())
             {
                 const FuncPtr& defining_func = scope->node_graph().second;
-                result += node_name(defining_func) + "_";
+                result += node_category(defining_func) + "_";
                 break;
             }
             if (not scope->has_parent())
@@ -116,7 +116,7 @@ VarPtr MtlXSerializer::write_node(const VarPtr& instance, const FuncPtr& func, c
     }
 
     const mx::GraphElementPtr& graph = scope().graph();
-    const mx::NodePtr node = graph->addNode(node_name(func), mx::EMPTY_STRING, serialize_type(func));
+    const mx::NodePtr node = graph->addNode(node_category(func), graph->createValidChildName("var__0"), serialize_type(func));
 
     for (const auto& [param, input_value] : input_values)
     {
@@ -232,7 +232,7 @@ void MtlXSerializer::save(const fs::path& dst_path) const
 
 mx::NodeDefPtr MtlXSerializer::write_node_def(const FuncPtr& func) const
 {
-    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), TypeName::Int, node_name(func));
+    mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), TypeName::Int, node_category(func));
     node_def->removeOutput("out");
     add_outputs_to_node_def(node_def, func->return_type());
 
@@ -404,10 +404,10 @@ void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const 
 
 string MtlXSerializer::node_def_name(const FuncPtr& func) const
 {
-    return doc_->createValidChildName("ND_" + node_name(func));
+    return doc_->createValidChildName("ND_" + node_category(func));
 }
 
 string MtlXSerializer::node_graph_name(const FuncPtr& func) const
 {
-    return doc_->createValidChildName("NG_" + node_name(func));
+    return doc_->createValidChildName("NG_" + node_category(func));
 }

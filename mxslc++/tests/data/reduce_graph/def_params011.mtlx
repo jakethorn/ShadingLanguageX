@@ -1,39 +1,39 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine2 name="node1" type="vector2">
+  <combine2 name="v" type="vector2">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
   </combine2>
-  <extract name="node2" type="float">
-    <input name="in" type="vector2" nodename="node1" />
+  <extract name="in1" type="float">
+    <input name="in" type="vector2" nodename="v" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node3" type="float">
-    <input name="in" type="vector2" nodename="node1" />
+  <extract name="in2" type="float">
+    <input name="in" type="vector2" nodename="v" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <add name="node4" type="float">
-    <input name="in1" type="float" nodename="node2" />
-    <input name="in2" type="float" nodename="node3" />
+  <add name="f1" type="float">
+    <input name="in1" type="float" nodename="in1" />
+    <input name="in2" type="float" nodename="in2" />
   </add>
-  <combine2 name="node5" type="vector2">
+  <combine2 name="v2" type="vector2">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
   </combine2>
-  <extract name="node6" type="float">
-    <input name="in" type="vector2" nodename="node5" />
+  <extract name="in3" type="float">
+    <input name="in" type="vector2" nodename="v2" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="node7" type="float">
-    <input name="in" type="vector2" nodename="node5" />
+  <extract name="in4" type="float">
+    <input name="in" type="vector2" nodename="v2" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <add name="node8" type="float">
-    <input name="in1" type="float" nodename="node6" />
-    <input name="in2" type="float" nodename="node7" />
+  <add name="f2" type="float">
+    <input name="in1" type="float" nodename="in3" />
+    <input name="in2" type="float" nodename="in4" />
   </add>
-  <randomfloat name="node9" type="float">
-    <input name="min" type="float" nodename="node4" />
-    <input name="max" type="float" nodename="node8" />
+  <randomfloat name="var__0" type="float">
+    <input name="min" type="float" nodename="f1" />
+    <input name="max" type="float" nodename="f2" />
   </randomfloat>
 </materialx>

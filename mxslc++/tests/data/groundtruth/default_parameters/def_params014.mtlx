@@ -5,25 +5,25 @@
     <output name="nonlocal_out__a" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="b" />
       <input name="in2" type="float" value="1" />
     </add>
-    <output name="nonlocal_out__a" type="float" nodename="node1" />
+    <output name="nonlocal_out__a" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="var__0" type="float">
     <input name="b" type="float" value="1" />
   </foo>
-  <foo name="node2" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="node1" />
+  <foo name="var__1" type="float">
+    <input name="b" type="float" output="nonlocal_out__a" nodename="var__0" />
   </foo>
-  <foo name="node3" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="node2" />
+  <foo name="var__2" type="float">
+    <input name="b" type="float" output="nonlocal_out__a" nodename="var__1" />
   </foo>
-  <foo name="node4" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="node3" />
+  <foo name="var__3" type="float">
+    <input name="b" type="float" output="nonlocal_out__a" nodename="var__2" />
   </foo>
-  <foo name="node5" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="node4" />
+  <foo name="var__4" type="float">
+    <input name="b" type="float" output="nonlocal_out__a" nodename="var__3" />
   </foo>
 </materialx>

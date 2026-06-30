@@ -19,7 +19,7 @@ public:
 
     }
 
-    Field(ModifierList mods, TypePtr type, string name, bool can_be_global = false)
+    Field(ModifierList mods, TypePtr type, string name, const bool can_be_global = false)
         : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}
     {
         if (can_be_global)

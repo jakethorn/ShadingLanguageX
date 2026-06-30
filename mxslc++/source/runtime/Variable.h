@@ -28,6 +28,7 @@ public:
 
     const string& name() const;
     void set_name(string name);
+    void set_name(const string& name, const TypePtr& parent_type, size_t index);
 
     bool is_assignable() const;
     bool is_temporary() const;
@@ -84,6 +85,7 @@ public:
 protected:
     virtual ValuePtr value_impl() const { return value_; }
     virtual void copy_value_impl(ValuePtr value) { value_ = std::move(value); }
+    virtual void set_node_name(const string& name) const;
 
 private:
     void copy_value(ValuePtr value);

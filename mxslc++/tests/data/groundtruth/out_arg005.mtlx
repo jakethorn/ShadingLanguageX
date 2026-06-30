@@ -5,13 +5,13 @@
     <input name="x" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_foo1" nodedef="ND_foo1">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <foo1 name="node1" type="float">
+  <foo1 name="var__0" type="float">
     <input name="x" type="float" value="1" />
   </foo1>
 </materialx>

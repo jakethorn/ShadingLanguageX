@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <noise2d name="node1" type="float">
+  <noise2d name="n" type="float">
     <input name="pivot" type="float" value="1" />
   </noise2d>
-  <noise2d name="node2" type="float">
+  <noise2d name="n2" type="float">
     <input name="pivot" type="float" value="4" />
   </noise2d>
-  <noise2d name="node3" type="float">
+  <noise2d name="n3" type="float">
     <input name="pivot" type="float" value="7" />
   </noise2d>
-  <noise2d name="node4" type="float">
+  <noise2d name="n4" type="float">
     <input name="pivot" type="float" value="10" />
   </noise2d>
 </materialx>

@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <texcoord name="node1" type="vector2">
+  <texcoord name="var__0" type="vector2">
     <input name="index" type="integer" value="1" />
   </texcoord>
-  <texcoord name="node2" type="vector2">
+  <texcoord name="var__1" type="vector2">
     <input name="index" type="integer" value="2" />
   </texcoord>
-  <texcoord name="node3" type="vector2">
+  <texcoord name="var__2" type="vector2">
     <input name="index" type="integer" value="3" />
   </texcoord>
 </materialx>

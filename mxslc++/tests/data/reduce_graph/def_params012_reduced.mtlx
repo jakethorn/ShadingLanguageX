@@ -5,30 +5,30 @@
     <input name="v" type="vector2" value="1, 0" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <extract name="node1" type="float">
+    <extract name="in1" type="float">
       <input name="in" type="vector2" interfacename="v" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <extract name="node2" type="float">
+    <extract name="in2" type="float">
       <input name="in" type="vector2" interfacename="v" />
       <input name="index" type="integer" value="1" />
     </extract>
-    <add name="node3" type="float">
-      <input name="in1" type="float" nodename="node1" />
-      <input name="in2" type="float" nodename="node2" />
+    <add name="var__0" type="float">
+      <input name="in1" type="float" nodename="in1" />
+      <input name="in2" type="float" nodename="in2" />
     </add>
-    <output name="out" type="float" nodename="node3" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="f1" type="float">
     <input name="v" type="vector2" value="1, 0" />
   </foo>
-  <foo name="node2" type="float">
+  <foo name="f2" type="float">
     <input name="v" type="vector2" value="0, 1" />
   </foo>
-  <foo name="node3" type="float">
+  <foo name="f3" type="float">
     <input name="v" type="vector2" value="2, 0" />
   </foo>
-  <foo name="node4" type="float">
+  <foo name="f4" type="float">
     <input name="v" type="vector2" value="0, 2" />
   </foo>
 </materialx>

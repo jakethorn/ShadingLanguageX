@@ -9,40 +9,40 @@
     <input name="b__1" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_atob" nodedef="ND_atob">
-    <subtract name="node1" type="float">
+    <subtract name="x" type="float">
       <input name="in1" type="float" interfacename="b__0" />
       <input name="in2" type="float" interfacename="a__0" />
     </subtract>
-    <subtract name="node2" type="float">
+    <subtract name="y" type="float">
       <input name="in1" type="float" interfacename="b__0" />
       <input name="in2" type="float" interfacename="a__0" />
     </subtract>
-    <output name="out__0" type="float" nodename="node1" />
-    <output name="out__1" type="float" nodename="node2" />
+    <output name="out__0" type="float" nodename="x" />
+    <output name="out__1" type="float" nodename="y" />
   </nodegraph>
-  <atob name="node1" type="multioutput">
+  <atob name="p" type="multioutput">
     <input name="a__0" type="float" value="0" />
     <input name="a__1" type="float" value="0" />
     <input name="b__0" type="float" value="1" />
     <input name="b__1" type="float" value="1" />
   </atob>
-  <combine2 name="node2" type="vector2">
-    <input name="in1" type="float" output="out__1" nodename="node1" />
-    <input name="in2" type="float" output="out__0" nodename="node1" />
+  <combine2 name="var__0" type="vector2">
+    <input name="in1" type="float" output="out__1" nodename="p" />
+    <input name="in2" type="float" output="out__0" nodename="p" />
   </combine2>
-  <separate2 name="node3" type="multioutput">
-    <input name="in" type="vector2" nodename="node2" />
+  <separate2 name="var__1" type="multioutput">
+    <input name="in" type="vector2" nodename="var__0" />
   </separate2>
-  <divide name="node4" type="float">
-    <input name="in1" type="float" output="outx" nodename="node3" />
-    <input name="in2" type="float" output="outy" nodename="node3" />
+  <divide name="z" type="float">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__1" />
   </divide>
-  <multiply name="node5" type="float">
+  <multiply name="in1" type="float">
     <input name="in1" type="float" value="4" />
     <input name="in2" type="float" value="4" />
   </multiply>
-  <multiply name="node6" type="float">
-    <input name="in1" type="float" nodename="node5" />
+  <multiply name="h" type="float">
+    <input name="in1" type="float" nodename="in1" />
     <input name="in2" type="float" value="4" />
   </multiply>
 </materialx>

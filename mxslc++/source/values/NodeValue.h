@@ -25,6 +25,8 @@ public:
 
 private:
     mx::NodePtr node_;
+
+    mutable bool is_node_name_set_{false};
 };
 
 #endif //FENNEC_NODEVALUE_H

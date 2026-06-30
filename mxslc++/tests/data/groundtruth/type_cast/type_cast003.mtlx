@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <texcoord name="node1" type="vector2" />
-  <separate2 name="node2" type="multioutput">
-    <input name="in" type="vector2" nodename="node1" />
+  <texcoord name="var__0" type="vector2" />
+  <separate2 name="a" type="multioutput">
+    <input name="in" type="vector2" nodename="var__0" />
   </separate2>
-  <multiply name="node3" type="float">
-    <input name="in1" type="float" output="outx" nodename="node2" />
-    <input name="in2" type="float" output="outy" nodename="node2" />
+  <multiply name="OUT1" type="float">
+    <input name="in1" type="float" output="outx" nodename="a" />
+    <input name="in2" type="float" output="outy" nodename="a" />
   </multiply>
-  <texcoord name="node4" type="vector3" />
-  <separate3 name="node5" type="multioutput">
-    <input name="in" type="vector3" nodename="node4" />
+  <texcoord name="var__1" type="vector3" />
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="vector3" nodename="var__1" />
   </separate3>
-  <multiply name="node6" type="float">
-    <input name="in1" type="float" output="outx" nodename="node5" />
-    <input name="in2" type="float" output="outy" nodename="node5" />
+  <multiply name="in1" type="float">
+    <input name="in1" type="float" output="outx" nodename="var__2" />
+    <input name="in2" type="float" output="outy" nodename="var__2" />
   </multiply>
-  <multiply name="node7" type="float">
-    <input name="in1" type="float" nodename="node6" />
-    <input name="in2" type="float" output="outz" nodename="node5" />
+  <multiply name="OUT2" type="float">
+    <input name="in1" type="float" nodename="in1" />
+    <input name="in2" type="float" output="outz" nodename="var__2" />
   </multiply>
 </materialx>

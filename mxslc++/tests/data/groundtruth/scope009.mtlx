@@ -8,20 +8,20 @@
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
     <output name="out" type="float" interfacename="nonlocal_in__b__0" />
   </nodegraph>
-  <multiply name="node1" type="float">
+  <multiply name="c" type="float">
     <input name="in1" type="float" interfacename="nonlocal_in__b__0" />
     <input name="in2" type="float" value="6" />
   </multiply>
-  <some_func name="node2" type="float">
+  <some_func name="z" type="float">
     <input name="nonlocal_in__b__0" type="float" value="5" />
     <input name="nonlocal_in__b__1" type="float" value="6" />
   </some_func>
-  <multiply name="node3" type="float">
+  <multiply name="in1" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" interfacename="nonlocal_in__b__1" />
   </multiply>
-  <add name="node4" type="float">
-    <input name="in1" type="float" nodename="node3" />
-    <input name="in2" type="float" nodename="node2" />
+  <add name="d" type="float">
+    <input name="in1" type="float" nodename="in1" />
+    <input name="in2" type="float" nodename="z" />
   </add>
 </materialx>

@@ -13,6 +13,20 @@ NodeOutputValue::NodeOutputValue(TypePtr type, mx::NodePtr node, string output_n
 
 }
 
+void NodeOutputValue::set_node_name(const string& name) const
+{
+    if (is_node_name_set_)
+        return;
+    is_node_name_set_ = true;
+
+    if (node_->getName() == name)
+        return;
+
+    node_->setName(
+        node_->getParent()->createValidChildName(name)
+    );
+}
+
 bool NodeOutputValue::equals(const ValuePtr& other) const
 {
     if (const shared_ptr<NodeOutputValue> other_output = std::dynamic_pointer_cast<NodeOutputValue>(other))

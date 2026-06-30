@@ -16,15 +16,15 @@
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <foo name="node1" type="integer">
+  <foo name="var__0" type="integer">
     <input name="x" type="integer" value="1" />
     <input name="s" type="string" value="world" />
   </foo>
-  <foo name="node2" type="integer">
+  <foo name="var__1" type="integer">
     <input name="x" type="integer" value="1" />
     <input name="s" type="string" value="hello" />
   </foo>
-  <foo name="node3" type="integer">
+  <foo name="var__2" type="integer">
     <input name="x" type="integer" value="1" />
     <input name="f" type="float" value="3.14" />
   </foo>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="node1" type="float">
+  <randomfloat name="x" type="float">
     <input name="in" type="integer" value="1" />
   </randomfloat>
   <nodedef name="ND_foo" node="foo">
@@ -8,26 +8,26 @@
     <input name="nonlocal_in__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <randomfloat name="node1" type="float">
+    <randomfloat name="in2" type="float">
       <input name="in" type="integer" value="2" />
     </randomfloat>
-    <multiply name="node2" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__x" />
-      <input name="in2" type="float" nodename="node1" />
+      <input name="in2" type="float" nodename="in2" />
     </multiply>
-    <output name="out" type="float" nodename="node2" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
   <nodedef name="ND_bar" node="bar">
     <output name="out" type="float" />
     <input name="nonlocal_in__x" type="float" />
   </nodedef>
   <nodegraph name="NG_bar" nodedef="ND_bar">
-    <foo name="node1" type="float">
+    <foo name="var__0" type="float">
       <input name="nonlocal_in__x" type="float" interfacename="nonlocal_in__x" />
     </foo>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <bar name="node2" type="float">
-    <input name="nonlocal_in__x" type="float" nodename="node1" />
+  <bar name="y" type="float">
+    <input name="nonlocal_in__x" type="float" nodename="x" />
   </bar>
 </materialx>

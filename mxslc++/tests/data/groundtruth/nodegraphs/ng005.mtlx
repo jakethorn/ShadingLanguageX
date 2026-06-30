@@ -7,13 +7,13 @@
     <output name="out" type="float" value="2" />
   </nodegraph>
   <nodegraph name="NG_bar">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" nodegraph="NG_foo1" />
       <input name="in2" type="float" nodegraph="NG_foo2" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <add name="node1" type="float">
+  <add name="theta" type="float">
     <input name="in1" type="float" nodegraph="NG_bar" />
     <input name="in2" type="float" value="3" />
   </add>

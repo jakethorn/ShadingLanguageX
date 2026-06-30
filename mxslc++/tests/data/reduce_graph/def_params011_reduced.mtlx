@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="node1" type="float">
+  <randomfloat name="var__0" type="float">
     <input name="min" type="float" value="1" />
     <input name="max" type="float" value="1" />
   </randomfloat>

@@ -6,18 +6,18 @@
     <input name="nonlocal_in__p__1" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__p__0" />
       <input name="in2" type="float" interfacename="nonlocal_in__p__1" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="node1" type="float">
+  <foo name="x" type="float">
     <input name="nonlocal_in__p__0" type="float" value="1" />
     <input name="nonlocal_in__p__1" type="float" value="2" />
   </foo>
-  <multiply name="node2" type="float">
-    <input name="in1" type="float" nodename="node1" />
+  <multiply name="y" type="float">
+    <input name="in1" type="float" nodename="x" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

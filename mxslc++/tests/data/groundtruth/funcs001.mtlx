@@ -10,12 +10,12 @@
     <output name="out" type="float" />
   </nodedef>
   <nodegraph name="NG_bar" nodedef="ND_bar">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" value="2" />
       <input name="in2" type="float" value="3" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="node1" type="float" />
-  <bar name="node2" type="float" />
+  <foo name="f" type="float" />
+  <bar name="b" type="float" />
 </materialx>

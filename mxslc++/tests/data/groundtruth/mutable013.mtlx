@@ -6,5 +6,5 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="nonlocal_out__b" type="float" value="2" />
   </nodegraph>
-  <foo name="node1" type="float" />
+  <foo name="var__0" type="float" />
 </materialx>

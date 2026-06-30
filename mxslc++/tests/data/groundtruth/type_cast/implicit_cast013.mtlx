@@ -10,7 +10,7 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <foo name="node1" type="integer">
+  <foo name="var__0" type="integer">
     <input name="a__0" type="float" value="1" />
     <input name="a__1" type="float" value="2" />
     <input name="a__2" type="integer" value="3" />

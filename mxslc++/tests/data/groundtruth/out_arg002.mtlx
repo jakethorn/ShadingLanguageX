@@ -4,41 +4,41 @@
     <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo1" nodedef="ND_foo1">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="out__x" type="float" nodename="node1" />
+    <output name="out__x" type="float" nodename="var__0" />
   </nodegraph>
-  <foo1 name="node1" type="float" />
+  <foo1 name="var__0" type="float" />
   <nodedef name="ND_foo2" node="foo2">
     <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="out__x" type="float" nodename="node1" />
+    <output name="out__x" type="float" nodename="var__0" />
   </nodegraph>
-  <foo2 name="node2" type="float" />
+  <foo2 name="var__1" type="float" />
   <nodedef name="ND_foo3" node="foo3">
     <output name="out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo3" nodedef="ND_foo3">
-    <multiply name="node1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="out__x" type="float" nodename="node1" />
+    <output name="out__x" type="float" nodename="var__0" />
   </nodegraph>
-  <foo3 name="node3" type="float" />
-  <add name="node4" type="float">
-    <input name="in1" type="float" output="out__x" nodename="node1" />
+  <foo3 name="var__2" type="float" />
+  <add name="in1" type="float">
+    <input name="in1" type="float" output="out__x" nodename="var__0" />
     <input name="in2" type="float" value="10" />
   </add>
-  <add name="node5" type="float">
-    <input name="in1" type="float" nodename="node4" />
+  <add name="HERE" type="float">
+    <input name="in1" type="float" nodename="in1" />
     <input name="in2" type="float" value="100" />
   </add>
 </materialx>
