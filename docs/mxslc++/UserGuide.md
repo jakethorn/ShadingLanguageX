@@ -433,7 +433,7 @@ standard_surface(
 ```
 
 Once again, the command line options are limited to passing basic types; however, the C++ and Python APIs
-allow vectors, colors, matrices as well as user-defined types to be passed as well (see below).
+allow vectors, colors, matrices as well as user-defined types to be passed as well (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#global)).
 
 There are two additional options that are related to globals, `--missing-globals-ok` and `--unused-globals-ok`, which 
 suppress compile errors either if a global variable is not provided a value or if a global value is provided, but never used.
@@ -491,11 +491,11 @@ _example.mtlx_:
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine2 name="node1" type="vector2">
+  <combine2 name="x" type="vector2">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
   </combine2>
-  <add name="node2" type="vector2">
+  <add name="y" type="vector2">
     <input name="in1" type="vector2" nodename="node1" />
     <input name="in2" type="float" value="2" />
   </add>
@@ -503,8 +503,8 @@ _example.mtlx_:
 ```
 _example_decomped.mxsl_:
 ```
-vector2 node1 = combine2(in1 = float{0}, in2 = float{1}, );
-vector2 node2 = node1 + float{2};
+vec2 x = combine2(in1 = 0, in2 = 1);
+vec2 y = x + 2;
 ```
 
 ## Help
@@ -881,20 +881,20 @@ _example1.mtlx_:
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-    <normal name="node1" type="vector3" />
-    <viewdirection name="node2" type="vector3" />
-    <dotproduct name="node3" type="float">
-        <input name="in1" type="vector3" nodename="node1" />
-        <input name="in2" type="vector3" nodename="node2" />
-    </dotproduct>
+  <normal name="n" type="vector3" />
+  <viewdirection name="i" type="vector3" />
+  <dotproduct name="theta" type="float">
+    <input name="in1" type="vector3" nodename="n" />
+    <input name="in2" type="vector3" nodename="i" />
+  </dotproduct>
 </materialx>
 ```
 
 _Output_:
 ```
-vector3 node1 = normal();
-vector3 node2 = viewdirection();
-float node3 = dotproduct(in1 = node1, in2 = node2, );
+vec3 n = normal();
+vec3 i = viewdirection();
+float theta = dotproduct(in1 = n, in2 = i);
 ```
 
 ### Example 2
@@ -905,7 +905,7 @@ float node3 = dotproduct(in1 = node1, in2 = node2, );
 
 std::filesystem::path src_path{"example2.mtlx"};
 mxslc::Decompiler decompiler{src_path};
-std::string result = decompiler.decompile_node("node2", /*with_dependencies*/true);
+std::string result = decompiler.decompile_node("y", /*with_dependencies*/true);
 std::cout << result << std::endl;
 ```
 
@@ -918,27 +918,27 @@ _example2.mtlx_:
     <input name="base" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_add_one" nodedef="ND_add_one">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="base" />
       <input name="in2" type="float" value="1" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
   <nodedef name="ND_add_two" node="add_two">
     <output name="out" type="float" />
     <input name="base" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_add_two" nodedef="ND_add_two">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="base" />
       <input name="in2" type="float" value="2" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <add_one name="node1" type="float">
+  <add_one name="x" type="float">
     <input name="base" type="float" value="11" />
   </add_one>
-  <add_two name="node2" type="float">
+  <add_two name="y" type="float">
     <input name="base" type="float" value="12" />
   </add_two>
 </materialx>
@@ -946,12 +946,12 @@ _example2.mtlx_:
 
 _Output_:
 ```
-float add_two(float base = float{0}, )
+float add_two(float base = 0)
 {
-    return node1;
+    return base + 2;
 }
 
-float node2 = add_two(base = float{12}, );
+float y = add_two(base = 12);
 ```
 
 ## Python
@@ -971,20 +971,20 @@ _example1.mtlx_:
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-    <normal name="node1" type="vector3" />
-    <viewdirection name="node2" type="vector3" />
-    <dotproduct name="node3" type="float">
-        <input name="in1" type="vector3" nodename="node1" />
-        <input name="in2" type="vector3" nodename="node2" />
-    </dotproduct>
+  <normal name="n" type="vector3" />
+  <viewdirection name="i" type="vector3" />
+  <dotproduct name="theta" type="float">
+    <input name="in1" type="vector3" nodename="n" />
+    <input name="in2" type="vector3" nodename="i" />
+  </dotproduct>
 </materialx>
 ```
 
 _Output_:
 ```
-vector3 node1 = normal();
-vector3 node2 = viewdirection();
-float node3 = dotproduct(in1 = node1, in2 = node2, );
+vec3 n = normal();
+vec3 i = viewdirection();
+float theta = dotproduct(in1 = n, in2 = i);
 ```
 
 ### Example 2
@@ -995,7 +995,7 @@ import mxslc
 
 src_path = Path("example2.mtlx")
 decompiler = mxslc.Decompiler(src_path)
-result = decompiler.decompile_node("node2", with_dependencies=True)
+result = decompiler.decompile_node("y", with_dependencies=True)
 print(result)
 ```
 
@@ -1008,27 +1008,27 @@ _example2.mtlx_:
     <input name="base" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_add_one" nodedef="ND_add_one">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="base" />
       <input name="in2" type="float" value="1" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
   <nodedef name="ND_add_two" node="add_two">
     <output name="out" type="float" />
     <input name="base" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_add_two" nodedef="ND_add_two">
-    <add name="node1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="base" />
       <input name="in2" type="float" value="2" />
     </add>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <add_one name="node1" type="float">
+  <add_one name="x" type="float">
     <input name="base" type="float" value="11" />
   </add_one>
-  <add_two name="node2" type="float">
+  <add_two name="y" type="float">
     <input name="base" type="float" value="12" />
   </add_two>
 </materialx>
@@ -1036,12 +1036,12 @@ _example2.mtlx_:
 
 _Output_:
 ```
-float add_two(float base = float{0}, )
+float add_two(float base = 0)
 {
-    return node1;
+    return base + 2;
 }
 
-float node2 = add_two(base = float{12}, );
+float y = add_two(base = 12);
 ```
 
 # MaterialX Libraries
