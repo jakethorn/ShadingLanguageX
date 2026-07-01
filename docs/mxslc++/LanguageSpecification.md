@@ -31,7 +31,6 @@
 23. [Operator Overloading](#operator-overloading)
 24. [Print Statement](#print-statement)
 25. [Attributes](#attributes)
-26. [Node Constructor](#node-constructor)
 27. [Null Expression](#null-expression)
 28. [Standard Library](#standard-library)
 29. [Scope](#scope)
@@ -288,9 +287,11 @@ class Sphere
 
 ## `typeof` Operator
 
-If you are ever unsure about the type of a variable you can use the `typeof` operator.
+If you are ever unsure about the type of a variable or expression you can use the `typeof` operator.
 
 ```
+print typeof(1 + 1).name; // "integer"
+
 auto x = 2 + vec3{1.0} * 2.0;
 print typeof(x).name; // "vector3"
 ```
@@ -301,7 +302,7 @@ was an unnamed struct), and `str` which holds a string representation of the typ
 ```
 auto x = {1, vec2{}, "world"};
 print typeof(x).name; // ""
-print typeof(x).str;  // "{int, vector2, string}"
+print typeof(x).str;  // "{integer, vector2, string}"
 ```
 
 Because the value returned by `typeof` is also a valid ShadingLanguageX variable, you can even call `typeof` on it.
@@ -312,6 +313,26 @@ auto t1 = typeof(f);
 auto t2 = typeof(t1);
 print t2.name; // ""
 print t2.str;  // "{string name, string str}"
+```
+
+You can also pass types to the `typeof` operator to get more information about them.
+
+```
+class Sphere
+{
+    vec3 center;
+    float radius;
+}
+
+print typeof(Sphere).str; // "Sphere{vec3 center, float radius}"
+
+string foo<mat3, mat4>()
+{
+    return typeof(T).name;
+}
+
+print foo<mat3>(); // "matrix33"
+print foo<mat4>(); // "matrix44"
 ```
 
 # Expressions
