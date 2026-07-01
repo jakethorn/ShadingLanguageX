@@ -1,0 +1,7 @@
+
+inline string foo<vec2, vec3, BSDF, mat4>()
+{
+    return typeof(T).name;
+}
+
+constant(foo<int>());

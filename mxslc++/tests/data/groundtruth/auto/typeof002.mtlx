@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND___Point__" node="__Point__">
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+    <output name="out__2" type="vector2" />
+    <output name="out__3" type="filename" />
+  </nodedef>
+  <nodegraph name="NG___Point__" nodedef="ND___Point__">
+    <constant name="value__2" type="vector2" />
+    <output name="out__0" type="float" value="0" />
+    <output name="out__1" type="float" value="1" />
+    <output name="out__2" type="vector2" nodename="value__2" />
+    <output name="out__3" type="filename" value="image.png" />
+  </nodegraph>
+  <constant name="var__0" type="string">
+    <input name="value" type="string" value="integer" />
+  </constant>
+  <constant name="var__1" type="string">
+    <input name="value" type="string" value="integer" />
+  </constant>
+  <constant name="var__2" type="string">
+    <input name="value" type="string" value="vector2" />
+  </constant>
+  <constant name="var__3" type="string">
+    <input name="value" type="string" value="vector2" />
+  </constant>
+  <constant name="var__4" type="string">
+    <input name="value" type="string" value="string" />
+  </constant>
+  <constant name="var__5" type="string">
+    <input name="value" type="string" value="string" />
+  </constant>
+  <constant name="var__6" type="string">
+    <input name="value" type="string" value="boolean" />
+  </constant>
+  <constant name="var__7" type="string">
+    <input name="value" type="string" value="boolean" />
+  </constant>
+  <constant name="var__8" type="string">
+    <input name="value" type="string" value="" />
+  </constant>
+  <constant name="var__9" type="string">
+    <input name="value" type="string" value="{float, float}" />
+  </constant>
+  <constant name="var__10" type="string">
+    <input name="value" type="string" value="Point" />
+  </constant>
+  <constant name="var__11" type="string">
+    <input name="value" type="string" value="Point{float x, float y, vector2 uv, filename texture}" />
+  </constant>
+  <constant name="var__12" type="string">
+    <input name="value" type="string" value="" />
+  </constant>
+  <constant name="var__13" type="string">
+    <input name="value" type="string" value="{boolean x, integer y}" />
+  </constant>
+</materialx>

@@ -12,6 +12,8 @@ class Identifier final : public Expression
 public:
     explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
 
+    const string& name() const { return name_; }
+
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
 protected:

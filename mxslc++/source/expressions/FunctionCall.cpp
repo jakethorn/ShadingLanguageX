@@ -245,8 +245,15 @@ void FunctionCall::init_arguments(const Scope& scope, const vector<TypePtr>& ret
         if (initialized_arg_count == prev_initialized_arg_count)
         {
             // no progress made, try to init with the default function...
-            const FuncPtr default_func = get_matching_function(scope, return_types);
-            initialized_arg_count = try_init_arguments(default_func);
+            try
+            {
+                const FuncPtr default_func = get_matching_function(scope, return_types);
+                initialized_arg_count = try_init_arguments(default_func);
+            }
+            catch (const AmbiguousFunctionError&)
+            {
+                throw AmbiguousFunctionError{name_, matching_funcs, underlying_errors_};
+            }
 
             if (initialized_arg_count == prev_initialized_arg_count)
                 throw AmbiguousFunctionError{name_, matching_funcs, underlying_errors_};

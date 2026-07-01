@@ -12,6 +12,7 @@ class TypeOfOperator final : public Expression
 public:
     explicit TypeOfOperator(ExprPtr expr);
     TypeOfOperator(ExprPtr expr, Token token);
+    TypeOfOperator(ExprPtr expr, TypePtr template_type, Token token);
 
     ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
@@ -23,7 +24,9 @@ protected:
 
 private:
     ExprPtr expr_;
-    TypePtr type_;
+    TypePtr expr_type_;
+    TypePtr template_type_;
+    TypePtr op_type_;
 };
 
 #endif //MXSLC_TYPEOFOPERATOR_H

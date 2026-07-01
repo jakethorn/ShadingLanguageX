@@ -272,6 +272,29 @@ string Type::str() const
     return result;
 }
 
+string Type::full_str() const
+{
+    string result;
+    if (has_name())
+        result += name_;
+
+    if (not has_fields())
+        return result;
+
+    result += "{";
+    for (const Field& field : fields_)
+    {
+        result += field.str();
+        result += ", ";
+    }
+
+    result.pop_back();
+    result.pop_back();
+
+    result += "}";
+    return result;
+}
+
 TypePtr Type::of(const mx::NodeGraphPtr& node_graph)
 {
     if (node_graph->getOutputCount() == 1)

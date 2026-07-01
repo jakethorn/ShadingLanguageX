@@ -1,0 +1,40 @@
+auto a = typeof(1 + 1);
+auto b = typeof(texcoord<vec2>());
+auto c = typeof("world");
+auto d = typeof(true);
+auto e = typeof({1.0, 2.0});
+
+class Point
+{
+    float x;
+    float y;
+    vec2 uv;
+    filename texture;
+
+    Point()
+    {
+        this.x = 0.0;
+        this.y = 1.0;
+        this.uv = vec2{};
+        this.texture = "image.png";
+    }
+}
+
+auto f = typeof(Point{});
+{bool x, int y} g_val = {false, 101};
+auto g = typeof(g_val);
+
+constant(a.name);
+constant(a.str);
+constant(b.name);
+constant(b.str);
+constant(c.name);
+constant(c.str);
+constant(d.name);
+constant(d.str);
+constant(e.name);
+constant(e.str);
+constant(f.name);
+constant(f.str);
+constant(g.name);
+constant(g.str);

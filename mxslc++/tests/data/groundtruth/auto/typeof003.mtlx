@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="string">
+    <input name="value" type="string" value="matrix33" />
+  </constant>
+  <constant name="var__1" type="string">
+    <input name="value" type="string" value="matrix33" />
+  </constant>
+  <constant name="var__2" type="string">
+    <input name="value" type="string" value="" />
+  </constant>
+  <constant name="var__3" type="string">
+    <input name="value" type="string" value="{float, string}" />
+  </constant>
+  <constant name="var__4" type="string">
+    <input name="value" type="string" value="Sphere" />
+  </constant>
+  <constant name="var__5" type="string">
+    <input name="value" type="string" value="Sphere{float radius, vector3 center}" />
+  </constant>
+  <constant name="var__6" type="string">
+    <input name="value" type="string" value="vector2" />
+  </constant>
+  <constant name="var__7" type="string">
+    <input name="value" type="string" value="vector3" />
+  </constant>
+  <constant name="var__8" type="string">
+    <input name="value" type="string" value="BSDF" />
+  </constant>
+  <constant name="var__9" type="string">
+    <input name="value" type="string" value="matrix44" />
+  </constant>
+</materialx>

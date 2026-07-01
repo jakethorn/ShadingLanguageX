@@ -1,10 +1,5 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="var__0" type="integer">
-    <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" value="1" />
-  </add>
-  <texcoord name="var__1" type="vector2" />
   <nodedef name="ND___Point__" node="__Point__">
     <output name="out__0" type="float" />
     <output name="out__1" type="float" />
@@ -15,26 +10,22 @@
     <output name="out__0" type="float" interfacename="x" />
     <output name="out__1" type="float" interfacename="y" />
   </nodegraph>
-  <__Point__ name="var__2" type="multioutput">
-    <input name="x" type="float" value="3" />
-    <input name="y" type="float" value="4" />
-  </__Point__>
-  <position name="var__3" type="vector3">
+  <position name="var__0" type="vector3">
     <input name="space" type="string" value="integer" />
   </position>
-  <position name="var__4" type="vector3">
+  <position name="var__1" type="vector3">
     <input name="space" type="string" value="vector2" />
   </position>
-  <position name="var__5" type="vector3">
+  <position name="var__2" type="vector3">
     <input name="space" type="string" value="string" />
   </position>
-  <position name="var__6" type="vector3">
+  <position name="var__3" type="vector3">
     <input name="space" type="string" value="boolean" />
   </position>
-  <position name="var__7" type="vector3">
+  <position name="var__4" type="vector3">
     <input name="space" type="string" value="" />
   </position>
-  <position name="var__8" type="vector3">
+  <position name="var__5" type="vector3">
     <input name="space" type="string" value="Point" />
   </position>
 </materialx>
