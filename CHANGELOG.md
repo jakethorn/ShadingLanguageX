@@ -1,6 +1,22 @@
+# (mxslc++) Version 0.1.3 - Version 0.1.6
+
+* Improved to GitHub actions.
+* Improved function overload evaluation.
+* Improved generated Node names.
+* Added [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md) and generally improved documentation.
+* Added entry functions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md#entry-function)).
+* Added support for `#` comments in response files.
+* Added global variables ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md#globals)).
+* Added decompiler ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md#decompiler)).
+* Added syntax to generate MaterialX NodeGraphs ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#parameterless-functions)).
+* Added absolute operator ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#absolute-operator)).
+* Added `typeof` operator ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#typeof-operator)).
+* Various bug fixes.
+
+
 # (mxslc++) Version 0.1.2
 
-Updated Python bindings to supprt 3.9, 3.10, 3.11, 3.12, and 3.13.  
+Updated Python bindings to support 3.9, 3.10, 3.11, 3.12, and 3.13.  
 
 
 # (mxslc++) Version 0.1.1
