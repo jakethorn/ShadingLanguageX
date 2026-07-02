@@ -44,9 +44,11 @@ You can easily target a specific MaterialX version either by defining the versio
 passing it as an argument to the compiler. If both are used, the value passed to the compiler takes precedence. The default version is 1.39.5.
 
 ```
-#version 1.38.10
 vec3 n = normal();
 float = swizzle(n, "x");
+```
+```bash
+> ./mxslc example.mxsl -v 1.38.10
 ```
 
 ## Attributes
@@ -318,7 +320,7 @@ To specifiy the output file name, use the `-o/--output-file` option:
 
 ### MaterialX Version
 
-To specify the MaterialX library version, use the `-v/--version` option:
+By default, the compiler uses MaterialX 1.39.5. To specify a different version, use the `-v/--version` option:
 
 ```bash
 > ./mxslc example.mxsl -v 1.38.10
