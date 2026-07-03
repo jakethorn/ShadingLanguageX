@@ -1,0 +1,7 @@
+#define MAJOR 1
+#define MINOR 38
+#define PATCH 10
+#version MAJOR.MINOR.PATCH
+
+vec2 uv = texcoord();
+vec2 vu = swizzle(uv, "yx");

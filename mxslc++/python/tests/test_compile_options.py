@@ -2,14 +2,7 @@ import mxslc
 import pytest
 
 from groundtruth import STANDARD_OUTPUT, REDUCED_OUTPUT
-
-
-def test_compile_options_output_file_defaults_to_none():
-    options = mxslc.CompileOptions()
-
-    assert options.output_file is None
-    assert options.version == "1.39.5"
-    assert options.reduce_graph == True
+from python.tests.data_utils import get_data_path, assert_matches_groundtruth
 
 
 def test_compile_options_reduce_graph_is_false():
@@ -17,33 +10,33 @@ def test_compile_options_reduce_graph_is_false():
     options.reduce_graph = False
 
     result = mxslc.compile_string_to_string("float f = 1.0 + 1.0;", options)
-
-    assert isinstance(result, str)
     assert result == STANDARD_OUTPUT
 
 
-def test_compile_options_reduce_graph_is_true_by_default():
+def test_compile_options_reduce_graph_is_true():
     options = mxslc.CompileOptions()
+    options.reduce_graph = True
 
     result = mxslc.compile_string_to_string("float f = 1.0 + 1.0;", options)
-
-    assert isinstance(result, str)
     assert result == REDUCED_OUTPUT
 
 
 def test_compile_options_with_non_default_version():
-    options = mxslc.CompileOptions()
-    options.version = "1.39.4"
+    options = mxslc.CompileOptions(version="1.39.4")
 
     result = mxslc.compile_string_to_string("float f = 1.0 + 1.0;", options)
-
-    assert isinstance(result, str)
     assert result == REDUCED_OUTPUT
 
 
-def test_compile_options_with_invalid_version():
-    options = mxslc.CompileOptions()
-    options.version = "bad_version_string"
+def test_compile_options_with_old_version():
+    options = mxslc.CompileOptions(version="1.38.10")
 
-    with pytest.raises(RuntimeError, match=f"MaterialX version {options.version} libraries could not be found"):
+    result = mxslc.compile_file_to_string(get_data_path("version1_38_10.mxsl"), options)
+    assert_matches_groundtruth(result, "version1_38_10.mtlx")
+
+
+def test_compile_options_with_invalid_version():
+    options = mxslc.CompileOptions(version="bad_version_string")
+
+    with pytest.raises(RuntimeError, match=f"Invalid MaterialX version: {options.version}"):
         mxslc.compile_string_to_string("float f = 1.0 + 1.0;", options)

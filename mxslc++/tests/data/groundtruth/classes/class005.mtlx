@@ -19,15 +19,15 @@
     <input name="this__0" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_extent" nodedef="ND_Sphere_extent">
-    <Point_extent name="in1" type="float">
+    <Point_extent name="var__0" type="float">
       <input name="this__0" type="float" interfacename="p__0" />
       <input name="this__1" type="float" interfacename="p__1" />
     </Point_extent>
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <add name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="this__0" />
     </add>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <Sphere_extent name="var__0" type="float">
     <input name="p__0" type="float" value="1" />

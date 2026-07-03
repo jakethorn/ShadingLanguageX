@@ -1,37 +1,37 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <convert name="in1" type="vector3">
+  <convert name="var__0" type="vector3">
     <input name="in" type="float" value="1" />
   </convert>
-  <convert name="in2" type="vector3">
+  <convert name="var__1" type="vector3">
     <input name="in" type="float" value="2" />
   </convert>
-  <convert name="in4" type="vector3">
+  <convert name="var__2" type="vector3">
     <input name="in" type="float" value="3" />
   </convert>
-  <add name="in3" type="vector3">
-    <input name="in1" type="vector3" nodename="in1" />
-    <input name="in2" type="vector3" nodename="in2" />
+  <add name="var__3" type="vector3">
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="vector3" nodename="var__1" />
   </add>
   <add name="b" type="vector3">
-    <input name="in1" type="vector3" nodename="in3" />
-    <input name="in2" type="vector3" nodename="in4" />
+    <input name="in1" type="vector3" nodename="var__3" />
+    <input name="in2" type="vector3" nodename="var__2" />
   </add>
-  <convert name="in5" type="vector4">
+  <convert name="var__4" type="vector4">
     <input name="in" type="float" value="1" />
   </convert>
-  <convert name="in6" type="vector4">
+  <convert name="var__5" type="vector4">
     <input name="in" type="float" value="2" />
   </convert>
-  <convert name="in8" type="vector4">
+  <convert name="var__6" type="vector4">
     <input name="in" type="float" value="3" />
   </convert>
-  <add name="in7" type="vector4">
-    <input name="in1" type="vector4" nodename="in5" />
-    <input name="in2" type="vector4" nodename="in6" />
+  <add name="var__7" type="vector4">
+    <input name="in1" type="vector4" nodename="var__4" />
+    <input name="in2" type="vector4" nodename="var__5" />
   </add>
   <add name="c" type="vector4">
-    <input name="in1" type="vector4" nodename="in7" />
-    <input name="in2" type="vector4" nodename="in8" />
+    <input name="in1" type="vector4" nodename="var__7" />
+    <input name="in2" type="vector4" nodename="var__6" />
   </add>
 </materialx>

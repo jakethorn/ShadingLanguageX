@@ -1,0 +1,5 @@
+mutable {int, int} a = {1, 2};
+int x = a[0];
+a = {3, 4};
+int y = a[0];
+int z = x + y;

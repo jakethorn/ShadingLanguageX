@@ -1,0 +1,15 @@
+#define X 0.5
+
+mutable float a = 0.0;
+
+#if 0.0 < X < 1.0
+a += 1.0;
+#else
+a += 2.0;
+#endif
+
+#if -1.0 < X < 0.0
+a += 1.0;
+#else
+a += 2.0;
+#endif

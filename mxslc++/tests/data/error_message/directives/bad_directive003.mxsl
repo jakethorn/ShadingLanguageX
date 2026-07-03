@@ -1,0 +1,3 @@
+#else
+float a;
+#endif

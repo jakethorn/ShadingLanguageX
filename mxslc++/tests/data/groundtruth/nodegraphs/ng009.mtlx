@@ -11,12 +11,12 @@
     <output name="out" type="float" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_foo">
-    <bar name="in1" type="float" />
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <bar name="var__0" type="float" />
+    <add name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" value="1" />
     </add>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <add name="theta" type="float">
     <input name="in1" type="float" nodegraph="NG_foo" />

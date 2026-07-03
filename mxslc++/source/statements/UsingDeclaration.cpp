@@ -2,19 +2,28 @@
 // Created by jaket on 16/01/2026.
 //
 
-#include "UsingDeclaration.h"
+#include "statements/UsingDeclaration.h"
 
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
+#include "statements/interface.h"
 
-StmtPtr UsingDeclaration::instantiate_template_types(const TypePtr& template_type) const
+namespace mxslc::statements
 {
-    TypePtr type = type_->instantiate_template_types(template_type);
-    return std::make_unique<UsingDeclaration>(token_, name_, type);
-}
+    StmtPtr UsingDeclaration::monomorphize(const TypePtr& template_type) const
+    {
+        TypePtr type = type_->monomorphize(template_type);
+        return create_statement<UsingDeclaration>(token_, name_, std::move(type));
+    }
 
-void UsingDeclaration::execute_impl() const
-{
-    scope().add_alias(name_, type_);
+    void UsingDeclaration::execute_impl() const
+    {
+        scope().add_alias(name_, type_);
+    }
+
+    string UsingDeclaration::to_string() const
+    {
+        return "using " + name_ + " = " + type_->to_string();
+    }
 }

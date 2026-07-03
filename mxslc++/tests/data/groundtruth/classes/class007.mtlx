@@ -27,15 +27,15 @@
       <input name="this__0" type="float" interfacename="p__0" />
       <input name="this__1" type="float" interfacename="p__1" />
     </Point_extent>
-    <add name="in1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" nodename="pe1" />
       <input name="in2" type="float" nodename="pe2" />
     </add>
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <add name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="this__0" />
     </add>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <nodedef name="ND_Sphere_extent2d" node="Sphere_extent2d">
     <output name="out" type="vector2" />
@@ -44,29 +44,29 @@
     <input name="this__0" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_extent2d" nodedef="ND_Sphere_extent2d">
-    <Sphere_extent name="in1" type="float">
+    <Sphere_extent name="var__0" type="float">
       <input name="p__0" type="float" interfacename="p__0" />
       <input name="p__1" type="float" interfacename="p__1" />
       <input name="this__0" type="float" interfacename="this__0" />
     </Sphere_extent>
     <add name="x" type="float">
-      <input name="in1" type="float" nodename="in1" />
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="p__0" />
     </add>
-    <Sphere_extent name="in2" type="float">
+    <Sphere_extent name="var__1" type="float">
       <input name="p__0" type="float" interfacename="p__0" />
       <input name="p__1" type="float" interfacename="p__1" />
       <input name="this__0" type="float" interfacename="this__0" />
     </Sphere_extent>
     <add name="y" type="float">
-      <input name="in1" type="float" nodename="in2" />
+      <input name="in1" type="float" nodename="var__1" />
       <input name="in2" type="float" interfacename="p__1" />
     </add>
-    <combine2 name="var__0" type="vector2">
+    <combine2 name="var__2" type="vector2">
       <input name="in1" type="float" nodename="x" />
       <input name="in2" type="float" nodename="y" />
     </combine2>
-    <output name="out" type="vector2" nodename="var__0" />
+    <output name="out" type="vector2" nodename="var__2" />
   </nodegraph>
   <Sphere_extent name="var__0" type="float">
     <input name="p__0" type="float" value="1" />

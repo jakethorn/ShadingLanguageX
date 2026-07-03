@@ -1,0 +1,4 @@
+#include "../../includes/b.mxsl"
+#include "../../includes/c.mxsl"
+
+float z = value + 1.0;

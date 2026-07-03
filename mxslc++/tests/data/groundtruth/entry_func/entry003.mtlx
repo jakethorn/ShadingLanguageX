@@ -4,24 +4,24 @@
     <output name="out" type="material" />
     <input name="in1" type="float" value="0" />
     <input name="s1" type="string" value="" />
-    <input name="s2" type="string" value="" />
+    <input name="s2" type="filename" value="" />
   </nodedef>
   <nodegraph name="NG_my_main" nodedef="ND_my_main">
-    <randomfloat name="in1" type="float" />
+    <randomfloat name="var__0" type="float" />
     <add name="f" type="float">
-      <input name="in1" type="float" nodename="in1" />
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="in1" />
     </add>
-    <convert name="var__0" type="color3">
+    <convert name="var__1" type="color3">
       <input name="in" type="float" nodename="f" />
     </convert>
-    <standard_surface name="var__1" type="surfaceshader">
-      <input name="base_color" type="color3" nodename="var__0" />
+    <standard_surface name="var__2" type="surfaceshader">
+      <input name="base_color" type="color3" nodename="var__1" />
     </standard_surface>
-    <surfacematerial name="var__2" type="material">
-      <input name="surfaceshader" type="surfaceshader" nodename="var__1" />
+    <surfacematerial name="var__3" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="var__2" />
     </surfacematerial>
-    <output name="out" type="material" nodename="var__2" />
+    <output name="out" type="material" nodename="var__3" />
   </nodegraph>
   <my_main name="var__0" type="material">
     <input name="in1" type="float" value="3" />

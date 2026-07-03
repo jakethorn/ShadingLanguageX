@@ -10,14 +10,14 @@
     <input name="in2" type="float" value="5" />
     <input name="in3" type="float" value="6" />
   </combine3>
-  <multiply name="in1" type="vector3">
+  <multiply name="var__0" type="vector3">
     <input name="in1" type="vector3" nodename="v1" />
     <input name="in2" type="vector3" nodename="v2" />
   </multiply>
-  <randomfloat name="in2" type="float" />
+  <randomfloat name="var__1" type="float" />
   <multiply name="v3" type="vector3">
-    <input name="in1" type="vector3" nodename="in1" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="float" nodename="var__1" />
   </multiply>
   <combine3 name="c1" type="color3">
     <input name="in1" type="float" value="1" />
@@ -29,13 +29,13 @@
     <input name="in2" type="float" value="5" />
     <input name="in3" type="float" value="6" />
   </combine3>
-  <multiply name="in3" type="color3">
+  <multiply name="var__2" type="color3">
     <input name="in1" type="color3" nodename="c1" />
     <input name="in2" type="color3" nodename="c2" />
   </multiply>
-  <randomfloat name="in4" type="float" />
+  <randomfloat name="var__3" type="float" />
   <multiply name="c3" type="color3">
-    <input name="in1" type="color3" nodename="in3" />
-    <input name="in2" type="float" nodename="in4" />
+    <input name="in1" type="color3" nodename="var__2" />
+    <input name="in2" type="float" nodename="var__3" />
   </multiply>
 </materialx>

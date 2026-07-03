@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "compile.h"
+#include "CompileOptions.h"
 #include "utils/comp_utils.h"
 #include "utils/data_utils.h"
 
@@ -17,9 +18,11 @@ using std::vector;
 
 using reduce_graph_tests = testing::TestWithParam<fs::path>;
 
-void run_test(const fs::path& input_path, const fs::path& expected_path, const bool reduce_path, const string& fail_message)
+void run_test(const fs::path& input_path, const fs::path& expected_path, const bool reduce_graph, const string& fail_message)
 {
-    const mxslc::CompileOptions opts{.reduce_graph = reduce_path};
+    mxslc::CompileOptions opts;
+    opts.reduce_graph = reduce_graph;
+
     const string actual_output = mxslc::compile_to_string(input_path, opts);
 
     if constexpr (overwrite_data_files())
@@ -55,9 +58,12 @@ TEST_P(reduce_graph_tests, compiler_reduces_graph)
 
 vector<fs::path> get_reduce_graph_files()
 {
-    vector<fs::path> files;
-    const fs::path test_dir = get_test_data("reduce_graph"s);
+    const fs::path test_dir = get_test_data("reduce_graph");
 
+    if (not fs::exists(test_dir))
+        return {};
+
+    vector<fs::path> files;
     for (const auto& p : fs::recursive_directory_iterator(test_dir))
         if (p.path().extension() == ".mxsl")
             files.push_back(p.path());

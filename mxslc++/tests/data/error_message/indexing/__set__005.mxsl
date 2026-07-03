@@ -1,0 +1,2 @@
+vec3 a = position();
+a[0] = 1.0;

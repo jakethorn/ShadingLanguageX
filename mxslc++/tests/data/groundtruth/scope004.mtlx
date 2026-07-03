@@ -13,16 +13,16 @@
     <output name="out" type="float" value="0" />
   </nodegraph>
   <foo name="var__0" type="multioutput" />
-  <divide name="in1" type="float">
+  <divide name="var__1" type="float">
     <input name="in1" type="float" output="nonlocal_out__a" nodename="var__0" />
     <input name="in2" type="float" output="nonlocal_out__b" nodename="var__0" />
   </divide>
-  <divide name="in2" type="float">
-    <input name="in1" type="float" nodename="in1" />
+  <divide name="var__2" type="float">
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" output="nonlocal_out__c" nodename="var__0" />
   </divide>
   <divide name="e" type="float">
-    <input name="in1" type="float" nodename="in2" />
+    <input name="in1" type="float" nodename="var__2" />
     <input name="in2" type="float" output="out" nodename="var__0" />
   </divide>
 </materialx>

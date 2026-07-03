@@ -2,12 +2,12 @@
 <materialx version="1.39">
   <randomfloat name="x__a" type="float" />
   <randomfloat name="y__b" type="float" />
-  <multiply name="m" type="float">
+  <multiply name="var__0" type="float">
     <input name="in1" type="float" nodename="y__b" />
     <input name="in2" type="float" value="3" />
   </multiply>
   <multiply name="z" type="float">
     <input name="in1" type="float" nodename="x__a" />
-    <input name="in2" type="float" nodename="m" />
+    <input name="in2" type="float" nodename="var__0" />
   </multiply>
 </materialx>

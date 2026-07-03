@@ -5,7 +5,7 @@
 #ifndef MXSLC_DECOMPILER_BINDINGS_H
 #define MXSLC_DECOMPILER_BINDINGS_H
 
-#include "common.h"
+#include "pybind.h"
 
 void bind_decompiler(py::module_& m);
 

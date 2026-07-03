@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="b" type="float">
+    <input name="in" type="float" value="0" />
+  </randomfloat>
+  <randomfloat name="d" type="float">
+    <input name="in" type="float" value="1" />
+  </randomfloat>
+  <randomfloat name="f" type="float">
+    <input name="in" type="float" value="0" />
+  </randomfloat>
+</materialx>

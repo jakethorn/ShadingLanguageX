@@ -4,12 +4,12 @@
     <input name="in1" type="integer" value="72" />
     <input name="in2" type="integer" value="2784" />
   </add>
-  <convert name="in1" type="float">
+  <convert name="var__0" type="float">
     <input name="in" type="integer" nodename="i" />
   </convert>
-  <randomfloat name="in2" type="float" />
+  <randomfloat name="var__1" type="float" />
   <multiply name="OUT" type="float">
-    <input name="in1" type="float" nodename="in1" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" nodename="var__1" />
   </multiply>
 </materialx>

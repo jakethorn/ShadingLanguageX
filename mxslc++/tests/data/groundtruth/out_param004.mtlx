@@ -18,12 +18,12 @@
   <foo name="var__0" type="multioutput">
     <input name="x" type="float" value="3" />
   </foo>
-  <multiply name="in1" type="float">
+  <multiply name="var__1" type="float">
     <input name="in1" type="float" output="out" nodename="var__0" />
     <input name="in2" type="float" output="out__y__0" nodename="var__0" />
   </multiply>
   <multiply name="w" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" output="out__y__1" nodename="var__0" />
   </multiply>
 </materialx>

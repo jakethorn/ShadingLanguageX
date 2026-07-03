@@ -1,0 +1,8 @@
+float a = switch(1.0, 2.0, which=5);
+float b = randomfloat(a);
+
+float c = switch(1.0, 2.0);
+float d = randomfloat(c);
+
+float e = switch();
+float f = randomfloat(e);

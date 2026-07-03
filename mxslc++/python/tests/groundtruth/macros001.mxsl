@@ -1,0 +1,7 @@
+#ifdef FOO
+#define VALUE 1.0
+#else
+#define VALUE 2.0
+#endif
+
+float x = randomfloat() + VALUE;

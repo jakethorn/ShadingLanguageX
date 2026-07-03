@@ -2,20 +2,29 @@
 // Created by jaket on 05/05/2026.
 //
 
-#include "Attribute.h"
+#include "runtime/Attribute.h"
 
-#include "CompileError.h"
+#include "errors/CompileError.h"
 
-void Attribute::add_to(const mx::ElementPtr& element) const
+namespace mxslc::runtime
 {
-    if (has_child())
+    void Attribute::add_to(const mx::ElementPtr& element) const
     {
-        if (element->getChild(child_) == nullptr)
-            throw CompileError{"Attribute could not be added because there is no child element with the name '" + child_ + "'"};
-        element->getChild(child_)->setAttribute(name_, value_);
+        if (has_child())
+        {
+            if (element->getChild(child_) == nullptr)
+                throw CompileError{"Attribute could not be added because there is no child element with the name '" + child_ + "'"};
+            element->getChild(child_)->setAttribute(name_, value_);
+        }
+        else
+        {
+            element->setAttribute(name_, value_);
+        }
     }
-    else
+
+    string Attribute::to_string() const
     {
-        element->setAttribute(name_, value_);
+        string name_string = name_ + (has_child() ? "." + child_ : "");
+        return "@" + name_string + " \"" + value_ + "\"";
     }
 }

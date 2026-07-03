@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" value="0.5" />
+  </combine3>
+  <multiply name="var__0" type="float">
+    <input name="in1" type="float" value="3.14" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <multiply name="circum" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="10" />
+  </multiply>
+  <power name="var__1" type="float">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <power name="var__2" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <power name="var__3" type="float">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <combine3 name="d" type="color3">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" nodename="var__2" />
+    <input name="in3" type="float" nodename="var__3" />
+  </combine3>
+  <power name="var__4" type="float">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <convert name="e" type="color3">
+    <input name="in" type="float" nodename="var__4" />
+  </convert>
+  <power name="var__5" type="float">
+    <input name="in1" type="float" value="0.5" />
+    <input name="in2" type="float" value="2.2" />
+  </power>
+  <subtract name="var__6" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="var__5" />
+  </subtract>
+  <convert name="f" type="color3">
+    <input name="in" type="float" nodename="var__6" />
+  </convert>
+</materialx>

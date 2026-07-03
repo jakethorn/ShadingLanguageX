@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="float" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <output name="out" type="float" value="80" />
+  </nodegraph>
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <bar name="var__0" type="float" />
+    <add name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
+      <input name="in2" type="float" value="8" />
+    </add>
+    <output name="out" type="float" nodename="var__1" />
+  </nodegraph>
+  <foo name="a" type="float" />
+  <bar name="var__0" type="float" />
+  <add name="b" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="8" />
+  </add>
+  <bar name="c" type="float" />
+  <add name="var__1" type="float">
+    <input name="in1" type="float" nodename="a" />
+    <input name="in2" type="float" nodename="b" />
+  </add>
+  <add name="var__2" type="float">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" nodename="c" />
+  </add>
+  <add name="z" type="float">
+    <input name="in1" type="float" nodename="var__2" />
+    <input name="in2" type="float" value="80" />
+  </add>
+</materialx>

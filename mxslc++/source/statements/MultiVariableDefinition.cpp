@@ -2,69 +2,85 @@
 // Created by jaket on 09/01/2026.
 //
 
-#include "MultiVariableDefinition.h"
+#include "statements/MultiVariableDefinition.h"
 #include "expressions/Expression.h"
+#include "expressions/interface.h"
 #include "expressions/RuntimeExpression.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "values/ValueFactory.h"
+#include "runtime/utils/monomorphize.h"
+#include "statements/interface.h"
+#include "statements/VariableDefinition.h"
 
-MultiVariableDefinition::MultiVariableDefinition(TypePtr type, ExprPtr expr)
-    : MultiVariableDefinition{std::move(type), std::move(expr), Token{}}
+namespace mxslc::statements
 {
-
-}
-
-MultiVariableDefinition::MultiVariableDefinition(TypePtr type, ExprPtr expr, Token token)
-    : Statement{std::move(token)}, type_{std::move(type)}, expr_{std::move(expr)}
-{
-
-}
-
-void MultiVariableDefinition::set_attributes(AttributeList attrs)
-{
-    if (expr_)
-        expr_->set_attributes(std::move(attrs));
-}
-
-StmtPtr MultiVariableDefinition::instantiate_template_types(const TypePtr& template_type) const
-{
-    TypePtr type = type_->instantiate_template_types(template_type);
-    ExprPtr expr = expr_->instantiate_template_types(template_type);
-    return std::make_unique<MultiVariableDefinition>(std::move(type), std::move(expr), token_);
-}
-
-void MultiVariableDefinition::execute_impl() const
-{
-    const TypePtr type = scope().resolve_type(type_);
-
-    VarPtr value;
-    if (expr_)
+    MultiVariableDefinition::MultiVariableDefinition(TypePtr type, ExprPtr expr)
+        : MultiVariableDefinition{std::move(type), std::move(expr), Token{}}
     {
-        expr_->init(type);
-        value = expr_->evaluate();
-    }
-    else
-    {
-        value = ValueFactory::create_default_value(type);
+
     }
 
-    for (size_t i = 0; i < value->child_count(); ++i)
+    MultiVariableDefinition::MultiVariableDefinition(TypePtr type, ExprPtr expr, Token token)
+        : Statement{std::move(token)}, type_{std::move(type)}, expr_{std::move(expr)}
     {
-        Field field = type->field(i);
-        VarPtr child = value->child(i);
-        if (field.is_global())
+
+    }
+
+    void MultiVariableDefinition::set_attributes(AttributeList attrs)
+    {
+        if (expr_)
+            expr_->set_attributes(std::move(attrs));
+    }
+
+    StmtPtr MultiVariableDefinition::monomorphize(const TypePtr& template_type) const
+    {
+        auto&& [type, expr] = runtime_utils::monomorphize_all(template_type, type_, expr_);
+        return create_statement<MultiVariableDefinition>(std::move(type), std::move(expr), token_);
+    }
+
+    void MultiVariableDefinition::init()
+    {
+        type_ = scope().resolve_type(type_);
+    }
+
+    void MultiVariableDefinition::execute_impl() const
+    {
+        VarPtr value;
+        if (expr_)
         {
-            if (VarPtr global = runtime().global(field.name()))
-            {
-                const ExprPtr child_expr = std::make_shared<RuntimeExpression>(std::move(global));
-                child_expr->init(type);
-                child = child_expr->evaluate();
-            }
+            expr_->init(type_);
+            value = expr_->evaluate();
         }
-        const VarPtr var = Variable::create(field.modifiers(), field.type(), child);
-        var->add_to_scope(type->field_name(i));
+
+        for (size_t i = 0; i < type_->field_count(); ++i)
+        {
+            Field field = type_->field(i);
+
+            ExprPtr child_expr;
+            if (value)
+            {
+                VarPtr child = value->child(i);
+                child_expr = as_expression(std::move(child));
+            }
+
+            create_statement<VariableDefinition>(
+                field.modifiers(),
+                field.type(),
+                field.name(),
+                std::move(child_expr)
+            )->execute();
+        }
+    }
+
+    string MultiVariableDefinition::to_string() const
+    {
+        string result = join(type_->fields(), ", ");
+        if (expr_)
+            result += " = " + expr_->to_string();
+        result += ";";
+        return result;
     }
 }
