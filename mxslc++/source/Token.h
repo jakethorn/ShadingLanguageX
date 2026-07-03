@@ -23,6 +23,12 @@ public:
     size_t line() const { return line_; }
     primitive_t literal() const;
 
+    template<typename T>
+    T literal() const
+    {
+        return std::get<T>(literal());
+    }
+
     void set_lexeme(const string& lexeme) { lexeme_ = lexeme; }
     void set_filename(const string& filename) { filename_ = filename; }
     void set_line(const size_t line) { line_ = line; }

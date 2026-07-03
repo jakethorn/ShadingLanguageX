@@ -28,6 +28,19 @@ namespace
         return false;
     }
 
+    bool try_match(const regex& pattern, const string_view text, Token& token)
+    {
+        if (string_view_match match;
+            std::regex_search(text.begin(), text.end(), match, pattern))
+        {
+            const TokenType token_type{match[0]};
+            token = Token{token_type, match[0]};
+            return true;
+        }
+
+        return false;
+    }
+
     bool try_match_float(const string_view text, Token& token)
     {
         static const regex pattern{R"(^(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))(e-?[0-9]+)?)", std::regex_constants::optimize};
@@ -133,6 +146,15 @@ namespace
         return false;
     }
 
+    bool try_match_directive(const string_view text, Token& token)
+    {
+        if (const char c = text.front(); c != '#')
+            return false;
+
+        static const regex pattern{R"(^#[_a-zA-Z0-9]*)", std::regex_constants::optimize};
+        return try_match(pattern, text, token);
+    }
+
     Token next_token(const string_view text, const size_t line)
     {
         if (Token token; try_match_whitespace(text, token)
@@ -143,13 +165,14 @@ namespace
                          or try_match_keyword_identifier(text, token)
                          or try_match_float(text, token)
                          or try_match_int(text, token)
-                         or try_match_string(text, token))
+                         or try_match_string(text, token)
+                         or try_match_directive(text, token))
         {
             token.set_line(line);
             return token;
         }
 
-        throw CompileError{"Scanning error on line "s + std::to_string(line) + ", character: "s + text.front()};
+        throw CompileError{"Scanning error on line " + std::to_string(line) + ", character: " + text.front()};
     }
 }
 
@@ -171,7 +194,6 @@ vector<Token> scan_string(string_view text)
         if (token == TokenType::Newline)
         {
             ++line;
-            continue;
         }
 
         tokens.push_back(token);

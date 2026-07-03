@@ -15,6 +15,14 @@ bool TokenReader::empty() const
     return index_ == tokens_.size();
 }
 
+void TokenReader::ignore(const TokenType token_type)
+{
+    tokens_.erase(
+        std::remove(tokens_.begin(), tokens_.end(), token_type),
+        tokens_.end()
+    );
+}
+
 const Token& TokenReader::peek(const size_t n) const
 {
     check_bounds(n);

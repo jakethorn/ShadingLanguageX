@@ -86,6 +86,7 @@ add_library(mxslc_lib
         values/NodeGraphValue.cpp
         values/NodeGraphOutputValue.cpp
         interface/Variable.cpp
+        preprocess/preprocess.cpp
 )
 
 set_target_properties(mxslc_lib PROPERTIES

@@ -21,6 +21,8 @@ public:
     size_t size() const;
     bool empty() const;
 
+    void ignore(TokenType token_type);
+
     const Token& peek(size_t n = 0) const;
     Span<Token> peek_until(TokenType type, size_t max_tokens = std::numeric_limits<size_t>::max()) const;
 
@@ -49,6 +51,18 @@ public:
         while (optional<Token> token = consume(types...))
         {
             tokens.push_back(std::move(*token));
+        }
+
+        return tokens;
+    }
+
+    template<typename... Args>
+    vector<Token> consume_until(const Args&... types)
+    {
+        vector<Token> tokens;
+        while ((... || (peek() != types)))
+        {
+            tokens.push_back(consume());
         }
 
         return tokens;

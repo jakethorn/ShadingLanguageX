@@ -5,7 +5,6 @@
 #ifndef FENNEC_COMPILEERROR_H
 #define FENNEC_COMPILEERROR_H
 
-#include <stdexcept>
 #include <string>
 #include <utility>
 

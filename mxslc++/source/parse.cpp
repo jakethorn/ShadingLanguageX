@@ -47,7 +47,9 @@ vector<StmtPtr> parse(vector<Token> tokens)
 
 Parser::Parser(vector<Token> tokens) : TokenReader{std::move(tokens)}
 {
-
+    // Newlines are removed by the preprocess step
+    // Ignore them in case the preprocess step is skipped
+    ignore(TokenType::Newline);
 }
 
 vector<StmtPtr> Parser::parse()
@@ -683,7 +685,7 @@ ExprPtr Parser::primary()
         return typeof_operator();
     }
 
-    throw CompileError{peek(), "Invalid expression"s};
+    throw CompileError{peek(), "Invalid expression"};
 }
 
 ExprPtr Parser::if_expression(ExprPtr else_expr)

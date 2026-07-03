@@ -12,9 +12,15 @@
 
 TokenType Token::init_type(const string& lexeme)
 {
+    const TokenType token_type{lexeme};
+    if (token_type != TokenType::Unknown)
+        return token_type;
+
     const vector<Token> tokens = scan_file(lexeme);
-    assert(tokens.size() == 1);
-    return tokens[0].type();
+    if (tokens.size() == 1)
+        return tokens[0].type();
+
+    throw CompileError{"Invalid token lexeme: " + lexeme};
 }
 
 primitive_t Token::literal() const
@@ -27,7 +33,7 @@ primitive_t Token::literal() const
         return std::stof(lexeme_);
     if (type_ == TokenType::String)
         return lexeme_.substr(1, lexeme_.size() - 2);
-    throw CompileError{"Invalid literal"s};
+    throw CompileError{"Invalid literal"};
 }
 
 Token Token::instantiate_template_types(const TypePtr& template_type) const

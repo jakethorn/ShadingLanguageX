@@ -85,6 +85,22 @@ public:
         Typeof,
         Break,
 
+        // Directives
+        HashInclude,
+        HashLibrary,
+        HashVersion,
+        HashDefine,
+        HashUndef,
+        HashIf,
+        HashIfdef,
+        HashIfndef,
+        HashElse,
+        HashElif,
+        HashElifdef,
+        HashElifndef,
+        HashEndif,
+        HashPragma,
+
         // Dynamic
         Identifier,
         Bool,
@@ -112,6 +128,10 @@ public:
     inline static const unordered_set Keywords {
         If, Else, Switch, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
         Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
+    };
+
+    inline static const unordered_set Directives {
+        HashInclude
     };
 
 private:
@@ -159,6 +179,7 @@ private:
         {"print", Print},
         {"typeof", Typeof},
         {"break", Break},
+        {"#include", HashInclude},
         {"<identifier>", Identifier},
         {"<bool>", Bool},
         {"<int>", Int},
@@ -213,6 +234,11 @@ public:
     bool operator==(const string& s) const { return enum_ == to_enum(s); }
     bool operator==(const TokenType& t) const { return enum_ == t.enum_; }
     bool operator==(const Enum e) const { return enum_ == e; }
+
+    bool operator!=(const char c) const { return enum_ != to_enum(c); }
+    bool operator!=(const string& s) const { return enum_ != to_enum(s); }
+    bool operator!=(const TokenType& t) const { return enum_ != t.enum_; }
+    bool operator!=(const Enum e) const { return enum_ != e; }
 
     Enum value() const { return enum_; }
     size_t index() const { return enum_; }
