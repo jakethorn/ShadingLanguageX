@@ -4,8 +4,6 @@
 
 #include "parse.h"
 
-#include "CompileError.h"
-#include "TokenReader.h"
 #include "expressions/CompoundAssignment.h"
 #include "expressions/DotOperator.h"
 #include "expressions/UnnamedConstructor.h"
@@ -189,20 +187,20 @@ StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
     vector<Field> fields;
     Token name = match(TokenType::Identifier);
     Token token{name};
-    fields.emplace_back(std::move(mods), std::move(type_), std::move(name), /*can_be_global*/true);
+    fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
     while (consume(','))
     {
         if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '=' or peek(1) == ';'))
         {
             name = match(TokenType::Identifier);
-            fields.emplace_back(fields.back().modifiers(), fields.back().type(), std::move(name), /*can_be_global*/true);
+            fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), /*can_be_global*/true);
         }
         else
         {
             mods = modifiers();
             type_ = type();
             name = match(TokenType::Identifier);
-            fields.emplace_back(std::move(mods), std::move(type_), std::move(name), /*can_be_global*/true);
+            fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
         }
     }
 
@@ -294,7 +292,7 @@ StmtPtr Parser::using_declaration()
     match('=');
     TypePtr type_ = type();
     match(';');
-    return std::make_unique<UsingDeclaration>(std::move(token), std::move(name), std::move(type_));
+    return std::make_unique<UsingDeclaration>(std::move(token), name.lexeme(), std::move(type_));
 }
 
 StmtPtr Parser::for_loop()
@@ -308,7 +306,7 @@ StmtPtr Parser::for_loop()
     ExprPtr range_expr = expression();
     match(')');
     StmtPtr body = block_statement();
-    return std::make_unique<ForEachLoop>(std::move(token), std::move(mods), std::move(type_), std::move(name), std::move(range_expr), std::move(body));
+    return std::make_unique<ForEachLoop>(std::move(token), std::move(mods), std::move(type_), name.lexeme(), std::move(range_expr), std::move(body));
 }
 
 StmtPtr Parser::expression_statement(ExprPtr expr)
@@ -392,7 +390,7 @@ ModifierList Parser::modifiers()
 TypePtr Parser::type()
 {
     if (const optional<Token> type = consume(TokenType::Identifier))
-        return std::make_shared<Type>(Token::to_string(type));
+        return std::make_shared<Type>(type ? type->lexeme() : "");
 
     vector<Field> fields = list<Field>('{', '}', [this](const size_t){ return field(); });
     return std::make_shared<Type>(std::move(fields));
@@ -403,7 +401,7 @@ Field Parser::field()
     ModifierList mods = modifiers();
     TypePtr type_ = type();
     const optional<Token> name = consume(TokenType::Identifier);
-    return Field{std::move(mods), std::move(type_), Token::to_string(name)};
+    return Field{std::move(mods), std::move(type_), name ? name->lexeme() : ""};
 }
 
 Parameter Parser::parameter(const size_t index)

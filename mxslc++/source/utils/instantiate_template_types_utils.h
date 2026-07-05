@@ -8,6 +8,7 @@
 #include "common.h"
 
 string instantiate_template_types(const string& src, const TypePtr& template_type);
+Token instantiate_template_types(const Token& src, const TypePtr& template_type);
 
 template<typename T>
 optional<T> instantiate_template_types(const optional<T>& src, const TypePtr& template_type)

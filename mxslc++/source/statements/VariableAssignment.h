@@ -6,7 +6,7 @@
 #define MXSLC_VARIABLEASSIGNMENT_H
 
 #include "Statement.h"
-#include "Token.h"
+#include "../../include/Token.h"
 
 class VariableAssignment final : public Statement
 {

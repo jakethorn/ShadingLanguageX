@@ -4,7 +4,7 @@
 
 #include "ModifierList.h"
 
-#include "Token.h"
+#include "../../include/Token.h"
 #include "CompileError.h"
 
 ModifierList::ModifierList(const TokenType::Enum mod)

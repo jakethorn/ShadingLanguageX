@@ -5,11 +5,8 @@
 #ifndef MXSLC_MODIFIERLIST_H
 #define MXSLC_MODIFIERLIST_H
 
-#include "CompileError.h"
-#include "TokenType.h"
 #include "utils/common.h"
-
-class Token;
+#include "utils/template_utils.h"
 
 class ModifierList
 {
@@ -46,7 +43,7 @@ public:
 
     void add(const TokenType mod) { mods_.insert(mod); }
     void remove(const TokenType mod) { mods_.erase(mod); }
-    bool contains(const TokenType mod) const { return ::contains(mods_, mod.str()); }
+    bool contains(const TokenType mod) const { return ::contains(mods_, mod); }
     size_t size() const { return mods_.size(); }
     bool empty() const { return mods_.empty(); }
     string str() const;

@@ -7,7 +7,7 @@
 
 #include "utils/common.h"
 #include "Statement.h"
-#include "Token.h"
+#include "../../include/Token.h"
 #include "runtime/Type.h"
 
 class VariableDefinition final : public Statement

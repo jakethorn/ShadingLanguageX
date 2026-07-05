@@ -9,7 +9,6 @@
 
 #include "utils/common.h"
 #include "Token.h"
-#include "TokenReader.h"
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
 

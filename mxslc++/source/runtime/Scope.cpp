@@ -13,7 +13,7 @@
 #include "Type.h"
 #include "Variable.h"
 #include "errors/AmbiguousFunctionError.h"
-#include "utils/template_utils.h"
+#include "../utils/template_utils.h"
 
 Scope::Scope() = default;
 

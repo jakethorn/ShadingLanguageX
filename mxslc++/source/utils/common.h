@@ -7,6 +7,7 @@
 
 // includes
 #include <ciso646>
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <variant>
@@ -16,6 +17,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
+
 #include <MaterialXCore/Node.h>
 
 #include "CompileError.h"
@@ -23,12 +25,18 @@
 #include "parse_args.h"
 #include "primitive_t.h"
 #include "Span.h"
+#include "TokenType.h"
+#include "Token.h"
+#include "TokenReader.h"
 
 using mxslc::CompileError;
 using mxslc::CompileOptions;
 using mxslc::CommandLineArgs;
 using mxslc::primitive_t;
 using mxslc::Span;
+using mxslc::TokenType;
+using mxslc::Token;
+using mxslc::TokenReader;
 
 // namespaces
 namespace fs = std::filesystem;

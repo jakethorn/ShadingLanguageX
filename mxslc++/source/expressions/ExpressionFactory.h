@@ -7,8 +7,6 @@
 
 #include "utils/common.h"
 
-class Token;
-
 class ExpressionFactory
 {
 public:

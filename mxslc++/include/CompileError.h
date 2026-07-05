@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-class Token;
+#include "Token.h"
 
 namespace mxslc
 {

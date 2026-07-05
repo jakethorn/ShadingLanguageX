@@ -6,7 +6,7 @@
 #define MXSLC_USINGDECLARATION_H
 
 #include "Statement.h"
-#include "Token.h"
+#include "../../include/Token.h"
 
 class UsingDeclaration final : public Statement
 {

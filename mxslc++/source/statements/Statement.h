@@ -5,7 +5,7 @@
 #ifndef FENNEC_STATEMENT_H
 #define FENNEC_STATEMENT_H
 
-#include "Token.h"
+#include "../../include/Token.h"
 #include "runtime/AttributeList.h"
 #include "runtime/RuntimeAccessor.h"
 #include "utils/common.h"

@@ -6,7 +6,7 @@
 #define MXSLC_FOREACHLOOP_H
 
 #include "Statement.h"
-#include "Token.h"
+#include "../../include/Token.h"
 #include "runtime/ModifierList.h"
 
 class ForEachLoop final : public Statement

@@ -3,7 +3,7 @@
 //
 
 #include "CompileError.h"
-#include "../Token.h"
+#include "../../include/Token.h"
 #include "../utils/common.h"
 #include "../utils/str_utils.h"
 

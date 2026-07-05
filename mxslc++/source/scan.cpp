@@ -146,15 +146,6 @@ namespace
         return false;
     }
 
-    bool try_match_directive(const string_view text, Token& token)
-    {
-        if (const char c = text.front(); c != '#')
-            return false;
-
-        static const regex pattern{R"(^#[_a-zA-Z0-9]*)", std::regex_constants::optimize};
-        return try_match(pattern, text, token);
-    }
-
     Token next_token(const string_view text, const size_t line)
     {
         if (Token token; try_match_whitespace(text, token)
@@ -165,8 +156,7 @@ namespace
                          or try_match_keyword_identifier(text, token)
                          or try_match_float(text, token)
                          or try_match_int(text, token)
-                         or try_match_string(text, token)
-                         or try_match_directive(text, token))
+                         or try_match_string(text, token))
         {
             token.set_line(line);
             return token;

@@ -10,7 +10,7 @@
 #include "mtlx/load_mtlx.h"
 #include "mtlx/mtlx_utils.h"
 #include "utils/io_utils.h"
-#include "utils/template_utils.h"
+#include "../utils/template_utils.h"
 
 namespace
 {

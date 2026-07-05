@@ -4,6 +4,7 @@ add_library(mxslc_lib
         TokenReader.cpp
         parse.cpp
         compile.cpp
+        TokenType.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
@@ -87,6 +88,7 @@ add_library(mxslc_lib
         values/NodeGraphOutputValue.cpp
         interface/Variable.cpp
         preprocess/preprocess.cpp
+        preprocess/Macro.cpp
 )
 
 set_target_properties(mxslc_lib PROPERTIES

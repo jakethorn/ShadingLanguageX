@@ -5,7 +5,7 @@
 #ifndef MXSLC_RUNTIMEUTILS_H
 #define MXSLC_RUNTIMEUTILS_H
 
-#include "Token.h"
+#include "../../include/Token.h"
 #include "utils/common.h"
 
 class ArgumentList;

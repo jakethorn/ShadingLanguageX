@@ -6,20 +6,42 @@
 #define MXSLC_MACRO_H
 
 #include <string>
+#include <vector>
 
-class Macro
+#include "Token.h"
+
+namespace mxslc
 {
-public:
-    Macro(std::string name) : name_{std::move(name)} { }
-    Macro(std::string name, std::string body) : name_{std::move(name)}, body_{std::move(body)} { }
+    class Macro
+    {
+    public:
+        Macro(std::string name);
+        Macro(std::string name, std::vector<Token> body);
+        Macro(std::string name, const std::string& body);
 
+        const std::string& name() const { return name_; }
+        const std::vector<Token>& body() const { return body_; }
 
-    const std::string& name() const { return name_; }
-    const std::string& body() const { return body_; }
+        bool operator==(const Macro& other) const noexcept { return name_ == other.name_; }
+        bool operator==(const std::string& other) const noexcept { return name_ == other; }
+        bool operator==(const Token& other) const noexcept { return name_ == other.lexeme(); }
 
-private:
-    std::string name_;
-    std::string body_;
-};
+    private:
+        std::string name_;
+        std::vector<Token> body_;
+    };
+}
+
+namespace std
+{
+    template<>
+    struct hash<mxslc::Macro>
+    {
+        size_t operator()(const mxslc::Macro& macro) const noexcept
+        {
+            return std::hash<std::string>{}(macro.name());
+        }
+    };
+}
 
 #endif //MXSLC_MACRO_H

@@ -4,7 +4,7 @@
 
 #include "str_utils.h"
 
-#include "Token.h"
+#include "../../include/Token.h"
 #include "runtime/Type.h"
 
 string get_postfix(const string& str, const char delim)

@@ -10,7 +10,7 @@
 
 VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name)
     : VariableDefinitionExpression{
-        std::make_unique<VariableDefinition>(std::move(mods), std::move(type), name, nullptr),
+        std::make_unique<VariableDefinition>(std::move(mods), std::move(type), name.lexeme(), nullptr),
         std::make_unique<Identifier>(name)
     }
 {

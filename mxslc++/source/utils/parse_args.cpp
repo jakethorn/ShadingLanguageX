@@ -10,7 +10,7 @@
 
 #include "parse_utils.h"
 #include "utils/common.h"
-#include "utils/template_utils.h"
+#include "template_utils.h"
 #include "Span.h"
 
 using std::ifstream;
