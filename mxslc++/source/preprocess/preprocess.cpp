@@ -54,6 +54,7 @@ namespace mxslc
                 {"version", &Preprocessor::process_version},
                 {"define", &Preprocessor::process_define},
                 {"undef", &Preprocessor::process_undef},
+                {"if", &Preprocessor::process_if},
             };
 
             const string& lexeme = consume().lexeme();
@@ -74,20 +75,22 @@ namespace mxslc
         // TODO use search paths when getting path
         // TODO track which files have been included
         // TODO track circular dependencies (look at ancestors)
-        const Token path = match(TokenType::String);
-        include_file(path.literal<string>());
+        const std::vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
+        const Primitive path = evaluate_expression(tokens);
+        include_file(path.as<string>());
     }
 
     void Preprocessor::process_library()
     {
-        const Token path = match(TokenType::String);
-        opts_.libraries.emplace_back(path.literal<string>());
+        const std::vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
+        const Primitive path = evaluate_expression(tokens);
+        opts_.libraries.emplace_back(path.as<string>());
     }
 
     void Preprocessor::process_version()
     {
         const vector<Token> version_parts = consume_until(TokenType::Newline);
-        opts_.version = utils::join_tokens(version_parts);
+        opts_.version = token_utils::join(version_parts);
     }
 
     void Preprocessor::process_define()
@@ -103,13 +106,19 @@ namespace mxslc
         undef_macro(name);
     }
 
+    void Preprocessor::process_if()
+    {
+        // evaluate_macros ( do the same as in process_non_directive) ( actually do this everywhere ) ( maybe override match/consume/peek )
+        const vector<Token> condition = consume_until(TokenType::Newline);
+    }
+
     void Preprocessor::process_non_directive()
     {
         Token token = consume();
 
         if (token == TokenType::Identifier and macro_is_defined(token))
         {
-            vector<Token> tokens = evaluate_macro(token);
+            vector<Token> tokens = expand_macro(token);
             add_tokens(std::move(tokens));
             return;
         }
@@ -157,19 +166,40 @@ namespace mxslc
         return contains(opts_.macros, name);
     }
 
-    vector<Token> Preprocessor::evaluate_macro(const Token& name) const
+    vector<Token> Preprocessor::expand_macro(const Token& name) const
     {
-        for (const Macro& macro : opts_.macros)
+        const auto it = position_of(opts_.macros, name);
+        if (it != opts_.macros.end())
         {
-            if (macro == name)
-            {
-                vector<Token> tokens = macro.body();
-                mxslc::preprocess(tokens, opts_, is_include_);
-                return tokens;
-            }
+            vector<Token> tokens = it->body();
+            mxslc::preprocess(tokens, opts_, is_include_);
+            return tokens;
         }
 
         throw CompileError{name, "Macro not defined: " + name.lexeme()};
+    }
+
+    vector<Token> Preprocessor::consume_and_expand_until(const TokenType token_type)
+    {
+        const vector<Token> tokens = consume_until(token_type);
+
+        vector<Token> result;
+        result.reserve(tokens.size());
+
+        for (const Token& token : tokens)
+        {
+            if (token == TokenType::Identifier and macro_is_defined(token))
+            {
+                vector<Token> expanded_macro = expand_macro(token);
+                result.insert(result.end(), std::make_move_iterator(expanded_macro.begin()), std::make_move_iterator(expanded_macro.end()));
+            }
+            else
+            {
+                result.push_back(token);
+            }
+        }
+
+        return result;
     }
 
     void Preprocessor::add_token(Token&& tokens)

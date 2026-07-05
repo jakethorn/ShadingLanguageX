@@ -19,7 +19,7 @@ inline std::ostream& operator<<(std::ostream& os, const mx::Vector3& v)
 
 inline std::ostream& operator<<(std::ostream& os, const mx::Vector4& v)
 {
-    return os << "vec4{" << v[0] << ", " << v[1] << ", " <<  v[2] << ", " <<  v[3] << "}";
+    return os << "vec4{" << v[0] << ", " << v[1] << ", " <<  v[2] << ", " << v[3] << "}";
 }
 
 inline std::ostream& operator<<(std::ostream& os, const mx::Color3& c)
@@ -29,7 +29,7 @@ inline std::ostream& operator<<(std::ostream& os, const mx::Color3& c)
 
 inline std::ostream& operator<<(std::ostream& os, const mx::Color4& c)
 {
-    return os << "Color4{" << c[0] << ", " << c[1] << ", " <<  c[2] << ", " <<  c[3] << "}";
+    return os << "Color4{" << c[0] << ", " << c[1] << ", " << c[2] << ", " << c[3] << "}";
 }
 
 inline std::ostream& operator<<(std::ostream& os, const mx::Matrix33& m)

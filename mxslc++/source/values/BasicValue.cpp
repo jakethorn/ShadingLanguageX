@@ -11,13 +11,13 @@
 #include "mtlx/mtlx_utils.h"
 #include "mtlx/mtlx_type_ostream_ops.h"
 
-BasicValue::BasicValue(primitive_t val) : Value{Type::of(val)}, val_{std::move(val)} { }
-BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, val_{std::move(val)} { }
+BasicValue::BasicValue(primitive_t val) : Value{Type::of(val)}, value_{std::move(val)} { }
+BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, value_{std::move(val)} { }
 
 bool BasicValue::equals(const ValuePtr& other) const
 {
     if (const shared_ptr<BasicValue> other_basic = std::dynamic_pointer_cast<BasicValue>(other))
-        return val_ == other_basic->val_;
+        return value_ == other_basic->value_;
     return false;
 }
 
@@ -35,7 +35,7 @@ void BasicValue::set_as_node_input(const mx::InputPtr& input) const
                 input->setValue(v, type_->name());
             }
         },
-        val_
+        value_
     );
 }
 
@@ -54,7 +54,7 @@ void BasicValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, co
                 output->setValue(v, type_->name());
             }
         },
-        val_
+        value_
     );
 }
 
@@ -73,7 +73,7 @@ void BasicValue::set_as_node_def_input(const mx::NodeDefPtr& node_def, const str
                 input->setValue(v, type_->name());
             }
         },
-        val_
+        value_
     );
 }
 
@@ -85,7 +85,7 @@ string BasicValue::str() const
             ss << std::boolalpha << v;
             return ss.str();
         },
-        val_
+        value_
     );
 }
 

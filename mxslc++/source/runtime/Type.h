@@ -68,7 +68,7 @@ public:
     static TypePtr Bool;
     static TypePtr Int;
     static TypePtr Float;
-    static TypePtr String ;
+    static TypePtr String;
     static TypePtr Filename;
     static TypePtr Vec2;
     static TypePtr Vec3;

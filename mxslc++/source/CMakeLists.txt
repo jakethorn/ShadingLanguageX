@@ -26,6 +26,7 @@ add_library(mxslc_lib
         runtime/InputVariable.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
+        runtime/Primitive.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp

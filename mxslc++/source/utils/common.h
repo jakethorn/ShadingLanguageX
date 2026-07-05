@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
+#include <sstream>
 
 #include <MaterialXCore/Node.h>
 
@@ -56,6 +57,7 @@ using std::pair;
 using std::variant;
 using std::unordered_map;
 using std::unordered_set;
+using std::stringstream;
 
 // forward declarations
 class Scope;

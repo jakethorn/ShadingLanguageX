@@ -28,27 +28,27 @@ public:
     template<typename T>
     bool is() const
     {
-        return std::holds_alternative<T>(val_);
+        return std::holds_alternative<T>(value_);
     }
 
     template<typename T0, typename T1>
     bool is() const
     {
-        return std::holds_alternative<T0>(val_) or std::holds_alternative<T1>(val_);
+        return std::holds_alternative<T0>(value_) or std::holds_alternative<T1>(value_);
     }
 
     template<typename T>
     T get() const
     {
         if (is<T>())
-            return std::get<T>(val_);
+            return std::get<T>(value_);
         throw CompileError{"Trying to access a value of type " + type_name() + " as a " + TypeName::of<T>()};
     }
 
 private:
     string type_name() const;
 
-    primitive_t val_;
+    primitive_t value_;
 };
 
 #endif //FENNEC_BASICVALUE_H

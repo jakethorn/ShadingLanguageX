@@ -10,9 +10,9 @@
 
 #include "Token.h"
 
-namespace mxslc::utils
+namespace mxslc::token_utils
 {
-    inline std::string join_tokens(const std::vector<Token>& tokens, const std::string& separator = "")
+    inline std::string join(const std::vector<Token>& tokens, const std::string& separator = "")
     {
         std::string result;
         for (auto it = tokens.begin(); it != tokens.end(); ++it)

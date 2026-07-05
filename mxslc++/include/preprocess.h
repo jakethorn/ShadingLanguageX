@@ -7,6 +7,7 @@
 
 #include "Token.h"
 #include "CompileOptions.h"
+#include "Primitive.h"
 #include "TokenReader.h"
 
 namespace mxslc
@@ -29,6 +30,7 @@ namespace mxslc
         void process_version();
         void process_define();
         void process_undef();
+        void process_if();
         void process_non_directive();
 
         void include_file(const std::filesystem::path& path);
@@ -38,7 +40,11 @@ namespace mxslc
         void undef_macro(const Token& name) const;
         void undef_macro(const std::string& name) const;
         bool macro_is_defined(const Token& name) const;
-        std::vector<Token> evaluate_macro(const Token& name) const;
+        std::vector<Token> expand_macro(const Token& name) const;
+
+        std::vector<Token> consume_and_expand_until(TokenType token_type);
+
+        Primitive evaluate_expression(const std::vector<Token>& tokens) const;
 
         void add_token(Token&& tokens);
         void add_tokens(std::vector<Token>&& tokens);
