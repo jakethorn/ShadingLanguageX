@@ -8,9 +8,9 @@
 #include <fstream>
 #include <functional>
 
-#include "parse_utils.h"
+#include "utils/parse_utils.h"
 #include "utils/common.h"
-#include "template_utils.h"
+#include "utils/template_utils.h"
 #include "Span.h"
 
 using std::ifstream;

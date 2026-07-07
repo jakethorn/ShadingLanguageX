@@ -2,11 +2,11 @@
 // Created by jaket on 16/04/2026.
 //
 
-#include "Variable.h"
+#include "runtime/Variable.h"
 
 #include "CompileError.h"
-#include "Scope.h"
-#include "Type.h"
+#include "runtime/Scope.h"
+#include "runtime/Type.h"
 #include "mtlx/MtlXSerializer.h"
 #include "mtlx/mtlx_utils.h"
 #include "utils/str_utils.h"

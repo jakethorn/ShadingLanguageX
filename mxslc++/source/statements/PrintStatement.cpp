@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "PrintStatement.h"
+#include "statements/PrintStatement.h"
 #include "expressions/Expression.h"
 #include "runtime/Variable.h"
 #include "utils/instantiate_template_types_utils.h"

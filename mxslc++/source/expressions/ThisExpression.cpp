@@ -2,7 +2,7 @@
 // Created by jaket on 06/05/2026.
 //
 
-#include "ThisExpression.h"
+#include "expressions/ThisExpression.h"
 
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"

@@ -2,9 +2,9 @@
 // Created by jaket on 01/12/2025.
 //
 
-#include "ParameterList.h"
+#include "runtime/ParameterList.h"
 
-#include "Argument.h"
+#include "runtime/Argument.h"
 #include "CompileError.h"
 
 ParameterList::ParameterList(vector<Parameter> params) : params_{std::move(params)}

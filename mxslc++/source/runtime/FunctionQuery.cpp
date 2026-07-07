@@ -2,11 +2,11 @@
 // Created by jaket on 06/05/2026.
 //
 
-#include "FunctionQuery.h"
+#include "runtime/FunctionQuery.h"
 
 #include "CompileError.h"
-#include "Function.h"
-#include "Type.h"
+#include "runtime/Function.h"
+#include "runtime/Type.h"
 
 FunctionQuery::FunctionQuery(const string& name) : name{&name}
 {

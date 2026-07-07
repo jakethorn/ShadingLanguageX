@@ -2,16 +2,16 @@
 // Created by jaket on 12/01/2026.
 //
 
-#include "ValueFactory.h"
+#include "values/ValueFactory.h"
 
 #include <cassert>
 
 #include "CompileError.h"
-#include "InterfaceValue.h"
-#include "NodeGraphOutputValue.h"
-#include "NodeGraphValue.h"
-#include "NodeValue.h"
-#include "NodeOutputValue.h"
+#include "values/InterfaceValue.h"
+#include "values/NodeGraphOutputValue.h"
+#include "values/NodeGraphValue.h"
+#include "values/NodeValue.h"
+#include "values/NodeOutputValue.h"
 #include "mtlx/mtlx_utils.h"
 #include "runtime/Function.h"
 #include "runtime/Type.h"

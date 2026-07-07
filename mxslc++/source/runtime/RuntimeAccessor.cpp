@@ -2,8 +2,8 @@
 // Created by jaket on 03/06/2026.
 //
 
-#include "RuntimeAccessor.h"
-#include "Runtime.h"
+#include "runtime/RuntimeAccessor.h"
+#include "runtime/Runtime.h"
 
 Runtime& RuntimeAccessor::runtime()
 {

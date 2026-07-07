@@ -2,7 +2,7 @@
 // Created by jaket on 25/06/2026.
 //
 
-#include "NodeGraphOutputValue.h"
+#include "values/NodeGraphOutputValue.h"
 
 #include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"

@@ -2,7 +2,7 @@
 // Created by jaket on 21/11/2025.
 //
 
-#include "Expression.h"
+#include "expressions/Expression.h"
 
 #include <cassert>
 
@@ -10,7 +10,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "../errors/AmbiguousFunctionError.h"
+#include "errors/AmbiguousFunctionError.h"
 #include "utils/type_cast.h"
 
 #define TRY_START try {

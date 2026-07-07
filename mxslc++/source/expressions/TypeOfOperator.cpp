@@ -2,9 +2,9 @@
 // Created by jaket on 14/06/2026.
 //
 
-#include "TypeOfOperator.h"
+#include "expressions/TypeOfOperator.h"
 
-#include "Identifier.h"
+#include "expressions/Identifier.h"
 #include "runtime/Field.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"

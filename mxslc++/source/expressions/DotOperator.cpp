@@ -2,11 +2,11 @@
 // Created by jaket on 25/03/2026.
 //
 
-#include "DotOperator.h"
+#include "expressions/DotOperator.h"
 
-#include "Identifier.h"
-#include "accessors/FieldAccessor.h"
-#include "accessors/PortAccessor.h"
+#include "expressions/Identifier.h"
+#include "expressions/accessors/FieldAccessor.h"
+#include "expressions/accessors/PortAccessor.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"

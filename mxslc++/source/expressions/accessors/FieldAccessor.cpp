@@ -2,7 +2,7 @@
 // Created by jaket on 04/05/2026.
 //
 
-#include "FieldAccessor.h"
+#include "expressions/accessors/FieldAccessor.h"
 
 #include "runtime/FunctionQuery.h"
 #include "runtime/RuntimeUtils.h"

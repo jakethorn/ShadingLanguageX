@@ -1,0 +1,25 @@
+//
+// Created by jaket on 03/05/2026.
+//
+
+#ifndef MXSLC_INPUTVARIABLE_H
+#define MXSLC_INPUTVARIABLE_H
+
+#include "utils/common.h"
+#include "runtime/Variable.h"
+
+class InputVariable final : public Variable
+{
+public:
+    explicit InputVariable(mx::InputPtr input);
+
+protected:
+    ValuePtr value_impl() const override;
+    void copy_value_impl(ValuePtr value) override;
+    void set_node_name(const string& name) const override;
+
+private:
+    mx::InputPtr input_;
+};
+
+#endif //MXSLC_INPUTVARIABLE_H

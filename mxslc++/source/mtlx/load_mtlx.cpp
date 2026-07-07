@@ -2,7 +2,7 @@
 // Created by jaket on 30/12/2025.
 //
 
-#include "load_mtlx.h"
+#include "mtlx/load_mtlx.h"
 #include <MaterialXFormat/Util.h>
 
 #include "statements/Statement.h"

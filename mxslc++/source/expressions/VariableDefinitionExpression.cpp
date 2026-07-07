@@ -2,10 +2,10 @@
 // Created by jaket on 13/04/2026.
 //
 
-#include "VariableDefinitionExpression.h"
+#include "expressions/VariableDefinitionExpression.h"
 
 #include "statements/VariableDefinition.h"
-#include "Identifier.h"
+#include "expressions/Identifier.h"
 #include "runtime/Variable.h"
 
 VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name)

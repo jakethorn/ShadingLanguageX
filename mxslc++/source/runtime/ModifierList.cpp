@@ -2,9 +2,9 @@
 // Created by jaket on 11/04/2026.
 //
 
-#include "ModifierList.h"
+#include "runtime/ModifierList.h"
 
-#include "../../include/Token.h"
+#include "Token.h"
 #include "CompileError.h"
 
 ModifierList::ModifierList(const TokenType::Enum mod)

@@ -2,12 +2,12 @@
 // Created by jaket on 03/01/2026.
 //
 
-#include "ArgumentList.h"
+#include "runtime/ArgumentList.h"
 
 #include "CompileError.h"
-#include "Parameter.h"
-#include "ParameterList.h"
-#include "Variable.h"
+#include "runtime/Parameter.h"
+#include "runtime/ParameterList.h"
+#include "runtime/Variable.h"
 #include "utils/instantiate_template_types_utils.h"
 
 ArgumentList::ArgumentList(vector<Argument> args) : args_{std::move(args)}

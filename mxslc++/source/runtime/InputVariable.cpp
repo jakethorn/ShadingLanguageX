@@ -2,10 +2,10 @@
 // Created by jaket on 03/05/2026.
 //
 
-#include "InputVariable.h"
+#include "runtime/InputVariable.h"
 
-#include "Runtime.h"
-#include "Type.h"
+#include "runtime/Runtime.h"
+#include "runtime/Type.h"
 #include "values/ValueFactory.h"
 
 InputVariable::InputVariable(mx::InputPtr input)

@@ -2,12 +2,12 @@
 // Created by jaket on 05/05/2026.
 //
 
-#include "ClassDefinition.h"
+#include "statements/ClassDefinition.h"
 
 #include "CompileError.h"
-#include "ConstructorDefinition.h"
-#include "FunctionDefinition.h"
-#include "VariableDefinition.h"
+#include "statements/ConstructorDefinition.h"
+#include "statements/FunctionDefinition.h"
+#include "statements/VariableDefinition.h"
 #include "mtlx/MtlXSerializer.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"

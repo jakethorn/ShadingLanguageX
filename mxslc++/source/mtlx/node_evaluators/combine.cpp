@@ -2,7 +2,7 @@
 // Created by jaket on 28/05/2026.
 //
 
-#include "combine.h"
+#include "mtlx/node_evaluators/combine.h"
 
 #include "CompileError.h"
 #include "runtime/Type.h"

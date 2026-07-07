@@ -2,12 +2,12 @@
 // Created by jaket on 17/04/2026.
 //
 
-#include "Runtime.h"
+#include "runtime/Runtime.h"
 
-#include "Scope.h"
+#include "runtime/Scope.h"
 #include "mtlx/load_mtlx.h"
 #include "CompileError.h"
-#include "Variable.h"
+#include "runtime/Variable.h"
 #include "utils/io_utils.h"
 
 std::unique_ptr<Runtime> Runtime::instance_ = nullptr;

@@ -3,9 +3,9 @@
 //
 
 #include "CompileError.h"
-#include "../../include/Token.h"
-#include "../utils/common.h"
-#include "../utils/str_utils.h"
+#include "Token.h"
+#include "utils/common.h"
+#include "utils/str_utils.h"
 
 string mxslc::CompileError::format(const Token& debug_info, const string& message)
 {

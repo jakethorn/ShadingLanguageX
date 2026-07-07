@@ -2,18 +2,18 @@
 // Created by jaket on 03/12/2025.
 //
 
-#include "Scope.h"
+#include "runtime/Scope.h"
 
 #include <cassert>
 
-#include "ArgumentList.h"
+#include "runtime/ArgumentList.h"
 #include "CompileError.h"
-#include "Function.h"
-#include "FunctionQuery.h"
-#include "Type.h"
-#include "Variable.h"
+#include "runtime/Function.h"
+#include "runtime/FunctionQuery.h"
+#include "runtime/Type.h"
+#include "runtime/Variable.h"
 #include "errors/AmbiguousFunctionError.h"
-#include "../utils/template_utils.h"
+#include "utils/template_utils.h"
 
 Scope::Scope() = default;
 

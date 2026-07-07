@@ -10,7 +10,7 @@
 #include "utils/common.h"
 #include "parse.h"
 #include "scan.h"
-#include "../include/Token.h"
+#include "Token.h"
 #include "expressions/FunctionCall.h"
 #include "runtime/Runtime.h"
 #include "runtime/RuntimeUtils.h"

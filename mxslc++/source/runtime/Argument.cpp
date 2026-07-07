@@ -2,10 +2,10 @@
 // Created by jaket on 21/11/2025.
 //
 
-#include "Argument.h"
+#include "runtime/Argument.h"
 
 #include "CompileError.h"
-#include "Parameter.h"
+#include "runtime/Parameter.h"
 #include "expressions/Literal.h"
 #include "expressions/RuntimeExpression.h"
 #include "expressions/VariableDefinitionExpression.h"

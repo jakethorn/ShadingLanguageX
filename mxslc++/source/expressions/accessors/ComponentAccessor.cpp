@@ -2,7 +2,7 @@
 // Created by jaket on 28/05/2026.
 //
 
-#include "ComponentAccessor.h"
+#include "expressions/accessors/ComponentAccessor.h"
 
 #include "expressions/FunctionCall.h"
 #include "runtime/RuntimeUtils.h"

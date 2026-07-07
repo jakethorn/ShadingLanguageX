@@ -2,8 +2,8 @@
 // Created by jaket on 08/12/2025.
 //
 
-#include "ExpressionFactory.h"
-#include "FunctionCall.h"
+#include "expressions/ExpressionFactory.h"
+#include "expressions/FunctionCall.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/RuntimeUtils.h"
 

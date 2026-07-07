@@ -2,7 +2,7 @@
 // Created by jaket on 14/04/2026.
 //
 
-#include "InterfaceValue.h"
+#include "values/InterfaceValue.h"
 
 #include "mtlx/mtlx_utils.h"
 #include "runtime/Type.h"

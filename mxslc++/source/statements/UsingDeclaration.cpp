@@ -2,7 +2,7 @@
 // Created by jaket on 16/01/2026.
 //
 
-#include "UsingDeclaration.h"
+#include "statements/UsingDeclaration.h"
 
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"

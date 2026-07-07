@@ -2,9 +2,9 @@
 // Created by jaket on 05/05/2026.
 //
 
-#include "NamedConstructor.h"
+#include "expressions/NamedConstructor.h"
 
-#include "FunctionCall.h"
+#include "expressions/FunctionCall.h"
 #include "runtime/RuntimeUtils.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"

@@ -2,11 +2,11 @@
 // Created by jaket on 16/04/2026.
 //
 
-#include "FunctionCall.h"
+#include "expressions/FunctionCall.h"
 
 #include "CompileError.h"
-#include "MethodCall.h"
-#include "ThisExpression.h"
+#include "expressions/MethodCall.h"
+#include "expressions/ThisExpression.h"
 #include "errors/AmbiguousFunctionError.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"

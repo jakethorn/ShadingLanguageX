@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-#include "Type.h"
+#include "runtime/Type.h"
 
 #include "CompileError.h"
 #include "utils/instantiate_template_types_utils.h"

@@ -2,16 +2,16 @@
 // Created by jaket on 10/04/2026.
 //
 
-#include "evaluate_mtlx.h"
+#include "mtlx/evaluate_mtlx.h"
 
 #include <cassert>
 
 #include "CompileError.h"
-#include "node_evaluators/binary_ops.h"
-#include "node_evaluators/combine.h"
-#include "node_evaluators/convert.h"
-#include "node_evaluators/extract.h"
-#include "node_evaluators/separate.h"
+#include "mtlx/node_evaluators/binary_ops.h"
+#include "mtlx/node_evaluators/combine.h"
+#include "mtlx/node_evaluators/convert.h"
+#include "mtlx/node_evaluators/extract.h"
+#include "mtlx/node_evaluators/separate.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "values/Value.h"

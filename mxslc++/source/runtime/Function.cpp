@@ -2,16 +2,16 @@
 // Created by jaket on 16/04/2026.
 //
 
-#include "Function.h"
+#include "runtime/Function.h"
 
 #include <cassert>
 
 #include "expressions/Expression.h"
 #include "statements/Statement.h"
-#include "Scope.h"
-#include "Type.h"
+#include "runtime/Scope.h"
+#include "runtime/Type.h"
 #include "CompileError.h"
-#include "Variable.h"
+#include "runtime/Variable.h"
 #include "utils/type_cast.h"
 
 Function::Function(

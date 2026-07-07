@@ -2,10 +2,10 @@
 // Created by jaket on 21/11/2025.
 //
 
-#include "Parameter.h"
+#include "runtime/Parameter.h"
 
 #include "CompileError.h"
-#include "Scope.h"
+#include "runtime/Scope.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"

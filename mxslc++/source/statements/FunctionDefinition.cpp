@@ -2,7 +2,7 @@
 // Created by jaket on 16/04/2026.
 //
 
-#include "FunctionDefinition.h"
+#include "statements/FunctionDefinition.h"
 
 #include "CompileError.h"
 #include "runtime/Function.h"

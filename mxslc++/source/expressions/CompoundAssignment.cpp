@@ -2,9 +2,9 @@
 // Created by jaket on 15/05/2026.
 //
 
-#include "CompoundAssignment.h"
+#include "expressions/CompoundAssignment.h"
 
-#include "FunctionCall.h"
+#include "expressions/FunctionCall.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/RuntimeUtils.h"
 #include "runtime/Variable.h"

@@ -2,7 +2,7 @@
 // Created by jaket on 28/05/2026.
 //
 
-#include "binary_ops.h"
+#include "mtlx/node_evaluators/binary_ops.h"
 #include "runtime/Variable.h"
 #include "values/BasicValue.h"
 #include "mtlx/mtlx_type_binary_ops.h"

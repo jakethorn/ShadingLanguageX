@@ -2,9 +2,9 @@
 // Created by jaket on 31/12/2025.
 //
 
-#include "str_utils.h"
+#include "utils/str_utils.h"
 
-#include "../../include/Token.h"
+#include "Token.h"
 #include "runtime/Type.h"
 
 string get_postfix(const string& str, const char delim)

@@ -2,9 +2,9 @@
 // Created by jaket on 05/05/2026.
 //
 
-#include "IncrementOperator.h"
+#include "expressions/IncrementOperator.h"
 
-#include "FunctionCall.h"
+#include "expressions/FunctionCall.h"
 #include "runtime/RuntimeUtils.h"
 #include "runtime/Variable.h"
 

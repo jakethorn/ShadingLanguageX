@@ -2,7 +2,7 @@
 // Created by jaket on 28/11/2025.
 //
 
-#include "VariableDefinition.h"
+#include "statements/VariableDefinition.h"
 
 #include "runtime/Scope.h"
 #include "expressions/Expression.h"

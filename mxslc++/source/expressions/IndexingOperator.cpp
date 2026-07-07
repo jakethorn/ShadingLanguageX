@@ -2,10 +2,10 @@
 // Created by jaket on 11/01/2026.
 //
 
-#include "IndexingOperator.h"
+#include "expressions/IndexingOperator.h"
 
-#include "accessors/ComponentAccessor.h"
-#include "accessors/FieldAccessor.h"
+#include "expressions/accessors/ComponentAccessor.h"
+#include "expressions/accessors/FieldAccessor.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
