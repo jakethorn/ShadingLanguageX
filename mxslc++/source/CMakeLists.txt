@@ -10,8 +10,6 @@ add_library(mxslc_lib
         decompile/decompile.cpp
         decompile/Decompiler.cpp
         runtime/Runtime.cpp
-        runtime/RuntimeAccessor.cpp
-        runtime/RuntimeUtils.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
@@ -27,6 +25,11 @@ add_library(mxslc_lib
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
         runtime/Primitive.cpp
+        runtime/utils/instantiate_template_types_utils.cpp
+        runtime/utils/RuntimeAware.cpp
+        runtime/utils/invoke_utils.cpp
+        runtime/utils/type_cast.cpp
+        runtime/utils/InitInfo.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp
@@ -63,12 +66,9 @@ add_library(mxslc_lib
         statements/ClassDefinition.cpp
         statements/ConstructorDefinition.cpp
         utils/io_utils.cpp
-        utils/str_utils.cpp
+        utils/string_utils.cpp
         utils/parse_args.cpp
-        utils/instantiate_template_types_utils.cpp
         utils/parse_utils.cpp
-        utils/type_cast.cpp
-        utils/InitInfo.cpp
         utils/ArgumentEvaluator.cpp
         mtlx/load_mtlx.cpp
         mtlx/mtlx_utils.cpp

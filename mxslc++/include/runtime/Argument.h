@@ -5,53 +5,56 @@
 #ifndef FENNEC_ARGUMENT_H
 #define FENNEC_ARGUMENT_H
 
-#include "utils/common.h"
+#include "common.h"
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
 #include "primitive_t.h"
 
-class Parameter;
-
-class Argument
+namespace mxslc::runtime
 {
-public:
-    Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, size_t index);
-    Argument(ModifierList mods, string name, ExprPtr expr, size_t index);
-    Argument(ModifierList mods, ExprPtr expr, size_t index);
-    Argument(string name, ExprPtr expr, size_t index);
-    Argument(ExprPtr expr, size_t index);
-    Argument(VarPtr value, size_t index);
-    Argument(primitive_t value, size_t index);
+    class Parameter;
 
-    Argument(Argument&& other) noexcept;
+    class Argument
+    {
+    public:
+        Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, size_t index);
+        Argument(ModifierList mods, string name, ExprPtr expr, size_t index);
+        Argument(ModifierList mods, ExprPtr expr, size_t index);
+        Argument(string name, ExprPtr expr, size_t index);
+        Argument(ExprPtr expr, size_t index);
+        Argument(VarPtr value, size_t index);
+        Argument(primitive_t value, size_t index);
 
-    ~Argument();
+        Argument(Argument&& other) noexcept;
 
-    const AttributeList& attributes() const { return attrs_; }
-    const ModifierList& modifiers() const { return mods_; }
-    bool has_name() const { return not name_.empty(); }
-    const string& name() const { return name_; }
-    size_t index() const { return index_; }
+        ~Argument();
 
-    Argument instantiate_template_types(const TypePtr& template_type) const;
-    void init(const TypePtr& type) const;
-    void init(const vector<TypePtr>& types) const;
-    bool try_init(const vector<TypePtr>& types) const;
-    bool is_initialized() const;
-    void update() const;
-    void reset() const;
-    const string& error_message() const;
-    TypePtr type() const;
-    VarPtr evaluate() const;
+        const AttributeList& attributes() const { return attrs_; }
+        const ModifierList& modifiers() const { return mods_; }
+        bool has_name() const { return not name_.empty(); }
+        const string& name() const { return name_; }
+        size_t index() const { return index_; }
 
-    void validate(const Parameter& param) const;
+        Argument instantiate_template_types(const TypePtr& template_type) const;
+        void init(const TypePtr& type) const;
+        void init(const vector<TypePtr>& types) const;
+        bool try_init(const vector<TypePtr>& types) const;
+        void update() const;
+        bool is_initialized() const;
+        void reset() const;
+        const string& error_message() const;
+        TypePtr type() const;
+        VarPtr evaluate() const;
 
-private:
-    AttributeList attrs_;
-    ModifierList mods_;
-    string name_;
-    ExprPtr expr_;
-    size_t index_;
-};
+        void validate(const Parameter& param) const;
+
+    private:
+        AttributeList attrs_;
+        ModifierList mods_;
+        string name_;
+        ExprPtr expr_;
+        size_t index_;
+    };
+}
 
 #endif //FENNEC_ARGUMENT_H

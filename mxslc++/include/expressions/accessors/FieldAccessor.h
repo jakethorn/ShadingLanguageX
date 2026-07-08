@@ -6,20 +6,23 @@
 #define MXSLC_FIELDACCESSOR_H
 
 #include "expressions/accessors/Accessor.h"
-#include "utils/common.h"
+#include "common.h"
 
-class FieldAccessor final : public Accessor
+namespace mxslc::expressions
 {
-public:
-    FieldAccessor(const vector<TypePtr>& types, VarPtr var, const string& property);
-    FieldAccessor(VarPtr var, int index);
+    class FieldAccessor final : public Accessor
+    {
+    public:
+        FieldAccessor(const vector<TypePtr>& types, VarPtr var, const string& property);
+        FieldAccessor(VarPtr var, int index);
 
-    TypePtr type() const override;
-    VarPtr evaluate() const override;
+        TypePtr type() const override;
+        VarPtr evaluate() const override;
 
-private:
-    VarPtr var_;
-    VarPtr field_var_;
-};
+    private:
+        VarPtr var_;
+        VarPtr field_var_;
+    };
+}
 
 #endif //MXSLC_FIELDACCESSOR_H

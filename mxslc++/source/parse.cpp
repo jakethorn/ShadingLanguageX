@@ -12,6 +12,7 @@
 #include "expressions/Identifier.h"
 #include "expressions/IncrementOperator.h"
 #include "expressions/IndexingOperator.h"
+#include "expressions/interface.h"
 #include "expressions/Literal.h"
 #include "expressions/MethodCall.h"
 #include "expressions/NamedConstructor.h"
@@ -24,6 +25,7 @@
 #include "runtime/ParameterList.h"
 #include "runtime/Field.h"
 #include "runtime/Attribute.h"
+#include "runtime/interface.h"
 #include "statements/BlockStatement.h"
 #include "statements/ClassDefinition.h"
 #include "statements/ConstructorDefinition.h"
@@ -32,826 +34,837 @@
 #include "statements/ForEachLoop.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/IfStatement.h"
+#include "statements/interface.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
 #include "statements/VariableDefinition.h"
 #include "statements/UsingDeclaration.h"
 #include "statements/VariableAssignment.h"
 
-vector<StmtPtr> parse(vector<Token> tokens)
+namespace mxslc
 {
-    return Parser{std::move(tokens)}.parse();
-}
-
-Parser::Parser(vector<Token> tokens) : TokenReader{std::move(tokens)}
-{
-    // Newlines are removed by the preprocess step
-    // Ignore them in case the preprocess step is skipped
-    ignore(TokenType::Newline);
-}
-
-vector<StmtPtr> Parser::parse()
-{
-    Token debug_info;
-    try
+    vector<StmtPtr> parse(vector<Token> tokens)
     {
-        vector<StmtPtr> statements;
-        while (not empty())
+        return Parser{std::move(tokens)}.parse();
+    }
+
+    Parser::Parser(vector<Token> tokens) : TokenReader{std::move(tokens)}
+    {
+        ignore(TokenType::Newline);
+    }
+
+    vector<StmtPtr> Parser::parse()
+    {
+        Token debug_info;
+        try
         {
-            debug_info = peek();
+            vector<StmtPtr> statements;
+            while (not empty())
+            {
+                debug_info = peek();
 
-            if (consume(TokenType::Break))
-                match(';');
+                if (consume(TokenType::Break))
+                    match(';');
 
-            statements.push_back(statement());
+                statements.push_back(statement());
+            }
+
+            return statements;
         }
-
-        return statements;
-    }
-    catch (CompileError& e)
-    {
-        e.set_debug_info(debug_info);
-        throw;
-    }
-}
-
-StmtPtr Parser::statement()
-{
-    AttributeList attrs = attributes();
-    StmtPtr stmt = bare_statement();
-    stmt->set_attributes(std::move(attrs));
-    return stmt;
-}
-
-StmtPtr Parser::bare_statement()
-{
-    if (peek() == "@@"s)
-    {
-        return document_attribute();
-    }
-
-    if (peek() == TokenType::Print)
-    {
-        return print_statement();
-    }
-
-    if (peek() == TokenType::Class)
-    {
-        return class_definition();
-    }
-
-    if (peek() == TokenType::Using)
-    {
-        return using_declaration();
-    }
-
-    if (peek() == TokenType::For)
-    {
-        return for_loop();
-    }
-
-    if (peek() == TokenType::If)
-    {
-        return if_statement();
-    }
-
-    ModifierList mods = modifiers();
-
-    if (is_typed_definition())
-    {
-        TypePtr type_ = type();
-
-        if (peek(1) == '=' or peek(1) == ';')
+        catch (CompileError& e)
         {
-            return variable_definition(std::move(mods), std::move(type_));
-        }
-        if (peek(1) == ',')
-        {
-            return multi_variable_definition(std::move(mods), std::move(type_));
-        }
-        if (peek(1) == '<' or peek(1) == '(' or peek(1) == TokenType::FatArrow)
-        {
-            return function_definition(std::move(mods), std::move(type_));
+            e.set_debug_info(debug_info);
+            throw;
         }
     }
 
-    mods.validate();
-
-    ExprPtr expr = expression();
-
-    if (peek() == '=')
+    StmtPtr Parser::statement()
     {
-        return variable_assignment(std::move(expr));
+        AttributeList attrs = attributes();
+        StmtPtr stmt = bare_statement();
+        stmt->set_attributes(std::move(attrs));
+        return stmt;
     }
 
-    if (peek() == ';')
+    StmtPtr Parser::bare_statement()
     {
-        return expression_statement(std::move(expr));
-    }
-
-    throw CompileError{peek(), "Invalid statement"s};
-}
-
-StmtPtr Parser::print_statement()
-{
-    Token token = match(TokenType::Print);
-
-    vector<ExprPtr> exprs;
-    do
-    {
-        exprs.push_back(expression());
-    }
-    while (consume(',') and peek() != ';');
-    match(';');
-
-    return std::make_unique<PrintStatement>(std::move(token), std::move(exprs));
-}
-
-StmtPtr Parser::variable_definition(ModifierList mods, TypePtr type)
-{
-    Token name = match(TokenType::Identifier);
-    ExprPtr expr = consume('=') ? expression() : nullptr;
-    match(';');
-
-    return std::make_unique<VariableDefinition>(
-        std::move(mods),
-        std::move(type),
-        string{name.lexeme()},
-        std::move(expr),
-        std::move(name)
-    );
-}
-
-StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
-{
-    vector<Field> fields;
-    Token name = match(TokenType::Identifier);
-    Token token{name};
-    fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
-    while (consume(','))
-    {
-        if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '=' or peek(1) == ';'))
+        if (peek() == "@@"s)
         {
-            name = match(TokenType::Identifier);
-            fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), /*can_be_global*/true);
+            return document_attribute();
         }
-        else
+
+        if (peek() == TokenType::Print)
         {
-            mods = modifiers();
-            type_ = type();
-            name = match(TokenType::Identifier);
-            fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
+            return print_statement();
         }
-    }
 
-    ExprPtr expr = consume('=') ? expression() : nullptr;
-    match(';');
+        if (peek() == TokenType::Class)
+        {
+            return class_definition();
+        }
 
-    return std::make_unique<MultiVariableDefinition>(
-        std::make_unique<Type>(std::move(fields)),
-        std::move(expr),
-        std::move(token)
-    );
-}
+        if (peek() == TokenType::Using)
+        {
+            return using_declaration();
+        }
 
-StmtPtr Parser::variable_assignment(ExprPtr lhs)
-{
-    Token token = match('=');
-    ExprPtr rhs;
-    if (peek() == TokenType::If)
-        rhs = if_expression(lhs);
-    else
-        rhs = expression();
-    match(';');
-    return std::make_unique<VariableAssignment>(std::move(token), std::move(lhs), std::move(rhs));
-}
+        if (peek() == TokenType::For)
+        {
+            return for_loop();
+        }
 
-StmtPtr Parser::function_definition(ModifierList mods, TypePtr type)
-{
-    Token name = match(TokenType::Identifier);
-    vector<TypePtr> template_types = template_list();
-
-    optional<ParameterList> params = optional_list<Parameter, ParameterList>('(', ')', [this](const size_t i){ return parameter(i); });
-    if (not params)
-        match(TokenType::FatArrow);
-
-    auto [body, return_expr] = function_body();
-
-    return std::make_unique<FunctionDefinition>(
-        std::move(mods),
-        std::move(type),
-        string{name.lexeme()},
-        std::move(template_types),
-        std::move(params),
-        std::move(body),
-        std::move(return_expr),
-        std::move(name)
-    );
-}
-
-StmtPtr Parser::class_definition()
-{
-    Token token = match(TokenType::Class);
-    string name = match(TokenType::Identifier).lexeme();
-    vector<TypePtr> template_types = template_list();
-    TypePtr parent = consume(':') ? type() : nullptr;
-
-    match('{');
-    vector<StmtPtr> body;
-    while (not consume('}'))
-    {
-        if (is_constructor_definition())
-            body.push_back(constructor_definition());
-        else
-            body.push_back(statement());
-    }
-
-    consume(';');
-    return std::make_unique<ClassDefinition>(std::move(name), std::move(template_types), std::move(parent), std::move(body), std::move(token));
-}
-
-StmtPtr Parser::constructor_definition()
-{
-    ModifierList mods = modifiers();
-    Token class_name = match(TokenType::Identifier);
-    ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
-    StmtPtr body = block_statement();
-    return std::make_unique<ConstructorDefinition>(
-        std::move(mods),
-        string{class_name.lexeme()},
-        std::move(params),
-        std::move(body),
-        std::move(class_name)
-    );
-}
-
-StmtPtr Parser::using_declaration()
-{
-    Token token = match(TokenType::Using);
-    Token name = match(TokenType::Identifier);
-    match('=');
-    TypePtr type_ = type();
-    match(';');
-    return std::make_unique<UsingDeclaration>(std::move(token), name.lexeme(), std::move(type_));
-}
-
-StmtPtr Parser::for_loop()
-{
-    Token token = match(TokenType::For);
-    match('(');
-    ModifierList mods = modifiers();
-    TypePtr type_ = type();
-    Token name = match(TokenType::Identifier);
-    match(TokenType::From);
-    ExprPtr range_expr = expression();
-    match(')');
-    StmtPtr body = block_statement();
-    return std::make_unique<ForEachLoop>(std::move(token), std::move(mods), std::move(type_), name.lexeme(), std::move(range_expr), std::move(body));
-}
-
-StmtPtr Parser::expression_statement(ExprPtr expr)
-{
-    match(';');
-    return std::make_unique<ExpressionStatement>(std::move(expr));
-}
-
-StmtPtr Parser::block_statement()
-{
-    vector<StmtPtr> body;
-
-    Token token = match('{');
-    while (not consume('}'))
-        body.push_back(statement());
-
-    return std::make_unique<BlockStatement>(std::move(token), std::move(body));
-}
-
-StmtPtr Parser::if_statement()
-{
-    Token token = match(TokenType::If);
-    match('(');
-    ExprPtr cond_expr = expression();
-    match(')');
-    StmtPtr then_block = block_statement();
-
-    StmtPtr else_block = nullptr;
-    if (consume(TokenType::Else))
-    {
         if (peek() == TokenType::If)
         {
-            else_block = if_statement();
+            return if_statement();
         }
-        else
+
+        ModifierList mods = modifiers();
+
+        if (is_typed_definition())
         {
-            else_block = block_statement();
-        }
-    }
+            TypePtr type_ = type();
 
-    return std::make_unique<IfStatement>(std::move(token), std::move(cond_expr), std::move(then_block), std::move(else_block));
-}
-
-StmtPtr Parser::document_attribute()
-{
-    Token token = match("@@"s);
-    Attribute attr = attribute();
-    return std::make_unique<DocumentAttribute>(std::move(token), std::move(attr));
-}
-
-Attribute Parser::attribute()
-{
-    string child = ""s;
-    if (peek(1) == '.')
-    {
-        child = match_identifier_or_keyword().lexeme();
-        match('.');
-    }
-    string name = match_identifier_or_keyword().lexeme();
-    string value = std::get<string>(match(TokenType::String).literal());
-    return Attribute{std::move(child), std::move(name), std::move(value)};
-}
-
-AttributeList Parser::attributes()
-{
-    vector<Attribute> result;
-    while (consume('@'))
-        result.push_back(attribute());
-    return AttributeList{result};
-}
-
-ModifierList Parser::modifiers()
-{
-    const vector<Token> mod_tokens = consume_while(
-        TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Ref, TokenType::Out
-    );
-
-    return ModifierList{mod_tokens};
-}
-
-TypePtr Parser::type()
-{
-    if (const optional<Token> type = consume(TokenType::Identifier))
-        return std::make_shared<Type>(type ? type->lexeme() : "");
-
-    vector<Field> fields = list<Field>('{', '}', [this](const size_t){ return field(); });
-    return std::make_shared<Type>(std::move(fields));
-}
-
-Field Parser::field()
-{
-    ModifierList mods = modifiers();
-    TypePtr type_ = type();
-    const optional<Token> name = consume(TokenType::Identifier);
-    return Field{std::move(mods), std::move(type_), name ? name->lexeme() : ""};
-}
-
-Parameter Parser::parameter(const size_t index)
-{
-    AttributeList attrs = attributes();
-    ModifierList mods = modifiers();
-    TypePtr type_ = type();
-    const Token name = match(TokenType::Identifier);
-    ExprPtr expr = consume('=') ? expression() : nullptr;
-    return Parameter{std::move(attrs), std::move(mods), std::move(type_), name.lexeme(), std::move(expr), index};
-}
-
-vector<TypePtr> Parser::template_list()
-{
-    if (peek() != '<')
-        return {};
-    return list<TypePtr>('<', '>', [this](const size_t){ return type(); });
-}
-
-tuple<StmtPtr, ExprPtr> Parser::function_body()
-{
-    vector<StmtPtr> body;
-    ExprPtr return_expr;
-    
-    Token token = match('{');
-    while (peek() != '}' and peek() != "return"s)
-        body.push_back(statement());
-    
-    if (consume("return"s))
-    {
-        return_expr = expression();
-        match(';');
-    }
-
-    // ignore statements after return
-    while (not consume('}'))
-        statement();
-
-    return {std::make_unique<BlockStatement>(std::move(token), std::move(body)), std::move(return_expr)};
-}
-
-ExprPtr Parser::expression()
-{
-    return logical();
-}
-
-ExprPtr Parser::logical()
-{
-    ExprPtr expr = equality();
-
-    const vector<TokenType> ops = in_abs_ ? vector<TokenType>{'&'} : vector<TokenType>{'&', '|'};
-    while (optional<Token> op = consume(ops))
-    {
-        ExprPtr right = equality();
-        expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
-    }
-
-    return expr;
-}
-
-ExprPtr Parser::equality()
-{
-    ExprPtr expr = relational();
-    while (optional<Token> op = consume("=="s, "!="s))
-    {
-        ExprPtr right = relational();
-        expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
-    }
-
-    return expr;
-}
-
-ExprPtr Parser::relational()
-{
-    ExprPtr left = range();
-    optional<Token> op1;
-    ExprPtr middle;
-    optional<Token> op2;
-    ExprPtr right;
-
-    if ((op1 = consume('>', ">="s, '<', "<="s)))
-        middle = range();
-    if ((op2 = consume('>', ">="s, '<', "<="s)))
-        right = range();
-
-    if (right)
-        return ExpressionFactory::ternary_relational(std::move(left), std::move(*op1), std::move(middle), std::move(*op2), std::move(right));
-    if (middle)
-        return ExpressionFactory::binary(std::move(left), std::move(*op1), std::move(middle));
-    return left;
-}
-
-ExprPtr Parser::range()
-{
-    ExprPtr expr1 = term();
-    if (optional<Token> to = consume(TokenType::To))
-    {
-        ExprPtr expr2 = term();
-        return std::make_unique<RangeExpression>(std::move(expr1), std::move(expr2), std::move(*to));
-    }
-    else if (optional<Token> colon = consume(':'))
-    {
-        ExprPtr expr2 = term();
-        if (consume(':'))
-        {
-            ExprPtr expr3 = term();
-            return std::make_unique<RangeExpression>(std::move(expr1), std::move(expr2), std::move(expr3), std::move(*colon));
-        }
-        else
-        {
-            return std::make_unique<RangeExpression>(std::move(expr1), std::move(expr2), std::move(*colon));
-        }
-    }
-    else
-    {
-        return expr1;
-    }
-}
-
-ExprPtr Parser::term()
-{
-    ExprPtr expr = factor();
-    while (optional<Token> op = consume('+', '-'))
-    {
-        ExprPtr right = factor();
-        expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
-    }
-
-    return expr;
-}
-
-ExprPtr Parser::factor()
-{
-    ExprPtr expr = exponent();
-    while (optional<Token> op = consume('*', '/', '%'))
-    {
-        ExprPtr right = exponent();
-        expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
-    }
-
-    return expr;
-}
-
-ExprPtr Parser::exponent()
-{
-    ExprPtr expr = unary();
-    while (optional<Token> op = consume('^'))
-    {
-        ExprPtr right = unary();
-        expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
-    }
-
-    return expr;
-}
-
-ExprPtr Parser::unary()
-{
-    if (optional<Token> op = consume('!', '+', '-'))
-        return ExpressionFactory::unary(std::move(*op), compound());
-    return compound();
-}
-
-ExprPtr Parser::compound()
-{
-    ExprPtr lhs = increment();
-    if (optional<Token> op = consume("+="s, "-="s, "*="s, "/="s, "%="s, "^="s, "&="s, "|="s))
-    {
-        ExprPtr rhs = expression();
-        return std::make_unique<CompoundAssignment>(std::move(lhs), std::move(*op), std::move(rhs));
-    }
-    else
-    {
-        return lhs;
-    }
-}
-
-ExprPtr Parser::increment()
-{
-    optional<Token> op = consume("++"s, "--"s);
-    bool prefix = op.has_value();
-
-    ExprPtr expr = property();
-
-    if (not op.has_value())
-        op = consume("++"s, "--"s);
-
-    if (op.has_value())
-        return std::make_unique<IncrementOperator>(std::move(expr), std::move(op.value()), prefix);
-    else
-        return expr;
-}
-
-ExprPtr Parser::property()
-{
-    ExprPtr expr = primary();
-    optional<Token> next;
-    while ((next = consume('[', '.')))
-    {
-        if (next == '[')
-        {
-            ExprPtr index = expression();
-            expr = std::make_unique<IndexingOperator>(std::move(expr), std::move(index));
-            match(']');
-        }
-        else
-        {
-            if (is_function_call())
+            if (peek(1) == '=' or peek(1) == ';')
             {
-                expr = method_call(std::move(expr));
+                return variable_definition(std::move(mods), std::move(type_));
+            }
+            if (peek(1) == ',')
+            {
+                return multi_variable_definition(std::move(mods), std::move(type_));
+            }
+            if (peek(1) == '<' or peek(1) == '(' or peek(1) == TokenType::FatArrow)
+            {
+                return function_definition(std::move(mods), std::move(type_));
+            }
+        }
+
+        mods.validate();
+
+        ExprPtr expr = expression();
+
+        if (peek() == '=')
+        {
+            return variable_assignment(std::move(expr));
+        }
+
+        if (peek() == ';')
+        {
+            return expression_statement(std::move(expr));
+        }
+
+        throw CompileError{peek(), "Invalid statement"};
+    }
+
+    StmtPtr Parser::print_statement()
+    {
+        Token token = match(TokenType::Print);
+
+        vector<ExprPtr> exprs;
+        do
+        {
+            exprs.push_back(expression());
+        }
+        while (consume(',') and peek() != ';');
+        match(';');
+
+        return create_statement<PrintStatement>(std::move(token), std::move(exprs));
+    }
+
+    StmtPtr Parser::variable_definition(ModifierList mods, TypePtr type)
+    {
+        Token name = match(TokenType::Identifier);
+        ExprPtr expr = consume('=') ? expression() : nullptr;
+        match(';');
+
+        return create_statement<VariableDefinition>(
+            std::move(mods),
+            std::move(type),
+            string{name.lexeme()},
+            std::move(expr),
+            std::move(name)
+        );
+    }
+
+    StmtPtr Parser::multi_variable_definition(ModifierList mods, TypePtr type_)
+    {
+        vector<Field> fields;
+        Token name = match(TokenType::Identifier);
+        Token token{name};
+        fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
+        while (consume(','))
+        {
+            if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '=' or peek(1) == ';'))
+            {
+                name = match(TokenType::Identifier);
+                fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), /*can_be_global*/true);
             }
             else
             {
-                Token name = match(TokenType::Identifier);
-                expr = std::make_unique<DotOperator>(std::move(expr), std::move(name));
+                mods = modifiers();
+                type_ = type();
+                name = match(TokenType::Identifier);
+                fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
             }
         }
+
+        ExprPtr expr = consume('=') ? expression() : nullptr;
+        match(';');
+
+        return create_statement<MultiVariableDefinition>(
+            create_type(std::move(fields)),
+            std::move(expr),
+            std::move(token)
+        );
     }
 
-    return expr;
-}
-
-ExprPtr Parser::primary()
-{
-    if (optional<Token> literal = consume(TokenType::Bool, TokenType::Int, TokenType::Float, TokenType::String))
+    StmtPtr Parser::variable_assignment(ExprPtr lhs)
     {
-        return std::make_unique<Literal>(std::move(*literal));
+        Token token = match('=');
+        ExprPtr rhs;
+        if (peek() == TokenType::If)
+            rhs = if_expression(lhs);
+        else
+            rhs = expression();
+        match(';');
+
+        return create_statement<VariableAssignment>(std::move(token), std::move(lhs), std::move(rhs));
     }
 
-    if (consume('('))
+    StmtPtr Parser::function_definition(ModifierList mods, TypePtr type)
     {
-        ExprPtr expr = expression();
+        Token name = match(TokenType::Identifier);
+        vector<TypePtr> template_types = template_list();
+
+        optional<ParameterList> params = optional_list<Parameter, ParameterList>('(', ')', [this](const size_t i){ return parameter(i); });
+        if (not params)
+            match(TokenType::FatArrow);
+
+        auto [body, return_expr] = function_body();
+
+        return create_statement<FunctionDefinition>(
+            std::move(mods),
+            std::move(type),
+            string{name.lexeme()},
+            std::move(template_types),
+            std::move(params),
+            std::move(body),
+            std::move(return_expr),
+            std::move(name)
+        );
+    }
+
+    StmtPtr Parser::class_definition()
+    {
+        Token token = match(TokenType::Class);
+        string name = match(TokenType::Identifier).lexeme();
+        vector<TypePtr> template_types = template_list();
+        TypePtr parent = consume(':') ? type() : nullptr;
+
+        match('{');
+        vector<StmtPtr> body;
+        while (not consume('}'))
+        {
+            if (is_constructor_definition())
+                body.push_back(constructor_definition());
+            else
+                body.push_back(statement());
+        }
+        consume(';');
+
+        return create_statement<ClassDefinition>(std::move(name), std::move(template_types), std::move(parent), std::move(body), std::move(token));
+    }
+
+    StmtPtr Parser::constructor_definition()
+    {
+        ModifierList mods = modifiers();
+        Token class_name = match(TokenType::Identifier);
+        ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
+        StmtPtr body = block_statement();
+
+        return create_statement<ConstructorDefinition>(
+            std::move(mods),
+            string{class_name.lexeme()},
+            std::move(params),
+            std::move(body),
+            std::move(class_name)
+        );
+    }
+
+    StmtPtr Parser::using_declaration()
+    {
+        Token token = match(TokenType::Using);
+        string name = match(TokenType::Identifier).lexeme();
+        match('=');
+        TypePtr type_ = type();
+        match(';');
+
+        return create_statement<UsingDeclaration>(std::move(token), std::move(name), std::move(type_));
+    }
+
+    StmtPtr Parser::for_loop()
+    {
+        Token token = match(TokenType::For);
+        match('(');
+        ModifierList mods = modifiers();
+        TypePtr type_ = type();
+        string name = match(TokenType::Identifier).lexeme();
+        match(TokenType::From);
+        ExprPtr range_expr = expression();
         match(')');
+        StmtPtr body = block_statement();
+
+        return create_statement<ForEachLoop>(std::move(token), std::move(mods), std::move(type_), std::move(name), std::move(range_expr), std::move(body));
+    }
+
+    StmtPtr Parser::expression_statement(ExprPtr expr)
+    {
+        match(';');
+        return create_statement<ExpressionStatement>(std::move(expr));
+    }
+
+    StmtPtr Parser::block_statement()
+    {
+        Token token = match('{');
+        vector<StmtPtr> body;
+        while (not consume('}'))
+            body.push_back(statement());
+
+        return create_statement<BlockStatement>(std::move(token), std::move(body));
+    }
+
+    StmtPtr Parser::if_statement()
+    {
+        Token token = match(TokenType::If);
+        match('(');
+        ExprPtr cond_expr = expression();
+        match(')');
+        StmtPtr then_block = block_statement();
+
+        StmtPtr else_block = nullptr;
+        if (consume(TokenType::Else))
+        {
+            if (peek() == TokenType::If)
+            {
+                else_block = if_statement();
+            }
+            else
+            {
+                else_block = block_statement();
+            }
+        }
+
+        return create_statement<IfStatement>(std::move(token), std::move(cond_expr), std::move(then_block), std::move(else_block));
+    }
+
+    StmtPtr Parser::document_attribute()
+    {
+        Token token = match("@@"s);
+        Attribute attr = attribute();
+        return create_statement<DocumentAttribute>(std::move(token), std::move(attr));
+    }
+
+    Attribute Parser::attribute()
+    {
+        string child;
+        if (peek(1) == '.')
+        {
+            child = match_identifier_or_keyword().lexeme();
+            match('.');
+        }
+        string name = match_identifier_or_keyword().lexeme();
+        string value = match(TokenType::String).literal<string>();
+        return Attribute{std::move(child), std::move(name), std::move(value)};
+    }
+
+    AttributeList Parser::attributes()
+    {
+        vector<Attribute> result;
+        while (consume('@'))
+            result.push_back(attribute());
+        return AttributeList{result};
+    }
+
+    ModifierList Parser::modifiers()
+    {
+        const vector<Token> mod_tokens = consume_while(
+            TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Inline, TokenType::Default, TokenType::Ref, TokenType::Out
+        );
+
+        return ModifierList{mod_tokens};
+    }
+
+    TypePtr Parser::type()
+    {
+        if (const optional<Token> type = consume(TokenType::Identifier))
+            return create_type(type->lexeme());
+
+        vector<Field> fields = list<Field>('{', '}', [this](const size_t){ return field(); });
+        return create_type(std::move(fields));
+    }
+
+    Field Parser::field()
+    {
+        ModifierList mods = modifiers();
+        TypePtr type_ = type();
+        const optional<Token> name = consume(TokenType::Identifier);
+        return Field{std::move(mods), std::move(type_), name ? name->lexeme() : ""};
+    }
+
+    Parameter Parser::parameter(const size_t index)
+    {
+        AttributeList attrs = attributes();
+        ModifierList mods = modifiers();
+        TypePtr type_ = type();
+        string name = match(TokenType::Identifier).lexeme();
+        ExprPtr expr = consume('=') ? expression() : nullptr;
+        return Parameter{std::move(attrs), std::move(mods), std::move(type_), std::move(name), std::move(expr), index};
+    }
+
+    vector<TypePtr> Parser::template_list()
+    {
+        if (peek() == '<')
+            return list<TypePtr>('<', '>', [this](const size_t){ return type(); });
+        return {};
+    }
+
+    std::tuple<StmtPtr, ExprPtr> Parser::function_body()
+    {
+        vector<StmtPtr> body;
+        ExprPtr return_expr;
+
+        Token token = match('{');
+        while (peek() != '}' and peek() != TokenType::Return)
+            body.push_back(statement());
+
+        if (consume(TokenType::Return))
+        {
+            return_expr = expression();
+            match(';');
+        }
+
+        // discard statements after return
+        while (not consume('}'))
+            statement();
+
+        return {
+            create_statement<BlockStatement>(std::move(token), std::move(body)),
+            std::move(return_expr)
+        };
+    }
+
+    ExprPtr Parser::expression()
+    {
+        return logical();
+    }
+
+    ExprPtr Parser::logical()
+    {
+        ExprPtr expr = equality();
+
+        const vector<TokenType> ops = in_abs_ ? vector<TokenType>{'&'} : vector<TokenType>{'&', '|'};
+        while (optional<Token> op = consume(ops))
+        {
+            ExprPtr right = equality();
+            expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
+        }
+
         return expr;
     }
 
-    if (optional<Token> token = consume('|'))
+    ExprPtr Parser::equality()
     {
-        in_abs_ = true;
-        ExprPtr expr = expression();
-        match('|');
-        in_abs_ = false;
-        return ExpressionFactory::absolute_value(std::move(expr), std::move(*token));
-    }
+        ExprPtr expr = relational();
 
-    if (peek() == TokenType::This)
-    {
-        Token token = match(TokenType::This);
-        return std::make_unique<ThisExpression>(std::move(token));
-    }
-
-    if (peek() == TokenType::Identifier)
-    {
-        if (is_function_call())
+        while (optional<Token> op = consume("=="s, "!="s))
         {
-            return function_call();
+            ExprPtr right = relational();
+            expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
         }
 
-        if (peek(1) == '{')
+        return expr;
+    }
+
+    ExprPtr Parser::relational()
+    {
+        ExprPtr left = range();
+        ExprPtr middle;
+        ExprPtr right;
+
+        optional<Token> op1 = consume('>', ">="s, '<', "<="s);
+        if (op1)
+            middle = range();
+
+        optional<Token> op2 = consume('>', ">="s, '<', "<="s);
+        if (op2)
+            right = range();
+
+        if (right)
+            return ExpressionFactory::ternary_relational(std::move(left), std::move(*op1), std::move(middle), std::move(*op2), std::move(right));
+        if (middle)
+            return ExpressionFactory::binary(std::move(left), std::move(*op1), std::move(middle));
+        return left;
+    }
+
+    ExprPtr Parser::range()
+    {
+        ExprPtr expr1 = term();
+
+        if (optional<Token> to = consume(TokenType::To))
         {
-            return named_constructor();
+            ExprPtr expr2 = term();
+            return create_expression<RangeExpression>(std::move(expr1), std::move(expr2), std::move(*to));
         }
 
-        Token name = match(TokenType::Identifier);
-        return std::make_unique<Identifier>(std::move(name));
+        if (optional<Token> colon = consume(':'))
+        {
+            ExprPtr expr2 = term();
+            if (consume(':'))
+            {
+                ExprPtr expr3 = term();
+                return create_expression<RangeExpression>(std::move(expr1), std::move(expr2), std::move(expr3), std::move(*colon));
+            }
+            else
+            {
+                return create_expression<RangeExpression>(std::move(expr1), std::move(expr2), std::move(*colon));
+            }
+        }
+
+        return expr1;
     }
 
-    if (peek() == '{')
+    ExprPtr Parser::term()
     {
-        return unnamed_constructor();
+        ExprPtr expr = factor();
+
+        while (optional<Token> op = consume('+', '-'))
+        {
+            ExprPtr right = factor();
+            expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
+        }
+
+        return expr;
     }
 
-    if (peek() == TokenType::If)
+    ExprPtr Parser::factor()
     {
-        return if_expression();
+        ExprPtr expr = exponent();
+
+        while (optional<Token> op = consume('*', '/', '%'))
+        {
+            ExprPtr right = exponent();
+            expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
+        }
+
+        return expr;
     }
 
-    if (peek() == TokenType::Typeof)
+    ExprPtr Parser::exponent()
     {
-        return typeof_operator();
+        ExprPtr expr = unary();
+
+        while (optional<Token> op = consume('^'))
+        {
+            ExprPtr right = unary();
+            expr = ExpressionFactory::binary(std::move(expr), std::move(*op), std::move(right));
+        }
+
+        return expr;
     }
 
-    throw CompileError{peek(), "Invalid expression"};
-}
-
-ExprPtr Parser::if_expression(ExprPtr else_expr)
-{
-    Token token = match(TokenType::If);
-    match('(');
-    ExprPtr cond_expr = expression();
-    match(')');
-    match('{');
-    ExprPtr then_expr = expression();
-    match('}');
-    if (consume(TokenType::Else))
+    ExprPtr Parser::unary()
     {
+        if (optional<Token> op = consume('!', '+', '-'))
+            return ExpressionFactory::unary(std::move(*op), compound());
+        return compound();
+    }
+
+    ExprPtr Parser::compound()
+    {
+        ExprPtr lhs = increment();
+
+        if (optional<Token> op = consume("+="s, "-="s, "*="s, "/="s, "%="s, "^="s, "&="s, "|="s))
+        {
+            ExprPtr rhs = expression();
+            return create_expression<CompoundAssignment>(std::move(lhs), std::move(*op), std::move(rhs));
+        }
+
+        return lhs;
+    }
+
+    ExprPtr Parser::increment()
+    {
+        optional<Token> op = consume("++"s, "--"s);
+        bool prefix = op.has_value();
+
+        ExprPtr expr = property();
+
+        if (not op)
+            op = consume("++"s, "--"s);
+
+        if (op)
+            return create_expression<IncrementOperator>(std::move(expr), std::move(op.value()), prefix);
+        else
+            return expr;
+    }
+
+    ExprPtr Parser::property()
+    {
+        ExprPtr expr = primary();
+        optional<Token> next;
+        while ((next = consume('[', '.')))
+        {
+            if (next == '[')
+            {
+                ExprPtr index = expression();
+                expr = create_expression<IndexingOperator>(std::move(expr), std::move(index));
+                match(']');
+            }
+            else
+            {
+                if (is_function_call())
+                {
+                    expr = method_call(std::move(expr));
+                }
+                else
+                {
+                    Token name = match(TokenType::Identifier);
+                    expr = create_expression<DotOperator>(std::move(expr), std::move(name));
+                }
+            }
+        }
+
+        return expr;
+    }
+
+    ExprPtr Parser::primary()
+    {
+        if (optional<Token> literal = consume(TokenType::Bool, TokenType::Int, TokenType::Float, TokenType::String))
+        {
+            return create_expression<Literal>(std::move(*literal));
+        }
+
+        if (consume('('))
+        {
+            ExprPtr expr = expression();
+            match(')');
+            return expr;
+        }
+
+        if (optional<Token> token = consume('|'))
+        {
+            in_abs_ = true;
+            ExprPtr expr = expression();
+            match('|');
+            in_abs_ = false;
+            return ExpressionFactory::absolute(std::move(expr), std::move(*token));
+        }
+
+        if (peek() == TokenType::This)
+        {
+            Token token = match(TokenType::This);
+            return create_expression<ThisExpression>(std::move(token));
+        }
+
+        if (peek() == TokenType::Identifier)
+        {
+            if (is_function_call())
+            {
+                return function_call();
+            }
+
+            if (peek(1) == '{')
+            {
+                return named_constructor();
+            }
+
+            Token name = match(TokenType::Identifier);
+            return create_expression<Identifier>(std::move(name));
+        }
+
+        if (peek() == '{')
+        {
+            return unnamed_constructor();
+        }
+
         if (peek() == TokenType::If)
         {
-            else_expr = if_expression(else_expr);
+            return if_expression();
+        }
+
+        if (peek() == TokenType::Typeof)
+        {
+            return typeof_operator();
+        }
+
+        throw CompileError{peek(), "Invalid expression"};
+    }
+
+    ExprPtr Parser::if_expression(ExprPtr else_expr)
+    {
+        Token token = match(TokenType::If);
+        match('(');
+        ExprPtr cond_expr = expression();
+        match(')');
+        match('{');
+        ExprPtr then_expr = expression();
+        match('}');
+        if (consume(TokenType::Else))
+        {
+            if (peek() == TokenType::If)
+            {
+                else_expr = if_expression(else_expr);
+            }
+            else
+            {
+                match('{');
+                else_expr = expression();
+                match('}');
+            }
+        }
+
+        if (else_expr == nullptr)
+            throw CompileError{peek(), "Missing else branch in if-expression"};
+
+        return ExpressionFactory::if_expression(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
+    }
+
+    ExprPtr Parser::function_call()
+    {
+        Token name = match(TokenType::Identifier);
+        TypePtr template_type = nullptr;
+        if (consume('<'))
+        {
+            template_type = type();
+            match('>');
+        }
+        optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
+        return create_expression<FunctionCall>(string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
+    }
+
+    ExprPtr Parser::method_call(ExprPtr instance)
+    {
+        Token name = match(TokenType::Identifier);
+        TypePtr template_type = nullptr;
+        if (consume('<'))
+        {
+            template_type = type();
+            match('>');
+        }
+        optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
+        return create_expression<MethodCall>(std::move(instance), string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
+    }
+
+    ExprPtr Parser::named_constructor()
+    {
+        Token type_name = match(TokenType::Identifier);
+        vector<Argument> arguments = list<Argument>('{', '}', [this](const size_t i) { return argument(i); });
+        return create_expression<NamedConstructor>(string{type_name.lexeme()}, std::move(arguments), std::move(type_name));
+    }
+
+    ExprPtr Parser::unnamed_constructor()
+    {
+        const Token& token = peek();
+        vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
+        return create_expression<UnnamedConstructor>(token, std::move(exprs));
+    }
+
+    ExprPtr Parser::variable_definition_argument(ModifierList mods)
+    {
+        TypePtr type_ = type();
+        Token name = match(TokenType::Identifier);
+        return create_expression<VariableDefinitionExpression>(std::move(mods), std::move(type_), std::move(name));
+    }
+
+    ExprPtr Parser::typeof_operator()
+    {
+        Token token = match(TokenType::Typeof);
+        match('(');
+        ExprPtr expr = expression();
+        match(')');
+        return create_expression<TypeOfOperator>(std::move(expr), std::move(token));
+    }
+
+    Argument Parser::argument(const size_t i)
+    {
+        AttributeList attrs = attributes();
+
+        string name;
+        if (peek(1) == '=')
+        {
+            name = match(TokenType::Identifier).lexeme();
+            match('=');
+        }
+
+        const ModifierList mods = modifiers();
+
+        ExprPtr expr;
+        if (is_typed_definition())
+        {
+            mods.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
+            expr = variable_definition_argument(mods.without(TokenType::Out));
         }
         else
         {
-            match('{');
-            else_expr = expression();
-            match('}');
+            mods.validate(TokenType::Ref, TokenType::Out);
+            expr = expression();
         }
+
+        return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
     }
 
-    if (else_expr == nullptr)
-        throw CompileError{peek(), "Missing else branch in if-expression"s};
-
-    return ExpressionFactory::if_expression(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
-}
-
-ExprPtr Parser::function_call()
-{
-    Token name = match(TokenType::Identifier);
-    TypePtr template_type = nullptr;
-    if (consume('<'))
+    bool Parser::is_typed_definition() const
     {
-        template_type = type();
-        match('>');
-    }
-    optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
-    return std::make_unique<FunctionCall>(string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
-}
+        // consume modifiers before calling this function
 
-ExprPtr Parser::method_call(ExprPtr instance)
-{
-    Token name = match(TokenType::Identifier);
-    TypePtr template_type = nullptr;
-    if (consume('<'))
-    {
-        template_type = type();
-        match('>');
-    }
-    optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
-    return std::make_unique<MethodCall>(std::move(instance), string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
-}
-
-ExprPtr Parser::named_constructor()
-{
-    Token type_name = match(TokenType::Identifier);
-    vector<Argument> arguments = list<Argument>('{', '}', [this](const size_t i) { return argument(i); });
-    return std::make_unique<NamedConstructor>(string{type_name.lexeme()}, std::move(arguments), std::move(type_name));
-}
-
-ExprPtr Parser::unnamed_constructor()
-{
-    const Token& token = peek();
-    vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
-    return std::make_unique<UnnamedConstructor>(token, std::move(exprs));
-}
-
-ExprPtr Parser::variable_definition_argument(ModifierList mods)
-{
-    TypePtr type_ = type();
-    Token name = match(TokenType::Identifier);
-    return std::make_unique<VariableDefinitionExpression>(std::move(mods), std::move(type_), std::move(name));
-}
-
-ExprPtr Parser::typeof_operator()
-{
-    Token token = match(TokenType::Typeof);
-    match('(');
-    ExprPtr expr = expression();
-    match(')');
-    return std::make_unique<TypeOfOperator>(std::move(expr), std::move(token));
-}
-
-Argument Parser::argument(const size_t i)
-{
-    AttributeList attrs = attributes();
-
-    string name;
-    if (peek(1) == '=')
-    {
-        name = match(TokenType::Identifier).lexeme();
-        match('=');
-    }
-
-    const ModifierList mods = modifiers();
-
-    ExprPtr expr;
-    if (is_typed_definition())
-    {
-        mods.validate(TokenType::Const, TokenType::Mutable, TokenType::Out);
-        expr = variable_definition_argument(mods.without(TokenType::Out));
-    }
-    else
-    {
-        mods.validate(TokenType::Ref, TokenType::Out);
-        expr = expression();
-    }
-
-    return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
-}
-
-bool Parser::is_typed_definition() const
-{
-    // consume modifiers before calling this function
-
-    if (peek(0) == TokenType::Identifier and peek(1) == TokenType::Identifier)
-    {
-        return true;
-    }
-
-    if (peek(0) == '{')
-    {
-        size_t i = 1;
-        size_t count = 1;
-        while (count > 0)
+        if (peek(0) == TokenType::Identifier and peek(1) == TokenType::Identifier)
         {
-            if (peek(i) == '{')
-                count++;
-            else if (peek(i) == '}')
-                count--;
-            i++;
+            return true;
         }
 
-        return peek(i) == TokenType::Identifier;
+        if (peek(0) == '{')
+        {
+            size_t i = 1;
+            size_t count = 1;
+            while (count > 0)
+            {
+                if (peek(i) == '{')
+                    count++;
+                else if (peek(i) == '}')
+                    count--;
+                i++;
+            }
+
+            return peek(i) == TokenType::Identifier;
+        }
+
+        return false;
     }
 
-    return false;
-}
+    bool Parser::is_function_call() const
+    {
+        const bool is_func_call =
+            peek(0) == TokenType::Identifier and
+            peek(1) == '(';
 
-bool Parser::is_function_call() const
-{
-    const bool is_func_call =
-        peek(0) == TokenType::Identifier and
-        peek(1) == '(';
+        const bool is_templated_func_call =
+            peek(0) == TokenType::Identifier and
+            peek(1) == '<' and
+            peek(2) == TokenType::Identifier and
+            peek(3) == '>' and
+            peek(4) == '(';
 
-    const bool is_templated_func_call =
-        peek(0) == TokenType::Identifier and
-        peek(1) == '<' and
-        peek(2) == TokenType::Identifier and
-        peek(3) == '>' and
-        peek(4) == '(';
+        const bool is_templated_paramless_func_call =
+            peek(0) == TokenType::Identifier and
+            peek(1) == '<' and
+            peek(2) == TokenType::Identifier and
+            peek(3) == '>';
 
-    const bool is_templated_paramless_func_call =
-        peek(0) == TokenType::Identifier and
-        peek(1) == '<' and
-        peek(2) == TokenType::Identifier and
-        peek(3) == '>';
+        return is_func_call or is_templated_paramless_func_call or is_templated_func_call;
+    }
 
-    return is_func_call or is_templated_paramless_func_call or is_templated_func_call;
-}
-
-bool Parser::is_constructor_definition() const
-{
-    return
-    (peek(0) == TokenType::Identifier and peek(1) == '(') or
-    (peek(0) == TokenType::Inline and peek(1) == TokenType::Identifier and peek(2) == '(');
+    bool Parser::is_constructor_definition() const
+    {
+        return (peek(0) == TokenType::Identifier and peek(1) == '(') or
+               (peek(0) == TokenType::Inline and peek(1) == TokenType::Identifier and peek(2) == '(');
+    }
 }

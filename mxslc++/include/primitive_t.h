@@ -5,10 +5,10 @@
 #ifndef MXSLC_PRIMITIVE_T_H
 #define MXSLC_PRIMITIVE_T_H
 
-#include <filesystem>
-#include <string>
 #include <variant>
 #include <MaterialXCore/Types.h>
+
+#include "common.h"
 
 namespace mxslc
 {
@@ -16,15 +16,15 @@ namespace mxslc
         bool,
         int,
         float,
-        std::string,
-        std::filesystem::path,
-        MaterialX::Vector2,
-        MaterialX::Vector3,
-        MaterialX::Vector4,
-        MaterialX::Color3,
-        MaterialX::Color4,
-        MaterialX::Matrix33,
-        MaterialX::Matrix44
+        string,
+        fs::path,
+        mx::Vector2,
+        mx::Vector3,
+        mx::Vector4,
+        mx::Color3,
+        mx::Color4,
+        mx::Matrix33,
+        mx::Matrix44
     >;
 }
 

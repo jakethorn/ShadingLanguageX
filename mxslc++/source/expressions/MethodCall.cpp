@@ -12,6 +12,8 @@
 #include "runtime/Variable.h"
 #include "values/ValueFactory.h"
 
+namespace mxslc
+{
 MethodCall::MethodCall(ExprPtr instance_expr, string method_name, optional<ArgumentList> args)
     : MethodCall{std::move(instance_expr), std::move(method_name), nullptr, std::move(args)}
 {
@@ -101,3 +103,5 @@ void MethodCall::update_instance(const VarPtr& local_copy) const
     if (not instance_->equals(local_copy))
         instance_->copy(local_copy);
 }
+}
+

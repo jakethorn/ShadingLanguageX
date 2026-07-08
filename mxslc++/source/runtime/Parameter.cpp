@@ -4,12 +4,14 @@
 
 #include "runtime/Parameter.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Scope.h"
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 
+namespace mxslc
+{
 Parameter::Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, const size_t index)
     : attrs_{std::move(attrs)},
     mods_{std::move(mods)},
@@ -77,3 +79,5 @@ string Parameter::str() const
     result += " " + name_;
     return result;
 }
+}
+

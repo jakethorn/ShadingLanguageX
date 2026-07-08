@@ -6,10 +6,12 @@
 
 #include "runtime/Scope.h"
 #include "mtlx/load_mtlx.h"
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Variable.h"
 #include "utils/io_utils.h"
 
+namespace mxslc
+{
 std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
 Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, std::make_unique<Scope>(), MtlXSerializer{}}
@@ -40,7 +42,7 @@ Runtime& Runtime::get()
 
 VarPtr Runtime::global(const string& name) const
 {
-    for (const mxslc::Variable& global : opts_.globals)
+    for (const interface::Variable& global : opts_.globals)
     {
         if (global.name() == name)
         {
@@ -84,9 +86,11 @@ void Runtime::destroy() const
     if (not opts_.error_on_unused_globals)
         return;
 
-    for (const mxslc::Variable& global : opts_.globals)
+    for (const interface::Variable& global : opts_.globals)
     {
         if (not contains(used_globals, global.name()))
             throw CompileError{"Unused global variable: " + global.name()};
     }
 }
+}
+

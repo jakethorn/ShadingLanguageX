@@ -9,10 +9,12 @@
 #include <functional>
 
 #include "utils/parse_utils.h"
-#include "utils/common.h"
-#include "utils/template_utils.h"
+#include "../../include/common.h"
+#include "utils/container_utils.h"
 #include "Span.h"
 
+namespace mxslc
+{
 using std::ifstream;
 using std::function;
 
@@ -119,7 +121,7 @@ options:
     {
         try
         {
-            return ::parse_literal(str);
+            return mxslc::parse_literal(str);
         }
         catch (const CompileError&)
         {
@@ -130,7 +132,7 @@ options:
     void parse_action(Span<string>& argv, CommandLineArgs& clargs)
     {
         if (argv.front() == "compile" or argv.front() == "decompile")
-            clargs.action = mxslc::to_action(argv.pop_front());
+            clargs.action = to_action(argv.pop_front());
     }
 
     void parse_input_file(Span<string>& argv, CommandLineArgs& clargs)
@@ -288,7 +290,7 @@ options:
     }
 }
 
-CommandLineArgs mxslc::parse_args(const int argc, char* argv[])
+CommandLineArgs parse_args(const int argc, char* argv[])
 {
     vector<string> args;
     args.reserve(argc);
@@ -297,7 +299,7 @@ CommandLineArgs mxslc::parse_args(const int argc, char* argv[])
     return parse_args(args);
 }
 
-CommandLineArgs mxslc::parse_args(const vector<string>& argv)
+CommandLineArgs parse_args(const vector<string>& argv)
 {
     Span args{argv, 1};
 
@@ -332,7 +334,7 @@ CommandLineArgs mxslc::parse_args(const vector<string>& argv)
     return clargs;
 }
 
-CommandLineArgs mxslc::parse_args(const fs::path& response_path)
+CommandLineArgs parse_args(const fs::path& response_path)
 {
     if (not fs::is_regular_file(response_path))
     {
@@ -357,7 +359,7 @@ CommandLineArgs mxslc::parse_args(const fs::path& response_path)
     return parse_args(argv);
 }
 
-mxslc::Action mxslc::to_action(const std::string& str)
+Action to_action(const std::string& str)
 {
     if (str == "compile")
         return Action::Compile;
@@ -366,3 +368,5 @@ mxslc::Action mxslc::to_action(const std::string& str)
     else
         return Action::Unknown;
 }
+}
+

@@ -5,48 +5,52 @@
 #ifndef FENNEC_PARAMETERLIST_H
 #define FENNEC_PARAMETERLIST_H
 
-#include "utils/common.h"
+#include "common.h"
 #include "runtime/Parameter.h"
-#include "runtime/Argument.h"
 #include "utils/instantiate_template_types_utils.h"
 
-class ParameterList
+namespace mxslc::runtime
 {
-public:
-    ParameterList() = default;
-    ParameterList(vector<Parameter> params);
+    class Argument;
 
-    ParameterList instantiate_template_types(const TypePtr& template_type) const
+    class ParameterList
     {
-        return ::instantiate_template_types(params_, template_type);
-    }
+    public:
+        ParameterList() = default;
+        ParameterList(vector<Parameter> params);
 
-    void init()
-    {
-        for (Parameter& param : params_)
-            param.init();
-    }
+        ParameterList instantiate_template_types(const TypePtr& template_type) const
+        {
+            return mxslc::instantiate_template_types(params_, template_type);
+        }
 
-    size_t size() const { return params_.size(); }
-    bool empty() const { return params_.empty(); }
+        void init()
+        {
+            for (Parameter& param : params_)
+                param.init();
+        }
 
-    bool contains(const string& s) const;
-    bool contains(const Argument& arg) const;
+        size_t size() const { return params_.size(); }
+        bool empty() const { return params_.empty(); }
 
-    const Parameter& operator[](const size_t i) const { return params_.at(i); }
-    const Parameter& operator[](const string& s) const;
-    const Parameter& operator[](const Argument& arg) const;
+        bool contains(const string& s) const;
+        bool contains(const Argument& arg) const;
 
-    auto begin() { return params_.begin(); }
-    auto begin() const { return params_.begin(); }
+        const Parameter& operator[](const size_t i) const { return params_.at(i); }
+        const Parameter& operator[](const string& s) const;
+        const Parameter& operator[](const Argument& arg) const;
 
-    auto end() { return params_.end(); }
-    auto end() const { return params_.end(); }
+        auto begin() { return params_.begin(); }
+        auto begin() const { return params_.begin(); }
 
-    string str() const;
+        auto end() { return params_.end(); }
+        auto end() const { return params_.end(); }
 
-private:
-    vector<Parameter> params_;
-};
+        string str() const;
+
+    private:
+        vector<Parameter> params_;
+    };
+}
 
 #endif //FENNEC_PARAMETERLIST_H

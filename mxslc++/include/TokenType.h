@@ -5,9 +5,7 @@
 #ifndef FENNEC_TOKENTYPE_H
 #define FENNEC_TOKENTYPE_H
 
-#include <string>
-#include <unordered_set>
-#include <unordered_map>
+#include "common.h"
 
 namespace mxslc
 {
@@ -103,23 +101,23 @@ namespace mxslc
             Unknown
         };
 
-        inline static const std::unordered_set Symbols {
+        inline static const unordered_set Symbols {
             LeftParen, RightParen, LeftBrace, RightBrace, LeftBracket, RightBracket, Period, Comma, Colon, Semicolon, At,
             Bang, Equals, Greater, Less, Plus, Minus, Star, Slash, Percent, Caret, Ampersand, Pipe, Hash
         };
 
-        inline static const std::unordered_set CompoundSymbols {
+        inline static const unordered_set CompoundSymbols {
             BangEq, EqualsEq, GreaterEq, LessEq, PlusEq, MinusEq, StarEq, SlashEq, PercentEq, CaretEq, AmpersandEq, PipeEq,
             Arrow, FatArrow, DoubleColon, Increment, Decrement, DoubleAt
         };
 
-        inline static const std::unordered_set Keywords {
+        inline static const unordered_set Keywords {
             If, Else, Switch, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
             Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
         };
 
     private:
-        inline static const std::unordered_map<std::string, Enum> lexemes_ {
+        inline static const unordered_map<string, Enum> Lexemes {
             {"!=", BangEq},
             {"==", EqualsEq},
             {">=", GreaterEq},
@@ -177,21 +175,21 @@ namespace mxslc
         TokenType() : enum_{Unknown} { }
         TokenType(const Enum e) : enum_{e} { }
         TokenType(const char c) : enum_{to_enum(c)} { }
-        TokenType(const std::string& s) : enum_{to_enum(s)} { }
+        TokenType(const string& s) : enum_{to_enum(s)} { }
 
         bool is_symbol() const;
         bool is_compound_symbol() const;
         bool is_keyword() const;
 
-        std::string str() const;
+        string str() const;
 
         bool operator==(const char c) const { return enum_ == to_enum(c); }
-        bool operator==(const std::string& s) const { return enum_ == to_enum(s); }
+        bool operator==(const string& s) const { return enum_ == to_enum(s); }
         bool operator==(const TokenType& t) const { return enum_ == t.enum_; }
         bool operator==(const Enum e) const { return enum_ == e; }
 
         bool operator!=(const char c) const { return enum_ != to_enum(c); }
-        bool operator!=(const std::string& s) const { return enum_ != to_enum(s); }
+        bool operator!=(const string& s) const { return enum_ != to_enum(s); }
         bool operator!=(const TokenType& t) const { return enum_ != t.enum_; }
         bool operator!=(const Enum e) const { return enum_ != e; }
 
@@ -199,7 +197,7 @@ namespace mxslc
 
     private:
         static Enum to_enum(char c);
-        static Enum to_enum(const std::string& s);
+        static Enum to_enum(const string& s);
 
         Enum enum_;
     };

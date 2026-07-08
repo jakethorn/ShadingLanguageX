@@ -7,29 +7,32 @@
 
 #include "expressions/FunctionCall.h"
 
-class MethodCall final : public FunctionCall
+namespace mxslc::expressions
 {
-public:
-    MethodCall(ExprPtr instance_expr, string method_name, optional<ArgumentList> args);
-    MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args);
-    MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, Token token);
-    MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
-    MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
+    class MethodCall final : public FunctionCall
+    {
+    public:
+        MethodCall(ExprPtr instance_expr, string method_name, optional<ArgumentList> args);
+        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args);
+        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, Token token);
+        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
+        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
-protected:
-    void init_subexpressions(const vector<TypePtr>& types) override;
-    void init_impl(const vector<TypePtr>& types) override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_subexpressions(const vector<TypePtr>& types) override;
+        void init_impl(const vector<TypePtr>& types) override;
+        VarPtr evaluate_impl() const override;
 
-    vector<FuncPtr> get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const override;
-    FuncPtr get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const override;
+        vector<FuncPtr> get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const override;
+        FuncPtr get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const override;
 
-private:
-    VarPtr copy_instance_to_scope() const;
-    void update_instance(const VarPtr& local_copy) const;
+    private:
+        VarPtr copy_instance_to_scope() const;
+        void update_instance(const VarPtr& local_copy) const;
 
-    ExprPtr instance_expr_;
-    VarPtr instance_;
-};
+        ExprPtr instance_expr_;
+        VarPtr instance_;
+    };
+}
 
 #endif //MXSLC_METHODCALL_H

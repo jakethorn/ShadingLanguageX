@@ -6,52 +6,56 @@
 #define MXSLC_FUNCTIONCALL_H
 
 #include "expressions/Expression.h"
-#include "utils/common.h"
+#include "common.h"
 #include "runtime/ArgumentList.h"
 
-class FunctionCall : public Expression
+namespace mxslc::expressions
 {
-public:
-    FunctionCall(string name, optional<ArgumentList> args);
-    FunctionCall(string name, optional<ArgumentList> args, Token token);
-    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args);
-    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, Token token);
-    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
-    FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
+    class FunctionCall : public Expression
+    {
+    public:
+        explicit FunctionCall(string name);
+        FunctionCall(string name, optional<ArgumentList> args);
+        FunctionCall(string name, optional<ArgumentList> args, Token token);
+        FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args);
+        FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, Token token);
+        FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
+        FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void init_subexpressions(const vector<TypePtr>& types) override;
-    void init_impl(const vector<TypePtr>& types) override;
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_subexpressions(const vector<TypePtr>& types) override;
+        void init_impl(const vector<TypePtr>& types) override;
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-    virtual vector<FuncPtr> get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const;
-    virtual FuncPtr get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const;
+        virtual vector<FuncPtr> get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const;
+        virtual FuncPtr get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const;
 
-    void evaluate_arguments() const;
-    VarPtr inline_invoke() const;
-    void update_out_arguments() const;
+        void evaluate_arguments() const;
+        VarPtr inline_invoke() const;
+        void update_out_arguments() const;
 
-    string name_;
-    TypePtr template_type_;
-    ArgumentList args_;
-    bool is_argumentless_ = false;
+        string name_;
+        TypePtr template_type_;
+        ArgumentList args_;
+        bool is_argumentless_{false};
 
-    FuncPtr func_ = nullptr;
+        FuncPtr func_;
 
-private:
-    bool arguments_are_initialized();
-    void init_arguments(const Scope& scope, const vector<TypePtr>& return_types);
-    size_t try_init_arguments(const vector<FuncPtr>& funcs);
-    size_t try_init_arguments(const FuncPtr& func);
+    private:
+        bool arguments_are_initialized();
+        void init_arguments(const Scope& scope, const vector<TypePtr>& return_types);
+        size_t try_init_arguments(const vector<FuncPtr>& funcs);
+        size_t try_init_arguments(const FuncPtr& func);
 
-    size_t initialized_arg_count_ = 0;
-    vector<string> underlying_errors_;
-    Scope* func_scope_ = nullptr;
+        size_t initialized_arg_count_{0};
+        vector<string> underlying_errors_;
+        Scope* func_scope_{nullptr};
 
-    ExprPtr method_call_ = nullptr;
-};
+        ExprPtr method_call_;
+    };
+}
 
 #endif //MXSLC_FUNCTIONCALL_H

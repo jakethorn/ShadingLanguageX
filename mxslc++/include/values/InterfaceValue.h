@@ -5,23 +5,25 @@
 #ifndef MXSLC_INTERFACEVALUE_H
 #define MXSLC_INTERFACEVALUE_H
 
-#include "utils/common.h"
 #include "values/Value.h"
 
-class InterfaceValue final : public Value
+namespace mxslc::values
 {
-public:
-    InterfaceValue(TypePtr type, string name);
+    class InterfaceValue final : public Value
+    {
+    public:
+        InterfaceValue(TypePtr type, string name);
 
-    bool equals(const ValuePtr& other) const override;
+        bool equals(const ValuePtr& other) const override;
 
-    void set_as_node_input(const mx::InputPtr& input) const override;
-    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
+        void set_as_node_input(const mx::InputPtr& input) const override;
+        void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
 
-    string str() const override;
+        string str() const override;
 
-private:
-    string name_;
-};
+    private:
+        string name_;
+    };
+}
 
 #endif //MXSLC_INTERFACEVALUE_H

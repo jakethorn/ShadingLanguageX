@@ -5,45 +5,48 @@
 #include "expressions/IncrementOperator.h"
 
 #include "expressions/FunctionCall.h"
-#include "runtime/RuntimeUtils.h"
+#include "expressions/interface.h"
 #include "runtime/Variable.h"
 
-IncrementOperator::IncrementOperator(ExprPtr lhs_expr, Token op, const bool prefix)
-    : Expression{std::move(op)}, lhs_expr_{std::move(lhs_expr)}, prefix_{prefix}
+namespace mxslc::expressions
 {
-    increment_ = token_ == TokenType::Increment;
-}
+    IncrementOperator::IncrementOperator(ExprPtr lhs_expr, Token op, const bool prefix)
+        : Expression{std::move(op)}, lhs_expr_{std::move(lhs_expr)}, prefix_{prefix}, increment_{token_ == TokenType::Increment}
+    {
 
-ExprPtr IncrementOperator::instantiate_template_types(const TypePtr& template_type) const
-{
-    ExprPtr lhs_expr = lhs_expr_->instantiate_template_types(template_type);
-    return std::make_unique<IncrementOperator>(std::move(lhs_expr), token_, prefix_);
-}
+    }
 
-void IncrementOperator::init_subexpressions(const vector<TypePtr>& types)
-{
-    lhs_expr_->init(types);
-}
+    ExprPtr IncrementOperator::instantiate_template_types(const TypePtr& template_type) const
+    {
+        ExprPtr lhs_expr = lhs_expr_->instantiate_template_types(template_type);
+        return create_expression<IncrementOperator>(std::move(lhs_expr), token_, prefix_);
+    }
 
-TypePtr IncrementOperator::type_impl() const
-{
-    return lhs_expr_->type();
-}
+    void IncrementOperator::init_subexpressions(const vector<TypePtr>& types)
+    {
+        lhs_expr_->init(types);
+    }
 
-VarPtr IncrementOperator::evaluate_impl() const
-{
-    const VarPtr lhs = lhs_expr_->evaluate();
-    VarPtr original_lhs = lhs->copy();
+    TypePtr IncrementOperator::type_impl() const
+    {
+        return lhs_expr_->type();
+    }
 
-    string dunder_name = increment_ ? "__inc__" : "__dec__";
-    const ExprPtr func_call = RuntimeUtils::function_call(std::move(dunder_name), ArgumentList{lhs_expr_});
+    VarPtr IncrementOperator::evaluate_impl() const
+    {
+        const VarPtr lhs = lhs_expr_->evaluate();
+        VarPtr original_lhs = lhs->copy();
 
-    func_call->init(lhs_expr_->type());
-    VarPtr incremented_lhs = func_call->evaluate();
-    lhs->copy(incremented_lhs);
+        string dunder_name = increment_ ? "__inc__" : "__dec__";
+        const ExprPtr func_call = create_expression<FunctionCall>(std::move(dunder_name), ArgumentList{lhs_expr_});
 
-    if (prefix_)
-        return incremented_lhs;
-    else
-        return original_lhs;
+        func_call->init(lhs->type());
+        VarPtr incremented_lhs = func_call->evaluate();
+        lhs->copy(incremented_lhs);
+
+        if (prefix_)
+            return incremented_lhs;
+        else
+            return original_lhs;
+    }
 }

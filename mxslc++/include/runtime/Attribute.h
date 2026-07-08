@@ -5,22 +5,27 @@
 #ifndef FENNEC_ATTRIBUTE_H
 #define FENNEC_ATTRIBUTE_H
 
-#include "utils/common.h"
+#include <MaterialXCore/Element.h>
 
-class Attribute
+#include "common.h"
+
+namespace mxslc::runtime
 {
-public:
-    Attribute(string name, string val) : Attribute{""s, std::move(name), std::move(val)} { }
-    Attribute(string child, string name, string value) : child_{std::move(child)}, name_{std::move(name)}, value_{std::move(value)} { }
+    class Attribute
+    {
+    public:
+        Attribute(string name, string val) : Attribute{""s, std::move(name), std::move(val)} { }
+        Attribute(string child, string name, string value) : child_{std::move(child)}, name_{std::move(name)}, value_{std::move(value)} { }
 
-    void add_to(const mx::ElementPtr& element) const;
+        void add_to(const mx::ElementPtr& element) const;
 
-private:
-    bool has_child() const { return not child_.empty(); }
+    private:
+        bool has_child() const { return not child_.empty(); }
 
-    string child_;
-    string name_;
-    string value_;
-};
+        string child_;
+        string name_;
+        string value_;
+    };
+}
 
 #endif //FENNEC_ATTRIBUTE_H

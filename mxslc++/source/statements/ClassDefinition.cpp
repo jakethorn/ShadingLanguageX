@@ -4,7 +4,7 @@
 
 #include "statements/ClassDefinition.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "statements/ConstructorDefinition.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/VariableDefinition.h"
@@ -13,8 +13,10 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "../../include/runtime/utils/instantiate_template_types_utils.h"
 
+namespace mxslc
+{
 ClassDefinition::ClassDefinition(string name, vector<TypePtr> template_types, TypePtr parent, vector<StmtPtr> body)
     : ClassDefinition{std::move(name), std::move(template_types), std::move(parent), std::move(body), Token{}}
 {
@@ -37,7 +39,7 @@ StmtPtr ClassDefinition::instantiate_template_types(const TypePtr& template_type
         throw CompileError{"Nested templated classes is not supported"s};
 
     TypePtr parent = parent_ ? parent_->instantiate_template_types(template_type) : nullptr;
-    vector<StmtPtr> body = ::instantiate_template_types(body, template_type);
+    vector<StmtPtr> body = mxslc::instantiate_template_types(body, template_type);
     return std::make_unique<ClassDefinition>(name_, template_types_, std::move(parent), std::move(body), token_);
 }
 
@@ -107,3 +109,5 @@ void ClassDefinition::add_constructor(const TypePtr& type, ConstructorDefinition
         throw CompileError{"Constructor name does not match class name"s};
     ctor_def->execute();
 }
+}
+

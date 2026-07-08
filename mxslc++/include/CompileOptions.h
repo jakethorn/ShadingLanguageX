@@ -5,10 +5,7 @@
 #ifndef MXSLC_COMPILEOPTIONS_H
 #define MXSLC_COMPILEOPTIONS_H
 
-#include <optional>
-#include <filesystem>
-#include <string>
-
+#include "common.h"
 #include "constants.h"
 #include "Macro.h"
 #include "primitive_t.h"
@@ -18,23 +15,23 @@ namespace mxslc
 {
     struct CompileOptions
     {
-        std::optional<std::filesystem::path> output_file = std::nullopt;
+        optional<fs::path> output_file;
 
-        std::string version{DEFAULT_MTLX_VERSION};
+        string version{DEFAULT_MTLX_VERSION};
         bool reduce_graph{true};
 
-        std::vector<std::filesystem::path> search_directories{};
-        std::vector<std::filesystem::path> includes{};
-        std::vector<std::filesystem::path> libraries{};
+        vector<fs::path> search_directories;
+        vector<fs::path> includes;
+        vector<fs::path> libraries;
 
-        std::vector<Macro> macros{};
+        vector<Macro> macros;
 
-        std::vector<Variable> globals{};
+        vector<interface::Variable> globals;
         bool error_on_missing_globals{true};
         bool error_on_unused_globals{true};
 
-        std::optional<std::string> func_name = std::nullopt;
-        std::vector<primitive_t> func_args{};
+        optional<string> func_name;
+        vector<primitive_t> func_args;
 
         bool has_output_file() const { return output_file.has_value(); }
         bool has_function() const { return func_name.has_value(); }

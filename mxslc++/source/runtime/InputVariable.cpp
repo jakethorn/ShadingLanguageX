@@ -8,6 +8,8 @@
 #include "runtime/Type.h"
 #include "values/ValueFactory.h"
 
+namespace mxslc
+{
 InputVariable::InputVariable(mx::InputPtr input)
     : Variable{TokenType::Mutable, Type::of(input)},
     input_{std::move(input)}
@@ -29,3 +31,5 @@ void InputVariable::set_node_name(const string& name) const
 {
 
 }
+}
+

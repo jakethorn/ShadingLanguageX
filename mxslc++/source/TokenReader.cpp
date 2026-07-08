@@ -4,11 +4,13 @@
 
 #include "TokenReader.h"
 
-#include "utils/common.h"
-#include "utils/template_utils.h"
+#include "common.h"
+#include "utils/container_utils.h"
 
 namespace mxslc
 {
+    using namespace container_utils;
+
     size_t TokenReader::size() const
     {
         return tokens_.size() - index_;
@@ -66,20 +68,13 @@ namespace mxslc
     {
         Token token = consume();
         if (token == TokenType::Identifier or token.type().is_keyword())
-        {
             return token;
-        }
-        else
-        {
-            throw CompileError{token, "Unexpected token: " + token.lexeme()};
-        }
+        throw CompileError{token, "Unexpected token: " + token.lexeme()};
     }
 
     void TokenReader::check_bounds(const size_t n) const
     {
         if (index_ + n >= tokens_.size())
-        {
             throw CompileError{tokens_.back(), "Unexpected end of tokens"s};
-        }
     }
 }

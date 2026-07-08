@@ -6,9 +6,11 @@
 #include "statements/PrintStatement.h"
 #include "expressions/Expression.h"
 #include "runtime/Variable.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "../../include/runtime/utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
+namespace mxslc
+{
 PrintStatement::PrintStatement(Token token, vector<ExprPtr> exprs) : Statement{std::move(token)}, exprs_{std::move(exprs)}
 {
 
@@ -16,7 +18,7 @@ PrintStatement::PrintStatement(Token token, vector<ExprPtr> exprs) : Statement{s
 
 StmtPtr PrintStatement::instantiate_template_types(const TypePtr& template_type) const
 {
-    vector<ExprPtr> exprs = ::instantiate_template_types(exprs_, template_type);
+    vector<ExprPtr> exprs = mxslc::instantiate_template_types(exprs_, template_type);
     return std::make_unique<PrintStatement>(token_, std::move(exprs));
 }
 
@@ -30,3 +32,5 @@ void PrintStatement::execute_impl() const
         std::cout << var->str() << std::endl;
     }
 }
+}
+

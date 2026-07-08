@@ -5,34 +5,35 @@
 #ifndef FENNEC_VARIABLEDEFINITION_H
 #define FENNEC_VARIABLEDEFINITION_H
 
-#include "utils/common.h"
 #include "statements/Statement.h"
-#include "Token.h"
-#include "runtime/Type.h"
+#include "runtime/ModifierList.h"
 
-class VariableDefinition final : public Statement
+namespace mxslc::statements
 {
-public:
-    VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr);
-    VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token);
-    ~VariableDefinition() override;
+    class VariableDefinition final : public Statement
+    {
+    public:
+        VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr);
+        VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token);
+        ~VariableDefinition() override;
 
-    void set_attributes(AttributeList attrs) override;
+        void set_attributes(AttributeList attrs) override;
 
-    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-    const ModifierList& modifiers() const { return mods_; }
-    TypePtr type() const;
-    const string& name() const;
+        const ModifierList& modifiers() const { return mods_; }
+        TypePtr type() const;
+        const string& name() const;
 
-protected:
-    void execute_impl() const override;
+    protected:
+        void execute_impl() const override;
 
-private:
-    ModifierList mods_;
-    TypePtr type_;
-    string name_;
-    ExprPtr expr_;
-};
+    private:
+        ModifierList mods_;
+        TypePtr type_;
+        string name_;
+        ExprPtr expr_;
+    };
+}
 
 #endif //FENNEC_VARIABLEDEFINITION_H

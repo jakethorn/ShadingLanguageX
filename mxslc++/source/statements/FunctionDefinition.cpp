@@ -4,13 +4,15 @@
 
 #include "statements/FunctionDefinition.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "expressions/Expression.h"
 
+namespace mxslc
+{
 FunctionDefinition::FunctionDefinition(
     ModifierList mods,
     TypePtr type,
@@ -56,9 +58,9 @@ FunctionDefinition::FunctionDefinition(
         for (const TypePtr& template_type : template_types_)
         {
             type = type_->instantiate_template_types(template_type);
-            params = ::instantiate_template_types(params_, template_type);
+            params = mxslc::instantiate_template_types(params_, template_type);
             body = body_->instantiate_template_types(template_type);
-            return_expr = ::instantiate_template_types(return_expr_, template_type);
+            return_expr = mxslc::instantiate_template_types(return_expr_, template_type);
             funcs_.push_back(std::make_shared<Function>(
                 mods_, std::move(type), name_, template_type, std::move(params), std::move(body), std::move(return_expr)
             ));
@@ -83,9 +85,9 @@ StmtPtr FunctionDefinition::instantiate_template_types(const TypePtr& template_t
         throw CompileError{"Nested templated functions is not supported"s};
 
     TypePtr type = type_->instantiate_template_types(template_type);
-    optional<ParameterList> params = ::instantiate_template_types(params, template_type);
+    optional<ParameterList> params = mxslc::instantiate_template_types(params, template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
-    ExprPtr return_expr = ::instantiate_template_types(return_expr_, template_type);
+    ExprPtr return_expr = mxslc::instantiate_template_types(return_expr_, template_type);
     return std::make_unique<FunctionDefinition>(mods_, std::move(type), name_, template_types_, std::move(params), std::move(body), std::move(return_expr), token_);
 }
 
@@ -109,3 +111,5 @@ void FunctionDefinition::execute_impl() const
             scope().add_function(func);
     }
 }
+}
+

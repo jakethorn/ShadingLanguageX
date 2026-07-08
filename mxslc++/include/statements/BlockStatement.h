@@ -7,18 +7,21 @@
 
 #include "statements/Statement.h"
 
-class BlockStatement final : public Statement
+namespace mxslc::statements
 {
-public:
-    BlockStatement(Token token, vector<StmtPtr> body);
+    class BlockStatement final : public Statement
+    {
+    public:
+        BlockStatement(Token token, vector<StmtPtr> body);
 
-    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void execute_impl() const override;
+    protected:
+        void execute_impl() const override;
 
-private:
-    vector<StmtPtr> body_;
-};
+    private:
+        vector<StmtPtr> body_;
+    };
+}
 
 #endif //MXSLC_BLOCKSTATEMENT_H

@@ -7,19 +7,22 @@
 
 #include "expressions/Expression.h"
 
-class RuntimeExpression final : public Expression
+namespace mxslc::expressions
 {
-public:
-    explicit RuntimeExpression(VarPtr value);
+    class RuntimeExpression final : public Expression
+    {
+    public:
+        explicit RuntimeExpression(VarPtr value);
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-private:
-    VarPtr value_;
-};
+    private:
+        VarPtr value_;
+    };
+}
 
 #endif //MXSLC_RUNTIMEEXPRESSION_H

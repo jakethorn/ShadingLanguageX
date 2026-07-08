@@ -25,6 +25,8 @@
         } \
     }
 
+namespace mxslc
+{
 VarPtr evaluate_convert(const TypePtr& type, const vector<BasicValuePtr>& values)
 {
     const BasicValuePtr& in = values[0];
@@ -109,3 +111,4 @@ VarPtr evaluate_convert(const TypePtr& type, const vector<BasicValuePtr>& values
 
 #undef CONVERT_SINGLE_TO_VECTOR
 #undef CONVERT_VECTOR_TO_VECTOR
+}

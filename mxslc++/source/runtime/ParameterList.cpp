@@ -5,8 +5,10 @@
 #include "runtime/ParameterList.h"
 
 #include "runtime/Argument.h"
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 
+namespace mxslc
+{
 ParameterList::ParameterList(vector<Parameter> params) : params_{std::move(params)}
 {
     for (size_t i = 0; i < params_.size(); ++i)
@@ -58,3 +60,5 @@ string ParameterList::str() const
         result.resize(result.size() - 2);
     return result;
 }
+}
+

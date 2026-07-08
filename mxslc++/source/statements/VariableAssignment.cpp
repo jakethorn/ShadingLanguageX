@@ -7,6 +7,8 @@
 #include "expressions/Expression.h"
 #include "runtime/Variable.h"
 
+namespace mxslc
+{
 VariableAssignment::VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rhs_expr)
     : Statement{std::move(token)}, lhs_expr_{std::move(lhs_expr)}, rhs_expr_{std::move(rhs_expr)}
 {
@@ -35,3 +37,5 @@ void VariableAssignment::execute_impl() const
     const VarPtr rhs = rhs_expr_->evaluate();
     lhs->copy(rhs);
 }
+}
+

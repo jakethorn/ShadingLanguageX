@@ -11,6 +11,8 @@
 #include "runtime/Variable.h"
 #include "values/ValueFactory.h"
 
+namespace mxslc
+{
 MultiVariableDefinition::MultiVariableDefinition(TypePtr type, ExprPtr expr)
     : MultiVariableDefinition{std::move(type), std::move(expr), Token{}}
 {
@@ -68,3 +70,5 @@ void MultiVariableDefinition::execute_impl() const
         var->add_to_scope(type->field_name(i));
     }
 }
+}
+

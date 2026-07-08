@@ -33,7 +33,7 @@ void bind_compile_options(py::module_& m)
 
                 for (py::handle py_obj : globals)
                 {
-                    auto var_ptr = py_obj.cast<mxslc::VariablePtr>();
+                    auto var_ptr = py_obj.cast<mxslc::interface::VariablePtr>();
                     opts->globals.push_back(*var_ptr);
                 }
 
@@ -68,7 +68,7 @@ void bind_compile_options(py::module_& m)
             [](mxslc::CompileOptions& opts, const py::list& py_globals) {
                 opts.globals.clear();
                 for (py::handle py_obj : py_globals) {
-                    auto var_ptr = py_obj.cast<mxslc::VariablePtr>();
+                    auto var_ptr = py_obj.cast<mxslc::interface::VariablePtr>();
                     opts.globals.push_back(*var_ptr);
                 }
             }

@@ -6,11 +6,13 @@
 
 #include "runtime/Type.h"
 
-#include "CompileError.h"
-#include "utils/instantiate_template_types_utils.h"
-#include "utils/str_utils.h"
+#include "../../include/errors/CompileError.h"
+#include "../../include/runtime/utils/instantiate_template_types_utils.h"
+#include "utils/string_utils.h"
 
 #define type_def(t) TypePtr Type::t = resolve(TypeName::t);
+namespace mxslc
+{
 type_def(Bool)
 type_def(Int)
 type_def(Float)
@@ -62,8 +64,8 @@ Type::Type(const TypePtr& field_type, const size_t field_count)
 
 TypePtr Type::instantiate_template_types(const TypePtr& template_type) const
 {
-    string name = ::instantiate_template_types(name_, template_type);
-    vector<Field> fields = ::instantiate_template_types(fields_, template_type);
+    string name = mxslc::instantiate_template_types(name_, template_type);
+    vector<Field> fields = mxslc::instantiate_template_types(fields_, template_type);
     return std::make_shared<Type>(std::move(name), std::move(fields));
 }
 
@@ -89,7 +91,7 @@ const Field& Type::field(const size_t index) const
     if (index < fields_.size())
         return fields_.at(index);
 
-    throw CompileError{"Expression of type " + str() + " does not have a field at index " + ::str(index)};
+    throw CompileError{"Expression of type " + str() + " does not have a field at index " + mxslc::str(index)};
 }
 
 const Field& Type::field(const string& name) const
@@ -313,13 +315,13 @@ TypePtr Type::of(const mx::TypedElementPtr& value)
     return resolve(value->getType());
 }
 
-TypePtr Type::of(const mxslc::Variable& var)
+TypePtr Type::of(const interface::Variable& var)
 {
     if (var.has_type())
         return std::make_shared<Type>(var.type());
     vector<Field> fields;
     fields.reserve(var.children().size());
-    for (const mxslc::VariablePtr& child : var.children())
+    for (const interface::VariablePtr& child : var.children())
         fields.emplace_back(of(*child), child->name());
     TypePtr type = std::make_shared<Type>(std::move(fields));
     return type;
@@ -377,3 +379,5 @@ void Type::validate() const
             throw CompileError{"Either all type fields must be named or none them\nType: " + str()};
     }
 }
+}
+

@@ -7,26 +7,29 @@
 
 #include "expressions/Expression.h"
 
-class TypeOfOperator final : public Expression
+namespace mxslc::expressions
 {
-public:
-    explicit TypeOfOperator(ExprPtr expr);
-    TypeOfOperator(ExprPtr expr, Token token);
-    TypeOfOperator(ExprPtr expr, TypePtr template_type, Token token);
+    class TypeOfOperator final : public Expression
+    {
+    public:
+        explicit TypeOfOperator(ExprPtr expr);
+        TypeOfOperator(ExprPtr expr, Token token);
+        TypeOfOperator(ExprPtr expr, TypePtr template_type, Token token);
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void init_subexpressions(const vector<TypePtr>& types) override;
-    void init_impl(const vector<TypePtr>& types) override;
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_subexpressions(const vector<TypePtr>& types) override;
+        void init_impl(const vector<TypePtr>& types) override;
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-private:
-    ExprPtr expr_;
-    TypePtr expr_type_;
-    TypePtr template_type_;
-    TypePtr op_type_;
-};
+    private:
+        ExprPtr expr_;
+        TypePtr expr_type_;
+        TypePtr template_type_;
+        TypePtr op_type_;
+    };
+}
 
 #endif //MXSLC_TYPEOFOPERATOR_H

@@ -7,14 +7,16 @@
 #include <cassert>
 
 #include "runtime/ArgumentList.h"
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "errors/AmbiguousFunctionError.h"
-#include "utils/template_utils.h"
+#include "utils/container_utils.h"
 
+namespace mxslc
+{
 Scope::Scope() = default;
 
 Scope::Scope(ScopePtr parent) : Scope{""s, std::move(parent)}
@@ -217,3 +219,5 @@ void Scope::resolve_fields(const TypePtr& type) const
     for (Field& field : type->fields_)
         field.type_ = resolve_type(field.type_);
 }
+}
+

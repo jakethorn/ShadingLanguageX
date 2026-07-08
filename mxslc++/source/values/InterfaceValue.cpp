@@ -7,6 +7,8 @@
 #include "mtlx/mtlx_utils.h"
 #include "runtime/Type.h"
 
+namespace mxslc
+{
 InterfaceValue::InterfaceValue(TypePtr type, string name)
     : Value{std::move(type)}, name_{std::move(name)}
 {
@@ -35,3 +37,5 @@ string InterfaceValue::str() const
 {
     return "<input name=\"" + name_ + "\" type=\"" + type_->name() + "\" />";
 }
+}
+

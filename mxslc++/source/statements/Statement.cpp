@@ -4,9 +4,11 @@
 
 #include "statements/Statement.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Runtime.h"
 
+namespace mxslc
+{
 void Statement::execute()
 {
     try
@@ -25,3 +27,5 @@ void Statement::execute()
         throw;
     }
 }
+}
+

@@ -7,28 +7,31 @@
 
 #include "Token.h"
 #include "runtime/AttributeList.h"
-#include "runtime/RuntimeAccessor.h"
-#include "utils/common.h"
+#include "../runtime/utils/RuntimeAware.h"
+#include "common.h"
 
-class Statement : protected RuntimeAccessor
+namespace mxslc::statements
 {
-public:
-    explicit Statement(Token token) : token_{std::move(token)} { }
-    ~Statement() override = default;
+    class Statement : protected RuntimeAware
+    {
+    public:
+        explicit Statement(Token token) : token_{std::move(token)} { }
+        ~Statement() override = default;
 
-    const Token& token() const { return token_; }
+        const Token& token() const { return token_; }
 
-    virtual void set_attributes(AttributeList attrs) { }
+        virtual void set_attributes(AttributeList attrs) { }
 
-    virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
-    virtual void init() { }
-    void execute();
+        virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
+        virtual void init() { }
+        void execute();
 
-protected:
-    virtual void execute_impl() const = 0;
+    protected:
+        virtual void execute_impl() const = 0;
 
-    Token token_;
-    bool is_initialized_ = false;
-};
+        Token token_;
+        bool is_initialized_{false};
+    };
+}
 
 #endif //FENNEC_STATEMENT_H

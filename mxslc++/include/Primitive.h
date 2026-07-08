@@ -5,9 +5,9 @@
 #ifndef MXSLC_PRIMITIVE_H
 #define MXSLC_PRIMITIVE_H
 
-#include "CompileError.h"
+#include "common.h"
 #include "primitive_t.h"
-#include "runtime/Type.h"
+#include "errors/CompileError.h"
 
 #define CTOR(T) Primitive(T value) : value_{value} { }
 
@@ -19,15 +19,15 @@ namespace mxslc
         CTOR(bool)
         CTOR(int)
         CTOR(float)
-        CTOR(std::string)
-        CTOR(std::filesystem::path)
-        CTOR(MaterialX::Vector2)
-        CTOR(MaterialX::Vector3)
-        CTOR(MaterialX::Vector4)
-        CTOR(MaterialX::Color3)
-        CTOR(MaterialX::Color4)
-        CTOR(MaterialX::Matrix33)
-        CTOR(MaterialX::Matrix44)
+        CTOR(string)
+        CTOR(fs::path)
+        CTOR(mx::Vector2)
+        CTOR(mx::Vector3)
+        CTOR(mx::Vector4)
+        CTOR(mx::Color3)
+        CTOR(mx::Color4)
+        CTOR(mx::Matrix33)
+        CTOR(mx::Matrix44)
 
         template<typename T>
         bool is_a() const
@@ -43,7 +43,7 @@ namespace mxslc
             throw CompileError{"'" + str() + "' is not a " + "type_utils::name_of<T>()"};
         }
 
-        std::string str() const;
+        string str() const;
 
     private:
         primitive_t value_;

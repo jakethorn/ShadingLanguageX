@@ -10,6 +10,8 @@
     if (in->is<fromtype>()) \
         return Variable::create(totype{in->get<fromtype>()[index->get<int>()]});
 
+namespace mxslc
+{
 VarPtr evaluate_extract(const TypePtr&, const vector<BasicValuePtr>& values)
 {
     const BasicValuePtr& in = values[0];
@@ -27,3 +29,5 @@ VarPtr evaluate_extract(const TypePtr&, const vector<BasicValuePtr>& values)
 }
 
 #undef EXTRACT
+}
+

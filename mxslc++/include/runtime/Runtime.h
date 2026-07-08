@@ -7,42 +7,50 @@
 
 #include <MaterialXCore/Document.h>
 
-#include "utils/common.h"
+#include "common.h"
 #include "mtlx/MtlXSerializer.h"
 
-class Runtime
+namespace mxslc
 {
-public:
-    explicit Runtime(const CompileOptions& opts);
-    Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer);
+    class CompileOptions;
+}
 
-    static Runtime& create(const optional<fs::path>& src_path, const CompileOptions& opts);
-    static Runtime& get();
+namespace mxslc::runtime
+{
+    class Runtime
+    {
+    public:
+        explicit Runtime(const CompileOptions& opts);
+        Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer);
 
-    VarPtr global(const string& name) const;
-    const vector<fs::path>& include_directories() const { return include_dirs_; }
+        static Runtime& create(const optional<fs::path>& src_path, const CompileOptions& opts);
+        static Runtime& get();
 
-    void load_materialx_library(const string& version);
-    mx::DocumentPtr materialx_library() { return mtlx_lib_; }
+        VarPtr global(const string& name) const;
+        const vector<fs::path>& include_directories() const { return include_dirs_; }
 
-    Scope& scope();
-    void enter_scope(string name = "");
-    void exit_scope();
+        void load_materialx_library(const string& version);
+        mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
-    MtlXSerializer& serializer();
+        Scope& scope();
+        void enter_scope(string name = "");
+        void exit_scope();
 
-    void destroy() const;
+        MtlXSerializer& serializer();
 
-private:
-    const CompileOptions& opts_;
-    vector<fs::path> include_dirs_;
-    mx::DocumentPtr mtlx_lib_;
-    ScopePtr scope_;
-    MtlXSerializer serializer_;
+        void destroy() const;
 
-    mutable vector<string> used_globals;
+    private:
+        const CompileOptions& opts_;
+        vector<fs::path> include_dirs_;
+        mx::DocumentPtr mtlx_lib_;
+        ScopePtr scope_;
+        MtlXSerializer serializer_;
 
-    static unique_ptr<Runtime> instance_;
-};
+        mutable vector<string> used_globals;
+
+        static unique_ptr<Runtime> instance_;
+    };
+}
 
 #endif //FENNEC_RUNTIME_H

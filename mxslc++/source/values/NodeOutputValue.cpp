@@ -7,6 +7,8 @@
 #include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
 
+namespace mxslc
+{
 NodeOutputValue::NodeOutputValue(TypePtr type, mx::NodePtr node, string output_name)
     : Value{std::move(type)}, node_{std::move(node)}, output_name_{std::move(output_name)}
 {
@@ -51,3 +53,5 @@ string NodeOutputValue::str() const
 {
     return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
 }
+}
+

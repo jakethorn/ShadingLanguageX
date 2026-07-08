@@ -4,6 +4,8 @@
 
 #include "runtime/AttributeList.h"
 
+namespace mxslc
+{
 void AttributeList::add_to(const mx::ElementPtr& element) const
 {
     for (const Attribute& attr : attrs_)
@@ -15,3 +17,5 @@ void AttributeList::add_to(const mx::ElementPtr& element, const string& child_na
     if (const mx::ElementPtr child = element->getChild(child_name))
         add_to(child);
 }
+}
+

@@ -4,7 +4,7 @@
 
 #include "preprocess.h"
 #include "scan.h"
-#include "utils/template_utils.h"
+#include "utils/container_utils.h"
 #include "utils/token_utils.h"
 
 namespace mxslc
@@ -212,4 +212,3 @@ namespace mxslc
         tokens_.insert(tokens_.cend(), std::make_move_iterator(tokens.begin()), std::make_move_iterator(tokens.end()));
     }
 }
-

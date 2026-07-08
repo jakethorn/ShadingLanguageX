@@ -8,6 +8,8 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 
+namespace mxslc
+{
 StmtPtr UsingDeclaration::instantiate_template_types(const TypePtr& template_type) const
 {
     TypePtr type = type_->instantiate_template_types(template_type);
@@ -18,3 +20,5 @@ void UsingDeclaration::execute_impl() const
 {
     scope().add_alias(name_, type_);
 }
+}
+

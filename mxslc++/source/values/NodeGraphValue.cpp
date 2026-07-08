@@ -10,6 +10,8 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 
+namespace mxslc
+{
 NodeGraphValue::NodeGraphValue(const mx::NodeGraphPtr& node_graph) : NodeGraphValue{Type::of(node_graph), node_graph->getName()}
 {
 
@@ -42,3 +44,5 @@ string NodeGraphValue::str() const
 {
     return name_;
 }
+}
+

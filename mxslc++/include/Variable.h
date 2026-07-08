@@ -12,7 +12,7 @@
 
 #include "primitive_t.h"
 
-namespace mxslc
+namespace mxslc::interface
 {
     class Variable;
     using VariablePtr = std::shared_ptr<Variable>;

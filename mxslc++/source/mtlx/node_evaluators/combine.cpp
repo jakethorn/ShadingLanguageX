@@ -4,11 +4,13 @@
 
 #include "mtlx/node_evaluators/combine.h"
 
-#include "CompileError.h"
+#include "../../../include/errors/CompileError.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "values/BasicValue.h"
 
+namespace mxslc
+{
 namespace
 {
     float as_float(const BasicValuePtr& value)
@@ -103,3 +105,5 @@ VarPtr evaluate_combine4(const TypePtr& type, const vector<BasicValuePtr>& value
 
     return nullptr;
 }
+}
+

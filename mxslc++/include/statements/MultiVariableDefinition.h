@@ -6,24 +6,26 @@
 #define MXSLC_MULTIVARIABLEDEFINITION_H
 
 #include "statements/Statement.h"
-#include "Token.h"
 
-class MultiVariableDefinition final : public Statement
+namespace mxslc::statements
 {
-public:
-    MultiVariableDefinition(TypePtr type, ExprPtr expr);
-    MultiVariableDefinition(TypePtr type, ExprPtr expr, Token token);
+    class MultiVariableDefinition final : public Statement
+    {
+    public:
+        MultiVariableDefinition(TypePtr type, ExprPtr expr);
+        MultiVariableDefinition(TypePtr type, ExprPtr expr, Token token);
 
-    void set_attributes(AttributeList attrs) override;
+        void set_attributes(AttributeList attrs) override;
 
-    StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void execute_impl() const override;
+    protected:
+        void execute_impl() const override;
 
-private:
-    TypePtr type_;
-    ExprPtr expr_;
-};
+    private:
+        TypePtr type_;
+        ExprPtr expr_;
+    };
+}
 
 #endif //MXSLC_MULTIVARIABLEDEFINITION_H

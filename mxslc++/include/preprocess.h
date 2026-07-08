@@ -5,6 +5,7 @@
 #ifndef MXSLC_PREPROCESS_H
 #define MXSLC_PREPROCESS_H
 
+#include "common.h"
 #include "Token.h"
 #include "CompileOptions.h"
 #include "Primitive.h"
@@ -12,16 +13,16 @@
 
 namespace mxslc
 {
-    void preprocess(std::vector<Token>& tokens, CompileOptions& opts, bool is_include = false);
+    void preprocess(vector<Token>& tokens, CompileOptions& opts, bool is_include = false);
 
     class Preprocessor : protected TokenReader
     {
     public:
-        Preprocessor(std::vector<Token> tokens, CompileOptions& opts, bool is_include = false);
+        Preprocessor(vector<Token> tokens, CompileOptions& opts, bool is_include = false);
 
         void preprocess();
 
-        std::vector<Token> tokens() { return std::move(tokens_); }
+        vector<Token> tokens() { return std::move(tokens_); }
 
     private:
         void process_next_token();
@@ -33,28 +34,28 @@ namespace mxslc
         void process_if();
         void process_non_directive();
 
-        void include_file(const std::filesystem::path& path);
+        void include_file(const fs::path& path);
 
-        void define_macro(const Token& name, std::vector<Token> body = {}) const;
-        void define_macro(const std::string& name, std::vector<Token> body = {}) const;
+        void define_macro(const Token& name, vector<Token> body = {}) const;
+        void define_macro(const string& name, vector<Token> body = {}) const;
         void undef_macro(const Token& name) const;
-        void undef_macro(const std::string& name) const;
+        void undef_macro(const string& name) const;
         bool macro_is_defined(const Token& name) const;
-        std::vector<Token> expand_macro(const Token& name) const;
+        vector<Token> expand_macro(const Token& name) const;
 
-        std::vector<Token> consume_and_expand_until(TokenType token_type);
+        vector<Token> consume_and_expand_until(TokenType token_type);
 
-        Primitive evaluate_expression(const std::vector<Token>& tokens) const;
+        Primitive evaluate_expression(const vector<Token>& tokens) const;
 
         void add_token(Token&& tokens);
-        void add_tokens(std::vector<Token>&& tokens);
+        void add_tokens(vector<Token>&& tokens);
 
-        std::vector<Token> tokens_;
+        vector<Token> tokens_;
         CompileOptions& opts_;
         bool is_include_;
 
-        static inline std::string MAIN{"__MAIN__"};
-        static inline std::string INCLUDE{"__INCLUDE__"};
+        inline static const string MAIN{"__MAIN__"};
+        inline static const string INCLUDE{"__INCLUDE__"};
     };
 }
 

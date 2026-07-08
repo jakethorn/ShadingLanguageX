@@ -4,15 +4,17 @@
 
 #include "runtime/Variable.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "mtlx/MtlXSerializer.h"
 #include "mtlx/mtlx_utils.h"
-#include "utils/str_utils.h"
+#include "utils/string_utils.h"
 #include "values/NodeOutputValue.h"
 #include "values/NodeValue.h"
 
+namespace mxslc
+{
 Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
 {
     set_modifiers(std::move(mods));
@@ -76,7 +78,7 @@ void Variable::set_name(const string& name, const TypePtr& parent_type, const si
     }
 
     const Field& field = parent_type->field(index);
-    const string child_name = field.has_name() ? field.name() : ::str(index);
+    const string child_name = field.has_name() ? field.name() : mxslc::str(index);
     set_node_name(name + "__" + child_name);
 }
 
@@ -130,7 +132,7 @@ size_t Variable::child_count() const
 VarPtr Variable::child(const size_t index)
 {
     if (index >= children_.size())
-        throw CompileError{"Index out of bounds: " + ::str(index)};
+        throw CompileError{"Index out of bounds: " + mxslc::str(index)};
 
     return children_.at(index);
 }
@@ -261,7 +263,7 @@ string Variable::str() const
         string result = "{";
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            const string field_name = type_->field(i).has_name() ? type_->field_name(i) : "field_" + ::str(i);
+            const string field_name = type_->field(i).has_name() ? type_->field_name(i) : "field_" + mxslc::str(i);
             const VarPtr& child = children_[i];
             result += "\n\t" + field_name + ": " + child->str();
         }
@@ -368,14 +370,14 @@ VarPtr Variable::create(const VarPtr& value)
     return create(ModifierList{}, value->type(), value);
 }
 
-VarPtr Variable::create(const mxslc::Variable& var)
+VarPtr Variable::create(const interface::Variable& var)
 {
     if (var.has_value())
         return create(var.value());
     TypePtr type = scope().resolve_type(Type::of(var));
     vector<VarPtr> children;
     children.reserve(var.children().size());
-    for (const mxslc::VariablePtr& child : var.children())
+    for (const interface::VariablePtr& child : var.children())
         children.emplace_back(create(*child));
     return create(std::move(type), children);
 }
@@ -493,3 +495,5 @@ TypePtr Variable::remove_auto(const TypePtr& original_type, const TypePtr& value
     }
     return original_type;
 }
+}
+

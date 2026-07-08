@@ -7,7 +7,7 @@
 #include <cassert>
 #include <MaterialXFormat/XmlIo.h>
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "mtlx/mtlx_utils.h"
 #include "mtlx/evaluate_mtlx.h"
 #include "runtime/Runtime.h"
@@ -20,6 +20,8 @@
 #include "values/ValueFactory.h"
 #include "utils/io_utils.h"
 
+namespace mxslc
+{
 namespace
 {
     string serialize_type(const FuncPtr& func)
@@ -411,3 +413,5 @@ string MtlXSerializer::node_graph_name(const FuncPtr& func) const
 {
     return doc_->createValidChildName("NG_" + node_category(func));
 }
+}
+

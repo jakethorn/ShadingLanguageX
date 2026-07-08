@@ -10,10 +10,12 @@
 #include "statements/Statement.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Variable.h"
-#include "utils/type_cast.h"
+#include "../../include/runtime/utils/type_cast.h"
 
+namespace mxslc
+{
 Function::Function(
     ModifierList mods,
     TypePtr return_type,
@@ -171,3 +173,5 @@ string Function::str() const
     }
     return result;
 }
+}
+

@@ -5,28 +5,30 @@
 #ifndef FENNEC_NODEVALUE_H
 #define FENNEC_NODEVALUE_H
 
-#include "utils/common.h"
 #include "values/Value.h"
 
-class NodeValue final : public Value
+namespace mxslc::values
 {
-public:
-    explicit NodeValue(mx::NodePtr node);
+    class NodeValue final : public Value
+    {
+    public:
+        explicit NodeValue(mx::NodePtr node);
 
-    mx::NodePtr node() const { return node_; }
-    void set_node_name(const string& name) const;
+        mx::NodePtr node() const { return node_; }
+        void set_node_name(const string& name) const;
 
-    bool equals(const ValuePtr& other) const override;
+        bool equals(const ValuePtr& other) const override;
 
-    void set_as_node_input(const mx::InputPtr& input) const override;
-    void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
+        void set_as_node_input(const mx::InputPtr& input) const override;
+        void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
 
-    string str() const override;
+        string str() const override;
 
-private:
-    mx::NodePtr node_;
+    private:
+        mx::NodePtr node_;
 
-    mutable bool is_node_name_set_{false};
-};
+        mutable bool is_node_name_set_{false};
+    };
+}
 
 #endif //FENNEC_NODEVALUE_H

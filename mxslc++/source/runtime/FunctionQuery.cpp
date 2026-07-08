@@ -4,10 +4,12 @@
 
 #include "runtime/FunctionQuery.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Function.h"
 #include "runtime/Type.h"
 
+namespace mxslc
+{
 FunctionQuery::FunctionQuery(const string& name) : name{&name}
 {
     
@@ -203,3 +205,5 @@ vector<FuncPtr> FunctionQuery::get_default_functions(const vector<FuncPtr>& func
 
     return default_funcs;
 }
+}
+

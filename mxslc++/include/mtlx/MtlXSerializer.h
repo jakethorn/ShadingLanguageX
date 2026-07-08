@@ -7,53 +7,59 @@
 
 #include <MaterialXCore/Document.h>
 
-#include "runtime/RuntimeAccessor.h"
-#include "utils/common.h"
+#include "../runtime/utils/RuntimeAware.h"
+#include "common.h"
 
-class ArgumentList;
-class AttributeList;
-
-class MtlXSerializer : protected RuntimeAccessor
+namespace mxslc::runtime
 {
-public:
-    MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
-    explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
+    class ArgumentList;
+    class AttributeList;
+}
 
-    void set_reduce_graph(const bool value) { reduce_graph_ = value; }
+namespace mxslc
+{
+    class MtlXSerializer : protected RuntimeAware
+    {
+    public:
+        MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
+        explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
-    VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
-    VarPtr write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
+        void set_reduce_graph(const bool value) { reduce_graph_ = value; }
 
-    void write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const;
+        VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
+        VarPtr write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
 
-    ValuePtr write_node_def_input(const VarPtr& var) const;
-    void write_node_def_output(const VarPtr& var, const ValuePtr& value) const;
+        void write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const;
 
-    mx::DocumentPtr document() const { return doc_; }
-    string xml() const;
-    void save(const fs::path& dst_path) const;
+        ValuePtr write_node_def_input(const VarPtr& var) const;
+        void write_node_def_output(const VarPtr& var, const ValuePtr& value) const;
 
-private:
-    mx::NodeDefPtr write_node_def(const FuncPtr& func) const;
-    mx::NodeGraphPtr write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
+        mx::DocumentPtr document() const { return doc_; }
+        string xml() const;
+        void save(const fs::path& dst_path) const;
 
-    void add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
-    VarPtr copy_instance(const FuncPtr& func) const;
-    void update_instance(const FuncPtr& func, const mx::NodeGraphPtr& node_graph, const VarPtr& original_instance) const;
+    private:
+        mx::NodeDefPtr write_node_def(const FuncPtr& func) const;
+        mx::NodeGraphPtr write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
 
-    void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var) const;
-    void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
-    void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var) const;
-    void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var, const AttributeList& attrs) const;
-    void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const TypePtr& type) const;
-    void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var) const;
-    void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
+        void add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
+        VarPtr copy_instance(const FuncPtr& func) const;
+        void update_instance(const FuncPtr& func, const mx::NodeGraphPtr& node_graph, const VarPtr& original_instance) const;
 
-    string node_def_name(const FuncPtr& func) const;
-    string node_graph_name(const FuncPtr& func) const;
+        void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var) const;
+        void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
+        void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var) const;
+        void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var, const AttributeList& attrs) const;
+        void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const TypePtr& type) const;
+        void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var) const;
+        void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
 
-    mx::DocumentPtr doc_;
-    bool reduce_graph_ = true;
-};
+        string node_def_name(const FuncPtr& func) const;
+        string node_graph_name(const FuncPtr& func) const;
+
+        mx::DocumentPtr doc_;
+        bool reduce_graph_{true};
+    };
+}
 
 #endif //FENNEC_MTLXSERIALIZER_H

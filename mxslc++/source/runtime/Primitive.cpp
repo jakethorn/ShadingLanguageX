@@ -3,7 +3,7 @@
 //
 
 #include "Primitive.h"
-#include "utils/common.h"
+#include "../../include/common.h"
 
 namespace mxslc
 {

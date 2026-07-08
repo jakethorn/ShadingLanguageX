@@ -5,17 +5,20 @@
 #ifndef MXSLC_ACCESSOR_H
 #define MXSLC_ACCESSOR_H
 
-#include "runtime/RuntimeAccessor.h"
-#include "utils/common.h"
+#include "../../runtime/utils/RuntimeAware.h"
+#include "common.h"
 
-class Accessor : protected RuntimeAccessor
+namespace mxslc::expressions
 {
-public:
-    Accessor() = default;
-    ~Accessor() override = default;
+    class Accessor : protected RuntimeAware
+    {
+    public:
+        Accessor() = default;
+        ~Accessor() override = default;
 
-    virtual TypePtr type() const = 0;
-    virtual VarPtr evaluate() const = 0;
-};
+        virtual TypePtr type() const = 0;
+        virtual VarPtr evaluate() const = 0;
+    };
+}
 
 #endif //MXSLC_ACCESSOR_H

@@ -7,6 +7,8 @@
 #include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
 
+namespace mxslc
+{
 NodeGraphOutputValue::NodeGraphOutputValue(TypePtr type, const mx::NodeGraphPtr& node_graph, string output_name)
     : NodeGraphOutputValue{std::move(type), node_graph->getName(), std::move(output_name)}
 {
@@ -43,3 +45,5 @@ string NodeGraphOutputValue::str() const
 {
     return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
 }
+}
+

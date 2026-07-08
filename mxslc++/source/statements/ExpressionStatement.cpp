@@ -10,6 +10,8 @@
 
 #include "expressions/Expression.h"
 
+namespace mxslc
+{
 ExpressionStatement::ExpressionStatement(ExprPtr expr)
     : Statement{expr->token()}, expr_{std::move(expr)}
 {
@@ -34,3 +36,5 @@ void ExpressionStatement::execute_impl() const
     expr_->init();
     VarPtr _ = expr_->evaluate();
 }
+}
+

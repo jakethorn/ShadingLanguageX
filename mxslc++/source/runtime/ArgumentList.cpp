@@ -4,12 +4,14 @@
 
 #include "runtime/ArgumentList.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Parameter.h"
 #include "runtime/ParameterList.h"
 #include "runtime/Variable.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "../../include/runtime/utils/instantiate_template_types_utils.h"
 
+namespace mxslc
+{
 ArgumentList::ArgumentList(vector<Argument> args) : args_{std::move(args)}
 {
 
@@ -40,7 +42,7 @@ ArgumentList::ArgumentList(const VarPtr& value)
 
 ArgumentList ArgumentList::instantiate_template_types(const TypePtr& template_type) const
 {
-    return ::instantiate_template_types(args_, template_type);
+    return mxslc::instantiate_template_types(args_, template_type);
 }
 
 VarPtr ArgumentList::evaluate(const Parameter& param) const
@@ -90,3 +92,5 @@ const Argument* ArgumentList::operator[](const Parameter& param) const
     }
     return nullptr;
 }
+}
+

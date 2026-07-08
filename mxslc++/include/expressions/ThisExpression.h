@@ -7,21 +7,24 @@
 
 #include "expressions/Expression.h"
 
-class ThisExpression final : public Expression
+namespace mxslc::expressions
 {
-public:
-    ThisExpression() : Expression{} { }
-    explicit ThisExpression(Token token) : Expression{std::move(token)} { }
+    class ThisExpression final : public Expression
+    {
+    public:
+        ThisExpression() = default;
+        explicit ThisExpression(Token token) : Expression{std::move(token)} { }
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void init_impl(const vector<TypePtr>& types) override;
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_impl(const vector<TypePtr>& types) override;
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-private:
-    VarPtr this_;
-};
+    private:
+        VarPtr this_;
+    };
+}
 
 #endif //MXSLC_THISEXPRESSION_H

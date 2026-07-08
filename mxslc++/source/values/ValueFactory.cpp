@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "values/InterfaceValue.h"
 #include "values/NodeGraphOutputValue.h"
 #include "values/NodeGraphValue.h"
@@ -17,6 +17,8 @@
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 
+namespace mxslc
+{
 VarPtr ValueFactory::create_interface_value(TypePtr type, const string& name)
 {
     if (type->has_fields())
@@ -242,3 +244,5 @@ VarPtr ValueFactory::create_default_value_impl(primitive_t value)
         std::make_shared<BasicValue>(std::move(value))
     );
 }
+}
+

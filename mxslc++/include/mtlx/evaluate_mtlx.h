@@ -5,8 +5,11 @@
 #ifndef MXSLC_EVALUATE_MTLX_H
 #define MXSLC_EVALUATE_MTLX_H
 
-#include "utils/common.h"
+#include "common.h"
 
-VarPtr evaluate_now(const TypePtr& node_type, const string& node_name, const ParameterValues& input_values);
+namespace mxslc::optimisations
+{
+    VarPtr evaluate_now(const TypePtr& node_type, const string& node_name, const ParameterValues& input_values);
+}
 
 #endif //MXSLC_EVALUATE_MTLX_H

@@ -7,6 +7,8 @@
 #include "runtime/Variable.h"
 #include "values/BasicValue.h"
 
+namespace mxslc
+{
 VarPtr evaluate_separate2(const TypePtr& type, const vector<BasicValuePtr>& values)
 {
     const BasicValuePtr& in = values[0];
@@ -67,3 +69,5 @@ VarPtr evaluate_separate4(const TypePtr& type, const vector<BasicValuePtr>& valu
 
     return nullptr;
 }
+}
+

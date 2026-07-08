@@ -7,21 +7,24 @@
 
 #include "expressions/Expression.h"
 
-class NullExpression final : public Expression
+namespace mxslc::expressions
 {
-public:
-    NullExpression() = default;
-    explicit NullExpression(Token token) : Expression{std::move(token)} { }
+    class NullExpression final : public Expression
+    {
+    public:
+        NullExpression() = default;
+        explicit NullExpression(Token token) : Expression{std::move(token)} { }
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void init_impl(const vector<TypePtr>& types) override;
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_impl(const vector<TypePtr>& types) override;
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-private:
-    TypePtr type_;
-};
+    private:
+        TypePtr type_;
+    };
+}
 
 #endif //FENNEC_NULLEXPRESSION_H

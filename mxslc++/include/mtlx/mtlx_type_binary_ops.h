@@ -5,28 +5,31 @@
 #ifndef MXSLC_MTLX_TYPE_BINARY_OPS_H
 #define MXSLC_MTLX_TYPE_BINARY_OPS_H
 
-template<typename T>
-T operator+(const T& t, const float f)
+namespace mxslc
 {
-    return t + T{f};
-}
+    template<typename T>
+    T operator+(const T& t, const float f)
+    {
+        return t + T{f};
+    }
 
-template<typename T>
-T operator-(const T& t, const float f)
-{
-    return t - T{f};
-}
+    template<typename T>
+    T operator-(const T& t, const float f)
+    {
+        return t - T{f};
+    }
 
-template<typename T>
-T operator*(const T& t, const float f)
-{
-    return t * T{f};
-}
+    template<typename T>
+    T operator*(const T& t, const float f)
+    {
+        return t * T{f};
+    }
 
-template<typename T>
-T operator/(const T& t, const float f)
-{
-    return t / T{f};
+    template<typename T>
+    T operator/(const T& t, const float f)
+    {
+        return t / T{f};
+    }
 }
 
 #endif //MXSLC_MTLX_TYPE_BINARY_OPS_H

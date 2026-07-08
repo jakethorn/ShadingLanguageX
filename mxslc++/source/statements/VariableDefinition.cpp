@@ -11,6 +11,8 @@
 #include "runtime/Variable.h"
 #include "values/ValueFactory.h"
 
+namespace mxslc
+{
 VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr)
     : VariableDefinition{std::move(mods), std::move(type), std::move(name), std::move(expr), Token{}}
 {
@@ -79,3 +81,5 @@ void VariableDefinition::execute_impl() const
     const VarPtr var = Variable::create(mods_, std::move(type), value);
     var->add_to_scope(name_);
 }
+}
+

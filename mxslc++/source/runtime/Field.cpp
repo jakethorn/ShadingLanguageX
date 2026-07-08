@@ -6,6 +6,8 @@
 #include "runtime/Type.h"
 #include "expressions/Expression.h"
 
+namespace mxslc
+{
 Field Field::instantiate_template_types(const TypePtr& template_type) const
 {
     TypePtr type = type_->instantiate_template_types(template_type);
@@ -19,3 +21,5 @@ string Field::str() const
         result += " " + name();
     return result;
 }
+}
+

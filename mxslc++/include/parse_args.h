@@ -5,10 +5,7 @@
 #ifndef MXSLC_PARSE_ARGS_H
 #define MXSLC_PARSE_ARGS_H
 
-#include <filesystem>
-#include <string>
-#include <vector>
-
+#include "common.h"
 #include "CompileOptions.h"
 
 namespace mxslc
@@ -23,7 +20,7 @@ namespace mxslc
     struct CommandLineArgs
     {
         Action action{Action::Compile};
-        std::filesystem::path input_file;
+        fs::path input_file;
         CompileOptions options;
         bool is_valid{true};
 
@@ -31,10 +28,10 @@ namespace mxslc
     };
 
     CommandLineArgs parse_args(int argc, char* argv[]);
-    CommandLineArgs parse_args(const std::vector<std::string>& argv);
-    CommandLineArgs parse_args(const std::filesystem::path& response_path);
+    CommandLineArgs parse_args(const vector<string>& argv);
+    CommandLineArgs parse_args(const fs::path& response_path);
 
-    Action to_action(const std::string& str);
+    Action to_action(const string& str);
 }
 
 #endif //MXSLC_PARSE_ARGS_H

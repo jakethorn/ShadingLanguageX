@@ -5,50 +5,53 @@
 #ifndef FENNEC_ARGUMENTLIST_H
 #define FENNEC_ARGUMENTLIST_H
 
-#include "utils/common.h"
+#include "common.h"
 #include "runtime/Argument.h"
 
-class Parameter;
-class ParameterList;
-
-class ArgumentList
+namespace mxslc::runtime
 {
-public:
-    ArgumentList() = default;
-    ArgumentList(vector<Argument> args);
-    ArgumentList(const vector<ExprPtr>& exprs);
-    ArgumentList(const vector<VarPtr>& values);
-    ArgumentList(const vector<primitive_t>& values);
-    ArgumentList(const VarPtr& value);
+    class Parameter;
+    class ParameterList;
 
-    template <typename... Exprs>
-    explicit ArgumentList(Exprs&&... exprs)
+    class ArgumentList
     {
-        args_.reserve(sizeof...(exprs));
+    public:
+        ArgumentList() = default;
+        ArgumentList(vector<Argument> args);
+        ArgumentList(const vector<ExprPtr>& exprs);
+        ArgumentList(const vector<VarPtr>& values);
+        ArgumentList(const vector<primitive_t>& values);
+        ArgumentList(const VarPtr& value);
 
-        size_t i = 0;
-        (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
-    }
+        template <typename... Exprs>
+        explicit ArgumentList(Exprs&&... exprs)
+        {
+            args_.reserve(sizeof...(exprs));
 
-    ArgumentList instantiate_template_types(const TypePtr& template_type) const;
+            size_t i = 0;
+            (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
+        }
 
-    VarPtr evaluate(const Parameter& param) const;
-    ParameterValues evaluate(const ParameterList& params) const;
+        ArgumentList instantiate_template_types(const TypePtr& template_type) const;
 
-    size_t size() const { return args_.size(); }
-    bool empty() const { return args_.empty(); }
+        VarPtr evaluate(const Parameter& param) const;
+        ParameterValues evaluate(const ParameterList& params) const;
 
-    const Argument& operator[](const size_t i) const { return args_.at(i); }
-    const Argument* operator[](const Parameter& param) const;
+        size_t size() const { return args_.size(); }
+        bool empty() const { return args_.empty(); }
 
-    auto begin() { return args_.begin(); }
-    auto begin() const { return args_.begin(); }
+        const Argument& operator[](const size_t i) const { return args_.at(i); }
+        const Argument* operator[](const Parameter& param) const;
 
-    auto end() { return args_.end(); }
-    auto end() const { return args_.end(); }
+        auto begin() { return args_.begin(); }
+        auto begin() const { return args_.begin(); }
 
-private:
-    vector<Argument> args_;
-};
+        auto end() { return args_.end(); }
+        auto end() const { return args_.end(); }
+
+    private:
+        vector<Argument> args_;
+    };
+}
 
 #endif //FENNEC_ARGUMENTLIST_H

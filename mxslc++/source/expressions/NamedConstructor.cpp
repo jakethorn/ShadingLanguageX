@@ -8,8 +8,10 @@
 #include "runtime/RuntimeUtils.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "../../include/runtime/utils/instantiate_template_types_utils.h"
 
+namespace mxslc
+{
 NamedConstructor::NamedConstructor(string name, ArgumentList args)
     : name_{std::move(name)}, args_{std::move(args)}
 {
@@ -24,7 +26,7 @@ NamedConstructor::NamedConstructor(string name, ArgumentList args, Token token)
 
 ExprPtr NamedConstructor::instantiate_template_types(const TypePtr& template_type) const
 {
-    string name = ::instantiate_template_types(name_, template_type);
+    string name = mxslc::instantiate_template_types(name_, template_type);
     ArgumentList args = args_.instantiate_template_types(template_type);
     return std::make_unique<NamedConstructor>(std::move(name), std::move(args), token_);
 }
@@ -45,3 +47,5 @@ VarPtr NamedConstructor::evaluate_impl() const
 {
     return func_call_->evaluate();
 }
+}
+

@@ -5,14 +5,16 @@
 #include "statements/ForEachLoop.h"
 
 #include "expressions/Expression.h"
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "../../include/runtime/utils/instantiate_template_types_utils.h"
 #include "values/Value.h"
 
+namespace mxslc
+{
 ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr iter_expr, StmtPtr body)
     : Statement{std::move(token)},
     mods_{std::move(mods)},
@@ -27,7 +29,7 @@ ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypePtr type, string na
 StmtPtr ForEachLoop::instantiate_template_types(const TypePtr& template_type) const
 {
     TypePtr type = type_->instantiate_template_types(template_type);
-    ExprPtr iter_expr = ::instantiate_template_types(iter_expr_, template_type);
+    ExprPtr iter_expr = mxslc::instantiate_template_types(iter_expr_, template_type);
     StmtPtr body = body_->instantiate_template_types(template_type);
     return std::make_unique<ForEachLoop>(token_, mods_, std::move(type), name_, std::move(iter_expr), std::move(body));
 }
@@ -54,3 +56,5 @@ void ForEachLoop::execute_impl() const
         runtime().exit_scope();
     }
 }
+}
+

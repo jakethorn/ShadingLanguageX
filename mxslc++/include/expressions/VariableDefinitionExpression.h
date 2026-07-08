@@ -6,27 +6,29 @@
 #define MXSLC_VARIABLEDEFINITIONEXPRESSION_H
 
 #include "expressions/Expression.h"
+#include "runtime/ModifierList.h"
 
-class ModifierList;
-
-class VariableDefinitionExpression final : public Expression
+namespace mxslc::expressions
 {
-public:
-    VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name);
-    VariableDefinitionExpression(StmtPtr var_def, ExprPtr identifier);
+    class VariableDefinitionExpression final : public Expression
+    {
+    public:
+        VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name);
+        VariableDefinitionExpression(StmtPtr var_def, ExprPtr identifier);
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void init_impl(const vector<TypePtr>& types) override;
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_impl(const vector<TypePtr>& types) override;
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-private:
-    const string& name() const { return token_.lexeme(); }
+    private:
+        const string& name() const { return token_.lexeme(); }
 
-    StmtPtr var_def_;
-    ExprPtr identifier_;
-};
+        StmtPtr var_def_;
+        ExprPtr identifier_;
+    };
+}
 
 #endif //MXSLC_VARIABLEDEFINITIONEXPRESSION_H

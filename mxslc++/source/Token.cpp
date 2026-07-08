@@ -4,10 +4,10 @@
 
 #include "Token.h"
 
-#include "CompileError.h"
 #include "scan.h"
 #include "runtime/Type.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "runtime/utils/instantiate_template_types_utils.h"
+#include "errors/CompileError.h"
 
 namespace mxslc
 {

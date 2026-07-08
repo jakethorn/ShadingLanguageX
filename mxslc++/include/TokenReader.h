@@ -5,14 +5,11 @@
 #ifndef FENNEC_TOKENREADER_H
 #define FENNEC_TOKENREADER_H
 
-#include <algorithm>
-#include <limits>
-#include <optional>
-
-#include "CompileError.h"
+#include "common.h"
 #include "Token.h"
 #include "TokenType.h"
 #include "Span.h"
+#include "errors/CompileError.h"
 
 namespace mxslc
 {
@@ -20,7 +17,7 @@ namespace mxslc
     {
     public:
         TokenReader() = default;
-        explicit TokenReader(std::vector<Token> tokens) : tokens_{std::move(tokens)} { }
+        explicit TokenReader(vector<Token> tokens) : tokens_{std::move(tokens)} { }
 
         size_t size() const;
         bool empty() const;
@@ -31,10 +28,10 @@ namespace mxslc
         Span<Token> peek_until(TokenType type, size_t max_tokens = std::numeric_limits<size_t>::max()) const;
 
         Token consume();
-        std::optional<Token> consume(const std::vector<TokenType>& types);
+        optional<Token> consume(const vector<TokenType>& types);
 
         template<typename... Args>
-        std::optional<Token> consume(const Args&... types)
+        optional<Token> consume(const Args&... types)
         {
             if (empty())
                 return std::nullopt;
@@ -49,10 +46,10 @@ namespace mxslc
         }
 
         template<typename... Args>
-        std::vector<Token> consume_while(const Args&... types)
+        vector<Token> consume_while(const Args&... types)
         {
-            std::vector<Token> tokens;
-            while (std::optional<Token> token = consume(types...))
+            vector<Token> tokens;
+            while (optional<Token> token = consume(types...))
             {
                 tokens.push_back(std::move(*token));
             }
@@ -61,9 +58,9 @@ namespace mxslc
         }
 
         template<typename... Args>
-        std::vector<Token> consume_until(const Args&... types)
+        vector<Token> consume_until(const Args&... types)
         {
-            std::vector<Token> tokens;
+            vector<Token> tokens;
             while ((... || (peek() != types)))
             {
                 tokens.push_back(consume());
@@ -89,8 +86,8 @@ namespace mxslc
     private:
         void check_bounds(size_t n = 0) const;
 
-        std::vector<Token> tokens_;
-        size_t index_ = 0;
+        vector<Token> tokens_;
+        size_t index_{0};
     };
 }
 

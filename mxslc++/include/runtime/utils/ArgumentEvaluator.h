@@ -5,10 +5,13 @@
 #ifndef MXSLC_ARGUMENTEVALUATOR_H
 #define MXSLC_ARGUMENTEVALUATOR_H
 
-class ArgumentEvaluator
+namespace mxslc::runtime::runtime_utils
 {
-public:
-    ArgumentEvaluator() = default;
-};
+    class ArgumentEvaluator
+    {
+    public:
+        ArgumentEvaluator() = default;
+    };
+}
 
 #endif //MXSLC_ARGUMENTEVALUATOR_H

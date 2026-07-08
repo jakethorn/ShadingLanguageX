@@ -5,8 +5,10 @@
 #include "runtime/ModifierList.h"
 
 #include "Token.h"
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 
+namespace mxslc
+{
 ModifierList::ModifierList(const TokenType::Enum mod)
 {
     add(mod);
@@ -31,3 +33,5 @@ string ModifierList::str() const
         result += mod.str() + " ";
     return result;
 }
+}
+

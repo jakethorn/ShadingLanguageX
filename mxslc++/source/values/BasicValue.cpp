@@ -6,11 +6,13 @@
 
 #include <sstream>
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Type.h"
 #include "mtlx/mtlx_utils.h"
 #include "mtlx/mtlx_type_ostream_ops.h"
 
+namespace mxslc
+{
 BasicValue::BasicValue(primitive_t val) : Value{Type::of(val)}, value_{std::move(val)} { }
 BasicValue::BasicValue(primitive_t val, TypePtr type) : Value{std::move(type)}, value_{std::move(val)} { }
 
@@ -93,3 +95,5 @@ string BasicValue::type_name() const
 {
     return type_->name();
 }
+}
+

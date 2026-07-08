@@ -11,6 +11,8 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 
+namespace mxslc
+{
 ConstructorDefinition::ConstructorDefinition(ModifierList mods, string class_name, ParameterList params, StmtPtr body, Token token)
     : Statement{std::move(token)}, mods_{std::move(mods)}, class_name_{std::move(class_name)}, params_{std::move(params)}, body_{std::move(body)}
 {
@@ -94,3 +96,5 @@ void ConstructorDefinition::execute_impl() const
     if (not outer_ctor_->is_inline())
         serializer().write_node_def_graph(outer_ctor_, AttributeList{});
 }
+}
+

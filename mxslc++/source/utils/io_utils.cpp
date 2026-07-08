@@ -15,8 +15,10 @@
     #include <dlfcn.h>
 #endif
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 
+namespace mxslc
+{
 using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
@@ -105,3 +107,5 @@ vector<fs::path> get_include_directories(const optional<fs::path>& src_path)
     dirs.push_back(get_executable_dir());
     return dirs;
 }
+}
+

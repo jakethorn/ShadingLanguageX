@@ -9,6 +9,8 @@
 #include "runtime/Variable.h"
 #include "values/BasicValue.h"
 
+namespace mxslc
+{
 ExprPtr Literal::instantiate_template_types(const TypePtr& template_type) const
 {
     return std::make_shared<Literal>(token_);
@@ -48,3 +50,5 @@ VarPtr Literal::evaluate_impl() const
     ValuePtr value = std::make_shared<BasicValue>(value_, type_);
     return Variable::create(std::move(value));
 }
+}
+

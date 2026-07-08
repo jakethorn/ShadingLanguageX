@@ -7,23 +7,26 @@
 
 #include "expressions/Expression.h"
 
-class Identifier final : public Expression
+namespace mxslc::expressions
 {
-public:
-    explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
+    class Identifier final : public Expression
+    {
+    public:
+        explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
 
-    const string& name() const { return name_; }
+        const string& name() const { return name_; }
 
-    ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
 
-protected:
-    void init_impl(const vector<TypePtr>& types) override;
-    TypePtr type_impl() const override;
-    VarPtr evaluate_impl() const override;
+    protected:
+        void init_impl(const vector<TypePtr>& types) override;
+        TypePtr type_impl() const override;
+        VarPtr evaluate_impl() const override;
 
-private:
-    string name_;
-    VarPtr var_;
-};
+    private:
+        string name_;
+        VarPtr var_;
+    };
+}
 
 #endif //FENNEC_IDENTIFIER_H

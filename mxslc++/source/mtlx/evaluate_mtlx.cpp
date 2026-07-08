@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "mtlx/node_evaluators/binary_ops.h"
 #include "mtlx/node_evaluators/combine.h"
 #include "mtlx/node_evaluators/convert.h"
@@ -17,6 +17,8 @@
 #include "values/Value.h"
 #include "values/BasicValue.h"
 
+namespace mxslc
+{
 namespace
 {
     unordered_map<string, std::function<VarPtr(const TypePtr& node_type, const vector<BasicValuePtr>&)>> constexpr_funcs {
@@ -63,3 +65,5 @@ VarPtr evaluate_now(const TypePtr& node_type, const string& node_name, const Par
     }
     return nullptr;
 }
+}
+

@@ -6,18 +6,21 @@
 #define MXSLC_COMPONENTACCESSOR_H
 
 #include "expressions/accessors/Accessor.h"
-#include "utils/common.h"
+#include "common.h"
 
-class ComponentAccessor final : public Accessor
+namespace mxslc::expressions
 {
-public:
-    ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr);
+    class ComponentAccessor final : public Accessor
+    {
+    public:
+        ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr);
 
-    TypePtr type() const override;
-    VarPtr evaluate() const override;
+        TypePtr type() const override;
+        VarPtr evaluate() const override;
 
-private:
-    ExprPtr func_call_;
-};
+    private:
+        ExprPtr func_call_;
+    };
+}
 
 #endif //MXSLC_COMPONENTACCESSOR_H

@@ -4,8 +4,10 @@
 
 #include "runtime/Attribute.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 
+namespace mxslc
+{
 void Attribute::add_to(const mx::ElementPtr& element) const
 {
     if (has_child())
@@ -19,3 +21,5 @@ void Attribute::add_to(const mx::ElementPtr& element) const
         element->setAttribute(name_, value_);
     }
 }
+}
+

@@ -3,11 +3,13 @@
 //
 
 #include "TokenType.h"
-#include "utils/common.h"
-#include "utils/template_utils.h"
+#include "common.h"
+#include "utils/container_utils.h"
 
 namespace mxslc
 {
+    using namespace container_utils;
+
     TokenType::Enum TokenType::to_enum(const char c)
     {
         const Enum e = static_cast<Enum>(c);
@@ -20,8 +22,8 @@ namespace mxslc
     {
         if (s.size() == 1)
             return to_enum(s[0]);
-        if (contains(lexemes_, s))
-            return lexemes_.at(s);
+        if (contains(Lexemes, s))
+            return Lexemes.at(s);
         return Unknown;
     }
 
@@ -42,12 +44,10 @@ namespace mxslc
 
     string TokenType::str() const
     {
-        for (const auto& [k, e] : lexemes_)
+        for (const auto& [k, e] : Lexemes)
         {
             if (enum_ == e)
-            {
                 return k;
-            }
         }
 
         return string{static_cast<char>(enum_)};

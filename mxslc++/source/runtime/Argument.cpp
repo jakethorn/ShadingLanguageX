@@ -4,12 +4,14 @@
 
 #include "runtime/Argument.h"
 
-#include "CompileError.h"
+#include "../../include/errors/CompileError.h"
 #include "runtime/Parameter.h"
 #include "expressions/Literal.h"
 #include "expressions/RuntimeExpression.h"
 #include "expressions/VariableDefinitionExpression.h"
 
+namespace mxslc
+{
 Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)
     : attrs_{std::move(attrs)}, mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
 {
@@ -68,14 +70,14 @@ bool Argument::try_init(const vector<TypePtr>& types) const
     return expr_->try_init(types);
 }
 
+void Argument::update() const
+{
+    expr_->update();
+}
+
 bool Argument::is_initialized() const
 {
     return expr_->is_initialized();
-}
-
-void Argument::update() const
-{
-    init(type());
 }
 
 void Argument::reset() const
@@ -101,11 +103,13 @@ VarPtr Argument::evaluate() const
 void Argument::validate(const Parameter& param) const
 {
     if (mods_.contains(TokenType::Ref) and not param.modifiers().contains(TokenType::Ref))
-        throw CompileError{"Ref argument is being passed to a non-ref parameter"s};
+        throw CompileError{"Ref argument is being passed to a non-ref parameter"};
 
     if (mods_.contains(TokenType::Out) and not param.modifiers().contains(TokenType::Out))
-        throw CompileError{"Out argument is being passed to a non-out parameter"s};
+        throw CompileError{"Out argument is being passed to a non-out parameter"};
 
     if (std::dynamic_pointer_cast<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
-        throw CompileError{"Variable definition expressions can only be passed to out parameter"s};
+        throw CompileError{"Variable definition expressions can only be passed to out parameter"};
 }
+}
+
