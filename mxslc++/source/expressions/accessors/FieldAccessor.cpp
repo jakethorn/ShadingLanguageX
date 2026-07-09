@@ -18,7 +18,7 @@ namespace mxslc::expressions
             field_var_ = var_->child(property);
 
         if (scope().has_function({var_->type(), types, property, /*is_parameterless*/true}))
-            field_var_ = invoke_utils::invoke_method(types, var_, property);
+            field_var_ = runtime_utils::invoke_method(types, var_, property);
 
         if (field_var_ == nullptr)
             throw CompileError{"Expression of type " + var_->type()->str() + " does not have a field or parameterless method with the name " + property};

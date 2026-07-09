@@ -42,6 +42,8 @@ namespace mxslc
     USING_NAMESPACE(runtime)
     USING_NAMESPACE(values)
     USING_NAMESPACE(optimisations)
+    USING_NAMESPACE(preprocess)
+    USING_NAMESPACE(decompile)
 
 #undef USING_NAMESPACE
 
@@ -79,9 +81,6 @@ namespace mxslc
     {
         class Value;
         using ValuePtr = shared_ptr<Value>;
-
-        class BasicValue;
-        using BasicValuePtr = shared_ptr<BasicValue>;
     }
 }
 

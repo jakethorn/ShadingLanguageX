@@ -7,16 +7,13 @@
 #include <cassert>
 
 #include "utils/string_utils.h"
-#include "expressions/FunctionCall.h"
-#include "expressions/NamedConstructor.h"
 #include "runtime/utils/invoke_utils.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 
-namespace mxslc::runtime
+namespace mxslc::runtime::runtime_utils
 {
-    using namespace string_utils;
-    using namespace invoke_utils;
+    using string_utils::str;
 
     VarPtr type_cast(const TypePtr& type, const VarPtr& value, const bool force)
     {

@@ -41,7 +41,7 @@ namespace mxslc::runtime
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
 
-        Field instantiate_template_types(const TypePtr& template_type) const;
+        Field monomorphize(const TypePtr& template_type) const;
 
         string str() const;
 

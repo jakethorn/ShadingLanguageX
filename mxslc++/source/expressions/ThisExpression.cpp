@@ -10,7 +10,7 @@
 
 namespace mxslc::expressions
 {
-    ExprPtr ThisExpression::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr ThisExpression::monomorphize(const TypePtr& template_type) const
     {
         return create_expression<ThisExpression>(token_);
     }

@@ -7,14 +7,15 @@
 #include "expressions/MethodCall.h"
 #include "expressions/ThisExpression.h"
 #include "errors/AmbiguousFunctionError.h"
+#include "expressions/interface.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "runtime/utils/instantiate_template_types_utils.h"
-#include "values/ValueFactory.h"
+#include "runtime/utils/monomorphize.h"
+#include "values/interface.h"
 
 namespace mxslc::expressions
 {
@@ -64,11 +65,15 @@ namespace mxslc::expressions
         set_attributes(std::move(attrs));
     }
 
-    ExprPtr FunctionCall::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr FunctionCall::monomorphize(const TypePtr& template_type) const
     {
-        TypePtr _template_type = runtime_utils::instantiate_template_types(template_type_, template_type);
-        ArgumentList args = args_.instantiate_template_types(template_type);
-        return std::make_unique<FunctionCall>(name_, std::move(_template_type), std::move(args), attrs_, token_);
+        return std::make_unique<FunctionCall>(
+            name_,
+            template_utils::monomorphize(template_type_, template_type),
+            template_utils::monomorphize(args_, template_type),
+            attrs_,
+            token_
+        );
     }
 
     void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
@@ -112,8 +117,8 @@ namespace mxslc::expressions
 
         if (func_->has_class_type() and method_call_ == nullptr)
         {
-            ExprPtr instance = std::make_unique<ThisExpression>(token_);
-            method_call_ = std::make_shared<MethodCall>(std::move(instance), std::move(name_), std::move(template_type_), std::move(args_), std::move(attrs_), std::move(token_));
+            ExprPtr instance = create_expression<ThisExpression>(token_);
+            method_call_ = create_expression<MethodCall>(std::move(instance), std::move(name_), std::move(template_type_), std::move(args_), std::move(attrs_), std::move(token_));
             method_call_->init();
         }
     }
@@ -140,7 +145,7 @@ namespace mxslc::expressions
         else
         {
             if (func_->is_parameterless())
-                return ValueFactory::create_node_graph_value(func_);
+                return value_utils::create_node_graph_value(func_);
             else
                 return serializer().write_node(func_, args_, attrs_);
         }
@@ -170,7 +175,7 @@ namespace mxslc::expressions
             }
             else
             {
-                const VarPtr default_value = param.has_default_value() ? param.evaluate() : ValueFactory::create_default_value(param.type());
+                const VarPtr default_value = param.has_default_value() ? param.evaluate() : value_utils::create_default_value(param.type());
                 default_value->set_modifiers(std::move(mods));
                 default_value->add_to_scope(param.name());
             }

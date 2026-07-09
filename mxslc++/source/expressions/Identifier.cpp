@@ -11,7 +11,7 @@
 
 namespace mxslc::expressions
 {
-    ExprPtr Identifier::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr Identifier::monomorphize(const TypePtr& template_type) const
     {
         return std::make_unique<Identifier>(token_);
     }

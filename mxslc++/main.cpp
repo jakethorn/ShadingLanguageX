@@ -2,7 +2,7 @@
 
 #include "parse_args.h"
 #include "compile.h"
-#include "include/decompile/decompile.h"
+#include "decompile/decompile.h"
 
 int main(const int argc, char* argv[])
 {

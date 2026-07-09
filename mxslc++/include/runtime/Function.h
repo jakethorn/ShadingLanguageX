@@ -15,7 +15,7 @@
 
 namespace mxslc::runtime
 {
-    class Function : protected RuntimeAware
+    class Function : protected runtime_utils::RuntimeAware
     {
     public:
         Function(

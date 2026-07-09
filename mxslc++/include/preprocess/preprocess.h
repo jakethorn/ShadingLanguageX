@@ -11,7 +11,7 @@
 #include "Primitive.h"
 #include "TokenReader.h"
 
-namespace mxslc
+namespace mxslc::preprocess
 {
     void preprocess(vector<Token>& tokens, CompileOptions& opts, bool is_include = false);
 

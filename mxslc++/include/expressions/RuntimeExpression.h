@@ -14,7 +14,7 @@ namespace mxslc::expressions
     public:
         explicit RuntimeExpression(VarPtr value);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         TypePtr type_impl() const override;

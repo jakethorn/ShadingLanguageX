@@ -24,7 +24,7 @@ namespace mxslc::expressions
 
         void set_attributes(AttributeList attrs) { attrs_ = std::move(attrs); }
 
-        virtual ExprPtr instantiate_template_types(const TypePtr& template_type) const = 0;
+        virtual ExprPtr monomorphize(const TypePtr& template_type) const = 0;
 
         void set_subexpression_type(TypePtr type) { subexpr_type_ = std::move(type); }
 

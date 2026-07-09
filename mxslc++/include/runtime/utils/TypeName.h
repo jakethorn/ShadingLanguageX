@@ -6,6 +6,7 @@
 #define MXSLC_TYPENAME_H
 
 #include "common.h"
+#include "primitive_t.h"
 
 namespace mxslc::runtime::runtime_utils
 {

@@ -2,10 +2,10 @@
 // Created by jaket on 03/06/2026.
 //
 
-#include "../../../include/runtime/utils/RuntimeAware.h"
+#include "runtime/utils/RuntimeAware.h"
 #include "runtime/Runtime.h"
 
-namespace mxslc
+namespace mxslc::runtime::runtime_utils
 {
     Runtime& RuntimeAware::runtime()
     {

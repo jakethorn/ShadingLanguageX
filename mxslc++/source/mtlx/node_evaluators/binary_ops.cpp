@@ -11,7 +11,7 @@
     if (values[0]->is<ltype>() && values[1]->is<rtype>()) \
         return Variable::create(values[0]->get<ltype>() op values[1]->get<rtype>());
 
-namespace mxslc
+namespace mxslc::optimisations
 {
     VarPtr evaluate_add(const TypePtr&, const vector<BasicValuePtr>& values)
     {

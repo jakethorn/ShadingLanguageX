@@ -22,7 +22,7 @@ namespace mxslc::expressions
         FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
         FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

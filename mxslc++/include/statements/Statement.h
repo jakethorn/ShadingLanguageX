@@ -7,11 +7,13 @@
 
 #include "Token.h"
 #include "runtime/AttributeList.h"
-#include "../runtime/utils/RuntimeAware.h"
+#include "runtime/utils/RuntimeAware.h"
 #include "common.h"
 
 namespace mxslc::statements
 {
+    using runtime_utils::RuntimeAware;
+
     class Statement : protected RuntimeAware
     {
     public:
@@ -22,7 +24,7 @@ namespace mxslc::statements
 
         virtual void set_attributes(AttributeList attrs) { }
 
-        virtual StmtPtr instantiate_template_types(const TypePtr& template_type) const = 0;
+        virtual StmtPtr monomorphize(const TypePtr& template_type) const = 0;
         virtual void init() { }
         void execute();
 

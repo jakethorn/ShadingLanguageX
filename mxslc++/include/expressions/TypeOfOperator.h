@@ -16,7 +16,7 @@ namespace mxslc::expressions
         TypeOfOperator(ExprPtr expr, Token token);
         TypeOfOperator(ExprPtr expr, TypePtr template_type, Token token);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

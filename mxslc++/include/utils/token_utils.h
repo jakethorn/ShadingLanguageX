@@ -14,7 +14,7 @@ namespace mxslc
 
 namespace mxslc::token_utils
 {
-    string join(const vector<Token>& tokens, const string& separator = "");
+    string join_tokens(const vector<Token>& tokens, const string& separator = "");
 }
 
 #endif //MXSLC_TOKEN_UTILS_H

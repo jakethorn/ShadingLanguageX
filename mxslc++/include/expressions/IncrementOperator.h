@@ -14,7 +14,7 @@ namespace mxslc::expressions
     public:
         IncrementOperator(ExprPtr lhs_expr, Token op, bool prefix);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

@@ -7,7 +7,7 @@
 
 namespace mxslc::token_utils
 {
-    string join(const vector<Token>& tokens, const string& separator)
+    string join_tokens(const vector<Token>& tokens, const string& separator)
     {
         string result;
         for (auto it = tokens.begin(); it != tokens.end(); ++it)

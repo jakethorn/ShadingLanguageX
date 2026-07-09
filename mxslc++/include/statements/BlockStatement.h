@@ -14,7 +14,7 @@ namespace mxslc::statements
     public:
         BlockStatement(Token token, vector<StmtPtr> body);
 
-        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void execute_impl() const override;

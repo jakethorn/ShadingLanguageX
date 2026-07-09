@@ -27,11 +27,11 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr VariableDefinitionExpression::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr VariableDefinitionExpression::monomorphize(const TypePtr& template_type) const
     {
         return create_expression<VariableDefinitionExpression>(
-            var_def_->instantiate_template_types(template_type),
-            identifier_->instantiate_template_types(template_type)
+            var_def_->monomorphize(template_type),
+            identifier_->monomorphize(template_type)
         );
     }
 

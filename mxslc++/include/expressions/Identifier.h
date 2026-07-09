@@ -16,7 +16,7 @@ namespace mxslc::expressions
 
         const string& name() const { return name_; }
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_impl(const vector<TypePtr>& types) override;

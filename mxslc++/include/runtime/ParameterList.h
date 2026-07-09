@@ -7,7 +7,6 @@
 
 #include "common.h"
 #include "runtime/Parameter.h"
-#include "utils/instantiate_template_types_utils.h"
 
 namespace mxslc::runtime
 {
@@ -19,10 +18,7 @@ namespace mxslc::runtime
         ParameterList() = default;
         ParameterList(vector<Parameter> params);
 
-        ParameterList instantiate_template_types(const TypePtr& template_type) const
-        {
-            return mxslc::instantiate_template_types(params_, template_type);
-        }
+        ParameterList monomorphize(const TypePtr& template_type) const;
 
         void init()
         {

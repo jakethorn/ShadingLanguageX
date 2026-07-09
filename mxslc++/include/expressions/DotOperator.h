@@ -16,7 +16,7 @@ namespace mxslc::expressions
     public:
         DotOperator(ExprPtr expr, Token property);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

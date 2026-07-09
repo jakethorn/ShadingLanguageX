@@ -18,7 +18,7 @@ namespace mxslc::expressions
         RangeExpression(ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr);
         RangeExpression(ExprPtr lower_expr, ExprPtr step_expr, ExprPtr upper_expr, Token token);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

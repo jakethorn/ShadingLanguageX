@@ -12,7 +12,7 @@
 
 namespace mxslc::expressions
 {
-    ExprPtr NullExpression::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr NullExpression::monomorphize(const TypePtr& template_type) const
     {
         return create_expression<NullExpression>(token_);
     }

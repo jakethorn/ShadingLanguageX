@@ -6,6 +6,7 @@
 #define MXSLC_BINARY_OPS_H
 
 #include "common.h"
+#include "values/interface.h"
 
 namespace mxslc::optimisations
 {

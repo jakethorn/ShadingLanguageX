@@ -16,9 +16,9 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr IncrementOperator::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr IncrementOperator::monomorphize(const TypePtr& template_type) const
     {
-        ExprPtr lhs_expr = lhs_expr_->instantiate_template_types(template_type);
+        ExprPtr lhs_expr = lhs_expr_->monomorphize(template_type);
         return create_expression<IncrementOperator>(std::move(lhs_expr), token_, prefix_);
     }
 

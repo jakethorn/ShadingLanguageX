@@ -5,12 +5,12 @@
 #ifndef MXSLC_ACCESSOR_H
 #define MXSLC_ACCESSOR_H
 
-#include "../../runtime/utils/RuntimeAware.h"
 #include "common.h"
+#include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::expressions
 {
-    class Accessor : protected RuntimeAware
+    class Accessor : protected runtime_utils::RuntimeAware
     {
     public:
         Accessor() = default;

@@ -32,7 +32,7 @@ namespace mxslc::runtime
             (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
         }
 
-        ArgumentList instantiate_template_types(const TypePtr& template_type) const;
+        ArgumentList monomorphize(const TypePtr& template_type) const;
 
         VarPtr evaluate(const Parameter& param) const;
         ParameterValues evaluate(const ParameterList& params) const;

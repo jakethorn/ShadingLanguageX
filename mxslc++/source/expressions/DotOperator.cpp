@@ -4,6 +4,7 @@
 
 #include "expressions/DotOperator.h"
 
+#include "expressions/interface.h"
 #include "expressions/accessors/FieldAccessor.h"
 #include "expressions/accessors/PortAccessor.h"
 #include "runtime/Variable.h"
@@ -15,10 +16,10 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr DotOperator::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr DotOperator::monomorphize(const TypePtr& template_type) const
     {
-        ExprPtr expr = expr_->instantiate_template_types(template_type);
-        return std::make_unique<DotOperator>(std::move(expr), token_);
+        ExprPtr expr = expr_->monomorphize(template_type);
+        return create_expression<DotOperator>(std::move(expr), token_);
     }
 
     void DotOperator::init_subexpressions(const vector<TypePtr>& types)
@@ -31,11 +32,11 @@ namespace mxslc::expressions
         VarPtr var = expr_->evaluate();
         if (var->has_value())
         {
-            accessor_ = std::make_unique<PortAccessor>(std::move(var), token_.lexeme());
+            accessor_ = create_accessor<PortAccessor>(std::move(var), token_.lexeme());
         }
         else
         {
-            accessor_ = std::make_unique<FieldAccessor>(types, std::move(var), token_.lexeme());
+            accessor_ = create_accessor<FieldAccessor>(types, std::move(var), token_.lexeme());
         }
     }
 

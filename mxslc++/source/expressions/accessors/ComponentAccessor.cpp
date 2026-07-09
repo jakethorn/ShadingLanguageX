@@ -5,13 +5,14 @@
 #include "expressions/accessors/ComponentAccessor.h"
 
 #include "expressions/FunctionCall.h"
+#include "expressions/interface.h"
 #include "runtime/utils/invoke_utils.h"
 
 namespace mxslc::expressions
 {
     ComponentAccessor::ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr)
     {
-        func_call_ = invoke_utils::function_call("extract", ArgumentList{std::move(value_expr), std::move(index_expr)});
+        func_call_ = create_expression<FunctionCall>("extract", ArgumentList{std::move(value_expr), std::move(index_expr)});
         func_call_->init();
     }
 

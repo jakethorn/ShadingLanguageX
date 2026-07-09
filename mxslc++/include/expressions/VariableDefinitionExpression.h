@@ -16,7 +16,7 @@ namespace mxslc::expressions
         VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name);
         VariableDefinitionExpression(StmtPtr var_def, ExprPtr identifier);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_impl(const vector<TypePtr>& types) override;

@@ -14,7 +14,7 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr RuntimeExpression::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr RuntimeExpression::monomorphize(const TypePtr& template_type) const
     {
         return create_expression<RuntimeExpression>(value_);
     }

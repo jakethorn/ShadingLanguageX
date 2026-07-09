@@ -4,112 +4,112 @@
 
 #include "runtime/Argument.h"
 
-#include "../../include/errors/CompileError.h"
 #include "runtime/Parameter.h"
 #include "expressions/Literal.h"
 #include "expressions/RuntimeExpression.h"
 #include "expressions/VariableDefinitionExpression.h"
+#include "errors/CompileError.h"
+#include "expressions/interface.h"
 
-namespace mxslc
+namespace mxslc::runtime
 {
-Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)
-    : attrs_{std::move(attrs)}, mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
-{
-    mods_.validate(TokenType::Ref, TokenType::Out);
-    if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
-        throw CompileError{"An argument cannot be both ref and out"s};
+    Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)
+        : attrs_{std::move(attrs)}, mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
+    {
+        mods_.validate(TokenType::Ref, TokenType::Out);
+        if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
+            throw CompileError{"An argument cannot be both ref and out"};
+    }
+
+    Argument::Argument(ModifierList mods, string name, ExprPtr expr, const size_t index)
+        : Argument{AttributeList{}, std::move(mods), std::move(name), std::move(expr), index} { }
+
+    Argument::Argument(ModifierList mods, ExprPtr expr, const size_t index)
+        : Argument{std::move(mods), string{}, std::move(expr), index} { }
+
+    Argument::Argument(string name, ExprPtr expr, const size_t index)
+        : Argument{ModifierList{}, std::move(name), std::move(expr), index} { }
+
+    Argument::Argument(ExprPtr expr, const size_t index)
+        : Argument{string{}, std::move(expr), index} { }
+
+    Argument::Argument(VarPtr value, const size_t index)
+        : Argument{create_expression<RuntimeExpression>(std::move(value)), index} { }
+
+    Argument::Argument(primitive_t value, const size_t index)
+        : Argument{create_expression<Literal>(std::move(value)), index} { }
+
+    Argument::Argument(Argument&& other) noexcept
+        : attrs_{std::move(other.attrs_)},
+        mods_{std::move(other.mods_)},
+        name_{std::move(other.name_)},
+        expr_{std::move(other.expr_)},
+        index_{other.index_}
+    {
+
+    }
+
+    Argument::~Argument() = default;
+
+    Argument Argument::monomorphize(const TypePtr& template_type) const
+    {
+        return Argument{name_, expr_->monomorphize(template_type), index_};
+    }
+
+    void Argument::init(const TypePtr& type) const
+    {
+        expr_->init(type);
+    }
+
+    void Argument::init(const vector<TypePtr>& types) const
+    {
+        expr_->init(types);
+    }
+
+    bool Argument::try_init(const vector<TypePtr>& types) const
+    {
+        return expr_->try_init(types);
+    }
+
+    void Argument::update() const
+    {
+        expr_->update();
+    }
+
+    bool Argument::is_initialized() const
+    {
+        return expr_->is_initialized();
+    }
+
+    void Argument::reset() const
+    {
+        expr_->reset();
+    }
+
+    const string& Argument::error_message() const
+    {
+        return expr_->error_message();
+    }
+
+    TypePtr Argument::type() const
+    {
+        return expr_->type();
+    }
+
+    VarPtr Argument::evaluate() const
+    {
+        return expr_->evaluate();
+    }
+
+    void Argument::validate(const Parameter& param) const
+    {
+        if (mods_.contains(TokenType::Ref) and not param.modifiers().contains(TokenType::Ref))
+            throw CompileError{"Ref argument is being passed to a non-ref parameter"};
+
+        if (mods_.contains(TokenType::Out) and not param.modifiers().contains(TokenType::Out))
+            throw CompileError{"Out argument is being passed to a non-out parameter"};
+
+        if (std::dynamic_pointer_cast<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
+            throw CompileError{"Variable definition expressions can only be passed to out parameter"};
+    }
 }
-
-Argument::Argument(ModifierList mods, string name, ExprPtr expr, const size_t index)
-    : Argument{AttributeList{}, std::move(mods), std::move(name), std::move(expr), index} { }
-
-Argument::Argument(ModifierList mods, ExprPtr expr, const size_t index)
-    : Argument{std::move(mods), ""s, std::move(expr), index} { }
-
-Argument::Argument(string name, ExprPtr expr, const size_t index)
-    : Argument{ModifierList{}, std::move(name), std::move(expr), index} { }
-
-Argument::Argument(ExprPtr expr, const size_t index)
-    : Argument{""s, std::move(expr), index} { }
-
-Argument::Argument(VarPtr value, const size_t index)
-    : Argument{std::make_shared<RuntimeExpression>(std::move(value)), index} { }
-
-Argument::Argument(primitive_t value, const size_t index)
-    : Argument{std::make_shared<Literal>(std::move(value)), index} { }
-
-Argument::Argument(Argument&& other) noexcept
-    : attrs_{std::move(other.attrs_)},
-    mods_{std::move(other.mods_)},
-    name_{std::move(other.name_)},
-    expr_{std::move(other.expr_)},
-    index_{other.index_}
-{
-
-}
-
-Argument::~Argument() = default;
-
-Argument Argument::instantiate_template_types(const TypePtr& template_type) const
-{
-    return Argument{name_, expr_->instantiate_template_types(template_type), index_};
-}
-
-void Argument::init(const TypePtr& type) const
-{
-    expr_->init(type);
-}
-
-void Argument::init(const vector<TypePtr>& types) const
-{
-    expr_->init(types);
-}
-
-bool Argument::try_init(const vector<TypePtr>& types) const
-{
-    return expr_->try_init(types);
-}
-
-void Argument::update() const
-{
-    expr_->update();
-}
-
-bool Argument::is_initialized() const
-{
-    return expr_->is_initialized();
-}
-
-void Argument::reset() const
-{
-    expr_->reset();
-}
-
-const string& Argument::error_message() const
-{
-    return expr_->error_message();
-}
-
-TypePtr Argument::type() const
-{
-    return expr_->type();
-}
-
-VarPtr Argument::evaluate() const
-{
-    return expr_->evaluate();
-}
-
-void Argument::validate(const Parameter& param) const
-{
-    if (mods_.contains(TokenType::Ref) and not param.modifiers().contains(TokenType::Ref))
-        throw CompileError{"Ref argument is being passed to a non-ref parameter"};
-
-    if (mods_.contains(TokenType::Out) and not param.modifiers().contains(TokenType::Out))
-        throw CompileError{"Out argument is being passed to a non-out parameter"};
-
-    if (std::dynamic_pointer_cast<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
-        throw CompileError{"Variable definition expressions can only be passed to out parameter"};
-}
-}
-

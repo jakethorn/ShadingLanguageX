@@ -8,36 +8,34 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "../../include/runtime/utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
+#include "statements/interface.h"
 
-namespace mxslc
+namespace mxslc::statements
 {
-IfStatement::IfStatement(Token token, ExprPtr cond_expr, StmtPtr then_body, StmtPtr else_body)
-    : Statement{std::move(token)}, cond_expr_{std::move(cond_expr)}, then_body_{std::move(then_body)}, else_body_{std::move(else_body)} { }
+    IfStatement::IfStatement(Token token, ExprPtr cond_expr, StmtPtr then_body, StmtPtr else_body)
+        : Statement{std::move(token)}, cond_expr_{std::move(cond_expr)}, then_body_{std::move(then_body)}, else_body_{std::move(else_body)} { }
 
-StmtPtr IfStatement::instantiate_template_types(const TypePtr& template_type) const
-{
-    ExprPtr cond_expr = mxslc::instantiate_template_types(cond_expr_, template_type);
-    StmtPtr then_body = then_body_->instantiate_template_types(template_type);
-    StmtPtr else_body = else_body_->instantiate_template_types(template_type);
-    return std::make_unique<IfStatement>(token_, std::move(cond_expr), std::move(then_body), std::move(else_body));
-}
-
-void IfStatement::execute_impl() const
-{
-    cond_expr_->init(Type::Bool);
-    const VarPtr cond = cond_expr_->evaluate();
-
-    runtime().enter_scope();
-    if (cond->value_as<bool>())
+    StmtPtr IfStatement::monomorphize(const TypePtr& template_type) const
     {
-        then_body_->execute();
+        auto&& [cond_expr, then_body, else_body] = template_utils::monomorphize_all(template_type, cond_expr_, then_body_, else_body_);
+        return create_statement<IfStatement>(token_, std::move(cond_expr), std::move(then_body), std::move(else_body));
     }
-    else if (else_body_)
-    {
-        else_body_->execute();
-    }
-    runtime().exit_scope();
-}
-}
 
+    void IfStatement::execute_impl() const
+    {
+        cond_expr_->init(Type::Bool);
+        const VarPtr cond = cond_expr_->evaluate();
+
+        runtime().enter_scope();
+        if (cond->value_as<bool>())
+        {
+            then_body_->execute();
+        }
+        else if (else_body_)
+        {
+            else_body_->execute();
+        }
+        runtime().exit_scope();
+    }
+}

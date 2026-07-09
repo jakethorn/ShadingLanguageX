@@ -2,13 +2,16 @@
 // Created by jaket on 02/07/2026.
 //
 
-#include "preprocess.h"
+#include "preprocess/preprocess.h"
 #include "scan.h"
 #include "utils/container_utils.h"
 #include "utils/token_utils.h"
 
-namespace mxslc
+namespace mxslc::preprocess
 {
+    using container_utils::contains;
+    using container_utils::position_of;
+
     void preprocess(vector<Token>& tokens, CompileOptions& opts, const bool is_include)
     {
         Preprocessor preprocessor{std::move(tokens), opts, is_include};
@@ -48,7 +51,7 @@ namespace mxslc
     {
         if (consume(TokenType::Hash))
         {
-            static const std::unordered_map<string, void (Preprocessor::*)()> directives = {
+            static const unordered_map<string, void (Preprocessor::*)()> directives = {
                 {"include", &Preprocessor::process_include},
                 {"library", &Preprocessor::process_library},
                 {"version", &Preprocessor::process_version},
@@ -75,14 +78,14 @@ namespace mxslc
         // TODO use search paths when getting path
         // TODO track which files have been included
         // TODO track circular dependencies (look at ancestors)
-        const std::vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
+        const vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
         const Primitive path = evaluate_expression(tokens);
         include_file(path.as<string>());
     }
 
     void Preprocessor::process_library()
     {
-        const std::vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
+        const vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
         const Primitive path = evaluate_expression(tokens);
         opts_.libraries.emplace_back(path.as<string>());
     }
@@ -90,7 +93,7 @@ namespace mxslc
     void Preprocessor::process_version()
     {
         const vector<Token> version_parts = consume_until(TokenType::Newline);
-        opts_.version = token_utils::join(version_parts);
+        opts_.version = token_utils::join_tokens(version_parts);
     }
 
     void Preprocessor::process_define()
@@ -130,7 +133,7 @@ namespace mxslc
     void Preprocessor::include_file(const fs::path& path)
     {
         vector<Token> included_tokens = scan_file(path);
-        mxslc::preprocess(included_tokens, opts_, true);
+        preprocess::preprocess(included_tokens, opts_, true);
         add_tokens(std::move(included_tokens));
 
         if (not is_include_)
@@ -144,7 +147,7 @@ namespace mxslc
         opts_.macros.emplace_back(name.lexeme(), std::move(body));
     }
 
-    void Preprocessor::define_macro(const std::string& name, std::vector<Token> body) const
+    void Preprocessor::define_macro(const string& name, vector<Token> body) const
     {
         define_macro({TokenType::Identifier, name}, std::move(body));
     }
@@ -156,7 +159,7 @@ namespace mxslc
             opts_.macros.erase(it);
     }
 
-    void Preprocessor::undef_macro(const std::string& name) const
+    void Preprocessor::undef_macro(const string& name) const
     {
         undef_macro({TokenType::Identifier, name});
     }
@@ -172,7 +175,7 @@ namespace mxslc
         if (it != opts_.macros.end())
         {
             vector<Token> tokens = it->body();
-            mxslc::preprocess(tokens, opts_, is_include_);
+            preprocess::preprocess(tokens, opts_, is_include_);
             return tokens;
         }
 
@@ -207,7 +210,7 @@ namespace mxslc
         tokens_.emplace_back(std::move(tokens));
     }
 
-    void Preprocessor::add_tokens(std::vector<Token>&& tokens)
+    void Preprocessor::add_tokens(vector<Token>&& tokens)
     {
         tokens_.insert(tokens_.cend(), std::make_move_iterator(tokens.begin()), std::make_move_iterator(tokens.end()));
     }

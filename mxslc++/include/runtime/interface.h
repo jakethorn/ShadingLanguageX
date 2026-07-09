@@ -13,6 +13,12 @@ namespace mxslc::runtime
     VarPtr create_variable();
 
     template<typename... Args>
+    FuncPtr create_function(Args&&... args)
+    {
+        return std::make_shared<Function>(std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
     TypePtr create_type(Args&&... args)
     {
         return std::make_shared<Type>(std::forward<Args>(args)...);

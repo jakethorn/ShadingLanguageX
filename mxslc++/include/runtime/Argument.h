@@ -35,7 +35,7 @@ namespace mxslc::runtime
         const string& name() const { return name_; }
         size_t index() const { return index_; }
 
-        Argument instantiate_template_types(const TypePtr& template_type) const;
+        Argument monomorphize(const TypePtr& template_type) const;
         void init(const TypePtr& type) const;
         void init(const vector<TypePtr>& types) const;
         bool try_init(const vector<TypePtr>& types) const;

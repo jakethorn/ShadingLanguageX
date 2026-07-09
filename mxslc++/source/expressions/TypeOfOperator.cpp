@@ -11,7 +11,7 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "runtime/utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
 
 namespace mxslc::expressions
 {
@@ -30,9 +30,9 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr TypeOfOperator::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr TypeOfOperator::monomorphize(const TypePtr& template_type) const
     {
-        ExprPtr expr = expr_->instantiate_template_types(template_type);
+        ExprPtr expr = expr_->monomorphize(template_type);
         return create_expression<TypeOfOperator>(std::move(expr), template_type, token_);
     }
 
@@ -42,7 +42,7 @@ namespace mxslc::expressions
         {
             string type_name = identifier->name();
             if (template_type_)
-                type_name = runtime_utils::instantiate_template_types(type_name, template_type_);
+                type_name = template_utils::monomorphize(type_name, template_type_);
 
             if (scope().has_type(type_name))
             {

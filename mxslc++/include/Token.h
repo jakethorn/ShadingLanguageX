@@ -24,6 +24,8 @@ namespace mxslc
         const string& filename() const { return filename_; }
         size_t line() const { return line_; }
 
+        Token monomorphize(const TypePtr& template_type) const;
+
         primitive_t literal() const;
 
         template<typename T>

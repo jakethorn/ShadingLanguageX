@@ -6,6 +6,7 @@
 
 #include "expressions/interface.h"
 #include "runtime/Type.h"
+#include "runtime/utils/monomorphize.h"
 
 namespace mxslc::expressions
 {
@@ -33,12 +34,14 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr RangeExpression::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr RangeExpression::monomorphize(const TypePtr& template_type) const
     {
-        ExprPtr lower_expr = lower_expr_->instantiate_template_types(template_type);
-        ExprPtr step_expr = step_expr_ ? step_expr_->instantiate_template_types(template_type) : nullptr;
-        ExprPtr upper_expr = upper_expr_->instantiate_template_types(template_type);
-        return create_expression<RangeExpression>(std::move(lower_expr), std::move(step_expr), std::move(upper_expr), token_);
+        return create_expression<RangeExpression>(
+            template_utils::monomorphize(lower_expr_, template_type),
+            template_utils::monomorphize(step_expr_, template_type),
+            template_utils::monomorphize(upper_expr_, template_type),
+            token_
+        );
     }
 
     void RangeExpression::init_subexpressions(const vector<TypePtr>& types)

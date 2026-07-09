@@ -7,8 +7,8 @@
 
 #include <MaterialXCore/Document.h>
 
-#include "../runtime/utils/RuntimeAware.h"
 #include "common.h"
+#include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::runtime
 {
@@ -18,7 +18,7 @@ namespace mxslc::runtime
 
 namespace mxslc
 {
-    class MtlXSerializer : protected RuntimeAware
+    class MtlXSerializer : protected runtime_utils::RuntimeAware
     {
     public:
         MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
@@ -29,6 +29,7 @@ namespace mxslc
         VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
         VarPtr write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
 
+        void write_node_def_graph(const FuncPtr& func) const;
         void write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const;
 
         ValuePtr write_node_def_input(const VarPtr& var) const;

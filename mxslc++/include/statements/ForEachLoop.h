@@ -15,7 +15,7 @@ namespace mxslc::statements
     public:
         ForEachLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr iter_expr, StmtPtr body);
 
-        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void execute_impl() const override;

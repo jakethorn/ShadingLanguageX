@@ -19,7 +19,7 @@ namespace mxslc::statements
 
         void set_attributes(AttributeList attrs) override;
 
-        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         const ModifierList& modifiers() const { return mods_; }
         TypePtr type() const;

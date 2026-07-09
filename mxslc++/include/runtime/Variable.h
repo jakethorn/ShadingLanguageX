@@ -10,11 +10,11 @@
 #include "values/BasicValue.h"
 #include "runtime/ModifierList.h"
 #include "errors/CompileError.h"
-#include "utils/RuntimeAware.h"
+#include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::runtime
 {
-    class Variable : public std::enable_shared_from_this<Variable>, protected RuntimeAware
+    class Variable : public std::enable_shared_from_this<Variable>, protected runtime_utils::RuntimeAware
     {
     public:
         Variable(ModifierList mods, TypePtr type);
@@ -64,7 +64,7 @@ namespace mxslc::runtime
         {
             if (const shared_ptr<BasicValue>& value = std::dynamic_pointer_cast<BasicValue>(value_))
                 return value->get<T>();
-            throw CompileError{"Value is not a compile-time "s + TypeName::of<T>()};
+            throw CompileError{"Value is not a compile-time " + TypeName::of<T>()};
         }
 
         static VarPtr create(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
@@ -81,8 +81,6 @@ namespace mxslc::runtime
         static VarPtr create(ValuePtr value);
         static VarPtr create(primitive_t value);
         static VarPtr create(const VarPtr& value);
-
-        //static VarPtr create(const mxslc::interface::Variable& var);
 
     protected:
         virtual ValuePtr value_impl() const { return value_; }

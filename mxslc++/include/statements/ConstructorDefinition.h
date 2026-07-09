@@ -16,7 +16,7 @@ namespace mxslc::statements
     public:
         ConstructorDefinition(ModifierList mods, string class_name, ParameterList params, StmtPtr body, Token token);
 
-        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr monomorphize(const TypePtr& template_type) const override;
         void init() override;
 
         const string& class_name() const { return class_name_; }

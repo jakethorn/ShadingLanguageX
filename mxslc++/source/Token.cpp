@@ -6,7 +6,7 @@
 
 #include "scan.h"
 #include "runtime/Type.h"
-#include "runtime/utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
 #include "errors/CompileError.h"
 
 namespace mxslc
@@ -22,6 +22,14 @@ namespace mxslc
             type_ = tokens[0].type();
 
         throw CompileError{"Invalid token lexeme: " + lexeme};
+    }
+
+    Token Token::monomorphize(const TypePtr& template_type) const
+    {
+        Token t{type(), template_utils::monomorphize(lexeme(), template_type)};
+        t.set_line(line());
+        t.set_filename(filename());
+        return t;
     }
 
     primitive_t Token::literal() const

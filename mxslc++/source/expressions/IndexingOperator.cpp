@@ -18,11 +18,11 @@ namespace mxslc::expressions
 
     }
 
-    ExprPtr IndexingOperator::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr IndexingOperator::monomorphize(const TypePtr& template_type) const
     {
         return create_expression<IndexingOperator>(
-            value_expr_->instantiate_template_types(template_type),
-            index_expr_->instantiate_template_types(template_type)
+            value_expr_->monomorphize(template_type),
+            index_expr_->monomorphize(template_type)
         );
     }
 

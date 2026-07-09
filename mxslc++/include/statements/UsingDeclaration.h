@@ -15,7 +15,7 @@ namespace mxslc::statements
         UsingDeclaration(Token token, string name, TypePtr type)
             : Statement{std::move(token)}, name_{std::move(name)}, type_{std::move(type)} { }
 
-        StmtPtr instantiate_template_types(const TypePtr& template_type) const override;
+        StmtPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void execute_impl() const override;

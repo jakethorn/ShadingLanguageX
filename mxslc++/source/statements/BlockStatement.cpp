@@ -4,23 +4,23 @@
 
 #include "statements/BlockStatement.h"
 
-#include "../../include/runtime/utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
+#include "statements/interface.h"
 
-namespace mxslc
+namespace mxslc::statements
 {
-BlockStatement::BlockStatement(Token token, vector<StmtPtr> body)
-    : Statement{std::move(token)}, body_{std::move(body)} { }
+    BlockStatement::BlockStatement(Token token, vector<StmtPtr> body)
+        : Statement{std::move(token)}, body_{std::move(body)} { }
 
-StmtPtr BlockStatement::instantiate_template_types(const TypePtr& template_type) const
-{
-    vector<StmtPtr> body = mxslc::instantiate_template_types(body_, template_type);
-    return std::make_unique<BlockStatement>(token_, std::move(body));
-}
+    StmtPtr BlockStatement::monomorphize(const TypePtr& template_type) const
+    {
+        vector<StmtPtr> body = template_utils::monomorphize(body_, template_type);
+        return create_statement<BlockStatement>(token_, std::move(body));
+    }
 
-void BlockStatement::execute_impl() const
-{
-    for (const StmtPtr& stmt : body_)
-        stmt->execute();
+    void BlockStatement::execute_impl() const
+    {
+        for (const StmtPtr& stmt : body_)
+            stmt->execute();
+    }
 }
-}
-

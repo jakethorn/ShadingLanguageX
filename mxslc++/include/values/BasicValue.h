@@ -12,11 +12,14 @@
 
 namespace mxslc::values
 {
+    using runtime_utils::TypeName;
+
     class BasicValue final : public Value
     {
     public:
-        explicit BasicValue(primitive_t val);
-        BasicValue(primitive_t val, TypePtr type);
+        explicit BasicValue(const mx::ValuePtr& value);
+        explicit BasicValue(primitive_t value);
+        BasicValue(primitive_t value, TypePtr type);
 
         bool equals(const ValuePtr& other) const override;
 
@@ -48,6 +51,8 @@ namespace mxslc::values
 
     private:
         string type_name() const;
+
+        static primitive_t to_primitive(const mx::ValuePtr& value);
 
         primitive_t value_;
     };

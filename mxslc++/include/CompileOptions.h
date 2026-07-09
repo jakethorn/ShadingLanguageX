@@ -7,9 +7,8 @@
 
 #include "common.h"
 #include "constants.h"
-#include "Macro.h"
+#include "preprocess/Macro.h"
 #include "primitive_t.h"
-#include "Variable.h"
 
 namespace mxslc
 {
@@ -26,7 +25,7 @@ namespace mxslc
 
         vector<Macro> macros;
 
-        vector<interface::Variable> globals;
+        vector<VarPtr> globals;
         bool error_on_missing_globals{true};
         bool error_on_unused_globals{true};
 

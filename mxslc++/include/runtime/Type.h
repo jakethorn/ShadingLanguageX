@@ -9,10 +9,12 @@
 
 #include "primitive_t.h"
 #include "runtime/Field.h"
-#include "utils/TypeName.h"
+#include "runtime/utils/TypeName.h"
 
 namespace mxslc::runtime
 {
+    using runtime_utils::TypeName;
+
     class Type
     {
         friend class Scope;
@@ -28,7 +30,7 @@ namespace mxslc::runtime
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
 
-        TypePtr instantiate_template_types(const TypePtr& template_type) const;
+        TypePtr monomorphize(const TypePtr& template_type) const;
 
         void add_field(Field field);
         size_t field_count() const { return fields_.size(); }
@@ -89,7 +91,6 @@ namespace mxslc::runtime
         static TypePtr of(const primitive_t& value) { return resolve(TypeName::of(value)); }
         static TypePtr of(const mx::NodeGraphPtr& node_graph);
         static TypePtr of(const mx::TypedElementPtr& value);
-        //static TypePtr of(const mxslc::interface::Variable& var);
         static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
         static string to_string(const vector<TypePtr>& types);
 

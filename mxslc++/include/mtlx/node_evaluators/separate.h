@@ -6,8 +6,9 @@
 #define MXSLC_SEPARATE_H
 
 #include "common.h"
+#include "values/interface.h"
 
-namespace mxslc
+namespace mxslc::optimisations
 {
     VarPtr evaluate_separate2(const TypePtr& type, const vector<BasicValuePtr>& values);
     VarPtr evaluate_separate3(const TypePtr& type, const vector<BasicValuePtr>& values);

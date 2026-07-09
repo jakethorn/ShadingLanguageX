@@ -6,6 +6,7 @@
 #define MXSLC_EXTRACT_H
 
 #include "common.h"
+#include "values/interface.h"
 
 namespace mxslc::optimisations
 {

@@ -5,6 +5,7 @@ add_library(mxslc_lib
         parse.cpp
         compile.cpp
         TokenType.cpp
+        Primitive.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
@@ -24,8 +25,8 @@ add_library(mxslc_lib
         runtime/InputVariable.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
-        runtime/Primitive.cpp
-        runtime/utils/instantiate_template_types_utils.cpp
+        runtime/interface.cpp
+        runtime/utils/monomorphize.cpp
         runtime/utils/RuntimeAware.cpp
         runtime/utils/invoke_utils.cpp
         runtime/utils/type_cast.cpp
@@ -80,14 +81,13 @@ add_library(mxslc_lib
         mtlx/node_evaluators/combine.cpp
         mtlx/node_evaluators/extract.cpp
         values/Value.cpp
-        values/ValueFactory.cpp
         values/NodeValue.cpp
         values/InterfaceValue.cpp
         values/NodeOutputValue.cpp
         values/BasicValue.cpp
         values/NodeGraphValue.cpp
         values/NodeGraphOutputValue.cpp
-        interface/Variable.cpp
+        values/interface.cpp
         preprocess/preprocess.cpp
         preprocess/Macro.cpp
 )

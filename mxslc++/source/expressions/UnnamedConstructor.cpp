@@ -8,15 +8,16 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "runtime/utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
 #include "errors/CompileError.h"
 #include "expressions/interface.h"
+#include "runtime/interface.h"
 
 namespace mxslc::expressions
 {
-    ExprPtr UnnamedConstructor::instantiate_template_types(const TypePtr& template_type) const
+    ExprPtr UnnamedConstructor::monomorphize(const TypePtr& template_type) const
     {
-        vector<ExprPtr> exprs = runtime_utils::instantiate_template_types(exprs_, template_type);
+        vector<ExprPtr> exprs = template_utils::monomorphize(exprs_, template_type);
         return create_expression<UnnamedConstructor>(token_, std::move(exprs));
     }
 
@@ -42,7 +43,7 @@ namespace mxslc::expressions
         types.reserve(exprs_.size());
         for (const ExprPtr& expr : exprs_)
             types.push_back(expr->type());
-        const TypePtr type = std::make_shared<Type>(std::move(types));
+        const TypePtr type = create_type(std::move(types));
         return scope().resolve_type(type);
     }
 

@@ -7,8 +7,8 @@
 #include <cassert>
 
 #include "mtlx/mtlx_utils.h"
-#include "runtime/Runtime.h"
 #include "runtime/Type.h"
+#include "values/interface.h"
 
 namespace mxslc::values
 {
@@ -33,7 +33,7 @@ namespace mxslc::values
 
     bool NodeValue::equals(const ValuePtr& other) const
     {
-        if (const shared_ptr<NodeValue> other_node = std::dynamic_pointer_cast<NodeValue>(other))
+        if (const NodeValuePtr other_node = cast_value<NodeValue>(other))
             return node_ == other_node->node_;
         return false;
     }

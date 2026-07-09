@@ -16,7 +16,7 @@ namespace mxslc::expressions
     public:
         IndexingOperator(ExprPtr value_expr, ExprPtr index_expr);
 
-        ExprPtr instantiate_template_types(const TypePtr& template_type) const override;
+        ExprPtr monomorphize(const TypePtr& template_type) const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

@@ -4,28 +4,26 @@
 
 #include "statements/Statement.h"
 
-#include "../../include/errors/CompileError.h"
-#include "runtime/Runtime.h"
+#include "errors/CompileError.h"
 
-namespace mxslc
+namespace mxslc::statements
 {
-void Statement::execute()
-{
-    try
+    void Statement::execute()
     {
-        if (not is_initialized_)
+        try
         {
-            init();
-            is_initialized_ = true;
+            if (not is_initialized_)
+            {
+                init();
+                is_initialized_ = true;
+            }
+
+            execute_impl();
         }
-
-        execute_impl();
-    }
-    catch (CompileError& e)
-    {
-        e.set_debug_info(token_);
-        throw;
+        catch (CompileError& e)
+        {
+            e.set_debug_info(token_);
+            throw;
+        }
     }
 }
-}
-

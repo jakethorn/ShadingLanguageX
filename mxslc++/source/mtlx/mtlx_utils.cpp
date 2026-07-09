@@ -3,9 +3,9 @@
 //
 
 #include "mtlx/mtlx_utils.h"
-#include "errors/CompileError.h"
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
+#include "errors/CompileError.h"
 
 namespace mxslc::mtlx_utils
 {
@@ -75,7 +75,7 @@ namespace mxslc::mtlx_utils
 
     void set_interface(const mx::PortElementPtr& port, const string& interface_name)
     {
-        port->removeAttribute("value"s);
+        port->removeAttribute("value");
         port->setInterfaceName(interface_name);
     }
 }

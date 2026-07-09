@@ -12,22 +12,23 @@
 #include "runtime/Variable.h"
 #include "values/NodeValue.h"
 #include "errors/CompileError.h"
+#include "values/interface.h"
 
 namespace mxslc::expressions
 {
     PortAccessor::PortAccessor(VarPtr node_var, string input_name) : node_var_{std::move(node_var)}, input_name_{std::move(input_name)}
     {
         if (not node_var_->has_value())
-            throw CompileError{"The port access (dot) operator cannot be used on values with custom types"s};
+            throw CompileError{"The port access (dot) operator cannot be used on values with custom types"};
 
         const ValuePtr value = node_var_->raw_value();
-        const shared_ptr<NodeValue> node_value = std::dynamic_pointer_cast<NodeValue>(value);
+        const NodeValuePtr node_value = cast_value<NodeValue>(value);
 
         if (node_value == nullptr)
-            throw CompileError{"The port access (dot) operator can only be used on values representing MaterialX nodes"s};
+            throw CompileError{"The port access (dot) operator can only be used on values representing MaterialX nodes"};
 
         const mx::NodePtr node = node_value->node();
-        const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node, Runtime::get().materialx_library());
+        const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node, runtime().materialx_library());
 
         const mx::InputPtr input = node_def->getActiveInput(input_name_);
         if (input == nullptr)

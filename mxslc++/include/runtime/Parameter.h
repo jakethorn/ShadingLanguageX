@@ -8,17 +8,18 @@
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
 #include "common.h"
+#include "utils/RuntimeAware.h"
 
 namespace mxslc::runtime
 {
-    class Parameter
+    class Parameter : protected runtime_utils::RuntimeAware
     {
     public:
         Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
 
         Parameter(Parameter&&) noexcept;
 
-        ~Parameter();
+        ~Parameter() override;
 
         const AttributeList& attributes() const { return attrs_; }
         const ModifierList& modifiers() const { return mods_; }
@@ -30,7 +31,7 @@ namespace mxslc::runtime
         const string& name() const { return name_; }
         size_t index() const { return index_; }
 
-        Parameter instantiate_template_types(const TypePtr& template_type) const;
+        Parameter monomorphize(const TypePtr& template_type) const;
         void init();
 
         bool has_default_value() const { return expr_ != nullptr; }
