@@ -8,8 +8,8 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "values/BasicValue.h"
-#include "values/interface.h"
+#include "serialize/values/BasicValue.h"
+#include "serialize/values/interface.h"
 
 namespace mxslc::expressions
 {

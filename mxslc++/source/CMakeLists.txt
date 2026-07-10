@@ -31,6 +31,7 @@ add_library(mxslc_lib
         runtime/utils/invoke_utils.cpp
         runtime/utils/type_cast.cpp
         runtime/utils/InitInfo.cpp
+        runtime/utils/ArgumentEvaluator.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp
@@ -70,24 +71,23 @@ add_library(mxslc_lib
         utils/string_utils.cpp
         utils/parse_args.cpp
         utils/parse_utils.cpp
-        utils/ArgumentEvaluator.cpp
-        mtlx/load_mtlx.cpp
-        mtlx/mtlx_utils.cpp
-        mtlx/MtlXSerializer.cpp
-        mtlx/evaluate_mtlx.cpp
-        mtlx/node_evaluators/binary_ops.cpp
-        mtlx/node_evaluators/separate.cpp
-        mtlx/node_evaluators/convert.cpp
-        mtlx/node_evaluators/combine.cpp
-        mtlx/node_evaluators/extract.cpp
-        values/Value.cpp
-        values/NodeValue.cpp
-        values/InterfaceValue.cpp
-        values/NodeOutputValue.cpp
-        values/BasicValue.cpp
-        values/NodeGraphValue.cpp
-        values/NodeGraphOutputValue.cpp
-        values/interface.cpp
+        utils/load_mtlx.cpp
+        utils/mtlx_utils.cpp
+        serialize/MtlXSerializer.cpp
+        serialize/evaluate_mtlx.cpp
+        serialize/node_evaluators/binary_ops.cpp
+        serialize/node_evaluators/separate.cpp
+        serialize/node_evaluators/convert.cpp
+        serialize/node_evaluators/combine.cpp
+        serialize/node_evaluators/extract.cpp
+        serialize/values/Value.cpp
+        serialize/values/NodeValue.cpp
+        serialize/values/InterfaceValue.cpp
+        serialize/values/NodeOutputValue.cpp
+        serialize/values/BasicValue.cpp
+        serialize/values/NodeGraphValue.cpp
+        serialize/values/NodeGraphOutputValue.cpp
+        serialize/values/interface.cpp
         preprocess/preprocess.cpp
         preprocess/Macro.cpp
 )

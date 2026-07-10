@@ -6,7 +6,7 @@
 #define MXSLC_SEPARATE_H
 
 #include "common.h"
-#include "values/interface.h"
+#include "serialize/values/interface.h"
 
 namespace mxslc::optimisations
 {

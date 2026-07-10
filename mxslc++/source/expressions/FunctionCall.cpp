@@ -15,7 +15,7 @@
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
-#include "values/interface.h"
+#include "serialize/values/interface.h"
 
 namespace mxslc::expressions
 {

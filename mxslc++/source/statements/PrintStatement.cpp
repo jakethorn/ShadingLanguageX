@@ -8,7 +8,7 @@
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
-#include "values/Value.h"
+#include "serialize/values/Value.h"
 
 namespace mxslc::statements
 {

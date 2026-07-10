@@ -6,8 +6,8 @@
 
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
-#include "values/interface.h"
-#include "values/InterfaceValue.h"
+#include "serialize/values/interface.h"
+#include "serialize/values/InterfaceValue.h"
 
 namespace mxslc::runtime
 {

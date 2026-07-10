@@ -5,14 +5,14 @@
 #include "expressions/accessors/PortAccessor.h"
 
 #include "expressions/Expression.h"
-#include "serialize/mtlx_utils.h"
+#include "../../../include/utils/mtlx_utils.h"
 #include "runtime/InputVariable.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "values/NodeValue.h"
+#include "serialize/values/NodeValue.h"
 #include "errors/CompileError.h"
-#include "values/interface.h"
+#include "serialize/values/interface.h"
 
 namespace mxslc::expressions
 {

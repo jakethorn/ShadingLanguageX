@@ -7,7 +7,7 @@
 
 #include "common.h"
 #include "utils/TypeName.h"
-#include "values/BasicValue.h"
+#include "serialize/values/BasicValue.h"
 #include "runtime/ModifierList.h"
 #include "errors/CompileError.h"
 #include "runtime/utils/RuntimeAware.h"

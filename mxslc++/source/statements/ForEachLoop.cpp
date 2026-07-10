@@ -10,7 +10,7 @@
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
-#include "values/Value.h"
+#include "serialize/values/Value.h"
 #include "errors/CompileError.h"
 #include "statements/interface.h"
 

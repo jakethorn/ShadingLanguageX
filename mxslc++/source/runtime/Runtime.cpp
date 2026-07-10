@@ -7,7 +7,7 @@
 #include "CompileOptions.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "serialize/load_mtlx.h"
+#include "../../include/utils/load_mtlx.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
 

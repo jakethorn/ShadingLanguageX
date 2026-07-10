@@ -5,10 +5,10 @@
 #include "expressions/NullExpression.h"
 
 #include "runtime/Variable.h"
-#include "values/NullValue.h"
 #include "errors/CompileError.h"
 #include "expressions/interface.h"
-#include "values/interface.h"
+#include "serialize/values/interface.h"
+#include "serialize/values/NullValue.h"
 
 namespace mxslc::expressions
 {
