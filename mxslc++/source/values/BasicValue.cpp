@@ -7,8 +7,8 @@
 #include <sstream>
 
 #include "runtime/Type.h"
-#include "mtlx/mtlx_utils.h"
-#include "mtlx/mtlx_type_ostream_ops.h"
+#include "serialize/mtlx_utils.h"
+#include "serialize/mtlx_type_ostream_ops.h"
 #include "values/interface.h"
 
 namespace mxslc::values

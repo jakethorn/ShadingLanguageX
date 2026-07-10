@@ -5,7 +5,7 @@
 #include "values/NodeOutputValue.h"
 
 #include "runtime/Type.h"
-#include "mtlx/mtlx_utils.h"
+#include "serialize/mtlx_utils.h"
 #include "values/interface.h"
 
 namespace mxslc::values

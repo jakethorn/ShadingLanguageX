@@ -2,13 +2,13 @@
 // Created by jaket on 04/01/2026.
 //
 
-#include "mtlx/MtlXSerializer.h"
+#include "serialize/MtlXSerializer.h"
 
 #include <cassert>
 #include <MaterialXFormat/XmlIo.h>
 
-#include "mtlx/mtlx_utils.h"
-#include "mtlx/evaluate_mtlx.h"
+#include "serialize/mtlx_utils.h"
+#include "serialize/evaluate_mtlx.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"

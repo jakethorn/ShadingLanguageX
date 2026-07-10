@@ -6,8 +6,8 @@
 
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "mtlx/MtlXSerializer.h"
-#include "mtlx/mtlx_utils.h"
+#include "serialize/MtlXSerializer.h"
+#include "serialize/mtlx_utils.h"
 #include "utils/string_utils.h"
 #include "values/NodeOutputValue.h"
 #include "values/NodeValue.h"

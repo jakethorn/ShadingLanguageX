@@ -4,7 +4,7 @@
 
 #include "values/NodeGraphValue.h"
 
-#include "mtlx/mtlx_utils.h"
+#include "serialize/mtlx_utils.h"
 #include "runtime/Type.h"
 #include "values/interface.h"
 

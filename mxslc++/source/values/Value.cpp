@@ -6,7 +6,7 @@
 
 #include "values/Value.h"
 
-#include "mtlx/mtlx_utils.h"
+#include "serialize/mtlx_utils.h"
 #include "runtime/Type.h"
 
 namespace mxslc::values

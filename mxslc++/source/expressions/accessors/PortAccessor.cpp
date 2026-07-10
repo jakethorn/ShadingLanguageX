@@ -5,7 +5,7 @@
 #include "expressions/accessors/PortAccessor.h"
 
 #include "expressions/Expression.h"
-#include "mtlx/mtlx_utils.h"
+#include "serialize/mtlx_utils.h"
 #include "runtime/InputVariable.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"

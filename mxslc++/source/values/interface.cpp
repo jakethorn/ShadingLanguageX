@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "mtlx/mtlx_utils.h"
+#include "serialize/mtlx_utils.h"
 #include "runtime/Function.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"

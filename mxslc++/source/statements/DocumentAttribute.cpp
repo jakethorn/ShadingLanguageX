@@ -4,7 +4,7 @@
 
 #include "statements/DocumentAttribute.h"
 
-#include "mtlx/MtlXSerializer.h"
+#include "serialize/MtlXSerializer.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements

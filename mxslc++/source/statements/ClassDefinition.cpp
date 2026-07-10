@@ -7,7 +7,7 @@
 #include "statements/ConstructorDefinition.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/VariableDefinition.h"
-#include "mtlx/MtlXSerializer.h"
+#include "serialize/MtlXSerializer.h"
 #include "runtime/Function.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"

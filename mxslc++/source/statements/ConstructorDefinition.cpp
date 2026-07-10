@@ -6,7 +6,7 @@
 
 #include "parse.h"
 #include "scan.h"
-#include "mtlx/MtlXSerializer.h"
+#include "serialize/MtlXSerializer.h"
 #include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "runtime/Scope.h"

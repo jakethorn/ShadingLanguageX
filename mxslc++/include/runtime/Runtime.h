@@ -8,7 +8,7 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
-#include "mtlx/MtlXSerializer.h"
+#include "serialize/MtlXSerializer.h"
 
 namespace mxslc
 {
