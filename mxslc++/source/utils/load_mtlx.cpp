@@ -50,7 +50,7 @@ namespace mxslc
             for (const mx::OutputPtr& o : nd->getActiveOutputs())
                 subtypes.push_back(create_type(o->getType()));
 
-            const TypePtr type = subtypes.size() == 1 ? subtypes.at(0) : std::make_shared<Type>(std::move(subtypes));
+            const TypePtr type = subtypes.size() == 1 ? subtypes.at(0) : create_type(std::move(subtypes));
             return Runtime::get().scope().resolve_type(type);
         }
 

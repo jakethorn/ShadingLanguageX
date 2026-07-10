@@ -23,6 +23,12 @@ namespace mxslc::runtime
     {
         return std::make_shared<Type>(std::forward<Args>(args)...);
     }
+
+    template<typename... Args>
+    ScopePtr create_scope(Args&&... args)
+    {
+        return std::make_unique<Scope>(std::forward<Args>(args)...);
+    }
 }
 
 #endif //MXSLC_RUNTIME_INTERFACE_H

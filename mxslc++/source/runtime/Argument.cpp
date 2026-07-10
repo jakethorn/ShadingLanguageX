@@ -109,7 +109,7 @@ namespace mxslc::runtime
         if (mods_.contains(TokenType::Out) and not param.modifiers().contains(TokenType::Out))
             throw CompileError{"Out argument is being passed to a non-out parameter"};
 
-        if (std::dynamic_pointer_cast<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
+        if (cast_expression<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
             throw CompileError{"Variable definition expressions can only be passed to out parameter"};
     }
 }

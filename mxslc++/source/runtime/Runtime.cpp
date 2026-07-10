@@ -7,17 +7,18 @@
 #include "CompileOptions.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "../../include/utils/load_mtlx.h"
+#include "utils/load_mtlx.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
+#include "runtime/interface.h"
 
 namespace mxslc::runtime
 {
     using container_utils::contains;
 
-    std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
+    unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-    Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, std::make_unique<Scope>(), Serializer{}}
+    Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, create_scope(), Serializer{}}
     {
 
     }
@@ -71,7 +72,7 @@ namespace mxslc::runtime
 
     void Runtime::enter_scope(string name)
     {
-        scope_ = std::make_unique<Scope>(std::move(name), std::move(scope_));
+        scope_ = create_scope(std::move(name), std::move(scope_));
     }
 
     void Runtime::exit_scope()

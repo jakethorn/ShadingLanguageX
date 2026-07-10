@@ -215,7 +215,7 @@ namespace mxslc::serialize
         const string input_name = nonlocal_in_name(var);
         write_node_def_input(node_graph->getNodeDef(), input_name, var->type());
         func->add_nonlocal_input(var);
-        return std::make_shared<InterfaceValue>(var->type(), input_name);
+        return create_value<InterfaceValue>(var->type(), input_name);
     }
 
     void Serializer::write_node_def_output(const VarPtr& var, const ValuePtr& value) const

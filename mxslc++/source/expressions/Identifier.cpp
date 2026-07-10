@@ -4,6 +4,7 @@
 
 #include "expressions/Identifier.h"
 
+#include "expressions/interface.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
@@ -13,7 +14,7 @@ namespace mxslc::expressions
 {
     ExprPtr Identifier::monomorphize(const TypePtr& template_type) const
     {
-        return std::make_unique<Identifier>(token_);
+        return create_expression<Identifier>(token_);
     }
 
     void Identifier::init_impl(const vector<TypePtr>& types)

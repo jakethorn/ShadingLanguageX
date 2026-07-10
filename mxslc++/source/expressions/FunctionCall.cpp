@@ -68,7 +68,7 @@ namespace mxslc::expressions
 
     ExprPtr FunctionCall::monomorphize(const TypePtr& template_type) const
     {
-        return std::make_unique<FunctionCall>(
+        return create_expression<FunctionCall>(
             name_,
             runtime_utils::monomorphize(template_type_, template_type),
             runtime_utils::monomorphize(args_, template_type),
