@@ -9,6 +9,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
+#include "serialize/serializer_utils.h"
 #include "serialize/values/interface.h"
 
 namespace mxslc::expressions
@@ -73,7 +74,7 @@ namespace mxslc::expressions
         else
         {
             if (func_->is_parameterless())
-                return value_utils::create_node_graph_value(func_);
+                return serialize_utils::create_node_graph_value(func_);
             else
                 return serializer().write_node(instance_, func_, args_, attrs_);
         }

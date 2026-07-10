@@ -8,7 +8,7 @@
 #include "utils/mtlx_utils.h"
 #include "serialize/values/interface.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     using mtlx_utils::add_or_get_output;
     using mtlx_utils::set_interface;

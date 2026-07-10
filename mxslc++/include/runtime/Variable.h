@@ -11,6 +11,7 @@
 #include "runtime/ModifierList.h"
 #include "errors/CompileError.h"
 #include "runtime/utils/RuntimeAware.h"
+#include "serialize/values/interface.h"
 
 namespace mxslc::runtime
 {
@@ -62,7 +63,7 @@ namespace mxslc::runtime
         template<typename T>
         T value_as() const
         {
-            if (const shared_ptr<BasicValue>& value = std::dynamic_pointer_cast<BasicValue>(value_))
+            if (const BasicValuePtr& value = cast_value<BasicValue>(value_))
                 return value->get<T>();
             throw CompileError{"Value is not a compile-time " + TypeName::of<T>()};
         }
@@ -76,6 +77,7 @@ namespace mxslc::runtime
         static VarPtr create(TypePtr type, const vector<VarPtr>& children);
         static VarPtr create(TypePtr type, ValuePtr value);
         static VarPtr create(TypePtr type, const VarPtr& value);
+        static VarPtr create(TypePtr type);
         static VarPtr create(const vector<VarPtr>& children);
         static VarPtr create(const vector<primitive_t>& children);
         static VarPtr create(ValuePtr value);

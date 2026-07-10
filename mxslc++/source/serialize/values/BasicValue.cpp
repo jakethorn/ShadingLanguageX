@@ -11,7 +11,7 @@
 #include "utils/mtlx_type_ostream_ops.h"
 #include "serialize/values/interface.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     BasicValue::BasicValue(const mx::ValuePtr& value) : BasicValue{to_primitive(value)} { }
     BasicValue::BasicValue(primitive_t value) : Value{Type::of(value)}, value_{std::move(value)} { }

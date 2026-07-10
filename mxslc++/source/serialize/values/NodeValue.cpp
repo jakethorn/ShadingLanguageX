@@ -10,7 +10,7 @@
 #include "serialize/values/interface.h"
 #include "runtime/Type.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     NodeValue::NodeValue(mx::NodePtr node) : Value{Type::of(node)}, node_{std::move(node)}
     {

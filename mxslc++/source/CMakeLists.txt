@@ -75,6 +75,7 @@ add_library(mxslc_lib
         utils/mtlx_utils.cpp
         serialize/Serializer.cpp
         serialize/serialize_constexpr.cpp
+        serialize/serializer_utils.cpp
         serialize/node_evaluators/binary_ops.cpp
         serialize/node_evaluators/separate.cpp
         serialize/node_evaluators/convert.cpp

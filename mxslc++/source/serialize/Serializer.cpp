@@ -17,6 +17,7 @@
 #include "runtime/Type.h"
 #include "runtime/Function.h"
 #include "errors/CompileError.h"
+#include "serialize/serializer_utils.h"
 #include "utils/mtlx_utils.h"
 #include "utils/io_utils.h"
 
@@ -134,7 +135,7 @@ namespace mxslc::serialize
 
             if (param.is_out())
             {
-                const VarPtr output = value_utils::create_node_output_value(node, param.type(), "out__" + param.name(), input_attrs);
+                const VarPtr output = serialize_utils::create_node_output_value(node, param.type(), "out__" + param.name(), input_attrs);
                 input_value->copy(output);
             }
         }
@@ -148,7 +149,7 @@ namespace mxslc::serialize
 
             if (func->mutates_instance())
             {
-                const VarPtr output = value_utils::create_node_output_value(node, instance->type(), "out_this");
+                const VarPtr output = serialize_utils::create_node_output_value(node, instance->type(), "out_this");
                 instance->copy(output);
             }
         }
@@ -162,13 +163,13 @@ namespace mxslc::serialize
         // outputs to nonlocal variables
         for (const VarPtr& var : func->nonlocal_outputs())
         {
-            const VarPtr nonlocal_output = value_utils::create_node_output_value(node, var->type(), nonlocal_out_name(var));
+            const VarPtr nonlocal_output = serialize_utils::create_node_output_value(node, var->type(), nonlocal_out_name(var));
             var->copy(nonlocal_output);
         }
 
         attrs.add_to(node);
 
-        return value_utils::create_node_value(node, func);
+        return serialize_utils::create_node_value(node, func);
     }
 
     void Serializer::write_node_def_graph(const FuncPtr& func) const
@@ -208,7 +209,7 @@ namespace mxslc::serialize
         const mx::OutputPtr& output = node_graph->getOutput(output_name);
         if (output)
         {
-            return value_utils::copy_value_from_port(output);
+            return serialize_utils::copy_value_from_port(output);
         }
 
         const string input_name = nonlocal_in_name(var);
@@ -249,16 +250,16 @@ namespace mxslc::serialize
         {
             if (param.is_in())
             {
-                const VarPtr in_var = param.has_default_value() ? param.evaluate() : value_utils::create_default_value(param.type());
+                const VarPtr in_var = param.has_default_value() ? param.evaluate() : serialize_utils::create_basic_value(param.type());
                 write_node_def_input(node_def, param.name(), in_var, param.attributes());
 
-                const VarPtr interface = value_utils::create_interface_value(param.type(), param.name());
+                const VarPtr interface = serialize_utils::create_interface_value(param.type(), param.name());
                 interface->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
                 interface->add_to_scope(param.name());
             }
             else
             {
-                const VarPtr out_var = param.has_default_value() ? param.evaluate() : value_utils::create_default_value(param.type());
+                const VarPtr out_var = param.has_default_value() ? param.evaluate() : serialize_utils::create_basic_value(param.type());
                 out_var->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
                 out_var->add_to_scope(param.name());
             }
@@ -306,7 +307,7 @@ namespace mxslc::serialize
         {
             write_node_def_input(node_def, "this", func->class_type());
 
-            const VarPtr instance = value_utils::create_interface_value(func->class_type(), "this");
+            const VarPtr instance = serialize_utils::create_interface_value(func->class_type(), "this");
             instance->set_modifiers(TokenType::Mutable);
             instance->add_to_scope("this");
         }

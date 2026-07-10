@@ -42,7 +42,7 @@ namespace mxslc
     USING_NAMESPACE(expressions)
     USING_NAMESPACE(runtime)
     USING_NAMESPACE(serialize)
-    USING_NAMESPACE(values)
+    USING_NAMESPACE(serialize::values)
     USING_NAMESPACE(decompile)
 
 #undef USING_NAMESPACE
@@ -77,7 +77,7 @@ namespace mxslc
         using ParameterValues = vector<std::pair<const Parameter&, VarPtr>>;
     }
 
-    namespace values
+    namespace serialize::values
     {
         class Value;
         using ValuePtr = shared_ptr<Value>;

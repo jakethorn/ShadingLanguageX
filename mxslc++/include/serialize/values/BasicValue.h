@@ -10,7 +10,7 @@
 #include "runtime/utils/TypeName.h"
 #include "errors/CompileError.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     using runtime_utils::TypeName;
 

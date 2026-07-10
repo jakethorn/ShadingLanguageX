@@ -14,6 +14,7 @@
 #include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
+#include "serialize/serializer_utils.h"
 
 namespace mxslc::runtime
 {
@@ -340,6 +341,11 @@ namespace mxslc::runtime
     VarPtr Variable::create(TypePtr type, const VarPtr& value)
     {
         return create(ModifierList{}, std::move(type), value);
+    }
+
+    VarPtr Variable::create(TypePtr type)
+    {
+        return serialize_utils::create_basic_value(std::move(type));
     }
 
     VarPtr Variable::create(const vector<VarPtr>& children)

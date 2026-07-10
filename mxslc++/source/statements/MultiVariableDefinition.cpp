@@ -11,6 +11,7 @@
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/serializer_utils.h"
 #include "statements/interface.h"
 #include "serialize/values/interface.h"
 
@@ -52,7 +53,7 @@ namespace mxslc::statements
         }
         else
         {
-            value = value_utils::create_default_value(type);
+            value = Variable::create(type);
         }
 
         for (size_t i = 0; i < value->child_count(); ++i)

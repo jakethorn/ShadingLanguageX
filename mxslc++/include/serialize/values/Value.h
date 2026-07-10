@@ -10,7 +10,7 @@
 
 #include "common.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     class Value
     {

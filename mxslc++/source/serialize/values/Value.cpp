@@ -9,7 +9,7 @@
 #include "utils/mtlx_utils.h"
 #include "runtime/Type.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     Value::Value(TypePtr type) : type_{std::move(type)}
     {

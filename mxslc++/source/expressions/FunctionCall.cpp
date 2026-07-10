@@ -15,6 +15,7 @@
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/serializer_utils.h"
 #include "serialize/values/interface.h"
 
 namespace mxslc::expressions
@@ -145,7 +146,7 @@ namespace mxslc::expressions
         else
         {
             if (func_->is_parameterless())
-                return value_utils::create_node_graph_value(func_);
+                return serialize_utils::create_node_graph_value(func_);
             else
                 return serializer().write_node(func_, args_, attrs_);
         }
@@ -175,7 +176,7 @@ namespace mxslc::expressions
             }
             else
             {
-                const VarPtr default_value = param.has_default_value() ? param.evaluate() : value_utils::create_default_value(param.type());
+                const VarPtr default_value = param.has_default_value() ? param.evaluate() : Variable::create(param.type());
                 default_value->set_modifiers(std::move(mods));
                 default_value->add_to_scope(param.name());
             }

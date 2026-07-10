@@ -7,7 +7,7 @@
 
 #include "serialize/values/Value.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     class NodeOutputValue final : public Value
     {

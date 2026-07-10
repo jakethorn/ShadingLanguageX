@@ -8,7 +8,7 @@
 #include "utils/mtlx_utils.h"
 #include "serialize/values/interface.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     NodeGraphOutputValue::NodeGraphOutputValue(TypePtr type, const mx::NodeGraphPtr& node_graph, string output_name)
         : NodeGraphOutputValue{std::move(type), node_graph->getName(), std::move(output_name)}

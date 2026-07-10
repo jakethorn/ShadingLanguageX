@@ -6,8 +6,7 @@
 
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
-#include "serialize/values/interface.h"
-#include "serialize/values/InterfaceValue.h"
+#include "serialize/serializer_utils.h"
 
 namespace mxslc::runtime
 {
@@ -20,7 +19,7 @@ namespace mxslc::runtime
 
     ValuePtr InputVariable::value_impl() const
     {
-        return value_utils::copy_value_from_port(input_);
+        return serialize_utils::copy_value_from_port(input_);
     }
 
     void InputVariable::copy_value_impl(const ValuePtr value)

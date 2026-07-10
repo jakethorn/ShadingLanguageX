@@ -77,7 +77,7 @@ namespace mxslc::statements
             }
             else
             {
-                value = value_utils::create_default_value(type);
+                value = Variable::create(type);
             }
         }
 

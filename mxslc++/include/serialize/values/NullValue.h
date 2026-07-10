@@ -7,7 +7,7 @@
 
 #include "serialize/values/Value.h"
 
-namespace mxslc::values
+namespace mxslc::serialize::values
 {
     class NullValue final : public Value
     {
@@ -16,7 +16,7 @@ namespace mxslc::values
 
         bool equals(const ValuePtr& other) const override
         {
-            return std::dynamic_pointer_cast<NullValue>(other) != nullptr;
+            return cast_value<NullValue>(other) != nullptr;
         }
 
         void set_as_node_input(const mx::InputPtr& input) const override
