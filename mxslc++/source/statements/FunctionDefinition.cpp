@@ -62,12 +62,12 @@ namespace mxslc::statements
             {
                 funcs_.push_back(create_function(
                     mods_,
-                    template_utils::monomorphize(type_, template_type),
+                    runtime_utils::monomorphize(type_, template_type),
                     name_,
                     template_type,
-                    template_utils::monomorphize(params_, template_type),
-                    template_utils::monomorphize(body_, template_type),
-                    template_utils::monomorphize(return_expr_, template_type)
+                    runtime_utils::monomorphize(params_, template_type),
+                    runtime_utils::monomorphize(body_, template_type),
+                    runtime_utils::monomorphize(return_expr_, template_type)
                 ));
             }
         }
@@ -97,12 +97,12 @@ namespace mxslc::statements
 
         return create_statement<FunctionDefinition>(
             mods_,
-            template_utils::monomorphize(type_, template_type),
+            runtime_utils::monomorphize(type_, template_type),
             name_,
             template_types_,
-            template_utils::monomorphize(params_, template_type),
-            template_utils::monomorphize(body_, template_type),
-            template_utils::monomorphize(return_expr_, template_type),
+            runtime_utils::monomorphize(params_, template_type),
+            runtime_utils::monomorphize(body_, template_type),
+            runtime_utils::monomorphize(return_expr_, template_type),
             token_
         );
     }

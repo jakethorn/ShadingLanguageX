@@ -20,7 +20,7 @@ namespace mxslc::runtime
 
     ParameterList ParameterList::monomorphize(const TypePtr& template_type) const
     {
-        return template_utils::monomorphize(params_, template_type);
+        return runtime_utils::monomorphize(params_, template_type);
     }
 
     bool ParameterList::contains(const string& s) const

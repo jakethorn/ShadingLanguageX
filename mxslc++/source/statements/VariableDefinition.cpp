@@ -39,7 +39,7 @@ namespace mxslc::statements
 
     StmtPtr VariableDefinition::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [type, expr] = template_utils::monomorphize_all(template_type, type_, expr_);
+        auto&& [type, expr] = runtime_utils::monomorphize_all(template_type, type_, expr_);
         return create_statement<VariableDefinition>(mods_, std::move(type), name_, std::move(expr), token_);
     }
 

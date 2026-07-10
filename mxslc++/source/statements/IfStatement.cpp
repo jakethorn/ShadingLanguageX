@@ -18,7 +18,7 @@ namespace mxslc::statements
 
     StmtPtr IfStatement::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [cond_expr, then_body, else_body] = template_utils::monomorphize_all(template_type, cond_expr_, then_body_, else_body_);
+        auto&& [cond_expr, then_body, else_body] = runtime_utils::monomorphize_all(template_type, cond_expr_, then_body_, else_body_);
         return create_statement<IfStatement>(token_, std::move(cond_expr), std::move(then_body), std::move(else_body));
     }
 

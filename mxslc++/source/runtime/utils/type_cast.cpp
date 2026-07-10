@@ -7,11 +7,11 @@
 #include <cassert>
 
 #include "utils/string_utils.h"
-#include "runtime/utils/invoke_utils.h"
+#include "runtime/utils/invoke.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     using string_utils::str;
 

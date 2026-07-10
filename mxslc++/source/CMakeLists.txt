@@ -28,7 +28,7 @@ add_library(mxslc_lib
         runtime/interface.cpp
         runtime/utils/monomorphize.cpp
         runtime/utils/RuntimeAware.cpp
-        runtime/utils/invoke_utils.cpp
+        runtime/utils/invoke.cpp
         runtime/utils/type_cast.cpp
         runtime/utils/InitInfo.cpp
         runtime/utils/ArgumentEvaluator.cpp

@@ -8,7 +8,7 @@
 #include "common.h"
 #include "primitive_t.h"
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     class TypeName
     {

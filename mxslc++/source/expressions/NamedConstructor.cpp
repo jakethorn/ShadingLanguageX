@@ -26,7 +26,7 @@ namespace mxslc::expressions
 
     ExprPtr NamedConstructor::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [name, args] = template_utils::monomorphize_all(template_type, name_, args_);
+        auto&& [name, args] = runtime_utils::monomorphize_all(template_type, name_, args_);
         return create_expression<NamedConstructor>(std::move(name), std::move(args), token_);
     }
 

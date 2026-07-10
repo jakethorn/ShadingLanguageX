@@ -14,7 +14,7 @@ namespace mxslc::statements
 
     StmtPtr BlockStatement::monomorphize(const TypePtr& template_type) const
     {
-        vector<StmtPtr> body = template_utils::monomorphize(body_, template_type);
+        vector<StmtPtr> body = runtime_utils::monomorphize(body_, template_type);
         return create_statement<BlockStatement>(token_, std::move(body));
     }
 

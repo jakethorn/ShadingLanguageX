@@ -42,7 +42,7 @@ namespace mxslc::expressions
         {
             string type_name = identifier->name();
             if (template_type_)
-                type_name = template_utils::monomorphize(type_name, template_type_);
+                type_name = runtime_utils::monomorphize(type_name, template_type_);
 
             if (scope().has_type(type_name))
             {

@@ -24,7 +24,7 @@ namespace mxslc::statements
 
     StmtPtr ConstructorDefinition::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [params, body] = template_utils::monomorphize_all(template_type, params_, body_);
+        auto&& [params, body] = runtime_utils::monomorphize_all(template_type, params_, body_);
         return create_statement<ConstructorDefinition>(mods_, class_name_, std::move(params), std::move(body), token_);
     }
 

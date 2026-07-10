@@ -69,7 +69,7 @@ namespace mxslc::runtime
 
     TypePtr Type::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [name, fields] = template_utils::monomorphize_all(template_type, name_, fields_);
+        auto&& [name, fields] = runtime_utils::monomorphize_all(template_type, name_, fields_);
         return create_type(std::move(name), std::move(fields));
     }
 

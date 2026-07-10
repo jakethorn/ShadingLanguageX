@@ -5,7 +5,7 @@
 #include "runtime/utils/RuntimeAware.h"
 #include "runtime/Runtime.h"
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     Runtime& RuntimeAware::runtime()
     {

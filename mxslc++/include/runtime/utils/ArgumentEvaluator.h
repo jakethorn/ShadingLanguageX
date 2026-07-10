@@ -5,7 +5,7 @@
 #ifndef MXSLC_ARGUMENTEVALUATOR_H
 #define MXSLC_ARGUMENTEVALUATOR_H
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     class ArgumentEvaluator
     {

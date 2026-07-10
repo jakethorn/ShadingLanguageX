@@ -6,7 +6,7 @@
 
 #include "expressions/FunctionCall.h"
 #include "expressions/interface.h"
-#include "runtime/utils/invoke_utils.h"
+#include "runtime/utils/invoke.h"
 
 namespace mxslc::expressions
 {

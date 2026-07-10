@@ -7,7 +7,7 @@
 
 #include "common.h"
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     struct InitInfo
     {

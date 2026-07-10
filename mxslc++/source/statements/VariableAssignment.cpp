@@ -26,7 +26,7 @@ namespace mxslc::statements
 
     StmtPtr VariableAssignment::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [lhs, rhs] = template_utils::monomorphize_all(template_type, lhs_expr_, rhs_expr_);
+        auto&& [lhs, rhs] = runtime_utils::monomorphize_all(template_type, lhs_expr_, rhs_expr_);
         return create_statement<VariableAssignment>(token_, std::move(lhs), std::move(rhs));
     }
 

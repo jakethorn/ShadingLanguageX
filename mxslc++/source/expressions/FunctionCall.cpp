@@ -69,8 +69,8 @@ namespace mxslc::expressions
     {
         return std::make_unique<FunctionCall>(
             name_,
-            template_utils::monomorphize(template_type_, template_type),
-            template_utils::monomorphize(args_, template_type),
+            runtime_utils::monomorphize(template_type_, template_type),
+            runtime_utils::monomorphize(args_, template_type),
             attrs_,
             token_
         );

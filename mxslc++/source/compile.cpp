@@ -15,7 +15,7 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
-#include "runtime/utils/invoke_utils.h"
+#include "runtime/utils/invoke.h"
 
 namespace mxslc
 {

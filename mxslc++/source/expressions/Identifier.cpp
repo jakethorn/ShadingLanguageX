@@ -7,7 +7,7 @@
 #include "runtime/FunctionQuery.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
-#include "runtime/utils/invoke_utils.h"
+#include "runtime/utils/invoke.h"
 
 namespace mxslc::expressions
 {

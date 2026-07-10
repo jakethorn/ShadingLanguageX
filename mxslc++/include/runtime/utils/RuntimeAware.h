@@ -18,7 +18,7 @@ namespace mxslc::runtime
     class Scope;
 }
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     class RuntimeAware
     {

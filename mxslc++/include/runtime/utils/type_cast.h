@@ -7,7 +7,7 @@
 
 #include "common.h"
 
-namespace mxslc::runtime::runtime_utils
+namespace mxslc::runtime_utils
 {
     VarPtr type_cast(const TypePtr& type, const VarPtr& value, bool force = false);
 }

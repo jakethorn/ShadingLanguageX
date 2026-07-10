@@ -29,7 +29,7 @@ namespace mxslc::statements
 
     StmtPtr ForEachLoop::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [type, iter_expr, body] = template_utils::monomorphize_all(template_type, type_, iter_expr_, body_);
+        auto&& [type, iter_expr, body] = runtime_utils::monomorphize_all(template_type, type_, iter_expr_, body_);
         return create_statement<ForEachLoop>(token_, mods_, std::move(type), name_, std::move(iter_expr), std::move(body));
     }
 

@@ -2,20 +2,20 @@
 // Created by jaket on 30/12/2025.
 //
 
-#include "../../include/utils/load_mtlx.h"
+#include "utils/load_mtlx.h"
+
 #include <MaterialXFormat/Util.h>
 
-#include "statements/Statement.h"
-#include "runtime/Scope.h"
-#include "runtime/Type.h"
-#include "expressions/NullExpression.h"
-#include "runtime/Function.h"
-#include "runtime/Runtime.h"
-#include "utils/io_utils.h"
-#include "utils/string_utils.h"
-#include "errors/CompileError.h"
 #include "expressions/interface.h"
+#include "expressions/NullExpression.h"
 #include "runtime/interface.h"
+#include "runtime/ModifierList.h"
+#include "runtime/ParameterList.h"
+#include "runtime/Runtime.h"
+#include "runtime/Scope.h"
+#include "runtime/Function.h"
+#include "utils/container_utils.h"
+#include "utils/string_utils.h"
 
 namespace mxslc
 {

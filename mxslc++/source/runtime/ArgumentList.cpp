@@ -42,7 +42,7 @@ namespace mxslc::runtime
 
     ArgumentList ArgumentList::monomorphize(const TypePtr& template_type) const
     {
-        return template_utils::monomorphize(args_, template_type);
+        return runtime_utils::monomorphize(args_, template_type);
     }
 
     VarPtr ArgumentList::evaluate(const Parameter& param) const

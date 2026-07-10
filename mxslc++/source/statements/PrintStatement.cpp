@@ -19,7 +19,7 @@ namespace mxslc::statements
 
     StmtPtr PrintStatement::monomorphize(const TypePtr& template_type) const
     {
-        vector<ExprPtr> exprs = template_utils::monomorphize(exprs_, template_type);
+        vector<ExprPtr> exprs = runtime_utils::monomorphize(exprs_, template_type);
         return create_statement<PrintStatement>(token_, std::move(exprs));
     }
 

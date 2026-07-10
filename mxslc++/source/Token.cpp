@@ -26,7 +26,7 @@ namespace mxslc
 
     Token Token::monomorphize(const TypePtr& template_type) const
     {
-        Token t{type(), template_utils::monomorphize(lexeme(), template_type)};
+        Token t{type(), runtime_utils::monomorphize(lexeme(), template_type)};
         t.set_line(line());
         t.set_filename(filename());
         return t;

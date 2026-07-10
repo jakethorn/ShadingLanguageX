@@ -6,7 +6,7 @@
 
 #include "runtime/Type.h"
 
-namespace mxslc::runtime::template_utils
+namespace mxslc::runtime_utils
 {
     string monomorphize(const string& src, const TypePtr& template_type)
     {

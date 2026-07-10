@@ -36,7 +36,7 @@ namespace mxslc::statements
 
     StmtPtr MultiVariableDefinition::monomorphize(const TypePtr& template_type) const
     {
-        auto&& [type, expr] = template_utils::monomorphize_all(template_type, type_, expr_);
+        auto&& [type, expr] = runtime_utils::monomorphize_all(template_type, type_, expr_);
         return create_statement<MultiVariableDefinition>(std::move(type), std::move(expr), token_);
     }
 

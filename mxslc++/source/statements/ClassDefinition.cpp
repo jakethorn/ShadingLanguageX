@@ -40,7 +40,7 @@ namespace mxslc::statements
         if (is_templated())
             throw CompileError{"Nested templated classes is not supported"};
 
-        auto&& [parent, body] = template_utils::monomorphize_all(template_type, parent_, body_);
+        auto&& [parent, body] = runtime_utils::monomorphize_all(template_type, parent_, body_);
         return create_statement<ClassDefinition>(name_, template_types_, std::move(parent), std::move(body), token_);
     }
 

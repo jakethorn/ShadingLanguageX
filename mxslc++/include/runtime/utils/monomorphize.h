@@ -2,13 +2,12 @@
 // Created by jaket on 18/01/2026.
 //
 
-#ifndef MXSLC_INSTANTIATE_TEMPLATE_TYPES_UTILS_H
-#define MXSLC_INSTANTIATE_TEMPLATE_TYPES_UTILS_H
+#ifndef MXSLC_MONOMORPHIZE_H
+#define MXSLC_MONOMORPHIZE_H
 
 #include "common.h"
-#include "Token.h"
 
-namespace mxslc::runtime::template_utils
+namespace mxslc::runtime_utils
 {
     template<typename T>
     class Monomorphizable
@@ -87,4 +86,4 @@ namespace mxslc::runtime::template_utils
     }
 }
 
-#endif //MXSLC_INSTANTIATE_TEMPLATE_TYPES_UTILS_H
+#endif //MXSLC_MONOMORPHIZE_H

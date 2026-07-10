@@ -37,9 +37,9 @@ namespace mxslc::expressions
     ExprPtr RangeExpression::monomorphize(const TypePtr& template_type) const
     {
         return create_expression<RangeExpression>(
-            template_utils::monomorphize(lower_expr_, template_type),
-            template_utils::monomorphize(step_expr_, template_type),
-            template_utils::monomorphize(upper_expr_, template_type),
+            runtime_utils::monomorphize(lower_expr_, template_type),
+            runtime_utils::monomorphize(step_expr_, template_type),
+            runtime_utils::monomorphize(upper_expr_, template_type),
             token_
         );
     }

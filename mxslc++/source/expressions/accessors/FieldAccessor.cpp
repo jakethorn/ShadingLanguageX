@@ -5,7 +5,7 @@
 #include "expressions/accessors/FieldAccessor.h"
 
 #include "runtime/FunctionQuery.h"
-#include "runtime/utils/invoke_utils.h"
+#include "runtime/utils/invoke.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
