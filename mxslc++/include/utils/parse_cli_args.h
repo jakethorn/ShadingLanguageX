@@ -27,9 +27,9 @@ namespace mxslc
         static CommandLineArgs invalid();
     };
 
-    CommandLineArgs parse_args(int argc, char* argv[]);
-    CommandLineArgs parse_args(const vector<string>& argv);
-    CommandLineArgs parse_args(const fs::path& response_path);
+    CommandLineArgs parse_cli_args(int argc, char* argv[]);
+    CommandLineArgs parse_cli_args(const vector<string>& argv);
+    CommandLineArgs parse_cli_args(const fs::path& response_path);
 }
 
 #endif //MXSLC_PARSE_ARGS_H

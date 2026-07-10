@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include "compile.h"
-#include "utils/parse_args.h"
+#include "utils/parse_cli_args.h"
 #include "utils/comp_utils.h"
 #include "utils/data_utils.h"
 
@@ -28,7 +28,7 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
     fs::path response_path = input_path;
     response_path.replace_extension(".rsp");
     if (fs::is_regular_file(response_path))
-        opts = mxslc::parse_args(response_path).options;
+        opts = mxslc::parse_cli_args(response_path).options;
 
     const string actual_output = mxslc::compile_to_string(input_path, opts);
 

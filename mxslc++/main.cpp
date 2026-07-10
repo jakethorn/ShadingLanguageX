@@ -1,12 +1,12 @@
 #include <iostream>
 
-#include "utils/parse_args.h"
+#include "utils/parse_cli_args.h"
 #include "compile.h"
 #include "decompile/decompile.h"
 
 int main(const int argc, char* argv[])
 {
-    if (const mxslc::CommandLineArgs args = mxslc::parse_args(argc, argv); args.is_valid)
+    if (const mxslc::CommandLineArgs args = mxslc::parse_cli_args(argc, argv); args.is_valid)
     {
         if (args.action == mxslc::Action::Compile)
         {

@@ -69,7 +69,7 @@ add_library(mxslc_lib
         statements/ConstructorDefinition.cpp
         utils/io_utils.cpp
         utils/string_utils.cpp
-        utils/parse_args.cpp
+        utils/parse_cli_args.cpp
         utils/parse_utils.cpp
         utils/load_mtlx.cpp
         utils/mtlx_utils.cpp
