@@ -7,11 +7,11 @@
 #include "runtime/interface.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "serialize/MtlXSerializer.h"
-#include "../../include/utils/mtlx_utils.h"
+#include "serialize/Serializer.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/NodeOutputValue.h"
 #include "serialize/values/NodeValue.h"
+#include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
 

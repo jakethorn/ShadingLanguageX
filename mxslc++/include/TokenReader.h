@@ -8,7 +8,7 @@
 #include "common.h"
 #include "Token.h"
 #include "TokenType.h"
-#include "Span.h"
+#include "utils/Span.h"
 #include "errors/CompileError.h"
 
 namespace mxslc

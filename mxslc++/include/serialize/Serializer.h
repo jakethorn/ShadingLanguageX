@@ -18,11 +18,11 @@ namespace mxslc::runtime
 
 namespace mxslc
 {
-    class MtlXSerializer : protected runtime_utils::RuntimeAware
+    class Serializer : protected runtime_utils::RuntimeAware
     {
     public:
-        MtlXSerializer() : MtlXSerializer{mx::createDocument()} { }
-        explicit MtlXSerializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
+        Serializer() : Serializer{mx::createDocument()} { }
+        explicit Serializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
         void set_reduce_graph(const bool value) { reduce_graph_ = value; }
 

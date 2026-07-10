@@ -8,7 +8,7 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
-#include "serialize/MtlXSerializer.h"
+#include "serialize/Serializer.h"
 
 namespace mxslc
 {
@@ -21,7 +21,7 @@ namespace mxslc::runtime
     {
     public:
         explicit Runtime(const CompileOptions& opts);
-        Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer);
+        Runtime(const CompileOptions& opts, ScopePtr scope, Serializer serializer);
 
         static Runtime& create(const optional<fs::path>& src_path, const CompileOptions& opts);
         static Runtime& get();
@@ -36,7 +36,7 @@ namespace mxslc::runtime
         void enter_scope(string name = "");
         void exit_scope();
 
-        MtlXSerializer& serializer();
+        Serializer& serializer();
 
         void destroy() const;
 
@@ -45,7 +45,7 @@ namespace mxslc::runtime
         vector<fs::path> include_dirs_;
         mx::DocumentPtr mtlx_lib_;
         ScopePtr scope_;
-        MtlXSerializer serializer_;
+        Serializer serializer_;
 
         mutable vector<string> used_globals;
 

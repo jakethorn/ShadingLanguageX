@@ -17,12 +17,12 @@ namespace mxslc::runtime
 
     std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-    Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, std::make_unique<Scope>(), MtlXSerializer{}}
+    Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, std::make_unique<Scope>(), Serializer{}}
     {
 
     }
 
-    Runtime::Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer) : opts_{opts}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
+    Runtime::Runtime(const CompileOptions& opts, ScopePtr scope, Serializer serializer) : opts_{opts}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
     {
         scope_->set_graph(serializer_.document(), nullptr);
     }
@@ -79,7 +79,7 @@ namespace mxslc::runtime
         scope_ = scope_->exit();
     }
 
-    MtlXSerializer& Runtime::serializer()
+    Serializer& Runtime::serializer()
     {
         return serializer_;
     }

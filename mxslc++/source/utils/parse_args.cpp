@@ -11,7 +11,7 @@
 #include "common.h"
 #include "utils/parse_utils.h"
 #include "utils/container_utils.h"
-#include "Span.h"
+#include "utils/Span.h"
 #include "errors/CompileError.h"
 #include "runtime/Variable.h"
 

@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include "compile.h"
-#include "../include/errors/CompileError.h"
+#include "errors/CompileError.h"
 #include "utils/comp_utils.h"
 #include "utils/data_utils.h"
 

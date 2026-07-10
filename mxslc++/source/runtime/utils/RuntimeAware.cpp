@@ -17,7 +17,7 @@ namespace mxslc::runtime::runtime_utils
         return Runtime::get().scope();
     }
 
-    MtlXSerializer& RuntimeAware::serializer()
+    Serializer& RuntimeAware::serializer()
     {
         return Runtime::get().serializer();
     }

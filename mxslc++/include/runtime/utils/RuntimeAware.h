@@ -7,7 +7,7 @@
 
 namespace mxslc
 {
-    class MtlXSerializer;
+    class Serializer;
 }
 
 namespace mxslc::runtime
@@ -27,7 +27,7 @@ namespace mxslc::runtime::runtime_utils
     protected:
         static Runtime& runtime();
         static Scope& scope();
-        static MtlXSerializer& serializer();
+        static Serializer& serializer();
     };
 }
 
