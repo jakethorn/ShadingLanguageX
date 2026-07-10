@@ -9,12 +9,15 @@
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
 #include "primitive_t.h"
+#include "runtime/utils/monomorphize.h"
 
 namespace mxslc::runtime
 {
+    using runtime_utils::Monomorphizable;
+
     class Parameter;
 
-    class Argument
+    class Argument : public Monomorphizable<Argument>
     {
     public:
         Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, size_t index);
@@ -27,7 +30,7 @@ namespace mxslc::runtime
 
         Argument(Argument&& other) noexcept;
 
-        ~Argument();
+        ~Argument() override;
 
         const AttributeList& attributes() const { return attrs_; }
         const ModifierList& modifiers() const { return mods_; }
@@ -35,18 +38,22 @@ namespace mxslc::runtime
         const string& name() const { return name_; }
         size_t index() const { return index_; }
 
-        Argument monomorphize(const TypePtr& template_type) const;
+        Argument monomorphize(const TypePtr& template_type) const override;
+
         void init(const TypePtr& type) const;
         void init(const vector<TypePtr>& types) const;
         bool try_init(const vector<TypePtr>& types) const;
         void update() const;
-        bool is_initialized() const;
         void reset() const;
-        const string& error_message() const;
+
+        bool is_initialized() const;
+
         TypePtr type() const;
         VarPtr evaluate() const;
 
         void validate(const Parameter& param) const;
+
+        const string& error_message() const;
 
     private:
         AttributeList attrs_;

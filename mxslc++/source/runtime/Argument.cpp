@@ -76,19 +76,14 @@ namespace mxslc::runtime
         expr_->update();
     }
 
-    bool Argument::is_initialized() const
-    {
-        return expr_->is_initialized();
-    }
-
     void Argument::reset() const
     {
         expr_->reset();
     }
 
-    const string& Argument::error_message() const
+    bool Argument::is_initialized() const
     {
-        return expr_->error_message();
+        return expr_->is_initialized();
     }
 
     TypePtr Argument::type() const
@@ -111,5 +106,10 @@ namespace mxslc::runtime
 
         if (cast_expression<VariableDefinitionExpression>(expr_) and not param.modifiers().contains(TokenType::Out))
             throw CompileError{"Variable definition expressions can only be passed to out parameter"};
+    }
+
+    const string& Argument::error_message() const
+    {
+        return expr_->error_message();
     }
 }

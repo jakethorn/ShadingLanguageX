@@ -8,10 +8,13 @@
 #include "common.h"
 #include "primitive_t.h"
 #include "TokenType.h"
+#include "runtime/utils/monomorphize.h"
 
 namespace mxslc
 {
-    class Token
+    using runtime_utils::Monomorphizable;
+
+    class Token : public Monomorphizable<Token>
     {
     public:
         Token() = default;
@@ -24,7 +27,7 @@ namespace mxslc
         const string& filename() const { return filename_; }
         size_t line() const { return line_; }
 
-        Token monomorphize(const TypePtr& template_type) const;
+        Token monomorphize(const TypePtr& template_type) const override;
 
         primitive_t literal() const;
 

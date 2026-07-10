@@ -10,10 +10,12 @@
 
 namespace mxslc::runtime
 {
+    using runtime_utils::Monomorphizable;
+
     class Parameter;
     class ParameterList;
 
-    class ArgumentList
+    class ArgumentList : public Monomorphizable<ArgumentList>
     {
     public:
         ArgumentList() = default;
@@ -32,7 +34,7 @@ namespace mxslc::runtime
             (args_.emplace_back(std::forward<Exprs>(exprs), i++), ...);
         }
 
-        ArgumentList monomorphize(const TypePtr& template_type) const;
+        ArgumentList monomorphize(const TypePtr& template_type) const override;
 
         VarPtr evaluate(const Parameter& param) const;
         ParameterValues evaluate(const ParameterList& params) const;

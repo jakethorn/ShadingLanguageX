@@ -5,14 +5,18 @@
 #ifndef FENNEC_PARAMETER_H
 #define FENNEC_PARAMETER_H
 
+#include "common.h"
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
-#include "common.h"
-#include "utils/RuntimeAware.h"
+#include "runtime/utils/monomorphize.h"
+#include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::runtime
 {
-    class Parameter : protected runtime_utils::RuntimeAware
+    using runtime_utils::RuntimeAware;
+    using runtime_utils::Monomorphizable;
+
+    class Parameter : protected RuntimeAware, public Monomorphizable<Parameter>
     {
     public:
         Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
@@ -31,7 +35,7 @@ namespace mxslc::runtime
         const string& name() const { return name_; }
         size_t index() const { return index_; }
 
-        Parameter monomorphize(const TypePtr& template_type) const;
+        Parameter monomorphize(const TypePtr& template_type) const override;
         void init();
 
         bool has_default_value() const { return expr_ != nullptr; }

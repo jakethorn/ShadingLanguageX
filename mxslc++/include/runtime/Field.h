@@ -6,12 +6,15 @@
 #define MXSLC_FIELD_H
 
 #include "common.h"
-#include "runtime/ModifierList.h"
 #include "TokenType.h"
+#include "runtime/ModifierList.h"
+#include "runtime/utils/monomorphize.h"
 
 namespace mxslc::runtime
 {
-    class Field
+    using runtime_utils::Monomorphizable;
+
+    class Field : public Monomorphizable<Field>
     {
         friend class Scope;
 
@@ -41,7 +44,7 @@ namespace mxslc::runtime
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
 
-        Field monomorphize(const TypePtr& template_type) const;
+        Field monomorphize(const TypePtr& template_type) const override;
 
         string str() const;
 

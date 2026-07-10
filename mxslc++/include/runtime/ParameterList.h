@@ -10,15 +10,17 @@
 
 namespace mxslc::runtime
 {
+    using runtime_utils::Monomorphizable;
+
     class Argument;
 
-    class ParameterList
+    class ParameterList : public Monomorphizable<ParameterList>
     {
     public:
         ParameterList() = default;
         ParameterList(vector<Parameter> params);
 
-        ParameterList monomorphize(const TypePtr& template_type) const;
+        ParameterList monomorphize(const TypePtr& template_type) const override;
 
         void init()
         {

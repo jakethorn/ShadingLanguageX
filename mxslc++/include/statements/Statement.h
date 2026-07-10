@@ -13,8 +13,9 @@
 namespace mxslc::statements
 {
     using runtime_utils::RuntimeAware;
+    using runtime_utils::Monomorphizable;
 
-    class Statement : protected RuntimeAware
+    class Statement : protected RuntimeAware, public Monomorphizable<StmtPtr>
     {
     public:
         explicit Statement(Token token) : token_{std::move(token)} { }

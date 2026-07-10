@@ -8,11 +8,15 @@
 #include "common.h"
 #include "Token.h"
 #include "runtime/AttributeList.h"
+#include "runtime/utils/monomorphize.h"
 #include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::expressions
 {
-    class Expression : protected runtime_utils::RuntimeAware
+    using runtime_utils::RuntimeAware;
+    using runtime_utils::Monomorphizable;
+
+    class Expression : protected RuntimeAware, public Monomorphizable<ExprPtr>
     {
     public:
         Expression() = default;
@@ -24,7 +28,7 @@ namespace mxslc::expressions
 
         void set_attributes(AttributeList attrs) { attrs_ = std::move(attrs); }
 
-        virtual ExprPtr monomorphize(const TypePtr& template_type) const = 0;
+        ExprPtr monomorphize(const TypePtr& template_type) const override = 0;
 
         void set_subexpression_type(TypePtr type) { subexpr_type_ = std::move(type); }
 

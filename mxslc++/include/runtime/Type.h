@@ -14,8 +14,9 @@
 namespace mxslc::runtime
 {
     using runtime_utils::TypeName;
+    using runtime_utils::Monomorphizable;
 
-    class Type
+    class Type : public Monomorphizable<TypePtr>
     {
         friend class Scope;
 
@@ -30,7 +31,7 @@ namespace mxslc::runtime
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
 
-        TypePtr monomorphize(const TypePtr& template_type) const;
+        TypePtr monomorphize(const TypePtr& template_type) const override;
 
         void add_field(Field field);
         size_t field_count() const { return fields_.size(); }
