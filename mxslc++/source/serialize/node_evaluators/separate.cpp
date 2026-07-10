@@ -8,7 +8,7 @@
 #include "runtime/Variable.h"
 #include "serialize/values/BasicValue.h"
 
-namespace mxslc::optimisations
+namespace mxslc::serialize
 {
     VarPtr evaluate_separate2(const TypePtr& type, const vector<BasicValuePtr>& values)
     {

@@ -5,7 +5,9 @@
 #ifndef MXSLC_RUNTIMEAWARE_H
 #define MXSLC_RUNTIMEAWARE_H
 
-namespace mxslc
+#include "common.h"
+
+namespace mxslc::serialize
 {
     class Serializer;
 }

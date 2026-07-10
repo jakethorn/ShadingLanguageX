@@ -7,7 +7,7 @@
 #include <cassert>
 #include <MaterialXFormat/XmlIo.h>
 
-#include "serialize/evaluate_mtlx.h"
+#include "serialize/serialize_constexpr.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
 #include "runtime/Runtime.h"
@@ -20,7 +20,7 @@
 #include "utils/mtlx_utils.h"
 #include "utils/io_utils.h"
 
-namespace mxslc
+namespace mxslc::serialize
 {
     using mtlx_utils::get_port_name;
 
@@ -115,7 +115,7 @@ namespace mxslc
 
         if (reduce_graph_)
         {
-            if (VarPtr value = evaluate_now(func->return_type(), func->name(), input_values))
+            if (VarPtr value = serialize_constexpr(func->return_type(), func->name(), input_values))
                 return value;
         }
 

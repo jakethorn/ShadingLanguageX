@@ -10,7 +10,7 @@
 #include "serialize/values/interface.h"
 #include "errors/CompileError.h"
 
-namespace mxslc::optimisations
+namespace mxslc::serialize
 {
     namespace
     {

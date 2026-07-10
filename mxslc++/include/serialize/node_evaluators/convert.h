@@ -8,7 +8,7 @@
 #include "common.h"
 #include "serialize/values/interface.h"
 
-namespace mxslc::optimisations
+namespace mxslc::serialize
 {
     VarPtr evaluate_convert(const TypePtr& type, const vector<BasicValuePtr>& values);
 }

@@ -16,7 +16,7 @@ namespace mxslc::runtime
     class AttributeList;
 }
 
-namespace mxslc
+namespace mxslc::serialize
 {
     class Serializer : protected runtime_utils::RuntimeAware
     {

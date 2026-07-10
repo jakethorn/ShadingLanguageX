@@ -11,7 +11,7 @@
     if (in->is<fromtype>()) \
         return Variable::create(totype{in->get<fromtype>()[index->get<int>()]});
 
-namespace mxslc::optimisations
+namespace mxslc::serialize
 {
     VarPtr evaluate_extract(const TypePtr&, const vector<BasicValuePtr>& values)
     {

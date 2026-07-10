@@ -37,12 +37,12 @@ namespace mxslc
 #define USING_NAMESPACE(N) namespace N { } \
     using namespace N;
 
-    USING_NAMESPACE(expressions)
-    USING_NAMESPACE(statements)
-    USING_NAMESPACE(runtime)
-    USING_NAMESPACE(values)
-    USING_NAMESPACE(optimisations)
     USING_NAMESPACE(preprocess)
+    USING_NAMESPACE(statements)
+    USING_NAMESPACE(expressions)
+    USING_NAMESPACE(runtime)
+    USING_NAMESPACE(serialize)
+    USING_NAMESPACE(values)
     USING_NAMESPACE(decompile)
 
 #undef USING_NAMESPACE
