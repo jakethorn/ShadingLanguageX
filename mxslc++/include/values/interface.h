@@ -9,7 +9,11 @@
 
 #include "common.h"
 #include "primitive_t.h"
-#include "runtime/AttributeList.h"
+
+namespace mxslc::runtime
+{
+    class AttributeList;
+}
 
 namespace mxslc::values
 {
@@ -18,6 +22,8 @@ namespace mxslc::values
     {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
+
+    ValuePtr create_value(primitive_t value);
 
     template<typename T>
     shared_ptr<T> cast_value(const ValuePtr& value)
@@ -47,13 +53,13 @@ using T##Ptr = shared_ptr<T>;
         VarPtr create_node_output_value(mx::NodePtr node, TypePtr type, const string& output_name, const AttributeList& attrs);
         VarPtr create_node_output_value(mx::NodePtr node, TypePtr type, const vector<string>& output_names);
         VarPtr create_node_graph_output_value(mx::NodeGraphPtr node_graph, TypePtr type, const string& output_name);
-        VarPtr create_default_value(primitive_t value);
+        VarPtr create_basic_value(primitive_t value);
         VarPtr create_default_value(TypePtr type);
 
         template<typename T>
         VarPtr create_default_value()
         {
-            return create_default_value(primitive_t{T{}});
+            return create_basic_value(primitive_t{T{}});
         }
 
         ValuePtr copy_value_from_port(const mx::PortElementPtr& port);

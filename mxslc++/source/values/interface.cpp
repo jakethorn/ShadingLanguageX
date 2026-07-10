@@ -16,6 +16,14 @@
 #include "values/NodeOutputValue.h"
 #include "values/NodeValue.h"
 
+namespace mxslc::values
+{
+    ValuePtr create_value(primitive_t value)
+    {
+        return create_value<BasicValue>(std::move(value));
+    }
+}
+
 namespace mxslc::values::value_utils
 {
     using mtlx_utils::get_port_name;
@@ -144,7 +152,7 @@ namespace mxslc::values::value_utils
         }
     }
 
-    VarPtr create_default_value(primitive_t value)
+    VarPtr create_basic_value(primitive_t value)
     {
         return Variable::create(create_value<BasicValue>(std::move(value)));
     }
