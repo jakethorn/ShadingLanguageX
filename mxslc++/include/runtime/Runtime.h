@@ -12,7 +12,7 @@
 
 namespace mxslc
 {
-    class CompileOptions;
+    struct CompileOptions;
 }
 
 namespace mxslc::runtime

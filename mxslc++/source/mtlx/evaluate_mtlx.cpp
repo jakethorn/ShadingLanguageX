@@ -31,9 +31,9 @@ namespace mxslc::optimisations
             {"combine2", evaluate_combine2},
             {"combine3", evaluate_combine3},
             {"combine4", evaluate_combine4},
-            {"eparate2", evaluate_separate2},
-            {"eparate3", evaluate_separate3},
-            {"eparate4", evaluate_separate4},
+            {"separate2", evaluate_separate2},
+            {"separate3", evaluate_separate3},
+            {"separate4", evaluate_separate4},
             {"convert", evaluate_convert},
             {"extract", evaluate_extract}
         };

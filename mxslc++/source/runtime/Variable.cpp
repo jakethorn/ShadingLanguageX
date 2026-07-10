@@ -67,7 +67,7 @@ namespace mxslc::runtime
         name_ = std::move(name);
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_name(name_, type(), i);
+            children_[i]->set_name(name_, type_, i);
         }
 
         set_node_name(name_);
@@ -78,7 +78,7 @@ namespace mxslc::runtime
         name_ = get_port_name(name, index);
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_name(name_, type(), i);
+            children_[i]->set_name(name_, type_, i);
         }
 
         const Field& field = parent_type->field(index);

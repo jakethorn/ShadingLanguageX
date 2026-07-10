@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "compile.h"
+#include "CompileOptions.h"
 #include "utils/comp_utils.h"
 #include "utils/data_utils.h"
 
@@ -17,9 +18,9 @@ using std::vector;
 
 using reduce_graph_tests = testing::TestWithParam<fs::path>;
 
-void run_test(const fs::path& input_path, const fs::path& expected_path, const bool reduce_path, const string& fail_message)
+void run_test(const fs::path& input_path, const fs::path& expected_path, const bool reduce_graph, const string& fail_message)
 {
-    const mxslc::CompileOptions opts{.reduce_graph = reduce_path};
+    const mxslc::CompileOptions opts{.reduce_graph = reduce_graph};
     const string actual_output = mxslc::compile_to_string(input_path, opts);
 
     if constexpr (overwrite_data_files())

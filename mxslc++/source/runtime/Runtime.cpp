@@ -45,14 +45,13 @@ namespace mxslc::runtime
 
     VarPtr Runtime::global(const string& name) const
     {
-        for (const VarPtr& global : opts_.globals)
+        for (const auto& [global_name, var] : opts_.globals)
         {
-            // dogsdontwearhats
-            //if (global.name() == name)
-            //{
-            //    used_globals.push_back(name);
-            //    return Variable::create(global);
-            //}
+            if (global_name == name)
+            {
+                used_globals.push_back(name);
+                return var->copy();
+            }
         }
         if (opts_.error_on_missing_globals)
             throw CompileError{"Missing global variable: " + name};
@@ -90,11 +89,10 @@ namespace mxslc::runtime
         if (not opts_.error_on_unused_globals)
             return;
 
-        // dogsdontwearhats
-        //for (const interface::Variable& global : opts_.globals)
-        //{
-        //    if (not contains(used_globals, global.name()))
-        //        throw CompileError{"Unused global variable: " + global.name()};
-        //}
+        for (const auto& [global_name, var] : opts_.globals)
+        {
+            if (not contains(used_globals, global_name))
+                throw CompileError{"Unused global variable: " + global_name};
+        }
     }
 }

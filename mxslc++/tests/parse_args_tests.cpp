@@ -4,6 +4,8 @@
 
 #include "gtest/gtest.h"
 #include "parse_args.h"
+#include "runtime/Type.h"
+#include "runtime/Variable.h"
 #include "utils/data_utils.h"
 
 using std::string;
@@ -293,26 +295,26 @@ TEST(parse_args_tests, test_global_options)
     ASSERT_TRUE(args.options.error_on_unused_globals);
 
     ASSERT_EQ(args.options.globals.size(), 5);
-    ASSERT_EQ(args.options.globals[0].name(), "x");
-    ASSERT_EQ(args.options.globals[1].name(), "y");
-    ASSERT_EQ(args.options.globals[2].name(), "z");
-    ASSERT_EQ(args.options.globals[3].name(), "w");
-    ASSERT_EQ(args.options.globals[4].name(), "u");
 
-    ASSERT_TRUE(std::holds_alternative<float>(args.options.globals[0].value()));
-    ASSERT_FLOAT_EQ(std::get<float>(args.options.globals[0].value()), 1.0);
+    const mxslc::VarPtr& x = args.options.globals.at("x");
+    ASSERT_TRUE(x->type()->is<float>());
+    ASSERT_FLOAT_EQ(x->value_as<float>(), 1.0);
 
-    ASSERT_TRUE(std::holds_alternative<string>(args.options.globals[1].value()));
-    ASSERT_EQ(std::get<string>(args.options.globals[1].value()), "hello");
+    const mxslc::VarPtr& y = args.options.globals.at("y");
+    ASSERT_TRUE(y->type()->is<string>());
+    ASSERT_EQ(y->value_as<string>(), "hello");
 
-    ASSERT_TRUE(std::holds_alternative<float>(args.options.globals[2].value()));
-    ASSERT_FLOAT_EQ(std::get<float>(args.options.globals[2].value()), 2.0);
+    const mxslc::VarPtr& z = args.options.globals.at("z");
+    ASSERT_TRUE(z->type()->is<float>());
+    ASSERT_FLOAT_EQ(z->value_as<float>(), 2.0);
 
-    ASSERT_TRUE(std::holds_alternative<string>(args.options.globals[3].value()));
-    ASSERT_EQ(std::get<string>(args.options.globals[3].value()), "world");
+    const mxslc::VarPtr& w = args.options.globals.at("w");
+    ASSERT_TRUE(w->type()->is<string>());
+    ASSERT_EQ(w->value_as<string>(), "world");
 
-    ASSERT_TRUE(std::holds_alternative<int>(args.options.globals[4].value()));
-    ASSERT_EQ(std::get<int>(args.options.globals[4].value()), 10);
+    const mxslc::VarPtr& u = args.options.globals.at("u");
+    ASSERT_TRUE(u->type()->is<int>());
+    ASSERT_EQ(u->value_as<int>(), 10);
 }
 
 TEST(parse_args_tests, test_global_error_options)

@@ -11,7 +11,7 @@
 
 namespace mxslc
 {
-    class CompileOptions;
+    struct CompileOptions;
     
     mx::DocumentPtr compile_to_document(const fs::path& src_path);
     mx::DocumentPtr compile_to_document(const fs::path& src_path, const CompileOptions& opts);

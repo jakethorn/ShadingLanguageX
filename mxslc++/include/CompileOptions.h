@@ -25,7 +25,7 @@ namespace mxslc
 
         vector<Macro> macros;
 
-        vector<VarPtr> globals;
+        unordered_map<string, VarPtr> globals;
         bool error_on_missing_globals{true};
         bool error_on_unused_globals{true};
 

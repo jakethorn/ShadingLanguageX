@@ -13,6 +13,7 @@
 #include "utils/container_utils.h"
 #include "Span.h"
 #include "errors/CompileError.h"
+#include "runtime/Variable.h"
 
 namespace mxslc
 {
@@ -56,6 +57,15 @@ options:
             std::cout << help_message;
         }
 
+        Action to_action(const std::string& str)
+        {
+            if (str == "compile")
+                return Action::Compile;
+            else if (str == "decompile")
+                return Action::Decompile;
+            else
+                return Action::Unknown;
+        }
         void print_error(const string& message)
         {
             std::cerr << "Error: " << message << std::endl;
@@ -240,8 +250,7 @@ options:
                     return;
                 }
 
-                // dogsdontwearhats
-                //clargs.options.globals.emplace_back(name, *value);
+                clargs.options.globals[name] = Variable::create(*value);
             }
         }
 
@@ -361,15 +370,5 @@ options:
         }
 
         return parse_args(argv);
-    }
-
-    Action to_action(const std::string& str)
-    {
-        if (str == "compile")
-            return Action::Compile;
-        else if (str == "decompile")
-            return Action::Decompile;
-        else
-            return Action::Unknown;
     }
 }

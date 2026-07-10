@@ -30,8 +30,6 @@ namespace mxslc
     CommandLineArgs parse_args(int argc, char* argv[]);
     CommandLineArgs parse_args(const vector<string>& argv);
     CommandLineArgs parse_args(const fs::path& response_path);
-
-    Action to_action(const string& str);
 }
 
 #endif //MXSLC_PARSE_ARGS_H
