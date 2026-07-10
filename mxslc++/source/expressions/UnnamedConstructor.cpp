@@ -4,14 +4,13 @@
 
 #include "expressions/UnnamedConstructor.h"
 
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "errors/CompileError.h"
 #include "expressions/interface.h"
-#include "runtime/interface.h"
 
 namespace mxslc::expressions
 {
@@ -53,7 +52,7 @@ namespace mxslc::expressions
         values.reserve(exprs_.size());
         for (const ExprPtr& expr : exprs_)
             values.push_back(expr->evaluate());
-        return Variable::create(values);
+        return create_variable(values);
     }
 
     bool UnnamedConstructor::expressions_are_initialized()

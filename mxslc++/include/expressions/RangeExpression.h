@@ -6,6 +6,7 @@
 #define MXSLC_RANGEEXPRESSION_H
 
 #include "expressions/Expression.h"
+#include "runtime/interface.h"
 #include "runtime/Variable.h"
 
 namespace mxslc::expressions
@@ -41,7 +42,7 @@ namespace mxslc::expressions
                 lower += step;
             }
 
-            range_ = Variable::create(result);
+            range_ = create_variable(result);
         }
 
         ExprPtr lower_expr_;

@@ -5,9 +5,9 @@
 #include "expressions/Literal.h"
 
 #include "expressions/interface.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
 #include "serialize/values/BasicValue.h"
 #include "serialize/values/interface.h"
 
@@ -50,6 +50,6 @@ namespace mxslc::expressions
     VarPtr Literal::evaluate_impl() const
     {
         BasicValuePtr value = create_value<BasicValue>(value_, type_);
-        return Variable::create(std::move(value));
+        return create_variable(std::move(value));
     }
 }

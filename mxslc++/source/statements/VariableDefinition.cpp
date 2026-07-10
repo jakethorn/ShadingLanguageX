@@ -8,12 +8,12 @@
 #include "expressions/Expression.h"
 #include "expressions/interface.h"
 #include "expressions/RuntimeExpression.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
-#include "serialize/values/interface.h"
 
 namespace mxslc::statements
 {
@@ -77,11 +77,11 @@ namespace mxslc::statements
             }
             else
             {
-                value = Variable::create(type);
+                value = create_variable(type);
             }
         }
 
-        const VarPtr var = Variable::create(mods_, std::move(type), value);
+        const VarPtr var = create_variable(mods_, std::move(type), value);
         var->add_to_scope(name_);
     }
 }

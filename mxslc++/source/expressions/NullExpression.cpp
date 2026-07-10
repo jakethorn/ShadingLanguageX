@@ -4,7 +4,7 @@
 
 #include "expressions/NullExpression.h"
 
-#include "runtime/Variable.h"
+#include "runtime/interface.h"
 #include "errors/CompileError.h"
 #include "expressions/interface.h"
 #include "serialize/values/interface.h"
@@ -32,6 +32,6 @@ namespace mxslc::expressions
     VarPtr NullExpression::evaluate_impl() const
     {
         ValuePtr value = create_value<NullValue>(type_);
-        return Variable::create(std::move(value));
+        return create_variable(std::move(value));
     }
 }

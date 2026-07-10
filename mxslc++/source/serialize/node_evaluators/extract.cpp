@@ -5,11 +5,11 @@
 #include "serialize/node_evaluators/extract.h"
 
 #include "serialize/values/BasicValue.h"
-#include "runtime/Variable.h"
+#include "runtime/interface.h"
 
 #define EXTRACT(fromtype, totype) \
     if (in->is<fromtype>()) \
-        return Variable::create(totype{in->get<fromtype>()[index->get<int>()]});
+        return create_variable(totype{in->get<fromtype>()[index->get<int>()]});
 
 namespace mxslc::serialize
 {

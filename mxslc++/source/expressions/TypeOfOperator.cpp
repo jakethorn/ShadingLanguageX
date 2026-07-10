@@ -10,7 +10,6 @@
 #include "runtime/interface.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 
 namespace mxslc::expressions
@@ -72,6 +71,6 @@ namespace mxslc::expressions
 
     VarPtr TypeOfOperator::evaluate_impl() const
     {
-        return Variable::create(TokenType::Const, op_type_, {expr_type_->name(), expr_type_->full_str()});
+        return create_variable(TokenType::Const, op_type_, {expr_type_->name(), expr_type_->full_str()});
     }
 }

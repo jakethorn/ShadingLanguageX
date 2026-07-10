@@ -6,14 +6,13 @@
 #include "expressions/Expression.h"
 #include "expressions/interface.h"
 #include "expressions/RuntimeExpression.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
-#include "serialize/serializer_utils.h"
 #include "statements/interface.h"
-#include "serialize/values/interface.h"
 
 namespace mxslc::statements
 {
@@ -53,7 +52,7 @@ namespace mxslc::statements
         }
         else
         {
-            value = Variable::create(type);
+            value = create_variable(type);
         }
 
         for (size_t i = 0; i < value->child_count(); ++i)
@@ -69,7 +68,7 @@ namespace mxslc::statements
                     child = child_expr->evaluate();
                 }
             }
-            const VarPtr var = Variable::create(field.modifiers(), field.type(), child);
+            const VarPtr var = create_variable(field.modifiers(), field.type(), child);
             var->add_to_scope(type->field_name(i));
         }
     }

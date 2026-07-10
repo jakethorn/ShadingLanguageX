@@ -4,12 +4,12 @@
 
 #include "serialize/node_evaluators/binary_ops.h"
 #include "serialize/values/BasicValue.h"
-#include "runtime/Variable.h"
+#include "runtime/interface.h"
 #include "utils/mtlx_type_binary_ops.h"
 
 #define BINARY_OP(ltype, op, rtype) \
     if (values[0]->is<ltype>() && values[1]->is<rtype>()) \
-        return Variable::create(values[0]->get<ltype>() op values[1]->get<rtype>());
+        return create_variable(values[0]->get<ltype>() op values[1]->get<rtype>());
 
 namespace mxslc::serialize
 {

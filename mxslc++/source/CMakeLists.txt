@@ -32,6 +32,7 @@ add_library(mxslc_lib
         runtime/utils/type_cast.cpp
         runtime/utils/InitInfo.cpp
         runtime/utils/ArgumentEvaluator.cpp
+        runtime/utils/type_utils.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp

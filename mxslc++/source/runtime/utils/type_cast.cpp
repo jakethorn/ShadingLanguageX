@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "utils/string_utils.h"
+#include "runtime/interface.h"
 #include "runtime/utils/invoke.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
@@ -23,7 +24,7 @@ namespace mxslc::runtime_utils
         assert(value->type()->is_compatible(type));
 
         if (value->child_count() == type->field_count())
-            return Variable::create(type, value);
+            return create_variable(type, value);
 
         VarPtr cast_value;
         if (type->is_vector())

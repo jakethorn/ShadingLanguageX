@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "runtime/Function.h"
+#include "runtime/interface.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "serialize/values/interface.h"
@@ -32,12 +33,12 @@ namespace mxslc::serialize_utils
                 field_values.push_back(std::move(field_value));
             }
 
-            return Variable::create(std::move(type), field_values);
+            return create_variable(std::move(type), field_values);
         }
         else
         {
             ValuePtr value = create_value<InterfaceValue>(std::move(type), name);
-            return Variable::create(std::move(value));
+            return create_variable(std::move(value));
         }
     }
 
@@ -50,7 +51,7 @@ namespace mxslc::serialize_utils
         else
         {
             ValuePtr value = create_value<NodeValue>(std::move(node));
-            return Variable::create(std::move(value));
+            return create_variable(std::move(value));
         }
     }
 
@@ -75,7 +76,7 @@ namespace mxslc::serialize_utils
         else
         {
             ValuePtr value = create_value<NodeGraphValue>(std::move(node_graph));
-            return Variable::create(std::move(value));
+            return create_variable(std::move(value));
         }
     }
 
@@ -101,13 +102,13 @@ namespace mxslc::serialize_utils
                 field_values.push_back(std::move(field_value));
             }
 
-            return Variable::create(std::move(type), field_values);
+            return create_variable(std::move(type), field_values);
         }
         else
         {
             attrs.add_to(node, output_name);
             ValuePtr value = create_value<NodeOutputValue>(std::move(type), std::move(node), output_name);
-            return Variable::create(std::move(value));
+            return create_variable(std::move(value));
         }
     }
 
@@ -121,7 +122,7 @@ namespace mxslc::serialize_utils
             VarPtr field_value = create_node_output_value(node, type->field_type(i), output_names[i]);
             field_values.push_back(std::move(field_value));
         }
-        return Variable::create(std::move(type), field_values);
+        return create_variable(std::move(type), field_values);
     }
 
     VarPtr create_node_graph_output_value(mx::NodeGraphPtr node_graph, TypePtr type, const string& output_name)
@@ -136,18 +137,18 @@ namespace mxslc::serialize_utils
                 field_values.push_back(std::move(field_value));
             }
 
-            return Variable::create(std::move(type), field_values);
+            return create_variable(std::move(type), field_values);
         }
         else
         {
             ValuePtr value = create_value<NodeGraphOutputValue>(std::move(type), std::move(node_graph), output_name);
-            return Variable::create(std::move(value));
+            return create_variable(std::move(value));
         }
     }
 
     VarPtr create_basic_value(primitive_t value)
     {
-        return Variable::create(create_value(std::move(value)));
+        return create_variable(std::move(value));
     }
 
     VarPtr create_basic_value(TypePtr type)
@@ -165,7 +166,7 @@ namespace mxslc::serialize_utils
                 fields_values.push_back(std::move(field_value));
             }
 
-            return Variable::create(std::move(type), fields_values);
+            return create_variable(std::move(type), fields_values);
         }
 
 #define START_INIT primitive_t primitive_value = ""s; if constexpr (false) { }
@@ -187,7 +188,7 @@ namespace mxslc::serialize_utils
 #undef INIT_PRIM
 #undef START_INIT
 
-        return create_basic_value(std::move(primitive_value));
+        return create_variable(std::move(primitive_value));
     }
 
     ValuePtr copy_value_from_port(const mx::PortElementPtr& port)

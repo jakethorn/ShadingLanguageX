@@ -6,11 +6,25 @@
 #define MXSLC_RUNTIME_INTERFACE_H
 
 #include "common.h"
-#include "runtime/Type.h"
+#include "runtime/ModifierList.h"
+#include "primitive_t.h"
 
 namespace mxslc::runtime
 {
-    VarPtr create_variable();
+    class Scope;
+    using ScopePtr = unique_ptr<Scope>;
+
+    class Variable;
+    using VarPtr = shared_ptr<Variable>;
+
+    class Function;
+    using FuncPtr = shared_ptr<Function>;
+
+    class Type;
+    using TypePtr = shared_ptr<Type>;
+
+    class Parameter;
+    using ParameterValues = vector<std::pair<const Parameter&, VarPtr>>;
 
     template<typename... Args>
     FuncPtr create_function(Args&&... args)
@@ -29,6 +43,24 @@ namespace mxslc::runtime
     {
         return std::make_unique<Scope>(std::forward<Args>(args)...);
     }
+
+    VarPtr create_variable(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
+    VarPtr create_variable(ModifierList mods, TypePtr type, const vector<primitive_t>& children);
+    VarPtr create_variable(ModifierList mods, TypePtr type, ValuePtr value);
+    VarPtr create_variable(ModifierList mods, TypePtr type, const VarPtr& value);
+    VarPtr create_variable(ModifierList mods, ValuePtr value);
+    VarPtr create_variable(ModifierList mods, primitive_t value);
+
+    VarPtr create_variable(TypePtr type, const vector<VarPtr>& children);
+    VarPtr create_variable(TypePtr type, ValuePtr value);
+    VarPtr create_variable(TypePtr type, const VarPtr& value);
+    VarPtr create_variable(TypePtr type);
+
+    VarPtr create_variable(const vector<VarPtr>& children);
+    VarPtr create_variable(const vector<primitive_t>& children);
+    VarPtr create_variable(ValuePtr value);
+    VarPtr create_variable(primitive_t value);
+    VarPtr create_variable(const VarPtr& value);
 }
 
 #endif //MXSLC_RUNTIME_INTERFACE_H

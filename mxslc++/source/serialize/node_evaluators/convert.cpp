@@ -3,13 +3,14 @@
 //
 
 #include "serialize/node_evaluators/convert.h"
+
+#include "runtime/interface.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
 #include "serialize/values/BasicValue.h"
 
 #define CONVERT_SINGLE_TO_VECTOR(fromtype, totype) \
     if (type->is<totype>()) \
-        return Variable::create(totype{static_cast<float>(in->get<fromtype>())});
+        return create_variable(totype{static_cast<float>(in->get<fromtype>())});
 
 #define CONVERT_VECTOR_TO_VECTOR(fromtype, totype) \
     if (in->is<fromtype>()) \
@@ -21,7 +22,7 @@
             { \
                 data[i] = in->get<fromtype>()[i]; \
             } \
-            return Variable::create(totype{data}); \
+            return create_variable(totype{data}); \
         } \
     }
 
@@ -35,13 +36,13 @@ namespace mxslc::serialize
             if (type->is<int>())
             {
                 int out = in->get<bool>();
-                return Variable::create(out);
+                return create_variable(out);
             }
 
             if (type->is<float>())
             {
                 float out = in->get<bool>();
-                return Variable::create(out);
+                return create_variable(out);
             }
 
             CONVERT_SINGLE_TO_VECTOR(bool, mx::Vector2)
@@ -56,13 +57,13 @@ namespace mxslc::serialize
             if (type->is<bool>())
             {
                 bool out = in->get<int>();
-                return Variable::create(out);
+                return create_variable(out);
             }
 
             if (type->is<float>())
             {
                 float out = static_cast<float>(in->get<int>());
-                return Variable::create(out);
+                return create_variable(out);
             }
 
             CONVERT_SINGLE_TO_VECTOR(int, mx::Vector2)

@@ -5,12 +5,12 @@
 #include "statements/ForEachLoop.h"
 
 #include "expressions/Expression.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
-#include "serialize/values/Value.h"
 #include "errors/CompileError.h"
 #include "statements/interface.h"
 
@@ -50,7 +50,7 @@ namespace mxslc::statements
                 throw CompileError{"Field value does not match loop iterator type"};
 
             runtime().enter_scope();
-            Variable::create(mods_, type, next_value)->add_to_scope(name_);
+            create_variable(mods_, type, next_value)->add_to_scope(name_);
             body_->execute();
             runtime().exit_scope();
         }

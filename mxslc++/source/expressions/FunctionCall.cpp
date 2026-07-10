@@ -8,15 +8,15 @@
 #include "expressions/ThisExpression.h"
 #include "errors/AmbiguousFunctionError.h"
 #include "expressions/interface.h"
+#include "runtime/interface.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
+#include "runtime/Variable.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "serialize/serializer_utils.h"
-#include "serialize/values/interface.h"
 
 namespace mxslc::expressions
 {
@@ -171,12 +171,12 @@ namespace mxslc::expressions
             if (param.is_in())
             {
                 const VarPtr arg_value = args_.evaluate(param);
-                const VarPtr arg_value_copy = Variable::create(std::move(mods), param.type(), arg_value);
+                const VarPtr arg_value_copy = create_variable(std::move(mods), param.type(), arg_value);
                 arg_value_copy->add_to_scope(param.name());
             }
             else
             {
-                const VarPtr default_value = param.has_default_value() ? param.evaluate() : Variable::create(param.type());
+                const VarPtr default_value = param.has_default_value() ? param.evaluate() : create_variable(param.type());
                 default_value->set_modifiers(std::move(mods));
                 default_value->add_to_scope(param.name());
             }

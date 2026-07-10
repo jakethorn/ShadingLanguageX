@@ -124,14 +124,22 @@ namespace mxslc::runtime
         return parent_.lock();
     }
 
-    const vector<VarPtr>& Variable::children() const
+    VarPtr Variable::oldest_ancestor()
     {
-        return children_;
+        if (has_parent())
+            return parent()->oldest_ancestor();
+        else
+            return shared_from_this();
     }
 
     size_t Variable::child_count() const
     {
         return children_.size();
+    }
+
+    const vector<VarPtr>& Variable::children() const
+    {
+        return children_;
     }
 
     VarPtr Variable::child(const size_t index)
@@ -145,14 +153,6 @@ namespace mxslc::runtime
     VarPtr Variable::child(const string& field_name)
     {
         return child(type_->field_index(field_name));
-    }
-
-    VarPtr Variable::oldest()
-    {
-        if (has_parent())
-            return parent()->oldest();
-        else
-            return shared_from_this();
     }
 
     bool Variable::has_value() const
@@ -179,7 +179,7 @@ namespace mxslc::runtime
 
     VarPtr Variable::copy()
     {
-        return create(shared_from_this());
+        return create_variable(shared_from_this());
     }
 
     void Variable::copy(const VarPtr& other)
@@ -276,110 +276,6 @@ namespace mxslc::runtime
         }
     }
 
-    VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<VarPtr>& children)
-    {
-        if (contains_auto(type))
-            type = remove_auto(type, type_of(children));
-
-        VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-        var->copy_children(children);
-        return var;
-    }
-
-    VarPtr Variable::create(ModifierList mods, TypePtr type, const vector<primitive_t>& children)
-    {
-        vector<VarPtr> vars;
-        vars.reserve(children.size());
-        for (const primitive_t& child : children)
-            vars.push_back(create(child));
-
-        return create(std::move(mods), std::move(type), vars);
-    }
-
-    VarPtr Variable::create(ModifierList mods, TypePtr type, ValuePtr value)
-    {
-        if (contains_auto(type))
-            type = remove_auto(type, value->type());
-
-        VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-        var->copy_value(std::move(value));
-        return var;
-    }
-
-    VarPtr Variable::create(ModifierList mods, TypePtr type, const VarPtr& value)
-    {
-        if (contains_auto(type))
-            type = remove_auto(type, value->type());
-
-        VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-        var->copy(value);
-        return var;
-    }
-
-    VarPtr Variable::create(ModifierList mods, ValuePtr value)
-    {
-        TypePtr type = value->type();
-        return create(std::move(mods), std::move(type), std::move(value));
-    }
-
-    VarPtr Variable::create(ModifierList mods, primitive_t value)
-    {
-        BasicValuePtr basic_value = create_value<BasicValue>(std::move(value));
-        return create(std::move(mods), std::move(basic_value));
-    }
-
-    VarPtr Variable::create(TypePtr type, const vector<VarPtr>& children)
-    {
-        return create(ModifierList{}, std::move(type), children);
-    }
-
-    VarPtr Variable::create(TypePtr type, ValuePtr value)
-    {
-        return create(ModifierList{}, std::move(type), std::move(value));
-    }
-
-    VarPtr Variable::create(TypePtr type, const VarPtr& value)
-    {
-        return create(ModifierList{}, std::move(type), value);
-    }
-
-    VarPtr Variable::create(TypePtr type)
-    {
-        return serialize_utils::create_basic_value(std::move(type));
-    }
-
-    VarPtr Variable::create(const vector<VarPtr>& children)
-    {
-        return create(ModifierList{}, type_of(children), children);
-    }
-
-    VarPtr Variable::create(const vector<primitive_t>& children)
-    {
-        vector<VarPtr> vars;
-        vars.reserve(children.size());
-        for (const primitive_t& child : children)
-            vars.push_back(create(child));
-
-        return create(vars);
-    }
-
-    VarPtr Variable::create(ValuePtr value)
-    {
-        TypePtr type = value->type();
-        return create(ModifierList{}, std::move(type), std::move(value));
-    }
-
-    VarPtr Variable::create(primitive_t value)
-    {
-        BasicValuePtr basic_value = create_value<BasicValue>(std::move(value));
-        return create(std::move(basic_value));
-    }
-
-    VarPtr Variable::create(const VarPtr& value)
-    {
-        return create(ModifierList{}, value->type(), value);
-    }
-
     void Variable::set_node_name(const string& name) const
     {
         if (const NodeValuePtr node_value = cast_value<NodeValue>(value_impl()))
@@ -435,7 +331,7 @@ namespace mxslc::runtime
         children_.clear();
         for (size_t i = 0; i < children.size(); ++i)
         {
-            VarPtr child = create(type_->field(i).modifiers(), type_->field_type(i), children[i]);
+            VarPtr child = create_variable(type_->field(i).modifiers(), type_->field_type(i), children[i]);
             child->parent_ = weak_from_this();
             if (not name_.empty())
                 child->set_name(get_port_name(name_, i));
@@ -443,54 +339,5 @@ namespace mxslc::runtime
         }
 
         is_initialized_ = true;
-    }
-
-    TypePtr Variable::type_of(const vector<VarPtr>& children)
-    {
-        vector<TypePtr> fields;
-        fields.reserve(children.size());
-        for (const VarPtr& child : children)
-            fields.push_back(child->type());
-
-        return scope().resolve_type(
-            create_type(std::move(fields))
-        );
-    }
-
-    bool Variable::contains_auto(const TypePtr& type)
-    {
-        if (type->is_auto())
-            return true;
-        if (type->has_fields())
-        {
-            for (const Field& field : type->fields())
-            {
-                if (contains_auto(field.type()))
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    TypePtr Variable::remove_auto(const TypePtr& original_type, const TypePtr& value_type)
-    {
-        if (original_type->is_auto())
-            return value_type;
-        if (original_type->has_fields())
-        {
-            vector<Field> fields;
-            fields.reserve(original_type->field_count());
-            for (size_t i = 0; i < original_type->field_count(); ++i)
-            {
-                Field original_field = original_type->field(i);
-                fields.emplace_back(
-                    original_field.modifiers(),
-                    remove_auto(original_field.type(), value_type->field_type(i)),
-                    original_field.name()
-                );
-            }
-            return create_type(original_type->name(), std::move(fields));
-        }
-        return original_type;
     }
 }

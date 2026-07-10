@@ -75,7 +75,7 @@ namespace mxslc::runtime
 
     bool Scope::is_variable_local(const VarPtr& var) const
     {
-        return is_variable_local(var->oldest()->name());
+        return is_variable_local(var->oldest_ancestor()->name());
     }
 
     bool Scope::is_variable_local(const string& name) const

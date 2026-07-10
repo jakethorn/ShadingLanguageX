@@ -9,7 +9,10 @@
 
 namespace mxslc::type_utils
 {
+    bool contains_auto(const TypePtr& type);
+    TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type);
 
+    TypePtr type_of(const vector<VarPtr>& children);
 }
 
 #endif //MXSLC_TYPE_UTILS_H

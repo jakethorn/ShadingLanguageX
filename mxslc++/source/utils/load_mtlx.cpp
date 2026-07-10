@@ -14,6 +14,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Function.h"
+#include "runtime/Type.h"
 #include "utils/container_utils.h"
 #include "utils/string_utils.h"
 

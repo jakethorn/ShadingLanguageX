@@ -13,7 +13,7 @@
 #include "utils/container_utils.h"
 #include "utils/Span.h"
 #include "errors/CompileError.h"
-#include "runtime/Variable.h"
+#include "runtime/interface.h"
 
 namespace mxslc
 {
@@ -250,7 +250,7 @@ options:
                     return;
                 }
 
-                clargs.options.globals[name] = Variable::create(*value);
+                clargs.options.globals[name] = create_variable(*value);
             }
         }
 
