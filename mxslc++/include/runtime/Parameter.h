@@ -31,7 +31,7 @@ namespace mxslc::runtime
         bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
         bool is_in() const { return not mods_.contains(TokenType::Out); }
         bool is_out() const { return mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out); }
-        TypePtr type() const;
+        const TypePtr& type() const { return type_; }
         const string& name() const { return name_; }
         size_t index() const { return index_; }
 

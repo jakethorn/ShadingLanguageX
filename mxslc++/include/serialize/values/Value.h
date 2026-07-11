@@ -18,7 +18,7 @@ namespace mxslc::serialize::values
         explicit Value(TypePtr type);
         virtual ~Value() = default;
 
-        TypePtr type() { return type_; }
+        const TypePtr& type() { return type_; }
 
         virtual bool equals(const ValuePtr& other) const = 0;
 

@@ -181,7 +181,7 @@ namespace mxslc::runtime
             const TypePtr param_type = params[arg].type();
             if (not param_type->is_compatible(arg.type()))
                 return Result::NoMatch;
-            if (param_type->is_equal(arg.type()))
+            if (param_type->equals(arg.type()))
                 result.score++;
         }
 

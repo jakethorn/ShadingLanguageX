@@ -115,7 +115,7 @@ namespace mxslc::expressions
 
         if (target_type_)
         {
-            assert(value->type()->is_equal(type_impl()));
+            assert(value->type()->equals(type_impl()));
             return runtime_utils::type_cast(target_type_, value);
         }
 

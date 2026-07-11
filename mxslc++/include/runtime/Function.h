@@ -43,7 +43,7 @@ namespace mxslc::runtime
 
         bool is_inline() const { return mods_.contains(TokenType::Inline); }
         bool is_default() const { return mods_.contains(TokenType::Default); }
-        TypePtr return_type() const { return return_type_; }
+        const TypePtr& return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }
         bool has_template_type() const { return template_type_ != nullptr; }

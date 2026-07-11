@@ -61,7 +61,7 @@ namespace mxslc::serialize
         {
             if (VarPtr value = CONSTEXPR_FUNCS.at(node_name)(node_type, basic_values))
             {
-                assert(value->type()->is_equal(node_type));
+                assert(value->type()->equals(node_type));
                 return value;
             }
         }

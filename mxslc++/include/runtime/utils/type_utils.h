@@ -6,6 +6,7 @@
 #define MXSLC_TYPE_UTILS_H
 
 #include "common.h"
+#include "TypeName.h"
 
 namespace mxslc::type_utils
 {
@@ -13,6 +14,12 @@ namespace mxslc::type_utils
     TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type);
 
     TypePtr type_of(const vector<VarPtr>& children);
+
+    template<typename T>
+    string name_of()
+    {
+        return runtime_utils::TypeName::of<T>();
+    }
 }
 
 #endif //MXSLC_TYPE_UTILS_H

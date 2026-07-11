@@ -17,22 +17,22 @@ namespace mxslc::runtime
     using container_utils::lock;
     using runtime_utils::TypeName;
 
-#define type_def(t) TypePtr Type::t = resolve(TypeName::t);
-    type_def(Bool)
-    type_def(Int)
-    type_def(Float)
-    type_def(String)
-    type_def(Filename)
-    type_def(Vec2)
-    type_def(Vec3)
-    type_def(Vec4)
-    type_def(Color3)
-    type_def(Color4)
-    type_def(Mat3)
-    type_def(Mat4)
-    type_def(Void)
-    type_def(Auto)
-#undef type_def
+#define TYPE_DEF(t) TypePtr Type::t = resolve(TypeName::t);
+    TYPE_DEF(Bool)
+    TYPE_DEF(Int)
+    TYPE_DEF(Float)
+    TYPE_DEF(String)
+    TYPE_DEF(Filename)
+    TYPE_DEF(Vec2)
+    TYPE_DEF(Vec3)
+    TYPE_DEF(Vec4)
+    TYPE_DEF(Color3)
+    TYPE_DEF(Color4)
+    TYPE_DEF(Mat3)
+    TYPE_DEF(Mat4)
+    TYPE_DEF(Void)
+    TYPE_DEF(Auto)
+#undef TYPE_DEF
 
     Type::Type(string name) : name_{std::move(name)} { }
 
@@ -208,7 +208,7 @@ namespace mxslc::runtime
         return false;
     }
 
-    bool Type::is_equal(const TypePtr& other, const bool field_names) const
+    bool Type::equals(const TypePtr& other, const bool field_names) const
     {
         if (other == nullptr)
             return false;
@@ -224,7 +224,7 @@ namespace mxslc::runtime
 
         for (size_t i = 0; i < field_count(); i++)
         {
-            if (not field_type(i)->is_equal(other->field_type(i), field_names))
+            if (not field_type(i)->equals(other->field_type(i), field_names))
                 return false;
             if (field_names and field_name(i) != other->field_name(i))
                 return false;
@@ -237,7 +237,7 @@ namespace mxslc::runtime
     {
         for (const TypePtr& type : types)
         {
-            if (is_equal(type))
+            if (equals(type))
                 return true;
         }
 
@@ -249,7 +249,7 @@ namespace mxslc::runtime
         vector<TypePtr> compatibles;
         for (const TypePtr& type : types)
         {
-            if (is_equal(type))
+            if (equals(type))
                 return type;
 
             if (is_compatible(type))

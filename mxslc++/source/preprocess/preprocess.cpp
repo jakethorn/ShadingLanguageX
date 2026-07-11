@@ -79,15 +79,15 @@ namespace mxslc::preprocess
         // TODO track which files have been included
         // TODO track circular dependencies (look at ancestors)
         const vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
-        const Primitive path = evaluate_expression(tokens);
-        include_file(path.as<string>());
+        //const Primitive path = evaluate_expression(tokens);
+        //include_file(path.as<string>());
     }
 
     void Preprocessor::process_library()
     {
         const vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
-        const Primitive path = evaluate_expression(tokens);
-        opts_.libraries.emplace_back(path.as<string>());
+        //const Primitive path = evaluate_expression(tokens);
+        //opts_.libraries.emplace_back(path.as<string>());
     }
 
     void Preprocessor::process_version()

@@ -40,7 +40,7 @@ namespace mxslc::runtime
         bool is_const() const { return mods_.contains(TokenType::Const); }
         bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
         bool is_global() const { return mods_.contains(TokenType::Global); }
-        TypePtr type() const { return type_; }
+        const TypePtr& type() const { return type_; }
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
 

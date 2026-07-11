@@ -18,7 +18,7 @@ namespace mxslc::runtime_utils
 
     VarPtr type_cast(const TypePtr& type, const VarPtr& value, const bool force)
     {
-        if (value->type()->is_equal(type, force))
+        if (value->type()->equals(type, force))
             return value;
 
         assert(value->type()->is_compatible(type));
@@ -36,7 +36,7 @@ namespace mxslc::runtime_utils
             cast_value = invoke_function(type, "separate" + str(type->field_count()), value);
         }
 
-        assert(cast_value->type()->is_equal(type));
+        assert(cast_value->type()->equals(type));
         return cast_value;
     }
 }

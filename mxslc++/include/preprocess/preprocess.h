@@ -8,7 +8,6 @@
 #include "common.h"
 #include "Token.h"
 #include "CompileOptions.h"
-#include "Primitive.h"
 #include "TokenReader.h"
 
 namespace mxslc::preprocess
@@ -45,7 +44,7 @@ namespace mxslc::preprocess
 
         vector<Token> consume_and_expand_until(TokenType token_type);
 
-        Primitive evaluate_expression(const vector<Token>& tokens) const;
+        //Primitive evaluate_expression(const vector<Token>& tokens) const;
 
         void add_token(Token&& tokens);
         void add_tokens(vector<Token>&& tokens);

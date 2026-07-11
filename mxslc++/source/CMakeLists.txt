@@ -5,7 +5,13 @@ add_library(mxslc_lib
         parse.cpp
         compile.cpp
         TokenType.cpp
-        Primitive.cpp
+        primitive/Primitive.cpp
+        primitive/primitive_utils/binary_arithmatic_ops.cpp
+        primitive/primitive_utils/binary_comparison_ops.cpp
+        primitive/primitive_utils/binary_logical_ops.cpp
+        primitive/primitive_utils/unary_ops.cpp
+        primitive/primitive_utils/convert.cpp
+        primitive/primitive_utils/extract.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp

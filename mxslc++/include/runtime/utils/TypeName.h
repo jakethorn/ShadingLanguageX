@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "primitive_t.h"
+#include "errors/CompileError.h"
 
 namespace mxslc::runtime_utils
 {
@@ -31,38 +32,42 @@ namespace mxslc::runtime_utils
         template<typename T>
         static const string& of()
         {
-            if constexpr (std::is_same_v<T, bool>) return Bool;
-            if constexpr (std::is_same_v<T, int>) return Int;
-            if constexpr (std::is_same_v<T, float>) return Float;
-            if constexpr (std::is_same_v<T, string>) return String;
-            if constexpr (std::is_same_v<T, mx::Vector2>) return Vec2;
-            if constexpr (std::is_same_v<T, mx::Vector3>) return Vec3;
-            if constexpr (std::is_same_v<T, mx::Vector4>) return Vec4;
-            if constexpr (std::is_same_v<T, mx::Color3>) return Color3;
-            if constexpr (std::is_same_v<T, mx::Color4>) return Color4;
-            if constexpr (std::is_same_v<T, mx::Matrix33>) return Mat3;
-            if constexpr (std::is_same_v<T, mx::Matrix44>) return Mat4;
-            if constexpr (std::is_same_v<T, void>) return Void;
-            throw std::runtime_error("Unknown type");
+#define NAME_OF(type, name) if constexpr (std::is_same_v<T, type>) { return name; }
+            NAME_OF(bool, Bool)
+            NAME_OF(int, Int)
+            NAME_OF(float, Float)
+            NAME_OF(string, String)
+            NAME_OF(fs::path, Filename)
+            NAME_OF(mx::Vector2, Vec2)
+            NAME_OF(mx::Vector3, Vec3)
+            NAME_OF(mx::Vector4, Vec4)
+            NAME_OF(mx::Color3, Color3)
+            NAME_OF(mx::Color4, Color4)
+            NAME_OF(mx::Matrix33, Mat3)
+            NAME_OF(mx::Matrix44, Mat4)
+            NAME_OF(void, Void)
+#undef NAME_OF
+
+            throw CompileError{"Unknown type"};
         }
 
         static const string& of(const primitive_t& value)
         {
-    #define type_of(t, p) if (std::holds_alternative<t>(value)) return p;
-            type_of(bool, Bool);
-            type_of(int, Int);
-            type_of(float, Float);
-            type_of(string, String);
-            type_of(fs::path, Filename);
-            type_of(mx::Vector2, Vec2);
-            type_of(mx::Vector3, Vec3);
-            type_of(mx::Vector4, Vec4);
-            type_of(mx::Color3, Color3);
-            type_of(mx::Color4, Color4);
-            type_of(mx::Matrix33, Mat3);
-            type_of(mx::Matrix44, Mat4);
-    #undef type_of
-            throw std::runtime_error{"Invalid primitive value"};
+#define NAME_OF(type, name) if (std::holds_alternative<type>(value)) { return name; }
+            NAME_OF(bool, Bool);
+            NAME_OF(int, Int);
+            NAME_OF(float, Float);
+            NAME_OF(string, String);
+            NAME_OF(fs::path, Filename);
+            NAME_OF(mx::Vector2, Vec2);
+            NAME_OF(mx::Vector3, Vec3);
+            NAME_OF(mx::Vector4, Vec4);
+            NAME_OF(mx::Color3, Color3);
+            NAME_OF(mx::Color4, Color4);
+            NAME_OF(mx::Matrix33, Mat3);
+            NAME_OF(mx::Matrix44, Mat4);
+#undef NAME_OF
+            throw CompileError{"Invalid primitive value"};
         }
 
         static bool is_primitive(const string& type_name)
@@ -73,9 +78,19 @@ namespace mxslc::runtime_utils
                     type_name == Mat3 or type_name == Mat4;
         }
 
+        static bool is_single(const string& type_name)
+        {
+            return type_name == Bool or type_name == Int or type_name == Float;
+        }
+
         static bool is_vector(const string& type_name)
         {
             return type_name == Vec2 or type_name == Vec3 or type_name == Vec4 or type_name == Color3 or type_name == Color4;
+        }
+
+        static bool is_matrix(const string& type_name)
+        {
+            return type_name == Mat3 or type_name == Mat4;
         }
     };
 }

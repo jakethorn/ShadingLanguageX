@@ -60,11 +60,6 @@ namespace mxslc::runtime
             expr_->init(type());
     }
 
-    TypePtr Parameter::type() const
-    {
-        return type_;
-    }
-
     VarPtr Parameter::evaluate() const
     {
         return expr_->evaluate();

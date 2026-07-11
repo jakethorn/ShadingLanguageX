@@ -55,13 +55,15 @@ namespace mxslc::runtime
         bool is_void() const { return name_ == TypeName::Void; }
         bool is_auto() const { return name_ == TypeName::Auto; }
         bool is_primitive() const { return has_name() and not has_fields(); }
+        bool is_single() const { return TypeName::is_single(name_); }
         bool is_vector() const { return TypeName::is_vector(name_); }
+        bool is_matrix() const { return TypeName::is_matrix(name_); }
 
         bool is_resolved() const { return is_resolved_; }
 
         bool is_compatible(const TypePtr& other) const;
         bool is_compatible(const vector<TypePtr>& types) const;
-        bool is_equal(const TypePtr& other, bool field_names = false) const;
+        bool equals(const TypePtr& other, bool field_names = false) const;
         bool is_in(const vector<TypePtr>& types) const;
 
         TypePtr find_unique_compatible(const vector<TypePtr>& types) const;
@@ -100,7 +102,7 @@ namespace mxslc::runtime
         vector<Field> fields_;
         vector<weak_ptr<Function>> methods_;
 
-        bool is_resolved_ = false;
+        bool is_resolved_{false};
 
         void set_resolved() { is_resolved_ = true; }
         static TypePtr resolve(const string& name);

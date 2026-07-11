@@ -15,7 +15,7 @@ namespace mxslc
         Stringable() = default;
         virtual ~Stringable() = default;
 
-        virtual string str() const = 0;
+        virtual string to_string() const = 0;
     };
 }
 
