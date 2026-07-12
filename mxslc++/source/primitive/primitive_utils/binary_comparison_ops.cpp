@@ -30,7 +30,7 @@ namespace mxslc::primitive_utils
         COMPARISON_OP_IF(string, OP)
         COMPARISON_OP_IF(fs::path, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -50,7 +50,7 @@ namespace mxslc::primitive_utils
         COMPARISON_OP_IF(string, OP)
         COMPARISON_OP_IF(fs::path, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -61,7 +61,7 @@ namespace mxslc::primitive_utils
         COMPARISON_OP_IF(int, OP)
         COMPARISON_OP_IF(bool, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -72,7 +72,7 @@ namespace mxslc::primitive_utils
         COMPARISON_OP_IF(int, OP)
         COMPARISON_OP_IF(bool, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -83,7 +83,7 @@ namespace mxslc::primitive_utils
         COMPARISON_OP_IF(int, OP)
         COMPARISON_OP_IF(bool, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -94,7 +94,7 @@ namespace mxslc::primitive_utils
         COMPARISON_OP_IF(int, OP)
         COMPARISON_OP_IF(bool, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 }

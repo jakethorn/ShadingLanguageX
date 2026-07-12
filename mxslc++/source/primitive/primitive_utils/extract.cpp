@@ -21,7 +21,7 @@ namespace mxslc::primitive_utils
                 n = T::numRows();
 
             if (index_value >= n)
-                throw CompileError{"Index '" + std::to_string(index_value) + "' is out of range for type '" + in.type()->name() + "'"};
+                throw CompileError{"Index '" + std::to_string(index_value) + "' is out of range for type '" + in.type_name() + "'"};
 
             return in.as<T>()[index_value];
         }
@@ -44,6 +44,6 @@ namespace mxslc::primitive_utils
         EXTRACT_IF(mx::Matrix44)
 #undef EXTRACT_IF
 
-        throw CompileError{"Cannot extract a value of type '" + in.type()->name() + "'"};
+        throw CompileError{"Cannot extract a value of type '" + in.type_name() + "'"};
     }
 }

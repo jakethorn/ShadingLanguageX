@@ -29,7 +29,7 @@ namespace mxslc::primitive_utils
         ARITHMATIC_OP_IF(mx::Matrix44, OP)
         ARITHMATIC_OP_IF(string, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -47,7 +47,7 @@ namespace mxslc::primitive_utils
         ARITHMATIC_OP_IF(mx::Matrix33, -)
         ARITHMATIC_OP_IF(mx::Matrix44, -)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -65,7 +65,7 @@ namespace mxslc::primitive_utils
         ARITHMATIC_OP_IF(mx::Matrix33, OP)
         ARITHMATIC_OP_IF(mx::Matrix44, OP)
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 
@@ -87,7 +87,7 @@ namespace mxslc::primitive_utils
         if (in1.is_a<string>() and in2.is_a<string>())
             return Primitive{in1.cast<fs::path>() / in2.cast<fs::path>()}.cast<string>();
 
-        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type()->name() + "' and '" + in2.type()->name() + "'"};
+        throw CompileError{"Binary operator " TO_STRING(OP) " not supported for values of type '" + in1.type_name() + "' and '" + in2.type_name() + "'"};
 #undef OP
     }
 }

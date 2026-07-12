@@ -27,8 +27,19 @@ namespace mxslc::primitive_utils
         vector<float> channels;
         for (const Primitive& p : in)
         {
-            for (const Primitive& q : separate(p))
-                channels.push_back(q.as<float>());
+            if (p.is_castable_to<float>())
+            {
+                channels.push_back(p.cast<float>());
+            }
+            else if (p.is_vector_type())
+            {
+                for (const Primitive& q : separate(p))
+                    channels.push_back(q.as<float>());
+            }
+            else
+            {
+                throw CompileError{"Cannot combine a value of type '" + p.type_name() + "'"};
+            }
         }
 
         if (channels.size() == 1 and type->is<float>())

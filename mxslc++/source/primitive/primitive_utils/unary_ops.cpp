@@ -22,7 +22,7 @@ namespace mxslc::primitive_utils
         UNARY_PLUS_IF(mx::Matrix44)
 #undef UNARY_PLUS_IF
 
-        throw CompileError{"Unary operator + not supported for a value of type '" + in.type()->name() + "'"};
+        throw CompileError{"Unary operator + not supported for a value of type '" + in.type_name() + "'"};
     }
 
     Primitive negative(const Primitive& in)
@@ -44,7 +44,7 @@ namespace mxslc::primitive_utils
         if (in.is_a<mx::Matrix44>())
             return mx::Matrix44{0.0f} - in.as<mx::Matrix44>();
 
-        throw CompileError{"Unary operator - not supported for a value of type '" + in.type()->name() + "'"};
+        throw CompileError{"Unary operator - not supported for a value of type '" + in.type_name() + "'"};
     }
 
     Primitive logical_not(const Primitive& in)
@@ -55,6 +55,6 @@ namespace mxslc::primitive_utils
         UNARY_BANG_IF(bool)
 #undef UNARY_BANG_IF
 
-        throw CompileError{"Unary operator ! not supported for a value of type '" + in.type()->name() + "'"};
+        throw CompileError{"Unary operator ! not supported for a value of type '" + in.type_name() + "'"};
     }
 }

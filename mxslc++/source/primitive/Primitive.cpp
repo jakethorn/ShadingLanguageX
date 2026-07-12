@@ -23,6 +23,11 @@ namespace mxslc
         return type()->name();
     }
 
+    bool Primitive::is_vector_type() const
+    {
+        return type()->is_vector();
+    }
+
     Primitive Primitive::convert(const TypePtr& type) const
     {
         return primitive_utils::convert(*this, type);

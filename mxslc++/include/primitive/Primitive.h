@@ -45,6 +45,7 @@ namespace mxslc
 
         TypePtr type() const;
         string type_name() const;
+        bool is_vector_type() const;
 
         template<typename T>
         bool is_a() const

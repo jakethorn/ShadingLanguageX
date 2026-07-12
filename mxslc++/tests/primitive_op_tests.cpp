@@ -9,7 +9,7 @@ using namespace mxslc;
 
 // --- Arithmetic Operators ---
 
-TEST(primitive_operators_test, arithmetic_addition) 
+TEST(primitive_tests, arithmetic_addition) 
 {
     // Integer addition
     Primitive i1{5};
@@ -50,7 +50,7 @@ TEST(primitive_operators_test, arithmetic_addition)
     EXPECT_FLOAT_EQ(v_result.as<mx::Vector2>()[1], 6.0f);
 }
 
-TEST(primitive_operators_test, arithmetic_subtraction) 
+TEST(primitive_tests, arithmetic_subtraction) 
 {
     EXPECT_EQ((Primitive{10} - Primitive{4}).as<int>(), 6);
     EXPECT_FLOAT_EQ((Primitive{10.5f} - Primitive{2.0f}).as<float>(), 8.5f);
@@ -67,7 +67,7 @@ TEST(primitive_operators_test, arithmetic_subtraction)
     EXPECT_FLOAT_EQ((v3 - true).as<mx::Vector3>()[2], 3.0f);
 }
 
-TEST(primitive_operators_test, arithmetic_multiplication) 
+TEST(primitive_tests, arithmetic_multiplication) 
 {
     // Integer and Float
     EXPECT_EQ((Primitive{5} * Primitive{4}).as<int>(), 20);
@@ -94,7 +94,7 @@ TEST(primitive_operators_test, arithmetic_multiplication)
     EXPECT_FLOAT_EQ(result2.as<mx::Vector2>()[1], 0.0f);
 }
 
-TEST(primitive_operators_test, arithmetic_division_and_path_concat) 
+TEST(primitive_tests, arithmetic_division_and_path_concat) 
 {
     // Standard division
     EXPECT_EQ((Primitive{20} / Primitive{4}).as<int>(), 5);
@@ -111,7 +111,7 @@ TEST(primitive_operators_test, arithmetic_division_and_path_concat)
 
 // --- Unary Operators ---
 
-TEST(primitive_operators_test, unary_operators) 
+TEST(primitive_tests, unary_operators) 
 {
     // Negation
     EXPECT_EQ((-Primitive{5}).as<int>(), -5);
@@ -128,7 +128,7 @@ TEST(primitive_operators_test, unary_operators)
 
 // --- Comparison Operators ---
 
-TEST(primitive_operators_test, comparison_equality) 
+TEST(primitive_tests, comparison_equality) 
 {
     // Numeric
     EXPECT_TRUE((Primitive{100} == Primitive{100}).as<bool>());
@@ -143,7 +143,7 @@ TEST(primitive_operators_test, comparison_equality)
     EXPECT_TRUE((Primitive{fs::path{"/etc/config"}} != Primitive{fs::path{"/var/log"}}).as<bool>());
 }
 
-TEST(primitive_operators_test, comparison_relational) 
+TEST(primitive_tests, comparison_relational) 
 {
     Primitive a{5.0f};
     Primitive b{10.0f};
@@ -170,7 +170,7 @@ TEST(primitive_operators_test, comparison_relational)
 
 // --- Logical Operators ---
 
-TEST(primitive_operators_test, logical_operators) 
+TEST(primitive_tests, logical_operators) 
 {
     Primitive t{true};
     Primitive f{false};
@@ -196,7 +196,7 @@ TEST(primitive_operators_test, logical_operators)
 
 // --- Subscript Operator ---
 
-TEST(primitive_operators_test, subscript_access) 
+TEST(primitive_tests, subscript_access) 
 {
     Primitive vec{std::array<float, 3>{7.0f, 8.0f, 9.0f}};
     
