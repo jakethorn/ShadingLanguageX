@@ -62,10 +62,9 @@ TEST(primitive_operators_test, arithmetic_subtraction)
     EXPECT_FLOAT_EQ((v1 - v2).as<mx::Vector3>()[2], 2.0f);
 
     Primitive v3{std::array<float, 3>{5.0f, 6.0f, 4.0f}};
-    Primitive v4{true};
-    EXPECT_FLOAT_EQ((v3 - v4).as<mx::Vector3>()[0], 4.0f);
-    EXPECT_FLOAT_EQ((v3 - v4).as<mx::Vector3>()[1], 5.0f);
-    EXPECT_FLOAT_EQ((v3 - v4).as<mx::Vector3>()[2], 3.0f);
+    EXPECT_FLOAT_EQ((v3 - true).as<mx::Vector3>()[0], 4.0f);
+    EXPECT_FLOAT_EQ((v3 - true).as<mx::Vector3>()[1], 5.0f);
+    EXPECT_FLOAT_EQ((v3 - true).as<mx::Vector3>()[2], 3.0f);
 }
 
 TEST(primitive_operators_test, arithmetic_multiplication) 
@@ -73,6 +72,7 @@ TEST(primitive_operators_test, arithmetic_multiplication)
     // Integer and Float
     EXPECT_EQ((Primitive{5} * Primitive{4}).as<int>(), 20);
     EXPECT_FLOAT_EQ((Primitive{2.5f} * Primitive{2.0f}).as<float>(), 5.0f);
+    EXPECT_FLOAT_EQ((Primitive{2.5f} * 2.0f).as<float>(), 5.0f);
 
     // Vector * Scalar
     Primitive vec{std::array<float, 4>{1.0f, 2.0f, 3.0f, 4.0f}};
