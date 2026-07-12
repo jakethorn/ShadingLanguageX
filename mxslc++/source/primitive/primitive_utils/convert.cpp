@@ -79,6 +79,6 @@ namespace mxslc::primitive_utils
         if (in.is_a<fs::path>() and type->is<string>())
             return in.as<fs::path>().string();
 
-        throw CompileError{"Cannot convert value of type '" + in.type()->name() + "' to '" + type->name() + "'"};
+        throw CompileError{"Cannot convert a value of type '" + in.type()->name() + "' to '" + type->name() + "'"};
     }
 }

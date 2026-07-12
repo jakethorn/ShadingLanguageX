@@ -9,27 +9,16 @@
 
 namespace mxslc
 {
-    const TypePtr& Primitive::type() const
+    TypePtr Primitive::type() const
     {
-#define TYPE_OF(type, name) if (is_a<type>()) { return Type::name; }
-        TYPE_OF(bool, Bool)
-        TYPE_OF(int, Int)
-        TYPE_OF(float, Float)
-        TYPE_OF(string, String)
-        TYPE_OF(fs::path, Filename)
-        TYPE_OF(mx::Vector2, Vec2)
-        TYPE_OF(mx::Vector3, Vec3)
-        TYPE_OF(mx::Vector4, Vec4)
-        TYPE_OF(mx::Color3, Color3)
-        TYPE_OF(mx::Color4, Color4)
-        TYPE_OF(mx::Matrix33, Mat3)
-        TYPE_OF(mx::Matrix44, Mat4)
-#undef TYPE_OF
+#define TYPE_OF_IF(type) if (is_a<type>()) { return Type::of<type>(); }
+        FOR_EACH_PRIMITIVE_TYPE(TYPE_OF_IF, )
+#undef TYPE_OF_IF
 
         throw CompileError{"Unknown primitive type"};
     }
 
-    const string& Primitive::type_name() const
+    string Primitive::type_name() const
     {
         return type()->name();
     }
@@ -37,6 +26,26 @@ namespace mxslc
     Primitive Primitive::convert(const TypePtr& type) const
     {
         return primitive_utils::convert(*this, type);
+    }
+
+    std::array<Primitive, 2> Primitive::separate2() const
+    {
+        return primitive_utils::separate2(*this);
+    }
+
+    std::array<Primitive, 3> Primitive::separate3() const
+    {
+        return primitive_utils::separate3(*this);
+    }
+
+    std::array<Primitive, 4> Primitive::separate4() const
+    {
+        return primitive_utils::separate4(*this);
+    }
+
+    vector<Primitive> Primitive::separate() const
+    {
+        return primitive_utils::separate(*this);
     }
 
     Primitive Primitive::operator+(const Primitive& other) const

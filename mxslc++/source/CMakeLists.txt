@@ -10,8 +10,10 @@ add_library(mxslc_lib
         primitive/primitive_utils/binary_comparison_ops.cpp
         primitive/primitive_utils/binary_logical_ops.cpp
         primitive/primitive_utils/unary_ops.cpp
+        primitive/primitive_utils/combine.cpp
         primitive/primitive_utils/convert.cpp
         primitive/primitive_utils/extract.cpp
+        primitive/primitive_utils/separate.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp

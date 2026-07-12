@@ -44,6 +44,6 @@ namespace mxslc::primitive_utils
         EXTRACT_IF(mx::Matrix44)
 #undef EXTRACT_IF
 
-        throw CompileError{"Cannot extract value of type '" + in.type()->name() + "'"};
+        throw CompileError{"Cannot extract a value of type '" + in.type()->name() + "'"};
     }
 }

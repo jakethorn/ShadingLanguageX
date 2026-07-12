@@ -14,32 +14,37 @@
 #include "errors/CompileError.h"
 #include "utils/Stringable.h"
 
+#define COMMA ,
+#define FOR_EACH_PRIMITIVE_TYPE(DO, sep) \
+    DO(bool) sep \
+    DO(int) sep \
+    DO(float) sep \
+    DO(string) sep \
+    DO(fs::path) sep \
+    DO(mx::Vector2) sep \
+    DO(mx::Vector3) sep \
+    DO(mx::Vector4) sep \
+    DO(mx::Color3) sep \
+    DO(mx::Color4) sep \
+    DO(mx::Matrix33) sep \
+    DO(mx::Matrix44)
+
 namespace mxslc
 {
     class Primitive : public Stringable
     {
     public:
-#define CTOR(T) Primitive(T value) : value_{value} { }
-        CTOR(bool)
-        CTOR(int)
-        CTOR(float)
-        CTOR(string)
-        CTOR(fs::path)
-        CTOR(mx::Vector2)
-        CTOR(mx::Vector3)
-        CTOR(mx::Vector4)
-        CTOR(mx::Color3)
-        CTOR(mx::Color4)
-        CTOR(mx::Matrix33)
-        CTOR(mx::Matrix44)
+#define CTOR(type) Primitive(type value) : value_{value} { }
+        FOR_EACH_PRIMITIVE_TYPE(CTOR, )
 #undef CTOR
 
+        Primitive(const char* value) : value_{string{value}} { }
         Primitive(const std::array<float, 2> value) : value_{mx::Vector2{value}} { }
         Primitive(const std::array<float, 3> value) : value_{mx::Vector3{value}} { }
         Primitive(const std::array<float, 4> value) : value_{mx::Vector4{value}} { }
 
-        const TypePtr& type() const;
-        const string& type_name() const;
+        TypePtr type() const;
+        string type_name() const;
 
         template<typename T>
         bool is_a() const
@@ -98,6 +103,10 @@ namespace mxslc
         }
 
         Primitive convert(const TypePtr& type) const;
+        std::array<Primitive, 2> separate2() const;
+        std::array<Primitive, 3> separate3() const;
+        std::array<Primitive, 4> separate4() const;
+        vector<Primitive> separate() const;
 
         Primitive operator+(const Primitive& other) const;
         Primitive operator-(const Primitive& other) const;
@@ -128,36 +137,16 @@ namespace mxslc
         template<typename T>
         constexpr void assert_type() const
         {
-            constexpr bool primitive_type_is_valid =
-                std::is_same_v<T, bool> or
-                std::is_same_v<T, int> or
-                std::is_same_v<T, float> or
-                std::is_same_v<T, string> or
-                std::is_same_v<T, fs::path> or
-                std::is_same_v<T, mx::Vector2> or
-                std::is_same_v<T, mx::Vector3> or
-                std::is_same_v<T, mx::Vector4> or
-                std::is_same_v<T, mx::Color3> or
-                std::is_same_v<T, mx::Color4> or
-                std::is_same_v<T, mx::Matrix33> or
-                std::is_same_v<T, mx::Matrix44>;
-
+#define IS_TYPE(type) std::is_same_v<T, type>
+            constexpr bool primitive_type_is_valid = FOR_EACH_PRIMITIVE_TYPE(IS_TYPE, or);
             static_assert(primitive_type_is_valid);
+#undef IS_TYPE
         }
 
         std::variant<
-            bool,
-            int,
-            float,
-            string,
-            fs::path,
-            mx::Vector2,
-            mx::Vector3,
-            mx::Vector4,
-            mx::Color3,
-            mx::Color4,
-            mx::Matrix33,
-            mx::Matrix44
+#define DECL(type) type
+            FOR_EACH_PRIMITIVE_TYPE(DECL, COMMA)
+#undef DECL
         > value_;
     };
 }

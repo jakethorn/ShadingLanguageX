@@ -134,13 +134,14 @@ namespace mxslc::runtime
 
     size_t Type::component_count() const
     {
-        assert(is_vector());
         if (is<mx::Vector2>()) return 2;
         if (is<mx::Vector3>()) return 3;
         if (is<mx::Vector4>()) return 4;
         if (is<mx::Color3>()) return 3;
         if (is<mx::Color4>()) return 4;
-        return 0;
+        if (is<mx::Matrix33>()) return 9;
+        if (is<mx::Matrix44>()) return 16;
+        return 1;
     }
 
     namespace
