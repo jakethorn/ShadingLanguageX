@@ -5,8 +5,9 @@
 #ifndef MXSLC_TYPENAME_H
 #define MXSLC_TYPENAME_H
 
+#include <MaterialXCore/Types.h>
+
 #include "common.h"
-#include "primitive_t.h"
 #include "errors/CompileError.h"
 
 namespace mxslc::runtime_utils
@@ -49,25 +50,6 @@ namespace mxslc::runtime_utils
 #undef NAME_OF
 
             throw CompileError{"Unknown type"};
-        }
-
-        static const string& of(const primitive_t& value)
-        {
-#define NAME_OF(type, name) if (std::holds_alternative<type>(value)) { return name; }
-            NAME_OF(bool, Bool);
-            NAME_OF(int, Int);
-            NAME_OF(float, Float);
-            NAME_OF(string, String);
-            NAME_OF(fs::path, Filename);
-            NAME_OF(mx::Vector2, Vec2);
-            NAME_OF(mx::Vector3, Vec3);
-            NAME_OF(mx::Vector4, Vec4);
-            NAME_OF(mx::Color3, Color3);
-            NAME_OF(mx::Color4, Color4);
-            NAME_OF(mx::Matrix33, Mat3);
-            NAME_OF(mx::Matrix44, Mat4);
-#undef NAME_OF
-            throw CompileError{"Invalid primitive value"};
         }
 
         static bool is_primitive(const string& type_name)

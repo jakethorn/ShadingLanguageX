@@ -41,7 +41,7 @@ namespace mxslc::expressions
         else
         {
             VarPtr var = value_expr_->evaluate();
-            const int index = index_expr_->evaluate()->value_as<int>();
+            const int index = index_expr_->evaluate()->basic<int>();
             accessor_ = create_accessor<FieldAccessor>(std::move(var), index);
         }
     }

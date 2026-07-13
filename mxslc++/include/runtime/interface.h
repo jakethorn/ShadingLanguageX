@@ -6,8 +6,8 @@
 #define MXSLC_RUNTIME_INTERFACE_H
 
 #include "common.h"
+#include "primitive/Primitive.h"
 #include "runtime/ModifierList.h"
-#include "primitive_t.h"
 
 namespace mxslc::runtime
 {
@@ -45,11 +45,11 @@ namespace mxslc::runtime
     }
 
     VarPtr create_variable(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
-    VarPtr create_variable(ModifierList mods, TypePtr type, const vector<primitive_t>& children);
+    VarPtr create_variable(ModifierList mods, TypePtr type, const vector<Primitive>& children);
     VarPtr create_variable(ModifierList mods, TypePtr type, ValuePtr value);
     VarPtr create_variable(ModifierList mods, TypePtr type, const VarPtr& value);
     VarPtr create_variable(ModifierList mods, ValuePtr value);
-    VarPtr create_variable(ModifierList mods, primitive_t value);
+    VarPtr create_variable(ModifierList mods, Primitive value);
 
     VarPtr create_variable(TypePtr type, const vector<VarPtr>& children);
     VarPtr create_variable(TypePtr type, ValuePtr value);
@@ -57,9 +57,9 @@ namespace mxslc::runtime
     VarPtr create_variable(TypePtr type);
 
     VarPtr create_variable(const vector<VarPtr>& children);
-    VarPtr create_variable(const vector<primitive_t>& children);
+    VarPtr create_variable(const vector<Primitive>& children);
     VarPtr create_variable(ValuePtr value);
-    VarPtr create_variable(primitive_t value);
+    VarPtr create_variable(Primitive value);
     VarPtr create_variable(const VarPtr& value);
 }
 

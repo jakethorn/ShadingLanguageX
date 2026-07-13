@@ -36,7 +36,7 @@ namespace mxslc::runtime
     Argument::Argument(VarPtr value, const size_t index)
         : Argument{create_expression<RuntimeExpression>(std::move(value)), index} { }
 
-    Argument::Argument(primitive_t value, const size_t index)
+    Argument::Argument(Primitive value, const size_t index)
         : Argument{create_expression<Literal>(std::move(value)), index} { }
 
     Argument::Argument(Argument&& other) noexcept

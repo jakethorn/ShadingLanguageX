@@ -8,6 +8,7 @@
 #include <variant>
 
 #include <MaterialXCore/Types.h>
+#include <MaterialXCore/Value.h>
 
 #include "common.h"
 #include "runtime/utils/type_utils.h"
@@ -29,6 +30,9 @@
     DO(mx::Matrix33) sep \
     DO(mx::Matrix44)
 
+#define VISITED_TYPE std::decay_t<decltype(v)>
+#define IF_VISITED_TYPE_IS(type) if constexpr (std::is_same_v<VISITED_TYPE, type>)
+
 namespace mxslc
 {
     class Primitive : public Stringable
@@ -43,8 +47,13 @@ namespace mxslc
         Primitive(const std::array<float, 3> value) : value_{mx::Vector3{value}} { }
         Primitive(const std::array<float, 4> value) : value_{mx::Vector4{value}} { }
 
+        explicit Primitive(const mx::ValuePtr& value);
+        explicit Primitive(const TypePtr& type);
+
         TypePtr type() const;
         string type_name() const;
+
+        bool is_a(const TypePtr& type) const;
         bool is_vector_type() const;
 
         template<typename T>
@@ -114,6 +123,11 @@ namespace mxslc
         Primitive operator*(const Primitive& other) const;
         Primitive operator/(const Primitive& other) const;
 
+        Primitive& operator+=(const Primitive& other);
+        Primitive& operator-=(const Primitive& other);
+        Primitive& operator*=(const Primitive& other);
+        Primitive& operator/=(const Primitive& other);
+
         Primitive operator and(const Primitive& other) const;
         Primitive operator or(const Primitive& other) const;
         Primitive operator xor(const Primitive& other) const;
@@ -132,6 +146,20 @@ namespace mxslc
         Primitive operator[](size_t index) const;
         Primitive operator[](const Primitive& index) const;
 
+        explicit operator bool() const;
+
+        template<typename Visitor>
+        decltype(auto) visit(Visitor&& vis)
+        {
+            return std::visit(std::forward<Visitor>(vis), value_);
+        }
+
+        template<typename Visitor>
+        decltype(auto) visit(Visitor&& vis) const
+        {
+            return std::visit(std::forward<Visitor>(vis), value_);
+        }
+
         string to_string() const override;
 
     private:
@@ -139,8 +167,7 @@ namespace mxslc
         constexpr void assert_type() const
         {
 #define IS_TYPE(type) std::is_same_v<T, type>
-            constexpr bool primitive_type_is_valid = FOR_EACH_PRIMITIVE_TYPE(IS_TYPE, or);
-            static_assert(primitive_type_is_valid);
+            static_assert(FOR_EACH_PRIMITIVE_TYPE(IS_TYPE, or));
 #undef IS_TYPE
         }
 

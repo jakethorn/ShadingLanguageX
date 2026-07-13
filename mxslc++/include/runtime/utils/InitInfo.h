@@ -6,9 +6,23 @@
 #define MXSLC_INITINFO_H
 
 #include "common.h"
+#include "utils/Stringable.h"
 
 namespace mxslc::runtime_utils
 {
+    class TypeList : Stringable
+    {
+    public:
+        TypeList() = default;
+
+        bool contains(const TypePtr& type) const;
+
+        string to_string() const override;
+
+    private:
+        vector<TypePtr> types_;
+    };
+
     struct InitInfo
     {
         // Types the expression can evaluate to

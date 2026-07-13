@@ -6,12 +6,9 @@
 #define MXSLC_VARIABLE_H
 
 #include "common.h"
+#include "primitive/Primitive.h"
 #include "runtime/ModifierList.h"
 #include "runtime/utils/RuntimeAware.h"
-#include "serialize/values/BasicValue.h"
-#include "serialize/values/interface.h"
-#include "utils/TypeName.h"
-#include "errors/CompileError.h"
 
 namespace mxslc::runtime
 {
@@ -62,15 +59,13 @@ namespace mxslc::runtime
         Scope& defining_scope();
         void add_to_scope(string name);
 
-        string str() const;
+        bool is_basic() const;
+        const Primitive& basic() const;
 
         template<typename T>
-        T value_as() const
-        {
-            if (const BasicValuePtr& value = cast_value<BasicValue>(value_))
-                return value->get<T>();
-            throw CompileError{"Value is not a compile-time " + TypeName::of<T>()};
-        }
+        T basic() const { return basic().as<T>(); }
+
+        string str() const;
 
     protected:
         virtual ValuePtr value_impl() const { return value_; }

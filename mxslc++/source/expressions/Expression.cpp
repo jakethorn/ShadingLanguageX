@@ -42,6 +42,11 @@ namespace mxslc::expressions
         TRY_END
     }
 
+    bool Expression::try_init(const TypePtr& type)
+    {
+        return try_init(vector<TypePtr>{type});
+    }
+
     bool Expression::try_init(const vector<TypePtr>& types)
     {
         TRY_START
@@ -73,7 +78,7 @@ namespace mxslc::expressions
         target_type_ = type->find_unique_compatible(types);
 
         if (target_type_ == nullptr)
-            error_message_ = "Attempting to assign an expression of type " + type->str() + " to a variable or parameter of type " + Type::to_string(types);
+            error_message_ = "Attempting to assign an expression of type " + type->str() + " to a variable or parameter of type " + type_utils::to_string(types);
 
         is_initialized_ = target_type_ != nullptr;
         return is_initialized_;

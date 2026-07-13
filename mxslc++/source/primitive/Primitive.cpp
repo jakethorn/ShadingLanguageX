@@ -3,24 +3,46 @@
 //
 
 #include "primitive/Primitive.h"
+
+
+
 #include "common.h"
 #include "primitive/primitive_utils.h"
 #include "runtime/Type.h"
 
 namespace mxslc
 {
+    Primitive::Primitive(const mx::ValuePtr& value)
+    {
+#define INIT_IF(type) if constexpr (not std::is_same_v<type, fs::path>) { if (value->isA<type>()) { value_ = value->asA<type>(); return; } }
+        FOR_EACH_PRIMITIVE_TYPE(INIT_IF, )
+#undef INIT_IF
+    }
+
+    Primitive::Primitive(const TypePtr& type)
+    {
+#define INIT_IF(t) if (type->is<t>()) { value_ = t{}; return; }
+        FOR_EACH_PRIMITIVE_TYPE(INIT_IF, )
+#undef INIT_IF
+    }
+
     TypePtr Primitive::type() const
     {
-#define TYPE_OF_IF(type) if (is_a<type>()) { return Type::of<type>(); }
-        FOR_EACH_PRIMITIVE_TYPE(TYPE_OF_IF, )
-#undef TYPE_OF_IF
-
-        throw CompileError{"Unknown primitive type"};
+        return visit([](const auto& v) -> TypePtr {
+            return Type::of<VISITED_TYPE>();
+        });
     }
 
     string Primitive::type_name() const
     {
         return type()->name();
+    }
+
+    bool Primitive::is_a(const TypePtr& type) const
+    {
+        return visit([&type](const auto& v) -> bool {
+            return type->is<VISITED_TYPE>();
+        });
     }
 
     bool Primitive::is_vector_type() const
@@ -71,6 +93,30 @@ namespace mxslc
     Primitive Primitive::operator/(const Primitive& other) const
     {
         return primitive_utils::divide(*this, other);
+    }
+
+    Primitive& Primitive::operator+=(const Primitive& other)
+    {
+        *this = *this + other;
+        return *this;
+    }
+
+    Primitive& Primitive::operator-=(const Primitive& other)
+    {
+        *this = *this - other;
+        return *this;
+    }
+
+    Primitive& Primitive::operator*=(const Primitive& other)
+    {
+        *this = *this * other;
+        return *this;
+    }
+
+    Primitive& Primitive::operator/=(const Primitive& other)
+    {
+        *this = *this / other;
+        return *this;
     }
 
     Primitive Primitive::operator and(const Primitive& other) const
@@ -143,57 +189,57 @@ namespace mxslc
         return primitive_utils::extract(*this, index);
     }
 
+    Primitive::operator bool() const
+    {
+        return cast<bool>();
+    }
+
     string Primitive::to_string() const
     {
-        return std::visit(
-            [](const auto& v)
+        return visit([](const auto& v) {
+            std::stringstream ss;
+
+            IF_VISITED_TYPE_IS(mx::Vector2)
             {
-                std::stringstream ss;
+                ss << "vec2{" << v[0] << ", " << v[1] << "}";
+            }
+            else IF_VISITED_TYPE_IS(mx::Vector3)
+            {
+                ss << "vec3{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
+            }
+            else IF_VISITED_TYPE_IS(mx::Vector4)
+            {
+                ss << "vec4{" << v[0] << ", " << v[1] << ", " <<  v[2] << ", " << v[3] << "}";
+            }
+            else IF_VISITED_TYPE_IS(mx::Color3)
+            {
+                ss << "color3{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
+            }
+            else IF_VISITED_TYPE_IS(mx::Color4)
+            {
+                ss << "Color4{" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";
+            }
+            else IF_VISITED_TYPE_IS(mx::Matrix33)
+            {
+                ss << "Matrix33{"
+                    << "{" << v[0][0] << ", " << v[0][1] << ", " << v[0][2] << "}, "
+                    << "{" << v[1][0] << ", " << v[1][1] << ", " << v[1][2] << "}, "
+                    << "{" << v[2][0] << ", " << v[2][1] << ", " << v[2][2] << "}}";
+            }
+            else IF_VISITED_TYPE_IS(mx::Matrix44)
+            {
+                ss << "Matrix44{"
+                    << "{" << v[0][0] << ", " << v[0][1] << ", " << v[0][2] << ", " << v[0][3] << "}, "
+                    << "{" << v[1][0] << ", " << v[1][1] << ", " << v[1][2] << ", " << v[1][3] << "}, "
+                    << "{" << v[2][0] << ", " << v[2][1] << ", " << v[2][2] << ", " << v[2][3] << "}, "
+                    << "{" << v[3][0] << ", " << v[3][1] << ", " << v[3][2] << ", " << v[3][3] << "}}";
+            }
+            else
+            {
+                ss << std::boolalpha << v;
+            }
 
-                using ValueType = std::decay_t<decltype(v)>;
-                if constexpr (std::is_same_v<ValueType, mx::Vector2>)
-                {
-                    ss << "vec2{" << v[0] << ", " << v[1] << "}";
-                }
-                else if constexpr (std::is_same_v<ValueType, mx::Vector3>)
-                {
-                    ss << "vec3{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
-                }
-                else if constexpr (std::is_same_v<ValueType, mx::Vector4>)
-                {
-                    ss << "vec4{" << v[0] << ", " << v[1] << ", " <<  v[2] << ", " << v[3] << "}";
-                }
-                else if constexpr (std::is_same_v<ValueType, mx::Color3>)
-                {
-                    ss << "color3{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
-                }
-                else if constexpr (std::is_same_v<ValueType, mx::Color4>)
-                {
-                    ss << "Color4{" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";
-                }
-                else if constexpr (std::is_same_v<ValueType, mx::Matrix33>)
-                {
-                    ss << "Matrix33{"
-                        << "{" << v[0][0] << ", " << v[0][1] << ", " << v[0][2] << "}, "
-                        << "{" << v[1][0] << ", " << v[1][1] << ", " << v[1][2] << "}, "
-                        << "{" << v[2][0] << ", " << v[2][1] << ", " << v[2][2] << "}}";
-                }
-                else if constexpr (std::is_same_v<ValueType, mx::Matrix44>)
-                {
-                    ss << "Matrix44{"
-                        << "{" << v[0][0] << ", " << v[0][1] << ", " << v[0][2] << ", " << v[0][3] << "}, "
-                        << "{" << v[1][0] << ", " << v[1][1] << ", " << v[1][2] << ", " << v[1][3] << "}, "
-                        << "{" << v[2][0] << ", " << v[2][1] << ", " << v[2][2] << ", " << v[2][3] << "}, "
-                        << "{" << v[3][0] << ", " << v[3][1] << ", " << v[3][2] << ", " << v[3][3] << "}}";
-                }
-                else
-                {
-                    ss << std::boolalpha << v;
-                }
-
-                return ss.str();
-            },
-            value_
-        );
+            return ss.str();
+        });
     }
 }

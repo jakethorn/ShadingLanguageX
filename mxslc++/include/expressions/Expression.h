@@ -35,6 +35,7 @@ namespace mxslc::expressions
         void init();
         void init(const TypePtr& type);
         void init(const vector<TypePtr>& types);
+        bool try_init(const TypePtr& types);
         bool try_init(const vector<TypePtr>& types);
         void update();
 

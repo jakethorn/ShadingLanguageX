@@ -10,10 +10,12 @@
 
 namespace mxslc::type_utils
 {
+    TypePtr type_of(const vector<VarPtr>& children);
+
     bool contains_auto(const TypePtr& type);
     TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type);
 
-    TypePtr type_of(const vector<VarPtr>& children);
+    string to_string(const vector<TypePtr>& types);
 
     template<typename T>
     string name_of()

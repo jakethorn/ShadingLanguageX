@@ -6,14 +6,18 @@
 #define MXSLC_BINARY_OPS_H
 
 #include "common.h"
-#include "serialize/values/interface.h"
+
+namespace mxslc
+{
+    class Primitive;
+}
 
 namespace mxslc::serialize
 {
-    VarPtr evaluate_add(const TypePtr&, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_subtract(const TypePtr&, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_multiply(const TypePtr&, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_divide(const TypePtr&, const vector<BasicValuePtr>& values);
+    VarPtr evaluate_add(const TypePtr&, const vector<Primitive>& values);
+    VarPtr evaluate_subtract(const TypePtr&, const vector<Primitive>& values);
+    VarPtr evaluate_multiply(const TypePtr&, const vector<Primitive>& values);
+    VarPtr evaluate_divide(const TypePtr&, const vector<Primitive>& values);
 }
 
 #endif //MXSLC_BINARY_OPS_H

@@ -6,6 +6,7 @@
 #define FENNEC_LITERAL_H
 
 #include "expressions/Expression.h"
+#include "primitive/Primitive.h"
 
 namespace mxslc::expressions
 {
@@ -13,7 +14,7 @@ namespace mxslc::expressions
     {
     public:
         explicit Literal(Token token) : Expression{std::move(token)}, value_{token_.literal()} { }
-        explicit Literal(primitive_t value) : value_{std::move(value)} { }
+        explicit Literal(Primitive value) : value_{std::move(value)} { }
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
@@ -23,8 +24,7 @@ namespace mxslc::expressions
         VarPtr evaluate_impl() const override;
 
     private:
-        primitive_t value_;
-        TypePtr type_;
+        Primitive value_;
     };
 }
 

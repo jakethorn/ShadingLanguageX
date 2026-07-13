@@ -29,7 +29,7 @@ namespace mxslc::runtime
             args_.emplace_back(values[i], i);
     }
 
-    ArgumentList::ArgumentList(const vector<primitive_t>& values)
+    ArgumentList::ArgumentList(const vector<Primitive>& values)
     {
         for (size_t i = 0; i < values.size(); ++i)
             args_.emplace_back(values[i], i);

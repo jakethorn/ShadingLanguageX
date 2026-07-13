@@ -32,7 +32,7 @@ namespace mxslc
         return t;
     }
 
-    primitive_t Token::literal() const
+    Primitive Token::literal() const
     {
         if (type_ == TokenType::Bool)
             return lexeme_ == "true";

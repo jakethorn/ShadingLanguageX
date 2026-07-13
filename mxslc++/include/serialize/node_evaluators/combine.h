@@ -6,13 +6,17 @@
 #define MXSLC_COMBINE_H
 
 #include "common.h"
-#include "serialize/values/interface.h"
+
+namespace mxslc
+{
+    class Primitive;
+}
 
 namespace mxslc::serialize
 {
-    VarPtr evaluate_combine2(const TypePtr& type, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_combine3(const TypePtr& type, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_combine4(const TypePtr& type, const vector<BasicValuePtr>& values);
+    VarPtr evaluate_combine2(const TypePtr& type, const vector<Primitive>& values);
+    VarPtr evaluate_combine3(const TypePtr& type, const vector<Primitive>& values);
+    VarPtr evaluate_combine4(const TypePtr& type, const vector<Primitive>& values);
 }
 
 #endif //MXSLC_COMBINE_H

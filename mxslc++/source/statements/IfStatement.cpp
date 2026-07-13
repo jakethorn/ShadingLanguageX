@@ -24,11 +24,13 @@ namespace mxslc::statements
 
     void IfStatement::execute_impl() const
     {
-        cond_expr_->init(Type::Bool);
+        if (not cond_expr_->try_init(Type::Bool))
+            cond_expr_->init();
+
         const VarPtr cond = cond_expr_->evaluate();
 
         runtime().enter_scope();
-        if (cond->value_as<bool>())
+        if (cond->basic())
         {
             then_body_->execute();
         }

@@ -341,25 +341,6 @@ namespace mxslc::runtime
         return type;
     }
 
-    string Type::to_string(const vector<TypePtr>& types)
-    {
-        if (types.empty())
-            return "";
-
-        if (types.size() == 1)
-            return types[0]->str();
-
-        string result = "(";
-        for (size_t i = 0; i < types.size(); ++i)
-        {
-            result += types[i]->str();
-            if (i < types.size() - 1)
-                result += ", ";
-        }
-        result += ")";
-        return result;
-    }
-
     void Type::validate() const
     {
         if (not has_fields())

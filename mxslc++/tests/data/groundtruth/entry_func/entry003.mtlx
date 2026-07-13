@@ -4,7 +4,7 @@
     <output name="out" type="material" />
     <input name="in1" type="float" value="0" />
     <input name="s1" type="string" value="" />
-    <input name="s2" type="string" value="" />
+    <input name="s2" type="filename" value="" />
   </nodedef>
   <nodegraph name="NG_my_main" nodedef="ND_my_main">
     <randomfloat name="in1" type="float" />

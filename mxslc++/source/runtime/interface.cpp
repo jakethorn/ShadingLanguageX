@@ -6,7 +6,10 @@
 
 #include "runtime/Variable.h"
 #include "runtime/utils/type_utils.h"
+#include "serialize/values/interface.h"
 #include "serialize/serializer_utils.h"
+#include "serialize/values/Value.h"
+#include "serialize/values/BasicValue.h"
 
 namespace mxslc::runtime
 {
@@ -36,11 +39,11 @@ namespace mxslc::runtime
         return var;
     }
 
-    VarPtr create_variable(ModifierList mods, TypePtr type, const vector<primitive_t>& children)
+    VarPtr create_variable(ModifierList mods, TypePtr type, const vector<Primitive>& children)
     {
         vector<VarPtr> vars;
         vars.reserve(children.size());
-        for (const primitive_t& child : children)
+        for (const Primitive& child : children)
             vars.push_back(create_variable(child));
 
         return create_variable(std::move(mods), std::move(type), vars);
@@ -72,9 +75,9 @@ namespace mxslc::runtime
         return create_variable(std::move(mods), std::move(type), std::move(value));
     }
 
-    VarPtr create_variable(ModifierList mods, primitive_t value)
+    VarPtr create_variable(ModifierList mods, Primitive value)
     {
-        BasicValuePtr basic_value = create_value<BasicValue>(std::move(value));
+        BasicValuePtr basic_value = create_value(std::move(value));
         return create_variable(std::move(mods), std::move(basic_value));
     }
 
@@ -103,11 +106,11 @@ namespace mxslc::runtime
         return create_variable(ModifierList{}, type_of(children), children);
     }
 
-    VarPtr create_variable(const vector<primitive_t>& children)
+    VarPtr create_variable(const vector<Primitive>& children)
     {
         vector<VarPtr> vars;
         vars.reserve(children.size());
-        for (const primitive_t& child : children)
+        for (const Primitive& child : children)
             vars.push_back(create_variable(child));
 
         return create_variable(vars);
@@ -119,7 +122,7 @@ namespace mxslc::runtime
         return create_variable(ModifierList{}, std::move(type), std::move(value));
     }
 
-    VarPtr create_variable(primitive_t value)
+    VarPtr create_variable(Primitive value)
     {
         BasicValuePtr basic_value = create_value<BasicValue>(std::move(value));
         return create_variable(std::move(basic_value));

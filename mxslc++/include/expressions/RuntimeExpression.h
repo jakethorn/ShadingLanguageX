@@ -13,6 +13,7 @@ namespace mxslc::expressions
     {
     public:
         explicit RuntimeExpression(VarPtr value);
+        explicit RuntimeExpression(Primitive value);
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 

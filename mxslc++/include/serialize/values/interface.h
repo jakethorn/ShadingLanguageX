@@ -6,7 +6,7 @@
 #define MXSLC_VALUES_INTERFACE_H
 
 #include "common.h"
-#include "primitive_t.h"
+#include "primitive/Primitive.h"
 
 namespace mxslc::serialize::values
 {
@@ -24,7 +24,7 @@ using T##Ptr = shared_ptr<T>;
 
 #undef TYPE_DEF
 
-    BasicValuePtr create_value(primitive_t value);
+    BasicValuePtr create_value(Primitive value);
 
     template<typename T, typename... Args>
     shared_ptr<T> create_value(Args&&... args)
@@ -35,7 +35,7 @@ using T##Ptr = shared_ptr<T>;
     template<typename T>
     BasicValuePtr create_value()
     {
-        return create_value(primitive_t{T{}});
+        return create_value(Primitive{T{}});
     }
 
     template<typename T>

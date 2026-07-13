@@ -10,7 +10,7 @@
 
 namespace mxslc::serialize
 {
-    VarPtr evaluate_convert(const TypePtr& type, const vector<BasicValuePtr>& values);
+    VarPtr evaluate_convert(const TypePtr& type, const vector<Primitive>& values);
 }
 
 #endif //MXSLC_CONVERT_H

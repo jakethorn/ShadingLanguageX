@@ -5,7 +5,9 @@
 #include "expressions/RangeExpression.h"
 
 #include "expressions/interface.h"
+#include "runtime/interface.h"
 #include "runtime/Type.h"
+#include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 
 namespace mxslc::expressions
@@ -59,15 +61,18 @@ namespace mxslc::expressions
 
     void RangeExpression::init_impl(const vector<TypePtr>& types)
     {
-        // if lower, step or upper is float, then init as float
-        if (lower_expr_->type()->is<float>() and (step_expr_ == nullptr or step_expr_->type()->is<float>()) and upper_expr_->type()->is<float>())
+        Primitive lower = lower_expr_->evaluate()->basic();
+        Primitive step = step_expr_ ? step_expr_->evaluate()->basic() : 1;
+        Primitive upper = upper_expr_->evaluate()->basic();
+
+        vector<Primitive> result;
+        while (lower <= upper)
         {
-            init_as<float>();
+            result.push_back(lower);
+            lower += step;
         }
-        else
-        {
-            init_as<int>();
-        }
+
+        range_ = create_variable(result);
     }
 
     TypePtr RangeExpression::type_impl() const

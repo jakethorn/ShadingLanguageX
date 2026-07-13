@@ -12,6 +12,18 @@
 
 namespace mxslc::type_utils
 {
+    TypePtr type_of(const vector<VarPtr>& children)
+    {
+        vector<TypePtr> fields;
+        fields.reserve(children.size());
+        for (const VarPtr& child : children)
+            fields.push_back(child->type());
+
+        return Runtime::get().scope().resolve_type(
+            create_type(std::move(fields))
+        );
+    }
+
     bool contains_auto(const TypePtr& type)
     {
         if (type->is_auto())
@@ -49,15 +61,22 @@ namespace mxslc::type_utils
         return original_type;
     }
 
-    TypePtr type_of(const vector<VarPtr>& children)
+    string to_string(const vector<TypePtr>& types)
     {
-        vector<TypePtr> fields;
-        fields.reserve(children.size());
-        for (const VarPtr& child : children)
-            fields.push_back(child->type());
+        if (types.empty())
+            return "";
 
-        return Runtime::get().scope().resolve_type(
-            create_type(std::move(fields))
-        );
+        if (types.size() == 1)
+            return types[0]->str();
+
+        string result = "(";
+        for (size_t i = 0; i < types.size(); ++i)
+        {
+            result += types[i]->str();
+            if (i < types.size() - 1)
+                result += ", ";
+        }
+        result += ")";
+        return result;
     }
 }

@@ -5,11 +5,17 @@
 #include "expressions/RuntimeExpression.h"
 
 #include "expressions/interface.h"
+#include "runtime/interface.h"
 #include "runtime/Variable.h"
 
 namespace mxslc::expressions
 {
     RuntimeExpression::RuntimeExpression(VarPtr value) : value_{std::move(value)}
+    {
+
+    }
+
+    RuntimeExpression::RuntimeExpression(Primitive value) : value_{create_variable(std::move(value))}
     {
 
     }

@@ -10,7 +10,7 @@
 
 namespace mxslc::serialize
 {
-    VarPtr evaluate_extract(const TypePtr&, const vector<BasicValuePtr>& values);
+    VarPtr evaluate_extract(const TypePtr&, const vector<Primitive>& values);
 }
 
 #endif //MXSLC_EXTRACT_H

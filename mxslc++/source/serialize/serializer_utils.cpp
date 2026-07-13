@@ -9,13 +9,13 @@
 #include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
 #include "serialize/values/NodeGraphOutputValue.h"
 #include "serialize/values/NodeGraphValue.h"
 #include "serialize/values/NodeOutputValue.h"
 #include "serialize/values/NodeValue.h"
+#include "serialize/values/BasicValue.h"
 #include "utils/mtlx_utils.h"
 
 namespace mxslc::serialize_utils
@@ -146,7 +146,7 @@ namespace mxslc::serialize_utils
         }
     }
 
-    VarPtr create_basic_value(primitive_t value)
+    VarPtr create_basic_value(Primitive value)
     {
         return create_variable(std::move(value));
     }
@@ -169,26 +169,7 @@ namespace mxslc::serialize_utils
             return create_variable(std::move(type), fields_values);
         }
 
-#define START_INIT primitive_t primitive_value = ""s; if constexpr (false) { }
-#define INIT_PRIM(T) else if (type->is<T>()) { primitive_value = T{}; }
-
-        START_INIT
-        INIT_PRIM(bool)
-        INIT_PRIM(int)
-        INIT_PRIM(float)
-        INIT_PRIM(string)
-        INIT_PRIM(mx::Vector2)
-        INIT_PRIM(mx::Vector3)
-        INIT_PRIM(mx::Vector4)
-        INIT_PRIM(mx::Color3)
-        INIT_PRIM(mx::Color4)
-        INIT_PRIM(mx::Matrix33)
-        INIT_PRIM(mx::Matrix44)
-
-#undef INIT_PRIM
-#undef START_INIT
-
-        return create_variable(std::move(primitive_value));
+        return create_variable(Primitive(type));
     }
 
     ValuePtr copy_value_from_port(const mx::PortElementPtr& port)

@@ -7,6 +7,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "serialize/serializer_utils.h"
+#include "serialize/values/Value.h"
 
 namespace mxslc::runtime
 {

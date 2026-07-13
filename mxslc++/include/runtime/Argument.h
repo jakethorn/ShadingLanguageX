@@ -6,9 +6,9 @@
 #define FENNEC_ARGUMENT_H
 
 #include "common.h"
+#include "primitive/Primitive.h"
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
-#include "primitive_t.h"
 #include "runtime/utils/monomorphize.h"
 
 namespace mxslc::runtime
@@ -24,9 +24,10 @@ namespace mxslc::runtime
         Argument(ModifierList mods, string name, ExprPtr expr, size_t index);
         Argument(ModifierList mods, ExprPtr expr, size_t index);
         Argument(string name, ExprPtr expr, size_t index);
+
         Argument(ExprPtr expr, size_t index);
         Argument(VarPtr value, size_t index);
-        Argument(primitive_t value, size_t index);
+        Argument(Primitive value, size_t index);
 
         Argument(Argument&& other) noexcept;
 

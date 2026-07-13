@@ -7,7 +7,6 @@
 
 #include <MaterialXCore/Node.h>
 
-#include "primitive_t.h"
 #include "runtime/Field.h"
 #include "runtime/utils/TypeName.h"
 
@@ -91,11 +90,9 @@ namespace mxslc::runtime
 
         template<typename T>
         static TypePtr of() { return resolve(TypeName::of<T>()); }
-        static TypePtr of(const primitive_t& value) { return resolve(TypeName::of(value)); }
         static TypePtr of(const mx::NodeGraphPtr& node_graph);
         static TypePtr of(const mx::TypedElementPtr& value);
         static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
-        static string to_string(const vector<TypePtr>& types);
 
     private:
         string name_;

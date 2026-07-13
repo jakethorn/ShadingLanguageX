@@ -6,9 +6,7 @@
 #define FENNEC_BASICVALUE_H
 
 #include "serialize/values/Value.h"
-#include "primitive_t.h"
-#include "runtime/utils/TypeName.h"
-#include "errors/CompileError.h"
+#include "primitive/Primitive.h"
 
 namespace mxslc::serialize::values
 {
@@ -18,8 +16,10 @@ namespace mxslc::serialize::values
     {
     public:
         explicit BasicValue(const mx::ValuePtr& value);
-        explicit BasicValue(primitive_t value);
-        BasicValue(primitive_t value, TypePtr type);
+        explicit BasicValue(Primitive value);
+        BasicValue(Primitive value, TypePtr type);
+
+        const Primitive& get() const { return value_; }
 
         bool equals(const ValuePtr& other) const override;
 
@@ -29,32 +29,10 @@ namespace mxslc::serialize::values
 
         string str() const override;
 
-        template<typename T>
-        bool is() const
-        {
-            return std::holds_alternative<T>(value_);
-        }
-
-        template<typename T0, typename T1>
-        bool is() const
-        {
-            return std::holds_alternative<T0>(value_) or std::holds_alternative<T1>(value_);
-        }
-
-        template<typename T>
-        T get() const
-        {
-            if (is<T>())
-                return std::get<T>(value_);
-            throw CompileError{"Trying to access a value of type " + type_name() + " as a " + TypeName::of<T>()};
-        }
-
     private:
         string type_name() const;
 
-        static primitive_t to_primitive(const mx::ValuePtr& value);
-
-        primitive_t value_;
+        Primitive value_;
     };
 }
 

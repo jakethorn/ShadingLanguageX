@@ -6,8 +6,6 @@
 #define MXSLC_RANGEEXPRESSION_H
 
 #include "expressions/Expression.h"
-#include "runtime/interface.h"
-#include "runtime/Variable.h"
 
 namespace mxslc::expressions
 {
@@ -28,23 +26,6 @@ namespace mxslc::expressions
         VarPtr evaluate_impl() const override;
 
     private:
-        template<typename T>
-        void init_as()
-        {
-            T lower = lower_expr_->evaluate()->value_as<T>();
-            T step = step_expr_ ? step_expr_->evaluate()->value_as<T>() : 1;
-            T upper = upper_expr_->evaluate()->value_as<T>();
-
-            vector<primitive_t> result;
-            while (lower <= upper)
-            {
-                result.push_back(lower);
-                lower += step;
-            }
-
-            range_ = create_variable(result);
-        }
-
         ExprPtr lower_expr_;
         ExprPtr step_expr_;
         ExprPtr upper_expr_;

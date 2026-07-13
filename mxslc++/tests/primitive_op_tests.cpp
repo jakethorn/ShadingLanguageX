@@ -190,8 +190,8 @@ TEST(primitive_tests, logical_operators)
     EXPECT_FALSE((t xor t).as<bool>());
     EXPECT_FALSE((f xor f).as<bool>());
 
-    EXPECT_TRUE((t and 1).as<bool>());
-    EXPECT_FALSE((t and 0).as<bool>());
+    EXPECT_TRUE((t and Primitive{1}).as<bool>());
+    EXPECT_FALSE((t and Primitive{0}).as<bool>());
 }
 
 // --- Subscript Operator ---

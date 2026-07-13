@@ -130,7 +130,7 @@ options:
             return argv;
         }
 
-        optional<primitive_t> parse_literal(const string& str)
+        optional<Primitive> parse_literal(const string& str)
         {
             try
             {
@@ -217,7 +217,7 @@ options:
             while (has_more_args(argv))
             {
                 string front = argv.pop_front();
-                optional<primitive_t> value = parse_literal(front);
+                optional<Primitive> value = parse_literal(front);
                 if (not value)
                 {
                     print_error("Invalid value in -a/--args option: " + front);
@@ -242,7 +242,7 @@ options:
                 }
 
                 string front = argv.pop_front();
-                optional<primitive_t> value = parse_literal(front);
+                optional<Primitive> value = parse_literal(front);
                 if (not value)
                 {
                     print_error("Invalid value in -g/--globals option: " + front);

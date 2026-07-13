@@ -6,8 +6,8 @@
 #define FENNEC_TOKEN_H
 
 #include "common.h"
-#include "primitive_t.h"
 #include "TokenType.h"
+#include "primitive/Primitive.h"
 #include "runtime/utils/monomorphize.h"
 
 namespace mxslc
@@ -29,12 +29,12 @@ namespace mxslc
 
         Token monomorphize(const TypePtr& template_type) const override;
 
-        primitive_t literal() const;
+        Primitive literal() const;
 
         template<typename T>
         T literal() const
         {
-            return std::get<T>(literal());
+            return literal().as<T>();
         }
 
         void set_filename(string filename) { filename_ = std::move(filename); }

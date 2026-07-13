@@ -1,1 +1,1 @@
-errmsg018.mxsl, line 1: Value is not a compile-time boolean
+errmsg018.mxsl, line 1: Variable is not available at compile-time

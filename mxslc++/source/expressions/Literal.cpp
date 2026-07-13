@@ -6,10 +6,7 @@
 
 #include "expressions/interface.h"
 #include "runtime/interface.h"
-#include "runtime/Runtime.h"
 #include "runtime/Type.h"
-#include "serialize/values/BasicValue.h"
-#include "serialize/values/interface.h"
 
 namespace mxslc::expressions
 {
@@ -20,36 +17,32 @@ namespace mxslc::expressions
 
     void Literal::init_impl(const vector<TypePtr>& types)
     {
-        type_ = Type::of(value_);
-
         // implicit cast from int to float
-        if (std::holds_alternative<int>(value_))
+        if (value_.is_a<int>())
         {
             if (not Type::Int->is_in(types) and Type::Float->is_in(types))
             {
-                value_ = static_cast<float>(std::get<int>(value_));
-                type_ = Type::Float;
+                value_ = value_.cast<float>();
             }
         }
 
         // implicit cast from string to filename
-        if (std::holds_alternative<string>(value_))
+        if (value_.is_a<string>())
         {
             if (not Type::String->is_in(types) and Type::Filename->is_in(types))
             {
-                type_ = Type::Filename;
+                value_ = value_.cast<fs::path>();
             }
         }
     }
 
     TypePtr Literal::type_impl() const
     {
-        return type_;
+        return value_.type();
     }
 
     VarPtr Literal::evaluate_impl() const
     {
-        BasicValuePtr value = create_value<BasicValue>(value_, type_);
-        return create_variable(std::move(value));
+        return create_variable(value_);
     }
 }

@@ -8,7 +8,7 @@
 #include "common.h"
 #include "constants.h"
 #include "preprocess/Macro.h"
-#include "primitive_t.h"
+#include "primitive/Primitive.h"
 
 namespace mxslc
 {
@@ -30,7 +30,7 @@ namespace mxslc
         bool error_on_unused_globals{true};
 
         optional<string> func_name;
-        vector<primitive_t> func_args;
+        vector<Primitive> func_args;
 
         bool has_output_file() const { return output_file.has_value(); }
         bool has_function() const { return func_name.has_value(); }

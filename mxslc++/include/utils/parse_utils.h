@@ -6,12 +6,12 @@
 #define MXSLC_PARSE_UTILS_H
 
 #include "common.h"
-#include "primitive_t.h"
+#include "primitive/Primitive.h"
 
 namespace mxslc::parse_utils
 {
     FuncPtr parse_function(const string& code);
-    primitive_t parse_literal(const string& code);
+    Primitive parse_literal(const string& code);
 }
 
 #endif //MXSLC_PARSE_UTILS_H

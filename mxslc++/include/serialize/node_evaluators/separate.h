@@ -10,9 +10,9 @@
 
 namespace mxslc::serialize
 {
-    VarPtr evaluate_separate2(const TypePtr& type, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_separate3(const TypePtr& type, const vector<BasicValuePtr>& values);
-    VarPtr evaluate_separate4(const TypePtr& type, const vector<BasicValuePtr>& values);
+    VarPtr evaluate_separate2(const TypePtr& type, const vector<Primitive>& values);
+    VarPtr evaluate_separate3(const TypePtr& type, const vector<Primitive>& values);
+    VarPtr evaluate_separate4(const TypePtr& type, const vector<Primitive>& values);
 }
 
 #endif //MXSLC_SEPARATE_H

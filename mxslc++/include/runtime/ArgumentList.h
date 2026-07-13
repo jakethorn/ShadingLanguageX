@@ -22,7 +22,7 @@ namespace mxslc::runtime
         ArgumentList(vector<Argument> args);
         ArgumentList(const vector<ExprPtr>& exprs);
         ArgumentList(const vector<VarPtr>& values);
-        ArgumentList(const vector<primitive_t>& values);
+        ArgumentList(const vector<Primitive>& values);
         ArgumentList(const VarPtr& value);
 
         template <typename... Exprs>

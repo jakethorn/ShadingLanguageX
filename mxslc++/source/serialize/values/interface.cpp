@@ -4,12 +4,13 @@
 
 #include "serialize/values/interface.h"
 
-#include "runtime/Type.h"
+#include "primitive/Primitive.h"
 #include "runtime/Variable.h"
+#include "serialize/values/BasicValue.h"
 
 namespace mxslc::serialize::values
 {
-    BasicValuePtr create_value(primitive_t value)
+    BasicValuePtr create_value(Primitive value)
     {
         return create_value<BasicValue>(std::move(value));
     }
