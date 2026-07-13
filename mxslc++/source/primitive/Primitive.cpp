@@ -4,8 +4,6 @@
 
 #include "primitive/Primitive.h"
 
-
-
 #include "common.h"
 #include "primitive/primitive_utils.h"
 #include "runtime/Type.h"

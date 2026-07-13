@@ -23,6 +23,17 @@ namespace mxslc::expressions
             if (not Type::Int->is_in(types) and Type::Float->is_in(types))
             {
                 value_ = value_.cast<float>();
+                return;
+            }
+        }
+
+        // implicit cast from int to bool
+        if (value_.is_a<int>())
+        {
+            if (not Type::Int->is_in(types) and Type::Bool->is_in(types))
+            {
+                value_ = value_.cast<bool>();
+                return;
             }
         }
 
@@ -32,6 +43,7 @@ namespace mxslc::expressions
             if (not Type::String->is_in(types) and Type::Filename->is_in(types))
             {
                 value_ = value_.cast<fs::path>();
+                return;
             }
         }
     }

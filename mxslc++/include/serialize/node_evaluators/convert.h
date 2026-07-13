@@ -6,7 +6,11 @@
 #define MXSLC_CONVERT_H
 
 #include "common.h"
-#include "serialize/values/interface.h"
+
+namespace mxslc
+{
+    class Primitive;
+}
 
 namespace mxslc::serialize
 {
