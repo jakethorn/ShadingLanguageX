@@ -244,6 +244,8 @@ namespace mxslc::expressions
 
     void FunctionCall::init_arguments(const Scope& scope, const vector<TypePtr>& return_types)
     {
+        initialized_arg_count_ = 0;
+
         if (arguments_are_initialized())
             return;
 
