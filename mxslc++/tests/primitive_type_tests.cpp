@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/Type.h"
 
 using namespace mxslc;

@@ -4,7 +4,7 @@
 
 #include "serialize/node_evaluators/binary_ops.h"
 
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/interface.h"
 
 namespace mxslc::serialize

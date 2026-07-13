@@ -6,7 +6,7 @@
 #define MXSLC_PARSE_UTILS_H
 
 #include "common.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 
 namespace mxslc::parse_utils
 {

@@ -6,7 +6,7 @@
 #define MXSLC_VARIABLE_H
 
 #include "common.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/ModifierList.h"
 #include "runtime/utils/RuntimeAware.h"
 

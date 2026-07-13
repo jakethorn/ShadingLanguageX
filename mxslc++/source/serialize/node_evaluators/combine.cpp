@@ -4,8 +4,8 @@
 
 #include "serialize/node_evaluators/combine.h"
 
-#include "primitive/Primitive.h"
-#include "primitive/primitive_utils.h"
+#include "Primitive.h"
+#include "utils/primitive_utils.h"
 #include "runtime/interface.h"
 
 namespace mxslc::serialize

@@ -6,7 +6,7 @@
 #define MXSLC_RUNTIME_INTERFACE_H
 
 #include "common.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/ModifierList.h"
 
 namespace mxslc::runtime

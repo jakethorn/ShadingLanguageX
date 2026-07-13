@@ -7,7 +7,7 @@
 
 #include "common.h"
 #include "TokenType.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/utils/monomorphize.h"
 
 namespace mxslc

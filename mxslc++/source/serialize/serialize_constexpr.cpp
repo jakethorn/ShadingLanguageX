@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "primitive/primitive_utils.h"
+#include "utils/primitive_utils.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "serialize/node_evaluators/binary_ops.h"

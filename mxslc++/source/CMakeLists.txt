@@ -5,15 +5,7 @@ add_library(mxslc_lib
         parse.cpp
         compile.cpp
         TokenType.cpp
-        primitive/Primitive.cpp
-        primitive/primitive_utils/binary_arithmatic_ops.cpp
-        primitive/primitive_utils/binary_comparison_ops.cpp
-        primitive/primitive_utils/binary_logical_ops.cpp
-        primitive/primitive_utils/unary_ops.cpp
-        primitive/primitive_utils/combine.cpp
-        primitive/primitive_utils/convert.cpp
-        primitive/primitive_utils/extract.cpp
-        primitive/primitive_utils/separate.cpp
+        Primitive.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
@@ -82,6 +74,14 @@ add_library(mxslc_lib
         utils/parse_utils.cpp
         utils/load_mtlx.cpp
         utils/mtlx_utils.cpp
+        utils/primitive_utils/binary_arithmatic_ops.cpp
+        utils/primitive_utils/binary_comparison_ops.cpp
+        utils/primitive_utils/binary_logical_ops.cpp
+        utils/primitive_utils/unary_ops.cpp
+        utils/primitive_utils/combine.cpp
+        utils/primitive_utils/convert.cpp
+        utils/primitive_utils/extract.cpp
+        utils/primitive_utils/separate.cpp
         serialize/Serializer.cpp
         serialize/serialize_constexpr.cpp
         serialize/serializer_utils.cpp

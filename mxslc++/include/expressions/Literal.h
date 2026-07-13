@@ -6,7 +6,7 @@
 #define FENNEC_LITERAL_H
 
 #include "expressions/Expression.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 
 namespace mxslc::expressions
 {

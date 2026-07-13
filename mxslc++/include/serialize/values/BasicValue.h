@@ -6,7 +6,7 @@
 #define FENNEC_BASICVALUE_H
 
 #include "serialize/values/Value.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 
 namespace mxslc::serialize::values
 {

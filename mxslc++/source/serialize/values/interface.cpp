@@ -4,7 +4,7 @@
 
 #include "serialize/values/interface.h"
 
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/Variable.h"
 #include "serialize/values/BasicValue.h"
 

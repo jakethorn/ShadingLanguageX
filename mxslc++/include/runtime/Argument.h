@@ -6,7 +6,7 @@
 #define FENNEC_ARGUMENT_H
 
 #include "common.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
 #include "runtime/utils/monomorphize.h"

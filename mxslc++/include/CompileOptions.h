@@ -8,7 +8,7 @@
 #include "common.h"
 #include "constants.h"
 #include "preprocess/Macro.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 
 namespace mxslc
 {

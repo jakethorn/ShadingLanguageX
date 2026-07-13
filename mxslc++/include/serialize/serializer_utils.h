@@ -8,7 +8,7 @@
 #include <MaterialXCore/Node.h>
 
 #include "common.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 
 namespace mxslc::runtime
 {

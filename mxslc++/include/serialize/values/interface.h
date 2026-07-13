@@ -6,7 +6,7 @@
 #define MXSLC_VALUES_INTERFACE_H
 
 #include "common.h"
-#include "primitive/Primitive.h"
+#include "Primitive.h"
 
 namespace mxslc::serialize::values
 {
