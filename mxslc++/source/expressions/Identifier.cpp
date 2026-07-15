@@ -38,4 +38,9 @@ namespace mxslc::expressions
     {
         return var_;
     }
+
+    string Identifier::to_string() const
+    {
+        return name_;
+    }
 }

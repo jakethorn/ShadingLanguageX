@@ -46,4 +46,9 @@ namespace mxslc::expressions
     {
         return func_call_->evaluate();
     }
+
+    string NamedConstructor::to_string() const
+    {
+        return name_ + "{" + args_.to_string() + "}";
+    }
 }

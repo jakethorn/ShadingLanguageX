@@ -54,9 +54,12 @@ TEST_P(error_message_tests, error_message_matches_groundtruth)
 
 vector<fs::path> get_error_message_files()
 {
-    vector<fs::path> files;
-    const fs::path test_dir = get_test_data("error_message"s);
+    const fs::path test_dir = get_test_data("error_message");
 
+    if (not fs::exists(test_dir))
+        return {};
+
+    vector<fs::path> files;
     for (const auto& p : fs::recursive_directory_iterator(test_dir))
         if (p.path().extension() == ".mxsl")
             files.push_back(p.path());

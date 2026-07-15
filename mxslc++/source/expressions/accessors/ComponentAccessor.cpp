@@ -4,25 +4,22 @@
 
 #include "expressions/accessors/ComponentAccessor.h"
 
-#include "expressions/FunctionCall.h"
-#include "expressions/interface.h"
-#include "runtime/utils/invoke.h"
+#include "runtime/ComponentVariable.h"
 
 namespace mxslc::expressions
 {
     ComponentAccessor::ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr)
     {
-        func_call_ = create_expression<FunctionCall>("extract", ArgumentList{std::move(value_expr), std::move(index_expr)});
-        func_call_->init();
+        component_var_ = std::make_shared<ComponentVariable>(std::move(value_expr), std::move(index_expr));
     }
 
     TypePtr ComponentAccessor::type() const
     {
-        return func_call_->type();
+        return component_var_->type();
     }
 
     VarPtr ComponentAccessor::evaluate() const
     {
-        return func_call_->evaluate();
+        return component_var_;
     }
 }

@@ -16,6 +16,16 @@ namespace mxslc::string_utils
         return "";
     }
 
+    bool starts_with(const string& str, const string& prefix)
+    {
+        return str.rfind(prefix, 0) == 0;
+    }
+
+    bool starts_with(const string& str, const char* prefix)
+    {
+        return str.rfind(prefix, 0) == 0;
+    }
+
     string str(const optional<Token>& token)
     {
         return token ? token->lexeme() : "";

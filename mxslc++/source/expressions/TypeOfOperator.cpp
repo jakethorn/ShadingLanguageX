@@ -73,4 +73,9 @@ namespace mxslc::expressions
     {
         return create_variable(TokenType::Const, op_type_, {expr_type_->name(), expr_type_->full_str()});
     }
+
+    string TypeOfOperator::to_string() const
+    {
+        return "typeof(" + expr_->to_string() + ")";
+    }
 }

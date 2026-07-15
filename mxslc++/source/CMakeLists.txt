@@ -23,6 +23,7 @@ add_library(mxslc_lib
         runtime/ModifierList.cpp
         runtime/Variable.cpp
         runtime/InputVariable.cpp
+        runtime/ComponentVariable.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
         runtime/interface.cpp

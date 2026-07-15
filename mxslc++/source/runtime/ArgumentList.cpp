@@ -92,4 +92,9 @@ namespace mxslc::runtime
         }
         return nullptr;
     }
+
+    string ArgumentList::to_string() const
+    {
+        return join(args_, ", ");
+    }
 }

@@ -16,7 +16,7 @@ namespace mxslc::expressions
     using runtime_utils::RuntimeAware;
     using runtime_utils::Monomorphizable;
 
-    class Expression : protected RuntimeAware, public Monomorphizable<ExprPtr>
+    class Expression : protected RuntimeAware, public Monomorphizable<ExprPtr>, public Stringable
     {
     public:
         Expression() = default;
@@ -38,14 +38,16 @@ namespace mxslc::expressions
         bool try_init(const TypePtr& types);
         bool try_init(const vector<TypePtr>& types);
         void update();
+        void reset();
 
         bool is_initialized() const { return is_initialized_; }
-        void reset();
-        const string& error_message() const { return error_message_; }
 
         TypePtr type() const;
-
         VarPtr evaluate() const;
+
+        const string& error_message() const { return error_message_; }
+
+        string to_string() const override = 0;
 
     protected:
         virtual void init_subexpressions(const vector<TypePtr>& types) { }

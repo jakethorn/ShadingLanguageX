@@ -21,4 +21,10 @@ namespace mxslc::runtime
             element->setAttribute(name_, value_);
         }
     }
+
+    string Attribute::to_string() const
+    {
+        string name_string = name_ + (has_child() ? "." + child_ : "");
+        return "@" + name_string + " \"" + value_ + "\"";
+    }
 }

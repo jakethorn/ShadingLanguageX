@@ -153,24 +153,34 @@ namespace mxslc::runtime
         }
     }
 
-    string Function::str() const
+    string Function::header() const
     {
+        string mods_string = mods_.to_string();
+        if (not mods_string.empty())
+            mods_string += " ";
+
         string result;
-        result += mods_.str();
-        result += return_type_->str();
+        result += mods_string;
+        result += return_type_->to_string();
         result += " " + name_;
-        if (template_type_)
-            result += "<" + template_type_->str() + ">";
-        if (is_parameterless_)
-        {
-            result += " [[parameterless]]";
-        }
-        else
+        if (has_template_type())
+            result += "<" + template_type_->to_string() + ">";
+        if (not is_parameterless_)
         {
             result += "(";
-            result += params_.str();
+            result += params_.to_string();
             result += ")";
         }
+        return result;
+    }
+
+    string Function::to_string() const
+    {
+        string result = header();
+        if (is_defined())
+            result += "\n" + body_->to_string();
+        else
+            result += ";";
         return result;
     }
 }

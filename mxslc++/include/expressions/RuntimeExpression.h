@@ -12,10 +12,13 @@ namespace mxslc::expressions
     class RuntimeExpression final : public Expression
     {
     public:
-        explicit RuntimeExpression(VarPtr value);
         explicit RuntimeExpression(Primitive value);
+        explicit RuntimeExpression(ValuePtr value);
+        explicit RuntimeExpression(VarPtr value);
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
+
+        string to_string() const override;
 
     protected:
         TypePtr type_impl() const override;

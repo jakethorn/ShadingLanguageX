@@ -57,13 +57,8 @@ namespace mxslc::runtime
         return (*this)[arg.index()];
     }
 
-    string ParameterList::str() const
+    string ParameterList::to_string() const
     {
-        string result;
-        for (const Parameter& param : *this)
-            result += param.str() + ", ";
-        if (result.size() >= 2)
-            result.resize(result.size() - 2);
-        return result;
+        return join(params_, ", ");
     }
 }

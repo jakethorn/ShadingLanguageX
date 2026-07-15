@@ -10,7 +10,7 @@
 
 namespace mxslc::runtime
 {
-    class AttributeList
+    class AttributeList : public Stringable
     {
     public:
         AttributeList() = default;
@@ -18,6 +18,8 @@ namespace mxslc::runtime
 
         void add_to(const mx::ElementPtr& element) const;
         void add_to(const mx::ElementPtr& element, const string& child_name) const;
+
+        string to_string() const override;
 
     private:
         vector<Attribute> attrs_;

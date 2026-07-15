@@ -18,6 +18,8 @@ namespace mxslc::expressions
         MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
         MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
+        string to_string() const override;
+
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;
         void init_impl(const vector<TypePtr>& types) override;

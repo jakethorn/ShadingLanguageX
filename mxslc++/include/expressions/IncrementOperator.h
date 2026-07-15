@@ -12,9 +12,11 @@ namespace mxslc::expressions
     class IncrementOperator final : public Expression
     {
     public:
-        IncrementOperator(ExprPtr lhs_expr, Token op, bool prefix);
+        IncrementOperator(ExprPtr value_expr, Token op, bool prefix);
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
+
+        string to_string() const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;
@@ -22,7 +24,7 @@ namespace mxslc::expressions
         VarPtr evaluate_impl() const override;
 
     private:
-        ExprPtr lhs_expr_;
+        ExprPtr value_expr_;
         bool prefix_;
         bool increment_;
     };

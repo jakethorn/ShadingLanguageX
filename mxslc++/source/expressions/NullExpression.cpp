@@ -34,4 +34,9 @@ namespace mxslc::expressions
         ValuePtr value = create_value<NullValue>(type_);
         return create_variable(std::move(value));
     }
+
+    string NullExpression::to_string() const
+    {
+        return "null";
+    }
 }

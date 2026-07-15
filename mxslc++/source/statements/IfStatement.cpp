@@ -40,4 +40,17 @@ namespace mxslc::statements
         }
         runtime().exit_scope();
     }
+
+    string IfStatement::to_string() const
+    {
+        string result;
+        result += "if (" + cond_expr_->to_string() + ")\n";
+        result += then_body_->to_string();
+        if (else_body_)
+        {
+            result += "else\n";
+            result += else_body_->to_string();
+        }
+        return result;
+    }
 }

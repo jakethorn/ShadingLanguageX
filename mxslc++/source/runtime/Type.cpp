@@ -265,18 +265,7 @@ namespace mxslc::runtime
         if (has_name())
             return name_;
 
-        string result = "{";
-        for (const Field& field : fields_)
-        {
-            result += field.str();
-            result += ", ";
-        }
-
-        result.pop_back();
-        result.pop_back();
-
-        result += "}";
-        return result;
+        return "{" + join(fields_, ", ") + "}";
     }
 
     string Type::full_str() const
@@ -291,7 +280,7 @@ namespace mxslc::runtime
         result += "{";
         for (const Field& field : fields_)
         {
-            result += field.str();
+            result += field.to_string();
             result += ", ";
         }
 
@@ -352,5 +341,10 @@ namespace mxslc::runtime
             if (field.has_name() != has_names)
                 throw CompileError{"Either all type fields must be named or none them\nType: " + str()};
         }
+    }
+
+    string Type::to_string() const
+    {
+        return str();
     }
 }

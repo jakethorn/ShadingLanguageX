@@ -172,12 +172,14 @@ namespace mxslc::expressions
             {
                 const VarPtr arg_value = args_.evaluate(param);
                 const VarPtr arg_value_copy = create_variable(std::move(mods), param.type(), arg_value);
+                arg_value_copy->disable_node_naming();
                 arg_value_copy->add_to_scope(param.name());
             }
             else
             {
                 const VarPtr default_value = param.has_default_value() ? param.evaluate() : create_variable(param.type());
                 default_value->set_modifiers(std::move(mods));
+                default_value->disable_node_naming();
                 default_value->add_to_scope(param.name());
             }
         }
@@ -307,5 +309,12 @@ namespace mxslc::expressions
     size_t FunctionCall::try_init_arguments(const FuncPtr &func)
     {
         return try_init_arguments(vector<FuncPtr>{func});
+    }
+
+    string FunctionCall::to_string() const
+    {
+        const string template_type_string = template_type_ ? template_type_->to_string() : "";
+        const string args_string = is_argumentless_ ? "" : "(" + join(args_, ", ") + ")";
+        return name_ + template_type_string + args_string;
     }
 }

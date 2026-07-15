@@ -37,4 +37,9 @@ namespace mxslc::statements
         expr_->init();
         VarPtr _ = expr_->evaluate();
     }
+
+    string ExpressionStatement::to_string() const
+    {
+        return expr_->to_string() + ";";
+    }
 }

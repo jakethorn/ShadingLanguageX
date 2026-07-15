@@ -14,12 +14,12 @@ namespace mxslc
 {
     using runtime_utils::Monomorphizable;
 
-    class Token : public Monomorphizable<Token>
+    class Token : public Monomorphizable<Token>, public Stringable
     {
     public:
         Token() = default;
         explicit Token(string lexeme);
-        explicit Token(const TokenType type) : Token{type, type.str()} { }
+        explicit Token(const TokenType type) : Token{type, type.to_string()} { }
         Token(const TokenType type, string lexeme) : type_{type}, lexeme_(std::move(lexeme)) { }
 
         TokenType type() const { return type_; }
@@ -39,6 +39,8 @@ namespace mxslc
 
         void set_filename(string filename) { filename_ = std::move(filename); }
         void set_line(const size_t line) { line_ = line; }
+
+        string to_string() const override { return lexeme_; }
 
         bool operator==(const char c) const { return type_ == c; }
         bool operator==(const TokenType t) const { return type_ == t; }

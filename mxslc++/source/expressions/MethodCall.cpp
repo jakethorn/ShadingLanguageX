@@ -103,4 +103,9 @@ namespace mxslc::expressions
         if (not instance_->equals(local_copy))
             instance_->copy(local_copy);
     }
+
+    string MethodCall::to_string() const
+    {
+        return instance_expr_->to_string() + "." + FunctionCall::to_string();
+    }
 }

@@ -12,6 +12,7 @@
 #include "runtime/Variable.h"
 #include "serialize/values/NodeValue.h"
 #include "errors/CompileError.h"
+#include "runtime/Type.h"
 #include "serialize/values/interface.h"
 
 namespace mxslc::expressions
@@ -39,7 +40,7 @@ namespace mxslc::expressions
 
     TypePtr PortAccessor::type() const
     {
-        return scope().get_type(input_->getType());
+        return Type::of(input_);
     }
 
     VarPtr PortAccessor::evaluate() const

@@ -136,4 +136,9 @@ namespace mxslc::expressions
 
         return result;
     }
+
+    string UnnamedConstructor::to_string() const
+    {
+        return "{" + join(exprs_, ", ") + "}";
+    }
 }

@@ -16,28 +16,32 @@ namespace mxslc
     class CompileError : public std::exception
     {
     public:
-        explicit CompileError(string message) : message_{std::move(message)}, has_debug_info_{false} { }
-        CompileError(const Token& debug_info, const string& message) : message_{format(debug_info, message)}, has_debug_info_{true} { }
+        explicit CompileError(const char* message) : message_{message} { }
+        explicit CompileError(string message) : message_{std::move(message)} { }
+        CompileError(const Token& debug_info, const char* message) : debug_info_{to_string(debug_info)}, message_{message} { }
+        CompileError(const Token& debug_info, string message) : debug_info_{to_string(debug_info)}, message_{std::move(message)} { }
 
         const char* what() const noexcept override
         {
-            return message_.c_str();
+            full_message_ = debug_info_ + message_;
+            return full_message_.c_str();
         }
 
-        bool has_debug_info() const { return has_debug_info_; }
         void set_debug_info(const Token& debug_info)
         {
-            if (has_debug_info_)
-                return;
-            has_debug_info_ = true;
-            message_ = format(debug_info, message_);
+            if (debug_info_.empty())
+                debug_info_ = to_string(debug_info);
         }
 
-    private:
-        static string format(const Token& debug_info, const string& message);
+        string message() const { return message_; }
+        void set_message(string message) { message_ = std::move(message); }
 
+    private:
+        static string to_string(const Token& debug_info);
+
+        string debug_info_;
         string message_;
-        bool has_debug_info_;
+        mutable string full_message_;
     };
 }
 

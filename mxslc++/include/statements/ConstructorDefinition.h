@@ -16,10 +16,12 @@ namespace mxslc::statements
     public:
         ConstructorDefinition(ModifierList mods, string class_name, ParameterList params, StmtPtr body, Token token);
 
+        const string& class_name() const { return class_name_; }
+
         StmtPtr monomorphize(const TypePtr& template_type) const override;
         void init() override;
 
-        const string& class_name() const { return class_name_; }
+        string to_string() const override;
 
     protected:
         void execute_impl() const override;

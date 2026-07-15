@@ -53,4 +53,9 @@ namespace mxslc::expressions
         lhs_expr_->evaluate()->copy(value);
         return value;
     }
+
+    string CompoundAssignment::to_string() const
+    {
+        return lhs_expr_->to_string() + " " + token_.lexeme() + " " + rhs_expr_->to_string();
+    }
 }

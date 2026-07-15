@@ -55,4 +55,23 @@ namespace mxslc::statements
             runtime().exit_scope();
         }
     }
+
+    string ForEachLoop::to_string() const
+    {
+        string mods_string = mods_.to_string();
+        if (not mods_string.empty())
+            mods_string += " ";
+
+        string result;
+        result += mods_string;
+        result += "for (";
+        result += type_->to_string();
+        result += " ";
+        result += name_;
+        result += " from ";
+        result += iter_expr_->to_string();
+        result += ")\n";
+        result += body_->to_string();
+        return result;
+    }
 }

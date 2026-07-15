@@ -10,12 +10,17 @@
 
 namespace mxslc::expressions
 {
-    RuntimeExpression::RuntimeExpression(VarPtr value) : value_{std::move(value)}
+    RuntimeExpression::RuntimeExpression(Primitive value) : value_{create_variable(std::move(value))}
     {
 
     }
 
-    RuntimeExpression::RuntimeExpression(Primitive value) : value_{create_variable(std::move(value))}
+    RuntimeExpression::RuntimeExpression(ValuePtr value) : value_{create_variable(std::move(value))}
+    {
+
+    }
+
+    RuntimeExpression::RuntimeExpression(VarPtr value) : value_{std::move(value)}
     {
 
     }
@@ -33,5 +38,10 @@ namespace mxslc::expressions
     VarPtr RuntimeExpression::evaluate_impl() const
     {
         return value_;
+    }
+
+    string RuntimeExpression::to_string() const
+    {
+        return value_->to_string();
     }
 }

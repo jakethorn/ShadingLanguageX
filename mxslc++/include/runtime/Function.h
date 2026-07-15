@@ -15,7 +15,9 @@
 
 namespace mxslc::runtime
 {
-    class Function : protected runtime_utils::RuntimeAware
+    using runtime_utils::RuntimeAware;
+
+    class Function : protected RuntimeAware, public Stringable
     {
     public:
         Function(
@@ -77,7 +79,8 @@ namespace mxslc::runtime
         bool mutates_instance() const { return mutates_instance_; }
         void set_mutates_instance(const bool value) { mutates_instance_ = value; }
 
-        string str() const;
+        string header() const;
+        string to_string() const override;
 
     private:
         ModifierList mods_;

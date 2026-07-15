@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="a" type="vector3" />
+  <extract name="x" type="float">
+    <input name="in" type="vector3" nodename="a" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="y" type="float">
+    <input name="in" type="vector3" nodename="a" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <add name="z" type="float">
+    <input name="in1" type="float" nodename="x" />
+    <input name="in2" type="float" nodename="y" />
+  </add>
+  <normal name="var__0" type="vector3" />
+  <add name="w" type="float">
+    <input name="in1" type="float" nodename="x" />
+    <input name="in2" type="float" nodename="y" />
+  </add>
+  <extract name="i" type="float">
+    <input name="in" type="vector3" nodename="var__0" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <extract name="j" type="float">
+    <input name="in" type="vector3" nodename="var__0" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <add name="k" type="float">
+    <input name="in1" type="float" nodename="i" />
+    <input name="in2" type="float" nodename="j" />
+  </add>
+  <magnitude name="m" type="float">
+    <input name="in" type="vector3" nodename="var__0" />
+  </magnitude>
+</materialx>

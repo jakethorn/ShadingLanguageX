@@ -57,4 +57,9 @@ namespace mxslc::expressions
     {
         return create_variable(value_);
     }
+
+    string Literal::to_string() const
+    {
+        return value_.to_string();
+    }
 }

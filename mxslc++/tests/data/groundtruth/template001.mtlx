@@ -7,12 +7,12 @@
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </add>
-  <add name="in1" type="float">
+  <add name="var__0" type="float">
     <input name="in1" type="float" nodename="x" />
     <input name="in2" type="float" nodename="y" />
   </add>
   <add name="b" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" nodename="z" />
   </add>
 </materialx>

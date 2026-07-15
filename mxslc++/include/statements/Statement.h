@@ -15,7 +15,7 @@ namespace mxslc::statements
     using runtime_utils::RuntimeAware;
     using runtime_utils::Monomorphizable;
 
-    class Statement : protected RuntimeAware, public Monomorphizable<StmtPtr>
+    class Statement : protected RuntimeAware, public Monomorphizable<StmtPtr>, public Stringable
     {
     public:
         explicit Statement(Token token) : token_{std::move(token)} { }
@@ -25,9 +25,11 @@ namespace mxslc::statements
 
         virtual void set_attributes(AttributeList attrs) { }
 
-        virtual StmtPtr monomorphize(const TypePtr& template_type) const = 0;
+        StmtPtr monomorphize(const TypePtr& template_type) const override = 0;
         virtual void init() { }
         void execute();
+
+        string to_string() const override = 0;
 
     protected:
         virtual void execute_impl() const = 0;

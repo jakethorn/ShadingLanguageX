@@ -49,7 +49,7 @@ namespace mxslc::serialize::values
         output->setConnectedNode(node_);
     }
 
-    string NodeValue::str() const
+    string NodeValue::to_string() const
     {
         string str = node_->asString();
         for (const mx::InputPtr& i : node_->getInputs())

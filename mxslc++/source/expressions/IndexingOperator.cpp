@@ -55,4 +55,9 @@ namespace mxslc::expressions
     {
         return accessor_->evaluate();
     }
+
+    string IndexingOperator::to_string() const
+    {
+        return value_expr_->to_string() + "[" + index_expr_->to_string() + "]";
+    }
 }

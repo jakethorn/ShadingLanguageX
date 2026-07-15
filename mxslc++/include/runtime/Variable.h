@@ -12,9 +12,9 @@
 
 namespace mxslc::runtime
 {
-    class VariableFactory;
+    using runtime_utils::RuntimeAware;
 
-    class Variable : public std::enable_shared_from_this<Variable>, protected runtime_utils::RuntimeAware
+    class Variable : public std::enable_shared_from_this<Variable>, protected RuntimeAware, public Stringable
     {
         friend class VariableFactory;
 
@@ -32,10 +32,11 @@ namespace mxslc::runtime
 
         const string& name() const;
         void set_name(string name);
+        void disable_node_naming() { can_name_nodes_ = false; }
 
-        bool is_assignable() const;
-        bool is_temporary() const;
-        bool is_local();
+        virtual bool is_assignable() const;
+        virtual bool is_temporary() const;
+        virtual bool is_local();
 
         bool has_parent() const;
         VarPtr parent() const;
@@ -65,7 +66,7 @@ namespace mxslc::runtime
         template<typename T>
         T basic() const { return basic().as<T>(); }
 
-        string str() const;
+        string to_string() const override;
 
     protected:
         virtual ValuePtr value_impl() const { return value_; }
@@ -83,6 +84,7 @@ namespace mxslc::runtime
         vector<VarPtr> children_;
         ValuePtr value_;
         string name_;
+        bool can_name_nodes_{true};
         bool is_initialized_{false};
     };
 }

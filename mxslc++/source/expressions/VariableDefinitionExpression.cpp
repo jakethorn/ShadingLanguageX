@@ -52,4 +52,9 @@ namespace mxslc::expressions
         var->uninitialize();
         return var;
     }
+
+    string VariableDefinitionExpression::to_string() const
+    {
+        return var_def_->to_string() + " " + identifier_->to_string();
+    }
 }

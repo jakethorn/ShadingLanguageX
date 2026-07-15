@@ -19,6 +19,8 @@ namespace mxslc::statements
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
+        string to_string() const override;
+
     protected:
         void execute_impl() const override;
 

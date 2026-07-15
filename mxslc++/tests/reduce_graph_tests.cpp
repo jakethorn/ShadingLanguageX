@@ -56,9 +56,12 @@ TEST_P(reduce_graph_tests, compiler_reduces_graph)
 
 vector<fs::path> get_reduce_graph_files()
 {
-    vector<fs::path> files;
-    const fs::path test_dir = get_test_data("reduce_graph"s);
+    const fs::path test_dir = get_test_data("reduce_graph");
 
+    if (not fs::exists(test_dir))
+        return {};
+
+    vector<fs::path> files;
     for (const auto& p : fs::recursive_directory_iterator(test_dir))
         if (p.path().extension() == ".mxsl")
             files.push_back(p.path());

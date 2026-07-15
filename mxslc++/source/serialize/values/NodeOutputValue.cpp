@@ -50,8 +50,11 @@ namespace mxslc::serialize::values
         output->setConnectedNode(node_);
     }
 
-    string NodeOutputValue::str() const
+    string NodeOutputValue::to_string() const
     {
-        return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
+        if (mx::OutputPtr output = node_->getOutput(output_name_))
+            return output->asString();
+        else
+            return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
     }
 }

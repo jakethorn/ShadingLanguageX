@@ -37,7 +37,7 @@ namespace mxslc::serialize::values
         set_interface(output, name_);
     }
 
-    string InterfaceValue::str() const
+    string InterfaceValue::to_string() const
     {
         return "<input name=\"" + name_ + "\" type=\"" + type_->name() + "\" />";
     }

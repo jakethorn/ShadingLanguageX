@@ -84,4 +84,12 @@ namespace mxslc::expressions
     {
         return range_;
     }
+
+    string RangeExpression::to_string() const
+    {
+        if (step_expr_)
+            return lower_expr_->to_string() + ":" + step_expr_->to_string() + ":" + upper_expr_->to_string();
+        else
+            return lower_expr_->to_string() + ":" + upper_expr_->to_string();
+    }
 }

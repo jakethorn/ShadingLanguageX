@@ -38,4 +38,9 @@ namespace mxslc::statements
         const VarPtr rhs = rhs_expr_->evaluate();
         lhs->copy(rhs);
     }
+
+    string VariableAssignment::to_string() const
+    {
+        return lhs_expr_->to_string() + " = " + rhs_expr_->to_string() + ";";
+    }
 }

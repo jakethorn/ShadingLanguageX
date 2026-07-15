@@ -45,9 +45,12 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
 
 vector<fs::path> get_groundtruth_files()
 {
-    vector<fs::path> files;
-    const fs::path test_dir = get_test_data("groundtruth"s);
+    const fs::path test_dir = get_test_data("groundtruth");
 
+    if (not fs::exists(test_dir))
+        return {};
+
+    vector<fs::path> files;
     for (const auto& p : fs::recursive_directory_iterator(test_dir))
         if (p.path().extension() == ".mxsl")
             files.push_back(p.path());

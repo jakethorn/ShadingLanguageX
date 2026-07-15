@@ -55,7 +55,7 @@ namespace mxslc::serialize::values
         });
     }
 
-    string BasicValue::str() const
+    string BasicValue::to_string() const
     {
         return value_.to_string();
     }

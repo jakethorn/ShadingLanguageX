@@ -12,7 +12,7 @@
 
 namespace mxslc::runtime
 {
-    class ModifierList
+    class ModifierList : public Stringable
     {
     public:
         ModifierList() = default;
@@ -25,7 +25,7 @@ namespace mxslc::runtime
             for (const TokenType& mod : mods_)
             {
                 if (not (... || (mod == valid_mods)))
-                    throw CompileError{"'" + mod.str() + "' is not a valid modifier here"};
+                    throw CompileError{"'" + mod.to_string() + "' is not a valid modifier here"};
             }
         }
 
@@ -50,7 +50,8 @@ namespace mxslc::runtime
         bool contains(const TokenType mod) const { return container_utils::contains(mods_, mod); }
         size_t size() const { return mods_.size(); }
         bool empty() const { return mods_.empty(); }
-        string str() const;
+
+        string to_string() const override;
 
     private:
         unordered_set<TokenType> mods_;

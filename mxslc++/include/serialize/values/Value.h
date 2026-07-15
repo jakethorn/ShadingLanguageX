@@ -9,14 +9,15 @@
 #include <MaterialXCore/Node.h>
 
 #include "common.h"
+#include "utils/Stringable.h"
 
 namespace mxslc::serialize::values
 {
-    class Value
+    class Value : public Stringable
     {
     public:
         explicit Value(TypePtr type);
-        virtual ~Value() = default;
+        ~Value() override = default;
 
         const TypePtr& type() { return type_; }
 
@@ -28,7 +29,7 @@ namespace mxslc::serialize::values
 
         void set_as_node_input(const mx::NodePtr& node, const string& input_name) const;
 
-        virtual string str() const = 0;
+        string to_string() const override = 0;
 
     protected:
         TypePtr type_;

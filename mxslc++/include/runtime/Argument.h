@@ -17,7 +17,7 @@ namespace mxslc::runtime
 
     class Parameter;
 
-    class Argument : public Monomorphizable<Argument>
+    class Argument : public Monomorphizable<Argument>, public Stringable
     {
     public:
         Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, size_t index);
@@ -55,6 +55,8 @@ namespace mxslc::runtime
         void validate(const Parameter& param) const;
 
         const string& error_message() const;
+
+        string to_string() const override;
 
     private:
         AttributeList attrs_;

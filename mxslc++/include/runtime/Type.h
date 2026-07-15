@@ -15,7 +15,7 @@ namespace mxslc::runtime
     using runtime_utils::TypeName;
     using runtime_utils::Monomorphizable;
 
-    class Type : public Monomorphizable<TypePtr>
+    class Type : public Monomorphizable<TypePtr>, public Stringable
     {
         friend class Scope;
 
@@ -69,6 +69,7 @@ namespace mxslc::runtime
 
         string str() const;
         string full_str() const;
+        string to_string() const override;
 
         bool operator==(const string& other) const { return name_ == other; }
         bool operator!=(const string& other) const { return not (*this == other); }

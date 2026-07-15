@@ -65,12 +65,18 @@ namespace mxslc::runtime
         return expr_->evaluate();
     }
 
-    string Parameter::str() const
+    string Parameter::to_string() const
     {
-        string result;
-        result += mods_.str();
-        result += type_->str();
-        result += " " + name_;
-        return result;
+        string mods_string = mods_.to_string();
+        if (not mods_string.empty())
+            mods_string += " ";
+
+        string default_value_string = has_default_value() ? expr_->to_string() : "";
+        if (default_value_string.empty() or default_value_string == "null")
+            default_value_string = "";
+        else
+            default_value_string = " = " + default_value_string;
+
+        return mods_string + type_->to_string() + " " + name_ + default_value_string;
     }
 }

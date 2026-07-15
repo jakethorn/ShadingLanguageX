@@ -30,7 +30,12 @@ namespace mxslc::statements
         {
             expr->init();
             const VarPtr var = expr->evaluate();
-            std::cout << var->str() << std::endl;
+            std::cout << var->to_string() << std::endl;
         }
+    }
+
+    string PrintStatement::to_string() const
+    {
+        return "print " + join(exprs_, ", ") + ";";
     }
 }

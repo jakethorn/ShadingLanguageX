@@ -7,9 +7,9 @@
     <input name="specular_roughness" type="float" nodename="var__1" />
   </standard_surface>
   <randomcolor name="var__0" type="color3" />
-  <randomfloat name="in1" type="float" />
+  <randomfloat name="var__1" type="float" />
   <multiply name="r" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

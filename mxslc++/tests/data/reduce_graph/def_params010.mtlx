@@ -9,19 +9,19 @@
     <input name="in2" type="float" value="0" />
   </combine2>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <extract name="in1" type="float">
+    <extract name="var__0" type="float">
       <input name="in" type="vector2" interfacename="v" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <extract name="in2" type="float">
+    <extract name="var__1" type="float">
       <input name="in" type="vector2" interfacename="v" />
       <input name="index" type="integer" value="1" />
     </extract>
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
-      <input name="in2" type="float" nodename="in2" />
+    <add name="var__2" type="float">
+      <input name="in1" type="float" nodename="var__0" />
+      <input name="in2" type="float" nodename="var__1" />
     </add>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__2" />
   </nodegraph>
   <combine2 name="var__1" type="vector2">
     <input name="in1" type="float" value="1" />

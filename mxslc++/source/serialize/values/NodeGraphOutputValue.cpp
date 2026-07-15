@@ -42,7 +42,7 @@ namespace mxslc::serialize::values
         output->setNodeGraphString(node_graph_name_);
     }
 
-    string NodeGraphOutputValue::str() const
+    string NodeGraphOutputValue::to_string() const
     {
         return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
     }

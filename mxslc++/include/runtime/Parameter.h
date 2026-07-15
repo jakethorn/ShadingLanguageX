@@ -16,7 +16,7 @@ namespace mxslc::runtime
     using runtime_utils::RuntimeAware;
     using runtime_utils::Monomorphizable;
 
-    class Parameter : protected RuntimeAware, public Monomorphizable<Parameter>
+    class Parameter : protected RuntimeAware, public Monomorphizable<Parameter>, Stringable
     {
     public:
         Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
@@ -41,7 +41,7 @@ namespace mxslc::runtime
         bool has_default_value() const { return expr_ != nullptr; }
         VarPtr evaluate() const;
 
-        string str() const;
+        string to_string() const override;
 
     private:
         AttributeList attrs_;

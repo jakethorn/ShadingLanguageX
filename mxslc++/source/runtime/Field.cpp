@@ -14,7 +14,7 @@ namespace mxslc::runtime
         return Field{mods_, std::move(type), name_};
     }
 
-    string Field::str() const
+    string Field::to_string() const
     {
         string result = type_->str();
         if (has_name())

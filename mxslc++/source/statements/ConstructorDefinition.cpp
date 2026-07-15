@@ -98,4 +98,13 @@ namespace mxslc::statements
         if (not outer_ctor_->is_inline())
             serializer().write_node_def_graph(outer_ctor_);
     }
+
+    string ConstructorDefinition::to_string() const
+    {
+        string mods_string = mods_.to_string();
+        if (not mods_string.empty())
+            mods_string += " ";
+
+        return mods_string + class_name_ + "(" + params_.to_string() + ")\n" + body_->to_string();
+    }
 }

@@ -36,7 +36,7 @@ namespace mxslc
             message = "Matching definition could not be found for function '" + func_name + "'\n";
             message += "Possible matches:\n";
             for (const FuncPtr& func : funcs)
-                message += func->str() + "\n";
+                message += func->header() + "\n";
         }
 
         if (not underlying_errors.empty())

@@ -72,4 +72,13 @@ namespace mxslc::statements
             var->add_to_scope(type->field_name(i));
         }
     }
+
+    string MultiVariableDefinition::to_string() const
+    {
+        string result = join(type_->fields(), ", ");
+        if (expr_)
+            result += " = " + expr_->to_string();
+        result += ";";
+        return result;
+    }
 }

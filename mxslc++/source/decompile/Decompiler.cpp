@@ -13,9 +13,11 @@
 #include "utils/io_utils.h"
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
+#include "utils/string_utils.h"
 
 namespace mxslc::decompile
 {
+    using string_utils::starts_with;
     using namespace container_utils;
 
     namespace
@@ -330,7 +332,7 @@ namespace mxslc::decompile
         if (not contains(decompiled_node_graphs_, node_graph_name))
             global_code_ += node_graph_to_function_definition(node_graph_name);
 
-        if (node_graph_name.rfind("NG_", 0) == 0)
+        if (starts_with(node_graph_name, "NG_"))
             return node_graph_name.substr(3);
         return node_graph_name;
     }

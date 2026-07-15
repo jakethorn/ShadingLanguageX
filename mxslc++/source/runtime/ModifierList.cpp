@@ -22,15 +22,12 @@ namespace mxslc::runtime
             if (not contains(mod))
                 add(mod);
             else
-                throw CompileError{"Multiple '" + mod.str() + "' modifiers"};
+                throw CompileError{"Multiple '" + mod.to_string() + "' modifiers"};
         }
     }
 
-    string ModifierList::str() const
+    string ModifierList::to_string() const
     {
-        string result;
-        for (TokenType mod : mods_)
-            result += mod.str() + " ";
-        return result;
+        return join(mods_, " ");
     }
 }

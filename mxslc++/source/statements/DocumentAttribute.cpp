@@ -23,4 +23,9 @@ namespace mxslc::statements
     {
         attr_.add_to(serializer().document());
     }
+
+    string DocumentAttribute::to_string() const
+    {
+        return "@" + attr_.to_string();
+    }
 }

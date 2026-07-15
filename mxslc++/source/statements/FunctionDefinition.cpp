@@ -127,4 +127,24 @@ namespace mxslc::statements
                 scope().add_function(func);
         }
     }
+
+    string FunctionDefinition::to_string() const
+    {
+        string mods_string = mods_.to_string();
+        if (not mods_string.empty())
+            mods_string += " ";
+
+        string result;
+        result += mods_string;
+        result += type_->to_string();
+        result += " " + name_;
+        if (not template_types_.empty())
+            result += "<" + join(template_types_, ", ") + ">";
+        if (params_)
+            result += "(" + params_->to_string() + ")";
+        result += "\n";
+        result += body_->to_string();
+
+        return result;
+    }
 }

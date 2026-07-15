@@ -17,12 +17,14 @@ namespace mxslc::statements
         FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, optional<ParameterList> params, StmtPtr body, ExprPtr return_expr);
         FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, optional<ParameterList> params, StmtPtr body, ExprPtr return_expr, Token token);
 
+        const vector<FuncPtr>& functions() const { return funcs_; }
+
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
         void init() override;
 
-        const vector<FuncPtr>& functions() const { return funcs_; }
+        string to_string() const override;
 
     protected:
         void execute_impl() const override;

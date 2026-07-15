@@ -110,4 +110,24 @@ namespace mxslc::statements
             throw CompileError{"Constructor name does not match class name"};
         ctor_def->execute();
     }
+
+    string ClassDefinition::to_string() const
+    {
+        string result;
+        result += "class " + name_;
+
+        if (not template_types_.empty())
+            result += "<" + join(template_types_, ", ") + ">";
+
+        if (parent_)
+            result += " : " + parent_->to_string();
+
+        result += "\n{\n\t";
+
+        result += join(body_, "\n\n\t");
+
+        result += "\n}";
+
+        return result;
+    }
 }

@@ -17,6 +17,8 @@ namespace mxslc::expressions
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
+        string to_string() const override;
+
     protected:
         void init_impl(const vector<TypePtr>& types) override;
         TypePtr type_impl() const override;

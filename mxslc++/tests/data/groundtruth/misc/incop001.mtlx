@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="integer" />
+    <input name="x" type="integer" value="0" />
+    <input name="y" type="integer" value="0" />
+    <input name="z" type="integer" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="var__0" type="integer">
+      <input name="in1" type="integer" interfacename="x" />
+      <input name="in2" type="integer" interfacename="y" />
+    </add>
+    <add name="var__1" type="integer">
+      <input name="in1" type="integer" nodename="var__0" />
+      <input name="in2" type="integer" interfacename="z" />
+    </add>
+    <output name="out" type="integer" nodename="var__1" />
+  </nodegraph>
+  <add name="var__0" type="integer">
+    <input name="in1" type="integer" value="0" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="var__1" type="integer">
+    <input name="in1" type="integer" nodename="var__0" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="var__2" type="integer">
+    <input name="in1" type="integer" nodename="var__1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <foo name="x" type="integer">
+    <input name="x" type="integer" nodename="var__0" />
+    <input name="y" type="integer" nodename="var__1" />
+    <input name="z" type="integer" nodename="var__2" />
+  </foo>
+  <add name="end" type="integer">
+    <input name="in1" type="integer" nodename="x" />
+    <input name="in2" type="integer" value="10" />
+  </add>
+</materialx>

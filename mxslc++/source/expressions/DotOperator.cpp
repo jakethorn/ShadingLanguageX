@@ -49,4 +49,9 @@ namespace mxslc::expressions
     {
         return accessor_->evaluate();
     }
+
+    string DotOperator::to_string() const
+    {
+        return expr_->to_string() + "." + token_.lexeme();
+    }
 }

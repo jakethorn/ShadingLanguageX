@@ -21,4 +21,9 @@ namespace mxslc::statements
     {
         scope().add_alias(name_, type_);
     }
+
+    string UsingDeclaration::to_string() const
+    {
+        return "using " + name_ + " = " + type_->to_string();
+    }
 }

@@ -17,13 +17,15 @@ namespace mxslc::statements
         VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token);
         ~VariableDefinition() override;
 
+        const ModifierList& modifiers() const { return mods_; }
+        TypePtr type() const;
+        const string& name() const;
+
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
-        const ModifierList& modifiers() const { return mods_; }
-        TypePtr type() const;
-        const string& name() const;
+        string to_string() const override;
 
     protected:
         void execute_impl() const override;

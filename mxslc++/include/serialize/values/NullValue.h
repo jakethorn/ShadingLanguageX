@@ -29,7 +29,7 @@ namespace mxslc::serialize::values
             throw CompileError{"Cannot return null value"};
         }
 
-        string str() const override { return "null"; }
+        string to_string() const override { return "null"; }
     };
 }
 

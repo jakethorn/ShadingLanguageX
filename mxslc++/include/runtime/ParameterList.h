@@ -14,7 +14,7 @@ namespace mxslc::runtime
 
     class Argument;
 
-    class ParameterList : public Monomorphizable<ParameterList>
+    class ParameterList : public Monomorphizable<ParameterList>, Stringable
     {
     public:
         ParameterList() = default;
@@ -44,7 +44,7 @@ namespace mxslc::runtime
         auto end() { return params_.end(); }
         auto end() const { return params_.end(); }
 
-        string str() const;
+        string to_string() const override;
 
     private:
         vector<Parameter> params_;

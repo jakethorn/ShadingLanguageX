@@ -29,4 +29,9 @@ namespace mxslc::expressions
     {
         return this_;
     }
+
+    string ThisExpression::to_string() const
+    {
+        return "this";
+    }
 }

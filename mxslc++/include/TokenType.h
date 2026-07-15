@@ -6,10 +6,11 @@
 #define FENNEC_TOKENTYPE_H
 
 #include "common.h"
+#include "utils/Stringable.h"
 
 namespace mxslc
 {
-    class TokenType
+    class TokenType : public Stringable
     {
     public:
         enum Enum : unsigned char
@@ -63,7 +64,6 @@ namespace mxslc
             // Keyword
             If,
             Else,
-            Switch,
             For,
             From,
             To,
@@ -112,7 +112,7 @@ namespace mxslc
         };
 
         inline static const unordered_set Keywords {
-            If, Else, Switch, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
+            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
             Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
         };
 
@@ -138,7 +138,6 @@ namespace mxslc
             {"@@", DoubleAt},
             {"if", If},
             {"else", Else},
-            {"switch", Switch},
             {"for", For},
             {"from", From},
             {"to", To},
@@ -181,7 +180,7 @@ namespace mxslc
         bool is_compound_symbol() const;
         bool is_keyword() const;
 
-        string str() const;
+        string to_string() const override;
 
         bool operator==(const char c) const { return enum_ == to_enum(c); }
         bool operator==(const string& s) const { return enum_ == to_enum(s); }

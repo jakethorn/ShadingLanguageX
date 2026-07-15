@@ -19,7 +19,7 @@ namespace mxslc::expressions
         VarPtr evaluate() const override;
 
     private:
-        ExprPtr func_call_;
+        VarPtr component_var_;
     };
 }
 

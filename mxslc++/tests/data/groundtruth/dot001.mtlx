@@ -37,12 +37,12 @@
     <input name="in1" type="float" output="outx" nodename="var__1" />
     <input name="in2" type="float" output="outy" nodename="var__1" />
   </divide>
-  <multiply name="in1" type="float">
+  <multiply name="var__2" type="float">
     <input name="in1" type="float" value="4" />
     <input name="in2" type="float" value="4" />
   </multiply>
   <multiply name="h" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__2" />
     <input name="in2" type="float" value="4" />
   </multiply>
 </materialx>

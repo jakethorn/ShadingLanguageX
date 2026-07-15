@@ -14,7 +14,7 @@ namespace mxslc::runtime
 {
     using runtime_utils::Monomorphizable;
 
-    class Field : public Monomorphizable<Field>
+    class Field : public Monomorphizable<Field>, Stringable
     {
         friend class Scope;
 
@@ -46,7 +46,7 @@ namespace mxslc::runtime
 
         Field monomorphize(const TypePtr& template_type) const override;
 
-        string str() const;
+        string to_string() const override;
 
     private:
         ModifierList mods_;

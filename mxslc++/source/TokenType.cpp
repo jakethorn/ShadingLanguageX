@@ -42,7 +42,7 @@ namespace mxslc
         return contains(Keywords, enum_);
     }
 
-    string TokenType::str() const
+    string TokenType::to_string() const
     {
         for (const auto& [k, e] : Lexemes)
         {

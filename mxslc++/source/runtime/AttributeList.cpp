@@ -17,4 +17,9 @@ namespace mxslc::runtime
         if (const mx::ElementPtr child = element->getChild(child_name))
             add_to(child);
     }
+
+    string AttributeList::to_string() const
+    {
+        return join(attrs_, "\n");
+    }
 }

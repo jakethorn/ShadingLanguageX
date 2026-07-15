@@ -14,16 +14,16 @@
   <bar name="var__0" type="float">
     <input name="nonlocal_in__x" type="float" value="7" />
   </bar>
-  <add name="in1" type="float">
+  <add name="var__1" type="float">
     <input name="in1" type="float" output="nonlocal_out__x" nodename="var__0" />
     <input name="in2" type="float" value="2" />
   </add>
   <add name="theta1" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" value="10" />
   </add>
   <add name="theta2" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" value="20" />
   </add>
 </materialx>

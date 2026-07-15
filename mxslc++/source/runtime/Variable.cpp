@@ -14,7 +14,6 @@
 #include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
-#include "serialize/serializer_utils.h"
 #include "serialize/values/BasicValue.h"
 
 namespace mxslc::runtime
@@ -270,11 +269,11 @@ namespace mxslc::runtime
         throw CompileError{"Variable is not available at compile-time"};
     }
 
-    string Variable::str() const
+    string Variable::to_string() const
     {
         if (has_value())
         {
-            return value_impl()->str();
+            return value_impl()->to_string();
         }
         else
         {
@@ -283,7 +282,7 @@ namespace mxslc::runtime
             {
                 const string field_name = type_->field(i).has_name() ? type_->field_name(i) : "field_" + string_utils::str(i);
                 const VarPtr& child = children_[i];
-                result += "\n\t" + field_name + ": " + child->str();
+                result += "\n\t" + field_name + ": " + child->to_string();
             }
             return result + "\n}";
         }
@@ -291,6 +290,9 @@ namespace mxslc::runtime
 
     void Variable::set_node_name(const string& name) const
     {
+        if (not can_name_nodes_)
+            return;
+
         if (const NodeValuePtr node_value = cast_value<NodeValue>(value_impl()))
         {
             node_value->set_node_name(name);

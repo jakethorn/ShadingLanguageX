@@ -23,4 +23,9 @@ namespace mxslc::statements
         for (const StmtPtr& stmt : body_)
             stmt->execute();
     }
+
+    string BlockStatement::to_string() const
+    {
+        return "{\n\t" + join(body_, "\n\t") + "\n}";
+    }
 }
