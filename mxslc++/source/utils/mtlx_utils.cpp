@@ -78,4 +78,9 @@ namespace mxslc::mtlx_utils
         port->removeAttribute("value");
         port->setInterfaceName(interface_name);
     }
+
+    void remove_port(const mx::PortElementPtr& port)
+    {
+        port->getParent()->removeChild(port->getName());
+    }
 }

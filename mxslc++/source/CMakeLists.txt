@@ -83,14 +83,14 @@ add_library(mxslc_lib
         utils/primitive_utils/convert.cpp
         utils/primitive_utils/extract.cpp
         utils/primitive_utils/separate.cpp
+        utils/primitive_utils/creatematrix.cpp
+        utils/primitive_utils/invertmatrix.cpp
+        utils/primitive_utils/separate.cpp
+        utils/primitive_utils/switch.cpp
         serialize/Serializer.cpp
         serialize/serialize_constexpr.cpp
+        serialize/serialize_constexpr_wrapper.cpp
         serialize/serializer_utils.cpp
-        serialize/node_evaluators/binary_ops.cpp
-        serialize/node_evaluators/separate.cpp
-        serialize/node_evaluators/convert.cpp
-        serialize/node_evaluators/combine.cpp
-        serialize/node_evaluators/extract.cpp
         serialize/values/Value.cpp
         serialize/values/NodeValue.cpp
         serialize/values/InterfaceValue.cpp

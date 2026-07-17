@@ -27,11 +27,6 @@ namespace mxslc::primitive_utils
         }
     }
 
-    Primitive extract(const Primitive& in, const size_t index)
-    {
-        return extract(in, Primitive{static_cast<int>(index)});
-    }
-
     Primitive extract(const Primitive& in, const Primitive& index)
     {
 #define EXTRACT_IF(from_type) if (in.is_a<from_type>()) { return extract<from_type>(in, index); }

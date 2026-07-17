@@ -21,6 +21,7 @@ using T##Ptr = shared_ptr<T>;
     TYPE_DEF(NodeOutputValue)
     TYPE_DEF(NodeOutputGraphValue)
     TYPE_DEF(NodeValue)
+    TYPE_DEF(NullValue)
 
 #undef TYPE_DEF
 

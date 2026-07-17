@@ -24,7 +24,9 @@ namespace mxslc::serialize::values
     void BasicValue::set_as_node_input(const mx::InputPtr& input) const
     {
         value_.visit([this, &input](const auto& v) {
-            IF_VISITED_TYPE_IS(fs::path)
+            IF_VISITED_TYPE_IS(std::monostate)
+                mtlx_utils::remove_port(input);
+            else IF_VISITED_TYPE_IS(fs::path)
                 input->setValue(v.string(), type_name());
             else
                 input->setValue(v, type_name());
@@ -36,7 +38,9 @@ namespace mxslc::serialize::values
         const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
 
         value_.visit([this, &output](const auto& v) {
-            IF_VISITED_TYPE_IS(fs::path)
+            IF_VISITED_TYPE_IS(std::monostate)
+                mtlx_utils::remove_port(output);
+            else IF_VISITED_TYPE_IS(fs::path)
                 output->setValue(v.string(), type_name());
             else
                 output->setValue(v, type_name());
@@ -48,7 +52,9 @@ namespace mxslc::serialize::values
         mx::InputPtr input = node_def->addInput(input_name, type_->name());
 
         value_.visit([this, &input](const auto& v) {
-            IF_VISITED_TYPE_IS(fs::path)
+            IF_VISITED_TYPE_IS(std::monostate)
+                mtlx_utils::remove_port(input);
+            else IF_VISITED_TYPE_IS(fs::path)
                 input->setValue(v.string(), type_name());
             else
                 input->setValue(v, type_name());

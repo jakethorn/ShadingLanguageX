@@ -38,10 +38,13 @@ namespace mxslc
     class Primitive : public Stringable
     {
     public:
+        Primitive() : value_{std::monostate{}} { }
+
 #define CTOR(type) Primitive(type value) : value_{value} { }
         FOR_EACH_PRIMITIVE_TYPE(CTOR, )
 #undef CTOR
 
+        Primitive(const size_t value) : value_{static_cast<int>(value)} { }
         Primitive(const char* value) : value_{string{value}} { }
         Primitive(const std::array<float, 2> value) : value_{mx::Vector2{value}} { }
         Primitive(const std::array<float, 3> value) : value_{mx::Vector3{value}} { }
@@ -55,6 +58,7 @@ namespace mxslc
 
         bool is_a(const TypePtr& type) const;
         bool is_vector_type() const;
+        bool is_null() const;
 
         template<typename T>
         bool is_a() const
@@ -173,6 +177,7 @@ namespace mxslc
 
         std::variant<
 #define DECL(type) type
+            std::monostate,
             FOR_EACH_PRIMITIVE_TYPE(DECL, COMMA)
 #undef DECL
         > value_;

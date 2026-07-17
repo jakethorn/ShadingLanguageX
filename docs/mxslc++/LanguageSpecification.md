@@ -38,21 +38,20 @@
 
 # Introduction
 
-ShadingLanguageX is a high level programming language that allows developers to write shaders that can be compiled into MaterialX (.mtlx) files.
-The primary use case is to provide a method of creating MaterialX shaders that overcomes some of the weaknesses of using a node editor or the MaterialX C++ or Python API.
-Node editors are very useful for getting quick feedback during shader development or when creating simple shader networks, but are difficult to use the larger the network becomes.
-At the same time, the MaterialX API can be quite verbose, reducing code readability and making it difficult to quickly iterate when writing a shader, without writing your own custom wrapper around the API first.
+ShadingLanguageX is a high-level programming language that can be compiled into MaterialX (.mtlx) files.
+The aim of the project is to provide a method of creating MaterialX shaders that overcomes some of the weaknesses of using a node editor,
+which can be difficult when creating large or complex networks, or the MaterialX C++ or Python APIs, which are very verbose, reducing code readability and making it difficult to quickly iterate when writing a shader.
 ShadingLanguageX is a simple, yet powerful language for writing complex MaterialX shaders that aims to overcome these drawbacks.
 
-A core aim of ShadingLanguageX is to maximize portability. At the time of writing, many renderers and frameworks only support
-a subset of the MaterialX specification. To ensure that ShaderLanguageX is compatible with as many platforms as possible,
-it compiles only to standard node elements. Additionally, functions compile to NodeDef/NodeGraphs
-for better cohesion with the main MaterialX specification. As support for MaterialX becomes more
-mature and as we continue to work on ShadingLanguageX more features will become utilised.
+ShadingLanguageX is purely based on the MaterialX [specification](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.Specification.md), and we've striven for equivalency as much
+as possible. All nodes from the MaterialX Standard Library are supported, represented as a built-in library of functions, and are called 
+by the same names as their MaterialX counterparts. More advanced features such as creating NodeDefs and NodeGraphs is also supported.
 
-At the end of the day, ShadingLanguageX is based on the MaterialX specification and we've striven for equivalency as much
-as possible. As such, if anything is omitted from this document, you can assume that the behaviour is the same as what is
-described in the official MaterialX [specification](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.Specification.md). For example, we don't specify in this document what is the return
+Beyond the standard library, ShadingLanguageX also offers other features such as for loops, ranges, classes, 
+operator overloading, templated functions, preprocessor directives, graph optimisations and more.
+
+If anything is omitted from this document, you can assume that the behaviour is the same as what is
+described in the official MaterialX specification. For example, we don't specify in this document what is the return
 type of a `vector3` multiplied by a `float`, as it is already described in the MaterialX Standard Node [document](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.StandardNodes.md).
 This is to keep this document as concise as possible as well as to reduce the chance of needing to update it in the future
 due to changes to the official MaterialX documentation.
@@ -77,34 +76,34 @@ compiles to:
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <viewdirection name="node1" type="vector3" />
-  <normal name="node2" type="vector3" />
-  <dotproduct name="node3" type="float">
-    <input name="in1" type="vector3" nodename="node1" />
-    <input name="in2" type="vector3" nodename="node2" />
+  <viewdirection name="v" type="vector3" />
+  <normal name="n" type="vector3" />
+  <dotproduct name="var__0" type="float">
+    <input name="in1" type="vector3" nodename="v" />
+    <input name="in2" type="vector3" nodename="n" />
   </dotproduct>
-  <invert name="node4" type="float">
-    <input name="in" type="float" nodename="node3" />
+  <invert name="theta" type="float">
+    <input name="in" type="float" nodename="var__0" />
   </invert>
-  <smoothstep name="node5" type="float">
-    <input name="in" type="float" nodename="node4" />
+  <smoothstep name="outline" type="float">
+    <input name="in" type="float" nodename="theta" />
     <input name="low" type="float" value="0.2" />
     <input name="high" type="float" value="0.25" />
   </smoothstep>
-  <position name="node6" type="vector3" />
-  <multiply name="node7" type="vector3">
-    <input name="in1" type="vector3" nodename="node6" />
-    <input name="in2" type="float" nodename="node5" />
+  <position name="var__1" type="vector3" />
+  <multiply name="var__2" type="vector3">
+    <input name="in1" type="vector3" nodename="var__1" />
+    <input name="in2" type="float" nodename="outline" />
   </multiply>
-  <convert name="node8" type="color3">
-    <input name="in" type="vector3" nodename="node7" />
+  <convert name="c" type="color3">
+    <input name="in" type="vector3" nodename="var__2" />
   </convert>
-  <standard_surface name="node9" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node8" />
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="c" />
     <input name="specular_roughness" type="float" value="1" />
   </standard_surface>
-  <surfacematerial name="node10" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="node9" />
+  <surfacematerial name="toon_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>
 ```
@@ -225,14 +224,13 @@ vec3 foo(auto space = "world") // OK: vec3 foo(string)
 
 ## Type Conversions
 
-ShadingLanguageX supports a limited number of implicit conversions. Integer and string literals can be implicitly converted to floats and filenames, respectively.
+ShadingLanguageX supports a limited number of implicit conversions. Integer literals can be implicitly converted to bools or floats and string literals can be implicitly converted to filenames.
 
-Vectors can also be implicitly converted to and from unnamed structs with the appropriate number of float fields. For example:
+Vectors can also be implicitly converted to and from unnamed structs with the correct number of float fields. For example:
 ```
-vec2 uv = {1.0, 2.0};
-
-{float, float} uv2 = uv;
-float u, v = uv;
+{float, float} a = {1.0, 2.0};
+vec2 b = a;
+float x, y = b;
 
 {float, float} foo(vec2 v)
 {
@@ -248,7 +246,10 @@ Otherwise, variables will need to be explicitly converted using a
 ```
 float x = 0;                 // implicit int ➔ float
 filename p = "my_image.exr"; // implicit string ➔ filename
+
 color3 c = color3{1.0};      // explicit float ➔ color3
+bool b = bool{1};            // explicit int ➔ bool
+vec2 n_xy = vec2{normal()};  // explicit vec3 ➔ vec2
 ```
 
 ## User-Defined Types
@@ -309,10 +310,9 @@ Because the value returned by `typeof` is also a valid ShadingLanguageX variable
 
 ```
 float f = 1.0;
-auto t1 = typeof(f);
-auto t2 = typeof(t1);
-print t2.name; // ""
-print t2.str;  // "{string name, string str}"
+auto t = typeof(typeof(f));
+print t.name; // ""
+print t.str;  // "{string name, string str}"
 ```
 
 You can also pass types to the `typeof` operator to get more information about them.

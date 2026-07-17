@@ -27,6 +27,8 @@ namespace mxslc
     TypePtr Primitive::type() const
     {
         return visit([](const auto& v) -> TypePtr {
+            IF_VISITED_TYPE_IS(std::monostate)
+                return Type::Void;
             return Type::of<VISITED_TYPE>();
         });
     }
@@ -39,6 +41,8 @@ namespace mxslc
     bool Primitive::is_a(const TypePtr& type) const
     {
         return visit([&type](const auto& v) -> bool {
+            IF_VISITED_TYPE_IS(std::monostate)
+                return false;
             return type->is<VISITED_TYPE>();
         });
     }
@@ -46,6 +50,11 @@ namespace mxslc
     bool Primitive::is_vector_type() const
     {
         return type()->is_vector();
+    }
+
+    bool Primitive::is_null() const
+    {
+        return std::holds_alternative<std::monostate>(value_);
     }
 
     Primitive Primitive::convert(const TypePtr& type) const
@@ -197,7 +206,11 @@ namespace mxslc
         return visit([](const auto& v) {
             std::stringstream ss;
 
-            IF_VISITED_TYPE_IS(mx::Vector2)
+            IF_VISITED_TYPE_IS(std::monostate)
+            {
+                ss << "null";
+            }
+            else IF_VISITED_TYPE_IS(mx::Vector2)
             {
                 ss << "vec2{" << v[0] << ", " << v[1] << "}";
             }

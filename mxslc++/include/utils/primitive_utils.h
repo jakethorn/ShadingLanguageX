@@ -38,12 +38,18 @@ namespace mxslc::primitive_utils
     Primitive combine4(const Primitive& in1, const Primitive& in2, const Primitive& in3, const Primitive& in4, const TypePtr& type);
     Primitive combine(const vector<Primitive>& in, const TypePtr& type);
     Primitive convert(const Primitive& in, const TypePtr& type);
-    Primitive extract(const Primitive& in, size_t index);
     Primitive extract(const Primitive& in, const Primitive& index);
     std::array<Primitive, 2> separate2(const Primitive& in);
     std::array<Primitive, 3> separate3(const Primitive& in);
     std::array<Primitive, 4> separate4(const Primitive& in);
     vector<Primitive> separate(const Primitive& in);
+
+    // TODO: Add tests to primitive_utils_tests.cpp for creatematrix and invertmatrix
+    Primitive creatematrix(const Primitive& in1, const Primitive& in2, const Primitive& in3, const TypePtr& type = nullptr);
+    Primitive creatematrix(const Primitive& in1, const Primitive& in2, const Primitive& in3, const Primitive& in4);
+    Primitive invertmatrix(const Primitive& in);
+
+    Primitive switch_(const vector<Primitive>& ins, const Primitive& which, const TypePtr& type = nullptr);
 }
 
 #endif //MXSLC_PRIMITIVE_UTILS_H

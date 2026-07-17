@@ -21,6 +21,8 @@ namespace mxslc::mtlx_utils
     mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const mx::DocumentPtr& mtlx_lib);
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib);
     void set_interface(const mx::PortElementPtr& port, const string& interface_name);
+
+    void remove_port(const mx::PortElementPtr& port);
 }
 
 #endif //FENNEC_MTLX_UTILS_H

@@ -6,6 +6,7 @@
 #define FENNEC_NULLVALUE_H
 
 #include "serialize/values/Value.h"
+#include "utils/mtlx_utils.h"
 
 namespace mxslc::serialize::values
 {
@@ -21,12 +22,12 @@ namespace mxslc::serialize::values
 
         void set_as_node_input(const mx::InputPtr& input) const override
         {
-            input->getParent()->removeChild(input->getName());
+            mtlx_utils::remove_port(input);
         }
 
         void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
         {
-            throw CompileError{"Cannot return null value"};
+            node_graph->removeChild(output_name);
         }
 
         string to_string() const override { return "null"; }

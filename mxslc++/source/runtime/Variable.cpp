@@ -15,6 +15,7 @@
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
 #include "serialize/values/BasicValue.h"
+#include "serialize/values/NullValue.h"
 
 namespace mxslc::runtime
 {
@@ -259,13 +260,15 @@ namespace mxslc::runtime
 
     bool Variable::is_basic() const
     {
-        return cast_value<BasicValue>(value_) != nullptr;
+        return cast_value<BasicValue>(value_) != nullptr or cast_value<NullValue>(value_) != nullptr;
     }
 
-    const Primitive& Variable::basic() const
+    Primitive Variable::basic() const
     {
         if (const BasicValuePtr& value = cast_value<BasicValue>(value_))
             return value->get();
+        if (const NullValuePtr& value = cast_value<NullValue>(value_))
+            return Primitive{};
         throw CompileError{"Variable is not available at compile-time"};
     }
 

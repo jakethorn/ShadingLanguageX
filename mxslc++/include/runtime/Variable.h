@@ -61,7 +61,7 @@ namespace mxslc::runtime
         void add_to_scope(string name);
 
         bool is_basic() const;
-        const Primitive& basic() const;
+        Primitive basic() const;
 
         template<typename T>
         T basic() const { return basic().as<T>(); }

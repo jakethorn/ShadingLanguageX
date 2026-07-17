@@ -7,6 +7,7 @@
 #include "expressions/interface.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/RuntimeExpression.h"
+#include "runtime/utils/invoke.h"
 
 namespace mxslc::runtime
 {
@@ -20,9 +21,7 @@ namespace mxslc::runtime
     {
         if (component_value_ == nullptr)
         {
-            const FunctionCallPtr getter = create_expression<FunctionCall>("__get__", ArgumentList{value_expr_, index_expr_});
-            getter->init();
-            component_value_ = getter->evaluate()->value();
+            component_value_ = runtime_utils::invoke_function("__get__", ArgumentList{value_expr_, index_expr_})->value();
         }
 
         return component_value_;
@@ -30,9 +29,7 @@ namespace mxslc::runtime
 
     void ComponentVariable::copy_value_impl(const ValuePtr value)
     {
-        const FunctionCallPtr setter = create_expression<FunctionCall>("__set__", ArgumentList{value_expr_, index_expr_, create_expression<RuntimeExpression>(value)});
-        setter->init();
-        setter->evaluate();
+        runtime_utils::invoke_function("__set__", ArgumentList{value_expr_, index_expr_, create_expression<RuntimeExpression>(value)});
     }
 
     void ComponentVariable::set_node_name(const string& name) const

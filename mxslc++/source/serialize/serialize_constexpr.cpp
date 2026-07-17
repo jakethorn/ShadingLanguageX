@@ -6,36 +6,40 @@
 
 #include <cassert>
 
+#include "runtime/interface.h"
 #include "utils/primitive_utils.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "serialize/node_evaluators/binary_ops.h"
-#include "serialize/node_evaluators/combine.h"
-#include "serialize/node_evaluators/convert.h"
-#include "serialize/node_evaluators/extract.h"
-#include "serialize/node_evaluators/separate.h"
+#include "serialize/serialize_constexpr_wrapper.h"
 #include "utils/container_utils.h"
 
 namespace mxslc::serialize
 {
     using primitive_utils::combine;
     using container_utils::contains;
+    using serialize_utils::constexpr_func;
+    using serialize_utils::wrap;
+    using serialize_utils::wrap_creatematrix;
+    using serialize_utils::wrap_switch;
 
     namespace
     {
-        const unordered_map<string, std::function<VarPtr(const TypePtr& node_type, const vector<Primitive>&)>> CONSTEXPR_FUNCS {
-            {"add", evaluate_add},
-            {"subtract", evaluate_subtract},
-            {"multiply", evaluate_multiply},
-            {"divide", evaluate_divide},
-            {"combine2", evaluate_combine2},
-            {"combine3", evaluate_combine3},
-            {"combine4", evaluate_combine4},
-            {"separate2", evaluate_separate2},
-            {"separate3", evaluate_separate3},
-            {"separate4", evaluate_separate4},
-            {"convert", evaluate_convert},
-            {"extract", evaluate_extract}
+        const unordered_map<string, constexpr_func> CONSTEXPR_FUNCS {
+            {"add", wrap(primitive_utils::add)},
+            {"subtract", wrap(primitive_utils::subtract)},
+            {"multiply", wrap(primitive_utils::multiply)},
+            {"divide", wrap(primitive_utils::divide)},
+            {"combine2", wrap(primitive_utils::combine2)},
+            {"combine3", wrap(primitive_utils::combine3)},
+            {"combine4", wrap(primitive_utils::combine4)},
+            {"separate2", wrap(primitive_utils::separate)},
+            {"separate3", wrap(primitive_utils::separate)},
+            {"separate4", wrap(primitive_utils::separate)},
+            {"convert", wrap(primitive_utils::convert)},
+            {"extract", wrap(primitive_utils::extract)},
+            {"creatematrix", wrap_creatematrix()},
+            //{"invertmatrix", wrap(primitive_utils::invertmatrix)},
+            {"switch", wrap_switch()},
         };
 
         bool is_constexpr(const string& node_name, const ParameterValues& input_values, vector<Primitive>& basic_values)

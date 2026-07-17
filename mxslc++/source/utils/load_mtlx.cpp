@@ -27,12 +27,22 @@ namespace mxslc
         const unordered_set<string> DEFAULT_NODE_DEFS = {
             "ND_randomfloat_float",
             "ND_randomcolor_float",
+
             "ND_invert_float",
             "ND_invert_vector2",
             "ND_invert_vector3",
             "ND_invert_vector4",
             "ND_invert_color3",
             "ND_invert_color4",
+
+            "ND_switch_float",
+            "ND_switch_vector2",
+            "ND_switch_vector3",
+            "ND_switch_vector4",
+            "ND_switch_color3",
+            "ND_switch_color4",
+            "ND_switch_matrix33",
+            "ND_switch_matrix44",
         };
 
         Parameter to_parameter(const mx::InputPtr& i, const size_t index)

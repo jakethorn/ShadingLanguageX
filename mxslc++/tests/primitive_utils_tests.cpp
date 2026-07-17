@@ -208,3 +208,29 @@ TEST(primitive_tests, test_extract_fails)
         const Primitive a = primitive_utils::extract(mx::Matrix44{}, 10);
     }, CompileError);
 }
+
+TEST(primitive_tests, test_switch)
+{
+    const int a = primitive_utils::switch_({5, 3, 7}, 2).as<int>();
+    ASSERT_EQ(a, 7);
+
+    const float b = primitive_utils::switch_({0.75f, 0.5f, 1, 1}, 1).as<float>();
+    ASSERT_FLOAT_EQ(b, 0.5f);
+
+    const int c = primitive_utils::switch_({Primitive{}, 3, 7}, 0).as<int>();
+    ASSERT_EQ(c, 0);
+
+    const Primitive d = primitive_utils::switch_({Primitive{}}, 0, Type::Int);
+    ASSERT_EQ(d, 0);
+}
+
+TEST(primitive_tests, test_switch_fails)
+{
+    ASSERT_THROW({
+        const Primitive a = primitive_utils::switch_({5, 3, 7}, 5);
+    }, CompileError);
+
+    ASSERT_THROW({
+        const Primitive a = primitive_utils::switch_({Primitive{}}, 0);
+    }, CompileError);
+}
