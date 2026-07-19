@@ -75,6 +75,7 @@ namespace mxslc
             Mutable,
             Consteval,
             Global,
+            Geomprop,
             Inline,
             Default,
             Using,
@@ -112,7 +113,7 @@ namespace mxslc
         };
 
         inline static const unordered_set Keywords {
-            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Inline, Default,
+            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Inline, Default,
             Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
         };
 
@@ -149,6 +150,7 @@ namespace mxslc
             {"mutable", Mutable},
             {"consteval", Consteval},
             {"global", Global},
+            {"geomprop", Geomprop},
             {"inline", Inline},
             {"default", Default},
             {"using", Using},

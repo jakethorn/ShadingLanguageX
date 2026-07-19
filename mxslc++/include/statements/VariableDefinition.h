@@ -28,9 +28,13 @@ namespace mxslc::statements
         string to_string() const override;
 
     protected:
+        void init() override;
         void execute_impl() const override;
 
     private:
+        VarPtr evaluate_global() const;
+        VarPtr evaluate_geomprop() const;
+
         ModifierList mods_;
         TypePtr type_;
         string name_;

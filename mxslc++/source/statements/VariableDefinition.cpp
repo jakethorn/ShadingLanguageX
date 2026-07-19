@@ -53,26 +53,25 @@ namespace mxslc::statements
         return create_statement<VariableDefinition>(mods_, std::move(type), name_, std::move(expr), token_);
     }
 
+    void VariableDefinition::init()
+    {
+        type_ = scope().resolve_type(type_);
+    }
+
     void VariableDefinition::execute_impl() const
     {
-        TypePtr type = scope().resolve_type(type_);
         VarPtr value;
 
         if (mods_.contains(TokenType::Global))
-        {
-            if (VarPtr global = runtime().global(name_))
-            {
-                const ExprPtr value_expr = create_expression<RuntimeExpression>(std::move(global));
-                value_expr->init(type);
-                value = value_expr->evaluate();
-            }
-        }
+            value = evaluate_global();
+        else if (mods_.contains(TokenType::Geomprop))
+            value = evaluate_geomprop();
 
         if (value == nullptr)
         {
             if (expr_)
             {
-                expr_->init(type);
+                expr_->init(type_);
                 value = expr_->evaluate();
             }
             else
@@ -81,8 +80,29 @@ namespace mxslc::statements
             }
         }
 
-        const VarPtr var = create_variable(mods_, std::move(type), value);
+        const VarPtr var = create_variable(mods_, type_, value);
         var->add_to_scope(name_);
+    }
+
+    VarPtr VariableDefinition::evaluate_global() const
+    {
+        if (VarPtr global = runtime().global(name_))
+        {
+            // init and evaluate here for type checking
+            const ExprPtr value_expr = create_expression<RuntimeExpression>(std::move(global));
+            value_expr->init(type_);
+            return value_expr->evaluate();
+        }
+
+        return nullptr;
+    }
+
+    VarPtr VariableDefinition::evaluate_geomprop() const
+    {
+        ArgumentList args{name_};
+        if (expr_)
+            args.append(expr_);
+        return runtime_utils::invoke_function(type_, "geompropvalue", std::move(args));
     }
 
     string VariableDefinition::to_string() const

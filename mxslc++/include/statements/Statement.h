@@ -26,12 +26,13 @@ namespace mxslc::statements
         virtual void set_attributes(AttributeList attrs) { }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override = 0;
-        virtual void init() { }
         void execute();
 
         string to_string() const override = 0;
 
     protected:
+        // TODO move all overrides to protected from public
+        virtual void init() { }
         virtual void execute_impl() const = 0;
 
         Token token_;
