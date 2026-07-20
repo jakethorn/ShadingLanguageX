@@ -31,7 +31,6 @@ namespace mxslc::statements
         string to_string() const override = 0;
 
     protected:
-        // TODO move all overrides to protected from public
         virtual void init() { }
         virtual void execute_impl() const = 0;
 

@@ -35,9 +35,9 @@ namespace mxslc::runtime
         }
 
         template<typename T>
-        void append(T expr)
+        void append(T arg)
         {
-            args_.emplace_back(T, size());
+            args_.emplace_back(arg, size());
         }
 
         ArgumentList monomorphize(const TypePtr& template_type) const override;

@@ -12,6 +12,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
+#include "runtime/utils/invoke.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
 
@@ -76,7 +77,7 @@ namespace mxslc::statements
             }
             else
             {
-                value = create_variable(type);
+                value = create_variable(type_);
             }
         }
 

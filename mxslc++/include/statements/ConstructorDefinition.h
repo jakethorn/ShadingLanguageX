@@ -19,11 +19,11 @@ namespace mxslc::statements
         const string& class_name() const { return class_name_; }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
-        void init() override;
 
         string to_string() const override;
 
     protected:
+        void init() override;
         void execute_impl() const override;
 
     private:

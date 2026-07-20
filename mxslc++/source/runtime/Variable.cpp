@@ -36,16 +36,6 @@ namespace mxslc::runtime
         return mods_.contains(TokenType::Mutable);
     }
 
-    bool Variable::is_global() const
-    {
-        return mods_.contains(TokenType::Global);
-    }
-
-    bool Variable::is_geomprop() const
-    {
-        return mods_.contains(TokenType::Geomprop);
-    }
-
     const ModifierList& Variable::modifiers() const
     {
         return mods_;
@@ -56,9 +46,7 @@ namespace mxslc::runtime
         mods_ = std::move(mods);
         mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Geomprop);
         if (is_const() and is_mutable())
-            throw CompileError{ "Variables cannot be both const and mutable" };
-        if (is_global() and is_geomprop())
-            throw CompileError{ "Variables cannot be both global and geomprop" };
+            throw CompileError{"Variables cannot be both const and mutable"};
     }
 
     const TypePtr& Variable::type() const
