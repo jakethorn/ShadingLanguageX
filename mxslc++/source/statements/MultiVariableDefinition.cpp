@@ -40,36 +40,37 @@ namespace mxslc::statements
         return create_statement<MultiVariableDefinition>(std::move(type), std::move(expr), token_);
     }
 
+    void MultiVariableDefinition::init()
+    {
+        type_ = scope().resolve_type(type_);
+    }
+
     void MultiVariableDefinition::execute_impl() const
     {
-        const TypePtr type = scope().resolve_type(type_);
-
         VarPtr value;
         if (expr_)
         {
-            expr_->init(type);
+            expr_->init(type_);
             value = expr_->evaluate();
         }
-        else
-        {
-            value = create_variable(type);
-        }
 
-        for (size_t i = 0; i < value->child_count(); ++i)
+        for (size_t i = 0; i < type_->field_count(); ++i)
         {
-            Field field = type->field(i);
-            VarPtr child = value->child(i);
-            if (field.is_global())
+            Field field = type_->field(i);
+
+            ExprPtr child_expr;
+            if (value)
             {
-                if (VarPtr global = runtime().global(field.name()))
-                {
-                    const ExprPtr child_expr = create_expression<RuntimeExpression>(std::move(global));
-                    child_expr->init(type);
-                    child = child_expr->evaluate();
-                }
+                VarPtr child = value->child(i);
+                child_expr = create_expression<RuntimeExpression>(child);
             }
-            const VarPtr var = create_variable(field.modifiers(), field.type(), child);
-            var->add_to_scope(type->field_name(i));
+
+            create_statement<VariableDefinition>(
+                field.modifiers(),
+                field.type(),
+                field.name(),
+                std::move(child_expr)
+            )->execute();
         }
     }
 

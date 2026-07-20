@@ -33,7 +33,7 @@ namespace mxslc::statements
 
     private:
         VarPtr evaluate_global() const;
-        VarPtr evaluate_geomprop() const;
+        VarPtr evaluate_geomprop(VarPtr default_value) const;
 
         ModifierList mods_;
         TypePtr type_;

@@ -61,27 +61,27 @@ namespace mxslc::statements
 
     void VariableDefinition::execute_impl() const
     {
+        const bool is_global = mods_.contains(TokenType::Global);
+        const bool is_geomprop = mods_.contains(TokenType::Geomprop);
+
         VarPtr value;
-
-        if (mods_.contains(TokenType::Global))
-            value = evaluate_global();
-        else if (mods_.contains(TokenType::Geomprop))
-            value = evaluate_geomprop();
-
-        if (value == nullptr)
+        if (is_global)
         {
-            if (expr_)
-            {
-                expr_->init(type_);
-                value = expr_->evaluate();
-            }
-            else
-            {
-                value = create_variable(type_);
-            }
+            value = evaluate_global();
+        }
+        else if (expr_)
+        {
+            expr_->init(type_);
+            value = expr_->evaluate();
         }
 
-        const VarPtr var = create_variable(mods_, type_, value);
+        if (is_geomprop)
+            value = evaluate_geomprop(value);
+
+        if (not value)
+            value = create_variable(type_);
+
+        const VarPtr var = create_variable(mods_.without(TokenType::Global, TokenType::Geomprop), type_, value);
         var->add_to_scope(name_);
     }
 
@@ -98,11 +98,11 @@ namespace mxslc::statements
         return nullptr;
     }
 
-    VarPtr VariableDefinition::evaluate_geomprop() const
+    VarPtr VariableDefinition::evaluate_geomprop(VarPtr default_value) const
     {
         ArgumentList args{name_};
-        if (expr_)
-            args.append(expr_);
+        if (default_value)
+            args.append(default_value);
         return runtime_utils::invoke_function(type_, "geompropvalue", std::move(args));
     }
 

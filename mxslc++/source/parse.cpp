@@ -191,20 +191,20 @@ namespace mxslc
         vector<Field> fields;
         Token name = match(TokenType::Identifier);
         Token token{name};
-        fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
+        fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*is_multi_var_def*/true);
         while (consume(','))
         {
             if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '=' or peek(1) == ';'))
             {
                 name = match(TokenType::Identifier);
-                fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), /*can_be_global*/true);
+                fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), /*is_multi_var_def*/true);
             }
             else
             {
                 mods = modifiers();
                 type_ = type();
                 name = match(TokenType::Identifier);
-                fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*can_be_global*/true);
+                fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*is_multi_var_def*/true);
             }
         }
 

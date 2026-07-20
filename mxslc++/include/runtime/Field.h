@@ -25,11 +25,11 @@ namespace mxslc::runtime
 
         }
 
-        Field(ModifierList mods, TypePtr type, string name, const bool can_be_global = false)
+        Field(ModifierList mods, TypePtr type, string name, const bool is_multi_var_def = false)
             : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}
         {
-            if (can_be_global)
-                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global);
+            if (is_multi_var_def)
+                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Geomprop);
             else
                 mods_.validate(TokenType::Const, TokenType::Mutable);
         }
@@ -40,6 +40,7 @@ namespace mxslc::runtime
         bool is_const() const { return mods_.contains(TokenType::Const); }
         bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
         bool is_global() const { return mods_.contains(TokenType::Global); }
+        bool is_geomprop() const { return mods_.contains(TokenType::Geomprop); }
         const TypePtr& type() const { return type_; }
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
