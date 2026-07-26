@@ -741,10 +741,45 @@ x = 2; // Error
 This isn't particularly useful for primitive data types (except to improve readability of the code) as variables are immutable by default in ShadingLanguageX, but it has some use cases
 with [user-defined types](#user-defined-types).
 
+### Geomprop
+
+The `geomprop` modifier converts a variable definition into a `geompropvalue` node. The name of the variable becomes the
+`geomprop` string input and the initializing expression becomes the `default` input:
+
+```
+geomprop float x;
+geomprop float y = 0.5;
+```
+This is equivalent to:
+```
+float x = geompropvalue("x");
+float x = geompropvalue("y", 0.5);
+```
+Both compile to:
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <geompropvalue name="x" type="float">
+    <input name="geomprop" type="string" value="x" />
+  </geompropvalue>
+  <geompropvalue name="y" type="float">
+    <input name="geomprop" type="string" value="y" />
+    <input name="default" type="float" value="0.5" />
+  </geompropvalue>
+</materialx>
+```
+
+You can also combine the `geomprop` and `global` modifiers in which case the global value passed to the compiler becomes the default
+input to the `geompropvalue` node.
+
+```
+geomprop global float x;
+```
+
 ### Global
 
-The global modifier operates similarly to `uniform` from GLSL. Essentially, they allow users to pass values into 
-ShadingLanguageX as the code is being compiled, either from the command line or the C++/Python APIs (see the 
+The `global` modifier operates similarly to `uniform` from GLSL. Essentially, it allows users to pass values into 
+ShadingLanguageX either from the command line or the C++/Python APIs (see the 
 [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/UserGuide.md) for more information). For example:
 
 ### Example 1
@@ -848,7 +883,7 @@ float a, int b, string c = {1.0, 2, "hello"};
 If all variables share the same modifiers and type, the syntax can be simplified to:
 
 ```
-float a, b, c = {1.0, 2.0, 3.0};
+const float a, b, c = {1.0, 2.0, 3.0};
 ```
 
 Functions that return multiple variables can also be used for initialisation:
