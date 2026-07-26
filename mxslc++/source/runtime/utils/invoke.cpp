@@ -40,7 +40,7 @@ namespace mxslc::runtime_utils
 
     VarPtr invoke_method(const vector<TypePtr>& target_types, VarPtr instance, string func_name)
     {
-        ExprPtr instance_expr = create_expression<RuntimeExpression>(std::move(instance));
+        ExprPtr instance_expr = as_expression(std::move(instance));
         const ExprPtr method_call = create_expression<MethodCall>(std::move(instance_expr), std::move(func_name), std::nullopt);
 
         method_call->init(target_types);

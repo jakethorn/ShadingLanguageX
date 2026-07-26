@@ -35,7 +35,7 @@ namespace mxslc::runtime
         }
 
         template<typename T>
-        void append(T arg)
+        void add(T arg)
         {
             args_.emplace_back(arg, size());
         }

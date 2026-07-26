@@ -13,6 +13,7 @@
 #include "runtime/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
+#include "statements/VariableDefinition.h"
 
 namespace mxslc::statements
 {
@@ -62,7 +63,7 @@ namespace mxslc::statements
             if (value)
             {
                 VarPtr child = value->child(i);
-                child_expr = create_expression<RuntimeExpression>(child);
+                child_expr = as_expression(std::move(child));
             }
 
             create_statement<VariableDefinition>(

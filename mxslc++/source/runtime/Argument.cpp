@@ -34,7 +34,7 @@ namespace mxslc::runtime
         : Argument{string{}, std::move(expr), index} { }
 
     Argument::Argument(VarPtr value, const size_t index)
-        : Argument{create_expression<RuntimeExpression>(std::move(value)), index} { }
+        : Argument{as_expression(std::move(value)), index} { }
 
     Argument::Argument(Primitive value, const size_t index)
         : Argument{create_expression<Literal>(std::move(value)), index} { }

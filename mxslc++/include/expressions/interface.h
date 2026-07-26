@@ -6,6 +6,7 @@
 #define MXSLC_EXPRESSIONS_INTERFACE_H
 
 #include "common.h"
+#include "Primitive.h"
 
 namespace mxslc::expressions
 {
@@ -42,6 +43,10 @@ using T##Ptr = shared_ptr<T>;
     TYPE_DEF(VariableDefinitionExpression)
 
 #undef TYPE_DEF
+
+    RuntimeExpressionPtr as_expression(Primitive value);
+    RuntimeExpressionPtr as_expression(ValuePtr value);
+    RuntimeExpressionPtr as_expression(VarPtr value);
 }
 
 #endif //MXSLC_EXPRESSIONS_INTERFACE_H

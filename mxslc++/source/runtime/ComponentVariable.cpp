@@ -29,7 +29,7 @@ namespace mxslc::runtime
 
     void ComponentVariable::copy_value_impl(const ValuePtr value)
     {
-        runtime_utils::invoke_function("__set__", ArgumentList{value_expr_, index_expr_, create_expression<RuntimeExpression>(value)});
+        runtime_utils::invoke_function("__set__", ArgumentList{value_expr_, index_expr_, as_expression(std::move(value))});
     }
 
     void ComponentVariable::set_node_name(const string& name) const

@@ -69,7 +69,8 @@ namespace mxslc::statements
         {
             value = evaluate_global();
         }
-        else if (expr_)
+
+        if (not value and expr_)
         {
             expr_->init(type_);
             value = expr_->evaluate();
@@ -90,7 +91,7 @@ namespace mxslc::statements
         if (VarPtr global = runtime().global(name_))
         {
             // init and evaluate here for type checking
-            const ExprPtr value_expr = create_expression<RuntimeExpression>(std::move(global));
+            const ExprPtr value_expr = as_expression(std::move(global));
             value_expr->init(type_);
             return value_expr->evaluate();
         }
@@ -102,7 +103,7 @@ namespace mxslc::statements
     {
         ArgumentList args{name_};
         if (default_value)
-            args.append(default_value);
+            args.add(std::move(default_value));
         return runtime_utils::invoke_function(type_, "geompropvalue", std::move(args));
     }
 
