@@ -1,9 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MXSL &#x2194; MTLX Converter</title>
+
+    <script>
+        // Detect OS color scheme preference before page renders
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+        }
+        // Listen for changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            document.documentElement.setAttribute('data-bs-theme', e.matches ? 'dark' : 'light');
+        });
+    </script>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,234 +29,61 @@
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/theme/monokai.min.css" rel="stylesheet">
 
     <style>
-        :root {
-            --editor-height: 55vh;
-            --header-bg: #1e1e2e;
-            --border-color: #313244;
-        }
+        :root { --editor-height: 55vh; }
+        @media (max-width: 767.98px) { :root { --editor-height: 40vh; } }
 
-        body {
-            background: #11111b;
-            color: #cdd6f4;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            min-height: 100vh;
-        }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .CodeMirror { height: var(--editor-height) !important; font-size: .85rem; }
 
-        .app-header {
-            background: var(--header-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-        }
-
-        .app-header h1 {
-            font-weight: 700;
-            font-size: 1.5rem;
-            letter-spacing: -0.02em;
-            margin: 0;
-        }
-
-        .app-header .badge {
-            font-size: 0.65rem;
-            font-weight: 500;
-            letter-spacing: 0.04em;
-            padding: 0.25em 0.7em;
-            vertical-align: middle;
-        }
-
-        .editor-panel {
-            background: #1e1e2e;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            overflow: hidden;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .editor-panel .panel-header {
-            background: #181825;
-            padding: 0.6rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .editor-panel .panel-header .icon {
-            font-size: 1.1rem;
-        }
-
-        .editor-panel .panel-body {
-            flex: 1;
-            position: relative;
-        }
-
-        .editor-panel .panel-body .CodeMirror {
-            height: var(--editor-height);
-            border-radius: 0;
-            font-size: 0.85rem;
-            line-height: 1.55;
-        }
-
-        .editor-panel .panel-footer {
-            background: #181825;
-            padding: 0.65rem 1rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .center-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: #6c7086;
-            height: 100%;
-            padding: 1rem 0;
-        }
-
-        .center-arrow .bi {
-            transition: transform 0.3s ease;
-        }
-
-        .center-arrow .bi:hover {
-            transform: scale(1.15);
-            color: #89b4fa;
-        }
-
-        .btn-convert-mtlx {
-            --bs-btn-color: #a6e3a1;
-            --bs-btn-border-color: #a6e3a1;
-            --bs-btn-hover-color: #11111b;
-            --bs-btn-hover-bg: #a6e3a1;
-            --bs-btn-hover-border-color: #a6e3a1;
-            --bs-btn-active-color: #11111b;
-            --bs-btn-active-bg: #a6e3a1;
-        }
-
-        .btn-convert-mxsl {
-            --bs-btn-color: #89b4fa;
-            --bs-btn-border-color: #89b4fa;
-            --bs-btn-hover-color: #11111b;
-            --bs-btn-hover-bg: #89b4fa;
-            --bs-btn-hover-border-color: #89b4fa;
-            --bs-btn-active-color: #11111b;
-            --bs-btn-active-bg: #89b4fa;
-        }
-
-        .btn-load {
-            --bs-btn-color: #cdd6f4;
-            --bs-btn-border-color: #585b70;
-            --bs-btn-hover-color: #cdd6f4;
-            --bs-btn-hover-bg: #313244;
-            --bs-btn-hover-border-color: #585b70;
-        }
-
-        .status-bar {
-            background: #181825;
-            border-top: 1px solid var(--border-color);
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-            color: #6c7086;
-        }
-
-        .status-bar .spinner-border {
-            width: 0.9rem;
-            height: 0.9rem;
-            margin-right: 0.4rem;
-        }
-
-        .log-panel {
-            background: #1e1e2e;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            overflow: hidden;
-        }
-
-        .log-panel .panel-header {
-            background: #181825;
-            padding: 0.5rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .log-panel textarea {
-            background: #11111b;
-            color: #a6adc8;
-            border: none;
-            width: 100%;
-            padding: 0.75rem 1rem;
+        .log-area {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 0.8rem;
-            line-height: 1.5;
-            resize: vertical;
-            min-height: 80px;
-            max-height: 200px;
+            font-size: .8rem; line-height: 1.5;
+            resize: vertical; min-height: 80px; max-height: 200px;
             outline: none;
         }
+        .log-area:focus { box-shadow: inset 0 0 0 1px #89b4fa; }
 
-        .log-panel textarea:focus {
-            box-shadow: inset 0 0 0 1px #89b4fa;
-        }
-
-        @media (max-width: 991.98px) {
-            .center-arrow {
-                padding: 0.5rem 0;
-                font-size: 2rem;
-            }
-            :root {
-                --editor-height: 35vh;
-            }
-        }
+        .btn-convert-mtlx { --bs-btn-color: #a6e3a1; --bs-btn-border-color: #a6e3a1;
+            --bs-btn-hover-color: #000; --bs-btn-hover-bg: #a6e3a1; }
+        .btn-convert-mxsl { --bs-btn-color: #89b4fa; --bs-btn-border-color: #89b4fa;
+            --bs-btn-hover-color: #000; --bs-btn-hover-bg: #89b4fa; }
+        .btn-load { --bs-btn-color: #6c757d; --bs-btn-border-color: #6c757d;
+            --bs-btn-hover-color: #fff; --bs-btn-hover-bg: #6c757d; }
     </style>
 </head>
-<body>
+<body class="min-vh-100">
 
     <!-- ── Header ──────────────────────────────────────────────── -->
-    <header class="app-header">
-        <div class="container">
-            <div class="d-flex align-items-center justify-content-between">
-                <h1>
-                    <i class="bi bi-arrow-left-right me-2" style="color:#89b4fa;"></i>
-                    MXSL <span class="text-white-50">&#x2194;</span> MTLX
-                    <span class="badge bg-secondary ms-2">Converter</span>
-                </h1>
-                <div>
-                    <span class="text-white-50 small me-2">powered by</span>
-                    <strong>ShadingLanguageX</strong>
-                </div>
+    <header class="border-bottom py-3">
+        <div class="container d-flex align-items-center justify-content-between">
+            <h1 class="fs-5 fw-bold m-0">
+                <i class="bi bi-arrow-left-right me-2" style="color:#89b4fa;"></i>
+                MXSL <span class="text-body-secondary">&#x2194;</span> MTLX
+                <span class="badge bg-secondary ms-2 align-middle" style="font-size:.65rem;">Converter</span>
+            </h1>
+            <div>
+                <span class="text-body-secondary small me-2">powered by</span>
+                <strong>ShadingLanguageX</strong>
             </div>
         </div>
     </header>
 
     <!-- ── Main ────────────────────────────────────────────────── -->
-    <main class="container-fluid py-2">
-        <div class="row">
+    <main class="container-fluid py-3">
+        <div class="row g-3">
 
             <!-- Left: MTLX -->
-            <div class="col-6">
-                <div class="editor-panel" id="panel-mtlx">
-                    <div class="panel-header">
-                        <span class="icon"><i class="bi bi-filetype-xml"></i></span>
+            <div class="col-md-6 d-flex">
+                <div class="border rounded-3 overflow-hidden w-100 d-flex flex-column">
+                    <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
+                        <i class="bi bi-filetype-xml"></i>
                         <span>MaterialX (MTLX)</span>
                         <span class="badge bg-success ms-auto">XML</span>
                     </div>
-                    <div class="panel-body">
+                    <div class="flex-fill position-relative">
                         <textarea id="editor-mtlx" placeholder="Paste MTLX XML here, or load a file..."></textarea>
                     </div>
-                    <div class="panel-footer">
+                    <div class="px-3 py-2 border-top d-flex gap-2 flex-wrap">
                         <button class="btn btn-sm btn-load" onclick="loadFile('mtlx')">
                             <i class="bi bi-folder2-open me-1"></i> Load File
                         </button>
@@ -255,17 +95,17 @@
             </div>
 
             <!-- Right: MXSL -->
-            <div class="col-6">
-                <div class="editor-panel" id="panel-mxsl">
-                    <div class="panel-header">
-                        <span class="icon"><i class="bi bi-filetype-js"></i></span>
+            <div class="col-md-6 d-flex">
+                <div class="border rounded-3 overflow-hidden w-100 d-flex flex-column">
+                    <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
+                        <i class="bi bi-file-earmark-code"></i>     
                         <span>MXSL Shading Language</span>
                         <span class="badge bg-info ms-auto">MXSL</span>
                     </div>
-                    <div class="panel-body">
+                    <div class="flex-fill position-relative">
                         <textarea id="editor-mxsl" placeholder="Paste MXSL code here, or load a file..."></textarea>
                     </div>
-                    <div class="panel-footer">
+                    <div class="px-3 py-2 border-top d-flex gap-2 flex-wrap">
                         <button class="btn btn-sm btn-load" onclick="loadFile('mxsl')">
                             <i class="bi bi-folder2-open me-1"></i> Load File
                         </button>
@@ -281,15 +121,15 @@
 
     <!-- ── Log / Message Area ──────────────────────────────────── -->
     <div class="container-fluid pb-4">
-        <div class="log-panel">
-            <div class="panel-header">
-                <span><i class="bi bi-terminal me-1" style="color:#89b4fa;"></i></span>
+        <div class="border rounded-3 overflow-hidden">
+            <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
+                <i class="bi bi-terminal me-1" style="color:#89b4fa;"></i>
                 <span>Log</span>
-                <button class="btn btn-sm btn-link text-white-50 ms-auto p-0" onclick="clearLog()" title="Clear log">
+                <button class="btn btn-sm btn-link text-body-secondary ms-auto p-0" onclick="clearLog()" title="Clear log">
                     <i class="bi bi-trash3"></i>
                 </button>
             </div>
-            <textarea id="message-log" placeholder=""></textarea>
+            <textarea id="message-log" class="log-area w-100 border-0 px-3 py-2" placeholder=""></textarea>
         </div>
     </div>
 
@@ -392,7 +232,7 @@
             indentUnit: 4,
             tabSize: 4,
             indentWithTabs: false,
-            lineWrapping: false,
+            lineWrapping: true,
             autofocus: false,
             extraKeys: {
                 'Ctrl-S': function(cm) { cm.save(); },
