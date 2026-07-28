@@ -24,7 +24,9 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
     fs::path expected_path = input_path;
     expected_path.replace_extension(".mtlx");
 
-    mxslc::CompileOptions opts{.reduce_graph = false};
+    mxslc::CompileOptions opts;
+    opts.reduce_graph = false;
+
     fs::path response_path = input_path;
     response_path.replace_extension(".rsp");
     if (fs::is_regular_file(response_path))

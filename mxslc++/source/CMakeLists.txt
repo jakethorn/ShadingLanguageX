@@ -77,6 +77,7 @@ add_library(mxslc_lib
         utils/parse_utils.cpp
         utils/load_mtlx.cpp
         utils/mtlx_utils.cpp
+        utils/token_utils.cpp
         utils/Logger.cpp
         utils/primitive_utils/binary_arithmatic_ops.cpp
         utils/primitive_utils/binary_comparison_ops.cpp

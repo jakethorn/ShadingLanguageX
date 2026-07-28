@@ -1,0 +1,1 @@
+bad_directive001.mxsl, line 1: Empty #if condition

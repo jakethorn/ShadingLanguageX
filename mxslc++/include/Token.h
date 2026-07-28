@@ -68,6 +68,11 @@ namespace mxslc
         friend bool operator!=(const string& s, const Token& token) { return token != s; }
         friend bool operator!=(const char* const s, const Token& token) { return token != s; }
 
+        operator string() const
+        {
+            return lexeme_;
+        }
+
     private:
         TokenType type_;
         string lexeme_;

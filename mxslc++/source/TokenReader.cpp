@@ -75,6 +75,11 @@ namespace mxslc
     void TokenReader::check_bounds(const size_t n) const
     {
         if (index_ + n >= tokens_.size())
-            throw CompileError{tokens_.back(), "Unexpected end of tokens"s};
+        {
+            if (tokens_.empty())
+                throw CompileError{"Unexpected end of tokens"};
+            else
+                throw CompileError{tokens_.back(), "Unexpected end of tokens"};
+        }
     }
 }

@@ -64,10 +64,10 @@ namespace mxslc
 
         mx::DocumentPtr compile_to_document(vector<Token> tokens, CompileOptions opts, const optional<fs::path>& src_path)
         {
-            opts.add_default_search_directories(src_path);
+            opts.add_default_search_directories();
             preprocess::preprocess(tokens, opts, src_path);
 
-            Runtime& runtime = Runtime::create(std::move(opts));
+            Runtime& runtime = Runtime::create(opts);
             {
                 runtime.enter_scope();
                 compile_mxsl_stdlib();

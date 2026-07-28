@@ -11,13 +11,13 @@ int main(const int argc, char* argv[])
         if (args.action == mxslc::Action::Compile)
         {
             const std::filesystem::path output_file = mxslc::compile_to_file(args.input_file, args.options);
-            std::cout << "Material successfully compiled to " << output_file.string() << std::endl;
+            std::cout << "\nMaterial successfully compiled to " << output_file.string();
         }
 
         if (args.action == mxslc::Action::Decompile)
         {
             const std::filesystem::path output_file = mxslc::decompile_to_file(args.input_file, args.options.output_file);
-            std::cout << "Material successfully decompiled to " << output_file.string() << std::endl;
+            std::cout << "\nMaterial successfully decompiled to " << output_file.string();
         }
     }
 

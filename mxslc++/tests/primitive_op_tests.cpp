@@ -175,23 +175,23 @@ TEST(primitive_tests, logical_operators)
     Primitive t{true};
     Primitive f{false};
 
-    EXPECT_TRUE((t and t).as<bool>());
-    EXPECT_FALSE((t and f).as<bool>());
-    EXPECT_FALSE((f and t).as<bool>());
-    EXPECT_FALSE((f and f).as<bool>());
+    EXPECT_TRUE((t & t).as<bool>());
+    EXPECT_FALSE((t & f).as<bool>());
+    EXPECT_FALSE((f & t).as<bool>());
+    EXPECT_FALSE((f & f).as<bool>());
 
-    EXPECT_TRUE((t or t).as<bool>());
-    EXPECT_TRUE((t or f).as<bool>());
-    EXPECT_TRUE((f or t).as<bool>());
-    EXPECT_FALSE((f or f).as<bool>());
+    EXPECT_TRUE((t | t).as<bool>());
+    EXPECT_TRUE((t | f).as<bool>());
+    EXPECT_TRUE((f | t).as<bool>());
+    EXPECT_FALSE((f | f).as<bool>());
     
-    EXPECT_TRUE((t xor f).as<bool>());
-    EXPECT_TRUE((f xor t).as<bool>());
-    EXPECT_FALSE((t xor t).as<bool>());
-    EXPECT_FALSE((f xor f).as<bool>());
+    EXPECT_TRUE((t ^ f).as<bool>());
+    EXPECT_TRUE((f ^ t).as<bool>());
+    EXPECT_FALSE((t ^ t).as<bool>());
+    EXPECT_FALSE((f ^ f).as<bool>());
 
-    EXPECT_TRUE((t and Primitive{1}).as<bool>());
-    EXPECT_FALSE((t and Primitive{0}).as<bool>());
+    EXPECT_TRUE((t & Primitive{1}).as<bool>());
+    EXPECT_FALSE((t & Primitive{0}).as<bool>());
 }
 
 // --- Subscript Operator ---

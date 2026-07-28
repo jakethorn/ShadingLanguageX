@@ -1,0 +1,11 @@
+#include "include2.mxsl"
+
+float foo()
+{
+    return bar() + 8.0;
+}
+
+inline float ifoo()
+{
+    return bar() + 8.0;
+}

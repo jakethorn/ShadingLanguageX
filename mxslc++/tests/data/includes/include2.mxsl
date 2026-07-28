@@ -1,0 +1,9 @@
+float bar()
+{
+    return 80.0;
+}
+
+inline float ibar()
+{
+    return 80.0;
+}

@@ -13,7 +13,7 @@ namespace mxslc::preprocess
     class Macro
     {
     public:
-        Macro(string name);
+        explicit Macro(string name);
         Macro(string name, const string& body);
         Macro(string name, vector<Token> body);
 

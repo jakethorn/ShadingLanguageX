@@ -2,7 +2,7 @@
 // Created by jaket on 03/01/2026.
 //
 
-#include "../../include/utils/mtlx_utils.h"
+#include "utils/mtlx_utils.h"
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"

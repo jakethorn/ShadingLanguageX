@@ -29,6 +29,16 @@ namespace mxslc::preprocess
 
         vector<Token> tokens() { return std::move(tokens_); }
 
+        inline static const vector<string> DIRECTIVES {
+            "include", "library", "version",
+            "define", "undef",
+            "if", "ifdef", "ifndef",
+            "elif", "elifdef", "elifndef", "else", "endif"
+        };
+
+        inline static const string MAIN{"__MAIN__"};
+        inline static const string INCLUDE{"__INCLUDE__"};
+
     private:
         void process_next_token();
         void process_include();
@@ -49,9 +59,9 @@ namespace mxslc::preprocess
 
         void include_file(const fs::path& path);
 
-        void define_macro(const Token& name, vector<Token> body = {}) const;
-        void undef_macro(const Token& name) const;
-        bool macro_is_defined(const Token& name) const;
+        void define_macro(const string& name, vector<Token> body = {}) const;
+        void undef_macro(const string& name) const;
+        bool macro_is_defined(const string& name) const;
         vector<Token> expand_macro(const Token& name) const;
         vector<Token> expand_macros(const vector<Token>& tokens) const;
 
@@ -59,6 +69,7 @@ namespace mxslc::preprocess
         Token match_macro();
         vector<Token> consume_and_expand_until(TokenType token_type);
 
+        void set_current_working_directory() const;
         void define_inclusion_type_macro() const;
 
         void add_token(Token&& tokens);
@@ -77,9 +88,6 @@ namespace mxslc::preprocess
         bool is_include_;
 
         vector<fs::path> included_files_;
-
-        inline static const string MAIN{"__MAIN__"};
-        inline static const string INCLUDE{"__INCLUDE__"};
     };
 }
 

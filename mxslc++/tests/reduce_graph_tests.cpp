@@ -20,7 +20,9 @@ using reduce_graph_tests = testing::TestWithParam<fs::path>;
 
 void run_test(const fs::path& input_path, const fs::path& expected_path, const bool reduce_graph, const string& fail_message)
 {
-    const mxslc::CompileOptions opts{.reduce_graph = reduce_graph};
+    mxslc::CompileOptions opts;
+    opts.reduce_graph = reduce_graph;
+
     const string actual_output = mxslc::compile_to_string(input_path, opts);
 
     if constexpr (overwrite_data_files())

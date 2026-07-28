@@ -7,6 +7,7 @@
 #include <cassert>
 #include <MaterialXFormat/XmlIo.h>
 
+#include "scan.h"
 #include "serialize/serialize_constexpr.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
@@ -103,6 +104,17 @@ namespace mxslc::serialize
                 node_graph->addOutput("out", TypeName::Int)->setValueString("0");
             }
         }
+    }
+
+    void Serializer::set_version(const string& version)
+    {
+        std::istringstream stream{version};
+        int major = 0, minor = 0;
+        char dot = 0;
+        if (stream >> major >> dot >> minor && dot == '.')
+            doc_->setVersionIntegers(major, minor);
+        else
+            throw CompileError{"Invalid version string: " + version};
     }
 
     VarPtr Serializer::write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const

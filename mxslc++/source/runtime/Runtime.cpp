@@ -11,6 +11,7 @@
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
+#include "utils/Logger.h"
 
 namespace mxslc::runtime
 {
@@ -18,21 +19,19 @@ namespace mxslc::runtime
 
     unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-    Runtime::Runtime(CompileOptions opts) : Runtime{std::move(opts), create_scope(), Serializer{}}
+    Runtime::Runtime(CompileOptions opts) : opts_{std::move(opts)}
     {
-
-    }
-
-    Runtime::Runtime(CompileOptions opts, ScopePtr scope, Serializer serializer) : opts_{std::move(opts)}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
-    {
+        scope_ = create_scope();
         scope_->set_graph(serializer_.document(), nullptr);
+        serializer_.set_version(opts_.version);
+        serializer_.set_reduce_graph(opts_.reduce_graph);
     }
 
     Runtime& Runtime::create(CompileOptions opts)
     {
         instance_ = std::make_unique<Runtime>(std::move(opts));
-        instance_->serializer_.set_reduce_graph(opts.reduce_graph);
-        instance_->load_materialx_library(opts.version);
+        instance_->load_libraries();
+        instance_->load_materialx_library();
         return *instance_;
     }
 
@@ -58,10 +57,21 @@ namespace mxslc::runtime
         return nullptr;
     }
 
-    void Runtime::load_materialx_library(const string& version)
+    void Runtime::load_libraries()
     {
-        mtlx_lib_ = get_materialx_library(version, include_directories());
+        for (const fs::path& path : opts_.libraries)
+        {
+            io_utils::search(opts_.search_directories(), path, [](const fs::path& found_path) {
+                load_library(found_path);
+            });
+        }
+    }
+
+    void Runtime::load_materialx_library()
+    {
+        mtlx_lib_ = get_materialx_library(opts_.version, opts_.search_directories());
         load_library(mtlx_lib_);
+        Logger::debug("Loaded MaterialX version " + opts_.version + " libraries.");
     }
 
     Scope& Runtime::scope()

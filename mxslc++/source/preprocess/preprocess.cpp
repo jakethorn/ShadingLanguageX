@@ -8,6 +8,7 @@
 #include "utils/container_utils.h"
 #include "utils/token_utils.h"
 #include "utils/io_utils.h"
+#include "utils/Logger.h"
 
 namespace mxslc::preprocess
 {
@@ -45,7 +46,7 @@ namespace mxslc::preprocess
     }
 
     Preprocessor::Preprocessor(vector<Token> tokens, CompileOptions& opts, const optional<fs::path>& src_path, const bool is_include)
-        : TokenReader{std::move(tokens)}, parent_{nullptr}, opts_{opts}, path_{src_path}, is_include_{is_include}
+        : Preprocessor{nullptr, std::move(tokens), opts, src_path, is_include}
     {
 
     }
@@ -58,6 +59,7 @@ namespace mxslc::preprocess
 
     void Preprocessor::preprocess()
     {
+        set_current_working_directory();
         define_inclusion_type_macro();
 
         if (is_main())
@@ -83,12 +85,12 @@ namespace mxslc::preprocess
             else if (token == "if")       process_if();
             else if (token == "ifdef")    process_ifdef();
             else if (token == "ifndef")   process_ifndef();
-            else if (token == "elif")     throw CompileError{token, "#elif without starting #(if/ifdef/ifndef)"};
-            else if (token == "elifdef")  throw CompileError{token, "#elifdef without starting #(if/ifdef/ifndef)"};
-            else if (token == "elifndef") throw CompileError{token, "#elifndef without starting #(if/ifdef/ifndef)"};
-            else if (token == "else")     throw CompileError{token, "#else without starting #(if/ifdef/ifndef)"};
-            else if (token == "endif")     throw CompileError{token, "#endif without starting #(if/ifdef/ifndef)"};
-            else throw CompileError{token, "Unknown preprocessor directive: " + token.lexeme()};
+            else if (token == "elif")     throw CompileError{token, "#elif without #(if/ifdef/ifndef)"};
+            else if (token == "elifdef")  throw CompileError{token, "#elifdef without #(if/ifdef/ifndef)"};
+            else if (token == "elifndef") throw CompileError{token, "#elifndef without #(if/ifdef/ifndef)"};
+            else if (token == "else")     throw CompileError{token, "#else without #(if/ifdef/ifndef)"};
+            else if (token == "endif")    throw CompileError{token, "#endif without #(if/ifdef/ifndef)"};
+            else throw CompileError{token, "Unknown preprocessor directive: #" + token.lexeme()};
         }
         else
         {
@@ -131,6 +133,8 @@ namespace mxslc::preprocess
     void Preprocessor::process_if(const bool ignore)
     {
         vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
+        if (tokens.empty())
+            throw CompileError{peek(), "Empty #if condition"};
         const bool condition = parse_primitive(std::move(tokens)).cast<bool>();
         process_remaining_if_blocks(condition, ignore);
     }
@@ -145,36 +149,27 @@ namespace mxslc::preprocess
         process_remaining_if_blocks(not macro_is_defined(match_macro()), ignore);
     }
 
-    void Preprocessor::process_remaining_if_blocks(const bool condition, const bool ignore)
+    void Preprocessor::process_remaining_if_blocks(const bool condition, bool ignore)
     {
         if (condition and not ignore)
         {
             process_if_block();
-
-            const Token directive = match_directive();
-            if (directive == "elif")
-                process_if(true);
-            else if (directive == "elifdef")
-                process_ifdef(true);
-            else if (directive == "elifndef")
-                process_ifndef(true);
-            else if (directive == "else")
-                process_else_block(true);
+            ignore = true;
         }
         else
         {
             consume_if_block();
-
-            const Token directive = match_directive();
-            if (directive == "elif")
-                process_if(ignore);
-            else if (directive == "elifdef")
-                process_ifdef(ignore);
-            else if (directive == "elifndef")
-                process_ifndef(ignore);
-            else if (directive == "else")
-                process_else_block(ignore);
         }
+
+        const Token directive = match_directive();
+        if (directive == "elif")
+            process_if(ignore);
+        else if (directive == "elifdef")
+            process_ifdef(ignore);
+        else if (directive == "elifndef")
+            process_ifndef(ignore);
+        else if (directive == "else")
+            process_else_block(ignore);
     }
 
     void Preprocessor::process_else_block(const bool ignore)
@@ -224,6 +219,8 @@ namespace mxslc::preprocess
 
     bool Preprocessor::end_of_if_block() const
     {
+        if (size() < 2)
+            throw CompileError{"Unterminated #if directive"};
         return peek() == TokenType::Hash and contains(vector{"elif", "elifdef", "elifndef", "else", "endif"}, peek(1));
     }
 
@@ -247,41 +244,40 @@ namespace mxslc::preprocess
         io_utils::search(opts_.search_directories(), path, [this](const fs::path& found_path) {
             check_for_circular_dependency(found_path);
             if (already_included(found_path))
+            {
+                Logger::debug("Skipping already included file: " + found_path.string());
                 return;
+            }
             vector<Token> tokens = scan_file(found_path);
             Preprocessor preprocessor{this, std::move(tokens), opts_, found_path, true};
             preprocessor.preprocess();
             add_tokens(preprocessor.tokens());
             included_files_.push_back(found_path);
             extend(included_files_, std::move(preprocessor.included_files_));
+            set_current_working_directory();
             define_inclusion_type_macro();
         });
     }
 
-    void Preprocessor::define_macro(const Token& name, vector<Token> body) const
+    void Preprocessor::define_macro(const string& name, vector<Token> body) const
     {
-        if (macro_is_defined(name))
-            undef_macro(name);
-        opts_.macros.emplace(name.lexeme(), std::move(body));
+        opts_.add_macro({name, std::move(body)});
     }
 
-    void Preprocessor::undef_macro(const Token& name) const
+    void Preprocessor::undef_macro(const string& name) const
     {
-        opts_.macros.erase(name.lexeme());
+        opts_.remove_macro(name);
     }
 
-    bool Preprocessor::macro_is_defined(const Token& name) const
+    bool Preprocessor::macro_is_defined(const string& name) const
     {
-        return contains(opts_.macros, name.lexeme());
+        return opts_.has_macro(name);
     }
 
     vector<Token> Preprocessor::expand_macro(const Token& name) const
     {
-        const auto it = opts_.macros.find(name.lexeme());
-        if (it != opts_.macros.end())
-        {
-            return expand_macros(it->body());
-        }
+        if (opts_.has_macro(name))
+            return expand_macros(opts_.get_macro(name).body());
 
         throw CompileError{name, "Macro not defined: " + name.lexeme()};
     }
@@ -301,9 +297,33 @@ namespace mxslc::preprocess
         return result;
     }
 
+    Token Preprocessor::match_directive()
+    {
+        match(TokenType::Hash);
+        Token directive = consume();
+        if (contains(DIRECTIVES, directive))
+            return directive;
+
+        throw CompileError{directive, "Invalid directive: #" + directive.lexeme()};
+    }
+
+    Token Preprocessor::match_macro()
+    {
+        Token token = consume();
+        if (token == TokenType::Identifier and not contains(DIRECTIVES, token))
+            return token;
+        throw CompileError{token, "Invalid macro name: " + token.lexeme()};
+    }
+
     vector<Token> Preprocessor::consume_and_expand_until(const TokenType token_type)
     {
         return expand_macros(consume_until(token_type));
+    }
+
+    void Preprocessor::set_current_working_directory() const
+    {
+        if (path_)
+            opts_.set_current_working_directory(path_->parent_path());
     }
 
     void Preprocessor::define_inclusion_type_macro() const
@@ -340,10 +360,19 @@ namespace mxslc::preprocess
 
     void Preprocessor::check_for_circular_dependency(const fs::path& path) const
     {
-        if (path_ == path)
-            throw CompileError{"Circular dependency detected in " + path_->filename().string() + " when including " + path.filename().string()};
+        CompileError e{"Circular dependency detected in " + path_->filename().string() + " when including " + path.filename().string()};
 
-        if (parent_)
-            parent_->check_for_circular_dependency(path);
+        if (path_ == path)
+            throw e;
+
+        try
+        {
+            if (parent_)
+                parent_->check_for_circular_dependency(path);
+        }
+        catch (const CompileError&)
+        {
+            throw e;
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace mxslc
     private:
         static void print(Level level, const string& message);
 
-        static unordered_set<Level> disabled_levels_;
+        inline static unordered_set<Level> disabled_levels_;
     };
 }
 

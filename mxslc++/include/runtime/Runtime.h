@@ -22,15 +22,13 @@ namespace mxslc::runtime
     {
     public:
         explicit Runtime(CompileOptions opts);
-        Runtime(CompileOptions opts, ScopePtr scope, Serializer serializer);
 
         static Runtime& create(CompileOptions opts);
         static Runtime& get();
 
         VarPtr global(const string& name) const;
-        const vector<fs::path>& include_directories() const { return opts_.search_directories; }
+        vector<fs::path> include_directories() const { return opts_.search_directories(); }
 
-        void load_materialx_library(const string& version);
         mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
         Scope& scope();
@@ -42,6 +40,9 @@ namespace mxslc::runtime
         void destroy() const;
 
     private:
+        void load_libraries();
+        void load_materialx_library();
+
         CompileOptions opts_;
         mx::DocumentPtr mtlx_lib_;
         ScopePtr scope_;
