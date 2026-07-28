@@ -288,6 +288,8 @@ string mxslc::Decompiler::value_to_constructor(const mx::ValuePtr& value)
     const string type_name = get_type_alias(value->getTypeString());
     if (contains(vector{"vec2", "vec3", "vec4", "color3", "color4"}, type_name))
         return type_name + "{" + value->getValueString() + "}";
+    if (type_name == "string" || type_name == "filename")
+        return "\"" + value->getValueString() + "\"";
     return value->getValueString();
 }
 
