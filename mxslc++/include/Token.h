@@ -18,8 +18,8 @@ namespace mxslc
     {
     public:
         Token() = default;
-        explicit Token(string lexeme);
-        explicit Token(const TokenType type) : Token{type, type.to_string()} { }
+        Token(string lexeme);
+        Token(const TokenType type) : Token{type, type.to_string()} { }
         Token(const TokenType type, string lexeme) : type_{type}, lexeme_(std::move(lexeme)) { }
 
         TokenType type() const { return type_; }
@@ -46,13 +46,27 @@ namespace mxslc
         bool operator==(const TokenType t) const { return type_ == t; }
         bool operator==(const TokenType::Enum t) const { return type_ == t; }
         bool operator==(const string& s) const { return lexeme_ == s; }
+        bool operator==(const char* const s) const { return lexeme_ == s; }
         bool operator==(const Token& t) const { return lexeme_ == t.lexeme_; }
 
         bool operator!=(const char c) const { return not (*this == c); }
         bool operator!=(const TokenType t) const { return not (*this == t); }
         bool operator!=(const TokenType::Enum t) const { return not (*this == t); }
         bool operator!=(const string& s) const { return not (*this == s); }
+        bool operator!=(const char* const s) const { return not (*this == s); }
         bool operator!=(const Token& t) const { return not (*this == t); }
+
+        friend bool operator==(const char c, const Token& token) { return token == c; }
+        friend bool operator==(const TokenType t, const Token& token) { return token == t; }
+        friend bool operator==(const TokenType::Enum t, const Token& token) { return token == t; }
+        friend bool operator==(const string& s, const Token& token) { return token == s; }
+        friend bool operator==(const char* const s, const Token& token) { return token == s; }
+
+        friend bool operator!=(const char c, const Token& token) { return token != c; }
+        friend bool operator!=(const TokenType t, const Token& token) { return token != t; }
+        friend bool operator!=(const TokenType::Enum t, const Token& token) { return token != t; }
+        friend bool operator!=(const string& s, const Token& token) { return token != s; }
+        friend bool operator!=(const char* const s, const Token& token) { return token != s; }
 
     private:
         TokenType type_;

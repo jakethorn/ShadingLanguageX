@@ -14,8 +14,8 @@ namespace mxslc::preprocess
     {
     public:
         Macro(string name);
-        Macro(string name, vector<Token> body);
         Macro(string name, const string& body);
+        Macro(string name, vector<Token> body);
 
         const string& name() const { return name_; }
         const vector<Token>& body() const { return body_; }
@@ -24,7 +24,13 @@ namespace mxslc::preprocess
         bool operator==(const string& other) const noexcept { return name_ == other; }
         bool operator==(const Token& other) const noexcept { return name_ == other.lexeme(); }
 
+        bool operator!=(const Macro& other) const noexcept { return name_ != other.name_; }
+        bool operator!=(const string& other) const noexcept { return name_ != other; }
+        bool operator!=(const Token& other) const noexcept { return name_ != other.lexeme(); }
+
     private:
+        void validate() const;
+
         string name_;
         vector<Token> body_;
     };

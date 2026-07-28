@@ -6,6 +6,7 @@ add_library(mxslc_lib
         compile.cpp
         TokenType.cpp
         Primitive.cpp
+        CompileOptions.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
@@ -76,6 +77,7 @@ add_library(mxslc_lib
         utils/parse_utils.cpp
         utils/load_mtlx.cpp
         utils/mtlx_utils.cpp
+        utils/Logger.cpp
         utils/primitive_utils/binary_arithmatic_ops.cpp
         utils/primitive_utils/binary_comparison_ops.cpp
         utils/primitive_utils/binary_logical_ops.cpp
@@ -88,6 +90,7 @@ add_library(mxslc_lib
         utils/primitive_utils/invertmatrix.cpp
         utils/primitive_utils/separate.cpp
         utils/primitive_utils/switch.cpp
+        utils/primitive_utils/path_functions.cpp
         serialize/Serializer.cpp
         serialize/serialize_constexpr.cpp
         serialize/serialize_constexpr_wrapper.cpp
@@ -102,6 +105,7 @@ add_library(mxslc_lib
         serialize/values/interface.cpp
         preprocess/preprocess.cpp
         preprocess/Macro.cpp
+        preprocess/parse_primitive.cpp
 )
 
 set_target_properties(mxslc_lib PROPERTIES

@@ -60,6 +60,8 @@ namespace mxslc
             Increment,
             Decrement,
             DoubleAt,
+            DoubleAmpersand,
+            DoublePipe,
 
             // Keyword
             If,
@@ -109,7 +111,7 @@ namespace mxslc
 
         inline static const unordered_set CompoundSymbols {
             BangEq, EqualsEq, GreaterEq, LessEq, PlusEq, MinusEq, StarEq, SlashEq, PercentEq, CaretEq, AmpersandEq, PipeEq,
-            Arrow, FatArrow, DoubleColon, Increment, Decrement, DoubleAt
+            Arrow, FatArrow, DoubleColon, Increment, Decrement, DoubleAt, DoubleAmpersand, DoublePipe
         };
 
         inline static const unordered_set Keywords {
@@ -137,6 +139,8 @@ namespace mxslc
             {"++", Increment},
             {"--", Decrement},
             {"@@", DoubleAt},
+            {"&&", DoubleAmpersand},
+            {"||", DoublePipe},
             {"if", If},
             {"else", Else},
             {"for", For},
@@ -186,13 +190,25 @@ namespace mxslc
 
         bool operator==(const char c) const { return enum_ == to_enum(c); }
         bool operator==(const string& s) const { return enum_ == to_enum(s); }
+        bool operator==(const char* const s) const { return enum_ == to_enum(s); }
         bool operator==(const TokenType& t) const { return enum_ == t.enum_; }
         bool operator==(const Enum e) const { return enum_ == e; }
 
         bool operator!=(const char c) const { return enum_ != to_enum(c); }
         bool operator!=(const string& s) const { return enum_ != to_enum(s); }
+        bool operator!=(const char* const s) const { return enum_ != to_enum(s); }
         bool operator!=(const TokenType& t) const { return enum_ != t.enum_; }
         bool operator!=(const Enum e) const { return enum_ != e; }
+
+        friend bool operator==(const char c, const TokenType& t) { return t == c; }
+        friend bool operator==(const string& s, const TokenType& t) { return t == s; }
+        friend bool operator==(const char* const s, const TokenType& t) { return t == s; }
+        friend bool operator==(const Enum e, const TokenType& t) { return t == e; }
+
+        friend bool operator!=(const char c, const TokenType& t) { return t != c; }
+        friend bool operator!=(const string& s, const TokenType& t) { return t != s; }
+        friend bool operator!=(const char* const s, const TokenType& t) { return t != s; }
+        friend bool operator!=(const Enum e, const TokenType& t) { return t != e; }
 
         size_t index() const { return enum_; }
 

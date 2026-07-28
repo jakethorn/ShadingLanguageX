@@ -36,6 +36,18 @@ namespace mxslc::container_utils
     {
         return ts.find(t) != ts.end();
     }
+
+    template<typename T>
+    void extend(vector<T>& dst, const vector<T>& src)
+    {
+        dst.insert(dst.end(), src.begin(), src.end());
+    }
+
+    template<typename T>
+    void extend(vector<T>& dst, vector<T>&& src)
+    {
+        dst.insert(dst.end(), std::make_move_iterator(src.begin()), std::make_move_iterator(src.end()));
+    }
 }
 
 #endif //FENNEC_CONTAINER_UTILS_H

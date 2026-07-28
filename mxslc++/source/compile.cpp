@@ -15,6 +15,7 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
+#include "preprocess/preprocess.h"
 #include "runtime/utils/invoke.h"
 
 namespace mxslc
@@ -61,9 +62,12 @@ namespace mxslc
             throw CompileError{"ShadingLanguageX standard library could not be found.\nSearched directories:\n" + searched_dirs};
         }
 
-        mx::DocumentPtr compile_to_document(vector<Token> tokens, const optional<fs::path>& src_path, const CompileOptions& opts)
+        mx::DocumentPtr compile_to_document(vector<Token> tokens, CompileOptions opts, const optional<fs::path>& src_path)
         {
-            Runtime& runtime = Runtime::create(src_path, opts);
+            opts.add_default_search_directories(src_path);
+            preprocess::preprocess(tokens, opts, src_path);
+
+            Runtime& runtime = Runtime::create(std::move(opts));
             {
                 runtime.enter_scope();
                 compile_mxsl_stdlib();
@@ -97,7 +101,7 @@ namespace mxslc
 
     mx::DocumentPtr compile_to_document(const fs::path& src_path, const CompileOptions& opts)
     {
-        return compile_to_document(scan_file(src_path), src_path, opts);
+        return compile_to_document(scan_file(src_path), opts, src_path);
     }
 
     std::string compile_to_string(const fs::path& src_path)
@@ -139,7 +143,7 @@ namespace mxslc
 
     mx::DocumentPtr compile_to_document(const string& source, const CompileOptions& opts)
     {
-        return compile_to_document(scan_string(source), std::nullopt, opts);
+        return compile_to_document(scan_string(source), opts, std::nullopt);
     }
 
     std::string compile_to_string(const string& source)

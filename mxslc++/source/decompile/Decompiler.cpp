@@ -374,7 +374,7 @@ namespace mxslc::decompile
     {
         if (node->isMultiOutputType())
         {
-            static const vector<fs::path> include_dirs = io_utils::get_include_directories();
+            static const vector<fs::path> include_dirs = io_utils::get_default_search_directories();
             static const mx::DocumentPtr mtlx_lib = get_materialx_library(DEFAULT_MTLX_VERSION, include_dirs);
             const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node, mtlx_lib);
             return outputs_to_data_type(node_def->getActiveOutputs());

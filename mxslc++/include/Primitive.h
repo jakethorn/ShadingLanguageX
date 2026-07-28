@@ -116,25 +116,21 @@ namespace mxslc
             );
         }
 
-        Primitive convert(const TypePtr& type) const;
-        std::array<Primitive, 2> separate2() const;
-        std::array<Primitive, 3> separate3() const;
-        std::array<Primitive, 4> separate4() const;
-        vector<Primitive> separate() const;
-
         Primitive operator+(const Primitive& other) const;
         Primitive operator-(const Primitive& other) const;
         Primitive operator*(const Primitive& other) const;
         Primitive operator/(const Primitive& other) const;
+        Primitive operator%(const Primitive& other) const;
 
         Primitive& operator+=(const Primitive& other);
         Primitive& operator-=(const Primitive& other);
         Primitive& operator*=(const Primitive& other);
         Primitive& operator/=(const Primitive& other);
+        Primitive& operator%=(const Primitive& other);
 
-        Primitive operator and(const Primitive& other) const;
-        Primitive operator or(const Primitive& other) const;
-        Primitive operator xor(const Primitive& other) const;
+        Primitive operator&(const Primitive& other) const;
+        Primitive operator|(const Primitive& other) const;
+        Primitive operator^(const Primitive& other) const;
 
         Primitive operator==(const Primitive& other) const;
         Primitive operator!=(const Primitive& other) const;

@@ -49,7 +49,7 @@ namespace mxslc::io_utils
         file << text;
     }
 
-    fs::path get_executable_dir()
+    fs::path get_executable_directory()
     {
 #ifdef _WIN32
         wchar_t path[MAX_PATH];
@@ -65,7 +65,7 @@ namespace mxslc::io_utils
 #endif
     }
 
-    fs::path get_python_module_dir()
+    fs::path get_python_module_directory()
     {
 #ifdef _WIN32
         HMODULE module = nullptr;
@@ -73,7 +73,7 @@ namespace mxslc::io_utils
         const BOOL ok = GetModuleHandleExW(
             GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
             GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-            reinterpret_cast<LPCWSTR>(&get_python_module_dir),
+            reinterpret_cast<LPCWSTR>(&get_python_module_directory),
             &module
         );
 
@@ -90,21 +90,46 @@ namespace mxslc::io_utils
 #else
         Dl_info info;
 
-        if (dladdr(reinterpret_cast<void*>(&get_python_module_dir), &info) == 0 || info.dli_fname == nullptr)
+        if (dladdr(reinterpret_cast<void*>(&get_python_module_directory), &info) == 0 || info.dli_fname == nullptr)
             throw CompileError{"Cannot determine python module path"};
 
         return fs::path{info.dli_fname}.parent_path();
 #endif
     }
 
-    vector<fs::path> get_include_directories(const optional<fs::path>& src_path)
+    vector<fs::path> get_default_search_directories(const optional<fs::path>& src_path)
     {
         vector<fs::path> dirs;
         if (src_path)
             dirs.push_back(src_path->parent_path());
         dirs.push_back(fs::current_path());
-        dirs.push_back(get_python_module_dir());
-        dirs.push_back(get_executable_dir());
+        dirs.push_back(get_python_module_directory());
+        dirs.push_back(get_executable_directory());
         return dirs;
+    }
+
+    void search(const vector<fs::path>& search_dirs, const fs::path& path, const std::function<void(const fs::path&)>& on_found)
+    {
+        if (fs::is_regular_file(path))
+        {
+            on_found(path);
+            return;
+        }
+
+        string searched_paths = path.string() + "\n";
+
+        for (const fs::path& dir : search_dirs)
+        {
+            fs::path full_path = dir / path;
+            if (fs::is_regular_file(full_path))
+            {
+                on_found(full_path);
+                return;
+            }
+
+            searched_paths += full_path.string() + "\n";
+        }
+
+        throw CompileError{"File " + path.string() + " could not be found.\nSearched paths:\n" + searched_paths};
     }
 }

@@ -13,15 +13,13 @@ namespace mxslc
 {
     Token::Token(string lexeme) : lexeme_{std::move(lexeme)}
     {
-        const TokenType token_type{lexeme};
-        if (token_type != TokenType::Unknown)
-            type_ = token_type;
-
-        const vector<Token> tokens = scan_string(lexeme);
-        if (tokens.size() == 1)
-            type_ = tokens[0].type();
-
-        throw CompileError{"Invalid token lexeme: " + lexeme};
+        type_ = TokenType{lexeme_};
+        if (type_ == TokenType::Unknown)
+        {
+            const vector<Token> tokens = scan_string(lexeme_);
+            if (tokens.size() == 1)
+                type_ = tokens[0].type();
+        }
     }
 
     Token Token::monomorphize(const TypePtr& template_type) const

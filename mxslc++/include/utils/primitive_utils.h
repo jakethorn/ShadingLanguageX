@@ -14,6 +14,8 @@ namespace mxslc::primitive_utils
     Primitive subtract(const Primitive& in1, const Primitive& in2);
     Primitive multiply(const Primitive& in1, const Primitive& in2);
     Primitive divide(const Primitive& in1, const Primitive& in2);
+    Primitive modulo(const Primitive& in1, const Primitive& in2);
+    Primitive power(const Primitive& in1, const Primitive& in2);
 
     // binary logical operators
     Primitive logical_and(const Primitive& in1, const Primitive& in2);
@@ -50,6 +52,11 @@ namespace mxslc::primitive_utils
     Primitive invertmatrix(const Primitive& in);
 
     Primitive switch_(const vector<Primitive>& ins, const Primitive& which, const TypePtr& type = nullptr);
+
+    // fs::path functions
+    Primitive exists(const Primitive& path);
+    Primitive is_dir(const Primitive& path);
+    Primitive is_file(const Primitive& path);
 }
 
 #endif //MXSLC_PRIMITIVE_UTILS_H

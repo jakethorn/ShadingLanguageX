@@ -18,20 +18,19 @@ namespace mxslc::runtime
 
     unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-    Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, create_scope(), Serializer{}}
+    Runtime::Runtime(CompileOptions opts) : Runtime{std::move(opts), create_scope(), Serializer{}}
     {
 
     }
 
-    Runtime::Runtime(const CompileOptions& opts, ScopePtr scope, Serializer serializer) : opts_{opts}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
+    Runtime::Runtime(CompileOptions opts, ScopePtr scope, Serializer serializer) : opts_{std::move(opts)}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
     {
         scope_->set_graph(serializer_.document(), nullptr);
     }
 
-    Runtime& Runtime::create(const optional<fs::path>& src_path, const CompileOptions& opts)
+    Runtime& Runtime::create(CompileOptions opts)
     {
-        instance_ = std::make_unique<Runtime>(opts);
-        instance_->include_dirs_ = io_utils::get_include_directories(src_path);
+        instance_ = std::make_unique<Runtime>(std::move(opts));
         instance_->serializer_.set_reduce_graph(opts.reduce_graph);
         instance_->load_materialx_library(opts.version);
         return *instance_;

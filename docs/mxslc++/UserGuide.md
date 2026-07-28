@@ -540,8 +540,8 @@ options:
 
 It's also possible to use a response file instead of manually passing options.
 
+_example.rsp_:
 ```
-# example.rsp
 example.mxsl -o output_file.mtlx -v 1.38.10 --no-reduce-graph
 --func main
 --args 1 0 0 "world"

@@ -19,7 +19,6 @@ namespace mxslc
         string version{DEFAULT_MTLX_VERSION};
         bool reduce_graph{true};
 
-        vector<fs::path> search_directories;
         vector<fs::path> includes;
         vector<fs::path> libraries;
 
@@ -32,8 +31,18 @@ namespace mxslc
         optional<string> func_name;
         vector<Primitive> func_args;
 
+    public:
+        CompileOptions() = default;
+
+        void add_search_directory(fs::path dir);
+        void add_default_search_directories(const optional<fs::path>& src_path = std::nullopt);
+        const vector<fs::path>& search_directories() const { return search_directories_; }
+
         bool has_output_file() const { return output_file.has_value(); }
         bool has_function() const { return func_name.has_value(); }
+
+    private:
+        vector<fs::path> search_directories_;
     };
 }
 

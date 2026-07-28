@@ -57,31 +57,6 @@ namespace mxslc
         return std::holds_alternative<std::monostate>(value_);
     }
 
-    Primitive Primitive::convert(const TypePtr& type) const
-    {
-        return primitive_utils::convert(*this, type);
-    }
-
-    std::array<Primitive, 2> Primitive::separate2() const
-    {
-        return primitive_utils::separate2(*this);
-    }
-
-    std::array<Primitive, 3> Primitive::separate3() const
-    {
-        return primitive_utils::separate3(*this);
-    }
-
-    std::array<Primitive, 4> Primitive::separate4() const
-    {
-        return primitive_utils::separate4(*this);
-    }
-
-    vector<Primitive> Primitive::separate() const
-    {
-        return primitive_utils::separate(*this);
-    }
-
     Primitive Primitive::operator+(const Primitive& other) const
     {
         return primitive_utils::add(*this, other);
@@ -100,6 +75,11 @@ namespace mxslc
     Primitive Primitive::operator/(const Primitive& other) const
     {
         return primitive_utils::divide(*this, other);
+    }
+
+    Primitive Primitive::operator%(const Primitive& other) const
+    {
+        return primitive_utils::modulo(*this, other);
     }
 
     Primitive& Primitive::operator+=(const Primitive& other)
@@ -126,19 +106,28 @@ namespace mxslc
         return *this;
     }
 
-    Primitive Primitive::operator and(const Primitive& other) const
+    Primitive& Primitive::operator%=(const Primitive& other)
+    {
+        *this = *this % other;
+        return *this;
+    }
+
+    Primitive Primitive::operator&(const Primitive& other) const
     {
         return primitive_utils::logical_and(*this, other);
     }
 
-    Primitive Primitive::operator or(const Primitive& other) const
+    Primitive Primitive::operator|(const Primitive& other) const
     {
         return primitive_utils::logical_or(*this, other);
     }
 
-    Primitive Primitive::operator xor(const Primitive& other) const
+    Primitive Primitive::operator^(const Primitive& other) const
     {
-        return primitive_utils::logical_xor(*this, other);
+        if (is_a<bool>() and other.is_a<bool>())
+            return primitive_utils::logical_xor(*this, other);
+        else
+            return primitive_utils::power(*this, other);
     }
 
     Primitive Primitive::operator==(const Primitive& other) const

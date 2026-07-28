@@ -8,6 +8,7 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
+#include "CompileOptions.h"
 #include "serialize/Serializer.h"
 
 namespace mxslc
@@ -20,14 +21,14 @@ namespace mxslc::runtime
     class Runtime
     {
     public:
-        explicit Runtime(const CompileOptions& opts);
-        Runtime(const CompileOptions& opts, ScopePtr scope, Serializer serializer);
+        explicit Runtime(CompileOptions opts);
+        Runtime(CompileOptions opts, ScopePtr scope, Serializer serializer);
 
-        static Runtime& create(const optional<fs::path>& src_path, const CompileOptions& opts);
+        static Runtime& create(CompileOptions opts);
         static Runtime& get();
 
         VarPtr global(const string& name) const;
-        const vector<fs::path>& include_directories() const { return include_dirs_; }
+        const vector<fs::path>& include_directories() const { return opts_.search_directories; }
 
         void load_materialx_library(const string& version);
         mx::DocumentPtr materialx_library() { return mtlx_lib_; }
@@ -41,8 +42,7 @@ namespace mxslc::runtime
         void destroy() const;
 
     private:
-        const CompileOptions& opts_;
-        vector<fs::path> include_dirs_;
+        CompileOptions opts_;
         mx::DocumentPtr mtlx_lib_;
         ScopePtr scope_;
         Serializer serializer_;
