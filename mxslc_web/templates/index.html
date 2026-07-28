@@ -27,6 +27,7 @@
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/theme/dracula.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/theme/monokai.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/theme/darcula.min.css" rel="stylesheet">
 
     <style>
         :root { --editor-height: 55vh; }
@@ -149,24 +150,10 @@
         //  MXSL custom CodeMirror mode — built from API keywords
         // ============================================================
 
-        /** Register a custom MXSL mode with given keywords and builtins. */
-        function registerMxslMode(keywords, builtins) {
-            // Categorize keywords
-            const dataTypes = new Set([
-                'boolean','integer','float','string','filename',
-                'vector2','vector3','vector4','color3','color4',
-                'matrix33','matrix44',
-                'surfaceshader','displacementshader','volumeshader','lightshader',
-                'material','BSDF','EDF','VDF',
-                'integerarray','floatarray','stringarray',
-                'vector2array','vector3array','vector4array',
-                'color3array','color4array','T',
-                'bool','int','vec2','vec3','vec4'
-            ]);
-            const control = new Set(['if','else','switch','for','return',
-                'true','false','and','or','not','null',
-                'auto','out','global','inline','const',
-                'uniform','varying','namespace','void']);
+        /** Register a custom MXSL mode with categorized keywords from the API. */
+        function registerMxslMode(dataTypes, control, builtins) {
+            dataTypes = new Set(dataTypes || []);
+            control = new Set(control || []);
 
             CodeMirror.defineMode('mxsl', function() {
                 return {
@@ -246,8 +233,8 @@
         fetch('/api/keywords')
             .then(r => r.json())
             .then(data => {
-                registerMxslMode(data.keywords || [], data.builtins || []);
-                logMessage('Loaded ' + (data.keywords || []).length + ' keywords and ' +
+                registerMxslMode(data.data_types, data.control, data.builtins);
+                logMessage('Loaded ' + (data.all || []).length + ' keywords and ' +
                     (data.builtins || []).length + ' builtins', 'success');
 
                 // MTLX editor – XML mode
@@ -264,7 +251,7 @@
                 editorMxsl = CodeMirror.fromTextArea(
                     document.getElementById('editor-mxsl'),
                     Object.assign({}, sharedOptions, {
-                        theme: 'monokai',
+                        theme: 'darcula',
                         mode: 'mxsl',
                         placeholder: 'Paste MXSL code here, or load a file...'
                     })
