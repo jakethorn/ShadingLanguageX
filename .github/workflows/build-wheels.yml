@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - mac_build_and_test
   pull_request:
   workflow_dispatch:
 
@@ -213,4 +212,4 @@ jobs:
         run: |
           cd mxslc++
           pytest
-          
+
