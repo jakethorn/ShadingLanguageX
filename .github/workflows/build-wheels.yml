@@ -200,11 +200,10 @@ jobs:
           name: wheels-${{ matrix.os }}
           path: mxslc++/wheelhouse/*.whl
 
-      - name: Install dependencies
+      - name: Install pytest and MaterialX
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
+          pip install pytest MaterialX
 
       - name: Install the built wheel
         run: |
