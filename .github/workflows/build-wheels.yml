@@ -210,4 +210,6 @@ jobs:
           python -c "import glob; import subprocess; import sys; wheel = glob.glob('mxslc++/wheelhouse/*.whl')[0]; subprocess.check_call([sys.executable, '-m', 'pip', 'install', wheel])"
       
       - name: Test with pytest
-        run: pytest
+        run: |
+          cd mxslc++
+          pytest tests/
