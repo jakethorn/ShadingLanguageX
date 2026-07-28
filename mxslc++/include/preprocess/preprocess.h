@@ -36,9 +36,14 @@ namespace mxslc::preprocess
         void process_version();
         void process_define();
         void process_undef();
-        void process_if();
-        void process_if(bool condition);
+        void process_if(bool ignore = false);
+        void process_ifdef(bool ignore = false);
+        void process_ifndef(bool ignore = false);
+        void process_remaining_if_blocks(bool condition, bool ignore = false);
+        void process_else_block(bool ignore = false);
         void process_if_block();
+        void consume_if_block();
+        bool start_of_if_block() const;
         bool end_of_if_block() const;
         void process_non_directive();
 
@@ -50,6 +55,8 @@ namespace mxslc::preprocess
         vector<Token> expand_macro(const Token& name) const;
         vector<Token> expand_macros(const vector<Token>& tokens) const;
 
+        Token match_directive();
+        Token match_macro();
         vector<Token> consume_and_expand_until(TokenType token_type);
 
         void define_inclusion_type_macro() const;

@@ -22,7 +22,7 @@ namespace mxslc
         vector<fs::path> includes;
         vector<fs::path> libraries;
 
-        vector<Macro> macros;
+        unordered_set<Macro> macros;
 
         unordered_map<string, VarPtr> globals;
         bool error_on_missing_globals{true};

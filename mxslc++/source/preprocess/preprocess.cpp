@@ -75,13 +75,20 @@ namespace mxslc::preprocess
         if (consume(TokenType::Hash))
         {
             const Token token = consume();
-                 if (token == "include") process_include();
-            else if (token == "library") process_library();
-            else if (token == "version") process_version();
-            else if (token == "define")  process_define();
-            else if (token == "undef")   process_undef();
-            else if (token == "if")      process_if();
-            else throw CompileError{"Unknown preprocessor directive: " + token.lexeme()};
+                 if (token == "include")  process_include();
+            else if (token == "library")  process_library();
+            else if (token == "version")  process_version();
+            else if (token == "define")   process_define();
+            else if (token == "undef")    process_undef();
+            else if (token == "if")       process_if();
+            else if (token == "ifdef")    process_ifdef();
+            else if (token == "ifndef")   process_ifndef();
+            else if (token == "elif")     throw CompileError{token, "#elif without starting #(if/ifdef/ifndef)"};
+            else if (token == "elifdef")  throw CompileError{token, "#elifdef without starting #(if/ifdef/ifndef)"};
+            else if (token == "elifndef") throw CompileError{token, "#elifndef without starting #(if/ifdef/ifndef)"};
+            else if (token == "else")     throw CompileError{token, "#else without starting #(if/ifdef/ifndef)"};
+            else if (token == "endif")     throw CompileError{token, "#endif without starting #(if/ifdef/ifndef)"};
+            else throw CompileError{token, "Unknown preprocessor directive: " + token.lexeme()};
         }
         else
         {
@@ -111,42 +118,108 @@ namespace mxslc::preprocess
 
     void Preprocessor::process_define()
     {
-        const Token name = match(TokenType::Identifier);
+        const Token name = match_macro();
         vector<Token> body = consume_until(TokenType::Newline);
         define_macro(name, std::move(body));
     }
 
     void Preprocessor::process_undef()
     {
-        const Token name = match(TokenType::Identifier);
-        undef_macro(name);
+        undef_macro(match_macro());
     }
 
-    void Preprocessor::process_if()
+    void Preprocessor::process_if(const bool ignore)
     {
         vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
         const bool condition = parse_primitive(std::move(tokens)).cast<bool>();
-        process_if(condition);
+        process_remaining_if_blocks(condition, ignore);
     }
 
-    void Preprocessor::process_if(const bool condition)
+    void Preprocessor::process_ifdef(const bool ignore)
     {
-        if (condition)
+        process_remaining_if_blocks(macro_is_defined(match_macro()), ignore);
+    }
+
+    void Preprocessor::process_ifndef(const bool ignore)
+    {
+        process_remaining_if_blocks(not macro_is_defined(match_macro()), ignore);
+    }
+
+    void Preprocessor::process_remaining_if_blocks(const bool condition, const bool ignore)
+    {
+        if (condition and not ignore)
         {
             process_if_block();
-            match(TokenType::Hash);
-            const string& directive = consume().lexeme();
+
+            const Token directive = match_directive();
+            if (directive == "elif")
+                process_if(true);
+            else if (directive == "elifdef")
+                process_ifdef(true);
+            else if (directive == "elifndef")
+                process_ifndef(true);
+            else if (directive == "else")
+                process_else_block(true);
         }
         else
         {
             consume_if_block();
+
+            const Token directive = match_directive();
+            if (directive == "elif")
+                process_if(ignore);
+            else if (directive == "elifdef")
+                process_ifdef(ignore);
+            else if (directive == "elifndef")
+                process_ifndef(ignore);
+            else if (directive == "else")
+                process_else_block(ignore);
         }
+    }
+
+    void Preprocessor::process_else_block(const bool ignore)
+    {
+        if (not ignore)
+            process_if_block();
+        else
+            consume_if_block();
+
+        const Token directive = match_directive();
+        if (directive != "endif")
+            throw CompileError{directive, "Encountered more conditional directives after #else"};
     }
 
     void Preprocessor::process_if_block()
     {
         while (not end_of_if_block())
             process_next_token();
+    }
+
+    void Preprocessor::consume_if_block()
+    {
+        while (not end_of_if_block())
+        {
+            // nested if directive
+            if (start_of_if_block())
+            {
+                const Token directive = match_directive();
+                if (directive == "if")
+                    process_if(/*ignore*/true);
+                else if (directive == "ifdef")
+                    process_ifdef(/*ignore*/true);
+                else if (directive == "ifndef")
+                    process_ifndef(/*ignore*/true);
+            }
+            else
+            {
+                consume();
+            }
+        }
+    }
+
+    bool Preprocessor::start_of_if_block() const
+    {
+        return peek() == TokenType::Hash and contains(vector{"if", "ifdef", "ifndef"}, peek(1));
     }
 
     bool Preprocessor::end_of_if_block() const
@@ -189,24 +262,22 @@ namespace mxslc::preprocess
     {
         if (macro_is_defined(name))
             undef_macro(name);
-        opts_.macros.emplace_back(name.lexeme(), std::move(body));
+        opts_.macros.emplace(name.lexeme(), std::move(body));
     }
 
     void Preprocessor::undef_macro(const Token& name) const
     {
-        const auto it = position_of(opts_.macros, name);
-        if (it != opts_.macros.end())
-            opts_.macros.erase(it);
+        opts_.macros.erase(name.lexeme());
     }
 
     bool Preprocessor::macro_is_defined(const Token& name) const
     {
-        return contains(opts_.macros, name);
+        return contains(opts_.macros, name.lexeme());
     }
 
     vector<Token> Preprocessor::expand_macro(const Token& name) const
     {
-        const auto it = position_of(opts_.macros, name);
+        const auto it = opts_.macros.find(name.lexeme());
         if (it != opts_.macros.end())
         {
             return expand_macros(it->body());
