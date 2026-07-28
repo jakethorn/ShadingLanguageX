@@ -139,7 +139,7 @@ jobs:
             CMAKE_ARGS="-DMTLX_ROOT=$PWD/external/MaterialX/install -DBUILD_TESTING=OFF"
             MACOSX_DEPLOYMENT_TARGET=11.0
 
-          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ARCHS_MACOS: "native"
 
       - name: Configure MaterialX on Windows
         if: runner.os == 'Windows'
