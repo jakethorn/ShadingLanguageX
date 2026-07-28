@@ -4,6 +4,11 @@
 
 #include "io_utils.h"
 
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>  // For _NSGetExecutablePath
+#include <limits.h>       // For PATH_MAX
+#endif
+
 #include <fstream>
 #include <sstream>
 
@@ -53,7 +58,20 @@ fs::path get_executable_dir()
     wchar_t path[MAX_PATH];
     GetModuleFileNameW(NULL, path, MAX_PATH);
     return fs::path{path}.parent_path();
+#elif defined(__APPLE__)
+    char path[PATH_MAX];
+    uint32_t size = sizeof(path);
+    if (_NSGetExecutablePath(path, &size) != 0) {
+        throw CompileError{"Cannot determine executable path: buffer too small"s};
+    }
+    // Resolve symlinks to get the real path
+    char real_path[PATH_MAX];
+    if (realpath(path, real_path) == nullptr) {
+        throw CompileError{"Cannot resolve executable path"s};
+    }
+    return fs::path{real_path}.parent_path();
 #else
+    // Linux and other Unix-like systems
     char path[PATH_MAX];
     const ssize_t count = readlink("/proc/self/exe", path, PATH_MAX - 1);
     if (count == -1)
