@@ -259,6 +259,19 @@ string mxslc::Decompiler::port_to_expression(const mx::PortElementPtr& port)
         const mx::NodePtr node = port->getConnectedNode();
         if (port->hasOutputString())
             return node_and_output_to_dot_op(node, port->getOutputString());
+        // Handle getting "default" output if no output provided for multioutput
+        // node reference.
+        if (node->isMultiOutputType())
+        {
+            static const vector<fs::path> include_dirs = get_include_directories();
+            static const mx::DocumentPtr mtlx_lib = get_materialx_library(DEFAULT_MTLX_VERSION, include_dirs);
+            const mx::NodeDefPtr node_def = get_node_def(node, mtlx_lib);
+            const vector<mx::OutputPtr> outputs = node_def->getActiveOutputs();
+            if (not outputs.empty())
+            {
+                return node_and_output_to_dot_op(node, outputs[0]->getName());
+            }
+        }
         return is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node);
     }
     if (port->hasNodeGraphString())
@@ -288,6 +301,8 @@ string mxslc::Decompiler::value_to_constructor(const mx::ValuePtr& value)
     const string type_name = get_type_alias(value->getTypeString());
     if (contains(vector{"vec2", "vec3", "vec4", "color3", "color4"}, type_name))
         return type_name + "{" + value->getValueString() + "}";
+    if (type_name == "string" || type_name == "filename")
+        return "\"" + value->getValueString() + "\"";        
     return value->getValueString();
 }
 
