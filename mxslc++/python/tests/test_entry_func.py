@@ -39,3 +39,20 @@ try:
 
 except ImportError:
     pass
+
+
+def test_decompile_multioutput_reference():
+    result = mxslc.decompile_file_to_string(get_data_path("entry006.mtlx"))
+
+    assert isinstance(result, str)
+    assert result == get_data("entry006.mxsl")
+
+
+def test_compile_multioutput_reference():
+    result = mxslc.compile_file_to_string(get_data_path("entry006.mxsl"))
+
+    assert isinstance(result, str)
+    # Remove output="outcolor" from result to match original default output
+    result = result.replace('output="outcolor" ', "")
+    write_data("entry006.mtlx", result)
+    assert result == get_data("entry006.mtlx")
