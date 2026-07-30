@@ -19,8 +19,25 @@ def _import_mxslc() -> object:
 
     return _m
 
+def _get_mtlx_definition_names() -> list[str]:
+    """Get the names of all definitions in the installed MaterialX package."""
+    import MaterialX as mx
+    stdlib = mx.createDocument()
+    searchPath = mx.getDefaultDataSearchPath()
+    libraryFolders = []
+    libraryFolders.extend(mx.getDefaultDataLibraryFolders())
+    mx.loadLibraries(libraryFolders, searchPath, stdlib)
+    defs = stdlib.getNodeDefs()
+    #print("loaded ", len(defs), "nodedefs from MaterialX stdlib")
+    #for nodedef in defs:
+    #    print(f"Found nodedef: {nodedef.getNodeString()}")
+    unique_names = set(nd.getNodeString() for nd in defs)
+    return sorted(unique_names)
 
 def _load_keywords() -> dict:
+    mtlx_keywords = _get_mtlx_definition_names()
+    print(f"Found {len(mtlx_keywords)} MTLX keywords")
+
     """Load MXSL keywords from the mxslc Python source Keyword enum, categorized."""
     try:
         kw_path = Path(__file__).resolve().parent.parent / "mxslc" / "mxslc" / "Keyword.py"
@@ -35,7 +52,10 @@ def _load_keywords() -> dict:
         data_types = sorted({str(k) for k in mod.Keyword.DATA_TYPES()})
         all_kw = sorted({str(k) for k in mod.Keyword})
         control = sorted(set(all_kw) - set(data_types))
-        return {"data_types": data_types, "control": control, "all": all_kw}
+
+        # MTLX nodedef names become function names for highlighting.
+        all_kw.extend(mtlx_keywords)
+        return {"data_types": data_types, "control": control, "functions": mtlx_keywords, "all": all_kw}
     except Exception:
         return {"data_types": [], "control": [], "all": []}
 
@@ -122,6 +142,7 @@ def _api_keywords():
     return jsonify({
         "data_types": kw.get("data_types", []),
         "control": kw.get("control", []),
+        "functions": kw.get("functions", []),
         "all": kw.get("all", []),
         "builtins": get_builtins()
     })
@@ -145,6 +166,8 @@ def create_app() -> Flask:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
+
 
 app = create_app()
 

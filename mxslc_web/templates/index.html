@@ -35,6 +35,7 @@
 
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
         .CodeMirror { height: var(--editor-height) !important; font-size: .85rem; }
+        .CodeMirror .cm-function { color: #0699ed; }
 
         .log-area {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
@@ -150,10 +151,14 @@
         //  MXSL custom CodeMirror mode — built from API keywords
         // ============================================================
 
-        /** Register a custom MXSL mode with categorized keywords from the API. */
-        function registerMxslMode(dataTypes, control, builtins) {
+        /** Register a custom MXSL mode with categorized keywords from the API.
+         *  @param {string} [funcStyle='def'] - Token class for function calls:
+         *    'def' uses theme's cm-def color, 'function' uses custom .cm-function color. */
+        function registerMxslMode(dataTypes, control, builtins, functions, funcStyle) {
             dataTypes = new Set(dataTypes || []);
             control = new Set(control || []);
+            functions = new Set(functions || []);
+            funcStyle = funcStyle || 'function'; // or 'def'
 
             CodeMirror.defineMode('mxsl', function() {
                 return {
@@ -194,6 +199,7 @@
                             if (dataTypes.has(word)) return 'type';
                             if (control.has(word)) return 'keyword';
                             if (builtins && builtins.includes(word)) return 'builtin';
+                            if (functions.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
                             if (word === word.toUpperCase() && word.length >= 2) return 'atom';
                             return 'variable';
                         }
@@ -233,7 +239,7 @@
         fetch('/api/keywords')
             .then(r => r.json())
             .then(data => {
-                registerMxslMode(data.data_types, data.control, data.builtins);
+                registerMxslMode(data.data_types, data.control, data.builtins, data.functions);
                 logMessage('Loaded ' + (data.all || []).length + ' keywords and ' +
                     (data.builtins || []).length + ' builtins', 'success');
 
