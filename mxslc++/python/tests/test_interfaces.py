@@ -134,3 +134,62 @@ def test_unnamed_fields_use_positional_names():
         "Unnamed fields should use positional 'out__0' as fallback"
     assert 'output name="out__0"' in result, \
         "Input reference should also use positional 'out__0'"
+
+
+# ---------------------------------------------------------------------------
+#  Interface parameters: nodegraph <input> elements become function params
+# ---------------------------------------------------------------------------
+
+MTLX_WITH_INTERFACE = """\
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodegraph name="NG_marble1">
+    <input name="noise_scale" type="float" value="6.0" />
+    <input name="base_color" type="color3" value="0.8, 0.8, 0.8" />
+    <position name="obj_pos" type="vector3" />
+    <multiply name="scaled" type="float">
+      <input name="in1" type="float" value="2" />
+      <input name="in2" type="float" interfacename="noise_scale" />
+    </multiply>
+    <mix name="color_mix" type="color3">
+      <input name="bg" type="color3" interfacename="base_color" />
+      <input name="fg" type="color3" value="1, 1, 1" />
+      <input name="mix" type="float" nodename="scaled" />
+    </mix>
+    <output name="out" type="color3" nodename="color_mix" />
+  </nodegraph>
+</materialx>
+"""
+
+
+def test_decompile_interface_parameters():
+    """Nodegraph with <input> elements should produce function + variable."""
+    result = mxslc.decompile_string_to_string(MTLX_WITH_INTERFACE)
+
+    # Should emit a function with parameters
+    assert 'marble1(float noise_scale' in result, \
+        "Function should have parameters from interface inputs"
+    # Should emit a variable calling the function with default values
+    assert 'marble1_out = marble1(' in result, \
+        "A variable calling the function with defaults should be emitted"
+    # interfacename references should resolve to parameter names
+    assert 'interfacename' not in result, \
+        "interfacename references should not remain in decompiled output"
+
+
+def test_compile_interface_roundtrip():
+    """Decompiled interface inputs should compile back to MTLX successfully."""
+    mxsl = mxslc.decompile_string_to_string(MTLX_WITH_INTERFACE)
+    # Re-compile the decompiled MXSL - should not throw
+    mtlx_again = mxslc.compile_string_to_string(mxsl)
+
+    assert isinstance(mtlx_again, str), \
+        "Re-compiled output should be a valid string"
+    # The round-trip should preserve the nodegraph structure
+    assert 'nodegraph' in mtlx_again, \
+        "Re-compiled MTLX should contain a nodegraph"
+    # Interface input names should survive the roundtrip
+    assert 'noise_scale' in mtlx_again, \
+        "Interface input name 'noise_scale' should survive roundtrip"
+    assert 'base_color' in mtlx_again, \
+        "Interface input name 'base_color' should survive roundtrip"
