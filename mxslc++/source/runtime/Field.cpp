@@ -2,20 +2,23 @@
 // Created by jaket on 18/01/2026.
 //
 
-#include "Field.h"
-#include "Type.h"
+#include "runtime/Field.h"
+#include "runtime/Type.h"
 #include "expressions/Expression.h"
 
-Field Field::instantiate_template_types(const TypePtr& template_type) const
+namespace mxslc::runtime
 {
-    TypePtr type = type_->instantiate_template_types(template_type);
-    return Field{mods_, std::move(type), name_};
-}
+    Field Field::monomorphize(const TypePtr& template_type) const
+    {
+        TypePtr type = type_->monomorphize(template_type);
+        return Field{mods_, std::move(type), name_};
+    }
 
-string Field::str() const
-{
-    string result = type_->str();
-    if (has_name())
-        result += " " + name();
-    return result;
+    string Field::to_string() const
+    {
+        string result = type_->str();
+        if (has_name())
+            result += " " + name();
+        return result;
+    }
 }

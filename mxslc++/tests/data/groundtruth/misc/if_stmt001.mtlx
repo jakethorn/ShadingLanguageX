@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomcolor name="var__0" type="color3">
+    <input name="in" type="integer" value="1" />
+  </randomcolor>
+  <randomcolor name="var__1" type="color3">
+    <input name="in" type="integer" value="2" />
+  </randomcolor>
+</materialx>

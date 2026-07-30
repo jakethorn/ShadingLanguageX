@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="a" type="vector3" />
+  <separate3 name="var__0" type="multioutput">
+    <input name="in" type="vector3" nodename="a" />
+  </separate3>
+  <combine3 name="var__1" type="vector3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" output="outy" nodename="var__0" />
+    <input name="in3" type="float" output="outz" nodename="var__0" />
+  </combine3>
+  <combine3 name="var__2" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__0" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" output="outz" nodename="var__0" />
+  </combine3>
+  <combine3 name="var__3" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__0" />
+    <input name="in2" type="float" output="outy" nodename="var__0" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <switch name="var__4" type="vector3">
+    <input name="in1" type="vector3" nodename="var__1" />
+    <input name="in2" type="vector3" nodename="var__2" />
+    <input name="in3" type="vector3" nodename="var__3" />
+    <input name="which" type="integer" value="0" />
+  </switch>
+  <magnitude name="m" type="float">
+    <input name="in" type="vector3" nodename="var__4" />
+  </magnitude>
+</materialx>

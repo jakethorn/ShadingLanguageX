@@ -7,15 +7,15 @@
     <input name="b__1" type="float" value="0" doc="input b" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <add name="in1" type="float">
+    <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="a" />
       <input name="in2" type="float" interfacename="b__0" />
     </add>
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <add name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="b__1" />
     </add>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <foo name="f" type="float">
     <input name="a" type="float" value="1" />

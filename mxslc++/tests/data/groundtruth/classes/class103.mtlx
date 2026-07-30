@@ -31,19 +31,19 @@
     <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_area" nodedef="ND_Sphere_area">
-    <multiply name="in1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" value="4" />
       <input name="in2" type="float" value="3.14159" />
     </multiply>
-    <multiply name="in2" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <multiply name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="this__1" />
     </multiply>
-    <multiply name="var__0" type="float">
-      <input name="in1" type="float" nodename="in2" />
+    <multiply name="var__2" type="float">
+      <input name="in1" type="float" nodename="var__1" />
       <input name="in2" type="float" interfacename="this__1" />
     </multiply>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__2" />
   </nodegraph>
   <combine3 name="s__position" type="vector3">
     <input name="in1" type="float" value="0" />

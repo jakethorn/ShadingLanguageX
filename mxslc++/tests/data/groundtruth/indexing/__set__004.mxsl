@@ -1,0 +1,5 @@
+mutable vec3 a = position();
+a[1] = 4.0;
+a = normal();
+a[2] = 5.0;
+float m = magnitude(a);

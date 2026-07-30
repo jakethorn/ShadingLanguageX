@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include "compile.h"
-#include "CompileError.h"
+#include "errors/CompileError.h"
 #include "utils/data_utils.h"
 
 namespace fs = std::filesystem;
@@ -41,14 +41,16 @@ TEST_P(failure_tests, compiler_throws_compile_error)
 
 vector<fs::path> get_failure_files()
 {
-    vector<fs::path> files;
-    const fs::path test_dir = get_test_data("failure"s);
+    const fs::path test_dir = get_test_data("failure");
 
-    if (fs::exists(test_dir)) {
-        for (const auto& p : fs::recursive_directory_iterator(test_dir))
-            if (p.path().extension() == ".mxsl")
-                files.push_back(p.path());
-    }
+    if (not fs::exists(test_dir))
+        return {};
+
+    vector<fs::path> files;
+    for (const auto& p : fs::recursive_directory_iterator(test_dir))
+        if (p.path().extension() == ".mxsl")
+            files.push_back(p.path());
+
     return files;
 }
 

@@ -6,4 +6,4 @@ Underlying errors:
 
 Matching definition could not be found for function 'foo'
 Possible matches:
-vector3 foo [[parameterless]]
+vector3 foo

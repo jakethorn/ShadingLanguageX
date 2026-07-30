@@ -1,0 +1,2 @@
+vec3 room_pos;
+float ao = 1.0 - distance(vec3(0.0), room_pos);

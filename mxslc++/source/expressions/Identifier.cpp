@@ -2,36 +2,45 @@
 // Created by jaket on 28/11/2025.
 //
 
-#include "Identifier.h"
+#include "expressions/Identifier.h"
 
+#include "expressions/interface.h"
 #include "runtime/FunctionQuery.h"
-#include "runtime/RuntimeUtils.h"
 #include "runtime/Scope.h"
 #include "runtime/Variable.h"
+#include "runtime/utils/invoke.h"
 
-ExprPtr Identifier::instantiate_template_types(const TypePtr& template_type) const
+namespace mxslc::expressions
 {
-    return std::make_unique<Identifier>(token_);
-}
+    ExprPtr Identifier::monomorphize(const TypePtr& template_type) const
+    {
+        return create_expression<Identifier>(token_);
+    }
 
-void Identifier::init_impl(const vector<TypePtr>& types)
-{
-    if (scope().has_variable(name_))
-        var_ = scope().get_variable(name_);
+    void Identifier::init_impl(const vector<TypePtr>& types)
+    {
+        if (scope().has_variable(name_))
+            var_ = scope().get_variable(name_);
 
-    if (scope().has_function({types, name_, /*is_parameterless*/true}))
-        var_ = RuntimeUtils::invoke_function(types, name_);
+        if (scope().has_function({types, name_, /*is_parameterless*/true}))
+            var_ = runtime_utils::invoke_function(types, name_);
 
-    if (var_ == nullptr)
-        throw CompileError{"Variable or parameterless function not defined or ambiguous: " + name_};
-}
+        if (var_ == nullptr)
+            throw CompileError{"Variable or parameterless function not defined or ambiguous: " + name_};
+    }
 
-TypePtr Identifier::type_impl() const
-{
-    return var_->type();
-}
+    TypePtr Identifier::type_impl() const
+    {
+        return var_->type();
+    }
 
-VarPtr Identifier::evaluate_impl() const
-{
-    return var_;
+    VarPtr Identifier::evaluate_impl() const
+    {
+        return var_;
+    }
+
+    string Identifier::to_string() const
+    {
+        return name_;
+    }
 }

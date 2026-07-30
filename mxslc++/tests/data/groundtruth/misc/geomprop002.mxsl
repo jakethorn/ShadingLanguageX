@@ -1,0 +1,3 @@
+geomprop global float x;
+geomprop global float y = 50;
+geomprop global float z = 50;

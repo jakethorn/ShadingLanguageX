@@ -1,0 +1,1 @@
+__set__006.mxsl, line 1: Temporary variable being passed to ref or out parameter 'vector'

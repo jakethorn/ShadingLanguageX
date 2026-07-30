@@ -1,0 +1,8 @@
+int foo(int x, int y, int z)
+{
+    return x + y + z;
+}
+
+mutable int i = 0;
+int x = foo(++i, ++i, ++i);
+int end = x + 10;

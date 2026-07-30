@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "Span.h"
+#include "utils/Span.h"
 
 using std::vector;
 using mxslc::Span;

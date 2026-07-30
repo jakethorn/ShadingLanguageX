@@ -1,0 +1,9 @@
+mutable vec3 p = position();
+
+float foo()
+{
+    p[0] = 3.0;
+    float y = p[0];
+    float z = p[0];
+    return 6.0;
+}

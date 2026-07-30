@@ -1,0 +1,7 @@
+mutable matrix33 m = creatematrix();
+
+//vector3 a = m[0];
+//float b = m[1][2];
+auto n = invertmatrix(m);
+m[1][2] = 5.0;
+auto o = invertmatrix(m);

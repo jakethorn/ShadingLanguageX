@@ -19,32 +19,32 @@
     <input name="in3" type="float" output="out__2" nodename="var__0" />
     <input name="in4" type="float" output="out__3" nodename="var__0" />
   </combine4>
-  <extract name="in1" type="float">
+  <extract name="var__1" type="float">
     <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="in2" type="float">
+  <extract name="var__2" type="float">
     <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <multiply name="in3" type="float">
-    <input name="in1" type="float" nodename="in1" />
-    <input name="in2" type="float" nodename="in2" />
+  <multiply name="var__3" type="float">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" nodename="var__2" />
   </multiply>
-  <extract name="in4" type="float">
+  <extract name="var__4" type="float">
     <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <multiply name="in5" type="float">
-    <input name="in1" type="float" nodename="in3" />
-    <input name="in2" type="float" nodename="in4" />
+  <multiply name="var__5" type="float">
+    <input name="in1" type="float" nodename="var__3" />
+    <input name="in2" type="float" nodename="var__4" />
   </multiply>
-  <extract name="in6" type="float">
+  <extract name="var__6" type="float">
     <input name="in" type="color4" nodename="a" />
     <input name="index" type="integer" value="3" />
   </extract>
   <multiply name="OUT" type="float">
-    <input name="in1" type="float" nodename="in5" />
-    <input name="in2" type="float" nodename="in6" />
+    <input name="in1" type="float" nodename="var__5" />
+    <input name="in2" type="float" nodename="var__6" />
   </multiply>
 </materialx>

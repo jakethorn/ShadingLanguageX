@@ -1,0 +1,6 @@
+#define OLD_VERSION 1.38.10
+#version OLD_VERSION
+#undef OLD_VERSION
+
+vec2 uv = texcoord();
+vec2 vu = swizzle(uv, "yx");

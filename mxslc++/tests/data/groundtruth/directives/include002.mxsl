@@ -1,0 +1,7 @@
+#if 1
+#include "../../includes/b.mxsl"
+#elif 1
+#include "../../includes/c.mxsl"
+#endif
+
+float z = value + 1.0;

@@ -13,12 +13,12 @@
     <input name="in2" type="float" value="6" />
   </multiply>
   <some_func name="var__0" type="multioutput" />
-  <multiply name="in1" type="float">
+  <multiply name="var__1" type="float">
     <input name="in1" type="float" output="nonlocal_out__b__0" nodename="var__0" />
     <input name="in2" type="float" value="6" />
   </multiply>
   <add name="d" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" output="out" nodename="var__0" />
   </add>
 </materialx>

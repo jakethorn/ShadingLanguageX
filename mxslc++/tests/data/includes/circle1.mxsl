@@ -1,0 +1,2 @@
+#include "circle2.mxsl"
+float a;

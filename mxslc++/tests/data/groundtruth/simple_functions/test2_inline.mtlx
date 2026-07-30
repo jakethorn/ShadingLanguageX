@@ -6,13 +6,13 @@
     <input name="in1" type="float" nodename="f" />
     <input name="in2" type="float" value="2" />
   </multiply>
-  <combine3 name="in2" type="color3">
+  <combine3 name="var__0" type="color3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="0" />
   </combine3>
   <multiply name="y" type="color3">
     <input name="in1" type="color3" nodename="c" />
-    <input name="in2" type="color3" nodename="in2" />
+    <input name="in2" type="color3" nodename="var__0" />
   </multiply>
 </materialx>

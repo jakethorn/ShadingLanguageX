@@ -1,0 +1,6 @@
+compile
+tests/data/groundtruth/misc/geomprop002.mxsl
+--no-reduce-graph
+-g x 78.0
+-g y 100.0
+--missing-globals-ok

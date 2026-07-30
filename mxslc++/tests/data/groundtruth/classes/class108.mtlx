@@ -7,15 +7,15 @@
     <input name="this__1" type="float" />
   </nodedef>
   <nodegraph name="NG_Point_extent" nodedef="ND_Point_extent">
-    <Point_extent_max_dim name="in1" type="float">
+    <Point_extent_max_dim name="var__0" type="float">
       <input name="nonlocal_in__x" type="float" interfacename="this__0" />
       <input name="nonlocal_in__y" type="float" interfacename="this__1" />
     </Point_extent_max_dim>
-    <subtract name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <subtract name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="offset" />
     </subtract>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <nodedef name="ND_Point_extent_max_dim" node="Point_extent_max_dim">
     <output name="out" type="float" />

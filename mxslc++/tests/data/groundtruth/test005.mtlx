@@ -5,11 +5,11 @@
     <input name="in2" type="float" value="0" />
     <input name="in3" type="float" value="1" />
   </combine3>
-  <convert name="in2" type="float">
+  <convert name="var__0" type="float">
     <input name="in" type="integer" value="2" />
   </convert>
   <add name="y" type="color3">
     <input name="in1" type="color3" nodename="x__1" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in2" type="float" nodename="var__0" />
   </add>
 </materialx>

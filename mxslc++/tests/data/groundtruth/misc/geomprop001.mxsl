@@ -1,0 +1,4 @@
+geomprop float x;
+geomprop float y = 1.0;
+float z = geompropvalue("z");
+float w = geompropvalue("w", 1.0);

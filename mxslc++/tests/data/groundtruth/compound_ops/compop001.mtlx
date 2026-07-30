@@ -7,36 +7,36 @@
     <output name="out" type="integer" value="0" />
   </nodegraph>
   <foo name="i" type="integer" />
-  <add name="in2" type="integer">
-    <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" value="1" />
-  </add>
-  <add name="in1" type="integer">
-    <input name="in1" type="integer" nodename="i" />
-    <input name="in2" type="integer" nodename="in2" />
-  </add>
-  <add name="in3" type="integer">
-    <input name="in1" type="integer" nodename="in1" />
-    <input name="in2" type="integer" value="1" />
-  </add>
   <add name="var__0" type="integer">
     <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" nodename="in3" />
-  </add>
-  <add name="in4" type="integer">
-    <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" value="1" />
-  </add>
-  <add name="in5" type="integer">
-    <input name="in1" type="integer" nodename="in3" />
-    <input name="in2" type="integer" nodename="in4" />
-  </add>
-  <add name="in6" type="integer">
-    <input name="in1" type="integer" nodename="in5" />
     <input name="in2" type="integer" value="1" />
   </add>
   <add name="var__1" type="integer">
+    <input name="in1" type="integer" nodename="i" />
+    <input name="in2" type="integer" nodename="var__0" />
+  </add>
+  <add name="var__2" type="integer">
+    <input name="in1" type="integer" nodename="var__1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="var__3" type="integer">
     <input name="in1" type="integer" value="1" />
-    <input name="in2" type="integer" nodename="in6" />
+    <input name="in2" type="integer" nodename="var__2" />
+  </add>
+  <add name="var__4" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="var__5" type="integer">
+    <input name="in1" type="integer" nodename="var__2" />
+    <input name="in2" type="integer" nodename="var__4" />
+  </add>
+  <add name="var__6" type="integer">
+    <input name="in1" type="integer" nodename="var__5" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="var__7" type="integer">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" nodename="var__6" />
   </add>
 </materialx>

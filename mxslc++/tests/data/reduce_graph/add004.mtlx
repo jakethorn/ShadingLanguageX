@@ -4,9 +4,9 @@
     <input name="in1" type="float" value="1010.25" />
     <input name="in2" type="float" value="1010.13" />
   </add>
-  <randomfloat name="in2" type="float" />
+  <randomfloat name="var__0" type="float" />
   <multiply name="OUT" type="float">
     <input name="in1" type="float" nodename="f" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in2" type="float" nodename="var__0" />
   </multiply>
 </materialx>

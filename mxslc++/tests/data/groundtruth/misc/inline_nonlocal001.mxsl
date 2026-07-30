@@ -1,0 +1,11 @@
+mutable int i = 1;
+
+inline int foo()
+{
+    return i;
+}
+
+int x = foo();
+i = 3;
+int y = foo();
+int z = x + y;

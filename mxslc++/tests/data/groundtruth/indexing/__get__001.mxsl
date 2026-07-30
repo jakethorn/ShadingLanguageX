@@ -1,0 +1,10 @@
+mutable vec3 a = position();
+float x = a[0];
+float y = a[0];
+float z = x + y;
+a = normal();
+float w = x + y;
+float i = a[1];
+float j = a[1];
+float k = i + j;
+float m = magnitude(a);
