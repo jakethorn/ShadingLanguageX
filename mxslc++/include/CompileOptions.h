@@ -45,14 +45,18 @@ namespace mxslc
         const unordered_map<string, Macro>& macros() const { return macros_; }
 
         void add_global(string name, VarPtr value);
+        void add_global(string name, Primitive value);
         void set_globals(unordered_map<string, VarPtr> globals);
+        void set_globals(const unordered_map<string, Primitive>& globals);
         void clear_globals();
         const VarPtr& get_global(const string& name) const;
         bool has_global(const string& name) const;
         const unordered_map<string, VarPtr>& globals() const { return globals_; }
 
         void add_entry_function_argument(VarPtr value);
+        void add_entry_function_argument(Primitive value);
         void set_entry_function_arguments(vector<VarPtr> args);
+        void set_entry_function_arguments(const vector<Primitive>& args);
         void clear_entry_function_arguments();
         const vector<VarPtr>& entry_function_arguments() const { return func_args_; }
 

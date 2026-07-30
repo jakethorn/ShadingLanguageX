@@ -10,15 +10,14 @@
 #include "common.h"
 #include "CompileOptions.h"
 #include "compile.h"
-#include "runtime/interface.h"
 
 using namespace mxslc;
 
 TEST(global_tests, test_string_to_path)
 {
     CompileOptions opts;
-    opts.add_global("tint", create_variable(0.3f));
-    opts.add_global("albedo_path", create_variable("../brick.png"));
+    opts.add_global("tint", 0.3f);
+    opts.add_global("albedo_path", "../brick.png");
 
     const fs::path input_path = get_test_data("globals/globals005.mxsl");
     fs::path expected_path = input_path;
