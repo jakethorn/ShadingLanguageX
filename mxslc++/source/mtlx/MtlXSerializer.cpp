@@ -42,7 +42,7 @@ namespace
         {
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                add_outputs_to_node_def(node_def, type->field_type(i), get_port_name(name, i));
+                add_outputs_to_node_def(node_def, type->field_type(i), port_name_for_field(type, i, name));
             }
         }
         else
@@ -338,7 +338,7 @@ void MtlXSerializer::write_node_input(const mx::NodePtr& node, const string& inp
     {
         for (size_t i = 0; i < var->child_count(); ++i)
         {
-            write_node_input(node, get_port_name(input_name, i), var->child(i), attrs);
+            write_node_input(node, port_name_for_field(var->type(), i, input_name), var->child(i), attrs);
         }
     }
 }
@@ -360,7 +360,7 @@ void MtlXSerializer::write_node_graph_output(const mx::NodeGraphPtr& node_graph,
     {
         for (size_t i = 0; i < var->child_count(); ++i)
         {
-            write_node_graph_output(node_graph, get_port_name(output_name, i), var->child(i), attrs);
+            write_node_graph_output(node_graph, port_name_for_field(var->type(), i, output_name), var->child(i), attrs);
         }
     }
 }
@@ -371,7 +371,7 @@ void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const 
     {
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            write_node_def_input(node_def, get_port_name(input_name, i), type->field_type(i));
+            write_node_def_input(node_def, port_name_for_field(type, i, input_name), type->field_type(i));
         }
     }
     else
@@ -397,7 +397,7 @@ void MtlXSerializer::write_node_def_input(const mx::NodeDefPtr& node_def, const 
     {
         for (size_t i = 0; i < var->child_count(); ++i)
         {
-            write_node_def_input(node_def, get_port_name(input_name, i), var->child(i), attrs);
+            write_node_def_input(node_def, port_name_for_field(var->type(), i, input_name), var->child(i), attrs);
         }
     }
 }

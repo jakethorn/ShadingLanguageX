@@ -93,7 +93,7 @@ VarPtr ValueFactory::create_output_value(mx::NodePtr node, TypePtr type, const s
         field_values.reserve(type->field_count());
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            VarPtr field_value = create_output_value(node, type->field_type(i), get_port_name(output_name, i), attrs);
+            VarPtr field_value = create_output_value(node, type->field_type(i), port_name_for_field(type, i, output_name), attrs);
             field_values.push_back(std::move(field_value));
         }
 
@@ -128,7 +128,7 @@ VarPtr ValueFactory::create_output_value(mx::NodeGraphPtr node_graph, TypePtr ty
         field_values.reserve(type->field_count());
         for (size_t i = 0; i < type->field_count(); ++i)
         {
-            VarPtr field_value = create_output_value(node_graph, type->field_type(i), get_port_name(output_name, i));
+            VarPtr field_value = create_output_value(node_graph, type->field_type(i), port_name_for_field(type, i, output_name));
             field_values.push_back(std::move(field_value));
         }
 
