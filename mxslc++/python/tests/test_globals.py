@@ -48,7 +48,9 @@ try:
         ])
 
         result = mxslc.compile_file_to_string(get_data_path("globals001.mxsl"), opts)
-        write_data("globals001.mtlx", result)
+        # Convert any Windows separators to Posix before compare.
+        result = result.replace("\\brick", "/brick")
+        write_data("globals001.mtlx", result)        
         assert result == get_data("globals001.mtlx")
 
     def test_globals_2():
