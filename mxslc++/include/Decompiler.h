@@ -6,6 +6,7 @@
 #define MXSLC_DECOMPILER_H
 
 #include <vector>
+#include <unordered_map>
 #include <unordered_set>
 #include <string>
 #include <filesystem>
@@ -63,6 +64,7 @@ namespace mxslc
         std::string function_code_;
         bool in_function_{false};
         std::unordered_set<MaterialX::NodePtr> decompiled_nodes_;
+        std::unordered_map<std::string, std::string> node_graph_var_names_;
         std::unordered_set<std::string> decompiled_node_graphs_;
     };
 }

@@ -6,6 +6,7 @@
 
 #include <MaterialXFormat/XmlIo.h>
 
+#include "TokenType.h"
 #include "utils/common.h"
 #include "mtlx/load_mtlx.h"
 #include "mtlx/mtlx_utils.h"
@@ -14,6 +15,19 @@
 
 namespace
 {
+    string safe_mxsl_name(const vector<mx::OutputPtr>& outputs, const string& name)
+    {
+        const TokenType type{name};
+        if (type == TokenType::Unknown or type == TokenType::Identifier)
+            return name;
+        for (size_t i = 0; i < outputs.size(); ++i)
+        {
+            if (outputs[i]->getName() == name)
+                return "out" + std::to_string(i + 1);
+        }
+        return name;
+    }
+
     bool is_inline_node(const mx::NodePtr& node)
     {
         return node->getName().rfind("var__", 0) == 0;
@@ -190,7 +204,24 @@ string mxslc::Decompiler::node_graph_to_function_definition(const mx::NodeGraphP
 
     in_function_ = false;
 
-    return "\n" + signature + "\n{\n" + function_code_ + "\n}\n";
+    const string func_def = "\n" + signature + "\n{\n" + function_code_ + "\n}\n";
+
+    // If the nodegraph has interface inputs, also emit a variable that calls
+    // the function with default argument values for external references.
+    const vector<mx::InputPtr> inputs = node_graph->getInputs();
+    const string func_name = get_node_graph_identifier(node_graph);
+    string var_name;
+    string var_def;
+    if (not inputs.empty())
+    {
+        var_name = func_name + "_out";
+        const string var_type = outputs_to_data_type(node_graph->getOutputs());
+        const string args = inputs_to_arguments(inputs);
+        var_def = var_type + " " + var_name + " = " + func_name + "(" + args + ");\n";
+        node_graph_var_names_[node_graph->getName()] = var_name;
+    }
+
+    return func_def + var_def;
 }
 
 string mxslc::Decompiler::node_to_expression(const mx::NodePtr& node)
@@ -241,7 +272,7 @@ string mxslc::Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outp
     {
         string result = "{";
         for (const mx::OutputPtr& output : outputs)
-            result += get_type_alias(output) + " " + output->getName() + ", ";
+            result += get_type_alias(output) + " " + safe_mxsl_name(outputs, output->getName()) + ", ";
         if (result.size() >= 2)
             result.resize(result.size() - 2);
         return result + "}";
@@ -259,6 +290,19 @@ string mxslc::Decompiler::port_to_expression(const mx::PortElementPtr& port)
         const mx::NodePtr node = port->getConnectedNode();
         if (port->hasOutputString())
             return node_and_output_to_dot_op(node, port->getOutputString());
+        // Handle getting "default" output if no output provided for multioutput
+        // node reference.
+        if (node->isMultiOutputType())
+        {
+            static const vector<fs::path> include_dirs = get_include_directories();
+            static const mx::DocumentPtr mtlx_lib = get_materialx_library(DEFAULT_MTLX_VERSION, include_dirs);
+            const mx::NodeDefPtr node_def = get_node_def(node, mtlx_lib);
+            const vector<mx::OutputPtr> outputs = node_def->getActiveOutputs();
+            if (not outputs.empty())
+            {
+                return node_and_output_to_dot_op(node, outputs[0]->getName());
+            }
+        }
         return is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node);
     }
     if (port->hasNodeGraphString())
@@ -289,7 +333,7 @@ string mxslc::Decompiler::value_to_constructor(const mx::ValuePtr& value)
     if (contains(vector{"vec2", "vec3", "vec4", "color3", "color4"}, type_name))
         return type_name + "{" + value->getValueString() + "}";
     if (type_name == "string" || type_name == "filename")
-        return "\"" + value->getValueString() + "\"";
+        return "\"" + value->getValueString() + "\"";        
     return value->getValueString();
 }
 
@@ -305,7 +349,15 @@ string mxslc::Decompiler::node_and_output_to_dot_op(const mx::NodePtr& node, con
 
 string mxslc::Decompiler::node_graph_name_and_output_to_dot_op(const string& node_graph_name, const string& output)
 {
-    return node_graph_name_to_identifier(node_graph_name) + "." + output;
+    const mx::NodeGraphPtr node_graph = document_->getNodeGraph(node_graph_name);
+    const vector<mx::OutputPtr> node_graph_outputs = node_graph ? node_graph->getOutputs() : vector<mx::OutputPtr>{};
+    const string safe_output = safe_mxsl_name(node_graph_outputs, output);
+
+    // For single-output nodegraphs, references use just the identifier
+    // (variable or function name) without a .output suffix.
+    if (node_graph_outputs.size() == 1)
+        return node_graph_name_to_identifier(node_graph_name);
+    return node_graph_name_to_identifier(node_graph_name) + "." + safe_output;
 }
 
 string mxslc::Decompiler::node_to_identifier(const mx::NodePtr& node)
@@ -325,6 +377,9 @@ string mxslc::Decompiler::node_graph_name_to_identifier(const string& node_graph
 {
     if (not contains(decompiled_node_graphs_, node_graph_name))
         global_code_ += node_graph_to_function_definition(node_graph_name);
+
+    if (contains(node_graph_var_names_, node_graph_name))
+        return node_graph_var_names_.at(node_graph_name);
 
     if (node_graph_name.rfind("NG_", 0) == 0)
         return node_graph_name.substr(3);
@@ -402,7 +457,13 @@ string mxslc::Decompiler::get_node_graph_signature(const mx::NodeGraphPtr& node_
     else
     {
         const string return_type = outputs_to_data_type(node_graph->getOutputs());
-        return return_type + " " + get_node_graph_identifier(node_graph) + " => ";
+        const vector<mx::InputPtr> inputs = node_graph->getInputs();
+        const string func_params = inputs_to_parameters(inputs);
+        const string func_name = get_node_graph_identifier(node_graph);
+        if (func_params.empty())
+            return return_type + " " + func_name + " => ";
+        else
+            return return_type + " " + func_name + "(" + func_params + ")";
     }
 }
 

@@ -12,6 +12,12 @@ string get_port_name(const string& port_name, const size_t i)
     return port_name + "__" + str(i);
 }
 
+string port_name_for_field(const TypePtr& type, const size_t i, const string& fallback)
+{
+    const string& field_name = type->field(i).name();
+    return not field_name.empty() ? field_name : get_port_name(fallback, i);
+}
+
 mx::InputPtr add_or_get_input(const mx::NodePtr& node, const string& type, const string& name)
 {
     if (mx::InputPtr input = node->getInput(name); input != nullptr)
