@@ -18,6 +18,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+          - macos-latest
 
     steps:
       - name: Check out mxslc
@@ -38,6 +39,7 @@ jobs:
           ref: v1.39.5
           path: mxslc++/external/MaterialX
 
+      # Linux Build
       - name: Build wheels on Linux
         if: runner.os == 'Linux'
         working-directory: mxslc++
@@ -86,6 +88,59 @@ jobs:
           CIBW_ENVIRONMENT_LINUX: >
             CMAKE_ARGS="-DMTLX_ROOT=/project/external/MaterialX/install -DBUILD_TESTING=OFF"
 
+      # macOS Build
+      - name: Build wheels on macOS
+        if: runner.os == 'macOS'
+        working-directory: mxslc++
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BEFORE_ALL_MACOS: >
+            cmake
+            -S $PWD/external/MaterialX
+            -B $PWD/external/MaterialX/build
+            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_INSTALL_PREFIX=$PWD/external/MaterialX/install
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+            -DMATERIALX_BUILD_PYTHON=OFF
+            -DMATERIALX_BUILD_VIEWER=OFF
+            -DMATERIALX_BUILD_GRAPH_EDITOR=OFF
+            -DMATERIALX_BUILD_DOCS=OFF
+            -DMATERIALX_BUILD_GEN_GLSL=OFF
+            -DMATERIALX_BUILD_GEN_OSL=OFF
+            -DMATERIALX_BUILD_GEN_MDL=OFF
+            -DMATERIALX_BUILD_GEN_MSL=OFF
+            -DMATERIALX_BUILD_GEN_SLANG=OFF
+            -DMATERIALX_BUILD_RENDER=OFF
+            -DMATERIALX_BUILD_RENDER_PLATFORMS=OFF
+            -DMATERIALX_BUILD_OIIO=OFF
+            -DMATERIALX_BUILD_OCIO=OFF
+            -DMATERIALX_BUILD_TESTS=OFF
+            -DMATERIALX_BUILD_BENCHMARK_TESTS=OFF
+            -DMATERIALX_BUILD_OSOS=OFF
+            -DMATERIALX_BUILD_PERFETTO_TRACING=OFF
+            -DMATERIALX_BUILD_SHARED_LIBS=OFF
+            -DMATERIALX_BUILD_DATA_LIBRARY=OFF
+            -DMATERIALX_BUILD_MONOLITHIC=OFF
+            -DMATERIALX_BUILD_USE_CCACHE=OFF
+            -DMATERIALX_PYTHON_LTO=OFF
+            -DMATERIALX_INSTALL_PYTHON=OFF
+            -DMATERIALX_INSTALL_RESOURCES=OFF
+            -DMATERIALX_TEST_RENDER=OFF
+            -DMATERIALX_TEST_RENDER_GLSL=OFF
+            -DMATERIALX_TEST_REFERENCE_QUALITY=OFF
+            -DMATERIALX_WARNINGS_AS_ERRORS=OFF
+            -DMATERIALX_COVERAGE_ANALYSIS=OFF
+            -DMATERIALX_DYNAMIC_ANALYSIS=OFF
+            &&
+            cmake --build $PWD/external/MaterialX/build --config Release --target install --parallel
+
+          CIBW_ENVIRONMENT_MACOS: >
+            CMAKE_ARGS="-DMTLX_ROOT=$PWD/external/MaterialX/install -DBUILD_TESTING=OFF"
+            MACOSX_DEPLOYMENT_TARGET=11.0
+
+          CIBW_ARCHS_MACOS: "arm64"
+
+      # Windows Build
       - name: Configure MaterialX on Windows
         if: runner.os == 'Windows'
         run: >
@@ -143,3 +198,18 @@ jobs:
         with:
           name: wheels-${{ matrix.os }}
           path: mxslc++/wheelhouse/*.whl
+
+      - name: Install pytest and MaterialX
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest MaterialX
+
+      - name: Install the built wheel
+        run: |
+          python -c "import glob; import subprocess; import sys; wheel = glob.glob('mxslc++/wheelhouse/*.whl')[0]; subprocess.check_call([sys.executable, '-m', 'pip', 'install', wheel])"
+      
+      - name: Test with pytest
+        run: |
+          cd mxslc++
+          pytest
+

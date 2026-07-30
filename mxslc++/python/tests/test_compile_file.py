@@ -3,6 +3,12 @@ import mxslc
 
 from groundtruth import RANDOMFLOAT_OUTPUT
 
+def test_compile_string_to_string():
+    result = mxslc.compile_string_to_string('float f = randomfloat() + 1.0;')
+
+    assert isinstance(result, str)
+    assert result == RANDOMFLOAT_OUTPUT
+    
 
 def test_compile_file_to_string(tmp_path):
     source_path = tmp_path / "simple.mxsl"
