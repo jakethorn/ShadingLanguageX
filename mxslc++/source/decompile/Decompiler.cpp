@@ -6,6 +6,7 @@
 
 #include <MaterialXFormat/XmlIo.h>
 
+#include "TokenType.h"
 #include "utils/common.h"
 #include "mtlx/load_mtlx.h"
 #include "mtlx/mtlx_utils.h"
@@ -14,6 +15,19 @@
 
 namespace
 {
+    string safe_mxsl_name(const vector<mx::OutputPtr>& outputs, const string& name)
+    {
+        const TokenType type{name};
+        if (type == TokenType::Unknown or type == TokenType::Identifier)
+            return name;
+        for (size_t i = 0; i < outputs.size(); ++i)
+        {
+            if (outputs[i]->getName() == name)
+                return "out" + std::to_string(i + 1);
+        }
+        return name;
+    }
+
     bool is_inline_node(const mx::NodePtr& node)
     {
         return node->getName().rfind("var__", 0) == 0;
@@ -241,7 +255,7 @@ string mxslc::Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outp
     {
         string result = "{";
         for (const mx::OutputPtr& output : outputs)
-            result += get_type_alias(output) + " " + output->getName() + ", ";
+            result += get_type_alias(output) + " " + safe_mxsl_name(outputs, output->getName()) + ", ";
         if (result.size() >= 2)
             result.resize(result.size() - 2);
         return result + "}";
@@ -318,7 +332,10 @@ string mxslc::Decompiler::node_and_output_to_dot_op(const mx::NodePtr& node, con
 
 string mxslc::Decompiler::node_graph_name_and_output_to_dot_op(const string& node_graph_name, const string& output)
 {
-    return node_graph_name_to_identifier(node_graph_name) + "." + output;
+    const mx::NodeGraphPtr node_graph = document_->getNodeGraph(node_graph_name);
+    const vector<mx::OutputPtr> node_graph_outputs = node_graph ? node_graph->getOutputs() : vector<mx::OutputPtr>{};
+    const string safe_output = safe_mxsl_name(node_graph_outputs, output);
+    return node_graph_name_to_identifier(node_graph_name) + "." + safe_output;
 }
 
 string mxslc::Decompiler::node_to_identifier(const mx::NodePtr& node)

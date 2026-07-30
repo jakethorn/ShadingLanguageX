@@ -10,6 +10,7 @@
 #include "utils/common.h"
 
 string get_port_name(const string& port_name, size_t i);
+string port_name_for_field(const TypePtr& type, size_t i, const string& fallback);
 
 mx::InputPtr add_or_get_input(const mx::NodePtr& node, const string& type, const string& name);
 mx::InputPtr add_or_get_input(const mx::NodePtr& node, const TypePtr& type, const string& name);
