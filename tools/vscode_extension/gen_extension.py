@@ -134,11 +134,11 @@ def generate_package_json() -> dict:
                     "textMateRules": [
                         {
                             "scope": "entity.name.function.mxsl",
-                            "settings": {"foreground": "#ECB52B"}
+                            "settings": {"foreground": "#78C48B"}
                         },
                         {
                             "scope": "support.function.mxsl",
-                            "settings": {"foreground": "#ECB52B"}
+                            "settings": {"foreground": "#78C48B"}
                         }
                     ]
                 }
