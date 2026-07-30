@@ -17,7 +17,7 @@ namespace mxslc::expressions
     ExprPtr UnnamedConstructor::monomorphize(const TypePtr& template_type) const
     {
         vector<ExprPtr> exprs = runtime_utils::monomorphize(exprs_, template_type);
-        return create_expression<UnnamedConstructor>(token_, std::move(exprs));
+        return create_expression<UnnamedConstructor>(std::move(exprs), token_);
     }
 
     void UnnamedConstructor::init_subexpressions(const vector<TypePtr>& types)

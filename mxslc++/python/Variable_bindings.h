@@ -5,8 +5,9 @@
 #ifndef MXSLC_VARIABLE_BINDINGS_H
 #define MXSLC_VARIABLE_BINDINGS_H
 
-#include "common.h"
+#include "pybind.h"
 
 void bind_variable(py::module_& m);
+void bind_create_variable(py::module_& m);
 
 #endif //MXSLC_VARIABLE_BINDINGS_H

@@ -44,9 +44,9 @@ using T##Ptr = shared_ptr<T>;
 
 #undef TYPE_DEF
 
-    RuntimeExpressionPtr as_expression(Primitive value);
-    RuntimeExpressionPtr as_expression(ValuePtr value);
-    RuntimeExpressionPtr as_expression(VarPtr value);
+    ExprPtr as_expression(Primitive value);
+    ExprPtr as_expression(ValuePtr value);
+    ExprPtr as_expression(VarPtr value);
 }
 
 #endif //MXSLC_EXPRESSIONS_INTERFACE_H

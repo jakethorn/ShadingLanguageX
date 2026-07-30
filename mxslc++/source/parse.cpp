@@ -773,7 +773,7 @@ namespace mxslc
     {
         const Token& token = peek();
         vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
-        return create_expression<UnnamedConstructor>(token, std::move(exprs));
+        return create_expression<UnnamedConstructor>(std::move(exprs), token);
     }
 
     ExprPtr Parser::variable_definition_argument(ModifierList mods)

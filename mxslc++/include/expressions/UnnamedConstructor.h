@@ -12,8 +12,8 @@ namespace mxslc::expressions
     class UnnamedConstructor final : public Expression
     {
     public:
-        UnnamedConstructor(Token token, vector<ExprPtr> exprs)
-            : Expression{std::move(token)}, exprs_{std::move(exprs)} { }
+        explicit UnnamedConstructor(vector<ExprPtr> exprs) : Expression{}, exprs_{std::move(exprs)} { }
+        UnnamedConstructor(vector<ExprPtr> exprs, Token token) : Expression{std::move(token)}, exprs_{std::move(exprs)} { }
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 

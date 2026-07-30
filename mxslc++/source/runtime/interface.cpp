@@ -130,6 +130,9 @@ namespace mxslc::runtime
 
     VarPtr create_variable(const VarPtr& value)
     {
-        return create_variable(ModifierList{}, value->type(), value);
+        VarPtr copy = create_variable(ModifierList{}, value->type(), value);
+        if (value->is_external())
+            copy->set_is_external();
+        return copy;
     }
 }

@@ -74,8 +74,8 @@ namespace mxslc
                 {
                     runtime.enter_scope();
                     compile_tokens(std::move(tokens));
-                    if (opts.has_function())
-                        runtime_utils::invoke_function(*opts.func_name, opts.func_args);
+                    if (opts.has_entry_function())
+                        runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
                     runtime.exit_scope();
                 }
                 runtime.exit_scope();

@@ -114,7 +114,7 @@ namespace mxslc::serialize
         if (stream >> major >> dot >> minor && dot == '.')
             doc_->setVersionIntegers(major, minor);
         else
-            throw CompileError{"Invalid version string: " + version};
+            throw CompileError{"Invalid MaterialX version: " + version};
     }
 
     VarPtr Serializer::write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const

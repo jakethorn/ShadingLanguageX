@@ -1,0 +1,6 @@
+#ifndef VALUE2
+#define VALUE2 100.0
+#endif
+
+float x = randomfloat() + VALUE1;
+float y = randomfloat() + VALUE2;

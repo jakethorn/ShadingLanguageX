@@ -235,9 +235,10 @@ TEST(parse_args_tests, test_options_005)
 
     ASSERT_TRUE(args.is_valid);
     ASSERT_EQ(args.options.func_name, "main"s);
-    ASSERT_EQ(args.options.func_args.size(), 1);
-    ASSERT_TRUE(args.options.func_args[0].is_a<float>());
-    ASSERT_FLOAT_EQ(args.options.func_args[0].as<float>(), 3.4);
+    const auto& func_args = args.options.entry_function_arguments();
+    ASSERT_EQ(func_args.size(), 1);
+    ASSERT_TRUE(func_args[0]->is_basic<float>());
+    ASSERT_FLOAT_EQ(func_args[0]->basic<float>(), 3.4);
 }
 
 TEST(parse_args_tests, test_response_file_005)
@@ -249,16 +250,17 @@ TEST(parse_args_tests, test_response_file_005)
 
     ASSERT_TRUE(args.is_valid);
 
-    ASSERT_EQ(args.options.func_args.size(), 3);
+    const auto& func_args = args.options.entry_function_arguments();
+    ASSERT_EQ(func_args.size(), 3);
 
-    ASSERT_TRUE(args.options.func_args[0].is_a<string>());
-    ASSERT_EQ(args.options.func_args[0].as<string>(), "hello world");
+    ASSERT_TRUE(func_args[0]->is_basic<string>());
+    ASSERT_EQ(func_args[0]->basic<string>(), "hello world");
 
-    ASSERT_TRUE(args.options.func_args[1].is_a<float>());
-    ASSERT_FLOAT_EQ(args.options.func_args[1].as<float>(), -3.4);
+    ASSERT_TRUE(func_args[1]->is_basic<float>());
+    ASSERT_FLOAT_EQ(func_args[1]->basic<float>(), -3.4);
 
-    ASSERT_TRUE(args.options.func_args[2].is_a<int>());
-    ASSERT_EQ(args.options.func_args[2].as<int>(), 123);
+    ASSERT_TRUE(func_args[2]->is_basic<int>());
+    ASSERT_EQ(func_args[2]->basic<int>(), 123);
 }
 
 TEST(parse_args_tests, test_response_file_006)
@@ -270,16 +272,17 @@ TEST(parse_args_tests, test_response_file_006)
 
     ASSERT_TRUE(args.is_valid);
 
-    ASSERT_EQ(args.options.func_args.size(), 3);
+    const auto& func_args = args.options.entry_function_arguments();
+    ASSERT_EQ(func_args.size(), 3);
 
-    ASSERT_TRUE(args.options.func_args[0].is_a<string>());
-    ASSERT_EQ(args.options.func_args[0].as<string>(), "hello world");
+    ASSERT_TRUE(func_args[0]->is_basic<string>());
+    ASSERT_EQ(func_args[0]->basic<string>(), "hello world");
 
-    ASSERT_TRUE(args.options.func_args[1].is_a<float>());
-    ASSERT_FLOAT_EQ(args.options.func_args[1].as<float>(), -3.4);
+    ASSERT_TRUE(func_args[1]->is_basic<float>());
+    ASSERT_FLOAT_EQ(func_args[1]->basic<float>(), -3.4);
 
-    ASSERT_TRUE(args.options.func_args[2].is_a<int>());
-    ASSERT_EQ(args.options.func_args[2].as<int>(), 123);
+    ASSERT_TRUE(func_args[2]->is_basic<int>());
+    ASSERT_EQ(func_args[2]->basic<int>(), 123);
 }
 
 TEST(parse_args_tests, test_global_options)
@@ -294,25 +297,25 @@ TEST(parse_args_tests, test_global_options)
     ASSERT_TRUE(args.options.error_on_missing_globals);
     ASSERT_TRUE(args.options.error_on_unused_globals);
 
-    ASSERT_EQ(args.options.globals.size(), 5);
+    ASSERT_EQ(args.options.globals().size(), 5);
 
-    const mxslc::VarPtr& x = args.options.globals.at("x");
+    const mxslc::VarPtr& x = args.options.get_global("x");
     ASSERT_TRUE(x->type()->is<float>());
     ASSERT_FLOAT_EQ(x->basic<float>(), 1.0);
 
-    const mxslc::VarPtr& y = args.options.globals.at("y");
+    const mxslc::VarPtr& y = args.options.get_global("y");
     ASSERT_TRUE(y->type()->is<string>());
     ASSERT_EQ(y->basic<string>(), "hello");
 
-    const mxslc::VarPtr& z = args.options.globals.at("z");
+    const mxslc::VarPtr& z = args.options.get_global("z");
     ASSERT_TRUE(z->type()->is<float>());
     ASSERT_FLOAT_EQ(z->basic<float>(), 2.0);
 
-    const mxslc::VarPtr& w = args.options.globals.at("w");
+    const mxslc::VarPtr& w = args.options.get_global("w");
     ASSERT_TRUE(w->type()->is<string>());
     ASSERT_EQ(w->basic<string>(), "world");
 
-    const mxslc::VarPtr& u = args.options.globals.at("u");
+    const mxslc::VarPtr& u = args.options.get_global("u");
     ASSERT_TRUE(u->type()->is<int>());
     ASSERT_EQ(u->basic<int>(), 10);
 }

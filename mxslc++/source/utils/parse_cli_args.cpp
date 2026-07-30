@@ -225,7 +225,7 @@ options:
                     return;
                 }
 
-                clargs.options.func_args.push_back(*value);
+                clargs.options.add_entry_function_argument(create_variable(*value));
             }
         }
 
@@ -250,7 +250,7 @@ options:
                     return;
                 }
 
-                clargs.options.globals[name] = create_variable(*value);
+                clargs.options.add_global(std::move(name), create_variable(*value));
             }
         }
 

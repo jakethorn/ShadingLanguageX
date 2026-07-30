@@ -133,6 +133,11 @@ namespace mxslc::runtime
         return children_.size();
     }
 
+    bool Variable::has_children() const
+    {
+        return not children_.empty();
+    }
+
     const vector<VarPtr>& Variable::children() const
     {
         return children_;
@@ -265,6 +270,13 @@ namespace mxslc::runtime
         if (const NullValuePtr& value = cast_value<NullValue>(value_))
             return Primitive{};
         throw CompileError{"Variable is not available at compile-time"};
+    }
+
+    void Variable::set_is_external()
+    {
+        is_external_ = true;
+        for (const VarPtr& child : children_)
+            child->set_is_external();
     }
 
     string Variable::to_string() const

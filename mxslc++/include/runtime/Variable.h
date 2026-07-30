@@ -42,6 +42,7 @@ namespace mxslc::runtime
         VarPtr oldest_ancestor();
 
         size_t child_count() const;
+        bool has_children() const;
         const vector<VarPtr>& children() const;
         VarPtr child(size_t index);
         VarPtr child(const string& field_name);
@@ -63,7 +64,14 @@ namespace mxslc::runtime
         Primitive basic() const;
 
         template<typename T>
+        bool is_basic() const { return is_basic() and basic().is_a<T>(); }
+
+        template<typename T>
         T basic() const { return basic().as<T>(); }
+
+        // Value comes from an external source, e.g., a global or entry function argument
+        bool is_external() const { return is_external_; }
+        void set_is_external();
 
         string to_string() const override;
 
@@ -85,6 +93,7 @@ namespace mxslc::runtime
         string name_;
         bool can_name_nodes_{true};
         bool is_initialized_{false};
+        bool is_external_{false};
     };
 }
 

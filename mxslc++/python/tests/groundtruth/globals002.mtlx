@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <position name="in2" type="vector3">
+  <position name="var__0" type="vector3">
     <input name="space" type="string" value="world" />
   </position>
-  <subtract name="var__0" type="vector3">
+  <subtract name="var__1" type="vector3">
     <input name="in1" type="vector3" value="0, 10, 0" />
-    <input name="in2" type="vector3" nodename="in2" />
+    <input name="in2" type="vector3" nodename="var__0" />
   </subtract>
   <normalize name="to_light" type="vector3">
-    <input name="in" type="vector3" nodename="var__0" />
+    <input name="in" type="vector3" nodename="var__1" />
   </normalize>
-  <normalize name="var__1" type="vector3">
+  <normalize name="var__2" type="vector3">
     <input name="in" type="vector3" value="0, -1, 0" />
   </normalize>
   <dotproduct name="intensity" type="float">
     <input name="in1" type="vector3" nodename="to_light" />
-    <input name="in2" type="vector3" nodename="var__1" />
+    <input name="in2" type="vector3" nodename="var__2" />
   </dotproduct>
   <convert name="c" type="color3">
     <input name="in" type="float" nodename="intensity" />

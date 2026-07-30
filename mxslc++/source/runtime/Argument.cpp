@@ -5,7 +5,6 @@
 #include "runtime/Argument.h"
 
 #include "runtime/Parameter.h"
-#include "expressions/Literal.h"
 #include "expressions/RuntimeExpression.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "errors/CompileError.h"
@@ -37,7 +36,7 @@ namespace mxslc::runtime
         : Argument{as_expression(std::move(value)), index} { }
 
     Argument::Argument(Primitive value, const size_t index)
-        : Argument{create_expression<Literal>(std::move(value)), index} { }
+        : Argument{as_expression(std::move(value)), index} { }
 
     Argument::Argument(Argument&& other) noexcept
         : attrs_{std::move(other.attrs_)},

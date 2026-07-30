@@ -1,0 +1,10 @@
+inline void foo(float a, {float b, string c} d)
+{
+    surfaceshader surface = standard_surface();
+    surface.base = a;
+    surface.base_color = color3{d.b};
+    surface.normal = normal(space=d.c);
+    surface.thin_walled = false;
+
+    surfacematerial(surface);
+}

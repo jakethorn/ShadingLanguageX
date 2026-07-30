@@ -4,6 +4,7 @@
 
 #include "CompileOptions.h"
 
+#include "runtime/Variable.h"
 #include "utils/container_utils.h"
 #include "utils/io_utils.h"
 #include "utils/Logger.h"
@@ -28,6 +29,11 @@ namespace mxslc
         cwd_ = std::move(dir);
     }
 
+    void CompileOptions::clear_search_directories()
+    {
+        search_dirs_.clear();
+    }
+
     vector<fs::path> CompileOptions::search_directories() const
     {
         vector<fs::path> dirs;
@@ -42,20 +48,78 @@ namespace mxslc
         macros_.insert_or_assign(macro.name(), std::move(macro));
     }
 
+    void CompileOptions::add_macro(string macro)
+    {
+        add_macro(Macro{std::move(macro)});
+    }
+
     void CompileOptions::remove_macro(const string& name)
     {
         macros_.erase(name);
+    }
+
+    void CompileOptions::clear_macros()
+    {
+        macros_.clear();
     }
 
     const Macro& CompileOptions::get_macro(const string& name) const
     {
         if (has_macro(name))
             return macros_.at(name);
-        throw CompileError{"Trying to access macro that does not exist with the name: " + name};
+        throw CompileError{"Macro does not exist: " + name};
     }
 
     bool CompileOptions::has_macro(const string& name) const
     {
         return container_utils::contains(macros_, name);
+    }
+
+    void CompileOptions::add_global(string name, VarPtr value)
+    {
+        value->set_is_external();
+        globals_.insert_or_assign(std::move(name), std::move(value));
+    }
+
+    void CompileOptions::set_globals(unordered_map<string, VarPtr> globals)
+    {
+        globals_ = std::move(globals);
+        for (const auto& [name, value] : globals_)
+            value->set_is_external();
+    }
+
+    void CompileOptions::clear_globals()
+    {
+        globals_.clear();
+    }
+
+    const VarPtr &CompileOptions::get_global(const string& name) const
+    {
+        if (has_global(name))
+            return globals_.at(name);
+        throw CompileError{"Global does not exist: " + name};
+    }
+
+    bool CompileOptions::has_global(const string& name) const
+    {
+        return container_utils::contains(globals_, name);
+    }
+
+    void CompileOptions::add_entry_function_argument(VarPtr value)
+    {
+        value->set_is_external();
+        func_args_.push_back(std::move(value));
+    }
+
+    void CompileOptions::set_entry_function_arguments(vector<VarPtr> args)
+    {
+        func_args_ = std::move(args);
+        for (const VarPtr& arg : func_args_)
+            arg->set_is_external();
+    }
+
+    void CompileOptions::clear_entry_function_arguments()
+    {
+        func_args_.clear();
     }
 }
