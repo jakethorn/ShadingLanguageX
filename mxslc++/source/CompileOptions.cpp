@@ -54,6 +54,11 @@ namespace mxslc
         add_macro(Macro{std::move(macro)});
     }
 
+    void CompileOptions::add_macro(string name, const string& body)
+    {
+        add_macro(Macro{std::move(name), body});
+    }
+
     void CompileOptions::remove_macro(const string& name)
     {
         macros_.erase(name);

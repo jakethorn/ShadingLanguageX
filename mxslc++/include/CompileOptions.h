@@ -38,6 +38,7 @@ namespace mxslc
 
         void add_macro(Macro macro);
         void add_macro(string macro);
+        void add_macro(string name, const string& body);
         void remove_macro(const string& name);
         void clear_macros();
         const Macro& get_macro(const string& name) const;
