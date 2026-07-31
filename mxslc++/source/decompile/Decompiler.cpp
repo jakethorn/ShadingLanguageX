@@ -285,11 +285,11 @@ namespace mxslc::decompile
             for (const mx::OutputPtr& output : outputs)
             {
                 // Ignore outputs that are generated from out parameters and setting nonlocals
-                //if (has_prefix(output->getName(), RETURN_VALUE_PREFIX))
-                //{
-                    //const string var_name = remove_prefix(output->getName());
-                    result += get_type_alias(output) + " " + safe_mxsl_name(outputs, output->getName()) + ", ";
-                //}
+                if (has_prefix(output->getName(), OUT_PARAMETER_PREFIX) or
+                    has_prefix(output->getName(), NONLOCAL_OUT_PREFIX))
+                    continue;
+                const string var_name = remove_prefix(output->getName());
+                result += get_type_alias(output) + " " + safe_mxsl_name(outputs, var_name) + ", ";
             }
             remove_trailing_comma(result);
             return result + "}";
