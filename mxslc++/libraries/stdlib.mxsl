@@ -306,7 +306,7 @@ inline T __pos__<integer, float, vector2, vector3, vector4>(T in1)
 
 inline T __neg__<float, vector2, vector3, vector4>(T in1)
 {
-    return invert(in1);
+    return invert(in1, 0);
 }
 
 inline integer __neg__(integer in1)
