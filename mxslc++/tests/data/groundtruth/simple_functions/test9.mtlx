@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="out__p__0" type="float" />
-    <output name="out__p__1" type="float" />
-    <output name="out__q__0" type="float" />
-    <output name="out__q__1" type="float" />
+    <output name="outparam__p__x" type="float" />
+    <output name="outparam__p__y" type="float" />
+    <output name="outparam__q__x" type="float" />
+    <output name="outparam__q__y" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="2" />
     </multiply>
-    <output name="out__p__0" type="float" value="0" />
-    <output name="out__p__1" type="float" value="2" />
-    <output name="out__q__0" type="float" nodename="var__0" />
-    <output name="out__q__1" type="float" value="4" />
+    <output name="outparam__p__x" type="float" value="0" />
+    <output name="outparam__p__y" type="float" value="2" />
+    <output name="outparam__q__x" type="float" nodename="var__0" />
+    <output name="outparam__q__y" type="float" value="4" />
   </nodegraph>
   <foo name="var__0" type="multioutput" />
   <multiply name="x" type="float">
-    <input name="in1" type="float" output="out__p__0" nodename="var__0" />
-    <input name="in2" type="float" output="out__q__0" nodename="var__0" />
+    <input name="in1" type="float" output="outparam__p__x" nodename="var__0" />
+    <input name="in2" type="float" output="outparam__q__x" nodename="var__0" />
   </multiply>
   <multiply name="y" type="float">
-    <input name="in1" type="float" output="out__p__1" nodename="var__0" />
-    <input name="in2" type="float" output="out__q__1" nodename="var__0" />
+    <input name="in1" type="float" output="outparam__p__y" nodename="var__0" />
+    <input name="in2" type="float" output="outparam__q__y" nodename="var__0" />
   </multiply>
 </materialx>

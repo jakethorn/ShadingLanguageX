@@ -60,6 +60,7 @@ namespace mxslc::decompile
         string function_code_;
         bool in_function_{false};
         unordered_set<mx::NodePtr> decompiled_nodes_;
+        unordered_map<std::string, std::string> node_graph_var_names_;
         unordered_set<string> decompiled_node_graphs_;
     };
 }

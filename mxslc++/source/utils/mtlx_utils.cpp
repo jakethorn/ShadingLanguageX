@@ -6,16 +6,11 @@
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
+#include "utils/io_utils.h"
+#include "utils/load_mtlx.h"
 
 namespace mxslc::mtlx_utils
 {
-    using namespace string_utils;
-
-    string get_port_name(const string& port_name, const size_t i)
-    {
-        return port_name + "__" + str(i);
-    }
-
     mx::InputPtr add_or_get_input(const mx::NodePtr& node, const string& type, const string& name)
     {
         if (mx::InputPtr input = node->getInput(name))
@@ -60,6 +55,16 @@ namespace mxslc::mtlx_utils
         throw CompileError{"Cannot find NodeDef for " + node->getCategory()};
     }
 
+    mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const string& mtlx_version, const vector<fs::path>& include_dirs)
+    {
+        const mx::DocumentPtr mtlx_lib = get_materialx_library(
+            mtlx_version,
+            include_dirs.empty() ? io_utils::get_default_search_directories() : include_dirs
+        );
+
+        return get_node_def(node, mtlx_lib);
+    }
+
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib)
     {
         mx::NodeDefPtr node_def = node_graph->getNodeDef();
@@ -71,6 +76,16 @@ namespace mxslc::mtlx_utils
             return node_def;
 
         throw CompileError{"Cannot find NodeDef for " + node_graph->getName()};
+    }
+
+    mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const string& mtlx_version, const vector<fs::path>& include_dirs)
+    {
+        const mx::DocumentPtr mtlx_lib = get_materialx_library(
+            mtlx_version,
+            include_dirs.empty() ? io_utils::get_default_search_directories() : include_dirs
+        );
+
+        return get_node_def(node_graph, mtlx_lib);
     }
 
     void set_interface(const mx::PortElementPtr& port, const string& interface_name)

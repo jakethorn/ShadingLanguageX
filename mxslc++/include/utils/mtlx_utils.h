@@ -10,16 +10,17 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
+#include "constants.h"
 
 namespace mxslc::mtlx_utils
 {
-    string get_port_name(const string& port_name, size_t i);
-
     mx::InputPtr add_or_get_input(const mx::NodePtr& node, const string& type, const string& name);
     mx::InputPtr add_or_get_input(const mx::NodePtr& node, const TypePtr& type, const string& name);
     mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const TypePtr& type, const string& name);
     mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const mx::DocumentPtr& mtlx_lib);
+    mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const string& mtlx_version = DEFAULT_MTLX_VERSION, const vector<fs::path>& include_dirs = {});
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib);
+    mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const string& mtlx_version = DEFAULT_MTLX_VERSION, const vector<fs::path>& include_dirs = {});
     void set_interface(const mx::PortElementPtr& port, const string& interface_name);
 
     void remove_port(const mx::PortElementPtr& port);

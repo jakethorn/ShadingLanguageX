@@ -32,6 +32,8 @@ def test_globals_4_3():
 def test_globals_5():
     opts = mxslc.CompileOptions(globals = {"tint": 0.3, "albedo_path": "../brick.png"})
     result = mxslc.compile_file_to_string(get_data_path("globals005.mxsl"), opts)
+    result = result.replace("\\brick", "/brick")
+
     assert_matches_groundtruth(result, "globals005.mtlx")
 
 
@@ -46,6 +48,8 @@ try:
         })
 
         result = mxslc.compile_file_to_string(get_data_path("globals001.mxsl"), opts)
+        result = result.replace("\\brick", "/brick")
+
         assert_matches_groundtruth(result, "globals001.mtlx")
 
 
@@ -56,6 +60,8 @@ try:
         })
 
         result = mxslc.compile_file_to_string(get_data_path("globals001.mxsl"), opts)
+        result = result.replace("\\brick", "/brick")
+        
         assert_matches_groundtruth(result, "globals001.mtlx")
 
 

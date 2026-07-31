@@ -7,8 +7,8 @@
     <convert name="b" type="vector3">
       <input name="in" type="integer" value="2" />
     </convert>
-    <output name="out__0" type="vector2" nodename="a" />
-    <output name="out__1" type="vector3" nodename="b" />
-    <output name="out__2" type="string" value="world" />
+    <output name="out__v2" type="vector2" nodename="a" />
+    <output name="out__v3" type="vector3" nodename="b" />
+    <output name="out__s" type="string" value="world" />
   </nodegraph>
 </materialx>

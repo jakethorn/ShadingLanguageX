@@ -9,6 +9,7 @@
 #include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
+#include "serialize/serialize_name_utils.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
 #include "serialize/values/NodeGraphOutputValue.h"
@@ -20,8 +21,6 @@
 
 namespace mxslc::serialize_utils
 {
-    using mtlx_utils::get_port_name;
-
     VarPtr create_interface_value(TypePtr type, const string& name)
     {
         if (type->has_fields())
@@ -29,7 +28,7 @@ namespace mxslc::serialize_utils
             vector<VarPtr> field_values;
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                VarPtr field_value = create_interface_value(type->field_type(i), get_port_name(name, i));
+                VarPtr field_value = create_interface_value(type->field_type(i), with_prefix(name, type, i));
                 field_values.push_back(std::move(field_value));
             }
 
@@ -46,7 +45,7 @@ namespace mxslc::serialize_utils
     {
         if (node_def->getOutputCount() > 1)
         {
-            return create_node_output_value(std::move(node), std::move(type), "out");
+            return create_node_output_value(std::move(node), std::move(type), RETURN_VALUE_PREFIX);
         }
         else
         {
@@ -71,7 +70,7 @@ namespace mxslc::serialize_utils
     {
         if (node_graph->getOutputCount() > 1)
         {
-            return create_node_graph_output_value(std::move(node_graph), std::move(type), "out");
+            return create_node_graph_output_value(std::move(node_graph), std::move(type), RETURN_VALUE_PREFIX);
         }
         else
         {
@@ -98,7 +97,7 @@ namespace mxslc::serialize_utils
             field_values.reserve(type->field_count());
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                VarPtr field_value = create_node_output_value(node, type->field_type(i), get_port_name(output_name, i), attrs);
+                VarPtr field_value = create_node_output_value(node, type->field_type(i), with_prefix(output_name, type, i), attrs);
                 field_values.push_back(std::move(field_value));
             }
 
@@ -133,7 +132,7 @@ namespace mxslc::serialize_utils
             field_values.reserve(type->field_count());
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                VarPtr field_value = create_node_graph_output_value(node_graph, type->field_type(i), get_port_name(output_name, i));
+                VarPtr field_value = create_node_graph_output_value(node_graph, type->field_type(i), with_prefix(output_name, type, i));
                 field_values.push_back(std::move(field_value));
             }
 

@@ -2,36 +2,36 @@
 <materialx version="1.39">
   <nodedef name="ND_Point_extent" node="Point_extent">
     <output name="out" type="float" />
-    <input name="this__0" type="float" />
-    <input name="this__1" type="float" />
+    <input name="this__x" type="float" />
+    <input name="this__y" type="float" />
   </nodedef>
   <nodegraph name="NG_Point_extent" nodedef="ND_Point_extent">
     <max name="var__0" type="float">
-      <input name="in1" type="float" interfacename="this__0" />
-      <input name="in2" type="float" interfacename="this__1" />
+      <input name="in1" type="float" interfacename="this__x" />
+      <input name="in2" type="float" interfacename="this__y" />
     </max>
     <output name="out" type="float" nodename="var__0" />
   </nodegraph>
   <nodedef name="ND_Sphere_extent" node="Sphere_extent">
     <output name="out" type="float" />
-    <input name="p__0" type="float" value="0" />
-    <input name="p__1" type="float" value="0" />
-    <input name="this__0" type="float" />
+    <input name="p__x" type="float" value="0" />
+    <input name="p__y" type="float" value="0" />
+    <input name="this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_extent" nodedef="ND_Sphere_extent">
     <Point_extent name="var__0" type="float">
-      <input name="this__0" type="float" interfacename="p__0" />
-      <input name="this__1" type="float" interfacename="p__1" />
+      <input name="this__x" type="float" interfacename="p__x" />
+      <input name="this__y" type="float" interfacename="p__y" />
     </Point_extent>
     <add name="var__1" type="float">
       <input name="in1" type="float" nodename="var__0" />
-      <input name="in2" type="float" interfacename="this__0" />
+      <input name="in2" type="float" interfacename="this__radius" />
     </add>
     <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <Sphere_extent name="var__0" type="float">
-    <input name="p__0" type="float" value="1" />
-    <input name="p__1" type="float" value="2" />
-    <input name="this__0" type="float" value="3" />
+    <input name="p__x" type="float" value="1" />
+    <input name="p__y" type="float" value="2" />
+    <input name="this__radius" type="float" value="3" />
   </Sphere_extent>
 </materialx>

@@ -9,7 +9,7 @@
 
 namespace mxslc
 {
-    const string DEFAULT_MTLX_VERSION{"1.39.5"};
+    inline const string DEFAULT_MTLX_VERSION{"1.39.5"};
 }
 
 #endif //MXSLC_CONSTANTS_H

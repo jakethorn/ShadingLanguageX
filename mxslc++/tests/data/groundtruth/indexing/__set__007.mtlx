@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="out__c" type="float" />
+    <output name="outparam__c" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="out__c" type="float" value="5" />
+    <output name="outparam__c" type="float" value="5" />
   </nodegraph>
   <convert name="v" type="vector3">
     <input name="in" type="float" value="1" />
@@ -14,19 +14,19 @@
     <input name="in" type="vector3" nodename="v" />
   </separate3>
   <combine3 name="var__2" type="vector3">
-    <input name="in1" type="float" output="out__c" nodename="var__0" />
+    <input name="in1" type="float" output="outparam__c" nodename="var__0" />
     <input name="in2" type="float" output="outy" nodename="var__1" />
     <input name="in3" type="float" output="outz" nodename="var__1" />
   </combine3>
   <combine3 name="var__3" type="vector3">
     <input name="in1" type="float" output="outx" nodename="var__1" />
-    <input name="in2" type="float" output="out__c" nodename="var__0" />
+    <input name="in2" type="float" output="outparam__c" nodename="var__0" />
     <input name="in3" type="float" output="outz" nodename="var__1" />
   </combine3>
   <combine3 name="var__4" type="vector3">
     <input name="in1" type="float" output="outx" nodename="var__1" />
     <input name="in2" type="float" output="outy" nodename="var__1" />
-    <input name="in3" type="float" output="out__c" nodename="var__0" />
+    <input name="in3" type="float" output="outparam__c" nodename="var__0" />
   </combine3>
   <switch name="var__5" type="vector3">
     <input name="in1" type="vector3" nodename="var__2" />

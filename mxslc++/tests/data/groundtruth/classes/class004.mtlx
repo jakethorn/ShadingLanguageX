@@ -1,34 +1,34 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_Sphere_self" node="Sphere_self">
-    <output name="out__0" type="vector3" />
-    <output name="out__1" type="float" />
-    <input name="this__0" type="vector3" />
-    <input name="this__1" type="float" />
+    <output name="out__position" type="vector3" />
+    <output name="out__radius" type="float" />
+    <input name="this__position" type="vector3" />
+    <input name="this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_self" nodedef="ND_Sphere_self">
-    <output name="out__0" type="vector3" interfacename="this__0" />
-    <output name="out__1" type="float" interfacename="this__1" />
+    <output name="out__position" type="vector3" interfacename="this__position" />
+    <output name="out__radius" type="float" interfacename="this__radius" />
   </nodegraph>
   <nodedef name="ND_Sphere_move" node="Sphere_move">
-    <output name="out__0" type="vector3" />
-    <output name="out__1" type="float" />
+    <output name="out__position" type="vector3" />
+    <output name="out__radius" type="float" />
     <input name="v" type="vector3" value="0, 0, 0" />
-    <input name="this__0" type="vector3" />
-    <input name="this__1" type="float" />
+    <input name="this__position" type="vector3" />
+    <input name="this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_move" nodedef="ND_Sphere_move">
     <add name="var__0" type="vector3">
-      <input name="in1" type="vector3" interfacename="this__0" />
+      <input name="in1" type="vector3" interfacename="this__position" />
       <input name="in2" type="vector3" interfacename="v" />
     </add>
-    <output name="out__0" type="vector3" nodename="var__0" />
-    <output name="out__1" type="float" interfacename="this__1" />
+    <output name="out__position" type="vector3" nodename="var__0" />
+    <output name="out__radius" type="float" interfacename="this__radius" />
   </nodegraph>
   <nodedef name="ND_Sphere_area" node="Sphere_area">
     <output name="out" type="float" />
-    <input name="this__0" type="vector3" />
-    <input name="this__1" type="float" />
+    <input name="this__position" type="vector3" />
+    <input name="this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_area" nodedef="ND_Sphere_area">
     <multiply name="var__0" type="float">
@@ -37,11 +37,11 @@
     </multiply>
     <multiply name="var__1" type="float">
       <input name="in1" type="float" nodename="var__0" />
-      <input name="in2" type="float" interfacename="this__1" />
+      <input name="in2" type="float" interfacename="this__radius" />
     </multiply>
     <multiply name="var__2" type="float">
       <input name="in1" type="float" nodename="var__1" />
-      <input name="in2" type="float" interfacename="this__1" />
+      <input name="in2" type="float" interfacename="this__radius" />
     </multiply>
     <output name="out" type="float" nodename="var__2" />
   </nodegraph>
@@ -51,11 +51,11 @@
     <input name="in3" type="float" value="0" />
   </combine3>
   <Sphere_area name="var__0" type="float">
-    <input name="this__0" type="vector3" nodename="s__position" />
-    <input name="this__1" type="float" value="1" />
+    <input name="this__position" type="vector3" nodename="s__position" />
+    <input name="this__radius" type="float" value="1" />
   </Sphere_area>
   <Sphere_area name="var__1" type="float">
-    <input name="this__0" type="vector3" nodename="s__position" />
-    <input name="this__1" type="float" value="2" />
+    <input name="this__position" type="vector3" nodename="s__position" />
+    <input name="this__radius" type="float" value="2" />
   </Sphere_area>
 </materialx>

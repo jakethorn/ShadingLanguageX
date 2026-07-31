@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND___Point__" node="__Point__">
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
+    <output name="out__x" type="float" />
+    <output name="out__y" type="float" />
     <input name="x" type="float" value="0" />
     <input name="y" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG___Point__" nodedef="ND___Point__">
-    <output name="out__0" type="float" interfacename="x" />
-    <output name="out__1" type="float" interfacename="y" />
+    <output name="out__x" type="float" interfacename="x" />
+    <output name="out__y" type="float" interfacename="y" />
   </nodegraph>
   <position name="var__0" type="vector3">
     <input name="space" type="string" value="integer" />

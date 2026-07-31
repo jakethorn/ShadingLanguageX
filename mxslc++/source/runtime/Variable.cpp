@@ -11,16 +11,14 @@
 #include "serialize/values/interface.h"
 #include "serialize/values/NodeOutputValue.h"
 #include "serialize/values/NodeValue.h"
-#include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
+#include "serialize/serialize_name_utils.h"
 #include "serialize/values/BasicValue.h"
 #include "serialize/values/NullValue.h"
 
 namespace mxslc::runtime
 {
-    using mtlx_utils::get_port_name;
-
     Variable::Variable(ModifierList mods, TypePtr type) : type_{std::move(type)}
     {
         set_modifiers(std::move(mods));
@@ -72,7 +70,7 @@ namespace mxslc::runtime
 
     void Variable::set_name(const string& name, const TypePtr& parent_type, const size_t index)
     {
-        name_ = get_port_name(name, index);
+        name_ = with_prefix(name, index);
         for (size_t i = 0; i < children_.size(); ++i)
         {
             children_[i]->set_name(name_, type_, i);
@@ -359,7 +357,7 @@ namespace mxslc::runtime
             VarPtr child = create_variable(type_->field(i).modifiers(), type_->field_type(i), children[i]);
             child->parent_ = weak_from_this();
             if (not name_.empty())
-                child->set_name(get_port_name(name_, i));
+                child->set_name(with_prefix(name_, i));
             children_.push_back(std::move(child));
         }
 

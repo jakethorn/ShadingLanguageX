@@ -2,14 +2,14 @@
 <materialx version="1.39">
   <nodegraph name="NG_foo">
     <normal name="var__0" type="vector3" />
-    <output name="out__0" type="vector3" nodename="var__0" />
-    <output name="out__1" type="string" value="world" />
+    <output name="out__n" type="vector3" nodename="var__0" />
+    <output name="out__space" type="string" value="world" />
   </nodegraph>
   <viewdirection name="var__0" type="vector3">
-    <input name="space" type="string" output="out__1" nodegraph="NG_foo" />
+    <input name="space" type="string" output="out__space" nodegraph="NG_foo" />
   </viewdirection>
   <dotproduct name="theta" type="float">
-    <input name="in1" type="vector3" output="out__0" nodegraph="NG_foo" />
+    <input name="in1" type="vector3" output="out__n" nodegraph="NG_foo" />
     <input name="in2" type="vector3" nodename="var__0" />
   </dotproduct>
 </materialx>

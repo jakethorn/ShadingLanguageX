@@ -96,6 +96,7 @@ add_library(mxslc_lib
         serialize/serialize_constexpr.cpp
         serialize/serialize_constexpr_wrapper.cpp
         serialize/serializer_utils.cpp
+        serialize/serialize_name_utils.cpp
         serialize/values/Value.cpp
         serialize/values/NodeValue.cpp
         serialize/values/InterfaceValue.cpp

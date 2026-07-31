@@ -10,9 +10,9 @@
     <convert name="var__2" type="vector3">
       <input name="in" type="float" value="3" />
     </convert>
-    <output name="out__0" type="vector3" nodename="var__0" />
-    <output name="out__1" type="vector3" nodename="var__1" />
-    <output name="out__2" type="vector3" nodename="var__2" />
+    <output name="out__x" type="vector3" nodename="var__0" />
+    <output name="out__y" type="vector3" nodename="var__1" />
+    <output name="out__z" type="vector3" nodename="var__2" />
   </nodegraph>
   <nodegraph name="NG__123_vector4">
     <convert name="var__0" type="vector4">
@@ -24,24 +24,24 @@
     <convert name="var__2" type="vector4">
       <input name="in" type="float" value="3" />
     </convert>
-    <output name="out__0" type="vector4" nodename="var__0" />
-    <output name="out__1" type="vector4" nodename="var__1" />
-    <output name="out__2" type="vector4" nodename="var__2" />
+    <output name="out__x" type="vector4" nodename="var__0" />
+    <output name="out__y" type="vector4" nodename="var__1" />
+    <output name="out__z" type="vector4" nodename="var__2" />
   </nodegraph>
   <add name="var__0" type="vector3">
-    <input name="in1" type="vector3" output="out__0" nodegraph="NG__123_vector3" />
-    <input name="in2" type="vector3" output="out__1" nodegraph="NG__123_vector3" />
+    <input name="in1" type="vector3" output="out__x" nodegraph="NG__123_vector3" />
+    <input name="in2" type="vector3" output="out__y" nodegraph="NG__123_vector3" />
   </add>
   <add name="b" type="vector3">
     <input name="in1" type="vector3" nodename="var__0" />
-    <input name="in2" type="vector3" output="out__2" nodegraph="NG__123_vector3" />
+    <input name="in2" type="vector3" output="out__z" nodegraph="NG__123_vector3" />
   </add>
   <add name="var__1" type="vector4">
-    <input name="in1" type="vector4" output="out__0" nodegraph="NG__123_vector4" />
-    <input name="in2" type="vector4" output="out__1" nodegraph="NG__123_vector4" />
+    <input name="in1" type="vector4" output="out__x" nodegraph="NG__123_vector4" />
+    <input name="in2" type="vector4" output="out__y" nodegraph="NG__123_vector4" />
   </add>
   <add name="c" type="vector4">
     <input name="in1" type="vector4" nodename="var__1" />
-    <input name="in2" type="vector4" output="out__2" nodegraph="NG__123_vector4" />
+    <input name="in2" type="vector4" output="out__z" nodegraph="NG__123_vector4" />
   </add>
 </materialx>

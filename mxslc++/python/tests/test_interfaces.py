@@ -20,15 +20,15 @@ material M = surfacematerial(surfaceshader = SR);
 """
 
 
-def test_compile_preserves_field_names():
+def test_compile_correctly_names_outputs():
     """Field names like 'out_color' should appear in MTLX output port names."""
     result = mxslc.compile_string_to_string(MXSL_MULTI_OUTPUT)
 
     # The nodegraph outputs should use field names, not positional out__N
-    assert 'output="out_color"' in result, \
-        "MTLX input reference should use field name 'out_color', not positional"
-    assert 'output="out_roughness"' in result, \
-        "MTLX input reference should use field name 'out_roughness', not positional"
+    assert 'output="out__out_color"' in result, \
+        "MTLX input reference should use 'out__' + field name 'out__out_color', not positional"
+    assert 'output="out__out_roughness"' in result, \
+        "MTLX input reference should use 'out__' + field name 'out__out_roughness', not positional"
 
 
 def test_compile_no_positional_names():
