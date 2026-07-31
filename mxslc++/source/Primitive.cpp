@@ -2,10 +2,12 @@
 // Created by jaket on 05/07/2026.
 //
 
-#include "../include/Primitive.h"
+#include <sstream>
+
+#include "Primitive.h"
 
 #include "common.h"
-#include "../include/utils/primitive_utils.h"
+#include "utils/primitive_utils.h"
 #include "runtime/Type.h"
 
 namespace mxslc
