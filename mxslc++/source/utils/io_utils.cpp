@@ -58,7 +58,9 @@ namespace mxslc::io_utils
     {
 #if defined(_WIN32)
         wchar_t path[MAX_PATH];
-        GetModuleFileNameW(NULL, path, MAX_PATH);
+        const DWORD count = GetModuleFileNameW(NULL, path, MAX_PATH);
+        if (count == 0 || count == MAX_PATH)
+            throw CompileError{"Cannot determine executable path"};
         return fs::path{path}.parent_path();
 #elif defined(__APPLE__)
         char path[PATH_MAX];
@@ -98,10 +100,8 @@ namespace mxslc::io_utils
 
         wchar_t path[MAX_PATH];
         const DWORD count = GetModuleFileNameW(module, path, MAX_PATH);
-
         if (count == 0 || count == MAX_PATH)
             throw CompileError{"Cannot determine python module path"};
-
         return fs::path{path}.parent_path();
 #else
         Dl_info info;
