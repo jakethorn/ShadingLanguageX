@@ -24,7 +24,7 @@ namespace mxslc
         bool try_match(const TokenType token_type, const regex& pattern, const string_view text, Token& token)
         {
             if (string_view_match match;
-                std::regex_search(text.begin(), text.end(), match, pattern))
+                std::regex_search(text.begin(), text.end(), match, pattern, std::regex_constants::match_continuous))
             {
                 token = Token{token_type, match[0]};
                 return true;
@@ -35,19 +35,19 @@ namespace mxslc
 
         bool try_match_float(const string_view text, Token& token)
         {
-            static const regex pattern{R"(^(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))(e-?[0-9]+)?)", std::regex_constants::optimize};
+            static const regex pattern{R"((([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*))(e-?[0-9]+)?)", std::regex_constants::optimize};
             return try_match(TokenType::Float, pattern, text, token);
         }
 
         bool try_match_int(const string_view text, Token& token)
         {
-            static const regex pattern{R"(^\d+)", std::regex_constants::optimize};
+            static const regex pattern{R"(\d+)", std::regex_constants::optimize};
             return try_match(TokenType::Int, pattern, text, token);
         }
 
         bool try_match_string(const string_view text, Token& token)
         {
-            static const regex pattern{R"(^"[^"]*")", std::regex_constants::optimize};
+            static const regex pattern{R"("[^"]*")", std::regex_constants::optimize};
             return try_match(TokenType::String, pattern, text, token);
         }
 
@@ -76,9 +76,9 @@ namespace mxslc
 
         bool try_match_keyword_identifier(const string_view text, Token& token)
         {
-            static const regex pattern{R"(^[_a-zA-Z][_a-zA-Z0-9]*)", std::regex_constants::optimize};
+            static const regex pattern{R"([_a-zA-Z][_a-zA-Z0-9]*)", std::regex_constants::optimize};
             if (string_view_match match;
-                std::regex_search(text.begin(), text.end(), match, pattern))
+                std::regex_search(text.begin(), text.end(), match, pattern, std::regex_constants::match_continuous))
             {
                 const TokenType t{match[0]};
                 token = Token{t.is_keyword() ? t : TokenType::Identifier, match[0]};
