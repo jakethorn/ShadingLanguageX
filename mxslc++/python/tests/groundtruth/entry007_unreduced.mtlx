@@ -36,14 +36,39 @@
       <input name="in" type="float" value="5" />
       <input name="amount" type="float" value="0" />
     </invert>
-    <combine3 name="c" type="color3">
+    <combine3 name="in1" type="color3">
       <input name="in1" type="float" value="1e-06" />
       <input name="in2" type="float" nodename="g" />
       <input name="in3" type="float" nodename="b" />
     </combine3>
-    <add name="var__0" type="color3">
+    <invert name="c" type="color3">
+      <input name="in" type="color3" nodename="in1" />
+      <input name="amount" type="float" value="0" />
+    </invert>
+    <invert name="g2" type="float">
+      <input name="in" type="float" value="5" />
+      <input name="amount" type="float" value="0" />
+    </invert>
+    <invert name="b2" type="float">
+      <input name="in" type="float" value="5" />
+      <input name="amount" type="float" value="0" />
+    </invert>
+    <combine3 name="in2" type="color3">
+      <input name="in1" type="float" value="1e-06" />
+      <input name="in2" type="float" nodename="g2" />
+      <input name="in3" type="float" nodename="b2" />
+    </combine3>
+    <add name="in3" type="color3">
       <input name="in1" type="color3" interfacename="color1" />
       <input name="in2" type="color3" interfacename="color2" />
+    </add>
+    <add name="in4" type="color3">
+      <input name="in1" type="color3" nodename="in3" />
+      <input name="in2" type="color3" nodename="c" />
+    </add>
+    <add name="var__0" type="color3">
+      <input name="in1" type="color3" nodename="in4" />
+      <input name="in2" type="color3" nodename="in2" />
     </add>
     <output name="out" type="color3" nodename="var__0" />
   </nodegraph>
@@ -111,18 +136,22 @@
       <input name="in" type="float" value="5" />
       <input name="amount" type="float" value="0" />
     </invert>
-    <combine4 name="c" type="color4">
+    <combine4 name="in1" type="color4">
       <input name="in1" type="float" value="1e-06" />
       <input name="in2" type="float" nodename="g" />
       <input name="in3" type="float" nodename="b" />
       <input name="in4" type="float" nodename="a" />
     </combine4>
-    <add name="in1" type="color4">
+    <invert name="c" type="color4">
+      <input name="in" type="color4" nodename="in1" />
+      <input name="amount" type="float" value="0" />
+    </invert>
+    <add name="in2" type="color4">
       <input name="in1" type="color4" interfacename="color1" />
       <input name="in2" type="color4" interfacename="color2" />
     </add>
     <add name="var__0" type="color4">
-      <input name="in1" type="color4" nodename="in1" />
+      <input name="in1" type="color4" nodename="in2" />
       <input name="in2" type="color4" nodename="c" />
     </add>
     <output name="out" type="color4" nodename="var__0" />
@@ -191,17 +220,21 @@
       <input name="in" type="float" value="5" />
       <input name="amount" type="float" value="0" />
     </invert>
-    <combine3 name="v" type="vector3">
+    <combine3 name="in1" type="vector3">
       <input name="in1" type="float" value="1e-06" />
       <input name="in2" type="float" nodename="y" />
       <input name="in3" type="float" nodename="z" />
     </combine3>
-    <add name="in1" type="vector3">
+    <invert name="v" type="vector3">
+      <input name="in" type="vector3" nodename="in1" />
+      <input name="amount" type="float" value="0" />
+    </invert>
+    <add name="in2" type="vector3">
       <input name="in1" type="vector3" interfacename="color1" />
       <input name="in2" type="vector3" interfacename="color2" />
     </add>
     <add name="var__0" type="vector3">
-      <input name="in1" type="vector3" nodename="in1" />
+      <input name="in1" type="vector3" nodename="in2" />
       <input name="in2" type="vector3" nodename="v" />
     </add>
     <output name="out" type="vector3" nodename="var__0" />

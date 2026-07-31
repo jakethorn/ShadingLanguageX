@@ -299,12 +299,12 @@ inline boolean __pow__(boolean in1, boolean in2)
 // unary operators
 //
 
-inline T __pos__<integer, float, vector2, vector3, vector4>(T in1)
+inline T __pos__<integer, float, vector2, vector3, vector4, color3, color4>(T in1)
 {
     return in1;
 }
 
-inline T __neg__<float, vector2, vector3, vector4>(T in1)
+inline T __neg__<float, vector2, vector3, vector4, color3, color4>(T in1)
 {
     return invert(in1, 0);
 }

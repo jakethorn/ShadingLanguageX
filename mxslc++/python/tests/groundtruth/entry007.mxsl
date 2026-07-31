@@ -2,15 +2,16 @@
 // Numeric test for color3
 color3 color3_test(color3 color1 = color3{-1,-1,-1}, color3 color2 = color3{1e-5,2,2})
 {
-  color3 c = color3{1e-6, -5, -5};
-  return color1 + color2;
+  color3 c = -color3{1e-6, -5, -5}; // unary -color = invert(val,0)
+  color3 c2 = +color3{1e-6, -5, -5}; // unary +color = no-op
+  return color1 + color2 + c + c2;
 }
 color3 color3_test_out = color3_test(color1 = color3{-1, 0.094118, 0.031373}, color2 = color3{2e-5, 1, 1});
 
 // Numeric test for color4
 color4 color4_test(color4 color1 = color4{-1,-1,-1,-1}, color4 color2 = color4{1e-5,2,2,1})
 {
-  color4 c = color4{1e-6, -5, -5, -5};
+  color4 c = -color4{1e-6, -5, -5, -5};
   return color1 + color2 + c;
 }
 color4 color4_test_out = color4_test(color1 = color4{-1, 0.094118, 0.031373, -1}, color2 = color4{2e-5, 1, 1, -1});
@@ -19,7 +20,7 @@ color4 color4_test_out = color4_test(color1 = color4{-1, 0.094118, 0.031373, -1}
 // Numeric test for vec3
 vec3 vec3_test(vec3 color1 = vec3{-1,-1,-1}, vec3 color2 = vec3{1e-5,2,2})
 {
-  vec3 v = vec3{1e-6, -5, -5};
+  vec3 v = -vec3{1e-6, -5, -5};
   return color1 + color2 + v;
 }
 vec3 vec3_test_out = vec3_test(color1 = vec3{-1, 0.094118, 0.031373}, color2 = vec3{2e-5, 1, 1});

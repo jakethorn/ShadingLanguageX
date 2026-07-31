@@ -6,9 +6,17 @@
     <input name="color2" type="color3" value="1e-05, 2, 2" />
   </nodedef>
   <nodegraph name="NG_color3_test" nodedef="ND_color3_test">
-    <add name="var__0" type="color3">
+    <add name="in1" type="color3">
       <input name="in1" type="color3" interfacename="color1" />
       <input name="in2" type="color3" interfacename="color2" />
+    </add>
+    <add name="in2" type="color3">
+      <input name="in1" type="color3" nodename="in1" />
+      <input name="in2" type="color3" value="-1e-06, 5, 5" />
+    </add>
+    <add name="var__0" type="color3">
+      <input name="in1" type="color3" nodename="in2" />
+      <input name="in2" type="color3" value="1e-06, -5, -5" />
     </add>
     <output name="out" type="color3" nodename="var__0" />
   </nodegraph>
@@ -28,7 +36,7 @@
     </add>
     <add name="var__0" type="color4">
       <input name="in1" type="color4" nodename="in1" />
-      <input name="in2" type="color4" value="1e-06, -5, -5, -5" />
+      <input name="in2" type="color4" value="-1e-06, 5, 5, 5" />
     </add>
     <output name="out" type="color4" nodename="var__0" />
   </nodegraph>
@@ -48,7 +56,7 @@
     </add>
     <add name="var__0" type="vector3">
       <input name="in1" type="vector3" nodename="in1" />
-      <input name="in2" type="vector3" value="1e-06, -5, -5" />
+      <input name="in2" type="vector3" value="-1e-06, 5, 5" />
     </add>
     <output name="out" type="vector3" nodename="var__0" />
   </nodegraph>
