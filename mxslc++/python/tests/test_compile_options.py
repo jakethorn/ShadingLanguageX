@@ -2,7 +2,7 @@ import mxslc
 import pytest
 
 from groundtruth import STANDARD_OUTPUT, REDUCED_OUTPUT
-from python.tests.data_utils import get_data_path, assert_matches_groundtruth
+from data_utils import get_data_path, assert_matches_groundtruth
 
 
 def test_compile_options_reduce_graph_is_false():

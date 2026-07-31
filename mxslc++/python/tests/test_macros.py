@@ -1,7 +1,7 @@
 import pytest
 import mxslc
 
-from python.tests.data_utils import get_data_path, assert_matches_groundtruth
+from data_utils import get_data_path, assert_matches_groundtruth
 
 
 def test_macro_ctor():
