@@ -10,8 +10,10 @@
 #if defined(_WIN32)
     #include <windows.h>
 #elif defined(__APPLE__)
-    #include <mach-o/dyld.h>  // For _NSGetExecutablePath
-    #include <limits.h>       // For PATH_MAX
+    #include <mach-o/dyld.h>
+    #include <limits.h>
+    #include <dlfcn.h>
+    #include <stdlib.h>
 #else
     #include <unistd.h>
     #include <limits.h>
@@ -129,6 +131,9 @@ namespace mxslc::io_utils
             on_found(path);
             return;
         }
+
+        if (path.is_absolute())
+            throw CompileError{"File " + path.string() + " could not be found."};
 
         string searched_paths = path.string() + "\n";
 
