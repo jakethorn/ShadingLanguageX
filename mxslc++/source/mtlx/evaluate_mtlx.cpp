@@ -12,6 +12,7 @@
 #include "node_evaluators/convert.h"
 #include "node_evaluators/extract.h"
 #include "node_evaluators/separate.h"
+#include "node_evaluators/invert.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
 #include "values/Value.h"
@@ -31,7 +32,8 @@ namespace
         {"separate3"s, evaluate_separate3},
         {"separate4"s, evaluate_separate4},
         {"convert"s, evaluate_convert},
-        {"extract"s, evaluate_extract}
+        {"extract"s, evaluate_extract},
+        {"invert"s, evaluate_invert}
     };
 
     bool is_constexpr(const string& node_name, const ParameterValues& input_values, vector<BasicValuePtr>& values)

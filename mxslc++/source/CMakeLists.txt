@@ -77,6 +77,7 @@ add_library(mxslc_lib
         mtlx/node_evaluators/convert.cpp
         mtlx/node_evaluators/combine.cpp
         mtlx/node_evaluators/extract.cpp
+        mtlx/node_evaluators/invert.cpp
         values/Value.cpp
         values/ValueFactory.cpp
         values/NodeValue.cpp

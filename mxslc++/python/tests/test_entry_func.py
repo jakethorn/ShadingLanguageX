@@ -56,3 +56,15 @@ def test_compile_multioutput_reference():
     result = result.replace('output="outcolor" ', "")
     write_data("entry006.mtlx", result)
     assert result == get_data("entry006.mtlx")
+
+def test_numeric_folding():
+    result = mxslc.compile_file_to_string(get_data_path("entry007.mxsl"))
+
+    assert isinstance(result, str)
+    write_data("entry007.mtlx", result)
+    assert result == get_data("entry007.mtlx")
+
+    unreduced_result = mxslc.compile_file_to_string(get_data_path("entry007.mxsl"), mxslc.CompileOptions(reduce_graph=False))
+    assert isinstance(unreduced_result, str)
+    write_data("entry007_unreduced.mtlx", unreduced_result)
+    assert unreduced_result == get_data("entry007_unreduced.mtlx")
