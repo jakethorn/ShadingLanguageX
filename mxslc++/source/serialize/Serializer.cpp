@@ -4,6 +4,7 @@
 
 #include "serialize/Serializer.h"
 
+#include <sstream>
 #include <cassert>
 #include <MaterialXFormat/XmlIo.h>
 
