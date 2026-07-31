@@ -87,13 +87,19 @@ namespace mxslc
 
             return std::visit(
                 [](const auto& v) -> T {
-                    using VariantType = std::decay_t<decltype(v)>;
-                    if constexpr (std::is_convertible_v<VariantType, T>)
+#ifdef _WIN32
+                    IF_VISITED_TYPE_IS(fs::path)
+                    {
+                        if constexpr (std::is_same_v<T, std::string>)
+                            return v.string();
+                    }
+#endif
+                    if constexpr (std::is_convertible_v<VISITED_TYPE, T>)
                         return static_cast<T>(v);
-                    else if constexpr (std::is_constructible_v<T, VariantType>)
+                    else if constexpr (std::is_constructible_v<T, VISITED_TYPE>)
                         return T(v);
                     else
-                        throw CompileError{"Invalid cast of primitive of type '" + type_utils::name_of<VariantType>() + "' to '" + type_utils::name_of<T>() + "'"};
+                        throw CompileError{"Invalid cast of primitive of type '" + type_utils::name_of<VISITED_TYPE>() + "' to '" + type_utils::name_of<T>() + "'"};
                 },
                 value_
             );
@@ -107,10 +113,14 @@ namespace mxslc
             if (is_a<T>())
                 return true;
 
+#ifdef _WIN32
+            if (is_a<fs::path>() and std::is_same_v<T, std::string>)
+                return true;
+#endif
+
             return std::visit(
                 [](const auto& v) -> bool {
-                    using VariantType = std::decay_t<decltype(v)>;
-                    return std::is_convertible_v<VariantType, T> or std::is_constructible_v<T, VariantType>;
+                    return std::is_convertible_v<VISITED_TYPE, T> or std::is_constructible_v<T, VISITED_TYPE>;
                 },
                 value_
             );
