@@ -7,7 +7,6 @@
 #include "runtime/Type.h"
 
 #include "runtime/utils/monomorphize.h"
-#include "runtime/utils/TypeName.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
@@ -15,24 +14,21 @@
 namespace mxslc::runtime
 {
     using container_utils::lock;
-    using runtime_utils::TypeName;
 
-#define TYPE_DEF(t) TypePtr Type::t = resolve(TypeName::t);
-    TYPE_DEF(Bool)
-    TYPE_DEF(Int)
-    TYPE_DEF(Float)
-    TYPE_DEF(String)
-    TYPE_DEF(Filename)
-    TYPE_DEF(Vec2)
-    TYPE_DEF(Vec3)
-    TYPE_DEF(Vec4)
-    TYPE_DEF(Color3)
-    TYPE_DEF(Color4)
-    TYPE_DEF(Mat3)
-    TYPE_DEF(Mat4)
-    TYPE_DEF(Void)
-    TYPE_DEF(Auto)
-#undef TYPE_DEF
+    TypePtr Type::Bool = resolve("boolean");
+    TypePtr Type::Int = resolve("integer");
+    TypePtr Type::Float = resolve("float");
+    TypePtr Type::String = resolve("string");
+    TypePtr Type::Filename = resolve("filename");
+    TypePtr Type::Vec2 = resolve("vector2");
+    TypePtr Type::Vec3 = resolve("vector3");
+    TypePtr Type::Vec4 = resolve("vector4");
+    TypePtr Type::Color3 = resolve("color3");
+    TypePtr Type::Color4 = resolve("color4");
+    TypePtr Type::Mat3 = resolve("matrix33");
+    TypePtr Type::Mat4 = resolve("matrix44");
+    TypePtr Type::Void = resolve("void");
+    TypePtr Type::Auto = resolve("auto");
 
     Type::Type(string name) : name_{std::move(name)} { }
 
