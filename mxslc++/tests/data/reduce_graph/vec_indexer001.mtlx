@@ -4,28 +4,28 @@
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
   </combine2>
-  <extract name="in1" type="float">
+  <extract name="var__0" type="float">
     <input name="in" type="vector2" nodename="v1" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <randomfloat name="in2" type="float" />
+  <randomfloat name="var__1" type="float" />
   <multiply name="f1" type="float">
-    <input name="in1" type="float" nodename="in1" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" nodename="var__1" />
   </multiply>
   <combine3 name="v2" type="vector3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <extract name="in3" type="float">
+  <extract name="var__2" type="float">
     <input name="in" type="vector3" nodename="v2" />
     <input name="index" type="integer" value="1" />
   </extract>
-  <randomfloat name="in4" type="float" />
+  <randomfloat name="var__3" type="float" />
   <multiply name="f2" type="float">
-    <input name="in1" type="float" nodename="in3" />
-    <input name="in2" type="float" nodename="in4" />
+    <input name="in1" type="float" nodename="var__2" />
+    <input name="in2" type="float" nodename="var__3" />
   </multiply>
   <combine4 name="v3" type="vector4">
     <input name="in1" type="float" value="1" />
@@ -33,32 +33,32 @@
     <input name="in3" type="float" value="3" />
     <input name="in4" type="float" value="4" />
   </combine4>
-  <add name="var__0" type="integer">
+  <add name="var__4" type="integer">
     <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <extract name="in5" type="float">
+  <extract name="var__5" type="float">
     <input name="in" type="vector4" nodename="v3" />
-    <input name="index" type="integer" nodename="var__0" />
+    <input name="index" type="integer" nodename="var__4" />
   </extract>
-  <randomfloat name="in6" type="float" />
+  <randomfloat name="var__6" type="float" />
   <multiply name="f3" type="float">
-    <input name="in1" type="float" nodename="in5" />
-    <input name="in2" type="float" nodename="in6" />
+    <input name="in1" type="float" nodename="var__5" />
+    <input name="in2" type="float" nodename="var__6" />
   </multiply>
   <combine3 name="c4" type="color3">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="0.5" />
     <input name="in3" type="float" value="1" />
   </combine3>
-  <extract name="in7" type="float">
+  <extract name="var__7" type="float">
     <input name="in" type="color3" nodename="c4" />
     <input name="index" type="integer" value="2" />
   </extract>
-  <randomfloat name="in8" type="float" />
+  <randomfloat name="var__8" type="float" />
   <multiply name="f4" type="float">
-    <input name="in1" type="float" nodename="in7" />
-    <input name="in2" type="float" nodename="in8" />
+    <input name="in1" type="float" nodename="var__7" />
+    <input name="in2" type="float" nodename="var__8" />
   </multiply>
   <combine4 name="c5" type="color4">
     <input name="in1" type="float" value="0" />
@@ -66,21 +66,21 @@
     <input name="in3" type="float" value="1" />
     <input name="in4" type="float" value="1" />
   </combine4>
-  <add name="in9" type="integer">
+  <add name="var__9" type="integer">
     <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="var__1" type="integer">
-    <input name="in1" type="integer" nodename="in9" />
+  <add name="var__10" type="integer">
+    <input name="in1" type="integer" nodename="var__9" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <extract name="in10" type="float">
+  <extract name="var__11" type="float">
     <input name="in" type="color4" nodename="c5" />
-    <input name="index" type="integer" nodename="var__1" />
+    <input name="index" type="integer" nodename="var__10" />
   </extract>
-  <randomfloat name="in11" type="float" />
+  <randomfloat name="var__12" type="float" />
   <multiply name="f5" type="float">
-    <input name="in1" type="float" nodename="in10" />
-    <input name="in2" type="float" nodename="in11" />
+    <input name="in1" type="float" nodename="var__11" />
+    <input name="in2" type="float" nodename="var__12" />
   </multiply>
 </materialx>

@@ -5,7 +5,7 @@
 #ifndef MXSLC_COMPILEOPTIONS_BINDINGS_H
 #define MXSLC_COMPILEOPTIONS_BINDINGS_H
 
-#include "common.h"
+#include "pybind.h"
 
 void bind_compile_options(py::module_& m);
 

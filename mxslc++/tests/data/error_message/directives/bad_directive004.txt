@@ -1,0 +1,1 @@
+bad_directive004.mxsl, line 1: Unknown preprocessor directive: #notadirective

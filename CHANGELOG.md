@@ -1,3 +1,12 @@
+# (mxslc++) Version 0.2.0
+
+* Added preprocessor directives ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#preprocessor-directives))
+* Added `geomprop` modifier ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#geomprop))
+* Added vector/color component setters ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#component-access))
+* Added support for macos (contributed by [@kwok](https://github.com/kwokcb))
+* Added sample flask app (contributed by [@kwok](https://github.com/kwokcb))
+* Various bug fixes
+
 # (mxslc++) Version 0.1.3 - Version 0.1.6
 
 * Improved to GitHub actions.

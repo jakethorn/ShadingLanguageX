@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo_boolean" node="foo_boolean">
+    <output name="out" type="integer" />
+    <input name="v" type="boolean" value="false" />
+  </nodedef>
+  <nodegraph name="NG_foo_boolean" nodedef="ND_foo_boolean">
+    <convert name="var__0" type="integer">
+      <input name="in" type="boolean" interfacename="v" />
+    </convert>
+    <output name="out" type="integer" nodename="var__0" />
+  </nodegraph>
+  <nodedef name="ND_foo_float" node="foo_float">
+    <output name="out" type="integer" />
+    <input name="v" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_foo_float" nodedef="ND_foo_float">
+    <round name="var__0" type="integer">
+      <input name="in" type="float" interfacename="v" />
+    </round>
+    <output name="out" type="integer" nodename="var__0" />
+  </nodegraph>
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="integer" />
+    <input name="v" type="boolean" value="false" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <convert name="var__0" type="integer">
+      <input name="in" type="boolean" interfacename="v" />
+    </convert>
+    <output name="out" type="integer" nodename="var__0" />
+  </nodegraph>
+  <foo_float name="a" type="integer">
+    <input name="v" type="float" value="1" />
+  </foo_float>
+  <foo_boolean name="b" type="integer">
+    <input name="v" type="boolean" value="false" />
+  </foo_boolean>
+  <foo_float name="c" type="integer">
+    <input name="v" type="float" value="2" />
+  </foo_float>
+  <bar name="d" type="integer">
+    <input name="v" type="boolean" value="true" />
+  </bar>
+</materialx>

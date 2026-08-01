@@ -6,31 +6,40 @@
 // Created by jaket on 28/11/2025.
 //
 
-#include "ExpressionStatement.h"
+#include "statements/ExpressionStatement.h"
 
 #include "expressions/Expression.h"
+#include "statements/interface.h"
 
-ExpressionStatement::ExpressionStatement(ExprPtr expr)
-    : Statement{expr->token()}, expr_{std::move(expr)}
+namespace mxslc::statements
 {
+    ExpressionStatement::ExpressionStatement(ExprPtr expr)
+        : Statement{expr->token()}, expr_{std::move(expr)}
+    {
 
-}
+    }
 
-ExpressionStatement::~ExpressionStatement() = default;
+    ExpressionStatement::~ExpressionStatement() = default;
 
-void ExpressionStatement::set_attributes(AttributeList attrs)
-{
-    expr_->set_attributes(std::move(attrs));
-}
+    void ExpressionStatement::set_attributes(AttributeList attrs)
+    {
+        expr_->set_attributes(std::move(attrs));
+    }
 
-StmtPtr ExpressionStatement::instantiate_template_types(const TypePtr& template_type) const
-{
-    ExprPtr expr = expr_->instantiate_template_types(template_type);
-    return std::make_unique<ExpressionStatement>(std::move(expr));
-}
+    StmtPtr ExpressionStatement::monomorphize(const TypePtr& template_type) const
+    {
+        ExprPtr expr = expr_->monomorphize(template_type);
+        return create_statement<ExpressionStatement>(std::move(expr));
+    }
 
-void ExpressionStatement::execute_impl() const
-{
-    expr_->init();
-    VarPtr _ = expr_->evaluate();
+    void ExpressionStatement::execute_impl() const
+    {
+        expr_->init();
+        VarPtr _ = expr_->evaluate();
+    }
+
+    string ExpressionStatement::to_string() const
+    {
+        return expr_->to_string() + ";";
+    }
 }

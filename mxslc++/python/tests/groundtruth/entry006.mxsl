@@ -1,3 +1,10 @@
-{color3 outcolor, float outa} gltf_colorimage = gltf_colorimage(file = "");
-surfaceshader gltf_pbr_surfaceshader = gltf_pbr(base_color = gltf_colorimage.outcolor);
-material surfacematerial = surfacematerial(surfaceshader = gltf_pbr_surfaceshader);
+inline void foo(float a, {float b, string c} d)
+{
+    surfaceshader surface = standard_surface();
+    surface.base = a;
+    surface.base_color = color3{d.b};
+    surface.normal = normal(space=d.c);
+    surface.thin_walled = false;
+
+    surfacematerial(surface);
+}

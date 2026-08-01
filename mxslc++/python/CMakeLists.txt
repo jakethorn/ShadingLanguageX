@@ -7,6 +7,7 @@ pybind11_add_module(_mxslc
         compile_bindings.cpp
         decompile_bindings.cpp
         Decompiler_bindings.cpp
+        Macro_bindings.cpp
         utils.cpp
 )
 

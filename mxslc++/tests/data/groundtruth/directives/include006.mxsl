@@ -1,0 +1,8 @@
+#include "../../includes/include1.mxsl"
+
+float a = foo();
+float b = ifoo();
+float c = bar();
+float d = ibar();
+
+float z = a + b + c + d;

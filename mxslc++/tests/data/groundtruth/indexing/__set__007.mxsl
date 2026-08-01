@@ -1,0 +1,11 @@
+
+void foo(out float c)
+{
+    c = 5.0;
+}
+
+mutable vec3 v = vec3{1.0};
+
+foo(out v[2]);
+
+vec3 v2 = v + 1.0;

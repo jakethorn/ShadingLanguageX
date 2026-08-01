@@ -9,6 +9,11 @@ add_executable(mxslc_tests
         failure_tests.cpp
         error_message_tests.cpp
         reduce_graph_tests.cpp
+        primitive_type_tests.cpp
+        primitive_op_tests.cpp
+        primitive_utils_tests.cpp
+        primitive_to_string_tests.cpp
+        global_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

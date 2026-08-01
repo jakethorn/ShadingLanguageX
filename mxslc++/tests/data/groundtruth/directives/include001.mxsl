@@ -1,0 +1,3 @@
+#include "../../includes/a.mxsl"
+
+float z = value + 1.0;

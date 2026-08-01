@@ -2,24 +2,24 @@
 // Created by jaket on 28/05/2026.
 //
 
-#include "ComponentAccessor.h"
+#include "expressions/accessors/ComponentAccessor.h"
 
-#include "expressions/FunctionCall.h"
-#include "runtime/RuntimeUtils.h"
-#include "runtime/Type.h"
+#include "runtime/ComponentVariable.h"
 
-ComponentAccessor::ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr)
+namespace mxslc::expressions
 {
-    func_call_ = RuntimeUtils::function_call("extract", ArgumentList{std::move(value_expr), std::move(index_expr)});
-    func_call_->init();
-}
+    ComponentAccessor::ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr)
+    {
+        component_var_ = std::make_shared<ComponentVariable>(std::move(value_expr), std::move(index_expr));
+    }
 
-TypePtr ComponentAccessor::type() const
-{
-    return func_call_->type();
-}
+    TypePtr ComponentAccessor::type() const
+    {
+        return component_var_->type();
+    }
 
-VarPtr ComponentAccessor::evaluate() const
-{
-    return func_call_->evaluate();
+    VarPtr ComponentAccessor::evaluate() const
+    {
+        return component_var_;
+    }
 }

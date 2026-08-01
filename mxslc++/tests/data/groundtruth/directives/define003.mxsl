@@ -1,0 +1,31 @@
+#define X 1 + 2
+
+#if X > 5
+float f = 1.0;
+#else
+float f = 2.0;
+#endif
+
+float g = f + 3.0;
+
+#if X == 0
+float h = 4.0;
+#elif X == 1
+float h = 5.0;
+#elif X == 2
+float h = 6.0;
+#elif X == 3
+float h = 7.0;
+#else
+float h = 8.0;
+#endif
+
+float i = h + 9.0;
+
+#if X == 3
+#define Y
+#endif
+
+#ifdef Y
+float j = 10.0 + 11.0;
+#endif

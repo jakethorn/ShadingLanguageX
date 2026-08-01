@@ -4,13 +4,14 @@ add_library(mxslc_lib
         TokenReader.cpp
         parse.cpp
         compile.cpp
+        TokenType.cpp
+        Primitive.cpp
+        CompileOptions.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
         decompile/Decompiler.cpp
         runtime/Runtime.cpp
-        runtime/RuntimeAccessor.cpp
-        runtime/RuntimeUtils.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
         runtime/ArgumentList.cpp
@@ -23,8 +24,18 @@ add_library(mxslc_lib
         runtime/ModifierList.cpp
         runtime/Variable.cpp
         runtime/InputVariable.cpp
+        runtime/ComponentVariable.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
+        runtime/interface.cpp
+        runtime/utils/monomorphize.cpp
+        runtime/utils/RuntimeAware.cpp
+        runtime/utils/invoke.cpp
+        runtime/utils/type_cast.cpp
+        runtime/utils/InitInfo.cpp
+        runtime/utils/ArgumentEvaluator.cpp
+        runtime/utils/type_utils.cpp
+        expressions/interface.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
         expressions/Identifier.cpp
@@ -61,31 +72,42 @@ add_library(mxslc_lib
         statements/ClassDefinition.cpp
         statements/ConstructorDefinition.cpp
         utils/io_utils.cpp
-        utils/str_utils.cpp
-        utils/parse_args.cpp
-        utils/instantiate_template_types_utils.cpp
+        utils/string_utils.cpp
+        utils/parse_cli_args.cpp
         utils/parse_utils.cpp
-        utils/type_cast.cpp
-        utils/InitInfo.cpp
-        utils/ArgumentEvaluator.cpp
-        mtlx/load_mtlx.cpp
-        mtlx/mtlx_utils.cpp
-        mtlx/MtlXSerializer.cpp
-        mtlx/evaluate_mtlx.cpp
-        mtlx/node_evaluators/binary_ops.cpp
-        mtlx/node_evaluators/separate.cpp
-        mtlx/node_evaluators/convert.cpp
-        mtlx/node_evaluators/combine.cpp
-        mtlx/node_evaluators/extract.cpp
-        values/Value.cpp
-        values/ValueFactory.cpp
-        values/NodeValue.cpp
-        values/InterfaceValue.cpp
-        values/NodeOutputValue.cpp
-        values/BasicValue.cpp
-        values/NodeGraphValue.cpp
-        values/NodeGraphOutputValue.cpp
-        interface/Variable.cpp
+        utils/load_mtlx.cpp
+        utils/mtlx_utils.cpp
+        utils/token_utils.cpp
+        utils/Logger.cpp
+        utils/primitive_utils/binary_arithmetic_ops.cpp
+        utils/primitive_utils/binary_comparison_ops.cpp
+        utils/primitive_utils/binary_logical_ops.cpp
+        utils/primitive_utils/unary_ops.cpp
+        utils/primitive_utils/combine.cpp
+        utils/primitive_utils/convert.cpp
+        utils/primitive_utils/extract.cpp
+        utils/primitive_utils/separate.cpp
+        utils/primitive_utils/creatematrix.cpp
+        utils/primitive_utils/invertmatrix.cpp
+        utils/primitive_utils/separate.cpp
+        utils/primitive_utils/switch.cpp
+        utils/primitive_utils/path_functions.cpp
+        serialize/Serializer.cpp
+        serialize/serialize_constexpr.cpp
+        serialize/serialize_constexpr_wrapper.cpp
+        serialize/serializer_utils.cpp
+        serialize/serialize_name_utils.cpp
+        serialize/values/Value.cpp
+        serialize/values/NodeValue.cpp
+        serialize/values/InterfaceValue.cpp
+        serialize/values/NodeOutputValue.cpp
+        serialize/values/BasicValue.cpp
+        serialize/values/NodeGraphValue.cpp
+        serialize/values/NodeGraphOutputValue.cpp
+        serialize/values/interface.cpp
+        preprocess/preprocess.cpp
+        preprocess/Macro.cpp
+        preprocess/parse_primitive.cpp
 )
 
 set_target_properties(mxslc_lib PROPERTIES

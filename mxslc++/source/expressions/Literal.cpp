@@ -2,49 +2,64 @@
 // Created by jaket on 27/11/2025.
 //
 
-#include "Literal.h"
-#include "runtime/Runtime.h"
-#include "runtime/Scope.h"
+#include "expressions/Literal.h"
+
+#include "expressions/interface.h"
+#include "runtime/interface.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
-#include "values/BasicValue.h"
 
-ExprPtr Literal::instantiate_template_types(const TypePtr& template_type) const
+namespace mxslc::expressions
 {
-    return std::make_shared<Literal>(token_);
-}
-
-void Literal::init_impl(const vector<TypePtr>& types)
-{
-    type_ = Type::of(value_);
-
-    // implicit cast from int to float
-    if (std::holds_alternative<int>(value_))
+    ExprPtr Literal::monomorphize(const TypePtr& template_type) const
     {
-        if (not Type::Int->is_in(types) and Type::Float->is_in(types))
+        return create_expression<Literal>(token_);
+    }
+
+    void Literal::init_impl(const vector<TypePtr>& types)
+    {
+        // implicit cast from int to float
+        if (value_.is_a<int>())
         {
-            value_ = static_cast<float>(std::get<int>(value_));
-            type_ = Type::Float;
+            if (not Type::Int->is_in(types) and Type::Float->is_in(types))
+            {
+                value_ = value_.cast<float>();
+                return;
+            }
+        }
+
+        // implicit cast from int to bool
+        if (value_.is_a<int>())
+        {
+            if (not Type::Int->is_in(types) and Type::Bool->is_in(types))
+            {
+                value_ = value_.cast<bool>();
+                return;
+            }
+        }
+
+        // implicit cast from string to filename
+        if (value_.is_a<string>())
+        {
+            if (not Type::String->is_in(types) and Type::Filename->is_in(types))
+            {
+                value_ = value_.cast<fs::path>();
+                return;
+            }
         }
     }
 
-    // implicit cast from string to filename
-    if (std::holds_alternative<string>(value_))
+    TypePtr Literal::type_impl() const
     {
-        if (not Type::String->is_in(types) and Type::Filename->is_in(types))
-        {
-            type_ = Type::Filename;
-        }
+        return value_.type();
     }
-}
 
-TypePtr Literal::type_impl() const
-{
-    return type_;
-}
+    VarPtr Literal::evaluate_impl() const
+    {
+        return create_variable(value_);
+    }
 
-VarPtr Literal::evaluate_impl() const
-{
-    ValuePtr value = std::make_shared<BasicValue>(value_, type_);
-    return Variable::create(std::move(value));
+    string Literal::to_string() const
+    {
+        return value_.to_string();
+    }
 }

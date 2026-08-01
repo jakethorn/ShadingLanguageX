@@ -5,14 +5,14 @@
   </nodegraph>
   <nodegraph name="NG_bar">
     <normal name="var__0" type="vector3" />
-    <output name="out__0" type="vector3" nodename="var__0" />
-    <output name="out__1" type="string" value="world" />
+    <output name="out__n" type="vector3" nodename="var__0" />
+    <output name="out__space" type="string" value="world" />
   </nodegraph>
   <convert name="var__0" type="vector3">
     <input name="in" type="float" nodegraph="NG_foo" />
   </convert>
   <viewdirection name="var__1" type="vector3">
-    <input name="space" type="string" output="out__1" nodegraph="NG_bar" />
+    <input name="space" type="string" output="out__space" nodegraph="NG_bar" />
   </viewdirection>
   <dotproduct name="theta" type="float">
     <input name="in1" type="vector3" nodename="var__0" />

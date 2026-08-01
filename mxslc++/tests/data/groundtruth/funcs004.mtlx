@@ -5,9 +5,9 @@
     <input name="in1" type="vector3" nodename="var__0" />
     <input name="in2" type="float" value="0" />
   </min>
-  <constant name="in2" type="vector3" />
+  <constant name="var__1" type="vector3" />
   <min name="b" type="vector3">
-    <input name="in1" type="vector3" nodename="in2" />
+    <input name="in1" type="vector3" nodename="var__1" />
     <input name="in2" type="float" value="0" />
   </min>
 </materialx>
