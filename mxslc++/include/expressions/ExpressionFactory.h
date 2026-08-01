@@ -16,7 +16,6 @@ namespace mxslc::expressions
         static ExprPtr binary(ExprPtr left, Token op, ExprPtr right);
         static ExprPtr ternary_relational(ExprPtr left, Token op1, ExprPtr middle, Token op2, ExprPtr right);
         static ExprPtr unary(Token op, ExprPtr right);
-        static ExprPtr if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr, Token token);
         static ExprPtr absolute(ExprPtr expr, Token token);
 
     private:

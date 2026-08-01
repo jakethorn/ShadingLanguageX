@@ -10,6 +10,7 @@
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
 #include "expressions/Identifier.h"
+#include "expressions/IfExpression.h"
 #include "expressions/IncrementOperator.h"
 #include "expressions/IndexingOperator.h"
 #include "expressions/interface.h"
@@ -733,7 +734,7 @@ namespace mxslc
         if (else_expr == nullptr)
             throw CompileError{peek(), "Missing else branch in if-expression"};
 
-        return ExpressionFactory::if_expression(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
+        return create_expression<IfExpression>(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
     }
 
     ExprPtr Parser::function_call()

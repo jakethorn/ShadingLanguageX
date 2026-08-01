@@ -1,1 +1,2 @@
-auto x = if (true) { 0.0 } else { 1.0 };
+auto x = if (true) { 7.0 } else { 4.0 };
+constant(x);
