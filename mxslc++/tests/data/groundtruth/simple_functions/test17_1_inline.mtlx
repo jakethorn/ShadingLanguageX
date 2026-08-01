@@ -8,14 +8,14 @@
     <input name="nonlocal_in__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <randomfloat name="in2" type="float">
+    <randomfloat name="var__0" type="float">
       <input name="in" type="integer" value="2" />
     </randomfloat>
-    <multiply name="var__0" type="float">
+    <multiply name="var__1" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__x" />
-      <input name="in2" type="float" nodename="in2" />
+      <input name="in2" type="float" nodename="var__0" />
     </multiply>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <foo name="y" type="float">
     <input name="nonlocal_in__x" type="float" nodename="x" />

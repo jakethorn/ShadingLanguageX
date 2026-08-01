@@ -1,0 +1,6 @@
+#if false
+#version 1.38.10
+#endif
+
+vec2 uv = texcoord();
+vec2 vu = swizzle(uv, "yx");

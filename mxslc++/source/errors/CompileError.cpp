@@ -2,22 +2,17 @@
 // Created by jaket on 14/11/2025.
 //
 
-#include "CompileError.h"
-#include "../Token.h"
-#include "../utils/common.h"
-#include "../utils/str_utils.h"
+#include "errors/CompileError.h"
+#include "Token.h"
 
-string mxslc::CompileError::format(const Token& debug_info, const string& message)
+namespace mxslc
 {
-    if (debug_info.line() == 0)
+    string CompileError::to_string(const Token& debug_info)
     {
-        return message;
+        if (debug_info.line() == 0)
+            return "";
+        if (debug_info.filename().empty())
+            return "line " + std::to_string(debug_info.line()) + ": ";
+        return debug_info.filename() + ", line " + std::to_string(debug_info.line()) + ": ";
     }
-
-    if (debug_info.filename().empty())
-    {
-        return "line " + str(debug_info.line()) + ": " + message;
-    }
-
-    return debug_info.filename() + ", line " + str(debug_info.line()) + ": " + message;
 }

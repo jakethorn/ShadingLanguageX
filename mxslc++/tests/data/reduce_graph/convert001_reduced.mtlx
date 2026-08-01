@@ -1,39 +1,39 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="in2" type="float" />
-  <multiply name="var__0" type="vector4">
+  <randomfloat name="var__0" type="float" />
+  <multiply name="var__1" type="vector4">
     <input name="in1" type="vector4" value="1, 2, 3, 4" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in2" type="float" nodename="var__0" />
   </multiply>
-  <randomfloat name="in3" type="float" />
-  <multiply name="var__1" type="color3">
+  <randomfloat name="var__2" type="float" />
+  <multiply name="var__3" type="color3">
     <input name="in1" type="color3" value="1, 2, 3" />
-    <input name="in2" type="float" nodename="in3" />
+    <input name="in2" type="float" nodename="var__2" />
   </multiply>
-  <randomfloat name="in4" type="float" />
-  <multiply name="var__2" type="vector2">
+  <randomfloat name="var__4" type="float" />
+  <multiply name="var__5" type="vector2">
     <input name="in1" type="vector2" value="1, 2" />
-    <input name="in2" type="float" nodename="in4" />
+    <input name="in2" type="float" nodename="var__4" />
   </multiply>
-  <randomfloat name="in5" type="float" />
-  <multiply name="var__3" type="color4">
+  <randomfloat name="var__6" type="float" />
+  <multiply name="var__7" type="color4">
     <input name="in1" type="color4" value="1, 2, 0, 0" />
-    <input name="in2" type="float" nodename="in5" />
+    <input name="in2" type="float" nodename="var__6" />
   </multiply>
   <ifequal name="e" type="boolean">
     <input name="value1" type="float" value="1" />
     <input name="value2" type="float" value="0" />
   </ifequal>
-  <randomfloat name="then_value" type="float">
+  <randomfloat name="var__8" type="float">
     <input name="in" type="integer" value="1" />
   </randomfloat>
-  <randomfloat name="else_value" type="float">
+  <randomfloat name="var__9" type="float">
     <input name="in" type="integer" value="2" />
   </randomfloat>
   <ifequal name="f" type="float">
     <input name="value1" type="boolean" nodename="e" />
     <input name="value2" type="boolean" value="true" />
-    <input name="in1" type="float" nodename="then_value" />
-    <input name="in2" type="float" nodename="else_value" />
+    <input name="in1" type="float" nodename="var__8" />
+    <input name="in2" type="float" nodename="var__9" />
   </ifequal>
 </materialx>

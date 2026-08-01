@@ -46,16 +46,16 @@
     <input name="in3" type="float" value="1" />
     <input name="in4" type="float" value="1" />
   </combine4>
-  <add name="in1" type="integer">
+  <add name="var__1" type="integer">
     <input name="in1" type="integer" value="1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="var__1" type="integer">
-    <input name="in1" type="integer" nodename="in1" />
+  <add name="var__2" type="integer">
+    <input name="in1" type="integer" nodename="var__1" />
     <input name="in2" type="integer" value="1" />
   </add>
   <extract name="f5" type="float">
     <input name="in" type="color4" nodename="c5" />
-    <input name="index" type="integer" nodename="var__1" />
+    <input name="index" type="integer" nodename="var__2" />
   </extract>
 </materialx>

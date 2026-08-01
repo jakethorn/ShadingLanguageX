@@ -2,91 +2,104 @@
 // Created by jaket on 17/04/2026.
 //
 
-#include "Runtime.h"
+#include "runtime/Runtime.h"
 
-#include "Scope.h"
-#include "mtlx/load_mtlx.h"
-#include "CompileError.h"
-#include "Variable.h"
+#include "CompileOptions.h"
+#include "runtime/Scope.h"
+#include "runtime/Variable.h"
+#include "utils/load_mtlx.h"
 #include "utils/io_utils.h"
+#include "errors/CompileError.h"
+#include "runtime/interface.h"
+#include "utils/Logger.h"
 
-std::unique_ptr<Runtime> Runtime::instance_ = nullptr;
-
-Runtime::Runtime(const CompileOptions& opts) : Runtime{opts, std::make_unique<Scope>(), MtlXSerializer{}}
+namespace mxslc::runtime
 {
+    using container_utils::contains;
 
-}
+    unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-Runtime::Runtime(const CompileOptions& opts, ScopePtr scope, MtlXSerializer serializer) : opts_{opts}, scope_{std::move(scope)}, serializer_{std::move(serializer)}
-{
-    scope_->set_graph(serializer_.document(), nullptr);
-}
-
-Runtime& Runtime::create(const optional<fs::path>& src_path, const CompileOptions& opts)
-{
-    instance_ = std::make_unique<Runtime>(opts);
-    instance_->include_dirs_ = get_include_directories(src_path);
-    instance_->serializer_.set_reduce_graph(opts.reduce_graph);
-    instance_->load_materialx_library(opts.version);
-    return *instance_;
-}
-
-Runtime& Runtime::get()
-{
-    if (instance_ == nullptr)
-        throw CompileError{"Runtime not created"s};
-    return *instance_;
-}
-
-VarPtr Runtime::global(const string& name) const
-{
-    for (const mxslc::Variable& global : opts_.globals)
+    Runtime::Runtime(CompileOptions opts) : opts_{std::move(opts)}
     {
-        if (global.name() == name)
+        scope_ = create_scope();
+        scope_->set_graph(serializer_.document(), nullptr);
+        serializer_.set_version(opts_.version);
+        serializer_.set_reduce_graph(opts_.reduce_graph);
+    }
+
+    Runtime& Runtime::create(CompileOptions opts)
+    {
+        instance_ = std::make_unique<Runtime>(std::move(opts));
+        instance_->load_libraries();
+        instance_->load_materialx_library();
+        return *instance_;
+    }
+
+    Runtime& Runtime::get()
+    {
+        if (instance_ == nullptr)
+            throw CompileError{"Runtime not created"};
+        return *instance_;
+    }
+
+    VarPtr Runtime::global(const string& name) const
+    {
+        if (opts_.has_global(name))
         {
             used_globals.push_back(name);
-            return Variable::create(global);
+            return opts_.get_global(name)->copy();
+        }
+        if (opts_.error_on_missing_globals)
+            throw CompileError{"Missing global variable: " + name};
+        return nullptr;
+    }
+
+    void Runtime::load_libraries()
+    {
+        for (const fs::path& path : opts_.libraries)
+        {
+            io_utils::search(opts_.search_directories(), path, [](const fs::path& found_path) {
+                load_library(found_path);
+            });
         }
     }
-    if (opts_.error_on_missing_globals)
-        throw CompileError{"Missing global variable: " + name};
-    return nullptr;
-}
 
-void Runtime::load_materialx_library(const string& version)
-{
-    mtlx_lib_ = get_materialx_library(version, include_directories());
-    load_library(mtlx_lib_);
-}
-
-Scope& Runtime::scope()
-{
-    return *scope_;
-}
-
-void Runtime::enter_scope(string name)
-{
-    scope_ = std::make_unique<Scope>(std::move(name), std::move(scope_));
-}
-
-void Runtime::exit_scope()
-{
-    scope_ = scope_->exit();
-}
-
-MtlXSerializer& Runtime::serializer()
-{
-    return serializer_;
-}
-
-void Runtime::destroy() const
-{
-    if (not opts_.error_on_unused_globals)
-        return;
-
-    for (const mxslc::Variable& global : opts_.globals)
+    void Runtime::load_materialx_library()
     {
-        if (not contains(used_globals, global.name()))
-            throw CompileError{"Unused global variable: " + global.name()};
+        mtlx_lib_ = get_materialx_library(opts_.version, opts_.search_directories());
+        load_library(mtlx_lib_);
+        Logger::debug("Loaded MaterialX version " + opts_.version + " libraries.");
+    }
+
+    Scope& Runtime::scope()
+    {
+        return *scope_;
+    }
+
+    void Runtime::enter_scope(string name)
+    {
+        scope_ = create_scope(std::move(name), std::move(scope_));
+    }
+
+    void Runtime::exit_scope()
+    {
+        scope_ = scope_->exit();
+    }
+
+    Serializer& Runtime::serializer()
+    {
+        return serializer_;
+    }
+
+    void Runtime::destroy() const
+    {
+        if (not opts_.error_on_unused_globals)
+            return;
+
+        for (const auto& [name, value] : opts_.globals())
+        {
+            if (not contains(used_globals, name))
+                throw CompileError{"Unused global variable: " + name};
+        }
     }
 }

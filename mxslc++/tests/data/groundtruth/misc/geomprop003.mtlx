@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <geompropvalue name="foo" type="vector4">
+    <input name="geomprop" type="string" value="foo" />
+  </geompropvalue>
+  <geompropvalue name="bar" type="vector4">
+    <input name="geomprop" type="string" value="bar" />
+  </geompropvalue>
+  <convert name="var__0" type="vector4">
+    <input name="in" type="float" value="2" />
+  </convert>
+  <convert name="var__1" type="vector4">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <geompropvalue name="boo" type="vector4">
+    <input name="geomprop" type="string" value="boo" />
+    <input name="default" type="vector4" nodename="var__0" />
+  </geompropvalue>
+  <geompropvalue name="far" type="vector4">
+    <input name="geomprop" type="string" value="far" />
+    <input name="default" type="vector4" nodename="var__1" />
+  </geompropvalue>
+</materialx>

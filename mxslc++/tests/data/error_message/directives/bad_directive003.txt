@@ -1,0 +1,1 @@
+bad_directive003.mxsl, line 1: #else without #(if/ifdef/ifndef)

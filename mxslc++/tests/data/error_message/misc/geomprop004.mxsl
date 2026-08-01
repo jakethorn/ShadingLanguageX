@@ -1,0 +1,6 @@
+int foo(geomprop int x)
+{
+    return x + 1;
+}
+
+int y = foo(1);

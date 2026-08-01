@@ -1,107 +1,12 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_color3_test" node="color3_test">
-    <output name="out" type="color3" />
-    <input name="color1" type="color3" value="-1, -1, -1" />
-    <input name="color2" type="color3" value="1e-05, 2, 2" />
-  </nodedef>
-  <nodegraph name="NG_color3_test" nodedef="ND_color3_test">
-    <add name="in1" type="color3">
-      <input name="in1" type="color3" interfacename="color1" />
-      <input name="in2" type="color3" interfacename="color2" />
-    </add>
-    <add name="in2" type="color3">
-      <input name="in1" type="color3" nodename="in1" />
-      <input name="in2" type="color3" value="-1e-06, 5, 5" />
-    </add>
-    <add name="var__0" type="color3">
-      <input name="in1" type="color3" nodename="in2" />
-      <input name="in2" type="color3" value="1e-06, -5, -5" />
-    </add>
-    <output name="out" type="color3" nodename="var__0" />
-  </nodegraph>
-  <color3_test name="color3_test_out" type="color3">
-    <input name="color1" type="color3" value="-1, 0.094118, 0.031373" />
-    <input name="color2" type="color3" value="2e-05, 1, 1" />
-  </color3_test>
-  <nodedef name="ND_color4_test" node="color4_test">
-    <output name="out" type="color4" />
-    <input name="color1" type="color4" value="-1, -1, -1, -1" />
-    <input name="color2" type="color4" value="1e-05, 2, 2, 1" />
-  </nodedef>
-  <nodegraph name="NG_color4_test" nodedef="ND_color4_test">
-    <add name="in1" type="color4">
-      <input name="in1" type="color4" interfacename="color1" />
-      <input name="in2" type="color4" interfacename="color2" />
-    </add>
-    <add name="var__0" type="color4">
-      <input name="in1" type="color4" nodename="in1" />
-      <input name="in2" type="color4" value="-1e-06, 5, 5, 5" />
-    </add>
-    <output name="out" type="color4" nodename="var__0" />
-  </nodegraph>
-  <color4_test name="color4_test_out" type="color4">
-    <input name="color1" type="color4" value="-1, 0.094118, 0.031373, -1" />
-    <input name="color2" type="color4" value="2e-05, 1, 1, -1" />
-  </color4_test>
-  <nodedef name="ND_vec3_test" node="vec3_test">
-    <output name="out" type="vector3" />
-    <input name="color1" type="vector3" value="-1, -1, -1" />
-    <input name="color2" type="vector3" value="1e-05, 2, 2" />
-  </nodedef>
-  <nodegraph name="NG_vec3_test" nodedef="ND_vec3_test">
-    <add name="in1" type="vector3">
-      <input name="in1" type="vector3" interfacename="color1" />
-      <input name="in2" type="vector3" interfacename="color2" />
-    </add>
-    <add name="var__0" type="vector3">
-      <input name="in1" type="vector3" nodename="in1" />
-      <input name="in2" type="vector3" value="-1e-06, 5, 5" />
-    </add>
-    <output name="out" type="vector3" nodename="var__0" />
-  </nodegraph>
-  <vec3_test name="vec3_test_out" type="vector3">
-    <input name="color1" type="vector3" value="-1, 0.094118, 0.031373" />
-    <input name="color2" type="vector3" value="2e-05, 1, 1" />
-  </vec3_test>
-  <nodedef name="ND_float_test" node="float_test">
-    <output name="out" type="float" />
-    <input name="color1" type="float" value="-1" />
-    <input name="color2" type="float" value="1e-05" />
-  </nodedef>
-  <nodegraph name="NG_float_test" nodedef="ND_float_test">
-    <add name="in1" type="float">
-      <input name="in1" type="float" interfacename="color1" />
-      <input name="in2" type="float" interfacename="color2" />
-    </add>
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
-      <input name="in2" type="float" value="1e-06" />
-    </add>
-    <output name="out" type="float" nodename="var__0" />
-  </nodegraph>
-  <float_test name="float_test_out" type="float">
-    <input name="color1" type="float" value="-1" />
-    <input name="color2" type="float" value="2e-05" />
-  </float_test>
-  <nodedef name="ND_int_test" node="int_test">
-    <output name="out" type="integer" />
-    <input name="color1" type="integer" value="-1" />
-    <input name="color2" type="integer" value="-3" />
-  </nodedef>
-  <nodegraph name="NG_int_test" nodedef="ND_int_test">
-    <add name="in1" type="integer">
-      <input name="in1" type="integer" interfacename="color1" />
-      <input name="in2" type="integer" interfacename="color2" />
-    </add>
-    <add name="var__0" type="integer">
-      <input name="in1" type="integer" nodename="in1" />
-      <input name="in2" type="integer" value="-3" />
-    </add>
-    <output name="out" type="integer" nodename="var__0" />
-  </nodegraph>
-  <int_test name="int_test_out" type="integer">
-    <input name="color1" type="integer" value="-1" />
-    <input name="color2" type="integer" value="-1000000000" />
-  </int_test>
+  <gltf_colorimage name="gltf_colorimage" type="multioutput">
+    <input name="file" type="filename" value="" />
+  </gltf_colorimage>
+  <gltf_pbr name="gltf_pbr_surfaceshader" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="gltf_colorimage" />
+  </gltf_pbr>
+  <surfacematerial name="surfacematerial" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="gltf_pbr_surfaceshader" />
+  </surfacematerial>
 </materialx>

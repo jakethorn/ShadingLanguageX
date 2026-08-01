@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="x" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <add name="y" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="2" />
+  </add>
+  <add name="x2" type="float">
+    <input name="in1" type="float" nodename="x" />
+    <input name="in2" type="float" nodename="y" />
+  </add>
+</materialx>

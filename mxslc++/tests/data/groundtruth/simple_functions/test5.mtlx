@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
-    <output name="out__2" type="float" />
-    <output name="out__3" type="string" />
+    <output name="out__x" type="float" />
+    <output name="out__y" type="float" />
+    <output name="out__z" type="float" />
+    <output name="out__space" type="string" />
     <input name="xy__0" type="float" value="0" />
     <input name="xy__1" type="float" value="0" />
     <input name="z" type="float" value="0" />
@@ -20,10 +20,10 @@
       <input name="in2" type="float" interfacename="z" />
     </divide>
     <randomfloat name="var__2" type="float" />
-    <output name="out__0" type="float" nodename="var__0" />
-    <output name="out__1" type="float" nodename="var__1" />
-    <output name="out__2" type="float" nodename="var__2" />
-    <output name="out__3" type="string" interfacename="space" />
+    <output name="out__x" type="float" nodename="var__0" />
+    <output name="out__y" type="float" nodename="var__1" />
+    <output name="out__z" type="float" nodename="var__2" />
+    <output name="out__space" type="string" interfacename="space" />
   </nodegraph>
   <foo name="n" type="multioutput">
     <input name="xy__0" type="float" value="1" />

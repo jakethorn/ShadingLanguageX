@@ -2,80 +2,123 @@
 // Created by jaket on 28/11/2025.
 //
 
-#include "VariableDefinition.h"
+#include "statements/VariableDefinition.h"
 
 #include "runtime/Scope.h"
 #include "expressions/Expression.h"
+#include "expressions/interface.h"
 #include "expressions/RuntimeExpression.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
+#include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "values/ValueFactory.h"
+#include "runtime/utils/invoke.h"
+#include "runtime/utils/monomorphize.h"
+#include "statements/interface.h"
 
-VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr)
-    : VariableDefinition{std::move(mods), std::move(type), std::move(name), std::move(expr), Token{}}
+namespace mxslc::statements
 {
+    VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr)
+        : VariableDefinition{std::move(mods), std::move(type), std::move(name), std::move(expr), Token{}}
+    {
 
-}
+    }
 
-VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token)
-    : Statement{std::move(token)}, mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, expr_{std::move(expr)}
-{
+    VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token)
+        : Statement{std::move(token)}, mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, expr_{std::move(expr)}
+    {
 
-}
+    }
 
-VariableDefinition::~VariableDefinition() = default;
+    VariableDefinition::~VariableDefinition() = default;
 
-void VariableDefinition::set_attributes(AttributeList attrs)
-{
-    if (expr_)
-        expr_->set_attributes(std::move(attrs));
-}
+    TypePtr VariableDefinition::type() const
+    {
+        return scope().resolve_type(type_);
+    }
 
-StmtPtr VariableDefinition::instantiate_template_types(const TypePtr& template_type) const
-{
-    TypePtr type = type_->instantiate_template_types(template_type);
-    ExprPtr expr = expr_ ? expr_->instantiate_template_types(template_type) : nullptr;
-    return std::make_unique<VariableDefinition>(mods_, std::move(type), name_, std::move(expr), token_);
-}
+    const string& VariableDefinition::name() const
+    {
+        return name_;
+    }
 
-TypePtr VariableDefinition::type() const
-{
-    return scope().resolve_type(type_);
-}
+    void VariableDefinition::set_attributes(AttributeList attrs)
+    {
+        if (expr_)
+            expr_->set_attributes(std::move(attrs));
+    }
 
-const string& VariableDefinition::name() const
-{
-    return name_;
-}
+    StmtPtr VariableDefinition::monomorphize(const TypePtr& template_type) const
+    {
+        auto&& [type, expr] = runtime_utils::monomorphize_all(template_type, type_, expr_);
+        return create_statement<VariableDefinition>(mods_, std::move(type), name_, std::move(expr), token_);
+    }
 
-void VariableDefinition::execute_impl() const
-{
-    TypePtr type = scope().resolve_type(type_);
-    VarPtr value;
+    void VariableDefinition::init()
+    {
+        type_ = scope().resolve_type(type_);
+    }
 
-    if (mods_.contains(TokenType::Global))
+    void VariableDefinition::execute_impl() const
+    {
+        const bool is_global = mods_.contains(TokenType::Global);
+        const bool is_geomprop = mods_.contains(TokenType::Geomprop);
+
+        VarPtr value;
+        if (is_global)
+        {
+            value = evaluate_global();
+        }
+
+        if (not value and expr_)
+        {
+            expr_->init(type_);
+            value = expr_->evaluate();
+        }
+
+        if (is_geomprop)
+            value = evaluate_geomprop(value);
+
+        if (not value)
+            value = create_variable(type_);
+
+        const VarPtr var = create_variable(mods_.without(TokenType::Global, TokenType::Geomprop), type_, value);
+        var->add_to_scope(name_);
+    }
+
+    VarPtr VariableDefinition::evaluate_global() const
     {
         if (VarPtr global = runtime().global(name_))
         {
-            const ExprPtr value_expr = std::make_shared<RuntimeExpression>(std::move(global));
-            value_expr->init(type);
-            value = value_expr->evaluate();
+            // init and evaluate here for type checking
+            const ExprPtr value_expr = as_expression(std::move(global));
+            value_expr->init(type_);
+            return value_expr->evaluate();
         }
+
+        return nullptr;
     }
 
-    if (value == nullptr)
+    VarPtr VariableDefinition::evaluate_geomprop(VarPtr default_value) const
     {
-        if (expr_)
-        {
-            expr_->init(type);
-            value = expr_->evaluate();
-        }
-        else
-        {
-            value = ValueFactory::create_default_value(type);
-        }
+        ArgumentList args{name_};
+        if (default_value)
+            args.add(std::move(default_value));
+        return runtime_utils::invoke_function(type_, "geompropvalue", std::move(args));
     }
 
-    const VarPtr var = Variable::create(mods_, std::move(type), value);
-    var->add_to_scope(name_);
+    string VariableDefinition::to_string() const
+    {
+        string mods_string = mods_.to_string();
+        if (not mods_string.empty())
+            mods_string += " ";
+
+        string result = mods_string;
+        result += type_->to_string() + " " + name_;
+        if (expr_)
+            result += " = " + expr_->to_string();
+        result += ";";
+
+        return result;
+    }
 }

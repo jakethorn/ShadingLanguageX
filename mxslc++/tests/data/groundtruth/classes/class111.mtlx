@@ -2,39 +2,39 @@
 <materialx version="1.39">
   <nodedef name="ND_Sphere_get_radius" node="Sphere_get_radius">
     <output name="out" type="float" />
-    <input name="this__0" type="vector2" />
-    <input name="this__1" type="float" />
+    <input name="this__center_" type="vector2" />
+    <input name="this__radius_" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_get_radius" nodedef="ND_Sphere_get_radius">
-    <output name="out" type="float" interfacename="this__1" />
+    <output name="out" type="float" interfacename="this__radius_" />
   </nodegraph>
   <nodedef name="ND_Sphere_set_radius" node="Sphere_set_radius">
     <input name="r" type="float" value="0" />
-    <input name="this__0" type="vector2" />
-    <input name="this__1" type="float" />
-    <output name="out__this__0" type="vector2" />
-    <output name="out__this__1" type="float" />
+    <input name="this__center_" type="vector2" />
+    <input name="this__radius_" type="float" />
+    <output name="out__this__center_" type="vector2" />
+    <output name="out__this__radius_" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_set_radius" nodedef="ND_Sphere_set_radius">
-    <output name="out__this__0" type="vector2" interfacename="this__0" />
-    <output name="out__this__1" type="float" interfacename="r" />
+    <output name="out__this__center_" type="vector2" interfacename="this__center_" />
+    <output name="out__this__radius_" type="float" interfacename="r" />
   </nodegraph>
   <combine2 name="s__center_" type="vector2">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="0" />
   </combine2>
   <Sphere_get_radius name="a" type="float">
-    <input name="this__0" type="vector2" nodename="s__center_" />
-    <input name="this__1" type="float" value="3" />
+    <input name="this__center_" type="vector2" nodename="s__center_" />
+    <input name="this__radius_" type="float" value="3" />
   </Sphere_get_radius>
   <Sphere_set_radius name="var__0" type="multioutput">
     <input name="r" type="float" value="4" />
-    <input name="this__0" type="vector2" nodename="s__center_" />
-    <input name="this__1" type="float" value="3" />
+    <input name="this__center_" type="vector2" nodename="s__center_" />
+    <input name="this__radius_" type="float" value="3" />
   </Sphere_set_radius>
   <Sphere_get_radius name="b" type="float">
-    <input name="this__0" type="vector2" output="out_this__0" nodename="var__0" />
-    <input name="this__1" type="float" output="out_this__1" nodename="var__0" />
+    <input name="this__center_" type="vector2" output="out_this__center_" nodename="var__0" />
+    <input name="this__radius_" type="float" output="out_this__radius_" nodename="var__0" />
   </Sphere_get_radius>
   <multiply name="var__1" type="float">
     <input name="in1" type="float" nodename="a" />

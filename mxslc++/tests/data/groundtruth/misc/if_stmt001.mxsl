@@ -1,0 +1,18 @@
+
+if (1)
+{
+    randomcolor(1);
+}
+else
+{
+    randomcolor(2);
+}
+
+if (0)
+{
+    randomcolor(1);
+}
+else
+{
+    randomcolor(2);
+}

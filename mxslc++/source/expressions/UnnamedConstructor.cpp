@@ -2,134 +2,143 @@
 // Created by jaket on 11/01/2026.
 //
 
-#include "UnnamedConstructor.h"
+#include "expressions/UnnamedConstructor.h"
 
-#include "CompileError.h"
+#include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/utils/monomorphize.h"
+#include "errors/CompileError.h"
+#include "expressions/interface.h"
 
-ExprPtr UnnamedConstructor::instantiate_template_types(const TypePtr& template_type) const
+namespace mxslc::expressions
 {
-    vector<ExprPtr> instantiated;
-    for (const ExprPtr& expr : exprs_)
-        instantiated.push_back(expr->instantiate_template_types(template_type));
-    return std::make_unique<UnnamedConstructor>(token_, std::move(instantiated));
-}
-
-void UnnamedConstructor::init_subexpressions(const vector<TypePtr>& types)
-{
-    if (expressions_are_initialized())
-        return;
-
-    while (initialized_expr_count_ < exprs_.size())
+    ExprPtr UnnamedConstructor::monomorphize(const TypePtr& template_type) const
     {
-        const size_t prev_initialized_expr_count = initialized_expr_count_;
-        try_init_expressions(types);
-
-        if (initialized_expr_count_ == prev_initialized_expr_count)
-            throw CompileError{"Invalid constructor call"s};
+        vector<ExprPtr> exprs = runtime_utils::monomorphize(exprs_, template_type);
+        return create_expression<UnnamedConstructor>(std::move(exprs), token_);
     }
-}
 
-TypePtr UnnamedConstructor::type_impl() const
-{
-    vector<TypePtr> types;
-    types.reserve(exprs_.size());
-    for (const ExprPtr& expr : exprs_)
-        types.push_back(expr->type());
-    const TypePtr type = std::make_shared<Type>(std::move(types));
-    return scope().resolve_type(type);
-}
-
-VarPtr UnnamedConstructor::evaluate_impl() const
-{
-    vector<VarPtr> values;
-    values.reserve(exprs_.size());
-    for (const ExprPtr& expr : exprs_)
-        values.push_back(expr->evaluate());
-    return Variable::create(values);
-}
-
-bool UnnamedConstructor::expressions_are_initialized()
-{
-    bool result = true;
-    for (const ExprPtr& expr : exprs_)
+    void UnnamedConstructor::init_subexpressions(const vector<TypePtr>& types)
     {
-        if (expr->is_initialized())
+        if (expressions_are_initialized())
+            return;
+
+        while (initialized_expr_count_ < exprs_.size())
         {
-            expr->init(expr->type());
-            ++initialized_expr_count_;
-        }
-        else
-        {
-            result = false;
+            const size_t prev_initialized_expr_count = initialized_expr_count_;
+
+            try_init_expressions(types);
+
+            if (initialized_expr_count_ == prev_initialized_expr_count)
+                throw CompileError{"Invalid constructor call"};
         }
     }
 
-    return result;
-}
-
-void UnnamedConstructor::try_init_expressions(const vector<TypePtr>& types)
-{
-    for (size_t i = 0; i < exprs_.size(); ++i)
+    TypePtr UnnamedConstructor::type_impl() const
     {
-        if (exprs_[i]->is_initialized())
-            continue;
-        if (exprs_[i]->try_init(index_types(types, i)))
-            ++initialized_expr_count_;
+        vector<TypePtr> types;
+        types.reserve(exprs_.size());
+        for (const ExprPtr& expr : exprs_)
+            types.push_back(expr->type());
+        const TypePtr type = create_type(std::move(types));
+        return scope().resolve_type(type);
     }
-}
 
-namespace
-{
-    vector<TypePtr> with_compatible_types(const vector<TypePtr>& types)
+    VarPtr UnnamedConstructor::evaluate_impl() const
     {
-        vector<TypePtr> result;
-        for (const TypePtr& type : types)
-        {
-            result.push_back(type);
+        vector<VarPtr> values;
+        values.reserve(exprs_.size());
+        for (const ExprPtr& expr : exprs_)
+            values.push_back(expr->evaluate());
+        return create_variable(values);
+    }
 
-            if (type->is_vector())
+    bool UnnamedConstructor::expressions_are_initialized()
+    {
+        bool result = true;
+        for (const ExprPtr& expr : exprs_)
+        {
+            if (expr->is_initialized())
             {
-                result.push_back(
-                    Type::unnamed_struct(Type::Float, type->component_count())
-                );
+                expr->update();
+                ++initialized_expr_count_;
+            }
+            else
+            {
+                result = false;
             }
         }
 
         return result;
     }
-}
 
-vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, const size_t index) const
-{
-    if (subexpr_type_)
-        return {subexpr_type_};
-
-    vector<TypePtr> result;
-
-    for (const TypePtr& type : with_compatible_types(types))
+    void UnnamedConstructor::try_init_expressions(const vector<TypePtr>& types)
     {
-        bool is_compatible = true;
-
-        if (type->field_count() != exprs_.size())
+        for (size_t i = 0; i < exprs_.size(); ++i)
         {
-            is_compatible = false;
+            if (exprs_[i]->is_initialized())
+                continue;
+            if (exprs_[i]->try_init(index_types(types, i)))
+                ++initialized_expr_count_;
         }
-        else
-        {
-            for (size_t i = 0; i < exprs_.size(); ++i)
-            {
-                if (exprs_[i]->is_initialized() and type->field_type(i) != exprs_[i]->type())
-                    is_compatible = false;
-            }
-        }
-
-        if (is_compatible)
-            result.push_back(type->field_type(index));
     }
 
-    return result;
+    namespace
+    {
+        vector<TypePtr> with_compatible_types(const vector<TypePtr>& types)
+        {
+            vector<TypePtr> result;
+            for (const TypePtr& type : types)
+            {
+                result.push_back(type);
+
+                if (type->is_vector())
+                {
+                    result.push_back(
+                        Type::unnamed_struct(Type::Float, type->component_count())
+                    );
+                }
+            }
+
+            return result;
+        }
+    }
+
+    vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, const size_t index) const
+    {
+        if (subexpr_type_)
+            return {subexpr_type_};
+
+        vector<TypePtr> result;
+
+        for (const TypePtr& type : with_compatible_types(types))
+        {
+            bool is_compatible = true;
+
+            if (type->field_count() != exprs_.size())
+            {
+                is_compatible = false;
+            }
+            else
+            {
+                for (size_t i = 0; i < exprs_.size(); ++i)
+                {
+                    if (exprs_[i]->is_initialized() and type->field_type(i) != exprs_[i]->type())
+                        is_compatible = false;
+                }
+            }
+
+            if (is_compatible)
+                result.push_back(type->field_type(index));
+        }
+
+        return result;
+    }
+
+    string UnnamedConstructor::to_string() const
+    {
+        return "{" + join(exprs_, ", ") + "}";
+    }
 }

@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="b" type="float">
+  <add name="var__0" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="1" />
   </add>
-  <add name="b2" type="float">
-    <input name="in1" type="float" nodename="b" />
+  <add name="var__1" type="float">
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="1" />
   </add>
-  <add name="b3" type="float">
-    <input name="in1" type="float" nodename="b2" />
+  <add name="var__2" type="float">
+    <input name="in1" type="float" nodename="var__1" />
     <input name="in2" type="float" value="1" />
   </add>
-  <add name="b4" type="float">
-    <input name="in1" type="float" nodename="b3" />
+  <add name="var__3" type="float">
+    <input name="in1" type="float" nodename="var__2" />
     <input name="in2" type="float" value="1" />
   </add>
-  <add name="var__0" type="float">
-    <input name="in1" type="float" nodename="b4" />
+  <add name="var__4" type="float">
+    <input name="in1" type="float" nodename="var__3" />
     <input name="in2" type="float" value="1" />
   </add>
 </materialx>

@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <power name="i" type="float">
+  <power name="j" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="2" />
   </power>
   <multiply name="k" type="float">
-    <input name="in1" type="float" nodename="i" />
-    <input name="in2" type="float" nodename="i" />
+    <input name="in1" type="float" nodename="j" />
+    <input name="in2" type="float" nodename="j" />
   </multiply>
 </materialx>

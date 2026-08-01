@@ -1,37 +1,37 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="out__x" type="float" />
+    <output name="outparam__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
     </multiply>
-    <output name="out__x" type="float" nodename="var__0" />
+    <output name="outparam__x" type="float" nodename="var__0" />
   </nodegraph>
   <foo name="var__0" type="float" />
   <foo name="var__1" type="float" />
   <add name="HERE1" type="float">
-    <input name="in1" type="float" output="out__x" nodename="var__0" />
-    <input name="in2" type="float" output="out__x" nodename="var__1" />
+    <input name="in1" type="float" output="outparam__x" nodename="var__0" />
+    <input name="in2" type="float" output="outparam__x" nodename="var__1" />
   </add>
   <nodedef name="ND_foo2" node="foo2">
-    <output name="out__y__0" type="float" />
-    <output name="out__y__1" type="float" />
+    <output name="outparam__y__0" type="float" />
+    <output name="outparam__y__1" type="float" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <output name="out__y__0" type="float" value="2" />
-    <output name="out__y__1" type="float" value="8" />
+    <output name="outparam__y__0" type="float" value="2" />
+    <output name="outparam__y__1" type="float" value="8" />
   </nodegraph>
   <foo2 name="var__2" type="multioutput" />
   <foo2 name="var__3" type="multioutput" />
   <add name="HERE2" type="float">
-    <input name="in1" type="float" output="out__y__0" nodename="var__2" />
-    <input name="in2" type="float" output="out__y__0" nodename="var__3" />
+    <input name="in1" type="float" output="outparam__y__0" nodename="var__2" />
+    <input name="in2" type="float" output="outparam__y__0" nodename="var__3" />
   </add>
   <add name="HERE3" type="float">
-    <input name="in1" type="float" output="out__y__1" nodename="var__2" />
-    <input name="in2" type="float" output="out__y__1" nodename="var__3" />
+    <input name="in1" type="float" output="outparam__y__1" nodename="var__2" />
+    <input name="in2" type="float" output="outparam__y__1" nodename="var__3" />
   </add>
 </materialx>

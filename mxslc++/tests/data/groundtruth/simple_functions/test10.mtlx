@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
-    <output name="out__x" type="float" />
+    <output name="outparam__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="out__x" type="float" value="3" />
+    <output name="outparam__x" type="float" value="3" />
   </nodegraph>
   <foo name="var__0" type="float" />
   <multiply name="z" type="float">
-    <input name="in1" type="float" output="out__x" nodename="var__0" />
+    <input name="in1" type="float" output="outparam__x" nodename="var__0" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

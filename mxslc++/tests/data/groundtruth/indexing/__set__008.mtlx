@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <creatematrix name="m" type="matrix33" />
+  <invertmatrix name="n" type="matrix33">
+    <input name="in" type="matrix33" nodename="m" />
+  </invertmatrix>
+  <extract name="var__0" type="vector3">
+    <input name="in" type="matrix33" nodename="m" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <separate3 name="var__1" type="multioutput">
+    <input name="in" type="vector3" nodename="var__0" />
+  </separate3>
+  <combine3 name="var__2" type="vector3">
+    <input name="in1" type="float" value="5" />
+    <input name="in2" type="float" output="outy" nodename="var__1" />
+    <input name="in3" type="float" output="outz" nodename="var__1" />
+  </combine3>
+  <combine3 name="var__3" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" value="5" />
+    <input name="in3" type="float" output="outz" nodename="var__1" />
+  </combine3>
+  <combine3 name="var__4" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__1" />
+    <input name="in3" type="float" value="5" />
+  </combine3>
+  <switch name="var__5" type="vector3">
+    <input name="in1" type="vector3" nodename="var__2" />
+    <input name="in2" type="vector3" nodename="var__3" />
+    <input name="in3" type="vector3" nodename="var__4" />
+    <input name="which" type="integer" value="2" />
+  </switch>
+  <extract name="row0" type="vector3">
+    <input name="in" type="matrix33" nodename="m" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="row1" type="vector3">
+    <input name="in" type="matrix33" nodename="m" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <extract name="row2" type="vector3">
+    <input name="in" type="matrix33" nodename="m" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <creatematrix name="var__6" type="matrix33">
+    <input name="in1" type="vector3" nodename="var__5" />
+    <input name="in2" type="vector3" nodename="row1" />
+    <input name="in3" type="vector3" nodename="row2" />
+  </creatematrix>
+  <creatematrix name="var__7" type="matrix33">
+    <input name="in1" type="vector3" nodename="row0" />
+    <input name="in2" type="vector3" nodename="var__5" />
+    <input name="in3" type="vector3" nodename="row2" />
+  </creatematrix>
+  <creatematrix name="var__8" type="matrix33">
+    <input name="in1" type="vector3" nodename="row0" />
+    <input name="in2" type="vector3" nodename="row1" />
+    <input name="in3" type="vector3" nodename="var__5" />
+  </creatematrix>
+  <switch name="var__9" type="matrix33">
+    <input name="in1" type="matrix33" nodename="var__6" />
+    <input name="in2" type="matrix33" nodename="var__7" />
+    <input name="in3" type="matrix33" nodename="var__8" />
+    <input name="which" type="integer" value="1" />
+  </switch>
+  <invertmatrix name="o" type="matrix33">
+    <input name="in" type="matrix33" nodename="var__9" />
+  </invertmatrix>
+</materialx>

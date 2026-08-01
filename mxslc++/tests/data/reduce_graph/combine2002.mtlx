@@ -1,67 +1,67 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine3 name="xyz" type="vector3">
+  <combine3 name="var__0" type="vector3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <separate3 name="var__0" type="multioutput">
-    <input name="in" type="vector3" nodename="xyz" />
+  <separate3 name="var__1" type="multioutput">
+    <input name="in" type="vector3" nodename="var__0" />
   </separate3>
-  <combine4 name="in1" type="vector4">
-    <input name="in1" type="float" output="outx" nodename="var__0" />
-    <input name="in2" type="float" output="outy" nodename="var__0" />
-    <input name="in3" type="float" output="outz" nodename="var__0" />
+  <combine4 name="var__2" type="vector4">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__1" />
+    <input name="in3" type="float" output="outz" nodename="var__1" />
     <input name="in4" type="float" value="4" />
   </combine4>
-  <combine3 name="var__1" type="vector3">
+  <combine3 name="var__3" type="vector3">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="6" />
     <input name="in3" type="float" value="7" />
   </combine3>
-  <combine2 name="in2" type="vector4">
-    <input name="in1" type="vector3" nodename="var__1" />
+  <combine2 name="var__4" type="vector4">
+    <input name="in1" type="vector3" nodename="var__3" />
     <input name="in2" type="float" value="8" />
   </combine2>
   <add name="v1" type="vector4">
-    <input name="in1" type="vector4" nodename="in1" />
-    <input name="in2" type="vector4" nodename="in2" />
+    <input name="in1" type="vector4" nodename="var__2" />
+    <input name="in2" type="vector4" nodename="var__4" />
   </add>
-  <randomfloat name="in3" type="float" />
+  <randomfloat name="var__5" type="float" />
   <multiply name="OUT1" type="vector4">
     <input name="in1" type="vector4" nodename="v1" />
-    <input name="in2" type="float" nodename="in3" />
+    <input name="in2" type="float" nodename="var__5" />
   </multiply>
-  <combine3 name="rgb" type="color3">
+  <combine3 name="var__6" type="color3">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <separate3 name="var__2" type="multioutput">
-    <input name="in" type="color3" nodename="rgb" />
+  <separate3 name="var__7" type="multioutput">
+    <input name="in" type="color3" nodename="var__6" />
   </separate3>
-  <combine4 name="in4" type="color4">
-    <input name="in1" type="float" output="outr" nodename="var__2" />
-    <input name="in2" type="float" output="outg" nodename="var__2" />
-    <input name="in3" type="float" output="outb" nodename="var__2" />
+  <combine4 name="var__8" type="color4">
+    <input name="in1" type="float" output="outr" nodename="var__7" />
+    <input name="in2" type="float" output="outg" nodename="var__7" />
+    <input name="in3" type="float" output="outb" nodename="var__7" />
     <input name="in4" type="float" value="4" />
   </combine4>
-  <combine3 name="var__3" type="color3">
+  <combine3 name="var__9" type="color3">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="6" />
     <input name="in3" type="float" value="7" />
   </combine3>
-  <combine2 name="in5" type="color4">
-    <input name="in1" type="color3" nodename="var__3" />
+  <combine2 name="var__10" type="color4">
+    <input name="in1" type="color3" nodename="var__9" />
     <input name="in2" type="float" value="8" />
   </combine2>
   <add name="v2" type="color4">
-    <input name="in1" type="color4" nodename="in4" />
-    <input name="in2" type="color4" nodename="in5" />
+    <input name="in1" type="color4" nodename="var__8" />
+    <input name="in2" type="color4" nodename="var__10" />
   </add>
-  <randomfloat name="in6" type="float" />
+  <randomfloat name="var__11" type="float" />
   <multiply name="OUT2" type="color4">
     <input name="in1" type="color4" nodename="v2" />
-    <input name="in2" type="float" nodename="in6" />
+    <input name="in2" type="float" nodename="var__11" />
   </multiply>
 </materialx>

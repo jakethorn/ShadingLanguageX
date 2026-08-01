@@ -2,38 +2,55 @@
 // Created by jaket on 10/04/2026.
 //
 
-#include "IfStatement.h"
+#include "statements/IfStatement.h"
 
 #include "expressions/Expression.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/Variable.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
+#include "statements/interface.h"
 
-IfStatement::IfStatement(Token token, ExprPtr cond_expr, StmtPtr then_body, StmtPtr else_body)
-    : Statement{std::move(token)}, cond_expr_{std::move(cond_expr)}, then_body_{std::move(then_body)}, else_body_{std::move(else_body)} { }
-
-StmtPtr IfStatement::instantiate_template_types(const TypePtr& template_type) const
+namespace mxslc::statements
 {
-    ExprPtr cond_expr = ::instantiate_template_types(cond_expr_, template_type);
-    StmtPtr then_body = then_body_->instantiate_template_types(template_type);
-    StmtPtr else_body = else_body_->instantiate_template_types(template_type);
-    return std::make_unique<IfStatement>(token_, std::move(cond_expr), std::move(then_body), std::move(else_body));
-}
+    IfStatement::IfStatement(Token token, ExprPtr cond_expr, StmtPtr then_body, StmtPtr else_body)
+        : Statement{std::move(token)}, cond_expr_{std::move(cond_expr)}, then_body_{std::move(then_body)}, else_body_{std::move(else_body)} { }
 
-void IfStatement::execute_impl() const
-{
-    cond_expr_->init(Type::Bool);
-    const VarPtr cond = cond_expr_->evaluate();
+    StmtPtr IfStatement::monomorphize(const TypePtr& template_type) const
+    {
+        auto&& [cond_expr, then_body, else_body] = runtime_utils::monomorphize_all(template_type, cond_expr_, then_body_, else_body_);
+        return create_statement<IfStatement>(token_, std::move(cond_expr), std::move(then_body), std::move(else_body));
+    }
 
-    runtime().enter_scope();
-    if (cond->value_as<bool>())
+    void IfStatement::execute_impl() const
     {
-        then_body_->execute();
+        if (not cond_expr_->try_init(Type::Bool))
+            cond_expr_->init();
+
+        const VarPtr cond = cond_expr_->evaluate();
+
+        runtime().enter_scope();
+        if (cond->basic())
+        {
+            then_body_->execute();
+        }
+        else if (else_body_)
+        {
+            else_body_->execute();
+        }
+        runtime().exit_scope();
     }
-    else if (else_body_)
+
+    string IfStatement::to_string() const
     {
-        else_body_->execute();
+        string result;
+        result += "if (" + cond_expr_->to_string() + ")\n";
+        result += then_body_->to_string();
+        if (else_body_)
+        {
+            result += "else\n";
+            result += else_body_->to_string();
+        }
+        return result;
     }
-    runtime().exit_scope();
 }
