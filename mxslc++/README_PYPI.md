@@ -9,7 +9,7 @@ for documentation on what language features the compiler supports.
 pip install mxslcxx
 ```
 
-OS: Linux and Windows.  
+OS: Linux, MacOS and Windows.  
 Python version: 3.9+.
 
 ```python

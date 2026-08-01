@@ -57,6 +57,7 @@ add_library(mxslc_lib
         expressions/RuntimeExpression.cpp
         expressions/TypeOfOperator.cpp
         expressions/RangeExpression.cpp
+        expressions/IfExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp

@@ -1,0 +1,30 @@
+
+class Foo
+{
+    float x;
+    float y;
+}
+
+class Bar
+{
+    float i;
+    float j;
+}
+
+Foo f = {1, 2};
+Bar b = {3, 4};
+constant(f[0]);
+constant(f[1]);
+constant(typeof(f).name);
+constant(b[0]);
+constant(b[1]);
+constant(typeof(b).name);
+
+Foo x = if (true) { f } else { {5, 6} };
+constant(x[0]);
+constant(x[1]);
+
+Foo y = if (false) { f } else { {7, 8} };
+constant(y[0]);
+constant(y[1]);
+

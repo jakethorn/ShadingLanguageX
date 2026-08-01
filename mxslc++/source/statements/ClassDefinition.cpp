@@ -16,6 +16,7 @@
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
 #include "statements/interface.h"
+#include "statements/MultiVariableDefinition.h"
 
 namespace mxslc::statements
 {
@@ -46,10 +47,10 @@ namespace mxslc::statements
 
     void ClassDefinition::execute_impl() const
     {
-        const TypePtr type = create_type(name_);
-        add_fields(type);
-        scope().add_type(type);
-        add_methods_and_constructors(type);
+        const TypePtr class_type = create_type(name_);
+        add_fields(class_type);
+        scope().add_type(class_type);
+        add_methods_and_constructors(class_type);
     }
 
     void ClassDefinition::validate_body() const
@@ -57,56 +58,62 @@ namespace mxslc::statements
         for (const StmtPtr& stmt : body_)
         {
             const bool is_var_def = dynamic_cast<VariableDefinition*>(stmt.get());
+            const bool is_multi_var_def = dynamic_cast<MultiVariableDefinition*>(stmt.get());
             const bool is_func_def = dynamic_cast<FunctionDefinition*>(stmt.get());
             const bool is_ctor_def = dynamic_cast<ConstructorDefinition*>(stmt.get());
-            if (not (is_var_def or is_func_def or is_ctor_def))
+            if (not (is_var_def or is_multi_var_def or is_func_def or is_ctor_def))
             {
-                throw CompileError{"Only fields, methods and constructors are allowed in class definitions"s};
+                throw CompileError{"Only fields, methods and constructors are allowed in class definitions"};
             }
         }
     }
 
-    void ClassDefinition::add_fields(const TypePtr& type) const
+    void ClassDefinition::add_fields(const TypePtr& class_type) const
     {
         for (const StmtPtr& stmt : body_)
         {
             if (const VariableDefinition* var_def = dynamic_cast<VariableDefinition*>(stmt.get()))
             {
                 Field field{var_def->modifiers(), var_def->type(), var_def->name()};
-                type->add_field(std::move(field));
+                class_type->add_field(std::move(field));
+            }
+            else if (const MultiVariableDefinition* multi_var_def = dynamic_cast<MultiVariableDefinition*>(stmt.get()))
+            {
+                for (const Field& field : multi_var_def->type()->fields())
+                    class_type->add_field(field);
             }
         }
     }
 
-    void ClassDefinition::add_methods_and_constructors(const TypePtr& type) const
+    void ClassDefinition::add_methods_and_constructors(const TypePtr& class_type) const
     {
         for (const StmtPtr& stmt : body_)
         {
             if (FunctionDefinition* func_def = dynamic_cast<FunctionDefinition*>(stmt.get()))
             {
-                add_method(type, func_def);
+                add_method(class_type, func_def);
             }
             else if (ConstructorDefinition* ctor_def = dynamic_cast<ConstructorDefinition*>(stmt.get()))
             {
-                add_constructor(type, ctor_def);
+                add_constructor(class_type, ctor_def);
             }
         }
     }
 
-    void ClassDefinition::add_method(const TypePtr& type, FunctionDefinition* func_def) const
+    void ClassDefinition::add_method(const TypePtr& class_type, FunctionDefinition* func_def) const
     {
         for (const FuncPtr& func : func_def->functions())
         {
-            type->add_method(func);
-            func->set_class_type(type);
+            class_type->add_method(func);
+            func->set_class_type(class_type);
         }
 
         func_def->execute();
     }
 
-    void ClassDefinition::add_constructor(const TypePtr& type, ConstructorDefinition* ctor_def) const
+    void ClassDefinition::add_constructor(const TypePtr& class_type, ConstructorDefinition* ctor_def) const
     {
-        if (type->name() != ctor_def->class_name())
+        if (class_type->name() != ctor_def->class_name())
             throw CompileError{"Constructor name does not match class name"};
         ctor_def->execute();
     }

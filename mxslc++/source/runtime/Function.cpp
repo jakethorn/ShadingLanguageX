@@ -146,7 +146,7 @@ namespace mxslc::runtime
         else
         {
             return_expr_->init(return_type_);
-            VarPtr return_value = type_cast(return_type_, return_expr_->evaluate(), true);
+            VarPtr return_value = type_cast(return_type_, return_expr_->evaluate(), /*force*/true);
             if (is_parameterless_)
                 parameterless_cache_ = return_value;
             return return_value;

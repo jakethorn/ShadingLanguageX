@@ -17,7 +17,7 @@ namespace mxslc::statements
         VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token);
         ~VariableDefinition() override;
 
-        const ModifierList& modifiers() const { return mods_; }
+        const ModifierList& modifiers() const;
         TypePtr type() const;
         const string& name() const;
 
