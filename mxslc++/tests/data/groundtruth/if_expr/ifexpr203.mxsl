@@ -1,0 +1,6 @@
+float x =
+if (randomfloat() < 0.5) { 2.0 }
+else if (false) { 3.0 }
+else { 4.0 };
+
+constant(x);

@@ -32,6 +32,11 @@ namespace mxslc::statements
 
     VariableDefinition::~VariableDefinition() = default;
 
+    const ModifierList &VariableDefinition::modifiers() const
+    {
+        return mods_;
+    }
+
     TypePtr VariableDefinition::type() const
     {
         return scope().resolve_type(type_);

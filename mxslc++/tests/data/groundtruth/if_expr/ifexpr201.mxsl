@@ -1,0 +1,4 @@
+float x = if (true) { 3.0 } else { 4.0 };
+float x2 = if (false) { 3.0 } else { 4.0 };
+float y = if (randomfloat() < 0.5) { 9.0 } else { 8.0 };
+float z = x + x2 + y;

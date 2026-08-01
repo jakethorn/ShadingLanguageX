@@ -61,12 +61,6 @@ namespace mxslc::expressions
         return create_expression<FunctionCall>(std::move(dunder_name), ArgumentList{std::move(right)}, std::move(op));
     }
 
-    ExprPtr ExpressionFactory::if_expression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr, Token token)
-    {
-        ArgumentList args{std::move(cond_expr), std::move(then_expr), std::move(else_expr)};
-        return create_expression<FunctionCall>("__if__", std::move(args), std::move(token));
-    }
-
     ExprPtr ExpressionFactory::absolute(ExprPtr expr, Token token)
     {
         return create_expression<FunctionCall>("__abs__", ArgumentList{std::move(expr)}, std::move(token));

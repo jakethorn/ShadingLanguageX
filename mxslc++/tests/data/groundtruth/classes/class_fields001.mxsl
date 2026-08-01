@@ -1,0 +1,28 @@
+
+class Foo
+{
+    float x, y;
+}
+
+class Bar
+{
+    float i;
+    float j;
+}
+
+Foo f = {1, 2};
+Bar b = {3, 4};
+constant(f[0]);
+constant(f[1]);
+constant(typeof(f).str);
+constant(b[0]);
+constant(b[1]);
+constant(typeof(b).str);
+
+//Foo f = {1, 2};
+//Bar b = {3, 4};
+//constant(f[0]);
+//constant(f[1]);
+//print typeof(typeof(f));
+//print b;
+//print typeof(b);

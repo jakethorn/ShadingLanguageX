@@ -153,8 +153,8 @@ Python bindings are available on PyPI and can be downloaded using pip:
 pip install mxslcxx
 ```
 
-OS: Linux and Windows.  
-Python version: 3.9+.   
+OS: Linux, MacOS and Windows.
+Python version: 3.9+.
 
 ```python
 import mxslc
