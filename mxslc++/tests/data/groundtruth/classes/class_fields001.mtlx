@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="float">
+    <input name="value" type="float" value="1" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" value="2" />
+  </constant>
+  <constant name="var__2" type="string">
+    <input name="value" type="string" value="Foo{float x, float y}" />
+  </constant>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" value="3" />
+  </constant>
+  <constant name="var__4" type="float">
+    <input name="value" type="float" value="4" />
+  </constant>
+  <constant name="var__5" type="string">
+    <input name="value" type="string" value="Bar{float i, float j}" />
+  </constant>
+</materialx>

@@ -15,6 +15,8 @@ namespace mxslc::statements
         MultiVariableDefinition(TypePtr type, ExprPtr expr);
         MultiVariableDefinition(TypePtr type, ExprPtr expr, Token token);
 
+        TypePtr type() const;
+
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
