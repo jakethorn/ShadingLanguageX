@@ -9,7 +9,7 @@
 
 namespace mxslc::primitive_utils
 {
-    // binary arithmatic operators
+    // binary arithmetic operators
     Primitive add(const Primitive& in1, const Primitive& in2);
     Primitive subtract(const Primitive& in1, const Primitive& in2);
     Primitive multiply(const Primitive& in1, const Primitive& in2);

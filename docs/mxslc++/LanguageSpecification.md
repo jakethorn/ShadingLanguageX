@@ -2345,9 +2345,17 @@ scope above the global document scope.
 # Preprocessor Directives
 
 ShadingLanguageX supports the following preprocessor directives:
+* MaterialX Version (`#version`)
 * File inclusion (`#include` `#library`)
 * Macro definition (`#define` `#undef`)
 * Conditional compilation (`#if` `#ifdef` `#ifndef` `#elif` `#elifdef` `#elifndef` `#else` `#endif`)
+
+## Version
+
+The `#version` directive can be used to tell the compiler which version of MaterialX it should target when loading the standard
+library as well as validating and setting the version string of the compiled .mtlx file. You need to specify the full version
+number, e.g., `#version 1.38.10`. You can specify any valid MaterialX version number you want, however, the compiler must
+have access to the MaterialX libraries for that version, otherwise it will fail. See the [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md) for more information.
 
 ## File Inclusion
 
@@ -2428,13 +2436,6 @@ the compiler either as command line arguments or using the C++/Python APIs. See 
 ## Conditional Compilation
 
 Conditional compilation directives operate as they do in C, with two extras: `#elifdef` and `#elifndef`.
-
-## Version
-
-The `#version` directive is an optional directive that can be used to tell the compiler which version of MaterialX it should target when loading the standard
-library as well as validating and setting the version string of the compiled .mtlx file. You need to specify the full version 
-number, e.g., `#version 1.38.10`. You can specify any valid MaterialX version number you want, however, the compiler must
-have access to the MaterialX libraries for that version, otherwise it will fail. See the [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md) for more information.
 
 ### Example
 

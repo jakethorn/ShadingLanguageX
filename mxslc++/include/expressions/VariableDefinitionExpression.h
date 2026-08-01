@@ -7,6 +7,7 @@
 
 #include "expressions/Expression.h"
 #include "runtime/ModifierList.h"
+#include "statements/Statement.h"
 
 namespace mxslc::expressions
 {
