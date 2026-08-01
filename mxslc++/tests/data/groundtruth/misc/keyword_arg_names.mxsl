@@ -1,0 +1,2 @@
+color3 c = image(default=color3{1});
+int i = geompropvalue(geomprop="i", default=0);

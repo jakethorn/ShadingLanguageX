@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="var__0" type="float" />
+  <ifgreater name="var__1" type="boolean">
+    <input name="value1" type="float" value="0.5" />
+    <input name="value2" type="float" nodename="var__0" />
+  </ifgreater>
+  <ifequal name="y" type="float">
+    <input name="value1" type="boolean" nodename="var__1" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" value="9" />
+    <input name="in2" type="float" value="8" />
+  </ifequal>
+  <add name="var__2" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" value="4" />
+  </add>
+  <add name="z" type="float">
+    <input name="in1" type="float" nodename="var__2" />
+    <input name="in2" type="float" nodename="y" />
+  </add>
+</materialx>

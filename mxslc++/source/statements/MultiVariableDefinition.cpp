@@ -29,6 +29,11 @@ namespace mxslc::statements
 
     }
 
+    TypePtr MultiVariableDefinition::type() const
+    {
+        return scope().resolve_type(type_);
+    }
+
     void MultiVariableDefinition::set_attributes(AttributeList attrs)
     {
         if (expr_)

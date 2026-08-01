@@ -428,11 +428,6 @@ inline void __set__(ref matrix44 matrix, int index, vector4 value)
 // other functions
 //
 
-inline T __if__<boolean, integer, float, vector2, vector3, vector4, color3, color4, matrix33, matrix44>(boolean condition, T then_value, T else_value)
-{
-    return ifequal(condition, true, then_value, else_value);
-}
-
 inline T __abs__<float, vector2, vector3, vector4, color3, color4>(T in1)
 {
     return absval(in1);
