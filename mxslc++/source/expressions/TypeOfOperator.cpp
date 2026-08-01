@@ -61,7 +61,8 @@ namespace mxslc::expressions
             {TokenType::Const, Type::String, "str"}
         };
 
-        op_type_ = create_type(std::move(fields));
+        const TypePtr type = create_type(std::move(fields));
+        op_type_ = scope().resolve_type(type);
     }
 
     TypePtr TypeOfOperator::type_impl() const
