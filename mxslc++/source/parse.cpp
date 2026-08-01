@@ -799,7 +799,8 @@ namespace mxslc
         string name;
         if (peek(1) == '=')
         {
-            name = match(TokenType::Identifier).lexeme();
+            // Must check for default and geomprop here because the image/geomprop nodes have inputs with the same name
+            name = match(TokenType::Identifier, TokenType::Default, TokenType::Geomprop).lexeme();
             match('=');
         }
 
