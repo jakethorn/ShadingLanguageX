@@ -2,18 +2,18 @@
 <materialx version="1.39">
   <nodedef name="ND_Sphere_expand" node="Sphere_expand">
     <input name="amount" type="float" value="0" />
-    <input name="this__0" type="vector2" />
-    <input name="this__1" type="float" />
-    <output name="out__this__0" type="vector2" />
-    <output name="out__this__1" type="float" />
+    <input name="this__center" type="vector2" />
+    <input name="this__radius" type="float" />
+    <output name="out__this__center" type="vector2" />
+    <output name="out__this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_expand" nodedef="ND_Sphere_expand">
     <add name="var__0" type="float">
-      <input name="in1" type="float" interfacename="this__1" />
+      <input name="in1" type="float" interfacename="this__radius" />
       <input name="in2" type="float" interfacename="amount" />
     </add>
-    <output name="out__this__0" type="vector2" interfacename="this__0" />
-    <output name="out__this__1" type="float" nodename="var__0" />
+    <output name="out__this__center" type="vector2" interfacename="this__center" />
+    <output name="out__this__radius" type="float" nodename="var__0" />
   </nodegraph>
   <combine2 name="s__center" type="vector2">
     <input name="in1" type="float" value="0" />
@@ -21,11 +21,11 @@
   </combine2>
   <Sphere_expand name="var__0" type="multioutput">
     <input name="amount" type="float" value="1" />
-    <input name="this__0" type="vector2" nodename="s__center" />
-    <input name="this__1" type="float" value="3" />
+    <input name="this__center" type="vector2" nodename="s__center" />
+    <input name="this__radius" type="float" value="3" />
   </Sphere_expand>
   <multiply name="var__1" type="vector2">
-    <input name="in1" type="vector2" output="out_this__0" nodename="var__0" />
-    <input name="in2" type="float" output="out_this__1" nodename="var__0" />
+    <input name="in1" type="vector2" output="out_this__center" nodename="var__0" />
+    <input name="in2" type="float" output="out_this__radius" nodename="var__0" />
   </multiply>
 </materialx>

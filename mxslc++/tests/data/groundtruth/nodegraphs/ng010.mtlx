@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG_foo">
-    <foo_bar name="in1" type="float">
+    <foo_bar name="var__0" type="float">
       <input name="nonlocal_in__x" type="float" value="7" />
     </foo_bar>
-    <add name="var__0" type="float">
-      <input name="in1" type="float" nodename="in1" />
+    <add name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" value="2" />
     </add>
-    <output name="out" type="float" nodename="var__0" />
+    <output name="out" type="float" nodename="var__1" />
   </nodegraph>
   <nodedef name="ND_foo_bar" node="foo_bar">
     <output name="out" type="float" />

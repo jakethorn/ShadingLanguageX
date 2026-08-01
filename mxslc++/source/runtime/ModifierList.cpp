@@ -2,32 +2,32 @@
 // Created by jaket on 11/04/2026.
 //
 
-#include "ModifierList.h"
+#include "runtime/ModifierList.h"
 
 #include "Token.h"
-#include "CompileError.h"
+#include "errors/CompileError.h"
 
-ModifierList::ModifierList(const TokenType::Enum mod)
+namespace mxslc::runtime
 {
-    add(mod);
-}
-
-ModifierList::ModifierList(const vector<Token>& mods)
-{
-    for (const Token token : mods)
+    ModifierList::ModifierList(const TokenType::Enum mod)
     {
-        const TokenType mod = token.type();
-        if (not contains(mod))
-            add(mod);
-        else
-            throw CompileError{"Multiple '" + mod.str() + "' modifiers"};
+        add(mod);
     }
-}
 
-string ModifierList::str() const
-{
-    string result;
-    for (TokenType mod : mods_)
-        result += mod.str() + " ";
-    return result;
+    ModifierList::ModifierList(const vector<Token>& mods)
+    {
+        for (const Token& token : mods)
+        {
+            const TokenType mod = token.type();
+            if (not contains(mod))
+                add(mod);
+            else
+                throw CompileError{"Multiple '" + mod.to_string() + "' modifiers"};
+        }
+    }
+
+    string ModifierList::to_string() const
+    {
+        return join(mods_, " ");
+    }
 }

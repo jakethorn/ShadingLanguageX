@@ -1,0 +1,1 @@
+c.mxsl, line 1: Variable already defined: value

@@ -7,7 +7,7 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="out" type="float" interfacename="i" />
   </nodegraph>
-  <power name="in1" type="float">
+  <power name="var__0" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="2" />
   </power>
@@ -15,7 +15,7 @@
     <input name="i" type="float" nodename="var__0" />
   </foo>
   <multiply name="k" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" nodename="j" />
   </multiply>
 </materialx>

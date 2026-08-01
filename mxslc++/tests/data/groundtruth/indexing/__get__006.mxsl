@@ -1,0 +1,9 @@
+mutable vec3 p = position();
+
+vec3 foo()
+{
+    p[0] = 3.0;
+    return p;
+}
+
+vec3 OUT = foo() + p;

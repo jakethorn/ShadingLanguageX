@@ -2,67 +2,88 @@ from pathlib import Path
 import mxslc
 import pytest
 
-from data_utils import get_data_path, get_data, write_data
-
-
-def test_globals_3():
-    _0 = mxslc.Variable((1, 3, 2))
-    _1 = mxslc.Variable(9.99)
-    x = mxslc.Variable("x", [_0, _1])
-
-    opts = mxslc.CompileOptions(globals = [x])
-    result = mxslc.compile_file_to_string(get_data_path("globals003.mxsl"), opts)
-    write_data("globals003.mtlx", result)
-    assert result == get_data("globals003.mtlx")
+from data_utils import get_data_path, assert_matches_groundtruth
 
 
 def test_globals_4_1():
-    a = mxslc.Variable("a", 1.0)
-    b = mxslc.Variable("b", 2.0)
-    x = mxslc.Variable("x", [a, b])
+    a = mxslc.create_variable(1.0)
+    b = mxslc.create_variable(2.0)
+    x = mxslc.create_variable([a, b])
 
-    opts = mxslc.CompileOptions(globals = [x])
+    opts = mxslc.CompileOptions(globals = {"x": x})
     result = mxslc.compile_file_to_string(get_data_path("globals004.mxsl"), opts)
-    write_data("globals004.mtlx", result)
-    assert result == get_data("globals004.mtlx")
+    assert_matches_groundtruth(result, "globals004.mtlx")
 
 
 def test_globals_4_2():
-    a = mxslc.Variable(1.0)
-    b = mxslc.Variable(2.0)
-    x = mxslc.Variable("x", [a, b])
-
-    opts = mxslc.CompileOptions(globals = [x])
+    opts = mxslc.CompileOptions(globals = {"x": [1.0, 2.0]})
     result = mxslc.compile_file_to_string(get_data_path("globals004.mxsl"), opts)
-    write_data("globals004.mtlx", result)
-    assert result == get_data("globals004.mtlx")
+    assert_matches_groundtruth(result, "globals004.mtlx")
+
+
+def test_globals_4_3():
+    a = mxslc.create_variable(1.0)
+
+    opts = mxslc.CompileOptions(globals = {"x": [a, 2.0]})
+    result = mxslc.compile_file_to_string(get_data_path("globals004.mxsl"), opts)
+    assert_matches_groundtruth(result, "globals004.mtlx")
+
+
+def test_globals_5():
+    opts = mxslc.CompileOptions(globals = {"tint": 0.3, "albedo_path": "../brick.png"})
+    result = mxslc.compile_file_to_string(get_data_path("globals005.mxsl"), opts)
+    result = result.replace("\\brick", "/brick")
+
+    assert_matches_groundtruth(result, "globals005.mtlx")
 
 
 try:
     import MaterialX as mx
 
-    def test_globals_1():
-        opts = mxslc.CompileOptions(globals = [
-            mxslc.Variable("albedo_path", Path("../brick.png")),
-            mxslc.Variable("tint", mx.Color3(1, 0, 0))
-        ])
+
+    def test_globals_1_1():
+        opts = mxslc.CompileOptions(globals = {
+            "albedo_path": mxslc.create_variable(Path("../brick.png")),
+            "tint": mxslc.create_variable(mx.Color3(1, 0, 0))
+        })
 
         result = mxslc.compile_file_to_string(get_data_path("globals001.mxsl"), opts)
-        # Convert any Windows separators to Posix before compare.
         result = result.replace("\\brick", "/brick")
-        write_data("globals001.mtlx", result)        
-        assert result == get_data("globals001.mtlx")
+
+        assert_matches_groundtruth(result, "globals001.mtlx")
+
+
+    def test_globals_1_2():
+        opts = mxslc.CompileOptions(globals = {
+            "albedo_path": Path("../brick.png"),
+            "tint": mx.Color3(1, 0, 0)
+        })
+
+        result = mxslc.compile_file_to_string(get_data_path("globals001.mxsl"), opts)
+        result = result.replace("\\brick", "/brick")
+        
+        assert_matches_groundtruth(result, "globals001.mtlx")
+
 
     def test_globals_2():
-        pos = mxslc.Variable("pos", mx.Vector3(0, 10, 0))
-        dir = mxslc.Variable("dir", mx.Vector3(0, -1, 0))
-        space = mxslc.Variable("space", "world")
-        light0 = mxslc.Variable("light0", [pos, dir, space])
+        pos = mxslc.create_variable(mx.Vector3(0, 10, 0))
+        dir = mx.Vector3(0, -1, 0)
+        space = mxslc.create_variable("world")
 
-        opts = mxslc.CompileOptions(globals = [light0])
+        opts = mxslc.CompileOptions(globals = {"light0": [pos, dir, space]})
         result = mxslc.compile_file_to_string(get_data_path("globals002.mxsl"), opts)
-        write_data("globals002.mtlx", result)
-        assert result == get_data("globals002.mtlx")
+        assert_matches_groundtruth(result, "globals002.mtlx")
+
+
+    def test_globals_3():
+        _0 = mxslc.create_variable(mx.Vector3(1, 3, 2))
+        _1 = mxslc.create_variable(9.99)
+        x = mxslc.create_variable([_0, _1])
+
+        opts = mxslc.CompileOptions(globals = {"x": x})
+        result = mxslc.compile_file_to_string(get_data_path("globals003.mxsl"), opts)
+        assert_matches_groundtruth(result, "globals003.mtlx")
+
 
 except ImportError:
     pass

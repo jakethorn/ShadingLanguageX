@@ -1,74 +1,74 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine2 name="v" type="vector2">
+  <combine2 name="var__0" type="vector2">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="0" />
   </combine2>
-  <extract name="in1" type="float">
-    <input name="in" type="vector2" nodename="v" />
+  <extract name="var__1" type="float">
+    <input name="in" type="vector2" nodename="var__0" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="in2" type="float">
-    <input name="in" type="vector2" nodename="v" />
+  <extract name="var__2" type="float">
+    <input name="in" type="vector2" nodename="var__0" />
     <input name="index" type="integer" value="1" />
   </extract>
   <add name="f1" type="float">
-    <input name="in1" type="float" nodename="in1" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" nodename="var__2" />
   </add>
-  <combine2 name="v2" type="vector2">
+  <combine2 name="var__3" type="vector2">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="1" />
   </combine2>
-  <extract name="in3" type="float">
-    <input name="in" type="vector2" nodename="v2" />
+  <extract name="var__4" type="float">
+    <input name="in" type="vector2" nodename="var__3" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="in4" type="float">
-    <input name="in" type="vector2" nodename="v2" />
+  <extract name="var__5" type="float">
+    <input name="in" type="vector2" nodename="var__3" />
     <input name="index" type="integer" value="1" />
   </extract>
   <add name="f2" type="float">
-    <input name="in1" type="float" nodename="in3" />
-    <input name="in2" type="float" nodename="in4" />
+    <input name="in1" type="float" nodename="var__4" />
+    <input name="in2" type="float" nodename="var__5" />
   </add>
-  <combine2 name="v3" type="vector2">
+  <combine2 name="var__6" type="vector2">
     <input name="in1" type="float" value="2" />
     <input name="in2" type="float" value="0" />
   </combine2>
-  <extract name="in5" type="float">
-    <input name="in" type="vector2" nodename="v3" />
+  <extract name="var__7" type="float">
+    <input name="in" type="vector2" nodename="var__6" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="in6" type="float">
-    <input name="in" type="vector2" nodename="v3" />
+  <extract name="var__8" type="float">
+    <input name="in" type="vector2" nodename="var__6" />
     <input name="index" type="integer" value="1" />
   </extract>
   <add name="f3" type="float">
-    <input name="in1" type="float" nodename="in5" />
-    <input name="in2" type="float" nodename="in6" />
+    <input name="in1" type="float" nodename="var__7" />
+    <input name="in2" type="float" nodename="var__8" />
   </add>
-  <combine2 name="v4" type="vector2">
+  <combine2 name="var__9" type="vector2">
     <input name="in1" type="float" value="0" />
     <input name="in2" type="float" value="2" />
   </combine2>
-  <extract name="in7" type="float">
-    <input name="in" type="vector2" nodename="v4" />
+  <extract name="var__10" type="float">
+    <input name="in" type="vector2" nodename="var__9" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <extract name="in8" type="float">
-    <input name="in" type="vector2" nodename="v4" />
+  <extract name="var__11" type="float">
+    <input name="in" type="vector2" nodename="var__9" />
     <input name="index" type="integer" value="1" />
   </extract>
   <add name="f4" type="float">
-    <input name="in1" type="float" nodename="in7" />
-    <input name="in2" type="float" nodename="in8" />
+    <input name="in1" type="float" nodename="var__10" />
+    <input name="in2" type="float" nodename="var__11" />
   </add>
-  <randomfloat name="var__0" type="float">
+  <randomfloat name="var__12" type="float">
     <input name="min" type="float" nodename="f1" />
     <input name="max" type="float" nodename="f2" />
   </randomfloat>
-  <randomfloat name="var__1" type="float">
+  <randomfloat name="var__13" type="float">
     <input name="min" type="float" nodename="f3" />
     <input name="max" type="float" nodename="f4" />
   </randomfloat>

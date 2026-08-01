@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND___Circle__" node="__Circle__">
-    <output name="out__0" type="vector2" />
-    <output name="out__1" type="float" />
+    <output name="out__position" type="vector2" />
+    <output name="out__radius" type="float" />
     <input name="radius" type="float" value="1" />
   </nodedef>
   <nodegraph name="NG___Circle__" nodedef="ND___Circle__">
@@ -10,8 +10,8 @@
       <input name="in1" type="float" value="0" />
       <input name="in2" type="float" value="0" />
     </combine2>
-    <output name="out__0" type="vector2" nodename="value__0" />
-    <output name="out__1" type="float" interfacename="radius" />
+    <output name="out__position" type="vector2" nodename="value__0" />
+    <output name="out__radius" type="float" interfacename="radius" />
   </nodegraph>
   <__Circle__ name="c" type="multioutput">
     <input name="radius" type="float" value="3" />
@@ -20,7 +20,7 @@
     <input name="radius" type="float" value="4" />
   </__Circle__>
   <multiply name="var__0" type="float">
-    <input name="in1" type="float" output="out__1" nodename="c" />
-    <input name="in2" type="float" output="out__1" nodename="d" />
+    <input name="in1" type="float" output="out__radius" nodename="c" />
+    <input name="in2" type="float" output="out__radius" nodename="d" />
   </multiply>
 </materialx>

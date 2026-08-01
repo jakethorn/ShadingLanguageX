@@ -1,9 +1,9 @@
 
 RANDOMFLOAT_OUTPUT = """<?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="in1" type="float" />
+  <randomfloat name="var__0" type="float" />
   <add name="f" type="float">
-    <input name="in1" type="float" nodename="in1" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="1" />
   </add>
 </materialx>

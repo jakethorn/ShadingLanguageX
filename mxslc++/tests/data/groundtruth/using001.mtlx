@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodedef name="ND_atob" node="atob">
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
-    <input name="a__0" type="float" value="0" />
-    <input name="a__1" type="float" value="0" />
-    <input name="b__0" type="float" value="0" />
-    <input name="b__1" type="float" value="0" />
+    <output name="out__x" type="float" />
+    <output name="out__y" type="float" />
+    <input name="a__x" type="float" value="0" />
+    <input name="a__y" type="float" value="0" />
+    <input name="b__x" type="float" value="0" />
+    <input name="b__y" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_atob" nodedef="ND_atob">
     <subtract name="x" type="float">
-      <input name="in1" type="float" interfacename="b__0" />
-      <input name="in2" type="float" interfacename="a__0" />
+      <input name="in1" type="float" interfacename="b__x" />
+      <input name="in2" type="float" interfacename="a__x" />
     </subtract>
     <subtract name="y" type="float">
-      <input name="in1" type="float" interfacename="b__0" />
-      <input name="in2" type="float" interfacename="a__0" />
+      <input name="in1" type="float" interfacename="b__x" />
+      <input name="in2" type="float" interfacename="a__x" />
     </subtract>
-    <output name="out__0" type="float" nodename="x" />
-    <output name="out__1" type="float" nodename="y" />
+    <output name="out__x" type="float" nodename="x" />
+    <output name="out__y" type="float" nodename="y" />
   </nodegraph>
   <atob name="p" type="multioutput">
     <input name="a__0" type="float" value="0" />
@@ -27,8 +27,8 @@
     <input name="b__1" type="float" value="1" />
   </atob>
   <combine2 name="var__0" type="vector2">
-    <input name="in1" type="float" output="out__0" nodename="p" />
-    <input name="in2" type="float" output="out__1" nodename="p" />
+    <input name="in1" type="float" output="out__x" nodename="p" />
+    <input name="in2" type="float" output="out__y" nodename="p" />
   </combine2>
   <separate2 name="var__1" type="multioutput">
     <input name="in" type="vector2" nodename="var__0" />

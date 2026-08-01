@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <gltf_colorimage name="gltf_colorimage" type="multioutput">
-    <input name="file" type="filename" value="" />
-  </gltf_colorimage>
-  <gltf_pbr name="gltf_pbr_surfaceshader" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="gltf_colorimage" />
-  </gltf_pbr>
-  <surfacematerial name="surfacematerial" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="gltf_pbr_surfaceshader" />
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base" type="float" value="6.66" />
+    <input name="base_color" type="color3" value="0.5, 0.5, 0.5" />
+    <input name="normal" type="vector3" nodename="var__0" />
+    <input name="thin_walled" type="boolean" value="false" />
+  </standard_surface>
+  <normal name="var__0" type="vector3">
+    <input name="space" type="string" value="world" />
+  </normal>
+  <surfacematerial name="var__1" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
   </surfacematerial>
 </materialx>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <geompropvalue name="x" type="float">
+    <input name="geomprop" type="string" value="x" />
+    <input name="default" type="float" value="78" />
+  </geompropvalue>
+  <geompropvalue name="y" type="float">
+    <input name="geomprop" type="string" value="y" />
+    <input name="default" type="float" value="100" />
+  </geompropvalue>
+  <geompropvalue name="z" type="float">
+    <input name="geomprop" type="string" value="z" />
+    <input name="default" type="float" value="50" />
+  </geompropvalue>
+</materialx>

@@ -46,12 +46,12 @@
     <input name="tangent" type="vector3" value="0, 0, 0" defaultgeomprop="Tworld" />
   </nodedef>
   <nodegraph name="NG_slx_standard_surface" nodedef="ND_slx_standard_surface">
-    <multiply name="in1" type="float">
+    <multiply name="var__0" type="float">
       <input name="in1" type="float" interfacename="coat_affect_roughness" />
       <input name="in2" type="float" interfacename="coat" />
     </multiply>
     <multiply name="coat_affect_roughness_combined" type="float">
-      <input name="in1" type="float" nodename="in1" />
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" interfacename="coat_roughness" />
     </multiply>
     <mix name="coat_affected_roughness" type="float">
@@ -63,12 +63,12 @@
       <input name="roughness" type="float" nodename="coat_affected_roughness" />
       <input name="anisotropy" type="float" interfacename="specular_anisotropy" />
     </roughness_anisotropy>
-    <add name="var__0" type="float">
+    <add name="var__1" type="float">
       <input name="in1" type="float" interfacename="specular_roughness" />
       <input name="in2" type="float" interfacename="transmission_extra_roughness" />
     </add>
     <clamp name="transmission_roughness_clamped" type="float">
-      <input name="in" type="float" nodename="var__0" />
+      <input name="in" type="float" nodename="var__1" />
     </clamp>
     <mix name="coat_affected_transmission_roughness" type="float">
       <input name="fg" type="float" value="1" />
@@ -79,75 +79,75 @@
       <input name="roughness" type="float" nodename="coat_affected_transmission_roughness" />
       <input name="anisotropy" type="float" interfacename="specular_anisotropy" />
     </roughness_anisotropy>
-    <multiply name="var__1" type="float">
+    <multiply name="var__2" type="float">
       <input name="in1" type="float" interfacename="specular_rotation" />
       <input name="in2" type="float" value="360" />
     </multiply>
     <rotate3d name="tangent_rotate" type="vector3">
       <input name="in" type="vector3" interfacename="tangent" />
-      <input name="amount" type="float" nodename="var__1" />
+      <input name="amount" type="float" nodename="var__2" />
       <input name="axis" type="vector3" interfacename="normal" />
     </rotate3d>
     <normalize name="tangent_rotate_normalize" type="vector3">
       <input name="in" type="vector3" nodename="tangent_rotate" />
     </normalize>
-    <ifgreater name="condition" type="boolean">
+    <ifgreater name="var__3" type="boolean">
       <input name="value1" type="float" interfacename="specular_anisotropy" />
       <input name="value2" type="float" value="0" />
     </ifgreater>
     <ifequal name="main_tangent" type="vector3">
-      <input name="value1" type="boolean" nodename="condition" />
+      <input name="value1" type="boolean" nodename="var__3" />
       <input name="value2" type="boolean" value="true" />
       <input name="in1" type="vector3" nodename="tangent_rotate_normalize" />
       <input name="in2" type="vector3" interfacename="tangent" />
     </ifequal>
-    <multiply name="var__2" type="float">
+    <multiply name="var__4" type="float">
       <input name="in1" type="float" interfacename="coat_rotation" />
       <input name="in2" type="float" value="360" />
     </multiply>
     <rotate3d name="coat_tangent_rotate" type="vector3">
       <input name="in" type="vector3" interfacename="tangent" />
-      <input name="amount" type="float" nodename="var__2" />
+      <input name="amount" type="float" nodename="var__4" />
       <input name="axis" type="vector3" interfacename="coat_normal" />
     </rotate3d>
     <normalize name="coat_tangent_rotate_normalize" type="vector3">
       <input name="in" type="vector3" nodename="coat_tangent_rotate" />
     </normalize>
-    <ifgreater name="condition2" type="boolean">
+    <ifgreater name="var__5" type="boolean">
       <input name="value1" type="float" interfacename="coat_anisotropy" />
       <input name="value2" type="float" value="0" />
     </ifgreater>
     <ifequal name="coat_tangent" type="vector3">
-      <input name="value1" type="boolean" nodename="condition2" />
+      <input name="value1" type="boolean" nodename="var__5" />
       <input name="value2" type="boolean" value="true" />
       <input name="in1" type="vector3" nodename="coat_tangent_rotate_normalize" />
       <input name="in2" type="vector3" interfacename="tangent" />
     </ifequal>
-    <clamp name="in2" type="float">
+    <clamp name="var__6" type="float">
       <input name="in" type="float" interfacename="coat" />
     </clamp>
-    <multiply name="in3" type="float">
-      <input name="in1" type="float" nodename="in2" />
+    <multiply name="var__7" type="float">
+      <input name="in1" type="float" nodename="var__6" />
       <input name="in2" type="float" interfacename="coat_affect_color" />
     </multiply>
     <add name="coat_gamma" type="float">
-      <input name="in1" type="float" nodename="in3" />
+      <input name="in1" type="float" nodename="var__7" />
       <input name="in2" type="float" value="1" />
     </add>
-    <max name="in4" type="color3">
+    <max name="var__8" type="color3">
       <input name="in1" type="color3" interfacename="base_color" />
       <input name="in2" type="float" value="0" />
     </max>
     <power name="coat_affected_diffuse_color" type="color3">
-      <input name="in1" type="color3" nodename="in4" />
+      <input name="in1" type="color3" nodename="var__8" />
       <input name="in2" type="float" nodename="coat_gamma" />
     </power>
-    <max name="in5" type="color3">
+    <max name="var__9" type="color3">
       <input name="in1" type="color3" interfacename="subsurface_color" />
       <input name="in2" type="float" value="0" />
     </max>
     <power name="coat_affected_subsurface_color" type="color3">
-      <input name="in1" type="color3" nodename="in5" />
+      <input name="in1" type="color3" nodename="var__9" />
       <input name="in2" type="float" nodename="coat_gamma" />
     </power>
     <oren_nayar_diffuse_bsdf name="diffuse_bsdf" type="BSDF">
@@ -161,24 +161,24 @@
       <input name="color" type="color3" nodename="coat_affected_subsurface_color" />
       <input name="normal" type="vector3" interfacename="normal" />
     </translucent_bsdf>
-    <multiply name="var__3" type="color3">
+    <multiply name="var__10" type="color3">
       <input name="in1" type="color3" interfacename="subsurface_radius" />
       <input name="in2" type="float" interfacename="subsurface_scale" />
     </multiply>
     <subsurface_bsdf name="subsurface_bsdf" type="BSDF">
       <input name="weight" type="float" value="1" />
       <input name="color" type="color3" nodename="coat_affected_subsurface_color" />
-      <input name="radius" type="color3" nodename="var__3" />
+      <input name="radius" type="color3" nodename="var__10" />
       <input name="anisotropy" type="float" interfacename="subsurface_anisotropy" />
       <input name="normal" type="vector3" interfacename="normal" />
     </subsurface_bsdf>
-    <convert name="var__4" type="float">
+    <convert name="var__11" type="float">
       <input name="in" type="boolean" interfacename="thin_walled" />
     </convert>
     <mix name="selected_subsurface_bsdf" type="BSDF">
       <input name="fg" type="BSDF" nodename="translucent_bsdf" />
       <input name="bg" type="BSDF" nodename="subsurface_bsdf" />
-      <input name="mix" type="float" nodename="var__4" />
+      <input name="mix" type="float" nodename="var__11" />
     </mix>
     <mix name="subsurface_mix" type="BSDF">
       <input name="fg" type="BSDF" nodename="selected_subsurface_bsdf" />
@@ -281,39 +281,39 @@
       <input name="top" type="BSDF" nodename="coat_bsdf" />
       <input name="base" type="BSDF" nodename="thin_film_layer_attenuated" />
     </layer>
-    <subtract name="in6" type="float">
+    <subtract name="var__12" type="float">
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" interfacename="coat_IOR" />
     </subtract>
-    <add name="in7" type="float">
+    <add name="var__13" type="float">
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" interfacename="coat_IOR" />
     </add>
     <divide name="coat_ior_to_F0_sqrt" type="float">
-      <input name="in1" type="float" nodename="in6" />
-      <input name="in2" type="float" nodename="in7" />
+      <input name="in1" type="float" nodename="var__12" />
+      <input name="in2" type="float" nodename="var__13" />
     </divide>
     <multiply name="coat_ior_to_F0" type="float">
       <input name="in1" type="float" nodename="coat_ior_to_F0_sqrt" />
       <input name="in2" type="float" nodename="coat_ior_to_F0_sqrt" />
     </multiply>
-    <multiply name="var__5" type="color3">
+    <multiply name="var__14" type="color3">
       <input name="in1" type="color3" interfacename="emission_color" />
       <input name="in2" type="float" interfacename="emission" />
     </multiply>
     <uniform_edf name="emission_edf" type="EDF">
-      <input name="color" type="color3" nodename="var__5" />
+      <input name="color" type="color3" nodename="var__14" />
     </uniform_edf>
     <multiply name="coat_tinted_emission_edf" type="EDF">
       <input name="in1" type="EDF" nodename="emission_edf" />
       <input name="in2" type="color3" interfacename="coat_color" />
     </multiply>
-    <subtract name="in8" type="float">
+    <subtract name="var__15" type="float">
       <input name="in1" type="float" value="1" />
       <input name="in2" type="float" nodename="coat_ior_to_F0" />
     </subtract>
     <convert name="emission_color0" type="color3">
-      <input name="in" type="float" nodename="in8" />
+      <input name="in" type="float" nodename="var__15" />
     </convert>
     <generalized_schlick_edf name="coat_emission_edf" type="EDF">
       <input name="color0" type="color3" nodename="emission_color0" />
@@ -326,18 +326,18 @@
       <input name="bg" type="EDF" nodename="emission_edf" />
       <input name="mix" type="float" interfacename="coat" />
     </mix>
-    <luminance name="var__6" type="color3">
-      <input name="in" type="color3" interfacename="opacity" />
-    </luminance>
-    <extract name="var__7" type="float">
-      <input name="in" type="color3" nodename="var__6" />
-      <input name="index" type="integer" value="0" />
-    </extract>
-    <surface name="var__8" type="surfaceshader">
+    <surface name="var__16" type="surfaceshader">
       <input name="bsdf" type="BSDF" nodename="coat_layer" />
       <input name="edf" type="EDF" nodename="blended_coat_emission_edf" />
-      <input name="opacity" type="float" nodename="var__7" />
+      <input name="opacity" type="float" nodename="var__18" />
     </surface>
-    <output name="out" type="surfaceshader" nodename="var__8" />
+    <luminance name="var__17" type="color3">
+      <input name="in" type="color3" interfacename="opacity" />
+    </luminance>
+    <extract name="var__18" type="float">
+      <input name="in" type="color3" nodename="var__17" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <output name="out" type="surfaceshader" nodename="var__16" />
   </nodegraph>
 </materialx>

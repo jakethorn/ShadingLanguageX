@@ -13,14 +13,14 @@
     <input name="in2" type="float" nodename="f" />
   </add>
   <nodedef name="ND___Foo__" node="__Foo__">
-    <output name="out__0" type="vector2" />
-    <output name="out__1" type="vector2" />
+    <output name="out__pos" type="vector2" />
+    <output name="out__vel" type="vector2" />
     <input name="pos" type="vector2" value="0, 0" />
     <input name="vel" type="vector2" value="0, 0" />
   </nodedef>
   <nodegraph name="NG___Foo__" nodedef="ND___Foo__">
-    <output name="out__0" type="vector2" interfacename="pos" />
-    <output name="out__1" type="vector2" interfacename="vel" />
+    <output name="out__pos" type="vector2" interfacename="pos" />
+    <output name="out__vel" type="vector2" interfacename="vel" />
   </nodegraph>
   <convert name="var__0" type="vector2">
     <input name="in" type="integer" value="1" />

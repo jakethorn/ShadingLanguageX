@@ -2,38 +2,44 @@
 // Created by jaket on 24/11/2025.
 //
 
-#include <cassert>
 #include "Token.h"
 
-#include "CompileError.h"
 #include "scan.h"
 #include "runtime/Type.h"
-#include "utils/instantiate_template_types_utils.h"
+#include "runtime/utils/monomorphize.h"
+#include "errors/CompileError.h"
 
-TokenType Token::init_type(const string& lexeme)
+namespace mxslc
 {
-    const vector<Token> tokens = scan_file(lexeme);
-    assert(tokens.size() == 1);
-    return tokens[0].type();
-}
+    Token::Token(string lexeme) : lexeme_{std::move(lexeme)}
+    {
+        type_ = TokenType{lexeme_};
+        if (type_ == TokenType::Unknown)
+        {
+            const vector<Token> tokens = scan_string(lexeme_);
+            if (tokens.size() == 1)
+                type_ = tokens[0].type();
+        }
+    }
 
-primitive_t Token::literal() const
-{
-    if (type_ == TokenType::Bool)
-        return lexeme_ == "true";
-    if (type_ == TokenType::Int)
-        return std::stoi(lexeme_);
-    if (type_ == TokenType::Float)
-        return std::stof(lexeme_);
-    if (type_ == TokenType::String)
-        return lexeme_.substr(1, lexeme_.size() - 2);
-    throw CompileError{"Invalid literal"s};
-}
+    Token Token::monomorphize(const TypePtr& template_type) const
+    {
+        Token t{type(), runtime_utils::monomorphize(lexeme(), template_type)};
+        t.set_line(line());
+        t.set_filename(filename());
+        return t;
+    }
 
-Token Token::instantiate_template_types(const TypePtr& template_type) const
-{
-    Token t{type_, ::instantiate_template_types(lexeme_, template_type)};
-    t.set_line(line_);
-    t.set_filename(filename_);
-    return t;
+    Primitive Token::literal() const
+    {
+        if (type_ == TokenType::Bool)
+            return lexeme_ == "true";
+        if (type_ == TokenType::Int)
+            return std::stoi(lexeme_);
+        if (type_ == TokenType::Float)
+            return std::stof(lexeme_);
+        if (type_ == TokenType::String)
+            return lexeme_.substr(1, lexeme_.size() - 2);
+        throw CompileError{"Invalid literal"};
+    }
 }

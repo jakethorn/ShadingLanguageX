@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <switch name="a" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="which" type="integer" value="5" />
+  </switch>
+  <randomfloat name="b" type="float">
+    <input name="in" type="float" nodename="a" />
+  </randomfloat>
+  <switch name="c" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </switch>
+  <randomfloat name="d" type="float">
+    <input name="in" type="float" nodename="c" />
+  </randomfloat>
+  <switch name="e" type="float" />
+  <randomfloat name="f" type="float">
+    <input name="in" type="float" nodename="e" />
+  </randomfloat>
+</materialx>

@@ -3,11 +3,11 @@
   <randomfloat name="x" type="float">
     <input name="in" type="integer" value="1" />
   </randomfloat>
-  <randomfloat name="in2" type="float">
+  <randomfloat name="var__0" type="float">
     <input name="in" type="integer" value="2" />
   </randomfloat>
   <multiply name="y" type="float">
     <input name="in1" type="float" nodename="x" />
-    <input name="in2" type="float" nodename="in2" />
+    <input name="in2" type="float" nodename="var__0" />
   </multiply>
 </materialx>
