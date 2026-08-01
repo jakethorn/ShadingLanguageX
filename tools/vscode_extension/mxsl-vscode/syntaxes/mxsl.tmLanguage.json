@@ -35,7 +35,7 @@
       "name": "entity.name.function.mxsl"
     },
     {
-      "match": "\\b(?:creatematrix|ifgreatereq|ifgreater|separate2|separate3|combine2|combine3|combine4|constant|multiply|subtract|convert|ifequal|absval|divide|invert|modulo|floor|power|round|add|and|max|min|not|xor|or)\\b(?=\\s*\\()",
+      "match": "\\b(?:creatematrix|ifgreatereq|ifgreater|separate2|separate3|separate4|combine2|combine3|combine4|constant|multiply|subtract|convert|extract|ifequal|absval|divide|invert|modulo|switch|floor|power|round|add|and|max|min|not|xor|or)\\b(?=\\s*\\()",
       "name": "support.function.mxsl"
     },
     {
@@ -82,7 +82,7 @@
       "name": "entity.name.function.mxsl"
     },
     "builtin": {
-      "match": "\\b(?:creatematrix|ifgreatereq|ifgreater|separate2|separate3|combine2|combine3|combine4|constant|multiply|subtract|convert|ifequal|absval|divide|invert|modulo|floor|power|round|add|and|max|min|not|xor|or)\\b(?=\\s*\\()",
+      "match": "\\b(?:creatematrix|ifgreatereq|ifgreater|separate2|separate3|separate4|combine2|combine3|combine4|constant|multiply|subtract|convert|extract|ifequal|absval|divide|invert|modulo|switch|floor|power|round|add|and|max|min|not|xor|or)\\b(?=\\s*\\()",
       "name": "support.function.mxsl"
     },
     "type": {
