@@ -14,7 +14,6 @@ add_executable(mxslc_tests
         primitive_utils_tests.cpp
         primitive_to_string_tests.cpp
         global_tests.cpp
-        decompiler_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

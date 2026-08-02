@@ -24,22 +24,21 @@ namespace mxslc::decompile
         // Attributes that the decompiler already re-expresses in ShadingLanguageX
         // syntax (element identity, type, port values and connections) or that are
         // internal graph-layout metadata (xpos/ypos/width/height), and therefore
-        // must not be re-emitted as `@` declarations.  Names are sourced from the
-        // MaterialX `*_ATTRIBUTE` constants.  Returned from a function so that the
-        // set is initialized lazily on first use, after MaterialX's own static
-        // strings are populated (avoids a static initialization order fiasco).
+        // should note be re-emitted as `@` declarations.  
         const unordered_set<string>& structural_attributes()
         {
             static const unordered_set<string> attributes {
+                // Identity, value and connection attributes
                 mx::Element::NAME_ATTRIBUTE,
-                mx::Element::XPOS_ATTRIBUTE,
-                mx::Element::YPOS_ATTRIBUTE,
                 mx::TypedElement::TYPE_ATTRIBUTE,
                 mx::ValueElement::VALUE_ATTRIBUTE,
                 mx::ValueElement::INTERFACE_NAME_ATTRIBUTE,
                 mx::PortElement::NODE_NAME_ATTRIBUTE,
                 mx::PortElement::NODE_GRAPH_ATTRIBUTE,
                 mx::PortElement::OUTPUT_ATTRIBUTE,
+                // Ignore layout attributes
+                mx::Element::XPOS_ATTRIBUTE,
+                mx::Element::YPOS_ATTRIBUTE,
                 mx::Backdrop::WIDTH_ATTRIBUTE,
                 mx::Backdrop::HEIGHT_ATTRIBUTE,
             };
@@ -114,6 +113,14 @@ namespace mxslc::decompile
     {
         global_code_ = "";
         decompiled_nodes_.clear();
+
+        // Document-level metadata, e.g. `@@doc "..."`.  Everything except the
+        // structural `version` attribute is emitted.
+        for (const string& attr_name : document_->getAttributeNames())
+        {
+            if (attr_name != "version")
+                global_code_ += "@@" + attr_name + " \"" + document_->getAttribute(attr_name) + "\"\n";
+        }
 
         for (const mx::NodeGraphPtr& node_graph : document_->getNodeGraphs())
         {
