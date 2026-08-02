@@ -21,6 +21,31 @@ namespace mxslc::decompile
 
     namespace
     {
+        // Attributes that the decompiler already re-expresses in ShadingLanguageX
+        // syntax (element identity, type, port values and connections) or that are
+        // internal graph-layout metadata (xpos/ypos/width/height), and therefore
+        // must not be re-emitted as `@` declarations.  Names are sourced from the
+        // MaterialX `*_ATTRIBUTE` constants.  Returned from a function so that the
+        // set is initialized lazily on first use, after MaterialX's own static
+        // strings are populated (avoids a static initialization order fiasco).
+        const unordered_set<string>& structural_attributes()
+        {
+            static const unordered_set<string> attributes {
+                mx::Element::NAME_ATTRIBUTE,
+                mx::Element::XPOS_ATTRIBUTE,
+                mx::Element::YPOS_ATTRIBUTE,
+                mx::TypedElement::TYPE_ATTRIBUTE,
+                mx::ValueElement::VALUE_ATTRIBUTE,
+                mx::ValueElement::INTERFACE_NAME_ATTRIBUTE,
+                mx::PortElement::NODE_NAME_ATTRIBUTE,
+                mx::PortElement::NODE_GRAPH_ATTRIBUTE,
+                mx::PortElement::OUTPUT_ATTRIBUTE,
+                mx::Backdrop::WIDTH_ATTRIBUTE,
+                mx::Backdrop::HEIGHT_ATTRIBUTE,
+            };
+            return attributes;
+        }
+
         string safe_mxsl_name(const vector<mx::OutputPtr>& outputs, const string& name)
         {
             const TokenType type{name};
@@ -173,7 +198,31 @@ namespace mxslc::decompile
         if (var_expr.front() == '(' and var_expr.back() == ')')
             var_expr = var_expr.substr(1, var_expr.size() - 2);
 
-        return var_type + " " + var_name + " = " + var_expr + ";\n";
+        return node_to_attributes(node) + var_type + " " + var_name + " = " + var_expr + ";\n";
+    }
+
+    string Decompiler::node_to_attributes(const mx::NodePtr& node)
+    {
+        string result;
+
+        // Node-level attributes, e.g. `@doc "..."`.
+        for (const string& attr_name : node->getAttributeNames())
+        {
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + node->getAttribute(attr_name) + "\"\n";
+        }
+
+        // Input-level attributes, e.g. `@file.colorspace "srgb_texture"`.
+        for (const mx::InputPtr& input : node->getInputs())
+        {
+            for (const string& attr_name : input->getAttributeNames())
+            {
+                if (not contains(structural_attributes(), attr_name))
+                    result += "@" + input->getName() + "." + attr_name + " \"" + input->getAttribute(attr_name) + "\"\n";
+            }
+        }
+
+        return result;
     }
 
     string Decompiler::node_def_to_function_definition(const string& node_def_name)
