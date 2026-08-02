@@ -212,21 +212,13 @@ namespace mxslc::decompile
     {
         string result;
 
-        // Node-level attributes, e.g. `@doc "..."`.
+        // Node-level attributes, e.g. `@doc "..."`.  Input-level metadata
+        // attributes are instead emitted inline within the node constructor
+        // call (see `input_to_argument`).
         for (const string& attr_name : node->getAttributeNames())
         {
             if (not contains(structural_attributes(), attr_name))
                 result += "@" + attr_name + " \"" + node->getAttribute(attr_name) + "\"\n";
-        }
-
-        // Input-level attributes, e.g. `@file.colorspace "srgb_texture"`.
-        for (const mx::InputPtr& input : node->getInputs())
-        {
-            for (const string& attr_name : input->getAttributeNames())
-            {
-                if (not contains(structural_attributes(), attr_name))
-                    result += "@" + input->getName() + "." + attr_name + " \"" + input->getAttribute(attr_name) + "\"\n";
-            }
         }
 
         return result;
@@ -457,7 +449,16 @@ namespace mxslc::decompile
 
     string Decompiler::input_to_argument(const mx::InputPtr& input)
     {
-        return input->getName() + " = " + port_to_expression(input);
+        // Input-level metadata attributes, e.g. `@colorspace "srgb_texture"`,
+        // are emitted inline before the argument value so that they are
+        // re-applied to the input element when compiled back to MTLX.
+        string result;
+        for (const string& attr_name : input->getAttributeNames())
+        {
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + input->getAttribute(attr_name) + "\" ";
+        }
+        return result + input->getName() + " = " + port_to_expression(input);
     }
 
     string Decompiler::inputs_to_arguments(const vector<mx::InputPtr>& inputs)

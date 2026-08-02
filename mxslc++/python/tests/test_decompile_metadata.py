@@ -11,10 +11,7 @@ MTLX_IMAGE_WITH_METADATA = """<?xml version="1.0"?>
 
 IMAGE_WITH_METADATA_EXPECTED = (
     '@doc "an image of a sphere"\n'
-    '@file.colorspace "srgb_texture"\n'
-    '@file.unit "feet"\n'
-    '@file.unittype "distance"\n'
-    'color3 out = image(file = "textures/albedo.tif");\n'
+    'color3 out = image(@colorspace "srgb_texture" @unit "feet" @unittype "distance" file = "textures/albedo.tif");\n'
 )
 
 def test_emit_node_input_metadata():
@@ -43,7 +40,7 @@ MTLX_SURFACE_SHADER = """<?xml version="1.0"?>
   <standard_surface name="Water_SS_SHD_PBM" type="surfaceshader" doc="Water documentation" uiname="Water" uifolder="Liquid">
     <input name="base_color" type="color3" value="0.969, 0.996, 0.997" colorspace="lin_rec709" />
     <input name="metalness" type="float" value="0" />
-    <input name="transmission_color" type="color3" value="0.969,0.996,0.997" unit="feet" unittype="distance" />
+    <input name="transmission_color" type="color3" value="0.969, 0.996, 0.997" unit="feet" unittype="distance" />
   </standard_surface>
   <surfacematerial name="Water_SS_MAT_PBM" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="Water_SS_SHD_PBM" />
@@ -64,11 +61,18 @@ def test_surface_shader_metadata_is_emitted():
     assert '@uiname "Water"' in result
     assert '@uifolder "Liquid"' in result
 
-    # Input-level metadata
-    assert '@base_color.colorspace "lin_rec709"' in result
-    assert '@transmission_color.unit "feet"' in result
-    assert '@transmission_color.unittype "distance"' in result
+    # Input-level metadata is emitted inline before the input argument
+    assert '@colorspace "lin_rec709"' in result
+    assert '@unit "feet"' in result
+    assert '@unittype "distance"' in result
 
     # Structural attributes are not emitted
     for structural in ("@name", "@type", "@value", "@nodename"):
         assert structural not in result, f"Structural attribute {structural!r} should not be emitted"
+
+    print("Decompiled result:\n", result)
+
+    # Check that we can compile the decompiled result back to MaterialX and that it matches the original
+    compiled = mxslc.compile_string_to_string(result)
+    print("Compiled result:\n", compiled)
+    assert compiled == MTLX_SURFACE_SHADER, "Recompiled MaterialX does not match original"
