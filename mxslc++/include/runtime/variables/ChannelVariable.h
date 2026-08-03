@@ -11,10 +11,10 @@
 namespace mxslc::runtime
 {
     /// Variable representing channel access of a vector/color, e.g., vec[i]
-    class ComponentVariable final : public Variable
+    class ChannelVariable final : public Variable
     {
     public:
-        explicit ComponentVariable(VarPtr value, VarPtr index);
+        explicit ChannelVariable(VarPtr value, VarPtr index);
 
         bool is_temporary() const override { return false; }
         bool is_local() override { return true; }
@@ -30,7 +30,7 @@ namespace mxslc::runtime
         VarPtr value_;
         VarPtr index_;
 
-        mutable ValuePtr component_value_;
+        mutable ValuePtr channel_value_;
     };
 }
 

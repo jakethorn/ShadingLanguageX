@@ -2,8 +2,8 @@
 // Created by jaket on 03/05/2026.
 //
 
-#ifndef MXSLC_INPUTVARIABLE_H
-#define MXSLC_INPUTVARIABLE_H
+#ifndef MXSLC_PORTVARIABLE_H
+#define MXSLC_PORTVARIABLE_H
 
 #include <MaterialXCore/Interface.h>
 
@@ -13,10 +13,10 @@
 namespace mxslc::runtime
 {
     /// Variable representing the input of a node
-    class InputVariable final : public Variable
+    class PortVariable final : public Variable
     {
     public:
-        explicit InputVariable(mx::InputPtr input);
+        explicit PortVariable(mx::InputPtr input);
 
     protected:
         ValuePtr value_impl() const override;
@@ -28,4 +28,4 @@ namespace mxslc::runtime
     };
 }
 
-#endif //MXSLC_INPUTVARIABLE_H
+#endif //MXSLC_PORTVARIABLE_H

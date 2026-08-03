@@ -19,7 +19,7 @@ namespace mxslc::expressions
 using T##Ptr = unique_ptr<T>;
 
     TYPE_DEF(Accessor)
-    TYPE_DEF(ComponentAccessor)
+    TYPE_DEF(ChannelAccessor)
     TYPE_DEF(FieldAccessor)
     TYPE_DEF(PortAccessor)
 

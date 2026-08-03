@@ -5,7 +5,7 @@
 #include "Variable_bindings.h"
 
 #include "utils.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 void bind_variable(py::module_& m)
 {

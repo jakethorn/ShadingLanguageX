@@ -11,7 +11,7 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
-#include "runtime/variables/InputVariable.h"
+#include "runtime/variables/PortVariable.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/NodeValue.h"
 #include "utils/mtlx_utils.h"
@@ -48,7 +48,7 @@ namespace mxslc::expressions
         string input_var_name = node_var_->name() + "__" + input_name_;
         if (scope().has_variable(input_var_name))
             return scope().get_variable(input_var_name);
-        VarPtr input_var = std::make_shared<InputVariable>(input_);
+        VarPtr input_var = std::make_shared<PortVariable>(input_);
         node_var_->defining_scope()->add_variable(std::move(input_var_name), input_var);
         return input_var;
     }

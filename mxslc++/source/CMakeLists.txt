@@ -23,8 +23,8 @@ add_library(mxslc_lib
         runtime/Field.cpp
         runtime/ModifierList.cpp
         runtime/variables/Variable.cpp
-        runtime/variables/InputVariable.cpp
-        runtime/variables/ComponentVariable.cpp
+        runtime/variables/PortVariable.cpp
+        runtime/variables/ChannelVariable.cpp
         runtime/variables/SwizzleVariable.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
@@ -49,7 +49,7 @@ add_library(mxslc_lib
         expressions/VariableDefinitionExpression.cpp
         expressions/accessors/PortAccessor.cpp
         expressions/accessors/FieldAccessor.cpp
-        expressions/accessors/ComponentAccessor.cpp
+        expressions/accessors/ChannelAccessor.cpp
         expressions/accessors/SwizzleAccessor.cpp
         expressions/IncrementOperator.cpp
         expressions/NamedConstructor.cpp

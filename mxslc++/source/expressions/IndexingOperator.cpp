@@ -5,7 +5,7 @@
 #include "expressions/IndexingOperator.h"
 
 #include "expressions/interface.h"
-#include "expressions/accessors/ComponentAccessor.h"
+#include "expressions/accessors/ChannelAccessor.h"
 #include "expressions/accessors/FieldAccessor.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
@@ -36,7 +36,7 @@ namespace mxslc::expressions
     {
         if (value_expr_->type()->is_primitive())
         {
-            accessor_ = create_accessor<ComponentAccessor>(value_expr_, index_expr_);
+            accessor_ = create_accessor<ChannelAccessor>(value_expr_, index_expr_);
         }
         else
         {
