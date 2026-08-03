@@ -22,9 +22,10 @@ add_library(mxslc_lib
         runtime/Type.cpp
         runtime/Field.cpp
         runtime/ModifierList.cpp
-        runtime/Variable.cpp
-        runtime/InputVariable.cpp
-        runtime/ComponentVariable.cpp
+        runtime/variables/Variable.cpp
+        runtime/variables/InputVariable.cpp
+        runtime/variables/ComponentVariable.cpp
+        runtime/variables/SwizzleVariable.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
         runtime/interface.cpp
@@ -49,6 +50,7 @@ add_library(mxslc_lib
         expressions/accessors/PortAccessor.cpp
         expressions/accessors/FieldAccessor.cpp
         expressions/accessors/ComponentAccessor.cpp
+        expressions/accessors/SwizzleAccessor.cpp
         expressions/IncrementOperator.cpp
         expressions/NamedConstructor.cpp
         expressions/ThisExpression.cpp
@@ -80,6 +82,7 @@ add_library(mxslc_lib
         utils/mtlx_utils.cpp
         utils/token_utils.cpp
         utils/Logger.cpp
+        utils/swizzle_utils.cpp
         utils/primitive_utils/binary_arithmetic_ops.cpp
         utils/primitive_utils/binary_comparison_ops.cpp
         utils/primitive_utils/binary_logical_ops.cpp
@@ -103,7 +106,7 @@ add_library(mxslc_lib
         serialize/values/NodeValue.cpp
         serialize/values/InterfaceValue.cpp
         serialize/values/NodeOutputValue.cpp
-        serialize/values/BasicValue.cpp
+        serialize/values/CompileTimeValue.cpp
         serialize/values/NodeGraphValue.cpp
         serialize/values/NodeGraphOutputValue.cpp
         serialize/values/interface.cpp

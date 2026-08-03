@@ -1,0 +1,10 @@
+vec3 v;
+
+vec2 a = v.xx;
+constant(a);
+
+vec2 b = v.yx;
+constant(b);
+
+vec2 c = v.xz;
+constant(c);

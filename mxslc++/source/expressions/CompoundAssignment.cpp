@@ -7,7 +7,7 @@
 #include "expressions/FunctionCall.h"
 #include "expressions/interface.h"
 #include "runtime/ArgumentList.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::expressions
 {
@@ -50,7 +50,7 @@ namespace mxslc::expressions
     VarPtr CompoundAssignment::evaluate_impl() const
     {
         VarPtr value = func_call_->evaluate();
-        lhs_expr_->evaluate()->copy(value);
+        lhs_expr_->assign(value);
         return value;
     }
 

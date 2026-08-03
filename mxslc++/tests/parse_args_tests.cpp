@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "utils/parse_cli_args.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "utils/data_utils.h"
 
 using std::string;
@@ -237,8 +237,8 @@ TEST(parse_args_tests, test_options_005)
     ASSERT_EQ(args.options.func_name, "main"s);
     const auto& func_args = args.options.entry_function_arguments();
     ASSERT_EQ(func_args.size(), 1);
-    ASSERT_TRUE(func_args[0]->is_basic<float>());
-    ASSERT_FLOAT_EQ(func_args[0]->basic<float>(), 3.4);
+    ASSERT_TRUE(func_args[0]->is_compile_time<float>());
+    ASSERT_FLOAT_EQ(func_args[0]->compile_time_value<float>(), 3.4);
 }
 
 TEST(parse_args_tests, test_response_file_005)
@@ -253,14 +253,14 @@ TEST(parse_args_tests, test_response_file_005)
     const auto& func_args = args.options.entry_function_arguments();
     ASSERT_EQ(func_args.size(), 3);
 
-    ASSERT_TRUE(func_args[0]->is_basic<string>());
-    ASSERT_EQ(func_args[0]->basic<string>(), "hello world");
+    ASSERT_TRUE(func_args[0]->is_compile_time<string>());
+    ASSERT_EQ(func_args[0]->compile_time_value<string>(), "hello world");
 
-    ASSERT_TRUE(func_args[1]->is_basic<float>());
-    ASSERT_FLOAT_EQ(func_args[1]->basic<float>(), -3.4);
+    ASSERT_TRUE(func_args[1]->is_compile_time<float>());
+    ASSERT_FLOAT_EQ(func_args[1]->compile_time_value<float>(), -3.4);
 
-    ASSERT_TRUE(func_args[2]->is_basic<int>());
-    ASSERT_EQ(func_args[2]->basic<int>(), 123);
+    ASSERT_TRUE(func_args[2]->is_compile_time<int>());
+    ASSERT_EQ(func_args[2]->compile_time_value<int>(), 123);
 }
 
 TEST(parse_args_tests, test_response_file_006)
@@ -275,14 +275,14 @@ TEST(parse_args_tests, test_response_file_006)
     const auto& func_args = args.options.entry_function_arguments();
     ASSERT_EQ(func_args.size(), 3);
 
-    ASSERT_TRUE(func_args[0]->is_basic<string>());
-    ASSERT_EQ(func_args[0]->basic<string>(), "hello world");
+    ASSERT_TRUE(func_args[0]->is_compile_time<string>());
+    ASSERT_EQ(func_args[0]->compile_time_value<string>(), "hello world");
 
-    ASSERT_TRUE(func_args[1]->is_basic<float>());
-    ASSERT_FLOAT_EQ(func_args[1]->basic<float>(), -3.4);
+    ASSERT_TRUE(func_args[1]->is_compile_time<float>());
+    ASSERT_FLOAT_EQ(func_args[1]->compile_time_value<float>(), -3.4);
 
-    ASSERT_TRUE(func_args[2]->is_basic<int>());
-    ASSERT_EQ(func_args[2]->basic<int>(), 123);
+    ASSERT_TRUE(func_args[2]->is_compile_time<int>());
+    ASSERT_EQ(func_args[2]->compile_time_value<int>(), 123);
 }
 
 TEST(parse_args_tests, test_global_options)
@@ -301,23 +301,23 @@ TEST(parse_args_tests, test_global_options)
 
     const mxslc::VarPtr& x = args.options.get_global("x");
     ASSERT_TRUE(x->type()->is<float>());
-    ASSERT_FLOAT_EQ(x->basic<float>(), 1.0);
+    ASSERT_FLOAT_EQ(x->compile_time_value<float>(), 1.0);
 
     const mxslc::VarPtr& y = args.options.get_global("y");
     ASSERT_TRUE(y->type()->is<string>());
-    ASSERT_EQ(y->basic<string>(), "hello");
+    ASSERT_EQ(y->compile_time_value<string>(), "hello");
 
     const mxslc::VarPtr& z = args.options.get_global("z");
     ASSERT_TRUE(z->type()->is<float>());
-    ASSERT_FLOAT_EQ(z->basic<float>(), 2.0);
+    ASSERT_FLOAT_EQ(z->compile_time_value<float>(), 2.0);
 
     const mxslc::VarPtr& w = args.options.get_global("w");
     ASSERT_TRUE(w->type()->is<string>());
-    ASSERT_EQ(w->basic<string>(), "world");
+    ASSERT_EQ(w->compile_time_value<string>(), "world");
 
     const mxslc::VarPtr& u = args.options.get_global("u");
     ASSERT_TRUE(u->type()->is<int>());
-    ASSERT_EQ(u->basic<int>(), 10);
+    ASSERT_EQ(u->compile_time_value<int>(), 10);
 }
 
 TEST(parse_args_tests, test_global_error_options)

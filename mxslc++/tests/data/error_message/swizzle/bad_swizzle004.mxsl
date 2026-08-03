@@ -1,0 +1,2 @@
+mutable vec3 v;
+v.xyw = vec3{1,2,3};

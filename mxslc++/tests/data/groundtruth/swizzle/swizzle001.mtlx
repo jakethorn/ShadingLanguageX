@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <extract name="f" type="float">
+    <input name="in" type="vector3" value="0, 0, 0" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodename="f" />
+  </constant>
+</materialx>

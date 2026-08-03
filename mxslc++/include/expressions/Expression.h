@@ -8,6 +8,7 @@
 #include "common.h"
 #include "Token.h"
 #include "runtime/AttributeList.h"
+#include "runtime/ModifierList.h"
 #include "runtime/utils/monomorphize.h"
 #include "runtime/utils/RuntimeAware.h"
 
@@ -26,6 +27,7 @@ namespace mxslc::expressions
 
         const Token& token() const { return token_; }
 
+        void set_modifiers(ModifierList mods) { mods_ = std::move(mods); }
         void set_attributes(AttributeList attrs) { attrs_ = std::move(attrs); }
 
         ExprPtr monomorphize(const TypePtr& template_type) const override = 0;
@@ -41,9 +43,11 @@ namespace mxslc::expressions
         void reset();
 
         bool is_initialized() const { return is_initialized_; }
+        bool is_comptime() const { return mods_.contains(TokenType::Comptime); }
 
         TypePtr type() const;
         VarPtr evaluate() const;
+        void assign(const VarPtr& value) const;
 
         const string& error_message() const { return error_message_; }
 
@@ -62,6 +66,7 @@ namespace mxslc::expressions
         TypePtr target_type_;
         string error_message_;
 
+        ModifierList mods_;
         AttributeList attrs_;
     };
 }

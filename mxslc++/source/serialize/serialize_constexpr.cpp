@@ -9,7 +9,7 @@
 #include "runtime/interface.h"
 #include "utils/primitive_utils.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "serialize/serialize_constexpr_wrapper.h"
 #include "utils/container_utils.h"
 
@@ -50,8 +50,8 @@ namespace mxslc::serialize
 
             for (const auto& [param, input_value] : input_values)
             {
-                if (input_value->is_basic())
-                    basic_values.push_back(input_value->basic());
+                if (input_value->is_compile_time())
+                    basic_values.push_back(input_value->compile_time_value());
                 else
                     return false;
             }

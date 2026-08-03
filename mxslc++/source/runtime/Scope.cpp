@@ -10,7 +10,7 @@
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
 #include "errors/AmbiguousFunctionError.h"
@@ -56,6 +56,7 @@ namespace mxslc::runtime
             throw CompileError{"Variable already defined: " + name};
 
         var->set_name(name);
+        var->defining_scope_ = this;
         variables_.emplace(std::move(name), std::move(var));
     }
 
@@ -75,25 +76,18 @@ namespace mxslc::runtime
 
     bool Scope::is_variable_local(const VarPtr& var) const
     {
-        return is_variable_local(var->oldest_ancestor()->name());
+        if (var->is_temporary())
+            return true;
+        if (var->defining_scope() == this)
+            return true;
+        if (parent_)
+            return parent_->is_variable_local(var) and is_inline();
+        throw CompileError{"Variable not defined: " + var->name()};
     }
 
     bool Scope::is_variable_local(const string& name) const
     {
-        if (contains(variables_, name))
-            return true;
-        if (parent_)
-            return parent_->is_variable_local(name) and is_inline();
-        throw CompileError{"Variable not defined: " + name};
-    }
-
-    Scope& Scope::get_defining_scope(const VarPtr& var)
-    {
-        if (contains(variables_, var->name()))
-            return *this;
-        if (parent_)
-            return parent_->get_defining_scope(var);
-        throw CompileError{"Variable not defined: " + var->name()};
+        return is_variable_local(get_variable(name));
     }
 
     void Scope::add_function(FuncPtr func)

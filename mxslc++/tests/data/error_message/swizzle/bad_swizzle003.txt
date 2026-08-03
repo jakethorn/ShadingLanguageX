@@ -1,0 +1,1 @@
+bad_swizzle003.mxsl, line 2: Swizzle cannot have duplicate channels during assignment

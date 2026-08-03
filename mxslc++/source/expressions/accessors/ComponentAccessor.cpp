@@ -4,13 +4,16 @@
 
 #include "expressions/accessors/ComponentAccessor.h"
 
-#include "runtime/ComponentVariable.h"
+#include "expressions/Expression.h"
+#include "runtime/variables/ComponentVariable.h"
 
 namespace mxslc::expressions
 {
-    ComponentAccessor::ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr)
+    ComponentAccessor::ComponentAccessor(const ExprPtr& value_expr, const ExprPtr& index_expr)
     {
-        component_var_ = std::make_shared<ComponentVariable>(std::move(value_expr), std::move(index_expr));
+        VarPtr value = value_expr->evaluate();
+        VarPtr index = index_expr->evaluate();
+        component_var_ = std::make_shared<ComponentVariable>(std::move(value), std::move(index));
     }
 
     TypePtr ComponentAccessor::type() const

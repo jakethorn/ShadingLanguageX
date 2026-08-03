@@ -5,7 +5,7 @@
 #ifndef MXSLC_SPAN_H
 #define MXSLC_SPAN_H
 
-#include "../common.h"
+#include "common.h"
 #include "string_utils.h"
 
 namespace mxslc

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <separate3 name="var__0" type="multioutput">
+    <input name="in" type="vector3" value="0, 0, 0" />
+  </separate3>
+  <combine2 name="a" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__0" />
+    <input name="in2" type="float" output="outx" nodename="var__0" />
+  </combine2>
+  <constant name="var__1" type="vector2">
+    <input name="value" type="vector2" nodename="a" />
+  </constant>
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="vector3" value="0, 0, 0" />
+  </separate3>
+  <combine2 name="b" type="vector2">
+    <input name="in1" type="float" output="outy" nodename="var__2" />
+    <input name="in2" type="float" output="outx" nodename="var__2" />
+  </combine2>
+  <constant name="var__3" type="vector2">
+    <input name="value" type="vector2" nodename="b" />
+  </constant>
+  <separate3 name="var__4" type="multioutput">
+    <input name="in" type="vector3" value="0, 0, 0" />
+  </separate3>
+  <combine2 name="c" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__4" />
+    <input name="in2" type="float" output="outz" nodename="var__4" />
+  </combine2>
+  <constant name="var__5" type="vector2">
+    <input name="value" type="vector2" nodename="c" />
+  </constant>
+</materialx>

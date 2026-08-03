@@ -29,7 +29,7 @@ namespace mxslc::runtime
             : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}
         {
             if (is_multi_var_def)
-                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Geomprop);
+                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Geomprop, TokenType::Comptime);
             else
                 mods_.validate(TokenType::Const, TokenType::Mutable);
         }

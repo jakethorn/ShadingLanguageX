@@ -14,7 +14,7 @@ namespace mxslc::serialize::values
 using T##Ptr = shared_ptr<T>;
 
     TYPE_DEF(Value)
-    TYPE_DEF(BasicValue)
+    TYPE_DEF(CompileTimeValue)
     TYPE_DEF(InterfaceValue)
     TYPE_DEF(NodeGraphOutputValue)
     TYPE_DEF(NodeGraphValue)
@@ -25,7 +25,7 @@ using T##Ptr = shared_ptr<T>;
 
 #undef TYPE_DEF
 
-    BasicValuePtr create_value(Primitive value);
+    CompileTimeValuePtr create_value(Primitive value);
 
     template<typename T, typename... Args>
     shared_ptr<T> create_value(Args&&... args)
@@ -34,7 +34,7 @@ using T##Ptr = shared_ptr<T>;
     }
 
     template<typename T>
-    BasicValuePtr create_value()
+    CompileTimeValuePtr create_value()
     {
         return create_value(Primitive{T{}});
     }

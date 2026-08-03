@@ -20,7 +20,7 @@ namespace mxslc::runtime
         expr_{std::move(expr)},
         index_{index}
     {
-        mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Ref, TokenType::Out);
+        mods_.validate(TokenType::Const, TokenType::Comptime, TokenType::Mutable, TokenType::Ref, TokenType::Out);
 
         if (mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out))
             mods_.add(TokenType::Mutable);

@@ -1,0 +1,2 @@
+mat3 m = creatematrix();
+constant(m[0].xx);

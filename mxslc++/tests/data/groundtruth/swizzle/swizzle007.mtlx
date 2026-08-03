@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_f1" node="f1">
+    <output name="out" type="vector2" />
+    <input name="nonlocal_in__v" type="vector4" />
+  </nodedef>
+  <nodegraph name="NG_f1" nodedef="ND_f1">
+    <f1_f3 name="var__0" type="vector2">
+      <input name="nonlocal_in__v" type="vector4" interfacename="nonlocal_in__v" />
+    </f1_f3>
+    <output name="out" type="vector2" nodename="var__0" />
+  </nodegraph>
+  <nodedef name="ND_f1_f3" node="f1_f3">
+    <output name="out" type="vector2" />
+    <input name="nonlocal_in__v" type="vector4" />
+  </nodedef>
+  <nodegraph name="NG_f1_f3" nodedef="ND_f1_f3">
+    <separate4 name="var__0" type="multioutput">
+      <input name="in" type="vector4" interfacename="nonlocal_in__v" />
+    </separate4>
+    <combine2 name="var__1" type="vector2">
+      <input name="in1" type="float" output="outx" nodename="var__0" />
+      <input name="in2" type="float" output="outy" nodename="var__0" />
+    </combine2>
+    <separate4 name="var__2" type="multioutput">
+      <input name="in" type="vector4" interfacename="nonlocal_in__v" />
+    </separate4>
+    <combine2 name="var__3" type="vector2">
+      <input name="in1" type="float" output="outz" nodename="var__2" />
+      <input name="in2" type="float" output="outw" nodename="var__2" />
+    </combine2>
+    <add name="v" type="vector2">
+      <input name="in1" type="vector2" nodename="var__1" />
+      <input name="in2" type="vector2" nodename="var__3" />
+    </add>
+    <output name="out" type="vector2" nodename="v" />
+  </nodegraph>
+  <f1 name="var__0" type="vector2">
+    <input name="nonlocal_in__v" type="vector4" value="0, 0, 0, 0" />
+  </f1>
+  <separate4 name="var__1" type="multioutput">
+    <input name="in" type="vector4" value="0, 0, 0, 0" />
+  </separate4>
+  <separate2 name="var__2" type="multioutput">
+    <input name="in" type="vector2" nodename="var__0" />
+  </separate2>
+  <combine4 name="var__3" type="vector4">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outx" nodename="var__2" />
+    <input name="in3" type="float" output="outy" nodename="var__2" />
+    <input name="in4" type="float" output="outw" nodename="var__1" />
+  </combine4>
+</materialx>

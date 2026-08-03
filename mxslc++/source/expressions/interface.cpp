@@ -4,7 +4,7 @@
 
 #include "expressions/interface.h"
 #include "expressions/RuntimeExpression.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "expressions/Literal.h"
 #include "expressions/UnnamedConstructor.h"
 
@@ -32,9 +32,9 @@ namespace mxslc::expressions
                     children.push_back(as_expression(child));
                 return create_expression<UnnamedConstructor>(std::move(children));
             }
-            else if (value->is_basic())
+            else if (value->is_compile_time())
             {
-                return create_expression<Literal>(value->basic());
+                return create_expression<Literal>(value->compile_time_value());
             }
         }
 

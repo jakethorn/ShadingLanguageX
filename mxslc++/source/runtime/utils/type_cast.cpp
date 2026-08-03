@@ -10,7 +10,7 @@
 #include "runtime/interface.h"
 #include "runtime/utils/invoke.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::runtime_utils
 {

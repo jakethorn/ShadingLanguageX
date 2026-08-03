@@ -16,7 +16,7 @@
 #include "serialize/values/InterfaceValue.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/Type.h"
 #include "runtime/Function.h"
@@ -255,7 +255,7 @@ namespace mxslc::serialize
         {
             if (param.is_in())
             {
-                const VarPtr in_var = param.has_default_value() ? param.evaluate() : serialize_utils::create_basic_value(param.type());
+                const VarPtr in_var = param.has_default_value() ? param.evaluate() : serialize_utils::create_compile_time_value(param.type());
                 write_node_def_input(node_def, param.name(), in_var, param.attributes());
 
                 const VarPtr interface = serialize_utils::create_interface_value(param.type(), param.name());
@@ -264,7 +264,7 @@ namespace mxslc::serialize
             }
             else
             {
-                const VarPtr out_var = param.has_default_value() ? param.evaluate() : serialize_utils::create_basic_value(param.type());
+                const VarPtr out_var = param.has_default_value() ? param.evaluate() : serialize_utils::create_compile_time_value(param.type());
                 out_var->set_modifiers(param.modifiers().without(TokenType::Ref, TokenType::Out));
                 out_var->add_to_scope(param.name());
             }

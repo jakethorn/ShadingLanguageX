@@ -5,7 +5,7 @@
 #include "CompileOptions.h"
 
 #include "runtime/interface.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "utils/container_utils.h"
 #include "utils/io_utils.h"
 #include "utils/Logger.h"

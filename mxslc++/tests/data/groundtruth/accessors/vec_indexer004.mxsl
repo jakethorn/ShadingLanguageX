@@ -1,0 +1,16 @@
+mutable vec2 y;
+
+inline void bar(out vec2 vector)
+{
+    float y;
+    vector = vec2{3.0, 3.0};
+}
+
+void foo()
+{
+    bar(y);
+}
+
+constant(y);
+foo();
+constant(y);

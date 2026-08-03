@@ -13,7 +13,7 @@ namespace mxslc::expressions
     class ComponentAccessor final : public Accessor
     {
     public:
-        ComponentAccessor(ExprPtr value_expr, ExprPtr index_expr);
+        ComponentAccessor(const ExprPtr& value_expr, const ExprPtr& index_expr);
 
         TypePtr type() const override;
         VarPtr evaluate() const override;

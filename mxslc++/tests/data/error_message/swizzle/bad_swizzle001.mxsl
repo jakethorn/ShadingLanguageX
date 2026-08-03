@@ -1,0 +1,2 @@
+vec3 v;
+float f = v.r;
