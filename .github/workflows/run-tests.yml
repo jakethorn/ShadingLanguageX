@@ -29,16 +29,15 @@ jobs:
         with:
           repository: AcademySoftwareFoundation/MaterialX
           ref: v1.39.5
-          path: external/MaterialX
+          path: mxslc++/external/MaterialX
 
       - name: Configure and Build MaterialX
-        # We use a single cross-platform CMake command, utilizing the same flags you use for cibuildwheel
         run: >
           cmake 
-          -S external/MaterialX 
-          -B external/MaterialX/build 
+          -S mxslc++/external/MaterialX 
+          -B mxslc++/external/MaterialX/build 
           -DCMAKE_BUILD_TYPE=Release 
-          -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/external/MaterialX/install" 
+          -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/mxslc++/external/MaterialX/install" 
           -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
           -DMATERIALX_BUILD_PYTHON=OFF 
           -DMATERIALX_BUILD_VIEWER=OFF 
@@ -72,22 +71,20 @@ jobs:
           -DMATERIALX_DYNAMIC_ANALYSIS=OFF
 
       - name: Install MaterialX
-        run: cmake --build external/MaterialX/build --config Release --target install --parallel
+        run: cmake --build mxslc++/external/MaterialX/build --config Release --target install --parallel
 
       - name: Configure mxslc (C++)
-        # Pass the installed MaterialX path to your root CMakeLists.txt
+        # Point CMake (-S) to the mxslc++ directory where your root CMakeLists.txt resides
         run: >
           cmake 
-          -S . 
-          -B build 
+          -S mxslc++ 
+          -B mxslc++/build 
           -DCMAKE_BUILD_TYPE=Release 
-          -DMTLX_ROOT="${{ github.workspace }}/external/MaterialX/install"
+          -DMTLX_ROOT="${{ github.workspace }}/mxslc++/external/MaterialX/install"
 
       - name: Build mxslc (C++)
-        # This will automatically trigger the FetchContent for GoogleTest
-        run: cmake --build build --config Release --parallel
+        run: cmake --build mxslc++/build --config Release --parallel
 
       - name: Run C++ Tests
-        working-directory: ${{ github.workspace }}/build
-        # The --output-on-failure flag ensures if a test fails, CTest prints the error to the GitHub Actions log
+        working-directory: ${{ github.workspace }}/mxslc++/build
         run: ctest --output-on-failure --build-config Release
