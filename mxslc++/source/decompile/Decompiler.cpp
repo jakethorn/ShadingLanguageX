@@ -21,6 +21,30 @@ namespace mxslc::decompile
 
     namespace
     {
+        // Attributes that the decompiler already re-expresses in ShadingLanguageX
+        // syntax (element identity, type, port values and connections) or that are
+        // internal graph-layout metadata (xpos/ypos/width/height), and therefore
+        // should note be re-emitted as `@` declarations.  
+        const unordered_set<string>& structural_attributes()
+        {
+            static const unordered_set<string> attributes {
+                // Identity, value and connection attributes
+                mx::Element::NAME_ATTRIBUTE,
+                mx::TypedElement::TYPE_ATTRIBUTE,
+                mx::ValueElement::VALUE_ATTRIBUTE,
+                mx::ValueElement::INTERFACE_NAME_ATTRIBUTE,
+                mx::PortElement::NODE_NAME_ATTRIBUTE,
+                mx::PortElement::NODE_GRAPH_ATTRIBUTE,
+                mx::PortElement::OUTPUT_ATTRIBUTE,
+                // Ignore layout attributes
+                mx::Element::XPOS_ATTRIBUTE,
+                mx::Element::YPOS_ATTRIBUTE,
+                mx::Backdrop::WIDTH_ATTRIBUTE,
+                mx::Backdrop::HEIGHT_ATTRIBUTE,
+            };
+            return attributes;
+        }
+
         string safe_mxsl_name(const vector<mx::OutputPtr>& outputs, const string& name)
         {
             const TokenType type{name};
@@ -89,6 +113,14 @@ namespace mxslc::decompile
     {
         global_code_ = "";
         decompiled_nodes_.clear();
+
+        // Document-level metadata, e.g. `@@doc "..."`.  Everything except the
+        // structural `version` attribute is emitted.
+        for (const string& attr_name : document_->getAttributeNames())
+        {
+            if (attr_name != "version")
+                global_code_ += "@@" + attr_name + " \"" + document_->getAttribute(attr_name) + "\"\n";
+        }
 
         for (const mx::NodeGraphPtr& node_graph : document_->getNodeGraphs())
         {
@@ -173,7 +205,23 @@ namespace mxslc::decompile
         if (var_expr.front() == '(' and var_expr.back() == ')')
             var_expr = var_expr.substr(1, var_expr.size() - 2);
 
-        return var_type + " " + var_name + " = " + var_expr + ";\n";
+        return node_to_attributes(node) + var_type + " " + var_name + " = " + var_expr + ";\n";
+    }
+
+    string Decompiler::node_to_attributes(const mx::NodePtr& node)
+    {
+        string result;
+
+        // Node-level attributes, e.g. `@doc "..."`.  Input-level metadata
+        // attributes are instead emitted inline within the node constructor
+        // call (see `input_to_argument`).
+        for (const string& attr_name : node->getAttributeNames())
+        {
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + node->getAttribute(attr_name) + "\"\n";
+        }
+
+        return result;
     }
 
     string Decompiler::node_def_to_function_definition(const string& node_def_name)
@@ -401,7 +449,16 @@ namespace mxslc::decompile
 
     string Decompiler::input_to_argument(const mx::InputPtr& input)
     {
-        return input->getName() + " = " + port_to_expression(input);
+        // Input-level metadata attributes, e.g. `@colorspace "srgb_texture"`,
+        // are emitted inline before the argument value so that they are
+        // re-applied to the input element when compiled back to MTLX.
+        string result;
+        for (const string& attr_name : input->getAttributeNames())
+        {
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + input->getAttribute(attr_name) + "\" ";
+        }
+        return result + input->getName() + " = " + port_to_expression(input);
     }
 
     string Decompiler::inputs_to_arguments(const vector<mx::InputPtr>& inputs)
