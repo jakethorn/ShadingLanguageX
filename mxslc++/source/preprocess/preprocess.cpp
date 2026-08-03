@@ -344,7 +344,7 @@ namespace mxslc::preprocess
         if (path_)
             define_macro(FILE, "\"" + path_->filename().string() + "\"");
         else
-            undef_macro(FILE);
+            define_macro(FILE);
 
         undef_macro(MAIN);
         undef_macro(INCLUDE);

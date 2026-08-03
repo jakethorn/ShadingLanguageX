@@ -104,7 +104,7 @@ namespace mxslc
         unordered_map<string, VarPtr> new_globals;
         new_globals.reserve(globals.size());
         for (const auto& [name, value] : globals)
-            new_globals.insert_or_assign(std::move(name), create_variable(value));
+            new_globals.insert_or_assign(name, create_variable(value));
         set_globals(std::move(new_globals));
     }
 
