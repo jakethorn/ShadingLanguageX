@@ -67,12 +67,12 @@ namespace mxslc::type_utils
             return "";
 
         if (types.size() == 1)
-            return types[0]->str();
+            return types[0]->to_string();
 
         string result = "(";
         for (size_t i = 0; i < types.size(); ++i)
         {
-            result += types[i]->str();
+            result += types[i]->to_string();
             if (i < types.size() - 1)
                 result += ", ";
         }

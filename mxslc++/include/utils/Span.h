@@ -21,9 +21,9 @@ namespace mxslc
         Span(const std::vector<T>& data, const size_t start, const size_t size) : ptr_{data.data() + start}, size_{size}
         {
             if (start > data.size())
-                throw std::out_of_range{"Start index (" + str(start) + ") is out of bounds for vector of size (" + str(data.size()) + ")"};
+                throw std::out_of_range{"Start index (" + std::to_string(start) + ") is out of bounds for vector of size (" + std::to_string(data.size()) + ")"};
             if (start + size > data.size())
-                throw std::out_of_range{"End index (" + str(start + size) + ") is out of bounds for vector of size (" + str(data.size()) + ")"};
+                throw std::out_of_range{"End index (" + std::to_string(start + size) + ") is out of bounds for vector of size (" + std::to_string(data.size()) + ")"};
         }
 
         Span(const T* data, const size_t size) : Span{data, 0, size} { }
@@ -35,7 +35,7 @@ namespace mxslc
                 i = size_ + i;
             if (i >= 0 and i < size_)
                 return *(ptr_ + i);
-            throw std::out_of_range{"Index (" + str(i) + ") is out of bounds for span of size (" + str(size_) + ")"};
+            throw std::out_of_range{"Index (" + std::to_string(i) + ") is out of bounds for span of size (" + std::to_string(size_) + ")"};
         }
 
         const T* begin() const

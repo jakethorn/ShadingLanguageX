@@ -1,0 +1,15 @@
+constant(__LINE__);
+/*
+multi
+line
+block
+comment
+*/
+constant(__LINE__);
+/*
+multi
+line
+block
+comment
+*/
+constant(__LINE__);

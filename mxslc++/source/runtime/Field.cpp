@@ -16,7 +16,7 @@ namespace mxslc::runtime
 
     string Field::to_string() const
     {
-        string result = type_->str();
+        string result = type_->to_string();
         if (has_name())
             result += " " + name();
         return result;

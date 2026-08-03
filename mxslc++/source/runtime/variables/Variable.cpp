@@ -88,7 +88,7 @@ namespace mxslc::runtime
         }
 
         const Field& field = parent_type->field(index);
-        const string child_name = field.has_name() ? field.name() : string_utils::str(index);
+        const string child_name = field.has_name() ? field.name() : std::to_string(index);
         set_node_name(name + "__" + child_name);
     }
 
@@ -153,7 +153,7 @@ namespace mxslc::runtime
     VarPtr Variable::child(const size_t index)
     {
         if (index >= children_.size())
-            throw CompileError{"Index out of bounds: " + string_utils::str(index)};
+            throw CompileError{"Index out of bounds: " + std::to_string(index)};
 
         return children_.at(index);
     }
@@ -319,7 +319,7 @@ namespace mxslc::runtime
             string result = "{";
             for (size_t i = 0; i < children_.size(); ++i)
             {
-                const string field_name = type_->field(i).has_name() ? type_->field_name(i) : "field_" + string_utils::str(i);
+                const string field_name = type_->field(i).has_name() ? type_->field_name(i) : "field_" + std::to_string(i);
                 const VarPtr& child = children_[i];
                 result += "\n\t" + field_name + ": " + child->to_string();
             }
