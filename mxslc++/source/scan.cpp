@@ -35,7 +35,7 @@ namespace mxslc
 
         bool try_match_float(const string_view text, Token& token)
         {
-            static const regex pattern{R"(^(([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*)|([0-9]+[eE][+-]?[0-9]+))[fF]?)", std::regex_constants::optimize};
+            static const regex pattern{R"((([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*)|([0-9]+[eE][+-]?[0-9]+))[fF]?)", std::regex_constants::optimize};
             return try_match(TokenType::Float, pattern, text, token);
         }
 
@@ -93,7 +93,7 @@ namespace mxslc
             if (text.size() < 2 or text[0] != '/' or text[1] != '/')
                 return false;
 
-            static const regex pattern{R"(^//.*)", std::regex_constants::optimize};
+            static const regex pattern{R"(//.*)", std::regex_constants::optimize};
             return try_match(TokenType::Comment, pattern, text, token);
         }
 
