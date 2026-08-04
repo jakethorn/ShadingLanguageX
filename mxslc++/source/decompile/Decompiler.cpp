@@ -224,6 +224,28 @@ namespace mxslc::decompile
         return result;
     }
 
+    string Decompiler::node_def_to_attributes(const mx::NodeDefPtr& node_def)
+    {
+        string result;
+
+        // NodeDef-level attributes, e.g. `@nodegroup "math"`, `@version "1.0"`,
+        // `@isdefaultversion "true"`, `@doc "..."`.  These are emitted as `@`
+        // declarations above the function definition so that they are re-applied
+        // to the NodeDef element when compiled back to MTLX.  The `node` attribute
+        // is skipped because it is re-expressed as the function name, and all other
+        // structural attributes are skipped because they are re-expressed by the
+        // function signature and body.
+        for (const string& attr_name : node_def->getAttributeNames())
+        {
+            if (attr_name == mx::NodeDef::NODE_ATTRIBUTE)
+                continue;
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + node_def->getAttribute(attr_name) + "\"\n";
+        }
+
+        return result;
+    }
+
     string Decompiler::node_def_to_function_definition(const string& node_def_name)
     {
         return node_def_to_function_definition(document_->getNodeDef(node_def_name));
@@ -264,7 +286,11 @@ namespace mxslc::decompile
 
         in_function_ = false;
 
-        const string func_def = "\n" + signature + "\n{\n" + function_code_ + "\n}\n";
+        // If this nodegraph implements a NodeDef, emit the NodeDef's metadata
+        // attributes (e.g. `@nodegroup`, `@version`, `@doc`) as `@` declarations
+        // above the function definition.
+        const string attrs = node_graph->hasNodeDefString() ? node_def_to_attributes(node_graph->getNodeDef()) : "";
+        const string func_def = "\n" + attrs + signature + "\n{\n" + function_code_ + "\n}\n";
 
         // If the nodegraph has interface inputs, also emit a variable that calls
         // the function with default argument values for external references.
@@ -473,7 +499,16 @@ namespace mxslc::decompile
 
     string Decompiler::input_to_parameter(const mx::InputPtr& input)
     {
-        string result = input->getType() + " " + input->getName();
+        // Input-level metadata attributes, e.g. `@uiname "..."`, `@uifolder "..."`,
+        // `@uimin "..."`, are emitted inline before the parameter so that they are
+        // re-applied to the NodeDef input element when compiled back to MTLX.
+        string result;
+        for (const string& attr_name : input->getAttributeNames())
+        {
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + input->getAttribute(attr_name) + "\" ";
+        }
+        result += input->getType() + " " + input->getName();
         if (input->hasValue())
             result += " = " + value_to_constructor(input->getValue());
         return result;
