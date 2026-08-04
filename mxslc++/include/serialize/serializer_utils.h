@@ -26,13 +26,13 @@ namespace mxslc::serialize_utils
     VarPtr create_node_output_value(mx::NodePtr node, TypePtr type, const string& output_name, const AttributeList& attrs);
     VarPtr create_node_output_value(mx::NodePtr node, TypePtr type, const vector<string>& output_names);
     VarPtr create_node_graph_output_value(mx::NodeGraphPtr node_graph, TypePtr type, const string& output_name);
-    VarPtr create_basic_value(Primitive value);
-    VarPtr create_basic_value(TypePtr type);
+    VarPtr create_compile_time_value(Primitive value);
+    VarPtr create_compile_time_value(TypePtr type);
 
     template<typename T>
-    VarPtr create_basic_value()
+    VarPtr create_compile_time_value()
     {
-        return create_basic_value(Primitive{T{}});
+        return create_compile_time_value(Primitive{T{}});
     }
 
     ValuePtr copy_value_from_port(const mx::PortElementPtr& port);

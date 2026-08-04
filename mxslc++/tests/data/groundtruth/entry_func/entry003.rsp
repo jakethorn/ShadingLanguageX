@@ -1,2 +1,2 @@
-tests/data/groundtruth/entry_func/entry003.mxsl -f my_main -a 3 "world" "image.png"
+entry003.mxsl -f my_main -a 3 "world" "image.png"
 --no-reduce-graph

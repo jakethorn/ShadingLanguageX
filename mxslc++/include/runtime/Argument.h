@@ -27,6 +27,7 @@ namespace mxslc::runtime
 
         Argument(ExprPtr expr, size_t index);
         Argument(VarPtr value, size_t index);
+        Argument(ValuePtr value, size_t index);
         Argument(Primitive value, size_t index);
 
         Argument(Argument&& other) noexcept;

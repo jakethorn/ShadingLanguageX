@@ -1,0 +1,11 @@
+/* single line block comment */
+float f = geompropvalue("f", /*default*/1.0);
+/*
+multi
+line
+block
+comment
+*/
+float g = randomfloat(); /* after statement comment */
+vec3 n = normal(/*space*/"world");
+/*end of script comment*/

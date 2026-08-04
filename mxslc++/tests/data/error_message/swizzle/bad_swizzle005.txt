@@ -1,0 +1,1 @@
+bad_swizzle005.mxsl, line 2: Variable of type 'color3' does not have a port or valid swizzle with the name: xyz

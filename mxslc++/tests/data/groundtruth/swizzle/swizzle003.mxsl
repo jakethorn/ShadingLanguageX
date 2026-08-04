@@ -1,0 +1,10 @@
+mutable vec4 v;
+
+void foo(out vec2 wy)
+{
+    wy = vec2{3.0, 2.0};
+}
+
+foo(out v.wy);
+
+constant(v);

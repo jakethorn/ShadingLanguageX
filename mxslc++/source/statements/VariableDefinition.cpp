@@ -11,7 +11,7 @@
 #include "runtime/interface.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/invoke.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"

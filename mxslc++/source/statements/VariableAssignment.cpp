@@ -5,7 +5,7 @@
 #include "statements/VariableAssignment.h"
 
 #include "expressions/Expression.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
 
@@ -34,9 +34,7 @@ namespace mxslc::statements
     {
         lhs_expr_->init();
         rhs_expr_->init(lhs_expr_->type());
-        const VarPtr lhs = lhs_expr_->evaluate();
-        const VarPtr rhs = rhs_expr_->evaluate();
-        lhs->copy(rhs);
+        lhs_expr_->assign(rhs_expr_->evaluate());
     }
 
     string VariableAssignment::to_string() const

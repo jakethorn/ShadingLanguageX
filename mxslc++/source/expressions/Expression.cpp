@@ -9,7 +9,7 @@
 #include "errors/CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/type_cast.h"
 #include "errors/AmbiguousFunctionError.h"
 
@@ -78,7 +78,7 @@ namespace mxslc::expressions
         target_type_ = type->find_unique_compatible(types);
 
         if (target_type_ == nullptr)
-            error_message_ = "Attempting to assign an expression of type " + type->str() + " to a variable or parameter of type " + type_utils::to_string(types);
+            error_message_ = "Attempting to assign an expression of type " + type->to_string() + " to a variable or parameter of type " + type_utils::to_string(types);
 
         is_initialized_ = target_type_ != nullptr;
         return is_initialized_;
@@ -116,7 +116,14 @@ namespace mxslc::expressions
         TRY_START
 
         assert(is_initialized_);
+
+        const bool reduce_graph_cache = serializer().reduce_graph();
+        if (is_comptime())
+            serializer().set_reduce_graph(true);
+
         VarPtr value = evaluate_impl();
+
+        serializer().set_reduce_graph(reduce_graph_cache);
 
         if (target_type_)
         {
@@ -124,7 +131,19 @@ namespace mxslc::expressions
             return runtime_utils::type_cast(target_type_, value);
         }
 
+        if (is_comptime() and not value->is_compile_time())
+            throw CompileError{"Expression could not be evaluated at compile-time"};
+
         return value;
+
+        TRY_END
+    }
+
+    void Expression::assign(const VarPtr& value) const
+    {
+        TRY_START
+
+        evaluate()->copy(value);
 
         TRY_END
     }

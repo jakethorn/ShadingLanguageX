@@ -91,7 +91,7 @@ namespace mxslc::runtime
         if (index < fields_.size())
             return fields_.at(index);
 
-        throw CompileError{"Expression of type " + str() + " does not have a field at index " + string_utils::str(index)};
+        throw CompileError{"Expression of type " + to_string() + " does not have a field at index " + std::to_string(index)};
     }
 
     const Field& Type::field(const string& name) const
@@ -102,7 +102,7 @@ namespace mxslc::runtime
                 return field;
         }
 
-        throw CompileError{"Expression of type " + str() + " does not have a field with the name " + name};
+        throw CompileError{"Expression of type " + to_string() + " does not have a field with the name " + name};
     }
 
     size_t Type::field_index(const string& name) const
@@ -115,7 +115,7 @@ namespace mxslc::runtime
             ++i;
         }
 
-        throw CompileError{"Expression of type " + str() + " does not have a field with the name " + name};
+        throw CompileError{"Expression of type " + to_string() + " does not have a field with the name " + name};
     }
 
     void Type::add_method(weak_ptr<Function> method)
@@ -256,37 +256,6 @@ namespace mxslc::runtime
         return compatibles.size() == 1 ? compatibles[0] : nullptr;
     }
 
-    string Type::str() const
-    {
-        if (has_name())
-            return name_;
-
-        return "{" + join(fields_, ", ") + "}";
-    }
-
-    string Type::full_str() const
-    {
-        string result;
-        if (has_name())
-            result += name_;
-
-        if (not has_fields())
-            return result;
-
-        result += "{";
-        for (const Field& field : fields_)
-        {
-            result += field.to_string();
-            result += ", ";
-        }
-
-        result.pop_back();
-        result.pop_back();
-
-        result += "}";
-        return result;
-    }
-
     TypePtr Type::of(const mx::NodeGraphPtr& node_graph)
     {
         if (node_graph->getOutputCount() == 1)
@@ -335,12 +304,38 @@ namespace mxslc::runtime
         for (const Field& field : fields_)
         {
             if (field.has_name() != has_names)
-                throw CompileError{"Either all type fields must be named or none them\nType: " + str()};
+                throw CompileError{"Either all type fields must be named or none them\nType: " + to_string()};
         }
     }
 
     string Type::to_string() const
     {
-        return str();
+        if (has_name())
+            return name_;
+
+        return "{" + join(fields_, ", ") + "}";
+    }
+
+    string Type::full_str() const
+    {
+        string result;
+        if (has_name())
+            result += name_;
+
+        if (not has_fields())
+            return result;
+
+        result += "{";
+        for (const Field& field : fields_)
+        {
+            result += field.to_string();
+            result += ", ";
+        }
+
+        result.pop_back();
+        result.pop_back();
+
+        result += "}";
+        return result;
     }
 }

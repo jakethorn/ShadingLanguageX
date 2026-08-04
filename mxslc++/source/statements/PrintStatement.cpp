@@ -5,7 +5,7 @@
 #include <iostream>
 #include "statements/PrintStatement.h"
 #include "expressions/Expression.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
 #include "serialize/values/Value.h"

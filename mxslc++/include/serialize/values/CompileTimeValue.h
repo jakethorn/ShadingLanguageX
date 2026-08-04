@@ -2,22 +2,20 @@
 // Created by jaket on 27/11/2025.
 //
 
-#ifndef FENNEC_BASICVALUE_H
-#define FENNEC_BASICVALUE_H
+#ifndef FENNEC_COMPILETIMEVALUE_H
+#define FENNEC_COMPILETIMEVALUE_H
 
 #include "serialize/values/Value.h"
 #include "Primitive.h"
 
 namespace mxslc::serialize::values
 {
-    using runtime_utils::TypeName;
-
-    class BasicValue final : public Value
+    class CompileTimeValue final : public Value
     {
     public:
-        explicit BasicValue(const mx::ValuePtr& value);
-        explicit BasicValue(Primitive value);
-        BasicValue(Primitive value, TypePtr type);
+        explicit CompileTimeValue(const mx::ValuePtr& value);
+        explicit CompileTimeValue(Primitive value);
+        CompileTimeValue(Primitive value, TypePtr type);
 
         const Primitive& get() const { return value_; }
 
@@ -36,4 +34,4 @@ namespace mxslc::serialize::values
     };
 }
 
-#endif //FENNEC_BASICVALUE_H
+#endif //FENNEC_COMPILETIMEVALUE_H

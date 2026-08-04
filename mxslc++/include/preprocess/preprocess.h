@@ -38,6 +38,8 @@ namespace mxslc::preprocess
 
         inline static const string MAIN{"__MAIN__"};
         inline static const string INCLUDE{"__INCLUDE__"};
+        inline static const string FILE{"__FILE__"};
+        inline static const string LINE{"__LINE__"};
 
     private:
         void process_next_token();
@@ -59,7 +61,16 @@ namespace mxslc::preprocess
 
         void include_file(const fs::path& path);
 
-        void define_macro(const string& name, vector<Token> body = {}) const;
+        void define_macro(string name) const;
+        void define_macro(string name, const string& body) const;
+        void define_macro(string name, vector<Token> body) const;
+
+        template<typename T>
+        void define_macro(string name, T body) const
+        {
+            define_macro(std::move(name), std::to_string(body));
+        }
+
         void undef_macro(const string& name) const;
         bool macro_is_defined(const string& name) const;
         vector<Token> expand_macro(const Token& name) const;
@@ -70,7 +81,7 @@ namespace mxslc::preprocess
         vector<Token> consume_and_expand_until(TokenType token_type);
 
         void set_current_working_directory() const;
-        void define_inclusion_type_macro() const;
+        void define_file_macros() const;
 
         void add_token(Token&& tokens);
         void add_tokens(vector<Token>&& tokens);

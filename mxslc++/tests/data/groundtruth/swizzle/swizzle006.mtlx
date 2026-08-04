@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <combine3 name="c" type="color3">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+  </combine3>
+  <combine3 name="d" type="color3">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="5" />
+    <input name="in3" type="float" value="6" />
+  </combine3>
+  <separate3 name="var__0" type="multioutput">
+    <input name="in" type="color3" nodename="d" />
+  </separate3>
+  <combine3 name="var__1" type="color3">
+    <input name="in1" type="float" output="outr" nodename="var__0" />
+    <input name="in2" type="float" output="outr" nodename="var__0" />
+    <input name="in3" type="float" output="outb" nodename="var__0" />
+  </combine3>
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="color3" nodename="c" />
+  </separate3>
+  <separate3 name="var__3" type="multioutput">
+    <input name="in" type="color3" nodename="var__1" />
+  </separate3>
+  <combine3 name="var__4" type="color3">
+    <input name="in1" type="float" output="outg" nodename="var__3" />
+    <input name="in2" type="float" output="outb" nodename="var__3" />
+    <input name="in3" type="float" output="outr" nodename="var__3" />
+  </combine3>
+  <constant name="var__5" type="color3">
+    <input name="value" type="color3" nodename="var__4" />
+  </constant>
+  <constant name="var__6" type="color3">
+    <input name="value" type="color3" nodename="d" />
+  </constant>
+</materialx>

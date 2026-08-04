@@ -6,7 +6,7 @@
 
 #include "expressions/FunctionCall.h"
 #include "expressions/interface.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::expressions
 {
@@ -34,20 +34,16 @@ namespace mxslc::expressions
 
     VarPtr IncrementOperator::evaluate_impl() const
     {
-        const VarPtr value = value_expr_->evaluate();
-        VarPtr original_value = value->copy();
+        VarPtr old_value = value_expr_->evaluate()->copy();
 
         string dunder_name = increment_ ? "__inc__" : "__dec__";
         const ExprPtr func_call = create_expression<FunctionCall>(std::move(dunder_name), ArgumentList{value_expr_});
+        func_call->init(value_expr_->type());
+        VarPtr new_value = func_call->evaluate();
 
-        func_call->init(value->type());
-        VarPtr incremented_value = func_call->evaluate();
-        value->copy(incremented_value);
+        value_expr_->assign(new_value);
 
-        if (prefix_)
-            return incremented_value;
-        else
-            return original_value;
+        return prefix_ ? new_value : old_value;
     }
 
     string IncrementOperator::to_string() const

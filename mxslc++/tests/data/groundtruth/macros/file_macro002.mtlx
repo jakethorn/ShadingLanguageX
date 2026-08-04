@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="string">
+    <input name="value" type="string" value="file_macro001.mxsl" />
+  </constant>
+  <constant name="var__1" type="string">
+    <input name="value" type="string" value="file_macro002.mxsl" />
+  </constant>
+</materialx>

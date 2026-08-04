@@ -6,7 +6,7 @@
 
 #include "expressions/interface.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::expressions
 {

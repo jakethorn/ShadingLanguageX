@@ -67,9 +67,8 @@ namespace mxslc::runtime
 
         TypePtr find_unique_compatible(const vector<TypePtr>& types) const;
 
-        string str() const;
-        string full_str() const;
         string to_string() const override;
+        string full_str() const;
 
         bool operator==(const string& other) const { return name_ == other; }
         bool operator!=(const string& other) const { return not (*this == other); }

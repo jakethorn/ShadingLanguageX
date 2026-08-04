@@ -1,0 +1,2 @@
+constant("hello/*thisisnotacomment*/world");
+constant("helloworld//thisisnotacomment");

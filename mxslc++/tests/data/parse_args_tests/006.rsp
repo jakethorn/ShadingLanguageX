@@ -1,5 +1,5 @@
 # this is a comment
-tests/data/parse_args_tests/001.mxsl # this is also a comment
+001.mxsl # this is also a comment
 ## this # is # a # comment
 -a "hello world" -3.4 123 #and
 #one

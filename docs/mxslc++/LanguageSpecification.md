@@ -541,26 +541,24 @@ float d = p.distance_to(q);
 
 See [User-Defined Types](#user-defined-types) for more information.
 
-> [!WARNING]
-> ### Not yet supported in mxslc++
-> ### Swizzle
-> 
-> The Swizzle Operator allows
-> users to access vector components using any of `x` `y` `z` `w` or color channels using `r` `g` `b` `a` after a period `.`.
-> For example, `vec3 b = a.yyz;` is equivalent to `vec3 b = vec3{a[1], a[1], a[2]};`.
-> The characters `x` `y` `z` `w` can only be used to access components from a vector, it is a syntax error to use them with
-> a color type variable, and vice versa for `r` `g` `b` `a`.
-> Swizzles can be made from any combination of valid characters, with a maximum number of 4 characters. However, a character cannot
-> be used that goes beyond the length of original vector, for example, `a.xyz` is an invalid swizzle for a variable of type
-> `vec2` because it does not have a z component.
-> Finally, vector swizzles will always return a vector or `float` type variable, the specific type is dependent on the swizzle, for example
-> `a.xy` return a `vec2`, while `a.zyzy` returns a `vec4`. Appropriately, color swizzles only return color or `float` type variables.
-> 
-> ```
-> float alpha = image("alpha_mask.png").a;  
-> vec2 left_wall_uv = position().yz;
-> color3 all_red = randomcolor().rrr;
-> ```
+### Swizzle
+
+The Swizzle Operator allows
+users to access vector components using any of `x` `y` `z` `w` or color channels using `r` `g` `b` `a`.
+For example, `vec3 b = a.yyz;` is equivalent to `vec3 b = vec3{a[1], a[1], a[2]};`.
+The characters `x` `y` `z` `w` can only be used to access components from a vector, it is a syntax error to use them with
+a color type variable, and vice versa for `r` `g` `b` `a`.
+Swizzles can be made from any combination of valid characters, with a maximum number of 4 characters. However, a character cannot
+be used that goes beyond the length of original vector, for example, `a.xyz` is an invalid swizzle for a variable of type
+`vec2` because it does not have a z component.
+Finally, vector swizzles will always return a vector or `float` type variable, the specific type is dependent on the swizzle, for example
+`a.xy` return a `vec2`, while `a.zyzy` returns a `vec4`. Appropriately, color swizzles only return color or `float` type variables.
+
+```
+float alpha = image("alpha_mask.png").a;  
+vec2 left_wall_uv = position().yz;
+color4 all_red = randomcolor().rrrr;
+```
 
 ### Port Access
 

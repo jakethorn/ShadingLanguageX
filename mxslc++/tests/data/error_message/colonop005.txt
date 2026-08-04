@@ -1,1 +1,1 @@
-colonop005.mxsl, line 2: No input named 'base_colo' found in NodeDef ND_standard_surface_surfaceshader
+colonop005.mxsl, line 2: Variable of type 'surfaceshader' does not have a port or valid swizzle with the name: base_colo

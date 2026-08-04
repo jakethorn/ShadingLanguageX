@@ -7,7 +7,9 @@
 #include "expressions/interface.h"
 #include "expressions/accessors/FieldAccessor.h"
 #include "expressions/accessors/PortAccessor.h"
-#include "runtime/Variable.h"
+#include "expressions/accessors/SwizzleAccessor.h"
+#include "runtime/variables/Variable.h"
+#include "utils/swizzle_utils.h"
 
 namespace mxslc::expressions
 {
@@ -32,7 +34,14 @@ namespace mxslc::expressions
         VarPtr var = expr_->evaluate();
         if (var->has_value())
         {
-            accessor_ = create_accessor<PortAccessor>(std::move(var), token_.lexeme());
+            if (swizzle_utils::is_valid_swizzle(var->type(), token_.lexeme()))
+            {
+                accessor_ = create_accessor<SwizzleAccessor>(std::move(var), token_.lexeme());
+            }
+            else
+            {
+                accessor_ = create_accessor<PortAccessor>(std::move(var), token_.lexeme());
+            }
         }
         else
         {

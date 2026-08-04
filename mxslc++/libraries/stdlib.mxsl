@@ -64,6 +64,74 @@ inline T max<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T i
 }
 
 //
+// separate
+//
+
+inline {float} separate(float in)
+{
+    return {in};
+}
+
+inline {float, float} separate(vector2 in)
+{
+    return separate2(in);
+}
+
+inline {float, float, float} separate(vector3 in)
+{
+    return separate3(in);
+}
+
+inline {float, float, float, float} separate(vector4 in)
+{
+    return separate4(in);
+}
+
+inline {float, float, float} separate(color3 in)
+{
+    return separate3(in);
+}
+
+inline {float, float, float, float} separate(color4 in)
+{
+    return separate4(in);
+}
+
+//
+// combine
+//
+
+inline float combine(float x)
+{
+    return x;
+}
+
+inline vector2 combine(float x, float y)
+{
+    return combine2(x, y);
+}
+
+inline vector3 combine(float x, float y, float z)
+{
+    return combine3(x, y, z);
+}
+
+inline vector4 combine(float x, float y, float z, float w)
+{
+    return combine4(x, y, z, w);
+}
+
+inline color3 combine(float r, float g, float b)
+{
+    return combine3(r, g, b);
+}
+
+inline color4 combine(float r, float g, float b, float a)
+{
+    return combine4(r, g, b, a);
+}
+
+//
 // arithmetic operators
 //
 

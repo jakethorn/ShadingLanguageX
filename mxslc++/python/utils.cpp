@@ -6,7 +6,7 @@
 
 #include "Primitive.h"
 #include "runtime/interface.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace utils
 {
@@ -198,16 +198,19 @@ namespace utils
 
     py::object to_py_variable(const VarPtr& var)
     {
-        if (var->is_basic())
+        if (var->is_compile_time())
         {
-            return to_py_primitive(var->basic());
-        }
-        else if (var->has_children())
-        {
-            py::list children;
-            for (const VarPtr& child : var->children())
-                children.append(to_py_variable(child));
-            return children;
+            if (var->has_value())
+            {
+                return to_py_primitive(var->compile_time_value());
+            }
+            else
+            {
+                py::list children;
+                for (const VarPtr& child : var->children())
+                    children.append(to_py_variable(child));
+                return children;
+            }
         }
         else
         {

@@ -8,7 +8,7 @@
 #include "runtime/utils/invoke.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::expressions
 {
@@ -21,7 +21,7 @@ namespace mxslc::expressions
             field_var_ = runtime_utils::invoke_method(types, var_, property);
 
         if (field_var_ == nullptr)
-            throw CompileError{"Expression of type " + var_->type()->str() + " does not have a field or parameterless method with the name " + property};
+            throw CompileError{"Variable of type '" + var_->type()->to_string() + "' does not have a field or parameterless method with the name: " + property};
     }
 
     FieldAccessor::FieldAccessor(VarPtr var, int index) : var_{std::move(var)}

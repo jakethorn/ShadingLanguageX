@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" />
+    <input name="nonlocal_in__x__0" type="float" />
+    <input name="nonlocal_in__y" type="vector2" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <extract name="var__0" type="float">
+      <input name="in" type="vector2" interfacename="nonlocal_in__y" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <add name="var__1" type="float">
+      <input name="in1" type="float" interfacename="nonlocal_in__x__0" />
+      <input name="in2" type="float" nodename="var__0" />
+    </add>
+    <output name="out" type="float" nodename="var__1" />
+  </nodegraph>
+  <foo name="var__0" type="float">
+    <input name="nonlocal_in__x__0" type="float" value="3" />
+    <input name="nonlocal_in__y" type="vector2" value="0, 0" />
+  </foo>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" nodename="var__0" />
+  </constant>
+</materialx>

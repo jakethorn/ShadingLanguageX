@@ -1,0 +1,2 @@
+vec3 v;
+vec2 a = v.xw;

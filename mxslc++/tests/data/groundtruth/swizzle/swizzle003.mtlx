@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="outparam__wy" type="vector2" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <combine2 name="var__0" type="vector2">
+      <input name="in1" type="float" value="3" />
+      <input name="in2" type="float" value="2" />
+    </combine2>
+    <output name="outparam__wy" type="vector2" nodename="var__0" />
+  </nodegraph>
+  <foo name="var__0" type="vector2" />
+  <separate4 name="var__1" type="multioutput">
+    <input name="in" type="vector4" value="0, 0, 0, 0" />
+  </separate4>
+  <separate2 name="var__2" type="multioutput">
+    <input name="in" type="vector2" output="outparam__wy" nodename="var__0" />
+  </separate2>
+  <combine4 name="var__3" type="vector4">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__2" />
+    <input name="in3" type="float" output="outz" nodename="var__1" />
+    <input name="in4" type="float" output="outx" nodename="var__2" />
+  </combine4>
+  <constant name="var__4" type="vector4">
+    <input name="value" type="vector4" nodename="var__3" />
+  </constant>
+</materialx>

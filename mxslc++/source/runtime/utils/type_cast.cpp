@@ -10,12 +10,10 @@
 #include "runtime/interface.h"
 #include "runtime/utils/invoke.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::runtime_utils
 {
-    using string_utils::str;
-
     VarPtr type_cast(const TypePtr& type, const VarPtr& value, const bool force)
     {
         if (value->type()->equals(type, force))
@@ -33,7 +31,7 @@ namespace mxslc::runtime_utils
         }
         else
         {
-            cast_value = invoke_function(type, "separate" + str(type->field_count()), value);
+            cast_value = invoke_function(type, "separate" + std::to_string(type->field_count()), value);
         }
 
         assert(cast_value->type()->equals(type));

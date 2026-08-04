@@ -30,7 +30,11 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
     fs::path response_path = input_path;
     response_path.replace_extension(".rsp");
     if (fs::is_regular_file(response_path))
-        opts = mxslc::parse_cli_args(response_path).options;
+    {
+        const mxslc::CommandLineArgs args = mxslc::parse_cli_args(response_path);
+        ASSERT_TRUE(args.is_valid) << "Errors in response file: " << response_path.string();
+        opts = args.options;
+    }
 
     const string actual_output = mxslc::compile_to_string(input_path, opts);
 

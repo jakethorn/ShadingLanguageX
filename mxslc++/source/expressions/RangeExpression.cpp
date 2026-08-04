@@ -7,7 +7,7 @@
 #include "expressions/interface.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
 
 namespace mxslc::expressions
@@ -61,9 +61,9 @@ namespace mxslc::expressions
 
     void RangeExpression::init_impl(const vector<TypePtr>& types)
     {
-        Primitive lower = lower_expr_->evaluate()->basic();
-        Primitive step = step_expr_ ? step_expr_->evaluate()->basic() : 1;
-        Primitive upper = upper_expr_->evaluate()->basic();
+        Primitive lower = lower_expr_->evaluate()->compile_time_value();
+        Primitive step = step_expr_ ? step_expr_->evaluate()->compile_time_value() : 1;
+        Primitive upper = upper_expr_->evaluate()->compile_time_value();
 
         vector<Primitive> result;
         while (lower <= upper)

@@ -28,6 +28,7 @@ namespace mxslc::runtime
         const AttributeList& attributes() const { return attrs_; }
         const ModifierList& modifiers() const { return mods_; }
         bool is_const() const { return mods_.contains(TokenType::Const); }
+        bool is_comptime() const { return mods_.contains(TokenType::Comptime); }
         bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
         bool is_in() const { return not mods_.contains(TokenType::Out); }
         bool is_out() const { return mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out); }

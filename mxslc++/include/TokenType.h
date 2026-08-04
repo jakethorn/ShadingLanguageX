@@ -80,6 +80,7 @@ namespace mxslc
             Geomprop,
             Inline,
             Default,
+            Comptime,
             Using,
             Class,
             This,
@@ -116,7 +117,7 @@ namespace mxslc
 
         inline static const unordered_set Keywords {
             If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Inline, Default,
-            Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
+            Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
         };
 
     private:
@@ -157,6 +158,7 @@ namespace mxslc
             {"geomprop", Geomprop},
             {"inline", Inline},
             {"default", Default},
+            {"comptime", Comptime},
             {"using", Using},
             {"class", Class},
             {"this", This},

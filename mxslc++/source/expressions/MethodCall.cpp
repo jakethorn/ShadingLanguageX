@@ -8,7 +8,7 @@
 #include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "serialize/serializer_utils.h"
 #include "serialize/values/interface.h"
 

@@ -1,0 +1,1 @@
+bad_swizzle001.mxsl, line 2: Variable of type 'vector3' does not have a port or valid swizzle with the name: r

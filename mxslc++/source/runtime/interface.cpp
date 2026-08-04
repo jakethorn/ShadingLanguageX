@@ -4,12 +4,12 @@
 
 #include "runtime/interface.h"
 
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/type_utils.h"
 #include "serialize/values/interface.h"
 #include "serialize/serializer_utils.h"
 #include "serialize/values/Value.h"
-#include "serialize/values/BasicValue.h"
+#include "serialize/values/CompileTimeValue.h"
 
 namespace mxslc::runtime
 {
@@ -77,7 +77,7 @@ namespace mxslc::runtime
 
     VarPtr create_variable(ModifierList mods, Primitive value)
     {
-        BasicValuePtr basic_value = create_value(std::move(value));
+        CompileTimeValuePtr basic_value = create_value(std::move(value));
         return create_variable(std::move(mods), std::move(basic_value));
     }
 
@@ -94,11 +94,6 @@ namespace mxslc::runtime
     VarPtr create_variable(TypePtr type, const VarPtr& value)
     {
         return create_variable(ModifierList{}, std::move(type), value);
-    }
-
-    VarPtr create_variable(TypePtr type)
-    {
-        return serialize_utils::create_basic_value(std::move(type));
     }
 
     VarPtr create_variable(const vector<VarPtr>& children)
@@ -124,7 +119,7 @@ namespace mxslc::runtime
 
     VarPtr create_variable(Primitive value)
     {
-        BasicValuePtr basic_value = create_value<BasicValue>(std::move(value));
+        CompileTimeValuePtr basic_value = create_value<CompileTimeValue>(std::move(value));
         return create_variable(std::move(basic_value));
     }
 
@@ -134,5 +129,17 @@ namespace mxslc::runtime
         if (value->is_external())
             copy->set_is_external();
         return copy;
+    }
+
+    VarPtr create_variable(ModifierList mods, TypePtr type)
+    {
+        VarPtr var = create_variable(std::move(type));
+        var->set_modifiers(std::move(mods));
+        return var;
+    }
+
+    VarPtr create_variable(TypePtr type)
+    {
+        return serialize_utils::create_compile_time_value(std::move(type));
     }
 }
