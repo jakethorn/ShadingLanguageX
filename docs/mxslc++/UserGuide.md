@@ -153,7 +153,7 @@ Python bindings are available on PyPI and can be downloaded using pip:
 pip install mxslcxx
 ```
 
-OS: Linux, MacOS and Windows.
+OS: Linux, MacOS and Windows.  
 Python version: 3.9+.
 
 ```python
@@ -218,7 +218,7 @@ Create a Python virtual environment, install the required dependencies and build
 
 ```bash
 sudo apt install python3-pip python3-venv
-python3 -m venv .build-venv
+python -m venv .build-venv
 source .build-venv/bin/activate
 python -m pip install --upgrade pip build scikit-build-core pybind11
 python -m build --wheel --config-setting=cmake.define.MTLX_ROOT=/path/to/MaterialX/install
@@ -228,7 +228,7 @@ deactivate
 Test the wheel by installing it in a new virtual environment:
 
 ```bash
-python3 -m venv .test-venv
+python -m venv .test-venv
 source .test-venv/bin/activate
 python -m pip install dist/mxslcxx-*.whl
 python -c "import mxslc; print(mxslc.compile_string_to_string('float f = randomfloat() + 1.0;'));"
@@ -242,6 +242,31 @@ python -c "import mxslc; print(mxslc.compile_string_to_string('float f = randomf
     <input name="in2" type="float" value="1" />
   </add>
 </materialx>
+```
+
+### Running the Tests
+
+To run the C++ tests, instead build with `BUILD_TESTING` enabled:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DMTLX_ROOT=/path/to/MaterialX/install -DBUILD_TESTING=ON
+cmake --build build --config Release
+```
+
+Then run the GTest executable:
+
+```bash
+./build/tests/mxslc_tests
+```
+
+To run the Python tests:
+
+```bash
+python -m venv .test-venv
+source .test-venv/bin/activate
+python -m pip install dist/mxslcxx-*.whl
+python -m pip install --upgrade pytest MaterialX
+python -m pytest python/tests -vv
 ```
 
 # Getting Started
