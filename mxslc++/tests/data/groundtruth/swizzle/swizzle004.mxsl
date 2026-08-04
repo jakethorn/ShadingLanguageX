@@ -1,0 +1,8 @@
+mutable color3 c;
+
+inline color3 foo()
+{
+    return c.rrr * 2.0;
+}
+
+c.bgr = foo();

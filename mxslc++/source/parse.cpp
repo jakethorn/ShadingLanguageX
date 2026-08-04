@@ -389,13 +389,14 @@ namespace mxslc
     ModifierList Parser::modifiers()
     {
         const vector<Token> mod_tokens = consume_while(
-            TokenType::Const, 
-            TokenType::Mutable, 
-            TokenType::Global, 
-            TokenType::Geomprop, 
-            TokenType::Inline, 
-            TokenType::Default, 
-            TokenType::Ref, 
+            TokenType::Const,
+            TokenType::Mutable,
+            TokenType::Global,
+            TokenType::Geomprop,
+            TokenType::Inline,
+            TokenType::Default,
+            TokenType::Comptime,
+            TokenType::Ref,
             TokenType::Out
         );
 
@@ -463,7 +464,12 @@ namespace mxslc
 
     ExprPtr Parser::expression()
     {
-        return logical();
+        const bool is_comptime = consume(TokenType::Comptime).has_value();
+
+        ExprPtr expr = logical();
+        if (is_comptime)
+            expr->set_modifiers(TokenType::Comptime);
+        return expr;
     }
 
     ExprPtr Parser::logical()

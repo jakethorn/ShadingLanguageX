@@ -11,7 +11,7 @@
 #include "runtime/interface.h"
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"

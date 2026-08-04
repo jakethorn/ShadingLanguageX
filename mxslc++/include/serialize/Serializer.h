@@ -24,6 +24,8 @@ namespace mxslc::serialize
         Serializer() : Serializer{mx::createDocument()} { }
         explicit Serializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
+        bool reduce_graph() const { return reduce_graph_; }
+
         void set_version(const string& version);
         void set_reduce_graph(const bool value) { reduce_graph_ = value; }
 

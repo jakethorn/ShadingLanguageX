@@ -24,7 +24,11 @@ constexpr bool overwrite_data_files()
 
 inline fs::path get_test_data_dir()
 {
+#ifdef TEST_ROOT
+    return fs::path(TEST_ROOT) / "data";
+#else
     return fs::current_path() / "tests" / "data";
+#endif
 }
 
 inline fs::path get_test_data(const string& relative_filepath)

@@ -54,13 +54,15 @@ namespace mxslc::runtime
     VarPtr create_variable(TypePtr type, const vector<VarPtr>& children);
     VarPtr create_variable(TypePtr type, ValuePtr value);
     VarPtr create_variable(TypePtr type, const VarPtr& value);
-    VarPtr create_variable(TypePtr type);
 
     VarPtr create_variable(const vector<VarPtr>& children);
     VarPtr create_variable(const vector<Primitive>& children);
     VarPtr create_variable(ValuePtr value);
     VarPtr create_variable(Primitive value);
     VarPtr create_variable(const VarPtr& value);
+
+    VarPtr create_variable(ModifierList mods, TypePtr type);
+    VarPtr create_variable(TypePtr type);
 }
 
 #endif //MXSLC_RUNTIME_INTERFACE_H

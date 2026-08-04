@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="string">
+    <input name="value" type="string" value="hello/*thisisnotacomment*/world" />
+  </constant>
+  <constant name="var__1" type="string">
+    <input name="value" type="string" value="helloworld//thisisnotacomment" />
+  </constant>
+</materialx>

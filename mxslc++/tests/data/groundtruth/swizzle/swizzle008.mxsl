@@ -1,0 +1,5 @@
+color3 c;
+constant(c.r);
+constant(c.g);
+constant(c.b);
+constant(c.r + c.g + c.b);

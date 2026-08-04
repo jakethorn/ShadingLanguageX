@@ -1,0 +1,1 @@
+bad_swizzle004.mxsl, line 2: Variable of type 'vector3' does not have a port or valid swizzle with the name: xyw

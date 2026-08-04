@@ -1,2 +1,2 @@
-tests/data/groundtruth/entry_func/entry002.mxsl -f my_main -a -1.1
+entry002.mxsl -f my_main -a -1.1
 --no-reduce-graph

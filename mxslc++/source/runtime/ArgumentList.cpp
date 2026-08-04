@@ -6,7 +6,7 @@
 
 #include "runtime/Parameter.h"
 #include "runtime/ParameterList.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "errors/CompileError.h"
 
@@ -36,6 +36,11 @@ namespace mxslc::runtime
     }
 
     ArgumentList::ArgumentList(const VarPtr& value)
+    {
+        args_.emplace_back(value, 0);
+    }
+
+    ArgumentList::ArgumentList(const ValuePtr& value)
     {
         args_.emplace_back(value, 0);
     }

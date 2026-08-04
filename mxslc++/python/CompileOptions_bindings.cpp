@@ -7,7 +7,7 @@
 #include "utils.h"
 
 #include "CompileOptions.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 
 void bind_compile_options(py::module_& m)
 {

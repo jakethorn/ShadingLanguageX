@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <separate2 name="var__0" type="multioutput">
+    <input name="in" type="vector2" value="0, 0" />
+  </separate2>
+  <combine4 name="b" type="vector4">
+    <input name="in1" type="float" output="outx" nodename="var__0" />
+    <input name="in2" type="float" output="outx" nodename="var__0" />
+    <input name="in3" type="float" output="outy" nodename="var__0" />
+    <input name="in4" type="float" output="outy" nodename="var__0" />
+  </combine4>
+  <separate2 name="var__1" type="multioutput">
+    <input name="in" type="vector2" value="0, 0" />
+  </separate2>
+  <combine4 name="c" type="vector4">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outx" nodename="var__1" />
+    <input name="in3" type="float" output="outx" nodename="var__1" />
+    <input name="in4" type="float" output="outx" nodename="var__1" />
+  </combine4>
+  <separate2 name="var__2" type="multioutput">
+    <input name="in" type="vector2" value="0, 0" />
+  </separate2>
+  <combine3 name="d" type="vector3">
+    <input name="in1" type="float" output="outy" nodename="var__2" />
+    <input name="in2" type="float" output="outy" nodename="var__2" />
+    <input name="in3" type="float" output="outy" nodename="var__2" />
+  </combine3>
+</materialx>

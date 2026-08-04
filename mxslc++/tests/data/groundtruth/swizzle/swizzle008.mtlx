@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodename="var__1" />
+  </constant>
+  <extract name="var__1" type="float">
+    <input name="in" type="color3" value="0, 0, 0" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" nodename="var__3" />
+  </constant>
+  <extract name="var__3" type="float">
+    <input name="in" type="color3" value="0, 0, 0" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <constant name="var__4" type="float">
+    <input name="value" type="float" nodename="var__5" />
+  </constant>
+  <extract name="var__5" type="float">
+    <input name="in" type="color3" value="0, 0, 0" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <extract name="var__6" type="float">
+    <input name="in" type="color3" value="0, 0, 0" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="var__7" type="float">
+    <input name="in" type="color3" value="0, 0, 0" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <add name="var__8" type="float">
+    <input name="in1" type="float" nodename="var__6" />
+    <input name="in2" type="float" nodename="var__7" />
+  </add>
+  <extract name="var__9" type="float">
+    <input name="in" type="color3" value="0, 0, 0" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <add name="var__10" type="float">
+    <input name="in1" type="float" nodename="var__8" />
+    <input name="in2" type="float" nodename="var__9" />
+  </add>
+  <constant name="var__11" type="float">
+    <input name="value" type="float" nodename="var__10" />
+  </constant>
+</materialx>

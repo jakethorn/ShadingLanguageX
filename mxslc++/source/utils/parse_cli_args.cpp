@@ -11,6 +11,7 @@
 #include "common.h"
 #include "utils/parse_utils.h"
 #include "utils/container_utils.h"
+#include "utils/io_utils.h"
 #include "utils/Span.h"
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
@@ -148,12 +149,22 @@ options:
                 clargs.action = to_action(argv.pop_front());
         }
 
-        void parse_input_file(Span<string>& argv, CommandLineArgs& clargs)
+        void parse_input_file(Span<string>& argv, CommandLineArgs& clargs, const vector<fs::path>& search_dirs)
         {
-            clargs.input_file = fs::absolute(argv.pop_front()).lexically_normal();
-            clargs.is_valid = fs::is_regular_file(clargs.input_file);
-            if (not clargs.is_valid)
-                print_error("Invalid input file path: " + clargs.input_file.string());
+            const fs::path path = argv.pop_front();
+            for (const fs::path& dir : search_dirs)
+            {
+                fs::path abs_path = fs::absolute(dir / path).lexically_normal();
+                if (fs::is_regular_file(abs_path))
+                {
+                    clargs.input_file = std::move(abs_path);
+                    clargs.is_valid = true;
+                    return;
+                }
+            }
+
+            clargs.is_valid = false;
+            print_error("Invalid input file path: " + path.string());
         }
 
         void parse_output_file(Span<string>& argv, CommandLineArgs& clargs)
@@ -314,6 +325,11 @@ options:
 
     CommandLineArgs parse_cli_args(const vector<string>& argv)
     {
+        return parse_cli_args(argv, io_utils::get_default_search_directories());
+    }
+
+    CommandLineArgs parse_cli_args(const vector<string>& argv, const vector<fs::path>& search_dirs)
+    {
         Span args{argv, 1};
 
         if (args.empty())
@@ -340,7 +356,7 @@ options:
         }
 
         parse_action(args, clargs);
-        parse_input_file(args, clargs);
+        parse_input_file(args, clargs, search_dirs);
         while (clargs.is_valid and not args.empty())
             parse_arg(args, clargs);
 
@@ -369,6 +385,7 @@ options:
             return CommandLineArgs::invalid();
         }
 
-        return parse_cli_args(argv);
+        const vector<fs::path> search_dirs = io_utils::get_default_search_directories(response_path);
+        return parse_cli_args(argv, search_dirs);
     }
 }

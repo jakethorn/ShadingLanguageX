@@ -7,7 +7,7 @@
 #include "statements/VariableDefinition.h"
 #include "expressions/Identifier.h"
 #include "expressions/interface.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "statements/interface.h"
 
 namespace mxslc::expressions

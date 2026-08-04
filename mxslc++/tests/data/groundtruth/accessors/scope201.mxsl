@@ -1,0 +1,15 @@
+mutable float f = 2.0;
+
+void foo()
+{
+    inline void bar(ref float g)
+    {
+        g = 3.0;
+    }
+
+    bar(f);
+}
+
+constant(f);
+foo();
+constant(f);

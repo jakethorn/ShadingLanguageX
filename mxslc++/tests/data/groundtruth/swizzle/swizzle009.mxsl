@@ -1,0 +1,4 @@
+vec2 a;
+vec4 b = a.xxyy;
+vec4 c = a.xxxx;
+vec3 d = a.yyy;

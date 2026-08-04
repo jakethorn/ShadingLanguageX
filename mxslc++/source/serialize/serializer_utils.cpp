@@ -16,7 +16,7 @@
 #include "serialize/values/NodeGraphValue.h"
 #include "serialize/values/NodeOutputValue.h"
 #include "serialize/values/NodeValue.h"
-#include "serialize/values/BasicValue.h"
+#include "serialize/values/CompileTimeValue.h"
 #include "utils/mtlx_utils.h"
 
 namespace mxslc::serialize_utils
@@ -145,12 +145,12 @@ namespace mxslc::serialize_utils
         }
     }
 
-    VarPtr create_basic_value(Primitive value)
+    VarPtr create_compile_time_value(Primitive value)
     {
         return create_variable(std::move(value));
     }
 
-    VarPtr create_basic_value(TypePtr type)
+    VarPtr create_compile_time_value(TypePtr type)
     {
         if (type->is_auto())
             throw CompileError{"Cannot create default value for variable of type auto"};
@@ -161,7 +161,7 @@ namespace mxslc::serialize_utils
             fields_values.reserve(type->field_count());
             for (size_t i = 0; i < type->field_count(); ++i)
             {
-                VarPtr field_value = create_basic_value(type->field_type(i));
+                VarPtr field_value = create_compile_time_value(type->field_type(i));
                 fields_values.push_back(std::move(field_value));
             }
 
@@ -200,7 +200,7 @@ namespace mxslc::serialize_utils
 
         if (port->hasValue())
         {
-            return create_value<BasicValue>(port->getValue());
+            return create_value<CompileTimeValue>(port->getValue());
         }
 
         throw CompileError{"Port does not have a value"};

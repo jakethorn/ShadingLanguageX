@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="integer">
+    <input name="value" type="integer" value="4" />
+  </constant>
+</materialx>

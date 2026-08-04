@@ -29,6 +29,7 @@ namespace mxslc
 
     CommandLineArgs parse_cli_args(int argc, char* argv[]);
     CommandLineArgs parse_cli_args(const vector<string>& argv);
+    CommandLineArgs parse_cli_args(const vector<string>& argv, const vector<fs::path>& search_dirs);
     CommandLineArgs parse_cli_args(const fs::path& response_path);
 }
 

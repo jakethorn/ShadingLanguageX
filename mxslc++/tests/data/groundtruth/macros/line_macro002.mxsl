@@ -1,0 +1,9 @@
+#if 0
+constant(__LINE__);
+constant(__LINE__);
+constant(__LINE__);
+#else
+constant(__LINE__);
+constant(__LINE__);
+constant(__LINE__);
+#endif

@@ -1,0 +1,19 @@
+mutable vec4 v;
+
+vec2 f1()
+{
+    inline vec2 f2()
+    {
+        vec2 f3()
+        {
+            vec2 v = v.xy + v.zw;
+            return v;
+        }
+
+        return f3();
+    }
+
+    return f2();
+}
+
+v.yz = f1();

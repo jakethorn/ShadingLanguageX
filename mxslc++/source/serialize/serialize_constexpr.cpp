@@ -9,7 +9,7 @@
 #include "runtime/interface.h"
 #include "utils/primitive_utils.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "serialize/serialize_constexpr_wrapper.h"
 #include "utils/container_utils.h"
 
@@ -37,6 +37,7 @@ namespace mxslc::serialize
             {"separate4", wrap(primitive_utils::separate)},
             {"convert", wrap(primitive_utils::convert)},
             {"extract", wrap(primitive_utils::extract)},
+            {"invert", wrap(primitive_utils::invert)},
             {"creatematrix", wrap_creatematrix()},
             {"invertmatrix", wrap(primitive_utils::invertmatrix)},
             {"switch", wrap_switch()},
@@ -49,8 +50,8 @@ namespace mxslc::serialize
 
             for (const auto& [param, input_value] : input_values)
             {
-                if (input_value->is_basic())
-                    basic_values.push_back(input_value->basic());
+                if (input_value->is_compile_time())
+                    basic_values.push_back(input_value->compile_time_value());
                 else
                     return false;
             }

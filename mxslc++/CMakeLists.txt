@@ -44,7 +44,7 @@ if(DEFINED SKBUILD)
         add_subdirectory(python)
 endif()
 
-# -------- main --------
+# -------- mxslc --------
 add_executable(mxslc main.cpp)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

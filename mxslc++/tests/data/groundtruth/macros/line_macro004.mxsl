@@ -1,0 +1,3 @@
+constant(__LINE__);
+#include "line_macro001.mxsl"
+constant(__LINE__);

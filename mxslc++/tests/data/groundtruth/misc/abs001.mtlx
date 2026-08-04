@@ -2,6 +2,7 @@
 <materialx version="1.39">
   <invert name="var__0" type="float">
     <input name="in" type="float" value="5" />
+    <input name="amount" type="float" value="0" />
   </invert>
   <absval name="a" type="float">
     <input name="in" type="float" nodename="var__0" />

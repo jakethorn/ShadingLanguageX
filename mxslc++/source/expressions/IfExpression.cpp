@@ -9,7 +9,7 @@
 #include "expressions/interface.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/invoke.h"
 
 namespace mxslc::expressions
@@ -74,8 +74,8 @@ namespace mxslc::expressions
     {
         const VarPtr cond = cond_expr_->evaluate();
 
-        if (cond->is_basic<bool>())
-            return cond->basic<bool>() ? then_expr_->evaluate() : else_expr_->evaluate();
+        if (cond->is_compile_time<bool>())
+            return cond->compile_time_value<bool>() ? then_expr_->evaluate() : else_expr_->evaluate();
 
         const VarPtr then = then_expr_->evaluate();
         const VarPtr else_ = else_expr_->evaluate();

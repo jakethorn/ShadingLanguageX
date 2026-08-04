@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out__0" type="float" />
+    <output name="out__1" type="float" />
+    <input name="nonlocal_in__y" type="vector2" />
+    <output name="nonlocal_out__y" type="vector2" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <extract name="x" type="float">
+      <input name="in" type="vector2" interfacename="nonlocal_in__y" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <combine2 name="var__0" type="vector2">
+      <input name="in1" type="float" value="3" />
+      <input name="in2" type="float" value="3" />
+    </combine2>
+    <extract name="var__1" type="float">
+      <input name="in" type="vector2" nodename="var__0" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <output name="nonlocal_out__y" type="vector2" nodename="var__0" />
+    <output name="out__0" type="float" nodename="var__1" />
+    <output name="out__1" type="float" nodename="x" />
+  </nodegraph>
+  <foo name="var__0" type="multioutput">
+    <input name="nonlocal_in__y" type="vector2" value="0, 0" />
+  </foo>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" output="out__0" nodename="var__0" />
+  </constant>
+  <foo name="var__2" type="multioutput">
+    <input name="nonlocal_in__y" type="vector2" output="nonlocal_out__y" nodename="var__0" />
+  </foo>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" output="out__1" nodename="var__2" />
+  </constant>
+</materialx>

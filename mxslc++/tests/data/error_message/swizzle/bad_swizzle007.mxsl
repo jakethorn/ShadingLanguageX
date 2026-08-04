@@ -1,0 +1,2 @@
+color3 c;
+constant(c.rg);

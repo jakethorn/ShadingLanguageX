@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="color3" />
+    <input name="nonlocal_in__c" type="color3" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <separate3 name="var__0" type="multioutput">
+      <input name="in" type="color3" interfacename="nonlocal_in__c" />
+    </separate3>
+    <combine3 name="var__1" type="color3">
+      <input name="in1" type="float" output="outr" nodename="var__0" />
+      <input name="in2" type="float" output="outr" nodename="var__0" />
+      <input name="in3" type="float" output="outr" nodename="var__0" />
+    </combine3>
+    <multiply name="var__2" type="color3">
+      <input name="in1" type="color3" nodename="var__1" />
+      <input name="in2" type="float" value="2" />
+    </multiply>
+    <output name="out" type="color3" nodename="var__2" />
+  </nodegraph>
+  <foo name="var__0" type="color3">
+    <input name="nonlocal_in__c" type="color3" value="0, 0, 0" />
+  </foo>
+  <separate3 name="var__1" type="multioutput">
+    <input name="in" type="color3" value="0, 0, 0" />
+  </separate3>
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="color3" nodename="var__0" />
+  </separate3>
+  <combine3 name="var__3" type="color3">
+    <input name="in1" type="float" output="outb" nodename="var__2" />
+    <input name="in2" type="float" output="outg" nodename="var__2" />
+    <input name="in3" type="float" output="outr" nodename="var__2" />
+  </combine3>
+</materialx>

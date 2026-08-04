@@ -1,0 +1,2 @@
+vec3 v;
+vec3 u = v.xy;

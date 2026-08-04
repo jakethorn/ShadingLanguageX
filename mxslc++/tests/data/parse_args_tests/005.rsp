@@ -1,1 +1,1 @@
-tests/data/parse_args_tests/001.mxsl -a "hello world" -3.4 123
+001.mxsl -a "hello world" -3.4 123

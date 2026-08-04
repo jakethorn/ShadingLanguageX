@@ -1,0 +1,1 @@
+bad_swizzle007.mxsl, line 2: Invalid swizzle: rg

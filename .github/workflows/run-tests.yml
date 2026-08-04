@@ -1,0 +1,90 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test_cpp:
+    name: Run tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: Check out mxslc
+        uses: actions/checkout@v4
+
+      - name: Check out MaterialX
+        uses: actions/checkout@v4
+        with:
+          repository: AcademySoftwareFoundation/MaterialX
+          ref: v1.39.5
+          path: mxslc++/external/MaterialX
+
+      - name: Configure and Build MaterialX
+        run: >
+          cmake 
+          -S mxslc++/external/MaterialX 
+          -B mxslc++/external/MaterialX/build 
+          -DCMAKE_BUILD_TYPE=Release 
+          -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/mxslc++/external/MaterialX/install" 
+          -DCMAKE_POSITION_INDEPENDENT_CODE=ON 
+          -DMATERIALX_BUILD_PYTHON=OFF 
+          -DMATERIALX_BUILD_VIEWER=OFF 
+          -DMATERIALX_BUILD_GRAPH_EDITOR=OFF 
+          -DMATERIALX_BUILD_DOCS=OFF 
+          -DMATERIALX_BUILD_GEN_GLSL=OFF 
+          -DMATERIALX_BUILD_GEN_OSL=OFF 
+          -DMATERIALX_BUILD_GEN_MDL=OFF 
+          -DMATERIALX_BUILD_GEN_MSL=OFF 
+          -DMATERIALX_BUILD_GEN_SLANG=OFF 
+          -DMATERIALX_BUILD_RENDER=OFF 
+          -DMATERIALX_BUILD_RENDER_PLATFORMS=OFF 
+          -DMATERIALX_BUILD_OIIO=OFF 
+          -DMATERIALX_BUILD_OCIO=OFF 
+          -DMATERIALX_BUILD_TESTS=OFF 
+          -DMATERIALX_BUILD_BENCHMARK_TESTS=OFF 
+          -DMATERIALX_BUILD_OSOS=OFF 
+          -DMATERIALX_BUILD_PERFETTO_TRACING=OFF 
+          -DMATERIALX_BUILD_SHARED_LIBS=OFF 
+          -DMATERIALX_BUILD_DATA_LIBRARY=OFF 
+          -DMATERIALX_BUILD_MONOLITHIC=OFF 
+          -DMATERIALX_BUILD_USE_CCACHE=OFF 
+          -DMATERIALX_PYTHON_LTO=OFF 
+          -DMATERIALX_INSTALL_PYTHON=OFF 
+          -DMATERIALX_INSTALL_RESOURCES=OFF 
+          -DMATERIALX_TEST_RENDER=OFF 
+          -DMATERIALX_TEST_RENDER_GLSL=OFF 
+          -DMATERIALX_TEST_REFERENCE_QUALITY=OFF 
+          -DMATERIALX_WARNINGS_AS_ERRORS=OFF 
+          -DMATERIALX_COVERAGE_ANALYSIS=OFF 
+          -DMATERIALX_DYNAMIC_ANALYSIS=OFF
+
+      - name: Install MaterialX
+        run: cmake --build mxslc++/external/MaterialX/build --config Release --target install --parallel
+
+      - name: Configure mxslc (C++)
+        # Point CMake (-S) to the mxslc++ directory where your root CMakeLists.txt resides
+        run: >
+          cmake 
+          -S mxslc++ 
+          -B mxslc++/build 
+          -DCMAKE_BUILD_TYPE=Release 
+          -DMTLX_ROOT="${{ github.workspace }}/mxslc++/external/MaterialX/install"
+
+      - name: Build mxslc (C++)
+        run: cmake --build mxslc++/build --config Release --parallel
+
+      - name: Run C++ Tests
+        working-directory: ${{ github.workspace }}/mxslc++/build
+        run: ctest --output-on-failure --build-config Release

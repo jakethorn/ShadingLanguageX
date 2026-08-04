@@ -15,7 +15,7 @@ namespace mxslc::runtime
     Argument::Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, const size_t index)
         : attrs_{std::move(attrs)}, mods_{std::move(mods)}, name_{std::move(name)}, expr_{std::move(expr)}, index_{index}
     {
-        mods_.validate(TokenType::Ref, TokenType::Out);
+        mods_.validate(TokenType::Ref, TokenType::Out, TokenType::Comptime);
         if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
             throw CompileError{"An argument cannot be both ref and out"};
     }
@@ -33,6 +33,9 @@ namespace mxslc::runtime
         : Argument{string{}, std::move(expr), index} { }
 
     Argument::Argument(VarPtr value, const size_t index)
+        : Argument{as_expression(std::move(value)), index} { }
+
+    Argument::Argument(ValuePtr value, const size_t index)
         : Argument{as_expression(std::move(value)), index} { }
 
     Argument::Argument(Primitive value, const size_t index)

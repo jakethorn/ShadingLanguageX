@@ -1,0 +1,16 @@
+mutable vec2 y;
+
+inline {float, float} bar(ref vec2 vector)
+{
+    float x = vector[0];
+    vector = vec2{3.0, 3.0};
+    return {vector[0], x};
+}
+
+{float, float} foo()
+{
+    return bar(y);
+}
+
+constant(foo()[0]);
+constant(foo()[1]);

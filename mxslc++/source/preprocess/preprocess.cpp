@@ -60,7 +60,8 @@ namespace mxslc::preprocess
     void Preprocessor::preprocess()
     {
         set_current_working_directory();
-        define_inclusion_type_macro();
+        define_file_macros();
+        define_macro(LINE, 1);
 
         if (is_main())
         {
@@ -235,7 +236,9 @@ namespace mxslc::preprocess
             return;
         }
 
-        if (token != TokenType::Newline)
+        if (token == TokenType::Newline)
+            define_macro(LINE, token.line() + 1);
+        else
             add_token(std::move(token));
     }
 
@@ -255,13 +258,23 @@ namespace mxslc::preprocess
             included_files_.push_back(found_path);
             extend(included_files_, std::move(preprocessor.included_files_));
             set_current_working_directory();
-            define_inclusion_type_macro();
+            define_file_macros();
         });
     }
 
-    void Preprocessor::define_macro(const string& name, vector<Token> body) const
+    void Preprocessor::define_macro(string name) const
     {
-        opts_.add_macro({name, std::move(body)});
+        opts_.add_macro({std::move(name)});
+    }
+
+    void Preprocessor::define_macro(string name, const string& body) const
+    {
+        opts_.add_macro({std::move(name), body});
+    }
+
+    void Preprocessor::define_macro(string name, vector<Token> body) const
+    {
+        opts_.add_macro({std::move(name), std::move(body)});
     }
 
     void Preprocessor::undef_macro(const string& name) const
@@ -326,8 +339,13 @@ namespace mxslc::preprocess
             opts_.set_current_working_directory(path_->parent_path());
     }
 
-    void Preprocessor::define_inclusion_type_macro() const
+    void Preprocessor::define_file_macros() const
     {
+        if (path_)
+            define_macro(FILE, "\"" + path_->filename().string() + "\"");
+        else
+            define_macro(FILE);
+
         undef_macro(MAIN);
         undef_macro(INCLUDE);
 

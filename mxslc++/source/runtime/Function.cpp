@@ -10,7 +10,7 @@
 #include "statements/Statement.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
-#include "runtime/Variable.h"
+#include "runtime/variables/Variable.h"
 #include "runtime/utils/type_cast.h"
 #include "errors/CompileError.h"
 

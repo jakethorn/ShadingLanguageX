@@ -1,0 +1,2 @@
+#include "file_macro001.mxsl"
+constant(__FILE__);

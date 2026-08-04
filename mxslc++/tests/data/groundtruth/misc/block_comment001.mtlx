@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <geompropvalue name="f" type="float">
+    <input name="geomprop" type="string" value="f" />
+    <input name="default" type="float" value="1" />
+  </geompropvalue>
+  <randomfloat name="g" type="float" />
+  <normal name="n" type="vector3">
+    <input name="space" type="string" value="world" />
+  </normal>
+</materialx>

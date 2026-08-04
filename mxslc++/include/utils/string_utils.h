@@ -13,12 +13,6 @@ namespace mxslc::string_utils
 
     bool starts_with(const string& str, const string& prefix);
     bool starts_with(const string& str, const char* prefix);
-
-    template<typename T>
-    string str(const T& value)
-    {
-        return std::to_string(value);
-    }
 }
 
 #endif //FENNEC_STRING_UTILS_H
