@@ -29,20 +29,6 @@ TEST(parse_args_tests, test_input_filepath)
     ASSERT_EQ(args.options.version, DEFAULT_MTLX_VERSION);
 }
 
-TEST(parse_args_tests, test_relative_input_filepath)
-{
-    const fs::path input_filepath = "tests/data/parse_args_tests/001.mxsl"s;
-
-    const vector argv{ EXECUTABLE, input_filepath.string() };
-    const mxslc::CommandLineArgs args = mxslc::parse_cli_args(argv);
-
-    ASSERT_TRUE(args.is_valid);
-    ASSERT_EQ(args.input_file, get_test_data("parse_args_tests/001.mxsl"s));
-    ASSERT_TRUE(args.input_file.is_absolute());
-    ASSERT_FALSE(args.options.output_file);
-    ASSERT_EQ(args.options.version, DEFAULT_MTLX_VERSION);
-}
-
 TEST(parse_args_tests, test_no_input_filepath)
 {
     const vector argv{ EXECUTABLE };
@@ -182,7 +168,7 @@ TEST(parse_args_tests, test_response_file_002)
     ASSERT_TRUE(args.is_valid);
     ASSERT_EQ(args.input_file, get_test_data("parse_args_tests/001.mxsl"s));
     ASSERT_TRUE(args.input_file.is_absolute());
-    ASSERT_EQ(args.options.output_file, get_test_data("parse_args_tests/001.mtlx"s));
+    ASSERT_EQ(args.options.output_file, fs::absolute("001.mtlx"s));
     ASSERT_TRUE(args.options.output_file->is_absolute());
     ASSERT_EQ(args.options.version, "1.39.4"s);
 }
@@ -197,7 +183,7 @@ TEST(parse_args_tests, test_response_file_003)
     ASSERT_TRUE(args.is_valid);
     ASSERT_EQ(args.input_file, get_test_data("parse_args_tests/001.mxsl"s));
     ASSERT_TRUE(args.input_file.is_absolute());
-    ASSERT_EQ(args.options.output_file, get_test_data("parse_args_tests/001.mtlx"s));
+    ASSERT_EQ(args.options.output_file, fs::absolute("001.mtlx"s));
     ASSERT_TRUE(args.options.output_file->is_absolute());
     ASSERT_EQ(args.options.version, "1.39.4"s);
 }

@@ -41,3 +41,12 @@ target_compile_definitions(mxslc_tests PRIVATE
 
 include(GoogleTest)
 gtest_discover_tests(mxslc_tests)
+
+# -------- Copy libraries directory --------
+add_custom_command(
+        TARGET mxslc_tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/libraries"
+        "$<TARGET_FILE_DIR:mxslc_tests>/libraries"
+        COMMENT "Copying libraries directory for mxslc_tests"
+)

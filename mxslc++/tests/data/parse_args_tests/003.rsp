@@ -1,8 +1,8 @@
-tests/data/parse_args_tests/001.mxsl
+001.mxsl
 
 
 
-   -o tests/data/parse_args_tests/001.mtlx
+   -o 001.mtlx
 
 
 
