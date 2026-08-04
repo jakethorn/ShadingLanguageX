@@ -37,6 +37,7 @@ namespace mxslc::serialize
             {"separate4", wrap(primitive_utils::separate)},
             {"convert", wrap(primitive_utils::convert)},
             {"extract", wrap(primitive_utils::extract)},
+            {"invert", wrap(primitive_utils::invert)},
             {"creatematrix", wrap_creatematrix()},
             {"invertmatrix", wrap(primitive_utils::invertmatrix)},
             {"switch", wrap_switch()},

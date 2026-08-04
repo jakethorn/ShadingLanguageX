@@ -87,6 +87,7 @@ add_library(mxslc_lib
         utils/primitive_utils/combine.cpp
         utils/primitive_utils/convert.cpp
         utils/primitive_utils/extract.cpp
+        utils/primitive_utils/invert.cpp
         utils/primitive_utils/separate.cpp
         utils/primitive_utils/creatematrix.cpp
         utils/primitive_utils/invertmatrix.cpp
