@@ -266,6 +266,29 @@ def test_nodedef_metadata_roundtrip():
         )
         print(f"NodeDef checks passed for {len(doc_node_defs)} document nodedef(s)")
 
+        # Create downstream usage of an instance
+        instance = doc.addNode('mydefinition', 'mydefinition', 'multioutput')
+        nodedef = instance.getNodeDef()
+        nodedef_outputs = {o.getName(): o for o in nodedef.getActiveOutputs()}
+        for output_name, output in nodedef_outputs.items():
+            instance.addOutput(output.getName(), output.getType())
+        instance.setInputValue('input1', mx.Color3(0.5, 0.5, 0.5))
+        instance.setInputValue('input2', mx.Color3(0.1, 0.2, 0.3))
+
+        for output_name, output in nodedef_outputs.items():
+          downstream = doc.addNode('standard_surface', '', 'surfaceshader')
+          downstream.setConnectedNode('base_color', instance)
+          input = downstream.getInput('base_color')
+          input.setOutputString(output_name)
+
+        print("Document with instance usage:\n", mx.writeToXmlString(doc))
+
+        valid, error = doc.validate()
+        if not valid:
+            print("Document validation failed with the following errors:")
+            print(error)
+        assert valid, f"Instance usage validation failed: {error}"
+
     except ImportError:
         pass 
     
