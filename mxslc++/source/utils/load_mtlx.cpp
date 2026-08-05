@@ -24,22 +24,66 @@ namespace mxslc
 
     namespace
     {
+        string get_return_type_key(const mx::NodeDefPtr& nd)
+        {
+            const vector<mx::OutputPtr> outputs = nd->getActiveOutputs();
+
+            if (outputs.empty())
+                return nd->getType();
+
+            if (outputs.size() == 1)
+                return outputs.front()->getType();
+
+            string key;
+            for (const mx::OutputPtr& output : outputs)
+            {
+                if (not key.empty())
+                    key += "|";
+                key += output->getType();
+            }
+
+            return key;
+        }
+
         // Scan every nodedef in the loaded MaterialX document and pick the
-        // first definition read for each node category as the "default". This
-        // set is used to resolve the case where an MXSL signature can match
-        // more than one MTLX definition. Versioned nodedefs are reduced to
-        // their default version, matching how they are loaded.
+        // first definition read for each node category and return type pair as
+        // the "default", but only when there are multiple definitions for that
+        // pair. This keeps defaults focused on ambiguous overload groups.
+        // Versioned nodedefs are reduced to their default version, matching how
+        // they are loaded.
         unordered_set<string> get_default_node_defs(const mx::DocumentPtr& doc)
         {
-            unordered_set<string> seen_categories;
+            unordered_map<string, unordered_map<string, string>> first_by_category_and_type;
+            unordered_map<string, unordered_map<string, size_t>> counts_by_category_and_type;
             unordered_set<string> defaults;
+
             for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
             {
                 if (nd->hasVersionString() and not nd->getDefaultVersion())
                     continue;
-                if (seen_categories.insert(nd->getNodeString()).second)
-                    defaults.insert(nd->getName());
+
+                const string& category = nd->getNodeString();
+                const string return_type = get_return_type_key(nd);
+
+                auto& first_by_type = first_by_category_and_type[category];
+                auto& counts_by_type = counts_by_category_and_type[category];
+
+                if (not contains(first_by_type, return_type))
+                    first_by_type.emplace(return_type, nd->getName());
+
+                ++counts_by_type[return_type];
             }
+
+            for (const auto& [category, counts_by_type] : counts_by_category_and_type)
+            {
+                const auto& first_by_type = first_by_category_and_type.at(category);
+                for (const auto& [return_type, count] : counts_by_type)
+                {
+                    if (count > 1)
+                        defaults.insert(first_by_type.at(return_type));
+                }
+            }
+
             return defaults;
         }
 

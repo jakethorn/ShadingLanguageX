@@ -37,9 +37,13 @@ namespace mxslc::expressions
 
         input_ = mtlx_utils::add_or_get_input(node, input->getType(), input_name_);
 
-        // When the port was not set on the node, initialize it with the default
-        // value from the node definition so that reading the port yields a value.
-        if (not input_->hasValue() and input->hasValue())
+        // Only seed defaults for an unconnected, unset port. Connected inputs
+        // should not get a literal value injected alongside their connection.
+        if (not input_->hasValue()
+            and not input_->hasNodeName()
+            and not input_->hasNodeGraphString()
+            and not input_->hasInterfaceName()
+            and input->hasValue())
             input_->setValueString(input->getValueString());
     }
 
