@@ -36,6 +36,11 @@ namespace mxslc::expressions
             throw CompileError{"Variable of type '" + node_var_->type()->to_string() + "' does not have a port or valid swizzle with the name: " + input_name_};
 
         input_ = mtlx_utils::add_or_get_input(node, input->getType(), input_name_);
+
+        // When the port was not set on the node, initialize it with the default
+        // value from the node definition so that reading the port yields a value.
+        if (not input_->hasValue() and input->hasValue())
+            input_->setValueString(input->getValueString());
     }
 
     TypePtr PortAccessor::type() const

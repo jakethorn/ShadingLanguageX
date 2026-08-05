@@ -24,26 +24,24 @@ namespace mxslc
 
     namespace
     {
-        const unordered_set<string> DEFAULT_NODE_DEFS = {
-            "ND_randomfloat_float",
-            "ND_randomcolor_float",
-
-            "ND_invert_float",
-            "ND_invert_vector2",
-            "ND_invert_vector3",
-            "ND_invert_vector4",
-            "ND_invert_color3",
-            "ND_invert_color4",
-
-            "ND_switch_float",
-            "ND_switch_vector2",
-            "ND_switch_vector3",
-            "ND_switch_vector4",
-            "ND_switch_color3",
-            "ND_switch_color4",
-            "ND_switch_matrix33",
-            "ND_switch_matrix44",
-        };
+        // Scan every nodedef in the loaded MaterialX document and pick the
+        // first definition read for each node category as the "default". This
+        // set is used to resolve the case where an MXSL signature can match
+        // more than one MTLX definition. Versioned nodedefs are reduced to
+        // their default version, matching how they are loaded.
+        unordered_set<string> get_default_node_defs(const mx::DocumentPtr& doc)
+        {
+            unordered_set<string> seen_categories;
+            unordered_set<string> defaults;
+            for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
+            {
+                if (nd->hasVersionString() and not nd->getDefaultVersion())
+                    continue;
+                if (seen_categories.insert(nd->getNodeString()).second)
+                    defaults.insert(nd->getName());
+            }
+            return defaults;
+        }
 
         Parameter to_parameter(const mx::InputPtr& i, const size_t index)
         {
@@ -83,12 +81,12 @@ namespace mxslc
             return names;
         }
 
-        FuncPtr to_function(const mx::NodeDefPtr& nd)
+        FuncPtr to_function(const mx::NodeDefPtr& nd, const unordered_set<string>& default_node_defs)
         {
             const Scope& scope = Runtime::get().scope();
 
             ModifierList mods;
-            if (contains(DEFAULT_NODE_DEFS, nd->getName()))
+            if (contains(default_node_defs, nd->getName()))
                 mods.add(TokenType::Default);
 
             TypePtr type = get_type(nd);
@@ -112,11 +110,13 @@ namespace mxslc
             scope.add_primitive_type(td->getName());
         }
 
+        const unordered_set<string> default_node_defs = get_default_node_defs(doc);
+
         for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
         {
             if (nd->hasVersionString() and not nd->getDefaultVersion())
                 continue;
-            scope.add_function(to_function(nd));
+            scope.add_function(to_function(nd, default_node_defs));
         }
     }
 
