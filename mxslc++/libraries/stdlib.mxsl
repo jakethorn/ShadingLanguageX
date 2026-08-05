@@ -573,6 +573,11 @@ inline vector2 __vector2__<boolean, integer, float, vector3, vector4, color3, co
     return convert(in1);
 }
 
+inline vector2 __vector2__<boolean, integer, float, vector3, vector4, color3, color4>(comptime T in1)
+{
+    return comptime convert(in1);
+}
+
 inline vector2 __vector2__(float x, float y)
 {
     return combine2(x, y);

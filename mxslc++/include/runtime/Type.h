@@ -30,6 +30,9 @@ namespace mxslc::runtime
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
 
+        bool has_template_type() const { return template_type_ != nullptr; }
+        TypePtr template_type() const { return template_type_; }
+
         TypePtr monomorphize(const TypePtr& template_type) const override;
 
         void add_field(Field field);
@@ -96,6 +99,7 @@ namespace mxslc::runtime
 
     private:
         string name_;
+        TypePtr template_type_;
         vector<Field> fields_;
         vector<weak_ptr<Function>> methods_;
 
