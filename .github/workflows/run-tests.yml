@@ -15,10 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
+        include:
+          - os: ubuntu-latest
+          - os: windows-latest
+          - os: macos-14
+            generator: Ninja
+            cc: clang
+            cxx: clang++
 
     steps:
       - name: Check out mxslc
@@ -34,6 +37,9 @@ jobs:
       - name: Configure and Build MaterialX
         run: >
           cmake 
+          ${{ matrix.generator != '' && format('-G "{0}"', matrix.generator) || '' }}
+          ${{ matrix.cc != '' && format('-DCMAKE_C_COMPILER={0}', matrix.cc) || '' }}
+          ${{ matrix.cxx != '' && format('-DCMAKE_CXX_COMPILER={0}', matrix.cxx) || '' }}
           -S mxslc++/external/MaterialX 
           -B mxslc++/external/MaterialX/build 
           -DCMAKE_BUILD_TYPE=Release 
@@ -78,12 +84,13 @@ jobs:
         timeout-minutes: 20
         run: >
           cmake 
+          ${{ matrix.generator != '' && format('-G "{0}"', matrix.generator) || '' }}
+          ${{ matrix.cc != '' && format('-DCMAKE_C_COMPILER={0}', matrix.cc) || '' }}
+          ${{ matrix.cxx != '' && format('-DCMAKE_CXX_COMPILER={0}', matrix.cxx) || '' }}
           -S mxslc++ 
           -B mxslc++/build 
           -DCMAKE_BUILD_TYPE=Release 
-          -DMTLX_ROOT="${{ github.workspace }}/mxslc++/external/MaterialX/install" 
-          -DCMAKE_FIND_DEBUG_MODE=ON 
-          --log-level=VERBOSE
+          -DMTLX_ROOT="${{ github.workspace }}/mxslc++/external/MaterialX/install"
 
       - name: Build mxslc (C++)
         timeout-minutes: 30
