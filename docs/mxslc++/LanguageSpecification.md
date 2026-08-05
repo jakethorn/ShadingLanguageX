@@ -454,7 +454,20 @@ although we do not recommend the latter for readability reasons.
 
 # Comments
 
-Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
+Comments in ShadingLanguageX can take the form of: 
+```
+// this is a comment
+```
+or:
+```
+/*
+this
+is
+a
+block
+comment
+*/
+```
 
 # Operators
 
@@ -1141,7 +1154,7 @@ If not enough arguments are provided, the remaining components will be zero.
 
 # If Expression
 
-Unlike most languages, ShaderLanguageX has limited support for if statements but instead mainly uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
+Unlike most languages, ShadingLanguageX has limited support for if statements but instead mainly uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
 ternary operators (`cond ? then : else`) than true if statements that control the logic of the program. 
 This makes if expressions better suited for compiling to MaterialX nodes than if statements.
 
@@ -1249,7 +1262,7 @@ if (a > 0.5) // Error: runtime condition
 > ### Not yet supported in mxslc++
 > # Switch Expression
 > 
-> ShaderLanguageX does not support switch statements, but instead uses switch expressions, for the same reasons as if
+> ShadingLanguageX does not support switch statements, but instead uses switch expressions, for the same reasons as if
 > expressions above. They are similar to switch expressions found in the C# programming language.
 > 
 > ```

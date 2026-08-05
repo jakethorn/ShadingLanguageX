@@ -1,3 +1,19 @@
+# (mxslc++) Version 0.2.1
+
+* If expressions shortcut if the condition is known at compile time
+* If expressions can be used with user-defined types
+* Classes support multi-variable definition statements (e.g., `float x, y;`)
+* Added swizzles ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#swizzle))
+* Added block comments ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#comments))
+* Added `__LINE__` and `__FILE__` macros
+* Decompiler now decompiles attributes (contributed by [@kwok](https://github.com/kwokcb))
+* Improved float serialization (contributed by [@kwok](https://github.com/kwokcb))
+* Added VSCode extension tool (contributed by [@kwok](https://github.com/kwokcb))
+* Updated testing framework to make it easier for other users to run
+* Updated documentation
+* Various bug fixes
+
+
 # (mxslc++) Version 0.2.0
 
 * Added preprocessor directives ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#preprocessor-directives))
@@ -6,6 +22,7 @@
 * Added support for macos (contributed by [@kwok](https://github.com/kwokcb))
 * Added sample flask app (contributed by [@kwok](https://github.com/kwokcb))
 * Various bug fixes
+
 
 # (mxslc++) Version 0.1.3 - Version 0.1.6
 
