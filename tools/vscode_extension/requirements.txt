@@ -1,0 +1,2 @@
+# Requirements for gen_extension.py
+MaterialX>=1.39.4
