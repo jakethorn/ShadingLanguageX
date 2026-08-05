@@ -53,7 +53,7 @@ namespace mxslc
         // they are loaded.
         unordered_set<string> get_default_node_defs(const mx::DocumentPtr& doc)
         {
-            unordered_map<string, unordered_map<string, string>> first_by_category_and_type;
+            unordered_map<string, unordered_map<string, string>> best_by_category_and_type;
             unordered_map<string, unordered_map<string, size_t>> counts_by_category_and_type;
             unordered_set<string> defaults;
 
@@ -65,22 +65,30 @@ namespace mxslc
                 const string& category = nd->getNodeString();
                 const string return_type = get_return_type_key(nd);
 
-                auto& first_by_type = first_by_category_and_type[category];
+                auto& best_by_type = best_by_category_and_type[category];
                 auto& counts_by_type = counts_by_category_and_type[category];
 
-                if (not contains(first_by_type, return_type))
-                    first_by_type.emplace(return_type, nd->getName());
+                if (not contains(best_by_type, return_type))
+                {
+                    best_by_type.emplace(return_type, nd->getName());
+                }
+                else
+                {
+                    string& best_name = best_by_type.at(return_type);
+                    if (nd->getName() < best_name)
+                        best_name = nd->getName();
+                }
 
                 ++counts_by_type[return_type];
             }
 
             for (const auto& [category, counts_by_type] : counts_by_category_and_type)
             {
-                const auto& first_by_type = first_by_category_and_type.at(category);
+                const auto& best_by_type = best_by_category_and_type.at(category);
                 for (const auto& [return_type, count] : counts_by_type)
                 {
                     if (count > 1)
-                        defaults.insert(first_by_type.at(return_type));
+                        defaults.insert(best_by_type.at(return_type));
                 }
             }
 
