@@ -14,7 +14,7 @@ namespace mxslc::runtime
 {
     using runtime_utils::Monomorphizable;
 
-    class Field : public Monomorphizable<Field>, Stringable
+    class Field : public Monomorphizable<Field>, public Stringable
     {
         friend class Scope;
 

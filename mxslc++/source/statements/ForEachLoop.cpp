@@ -37,16 +37,16 @@ namespace mxslc::statements
     {
         const TypePtr type = scope().resolve_type(type_);
 
-        iter_expr_->set_subexpression_type(type);
-        iter_expr_->init();
-        if (not iter_expr_->type()->has_fields())
-            throw CompileError{"Value not iterable"};
+        const TypePtr iter_type = Type::tuple(type);
+        iter_expr_->init(iter_type);
         const VarPtr iter_value = iter_expr_->evaluate();
+        if (iter_value->has_value())
+            throw CompileError{"Expression is not iterable"};
 
         for (size_t i = 0; i < iter_value->child_count(); i++)
         {
             VarPtr next_value = iter_value->child(i);
-            if (not next_value->type()->is_compatible(type))
+            if (not next_value->type()->is_compatible_with(type))
                 throw CompileError{"Field value does not match loop iterator type"};
 
             runtime().enter_scope();

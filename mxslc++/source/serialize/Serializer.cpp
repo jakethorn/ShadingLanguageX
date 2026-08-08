@@ -62,7 +62,7 @@ namespace mxslc::serialize
             if (not func->is_defined())
                 return func->name();
 
-            const Scope* scope = &Runtime::get().scope().get_defining_scope(func);
+            const Scope* scope = func->defining_scope();
 
             string result;
             while (true)
@@ -75,7 +75,7 @@ namespace mxslc::serialize
                 }
                 if (not scope->has_parent())
                     break;
-                scope = &scope->parent();
+                scope = scope->parent();
             }
             if (func->has_class_type())
                 result += func->class_type()->name() + "_";

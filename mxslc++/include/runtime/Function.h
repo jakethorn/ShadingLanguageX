@@ -17,8 +17,10 @@ namespace mxslc::runtime
 {
     using runtime_utils::RuntimeAware;
 
-    class Function : protected RuntimeAware, public Stringable
+    class Function : public Stringable, protected RuntimeAware
     {
+        friend class Scope;
+
     public:
         Function(
             ModifierList mods,
@@ -63,6 +65,8 @@ namespace mxslc::runtime
         void set_node_graph(mx::NodeGraphPtr node_graph);
         vector<string> output_names() const;
 
+        Scope* defining_scope() const;
+
         void init();
 
         VarPtr invoke() const;
@@ -94,6 +98,7 @@ namespace mxslc::runtime
         mx::NodeDefPtr node_def_;
         mx::NodeGraphPtr node_graph_;
 
+        Scope* defining_scope_{nullptr};
         bool is_initialized_{false};
 
         vector<VarPtr> nonlocal_inputs_;

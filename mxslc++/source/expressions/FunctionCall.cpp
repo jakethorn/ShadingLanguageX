@@ -98,7 +98,7 @@ namespace mxslc::expressions
                     arg.reset();
 
                 if (current_scope->has_parent())
-                    current_scope = &current_scope->parent();
+                    current_scope = current_scope->parent();
                 else
                     current_scope = nullptr;
             }
@@ -306,7 +306,7 @@ namespace mxslc::expressions
         return initialized_arg_count;
     }
 
-    size_t FunctionCall::try_init_arguments(const FuncPtr &func)
+    size_t FunctionCall::try_init_arguments(const FuncPtr& func)
     {
         return try_init_arguments(vector<FuncPtr>{func});
     }

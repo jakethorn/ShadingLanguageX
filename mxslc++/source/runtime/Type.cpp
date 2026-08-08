@@ -56,6 +56,12 @@ namespace mxslc::runtime
         validate();
     }
 
+    Type::Type(string name, TypePtr template_type)
+        : name_{std::move(name)}, template_type_{std::move(template_type)}
+    {
+
+    }
+
     Type::Type(const TypePtr& field_type, const size_t field_count)
     {
         fields_.reserve(field_count);
@@ -160,9 +166,23 @@ namespace mxslc::runtime
 
             return vec_type.component_count() == type.field_count();
         }
+
+        bool is_tuple_compatible(const Type& tuple_type, const Type& type)
+        {
+            if (not type.has_fields())
+                return false;
+
+            for (const Field& field : type.fields())
+            {
+                if (not field.type()->equals(tuple_type.template_type()))
+                    return false;
+            }
+
+            return true;
+        }
     }
 
-    bool Type::is_compatible(const TypePtr& other) const
+    bool Type::is_compatible_with(const TypePtr& other) const
     {
         if (other == nullptr)
             return false;
@@ -179,6 +199,9 @@ namespace mxslc::runtime
         if (other->is_vector() and is_vector_compatible(*other, *this))
             return true;
 
+        if (other->is_tuple() and is_tuple_compatible(*other, *this))
+            return true;
+
         if (has_name() and other->has_name())
             return name_ == other->name_;
 
@@ -187,18 +210,18 @@ namespace mxslc::runtime
 
         for (size_t i = 0; i < field_count(); i++)
         {
-            if (not field_type(i)->is_compatible(other->field_type(i)))
+            if (not field_type(i)->is_compatible_with(other->field_type(i)))
                 return false;
         }
 
         return true;
     }
 
-    bool Type::is_compatible(const vector<TypePtr>& types) const
+    bool Type::is_compatible_with(const vector<TypePtr>& types) const
     {
         for (const TypePtr& type : types)
         {
-            if (is_compatible(type))
+            if (is_compatible_with(type))
                 return true;
         }
 
@@ -241,7 +264,7 @@ namespace mxslc::runtime
         return false;
     }
 
-    TypePtr Type::find_unique_compatible(const vector<TypePtr>& types) const
+    TypePtr Type::find_unique_compatible(const vector<TypePtr>& types)
     {
         vector<TypePtr> compatibles;
         for (const TypePtr& type : types)
@@ -249,8 +272,13 @@ namespace mxslc::runtime
             if (equals(type))
                 return type;
 
-            if (is_compatible(type))
-                compatibles.push_back(type);
+            if (is_compatible_with(type))
+            {
+                if (type->is_tuple())
+                    compatibles.push_back(shared_from_this());
+                else
+                    compatibles.push_back(type);
+            }
         }
 
         return compatibles.size() == 1 ? compatibles[0] : nullptr;
@@ -272,6 +300,15 @@ namespace mxslc::runtime
     TypePtr Type::of(const mx::TypedElementPtr& value)
     {
         return resolve(value->getType());
+    }
+
+    TypePtr Type::tuple(TypePtr template_type)
+    {
+        assert(template_type->is_resolved());
+
+        TypePtr type = create_type(TypeName::Tuple, std::move(template_type));
+        type->set_resolved();
+        return type;
     }
 
     TypePtr Type::unnamed_struct(TypePtr field_type, const size_t field_count)
@@ -311,7 +348,12 @@ namespace mxslc::runtime
     string Type::to_string() const
     {
         if (has_name())
-            return name_;
+        {
+            string result = name_;
+            if (has_template_type())
+                result += "<" + template_type_->to_string() + ">";
+            return result;
+        }
 
         return "{" + join(fields_, ", ") + "}";
     }

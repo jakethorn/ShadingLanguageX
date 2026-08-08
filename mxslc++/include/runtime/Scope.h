@@ -27,7 +27,7 @@ namespace mxslc::runtime
         }
 
         bool has_parent() const { return parent_ != nullptr; }
-        Scope& parent() const { return *parent_; }
+        Scope* parent() const { return parent_.get(); }
 
         mx::GraphElementPtr graph() const { return graph_; }
         std::pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
@@ -53,7 +53,6 @@ namespace mxslc::runtime
         vector<FuncPtr> get_functions(const FunctionQuery& query, bool throw_on_fail = true) const;
         bool has_function(const FuncPtr& func) const;
         bool has_function(const FunctionQuery& query) const;
-        Scope& get_defining_scope(const FuncPtr& func);
 
         /*
          * types

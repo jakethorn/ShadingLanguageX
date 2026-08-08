@@ -142,7 +142,7 @@ namespace mxslc::runtime
             return Result::Ignore;
         if (func->return_type()->is_in(*return_types))
             return Result{Result::Match, 1};
-        if (func->return_type()->is_compatible(*return_types))
+        if (func->return_type()->is_compatible_with(*return_types))
             return Result::Match;
         return Result::NoMatch;
     }
@@ -179,7 +179,7 @@ namespace mxslc::runtime
             if (not arg.is_initialized())
                 continue;
             const TypePtr param_type = params[arg].type();
-            if (not param_type->is_compatible(arg.type()))
+            if (not param_type->is_compatible_with(arg.type()))
                 return Result::NoMatch;
             if (param_type->equals(arg.type()))
                 result.score++;

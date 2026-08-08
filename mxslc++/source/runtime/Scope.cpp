@@ -93,6 +93,7 @@ namespace mxslc::runtime
     void Scope::add_function(FuncPtr func)
     {
         assert(func->is_initialized());
+        func->defining_scope_ = this;
         functions_.push_back(std::move(func));
     }
 
@@ -134,15 +135,6 @@ namespace mxslc::runtime
     bool Scope::has_function(const FunctionQuery& query) const
     {
         return get_function(query, false) != nullptr;
-    }
-
-    Scope& Scope::get_defining_scope(const FuncPtr& func)
-    {
-        if (contains(functions_, func))
-            return *this;
-        if (parent_)
-            return parent_->get_defining_scope(func);
-        throw CompileError{"Function not defined: " + func->name()};
     }
 
     void Scope::add_type(TypePtr type)

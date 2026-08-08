@@ -78,7 +78,7 @@ namespace mxslc::expressions
         target_type_ = type->find_unique_compatible(types);
 
         if (target_type_ == nullptr)
-            error_message_ = "Attempting to assign an expression of type " + type->to_string() + " to a variable or parameter of type " + type_utils::to_string(types);
+            error_message_ = "Cannot assign an expression of type " + type->to_string() + " to a variable or parameter of type " + type_utils::to_string(types);
 
         is_initialized_ = target_type_ != nullptr;
         return is_initialized_;

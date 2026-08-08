@@ -27,7 +27,8 @@ namespace mxslc::expressions
     private:
         bool expressions_are_initialized();
         void try_init_expressions(const vector<TypePtr>& types);
-        vector<TypePtr> index_types(const vector<TypePtr>& types, size_t index) const;
+        vector<TypePtr> types_at_index(const vector<TypePtr>& types, size_t index) const;
+        string initialization_error_message(const vector<TypePtr>& types) const;
 
         vector<ExprPtr> exprs_;
         size_t initialized_expr_count_{0};

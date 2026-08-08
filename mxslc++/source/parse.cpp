@@ -778,7 +778,7 @@ namespace mxslc
 
     ExprPtr Parser::unnamed_constructor()
     {
-        const Token& token = peek();
+        const Token token = peek();
         vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
         return create_expression<UnnamedConstructor>(std::move(exprs), token);
     }

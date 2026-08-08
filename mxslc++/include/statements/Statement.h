@@ -12,10 +12,10 @@
 
 namespace mxslc::statements
 {
-    using runtime_utils::RuntimeAware;
     using runtime_utils::Monomorphizable;
+    using runtime_utils::RuntimeAware;
 
-    class Statement : protected RuntimeAware, public Monomorphizable<StmtPtr>, public Stringable
+    class Statement : public Monomorphizable<StmtPtr>, public Stringable, protected RuntimeAware
     {
     public:
         explicit Statement(Token token) : token_{std::move(token)} { }

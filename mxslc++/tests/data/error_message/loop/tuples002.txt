@@ -1,0 +1,1 @@
+tuples002.mxsl, line 1: Attempting to assign an expression of type {float, float, float} to a variable or parameter of type {integer, integer, integer}

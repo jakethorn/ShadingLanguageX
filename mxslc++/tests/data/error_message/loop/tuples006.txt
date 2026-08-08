@@ -1,0 +1,5 @@
+tuples006.mxsl, line 1: Cannot assign the unnamed constructor to a variable or parameter of type tuple<integer>
+Underlying errors:
+Argument 0: Cannot assign an expression of type float to a variable or parameter of type integer
+Argument 1: Cannot assign an expression of type float to a variable or parameter of type integer
+Argument 2: Cannot assign an expression of type float to a variable or parameter of type integer
