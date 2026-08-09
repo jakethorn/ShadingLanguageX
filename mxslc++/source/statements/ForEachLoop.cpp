@@ -33,12 +33,14 @@ namespace mxslc::statements
         return create_statement<ForEachLoop>(token_, mods_, std::move(type), name_, std::move(iter_expr), std::move(body));
     }
 
+    void ForEachLoop::init()
+    {
+        type_ = scope().resolve_type(type_);
+        iter_expr_->init(Type::tuple(type_));
+    }
+
     void ForEachLoop::execute_impl() const
     {
-        const TypePtr type = scope().resolve_type(type_);
-
-        const TypePtr iter_type = Type::tuple(type);
-        iter_expr_->init(iter_type);
         const VarPtr iter_value = iter_expr_->evaluate();
         if (iter_value->has_value())
             throw CompileError{"Expression is not iterable"};
@@ -46,11 +48,11 @@ namespace mxslc::statements
         for (size_t i = 0; i < iter_value->child_count(); i++)
         {
             VarPtr next_value = iter_value->child(i);
-            if (not next_value->type()->is_compatible_with(type))
+            if (not next_value->type()->is_compatible_with(type_))
                 throw CompileError{"Field value does not match loop iterator type"};
 
             runtime().enter_scope();
-            create_variable(mods_, type, next_value)->add_to_scope(name_);
+            create_variable(mods_, type_, next_value)->add_to_scope(name_);
             body_->execute();
             runtime().exit_scope();
         }

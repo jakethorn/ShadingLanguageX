@@ -54,17 +54,17 @@ namespace mxslc::expressions
         for (const TypePtr& type : types)
             assert(type->is_resolved());
 
-        try
-        {
+        //try
+        //{
             init_subexpressions(types);
             init_impl(types);
-        }
-        catch (const AmbiguousFunctionError& e)
-        {
-            error_message_ = e.what();
-            is_initialized_ = false;
-            return false;
-        }
+        //}
+        //catch (const AmbiguousFunctionError& e)
+        //{
+        //    error_message_ = e.what();
+        //    is_initialized_ = false;
+        //    return false;
+        //}
 
         if (types.empty() or (types.size() == 1 and types[0]->is_auto()))
         {

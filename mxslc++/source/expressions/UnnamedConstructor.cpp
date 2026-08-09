@@ -119,9 +119,8 @@ namespace mxslc::expressions
                 bool is_compatible = true;
                 for (size_t i = 0; i < exprs_.size(); ++i)
                 {
-                    const TypePtr expr_type = exprs_[i]->type();
                     const TypePtr field_type = type->field_type(i);
-                    if (exprs_[i]->is_initialized() and not expr_type->is_compatible_with(field_type))
+                    if (exprs_[i]->is_initialized() and not exprs_[i]->type()->is_compatible_with(field_type))
                         is_compatible = false;
                 }
 

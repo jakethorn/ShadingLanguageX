@@ -6,12 +6,13 @@
 #define MXSLC_FUNCTIONQUERY_H
 
 #include "common.h"
+#include "utils/Stringable.h"
 
 namespace mxslc::runtime
 {
     class ArgumentList;
 
-    class FunctionQuery
+    class FunctionQuery : public Stringable
     {
     public:
         struct Result
@@ -95,7 +96,7 @@ namespace mxslc::runtime
 
         FunctionQuery() = default;
 
-        explicit FunctionQuery(const string& name);
+        FunctionQuery(const string& name);
         FunctionQuery(const string& name, const TypePtr& template_type);
 
         FunctionQuery(const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless);
@@ -123,6 +124,10 @@ namespace mxslc::runtime
         Result has_match(const vector<FuncPtr>& funcs) const;
         FuncPtr get_match(const vector<FuncPtr>& funcs, bool throw_on_fail) const;
         vector<FuncPtr> get_matches(const vector<FuncPtr>& funcs) const;
+
+        bool has_class_type() const { return class_type != nullptr and *class_type != nullptr; }
+
+        string to_string() const override;
 
     private:
         Result class_type_matches(const FuncPtr& func) const;

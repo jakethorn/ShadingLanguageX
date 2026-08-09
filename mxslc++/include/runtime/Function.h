@@ -65,7 +65,7 @@ namespace mxslc::runtime
         void set_node_graph(mx::NodeGraphPtr node_graph);
         vector<string> output_names() const;
 
-        Scope* defining_scope() const;
+        Scope* defining_scope() const { return defining_scope_; }
 
         void init();
 

@@ -174,7 +174,7 @@ namespace mxslc::runtime
 
             for (const Field& field : type.fields())
             {
-                if (not field.type()->equals(tuple_type.template_type()))
+                if (not field.type()->is_compatible_with(tuple_type.template_type()))
                     return false;
             }
 

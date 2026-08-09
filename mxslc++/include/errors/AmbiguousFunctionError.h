@@ -8,17 +8,22 @@
 #include "CompileError.h"
 #include "common.h"
 
+namespace mxslc::runtime
+{
+    class FunctionQuery;
+}
+
 namespace mxslc
 {
     class AmbiguousFunctionError final : public CompileError
     {
     public:
         explicit AmbiguousFunctionError(const string& message);
-        AmbiguousFunctionError(const string& func_name, const vector<FuncPtr>& funcs);
-        AmbiguousFunctionError(const string& func_name, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors);
+        AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs);
+        AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors);
 
     private:
-        static string format(const string& func_name, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors);
+        static string format(const FunctionQuery& query, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors);
     };
 }
 

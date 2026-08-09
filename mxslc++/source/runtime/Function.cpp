@@ -161,8 +161,10 @@ namespace mxslc::runtime
 
         string result;
         result += mods_string;
-        result += return_type_->to_string();
-        result += " " + name_;
+        result += return_type_->to_string() + " ";
+        if (has_class_type())
+            result += class_type()->to_string() + ".";
+        result += name_;
         if (has_template_type())
             result += "<" + template_type_->to_string() + ">";
         if (not is_parameterless_)

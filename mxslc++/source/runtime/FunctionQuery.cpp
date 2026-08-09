@@ -8,6 +8,7 @@
 #include "runtime/Type.h"
 #include "runtime/ArgumentList.h"
 #include "errors/CompileError.h"
+#include "utils/string_utils.h"
 
 namespace mxslc::runtime
 {
@@ -159,7 +160,9 @@ namespace mxslc::runtime
         // nullptr means any type
         if (template_type == nullptr or *template_type == nullptr)
             return Result::Ignore;
-        return func->template_type() == *template_type;
+        if (not func->has_template_type())
+            return Result::NoMatch;
+        return func->template_type()->equals(*template_type);
     }
 
     FunctionQuery::Result FunctionQuery::arguments_match(const FuncPtr& func) const
@@ -205,5 +208,36 @@ namespace mxslc::runtime
         }
 
         return default_funcs;
+    }
+
+    string FunctionQuery::to_string() const
+    {
+        string result;
+
+        if (return_types != nullptr and not return_types->empty())
+        {
+            string types = type_utils::to_string(*return_types);
+            string_utils::replace_last(types, ", ", " or ");
+            result += types + " ";
+        }
+
+        if (class_type != nullptr and *class_type != nullptr)
+            result += (*class_type)->to_string() + ".";
+
+        if (name != nullptr)
+            result += *name;
+
+        if (template_type != nullptr and *template_type != nullptr)
+            result += "<" + (*template_type)->to_string() + ">";
+
+        if (is_parameterless == nullptr or not *is_parameterless)
+        {
+            result += "(";
+            if (args != nullptr)
+                result += args->to_string();
+            result += ")";
+        }
+
+        return result;
     }
 }

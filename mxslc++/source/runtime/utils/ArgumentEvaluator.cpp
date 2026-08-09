@@ -14,33 +14,68 @@ namespace mxslc::runtime_utils
 {
     using container_utils::extend;
 
-    FuncPtr ArgumentEvaluator::execute(ArgumentList& args) const
+    FuncPtr resolve_function(const vector<TypePtr>& types, const string& name, const TypePtr& template_type, ArgumentList& args, const bool& is_argumentless)
+    {
+        const FunctionQuery query{types, name, template_type, args, is_argumentless};
+        return FunctionInitializer{query, nullptr, args}.initialize_function();
+    }
+
+    FuncPtr resolve_method(const TypePtr& class_type, const vector<TypePtr>& types, const string& name, const TypePtr& template_type, ArgumentList& args, const bool& is_argumentless)
+    {
+        const FunctionQuery query{class_type, types, name, template_type, args, is_argumentless};
+        return FunctionInitializer{query, class_type, args}.initialize_method();
+    }
+
+    FuncPtr FunctionInitializer::initialize_function() const
     {
         const Scope* scope_ = &scope();
         vector<FuncPtr> checked_funcs;
         while (scope_ != nullptr)
         {
-            FuncPtr func = try_init(args, scope_, checked_funcs);
+            FuncPtr func = try_init(scope_, checked_funcs);
             if (func != nullptr)
                 return func;
         }
 
-        throw AmbiguousFunctionError{*query_.name, checked_funcs};
+        if (checked_funcs.empty())
+            checked_funcs = scope().get_functions(*query_.name, /*throw_on_fail*/false);
+
+        if (underlying_errors_.empty())
+            throw AmbiguousFunctionError{query_, checked_funcs};
+        else
+            throw AmbiguousFunctionError{underlying_errors_[0]};
     }
 
-    FuncPtr ArgumentEvaluator::try_init(ArgumentList& args, const Scope*& scope, vector<FuncPtr>& checked_funcs) const
+    FuncPtr FunctionInitializer::initialize_method() const
     {
-        size_t init_count = count_initialized(args);
-        while (init_count < args.size())
+        if (class_type_ == nullptr)
+            throw CompileError{"Cannot resolve method without a class type"};
+
+        return initialize_function();
+    }
+
+    FuncPtr FunctionInitializer::try_init(const Scope*& scope, vector<FuncPtr>& checked_funcs) const
+    {
+        reset_arguments();
+
+        size_t init_count = 0;
+        while (init_count < args_.size())
         {
             size_t last_init_count = init_count;
-            vector<FuncPtr> funcs = scope->get_functions(query_);
-            init_count = try_init(funcs, args);
+
+            vector<FuncPtr> funcs = scope->get_functions(query_, /*throw_on_fail*/false);
+            if (funcs.empty())
+            {
+                scope = nullptr;
+                return nullptr;
+            }
+
+            init_count = try_init(funcs);
 
             if (last_init_count == init_count)
             {
-                init_count = try_init_with_default(funcs, args);
-                if (init_count < args.size())
+                init_count = try_init_with_default(funcs);
+                if (init_count < args_.size())
                 {
                     scope = funcs[0]->defining_scope()->parent();
                     extend(checked_funcs, std::move(funcs));
@@ -49,28 +84,42 @@ namespace mxslc::runtime_utils
             }
         }
 
-        return scope->get_function(query_);
+        FuncPtr func = scope->get_function(query_, /*throw_on_fail*/false);
+        scope = nullptr;
+        return func;
     }
 
-    size_t ArgumentEvaluator::try_init(const FuncPtr& func, ArgumentList& args) const
+    void FunctionInitializer::reset_arguments() const
     {
-        return try_init(vector{func}, args);
+        for (const Argument& arg : args_)
+        {
+            if (arg.is_initialized())
+                arg.reset();
+        }
     }
 
-    size_t ArgumentEvaluator::try_init(const vector<FuncPtr>& funcs, ArgumentList& args) const
+    size_t FunctionInitializer::try_init(const vector<FuncPtr>& funcs) const
     {
         size_t initialized_arg_count = 0;
 
-        for (Argument& arg : args)
+        for (Argument& arg : args_)
         {
-            vector<TypePtr> target_types = get_target_types(funcs, arg);
-            if (arg.is_initialized() or arg.try_init(target_types))
-                initialized_arg_count++;
+            vector<TypePtr> target_types = get_parameter_types(funcs, arg);
+
+            try
+            {
+                if (arg.is_initialized() or arg.try_init(target_types))
+                    initialized_arg_count++;
+            }
+            catch (const AmbiguousFunctionError& e)
+            {
+                underlying_errors_.emplace_back(e.message());
+            }
         }
         return initialized_arg_count;
     }
 
-    size_t ArgumentEvaluator::try_init_with_default(const vector<FuncPtr>& funcs, ArgumentList& args) const
+    size_t FunctionInitializer::try_init_with_default(const vector<FuncPtr>& funcs) const
     {
         FuncPtr default_func;
         for (const FuncPtr& func : funcs)
@@ -82,10 +131,13 @@ namespace mxslc::runtime_utils
             }
         }
 
-        return try_init(default_func, args);
+        if (default_func != nullptr)
+            return try_init(vector{default_func});
+        else
+            return 0;
     }
 
-    vector<TypePtr> ArgumentEvaluator::get_target_types(const vector<FuncPtr>& funcs, const Argument& arg) const
+    vector<TypePtr> FunctionInitializer::get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg) const
     {
         vector<TypePtr> types;
 

@@ -1,4 +1,16 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <constant name="stuff__3" type="vector2" />
+  <constant name="var__0" type="integer">
+    <input name="value" type="integer" value="1" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" value="2" />
+  </constant>
+  <constant name="var__2" type="string">
+    <input name="value" type="string" value="world" />
+  </constant>
+  <constant name="var__3" type="vector2">
+    <input name="value" type="vector2" nodename="stuff__3" />
+  </constant>
 </materialx>

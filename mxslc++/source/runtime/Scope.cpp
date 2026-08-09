@@ -94,12 +94,19 @@ namespace mxslc::runtime
     {
         assert(func->is_initialized());
         func->defining_scope_ = this;
-        functions_.push_back(std::move(func));
+        functions_[func->name()].push_back(std::move(func));
     }
 
     FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail) const
     {
-        FuncPtr func = query.get_match(functions_, false);
+        FuncPtr func;
+        const auto it = functions_.find(*query.name);
+        if (it != functions_.end())
+        {
+            func = query.get_match(it->second, /*throw_on_fail*/false);
+            if (func)
+                return func;
+        }
         if (func)
             return func;
         if (parent_)
@@ -114,9 +121,14 @@ namespace mxslc::runtime
 
     vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool throw_on_fail) const
     {
-        vector<FuncPtr> funcs = query.get_matches(functions_);
-        if (not funcs.empty())
-            return funcs;
+        vector<FuncPtr> funcs;
+        const auto it = functions_.find(*query.name);
+        if (it != functions_.end())
+        {
+            funcs = query.get_matches(it->second);
+            if (not funcs.empty())
+                return funcs;
+        }
         if (parent_)
             funcs = parent_->get_functions(query, false);
         if (not funcs.empty())
@@ -129,12 +141,15 @@ namespace mxslc::runtime
 
     bool Scope::has_function(const FuncPtr& func) const
     {
-        return contains(functions_, func) or (parent_ and parent_->has_function(func));
+        const auto it = functions_.find(func->name());
+        if (it == functions_.end())
+            return false;
+        return contains(it->second, func) or (parent_ and parent_->has_function(func));
     }
 
     bool Scope::has_function(const FunctionQuery& query) const
     {
-        return get_function(query, false) != nullptr;
+        return get_function(query, /*throw_on_fail*/false) != nullptr;
     }
 
     void Scope::add_type(TypePtr type)

@@ -1,21 +1,4 @@
-types011.mxsl, line 7: Matching definition could not be found for function 'constant'
-Possible matches:
-float constant<float>(float value)
-color3 constant<color3>(color3 value)
-color4 constant<color4>(color4 value)
-vector2 constant<vector2>(vector2 value)
-vector3 constant<vector3>(vector3 value)
-vector4 constant<vector4>(vector4 value)
-boolean constant<boolean>(boolean value)
-integer constant<integer>(integer value)
-matrix33 constant<matrix33>(matrix33 value)
-matrix44 constant<matrix44>(matrix44 value)
-string constant<string>(string value)
-filename constant<filename>(filename value)
-
-Underlying errors:
-
-Matching definition could not be found for function 'foo'
+types011.mxsl, line 7: No function could be found that matches the signature '(float, color3, color4, vector2, vector3, vector4, boolean, integer, matrix33, matrix44, string or filename) foo<integer>()'
 Possible matches:
 inline string foo<vector2>()
 inline string foo<vector3>()

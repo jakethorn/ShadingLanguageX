@@ -73,7 +73,7 @@ namespace mxslc::runtime
         bool is_youngest_{true};
 
         unordered_map<string, VarPtr> variables_;
-        vector<FuncPtr> functions_;
+        unordered_map<string, vector<FuncPtr>> functions_;
         unordered_map<string, TypePtr> types_;
 
         mx::GraphElementPtr graph_;
