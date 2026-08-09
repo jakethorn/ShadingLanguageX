@@ -8,7 +8,7 @@
 #include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
-#include "runtime/utils/ArgumentEvaluator.h"
+#include "runtime/utils/FunctionResolver.h"
 #include "runtime/variables/Variable.h"
 #include "serialize/serializer_utils.h"
 #include "serialize/values/interface.h"
@@ -83,16 +83,6 @@ namespace mxslc::expressions
                 return serializer().write_node(instance_, func_, args_, attrs_);
         }
     }
-
-    //vector<FuncPtr> MethodCall::get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const
-    //{
-    //    return scope.get_functions({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
-    //}
-    //
-    //FuncPtr MethodCall::get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const
-    //{
-    //    return scope.get_function({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
-    //}
 
     VarPtr MethodCall::copy_instance_to_scope() const
     {

@@ -49,8 +49,8 @@ namespace mxslc::runtime
          */
 
         void add_function(FuncPtr func);
-        FuncPtr get_function(const FunctionQuery& query, bool throw_on_fail = true) const;
-        vector<FuncPtr> get_functions(const FunctionQuery& query, bool throw_on_fail = true) const;
+        FuncPtr get_function(const FunctionQuery& query) const;
+        vector<FuncPtr> get_functions(const FunctionQuery& query) const;
         bool has_function(const FuncPtr& func) const;
         bool has_function(const FunctionQuery& query) const;
 

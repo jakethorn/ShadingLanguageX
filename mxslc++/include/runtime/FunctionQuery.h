@@ -94,8 +94,6 @@ namespace mxslc::runtime
             }
         };
 
-        FunctionQuery() = default;
-
         FunctionQuery(const string& name);
         FunctionQuery(const string& name, const TypePtr& template_type);
 

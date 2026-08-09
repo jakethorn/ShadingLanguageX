@@ -97,46 +97,32 @@ namespace mxslc::runtime
         functions_[func->name()].push_back(std::move(func));
     }
 
-    FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail) const
+    FuncPtr Scope::get_function(const FunctionQuery& query) const
     {
         FuncPtr func;
         const auto it = functions_.find(*query.name);
         if (it != functions_.end())
-        {
             func = query.get_match(it->second, /*throw_on_fail*/false);
-            if (func)
-                return func;
-        }
+
         if (func)
             return func;
         if (parent_)
-            func = parent_->get_function(query, false);
-        if (func)
-            return func;
-        if (throw_on_fail)
-            throw AmbiguousFunctionError{*query.name, get_functions(FunctionQuery{*query.name}, false)};
-        else
-            return nullptr;
+            return parent_->get_function(query);
+        return nullptr;
     }
 
-    vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool throw_on_fail) const
+    vector<FuncPtr> Scope::get_functions(const FunctionQuery& query) const
     {
         vector<FuncPtr> funcs;
         const auto it = functions_.find(*query.name);
         if (it != functions_.end())
-        {
             funcs = query.get_matches(it->second);
-            if (not funcs.empty())
-                return funcs;
-        }
-        if (parent_)
-            funcs = parent_->get_functions(query, false);
+
         if (not funcs.empty())
             return funcs;
-        if (throw_on_fail)
-            throw AmbiguousFunctionError{*query.name, get_functions(FunctionQuery{*query.name}, false)};
-        else
-            return vector<FuncPtr>{};
+        if (parent_)
+            return parent_->get_functions(query);
+        return funcs;
     }
 
     bool Scope::has_function(const FuncPtr& func) const
@@ -149,7 +135,7 @@ namespace mxslc::runtime
 
     bool Scope::has_function(const FunctionQuery& query) const
     {
-        return get_function(query, /*throw_on_fail*/false) != nullptr;
+        return get_function(query) != nullptr;
     }
 
     void Scope::add_type(TypePtr type)

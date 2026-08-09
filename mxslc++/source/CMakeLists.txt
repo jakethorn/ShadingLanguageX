@@ -34,7 +34,7 @@ add_library(mxslc_lib
         runtime/utils/RuntimeAware.cpp
         runtime/utils/invoke.cpp
         runtime/utils/type_cast.cpp
-        runtime/utils/ArgumentEvaluator.cpp
+        runtime/utils/FunctionResolver.cpp
         runtime/utils/type_utils.cpp
         expressions/interface.cpp
         expressions/Expression.cpp
