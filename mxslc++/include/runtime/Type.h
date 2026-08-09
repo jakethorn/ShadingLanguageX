@@ -70,8 +70,6 @@ namespace mxslc::runtime
         bool equals(const TypePtr& other, bool field_names = false) const;
         bool is_in(const vector<TypePtr>& types) const;
 
-        TypePtr find_unique_compatible(const vector<TypePtr>& types);
-
         string to_string() const override;
         string full_str() const;
 

@@ -264,26 +264,6 @@ namespace mxslc::runtime
         return false;
     }
 
-    TypePtr Type::find_unique_compatible(const vector<TypePtr>& types)
-    {
-        vector<TypePtr> compatibles;
-        for (const TypePtr& type : types)
-        {
-            if (equals(type))
-                return type;
-
-            if (is_compatible_with(type))
-            {
-                if (type->is_tuple())
-                    compatibles.push_back(shared_from_this());
-                else
-                    compatibles.push_back(type);
-            }
-        }
-
-        return compatibles.size() == 1 ? compatibles[0] : nullptr;
-    }
-
     TypePtr Type::of(const mx::NodeGraphPtr& node_graph)
     {
         if (node_graph->getOutputCount() == 1)

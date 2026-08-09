@@ -33,10 +33,10 @@ namespace mxslc::expressions
         ExprPtr monomorphize(const TypePtr& template_type) const override = 0;
 
         void init();
-        void init(const TypePtr& type);
-        void init(const vector<TypePtr>& types);
-        bool try_init(const TypePtr& types);
-        bool try_init(const vector<TypePtr>& types);
+        void init(const TypePtr& target_type);
+        void init(const vector<TypePtr>& target_types);
+        bool try_init(const TypePtr& target_type);
+        bool try_init(const vector<TypePtr>& target_types);
         void update();
         void reset();
 
@@ -66,6 +66,9 @@ namespace mxslc::expressions
 
         ModifierList mods_;
         AttributeList attrs_;
+
+    private:
+        bool update_target_type(const TypePtr& type, const vector<TypePtr>& target_types);
     };
 }
 
