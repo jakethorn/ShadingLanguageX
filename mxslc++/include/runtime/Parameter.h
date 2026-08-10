@@ -13,10 +13,10 @@
 
 namespace mxslc::runtime
 {
-    using runtime_utils::RuntimeAware;
     using runtime_utils::Monomorphizable;
+    using runtime_utils::RuntimeAware;
 
-    class Parameter : protected RuntimeAware, public Monomorphizable<Parameter>, Stringable
+    class Parameter : public Monomorphizable<Parameter>, public Stringable, protected RuntimeAware
     {
     public:
         Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);

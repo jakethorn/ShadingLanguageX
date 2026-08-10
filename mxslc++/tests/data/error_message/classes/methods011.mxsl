@@ -1,0 +1,12 @@
+class A
+{
+    float x, y;
+
+    float add()
+    {
+        return x + y;
+    }
+}
+
+A a = {1.0, 2.0};
+constant(a.sub());

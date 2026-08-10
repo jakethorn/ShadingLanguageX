@@ -1,0 +1,4 @@
+{int, int, int} a = 1.0 to 3.0;
+constant(a[0]);
+constant(a[1]);
+constant(a[2]);

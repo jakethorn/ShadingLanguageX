@@ -27,13 +27,9 @@ namespace mxslc::expressions
         string to_string() const override;
 
     protected:
-        void init_subexpressions(const vector<TypePtr>& types) override;
         void init_impl(const vector<TypePtr>& types) override;
         TypePtr type_impl() const override;
         VarPtr evaluate_impl() const override;
-
-        virtual vector<FuncPtr> get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const;
-        virtual FuncPtr get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const;
 
         void evaluate_arguments() const;
         VarPtr inline_invoke() const;
@@ -47,15 +43,6 @@ namespace mxslc::expressions
         FuncPtr func_;
 
     private:
-        bool arguments_are_initialized();
-        void init_arguments(const Scope& scope, const vector<TypePtr>& return_types);
-        size_t try_init_arguments(const vector<FuncPtr>& funcs);
-        size_t try_init_arguments(const FuncPtr& func);
-
-        size_t initialized_arg_count_{0};
-        vector<string> underlying_errors_;
-        Scope* func_scope_{nullptr};
-
         ExprPtr method_call_;
     };
 }

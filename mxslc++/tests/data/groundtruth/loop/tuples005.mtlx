@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="float">
+    <input name="value" type="float" value="1" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" value="7" />
+  </constant>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" value="4" />
+  </constant>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" value="2" />
+  </constant>
+  <constant name="var__4" type="float">
+    <input name="value" type="float" value="5" />
+  </constant>
+  <constant name="var__5" type="float">
+    <input name="value" type="float" value="3" />
+  </constant>
+  <constant name="var__6" type="integer">
+    <input name="value" type="integer" value="3" />
+  </constant>
+  <constant name="var__7" type="integer">
+    <input name="value" type="integer" value="5" />
+  </constant>
+  <constant name="var__8" type="integer">
+    <input name="value" type="integer" value="0" />
+  </constant>
+  <constant name="var__9" type="integer">
+    <input name="value" type="integer" value="9" />
+  </constant>
+  <constant name="var__10" type="integer">
+    <input name="value" type="integer" value="4" />
+  </constant>
+</materialx>

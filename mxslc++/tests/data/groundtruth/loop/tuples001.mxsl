@@ -1,0 +1,15 @@
+{int, int, int} a = 1 to 3;
+constant(a[0]);
+constant(a[1]);
+constant(a[2]);
+
+{float, float, float} b = 1 to 3;
+constant(b[0]);
+constant(b[1]);
+constant(b[2]);
+
+{int, float, int} c = 1 to 3;
+constant(c[0]);
+constant(c[1]);
+constant(c[2]);
+

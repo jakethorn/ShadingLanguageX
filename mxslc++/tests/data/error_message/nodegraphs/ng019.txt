@@ -1,9 +1,3 @@
-ng019.mxsl, line 6: Matching definition could not be found for function 'dotproduct'
-Possible matches:
-float dotproduct<vector3>(vector3 in1, vector3 in2)
-
-Underlying errors:
-
-Matching definition could not be found for function 'foo'
+ng019.mxsl, line 6: No function could be found that matches the signature '(vector2, vector3 or vector4) foo()'
 Possible matches:
 vector3 foo

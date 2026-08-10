@@ -4,11 +4,7 @@
     <output name="outparam__wy" type="vector2" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <combine2 name="var__0" type="vector2">
-      <input name="in1" type="float" value="3" />
-      <input name="in2" type="float" value="2" />
-    </combine2>
-    <output name="outparam__wy" type="vector2" nodename="var__0" />
+    <output name="outparam__wy" type="vector2" value="3, 2" />
   </nodegraph>
   <foo name="var__0" type="vector2" />
   <separate4 name="var__1" type="multioutput">

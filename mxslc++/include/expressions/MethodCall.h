@@ -25,9 +25,6 @@ namespace mxslc::expressions
         void init_impl(const vector<TypePtr>& types) override;
         VarPtr evaluate_impl() const override;
 
-        vector<FuncPtr> get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const override;
-        FuncPtr get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const override;
-
     private:
         VarPtr copy_instance_to_scope() const;
         void update_instance(const VarPtr& local_copy) const;

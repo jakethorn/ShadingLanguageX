@@ -17,8 +17,10 @@ namespace mxslc::runtime
 {
     using runtime_utils::RuntimeAware;
 
-    class Function : protected RuntimeAware, public Stringable
+    class Function : public Stringable, protected RuntimeAware
     {
+        friend class Scope;
+
     public:
         Function(
             ModifierList mods,
@@ -43,8 +45,9 @@ namespace mxslc::runtime
 
         ~Function() override;
 
-        bool is_inline() const { return mods_.contains(TokenType::Inline); }
+        bool is_inline() const { return mods_.contains(TokenType::Inline) or is_comptime(); }
         bool is_default() const { return mods_.contains(TokenType::Default); }
+        bool is_comptime() const { return mods_.contains(TokenType::Comptime); }
         const TypePtr& return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }
@@ -63,6 +66,8 @@ namespace mxslc::runtime
         void set_node_graph(mx::NodeGraphPtr node_graph);
         vector<string> output_names() const;
 
+        Scope* defining_scope() const { return defining_scope_; }
+
         void init();
 
         VarPtr invoke() const;
@@ -71,6 +76,7 @@ namespace mxslc::runtime
         void add_nonlocal_output(VarPtr var) { nonlocal_outputs_.push_back(std::move(var)); }
         const vector<VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
         const vector<VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
+        void update_nonlocal_variables();
 
         TypePtr class_type() const { return class_type_.lock(); }
         void set_class_type(weak_ptr<Type> type) { class_type_ = std::move(type); }
@@ -94,6 +100,7 @@ namespace mxslc::runtime
         mx::NodeDefPtr node_def_;
         mx::NodeGraphPtr node_graph_;
 
+        Scope* defining_scope_{nullptr};
         bool is_initialized_{false};
 
         vector<VarPtr> nonlocal_inputs_;

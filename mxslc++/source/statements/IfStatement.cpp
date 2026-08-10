@@ -29,7 +29,7 @@ namespace mxslc::statements
 
         const VarPtr cond = cond_expr_->evaluate();
 
-        runtime().enter_scope();
+        runtime().enter_scope("if");
         if (cond->compile_time_value())
         {
             then_body_->execute();

@@ -1,1 +1,1 @@
-errmsg014.mxsl, line 6: Definition could not be found for function 'bar'
+errmsg014.mxsl, line 6: No function could be found with the name 'bar'

@@ -1,1 +1,1 @@
-funcquery006.mxsl, line 1: Definition could not be found for function 'foo'
+funcquery006.mxsl, line 1: No function could be found with the name 'foo'

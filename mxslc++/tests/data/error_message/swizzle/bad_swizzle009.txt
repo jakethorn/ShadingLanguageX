@@ -1,1 +1,1 @@
-bad_swizzle009.mxsl, line 2: Attempting to assign an expression of type vector3 to a variable or parameter of type vector2
+bad_swizzle009.mxsl, line 2: Cannot assign an expression of type vector3 to a variable or parameter of type vector2

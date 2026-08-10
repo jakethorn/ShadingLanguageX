@@ -13,26 +13,23 @@
 #include "runtime/variables/Variable.h"
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
-#include "errors/AmbiguousFunctionError.h"
 #include "runtime/interface.h"
 
 namespace mxslc::runtime
 {
     using container_utils::contains;
 
-    Scope::Scope() = default;
-
-    Scope::Scope(ScopePtr parent) : Scope{string{}, std::move(parent)}
+    Scope::Scope() : Scope{string{}, nullptr} { }
+    Scope::Scope(string name) : Scope{std::move(name), nullptr} { }
+    Scope::Scope(ScopePtr parent) : Scope{string{}, std::move(parent)} { }
+    Scope::Scope(string name, ScopePtr parent) : name_{std::move(name)}, parent_{std::move(parent)}
     {
-
-    }
-
-    Scope::Scope(string name, ScopePtr parent) : parent_{std::move(parent)}
-    {
-        name_ = std::move(name);
-        parent_->is_youngest_ = false;
-        graph_ = parent_->graph_;
-        func_ = parent_->func_;
+        if (parent_)
+        {
+            parent_->is_youngest_ = false;
+            graph_ = parent_->graph_;
+            func_ = parent_->func_;
+        }
     }
 
     std::pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
@@ -93,56 +90,49 @@ namespace mxslc::runtime
     void Scope::add_function(FuncPtr func)
     {
         assert(func->is_initialized());
-        functions_.push_back(std::move(func));
+        func->defining_scope_ = this;
+        functions_[func->name()].push_back(std::move(func));
     }
 
-    FuncPtr Scope::get_function(const FunctionQuery& query, const bool throw_on_fail) const
+    FuncPtr Scope::get_function(const FunctionQuery& query) const
     {
-        FuncPtr func = query.get_match(functions_, false);
+        FuncPtr func;
+        const auto it = functions_.find(*query.name);
+        if (it != functions_.end())
+            func = query.get_match(it->second, /*throw_on_fail*/false);
+
         if (func)
             return func;
         if (parent_)
-            func = parent_->get_function(query, false);
-        if (func)
-            return func;
-        if (throw_on_fail)
-            throw AmbiguousFunctionError{*query.name, get_functions(FunctionQuery{*query.name}, false)};
-        else
-            return nullptr;
+            return parent_->get_function(query);
+        return nullptr;
     }
 
-    vector<FuncPtr> Scope::get_functions(const FunctionQuery& query, const bool throw_on_fail) const
+    vector<FuncPtr> Scope::get_functions(const FunctionQuery& query) const
     {
-        vector<FuncPtr> funcs = query.get_matches(functions_);
+        vector<FuncPtr> funcs;
+        const auto it = functions_.find(*query.name);
+        if (it != functions_.end())
+            funcs = query.get_matches(it->second);
+
         if (not funcs.empty())
             return funcs;
         if (parent_)
-            funcs = parent_->get_functions(query, false);
-        if (not funcs.empty())
-            return funcs;
-        if (throw_on_fail)
-            throw AmbiguousFunctionError{*query.name, get_functions(FunctionQuery{*query.name}, false)};
-        else
-            return vector<FuncPtr>{};
+            return parent_->get_functions(query);
+        return funcs;
     }
 
     bool Scope::has_function(const FuncPtr& func) const
     {
-        return contains(functions_, func) or (parent_ and parent_->has_function(func));
+        const auto it = functions_.find(func->name());
+        if (it != functions_.end() and contains(it->second, func))
+            return true;
+        return parent_ and parent_->has_function(func);
     }
 
     bool Scope::has_function(const FunctionQuery& query) const
     {
-        return get_function(query, false) != nullptr;
-    }
-
-    Scope& Scope::get_defining_scope(const FuncPtr& func)
-    {
-        if (contains(functions_, func))
-            return *this;
-        if (parent_)
-            return parent_->get_defining_scope(func);
-        throw CompileError{"Function not defined: " + func->name()};
+        return get_function(query) != nullptr;
     }
 
     void Scope::add_type(TypePtr type)

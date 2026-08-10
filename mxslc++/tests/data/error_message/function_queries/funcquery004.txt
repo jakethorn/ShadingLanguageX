@@ -1,4 +1,4 @@
-funcquery004.mxsl, line 16: Matching definition could not be found for function 'foo'
+funcquery004.mxsl, line 16: No function could be found that matches the signature 'foo(1)'
 Possible matches:
 void foo(string s)
 void foo(integer i, string s = "")

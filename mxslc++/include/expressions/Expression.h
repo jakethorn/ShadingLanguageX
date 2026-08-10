@@ -14,10 +14,10 @@
 
 namespace mxslc::expressions
 {
-    using runtime_utils::RuntimeAware;
     using runtime_utils::Monomorphizable;
+    using runtime_utils::RuntimeAware;
 
-    class Expression : protected RuntimeAware, public Monomorphizable<ExprPtr>, public Stringable
+    class Expression : public Monomorphizable<ExprPtr>, public Stringable, protected RuntimeAware
     {
     public:
         Expression() = default;
@@ -32,13 +32,11 @@ namespace mxslc::expressions
 
         ExprPtr monomorphize(const TypePtr& template_type) const override = 0;
 
-        void set_subexpression_type(TypePtr type) { subexpr_type_ = std::move(type); }
-
         void init();
-        void init(const TypePtr& type);
-        void init(const vector<TypePtr>& types);
-        bool try_init(const TypePtr& types);
-        bool try_init(const vector<TypePtr>& types);
+        void init(const TypePtr& target_type);
+        void init(const vector<TypePtr>& target_types);
+        bool try_init(const TypePtr& target_type);
+        bool try_init(const vector<TypePtr>& target_types);
         void update();
         void reset();
 
@@ -49,6 +47,7 @@ namespace mxslc::expressions
         VarPtr evaluate() const;
         void assign(const VarPtr& value) const;
 
+        bool has_error() const { return not error_message_.empty(); }
         const string& error_message() const { return error_message_; }
 
         string to_string() const override = 0;
@@ -61,13 +60,15 @@ namespace mxslc::expressions
 
         Token token_;
 
-        bool is_initialized_{false};
-        TypePtr subexpr_type_;
         TypePtr target_type_;
         string error_message_;
+        bool is_initialized_{false};
 
         ModifierList mods_;
         AttributeList attrs_;
+
+    private:
+        bool update_target_type(const TypePtr& type, const vector<TypePtr>& target_types);
     };
 }
 

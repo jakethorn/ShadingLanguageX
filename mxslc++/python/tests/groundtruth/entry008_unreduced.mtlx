@@ -3,7 +3,7 @@
   <nodedef name="ND_color3_test" node="color3_test">
     <output name="out" type="color3" />
     <input name="color1" type="color3" />
-    <input name="color2" type="color3" />
+    <input name="color2" type="color3" value="1e-05, 2, 2" />
   </nodedef>
   <invert name="var__0" type="float">
     <input name="in" type="float" value="1" />
@@ -21,11 +21,6 @@
     <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" nodename="var__1" />
     <input name="in3" type="float" nodename="var__2" />
-  </combine3>
-  <combine3 name="var__4" type="color3">
-    <input name="in1" type="float" value="1e-05" />
-    <input name="in2" type="float" value="2" />
-    <input name="in3" type="float" value="2" />
   </combine3>
   <nodegraph name="NG_color3_test" nodedef="ND_color3_test">
     <invert name="var__0" type="float">
@@ -72,29 +67,32 @@
     </add>
     <output name="out" type="color3" nodename="var__7" />
   </nodegraph>
-  <invert name="var__5" type="float">
+  <invert name="var__4" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <combine3 name="var__6" type="color3">
-    <input name="in1" type="float" nodename="var__5" />
+  <combine3 name="var__5" type="color3">
+    <input name="in1" type="float" nodename="var__4" />
     <input name="in2" type="float" value="0.094118" />
     <input name="in3" type="float" value="0.031373" />
   </combine3>
-  <combine3 name="var__7" type="color3">
-    <input name="in1" type="float" value="2e-05" />
-    <input name="in2" type="float" value="1" />
-    <input name="in3" type="float" value="1" />
-  </combine3>
   <color3_test name="color3_test_out" type="color3">
-    <input name="color1" type="color3" nodename="var__6" />
-    <input name="color2" type="color3" nodename="var__7" />
+    <input name="color1" type="color3" nodename="var__5" />
+    <input name="color2" type="color3" value="2e-05, 1, 1" />
   </color3_test>
   <nodedef name="ND_color4_test" node="color4_test">
     <output name="out" type="color4" />
     <input name="color1" type="color4" />
-    <input name="color2" type="color4" />
+    <input name="color2" type="color4" value="1e-05, 2, 2, 1" />
   </nodedef>
+  <invert name="var__6" type="float">
+    <input name="in" type="float" value="1" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <invert name="var__7" type="float">
+    <input name="in" type="float" value="1" />
+    <input name="amount" type="float" value="0" />
+  </invert>
   <invert name="var__8" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
@@ -103,25 +101,11 @@
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <invert name="var__10" type="float">
-    <input name="in" type="float" value="1" />
-    <input name="amount" type="float" value="0" />
-  </invert>
-  <invert name="var__11" type="float">
-    <input name="in" type="float" value="1" />
-    <input name="amount" type="float" value="0" />
-  </invert>
-  <combine4 name="var__12" type="color4">
-    <input name="in1" type="float" nodename="var__8" />
-    <input name="in2" type="float" nodename="var__9" />
-    <input name="in3" type="float" nodename="var__10" />
-    <input name="in4" type="float" nodename="var__11" />
-  </combine4>
-  <combine4 name="var__13" type="color4">
-    <input name="in1" type="float" value="1e-05" />
-    <input name="in2" type="float" value="2" />
-    <input name="in3" type="float" value="2" />
-    <input name="in4" type="float" value="1" />
+  <combine4 name="var__10" type="color4">
+    <input name="in1" type="float" nodename="var__6" />
+    <input name="in2" type="float" nodename="var__7" />
+    <input name="in3" type="float" nodename="var__8" />
+    <input name="in4" type="float" nodename="var__9" />
   </combine4>
   <nodegraph name="NG_color4_test" nodedef="ND_color4_test">
     <invert name="var__0" type="float">
@@ -156,60 +140,55 @@
     </add>
     <output name="out" type="color4" nodename="var__5" />
   </nodegraph>
+  <invert name="var__11" type="float">
+    <input name="in" type="float" value="1" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <invert name="var__12" type="float">
+    <input name="in" type="float" value="1" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <combine4 name="var__13" type="color4">
+    <input name="in1" type="float" nodename="var__11" />
+    <input name="in2" type="float" value="0.094118" />
+    <input name="in3" type="float" value="0.031373" />
+    <input name="in4" type="float" nodename="var__12" />
+  </combine4>
   <invert name="var__14" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <invert name="var__15" type="float">
-    <input name="in" type="float" value="1" />
-    <input name="amount" type="float" value="0" />
-  </invert>
-  <combine4 name="var__16" type="color4">
-    <input name="in1" type="float" nodename="var__14" />
-    <input name="in2" type="float" value="0.094118" />
-    <input name="in3" type="float" value="0.031373" />
-    <input name="in4" type="float" nodename="var__15" />
-  </combine4>
-  <invert name="var__17" type="float">
-    <input name="in" type="float" value="1" />
-    <input name="amount" type="float" value="0" />
-  </invert>
-  <combine4 name="var__18" type="color4">
+  <combine4 name="var__15" type="color4">
     <input name="in1" type="float" value="2e-05" />
     <input name="in2" type="float" value="1" />
     <input name="in3" type="float" value="1" />
-    <input name="in4" type="float" nodename="var__17" />
+    <input name="in4" type="float" nodename="var__14" />
   </combine4>
   <color4_test name="color4_test_out" type="color4">
-    <input name="color1" type="color4" nodename="var__16" />
-    <input name="color2" type="color4" nodename="var__18" />
+    <input name="color1" type="color4" nodename="var__13" />
+    <input name="color2" type="color4" nodename="var__15" />
   </color4_test>
   <nodedef name="ND_vec3_test" node="vec3_test">
     <output name="out" type="vector3" />
     <input name="color1" type="vector3" />
-    <input name="color2" type="vector3" />
+    <input name="color2" type="vector3" value="1e-05, 2, 2" />
   </nodedef>
-  <invert name="var__19" type="float">
+  <invert name="var__16" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <invert name="var__20" type="float">
+  <invert name="var__17" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <invert name="var__21" type="float">
+  <invert name="var__18" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <combine3 name="var__22" type="vector3">
-    <input name="in1" type="float" nodename="var__19" />
-    <input name="in2" type="float" nodename="var__20" />
-    <input name="in3" type="float" nodename="var__21" />
-  </combine3>
-  <combine3 name="var__23" type="vector3">
-    <input name="in1" type="float" value="1e-05" />
-    <input name="in2" type="float" value="2" />
-    <input name="in3" type="float" value="2" />
+  <combine3 name="var__19" type="vector3">
+    <input name="in1" type="float" nodename="var__16" />
+    <input name="in2" type="float" nodename="var__17" />
+    <input name="in3" type="float" nodename="var__18" />
   </combine3>
   <nodegraph name="NG_vec3_test" nodedef="ND_vec3_test">
     <invert name="var__0" type="float">
@@ -239,30 +218,25 @@
     </add>
     <output name="out" type="vector3" nodename="var__4" />
   </nodegraph>
-  <invert name="var__24" type="float">
+  <invert name="var__20" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <combine3 name="var__25" type="vector3">
-    <input name="in1" type="float" nodename="var__24" />
+  <combine3 name="var__21" type="vector3">
+    <input name="in1" type="float" nodename="var__20" />
     <input name="in2" type="float" value="0.094118" />
     <input name="in3" type="float" value="0.031373" />
   </combine3>
-  <combine3 name="var__26" type="vector3">
-    <input name="in1" type="float" value="2e-05" />
-    <input name="in2" type="float" value="1" />
-    <input name="in3" type="float" value="1" />
-  </combine3>
   <vec3_test name="vec3_test_out" type="vector3">
-    <input name="color1" type="vector3" nodename="var__25" />
-    <input name="color2" type="vector3" nodename="var__26" />
+    <input name="color1" type="vector3" nodename="var__21" />
+    <input name="color2" type="vector3" value="2e-05, 1, 1" />
   </vec3_test>
   <nodedef name="ND_float_test" node="float_test">
     <output name="out" type="float" />
     <input name="color1" type="float" />
     <input name="color2" type="float" value="1e-05" />
   </nodedef>
-  <invert name="var__27" type="float">
+  <invert name="var__22" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
@@ -277,12 +251,12 @@
     </add>
     <output name="out" type="float" nodename="var__1" />
   </nodegraph>
-  <invert name="var__28" type="float">
+  <invert name="var__23" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
   <float_test name="float_test_out" type="float">
-    <input name="color1" type="float" nodename="var__28" />
+    <input name="color1" type="float" nodename="var__23" />
     <input name="color2" type="float" value="2e-05" />
   </float_test>
   <nodedef name="ND_int_test" node="int_test">
@@ -290,11 +264,11 @@
     <input name="color1" type="integer" />
     <input name="color2" type="integer" />
   </nodedef>
-  <subtract name="var__29" type="integer">
+  <subtract name="var__24" type="integer">
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="1" />
   </subtract>
-  <subtract name="var__30" type="integer">
+  <subtract name="var__25" type="integer">
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="3" />
   </subtract>
@@ -313,16 +287,16 @@
     </add>
     <output name="out" type="integer" nodename="var__1" />
   </nodegraph>
-  <subtract name="var__31" type="integer">
+  <subtract name="var__26" type="integer">
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="1" />
   </subtract>
-  <subtract name="var__32" type="integer">
+  <subtract name="var__27" type="integer">
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="1000000000" />
   </subtract>
   <int_test name="int_test_out" type="integer">
-    <input name="color1" type="integer" nodename="var__31" />
-    <input name="color2" type="integer" nodename="var__32" />
+    <input name="color1" type="integer" nodename="var__26" />
+    <input name="color2" type="integer" nodename="var__27" />
   </int_test>
 </materialx>

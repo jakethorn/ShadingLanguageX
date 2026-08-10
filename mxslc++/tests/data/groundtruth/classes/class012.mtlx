@@ -1,9 +1,5 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine2 name="s__center_" type="vector2">
-    <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" value="0" />
-  </combine2>
   <multiply name="a" type="float">
     <input name="in1" type="float" value="3" />
     <input name="in2" type="float" value="2" />

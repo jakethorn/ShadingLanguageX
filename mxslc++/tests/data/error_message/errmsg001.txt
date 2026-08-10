@@ -1,1 +1,1 @@
-errmsg001.mxsl, line 1: Attempting to assign an expression of type string to a variable or parameter of type float
+errmsg001.mxsl, line 1: Cannot assign an expression of type string to a variable or parameter of type float

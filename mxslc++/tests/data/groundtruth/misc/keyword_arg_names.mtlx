@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <convert name="var__0" type="color3">
-    <input name="in" type="integer" value="1" />
-  </convert>
   <image name="c" type="color3">
-    <input name="default" type="color3" nodename="var__0" />
+    <input name="default" type="color3" value="1, 1, 1" />
   </image>
   <geompropvalue name="i" type="integer">
     <input name="geomprop" type="string" value="i" />

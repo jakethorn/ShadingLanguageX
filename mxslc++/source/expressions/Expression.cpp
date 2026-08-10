@@ -11,7 +11,6 @@
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/type_cast.h"
-#include "errors/AmbiguousFunctionError.h"
 
 #define TRY_START try {
 #define TRY_END } catch (CompileError& e) { e.set_debug_info(token_); throw; }
@@ -25,48 +24,37 @@ namespace mxslc::expressions
         init(vector<TypePtr>{});
     }
 
-    void Expression::init(const TypePtr& type)
+    void Expression::init(const TypePtr& target_type)
     {
-        init(vector<TypePtr>{type});
+        init(vector<TypePtr>{target_type});
     }
 
-    void Expression::init(const vector<TypePtr>& types)
+    void Expression::init(const vector<TypePtr>& target_types)
     {
         TRY_START
 
-        if (not try_init(types))
-        {
+        if (not try_init(target_types))
             throw CompileError{error_message_};
-        }
 
         TRY_END
     }
 
-    bool Expression::try_init(const TypePtr& type)
+    bool Expression::try_init(const TypePtr& target_type)
     {
-        return try_init(vector<TypePtr>{type});
+        return try_init(vector<TypePtr>{target_type});
     }
 
-    bool Expression::try_init(const vector<TypePtr>& types)
+    bool Expression::try_init(const vector<TypePtr>& target_types)
     {
         TRY_START
 
-        for (const TypePtr& type : types)
+        for (const TypePtr& type : target_types)
             assert(type->is_resolved());
 
-        try
-        {
-            init_subexpressions(types);
-            init_impl(types);
-        }
-        catch (const AmbiguousFunctionError& e)
-        {
-            error_message_ = e.what();
-            is_initialized_ = false;
-            return false;
-        }
+        init_subexpressions(target_types);
+        init_impl(target_types);
 
-        if (types.empty() or (types.size() == 1 and types[0]->is_auto()))
+        if (target_types.empty() or (target_types.size() == 1 and target_types[0]->is_auto()))
         {
             is_initialized_ = true;
             return true;
@@ -75,13 +63,13 @@ namespace mxslc::expressions
         const TypePtr type = type_impl();
         assert(type->is_resolved());
 
-        target_type_ = type->find_unique_compatible(types);
+        const bool success = update_target_type(type, target_types);
 
-        if (target_type_ == nullptr)
-            error_message_ = "Attempting to assign an expression of type " + type->to_string() + " to a variable or parameter of type " + type_utils::to_string(types);
+        if (not success)
+            error_message_ = "Cannot assign an expression of type " + type->to_string() + " to a variable or parameter of type " + type_utils::to_string(target_types);
 
-        is_initialized_ = target_type_ != nullptr;
-        return is_initialized_;
+        is_initialized_ = success;
+        return success;
 
         TRY_END
     }
@@ -93,8 +81,9 @@ namespace mxslc::expressions
 
     void Expression::reset()
     {
-        is_initialized_ = false;
         target_type_ = nullptr;
+        error_message_.clear();
+        is_initialized_ = false;
     }
 
     TypePtr Expression::type() const
@@ -117,24 +106,19 @@ namespace mxslc::expressions
 
         assert(is_initialized_);
 
-        const bool reduce_graph_cache = serializer().reduce_graph();
-        if (is_comptime())
-            serializer().set_reduce_graph(true);
-
+        serializer().begin_comptime(is_comptime());
         VarPtr value = evaluate_impl();
-
-        serializer().set_reduce_graph(reduce_graph_cache);
+        serializer().end_comptime();
 
         if (target_type_)
         {
             assert(value->type()->equals(type_impl()));
             return runtime_utils::type_cast(target_type_, value);
         }
-
-        if (is_comptime() and not value->is_compile_time())
-            throw CompileError{"Expression could not be evaluated at compile-time"};
-
-        return value;
+        else
+        {
+            return value;
+        }
 
         TRY_END
     }
@@ -146,6 +130,38 @@ namespace mxslc::expressions
         evaluate()->copy(value);
 
         TRY_END
+    }
+
+    bool Expression::update_target_type(const TypePtr& type, const vector<TypePtr>& target_types)
+    {
+        target_type_ = nullptr;
+
+        if (target_types.empty())
+            return true;
+
+        vector<TypePtr> compatibles;
+        for (const TypePtr& target_type : target_types)
+        {
+            if (type->equals(target_type))
+                return true;
+
+            if (type->is_compatible_with(target_type))
+            {
+                if (target_type->is_auto() or target_type->is_tuple())
+                    compatibles.push_back(type);
+                else
+                    compatibles.push_back(target_type);
+            }
+        }
+
+        if (compatibles.size() == 1)
+        {
+            if (compatibles[0] != type)
+                target_type_ = compatibles[0];
+            return true;
+        }
+
+        return false;
     }
 }
 

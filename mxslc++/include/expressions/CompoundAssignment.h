@@ -2,8 +2,8 @@
 // Created by jaket on 15/05/2026.
 //
 
-#ifndef MXSLC_COMPOUNDEXPRESSION_H
-#define MXSLC_COMPOUNDEXPRESSION_H
+#ifndef MXSLC_COMPOUNDASSIGNMENT_H
+#define MXSLC_COMPOUNDASSIGNMENT_H
 
 #include "expressions/Expression.h"
 
@@ -31,4 +31,4 @@ namespace mxslc::expressions
     };
 }
 
-#endif //MXSLC_COMPOUNDEXPRESSION_H
+#endif //MXSLC_COMPOUNDASSIGNMENT_H

@@ -24,4 +24,10 @@ namespace mxslc::string_utils
     {
         return str.rfind(prefix, 0) == 0;
     }
+
+    void replace_last(string& str, const string& old_str, const string& new_str)
+    {
+        if (const size_t i = str.rfind(old_str); i != string::npos)
+            str.replace(i, old_str.length(), new_str);
+    }
 }

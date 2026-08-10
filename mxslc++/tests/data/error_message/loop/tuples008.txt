@@ -1,0 +1,1 @@
+tuples008.mxsl, line 1: Cannot assign an expression of type integer to a variable or parameter of type tuple<integer>

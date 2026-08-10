@@ -1,16 +1,15 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <constant name="var__0" type="color4" />
-  <constant name="var__1" type="color4">
-    <input name="value" type="color4" nodename="var__3" />
+  <constant name="var__0" type="color4">
+    <input name="value" type="color4" nodename="var__2" />
   </constant>
-  <separate4 name="var__2" type="multioutput">
-    <input name="in" type="color4" nodename="var__0" />
+  <separate4 name="var__1" type="multioutput">
+    <input name="in" type="color4" value="0, 0, 0, 0" />
   </separate4>
-  <combine4 name="var__3" type="color4">
-    <input name="in1" type="float" output="outg" nodename="var__2" />
-    <input name="in2" type="float" output="outa" nodename="var__2" />
-    <input name="in3" type="float" output="outr" nodename="var__2" />
-    <input name="in4" type="float" output="outb" nodename="var__2" />
+  <combine4 name="var__2" type="color4">
+    <input name="in1" type="float" output="outg" nodename="var__1" />
+    <input name="in2" type="float" output="outa" nodename="var__1" />
+    <input name="in3" type="float" output="outr" nodename="var__1" />
+    <input name="in4" type="float" output="outb" nodename="var__1" />
   </combine4>
 </materialx>

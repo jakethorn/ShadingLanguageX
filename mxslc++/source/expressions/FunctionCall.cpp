@@ -2,11 +2,12 @@
 // Created by jaket on 16/04/2026.
 //
 
+#include <cassert>
+
 #include "expressions/FunctionCall.h"
 
 #include "expressions/MethodCall.h"
 #include "expressions/ThisExpression.h"
-#include "errors/AmbiguousFunctionError.h"
 #include "expressions/interface.h"
 #include "runtime/interface.h"
 #include "runtime/Function.h"
@@ -15,6 +16,7 @@
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
+#include "runtime/utils/FunctionResolver.h"
 #include "runtime/utils/monomorphize.h"
 #include "serialize/serializer_utils.h"
 
@@ -77,66 +79,49 @@ namespace mxslc::expressions
         );
     }
 
-    void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
+    void FunctionCall::init_impl(const vector<TypePtr>& types)
     {
+        if (method_call_)
+        {
+            method_call_->init(types);
+            return;
+        }
+
         if (template_type_)
             template_type_ = scope().resolve_type(template_type_);
 
-        Scope* current_scope = &scope();
-        while (current_scope)
-        {
-            try
-            {
-                init_arguments(*current_scope, types);
-                func_scope_ = current_scope;
-                current_scope = nullptr;
-            }
-            catch (const AmbiguousFunctionError&)
-            {
-                initialized_arg_count_ = 0;
-                for (const Argument& arg : args_)
-                    arg.reset();
-
-                if (current_scope->has_parent())
-                    current_scope = &current_scope->parent();
-                else
-                    current_scope = nullptr;
-            }
-        }
-
-        // throw the original exception
-        if (func_scope_ == nullptr)
-            init_arguments(scope(), types);
-    }
-
-    void FunctionCall::init_impl(const vector<TypePtr>& types)
-    {
-        func_ = get_matching_function(*func_scope_, types);
+        func_ = runtime_utils::resolve_function(types, name_, template_type_, args_, is_argumentless_);
 
         for (const Argument& arg : args_)
+        {
+            assert(arg.is_initialized());
             arg.validate(func_->parameters()[arg]);
+        }
 
         if (func_->has_class_type() and method_call_ == nullptr)
         {
             ExprPtr instance = create_expression<ThisExpression>(token_);
             method_call_ = create_expression<MethodCall>(std::move(instance), std::move(name_), std::move(template_type_), std::move(args_), std::move(attrs_), std::move(token_));
-            method_call_->init();
+            method_call_->init(types);
         }
     }
 
     TypePtr FunctionCall::type_impl() const
     {
+        if (method_call_)
+            return method_call_->type();
+
         return func_->return_type();
     }
 
     VarPtr FunctionCall::evaluate_impl() const
     {
-        if (func_->has_class_type())
+        if (method_call_)
             return method_call_->evaluate();
 
         if (func_->is_inline())
         {
-            runtime().enter_scope();
+            runtime().enter_scope(name_);
             evaluate_arguments();
             VarPtr return_value = inline_invoke();
             update_out_arguments();
@@ -150,16 +135,6 @@ namespace mxslc::expressions
             else
                 return serializer().write_node(func_, args_, attrs_);
         }
-    }
-
-    vector<FuncPtr> FunctionCall::get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const
-    {
-        return scope.get_functions({return_types, name_, template_type_, args_, is_argumentless_});
-    }
-
-    FuncPtr FunctionCall::get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const
-    {
-        return scope.get_function({return_types, name_, template_type_, args_, is_argumentless_});
     }
 
     // inline only
@@ -208,112 +183,9 @@ namespace mxslc::expressions
         }
     }
 
-    namespace
-    {
-        vector<TypePtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg)
-        {
-            vector<TypePtr> types;
-
-            for (const FuncPtr& func : funcs)
-            {
-                const TypePtr& type = func->parameters()[arg].type();
-                if (not type->is_in(types))
-                    types.push_back(type);
-            }
-
-            return types;
-        }
-    }
-
-    bool FunctionCall::arguments_are_initialized()
-    {
-        bool result = true;
-        for (const Argument& arg : args_)
-        {
-            if (arg.is_initialized())
-            {
-                arg.update();
-                ++initialized_arg_count_;
-            }
-            else
-            {
-                result = false;
-            }
-        }
-
-        return result;
-    }
-
-    void FunctionCall::init_arguments(const Scope& scope, const vector<TypePtr>& return_types)
-    {
-        initialized_arg_count_ = 0;
-
-        if (arguments_are_initialized())
-            return;
-
-        size_t initialized_arg_count = initialized_arg_count_;
-        while (initialized_arg_count < args_.size())
-        {
-            vector<FuncPtr> matching_funcs = get_matching_functions(scope, return_types);
-
-            const size_t prev_initialized_arg_count = initialized_arg_count;
-            initialized_arg_count = try_init_arguments(matching_funcs);
-
-            if (initialized_arg_count == prev_initialized_arg_count)
-            {
-                // no progress made, try to init with the default function...
-                try
-                {
-                    const FuncPtr default_func = get_matching_function(scope, return_types);
-                    initialized_arg_count = try_init_arguments(default_func);
-                }
-                catch (const AmbiguousFunctionError&)
-                {
-                    throw AmbiguousFunctionError{name_, matching_funcs, underlying_errors_};
-                }
-
-                if (initialized_arg_count == prev_initialized_arg_count)
-                    throw AmbiguousFunctionError{name_, matching_funcs, underlying_errors_};
-            }
-        }
-    }
-
-    size_t FunctionCall::try_init_arguments(const vector<FuncPtr>& funcs)
-    {
-        underlying_errors_.clear();
-        size_t initialized_arg_count = 0;
-        for (const Argument& arg : args_)
-        {
-            if (not arg.is_initialized())
-            {
-                if (const vector<TypePtr> types = get_parameter_types(funcs, arg);
-                    arg.try_init(types))
-                {
-                    ++initialized_arg_count_;
-                }
-            }
-
-            if (arg.is_initialized())
-            {
-                ++initialized_arg_count;
-            }
-            else
-            {
-                underlying_errors_.push_back(arg.error_message());
-            }
-        }
-
-        return initialized_arg_count;
-    }
-
-    size_t FunctionCall::try_init_arguments(const FuncPtr &func)
-    {
-        return try_init_arguments(vector<FuncPtr>{func});
-    }
-
     string FunctionCall::to_string() const
     {
-        const string template_type_string = template_type_ ? template_type_->to_string() : "";
+        const string template_type_string = template_type_ ? "<" + template_type_->to_string() + ">" : "";
         const string args_string = is_argumentless_ ? "" : "(" + join(args_, ", ") + ")";
         return name_ + template_type_string + args_string;
     }

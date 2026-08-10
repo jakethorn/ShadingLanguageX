@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_bar" node="bar">
+    <input name="nonlocal_in__x" type="float" />
+    <output name="nonlocal_out__x" type="float" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="nonlocal_in__x" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="nonlocal_out__x" type="float" nodename="var__0" />
+  </nodegraph>
+  <bar name="var__0" type="float">
+    <input name="nonlocal_in__x" type="float" value="7" />
+  </bar>
+  <add name="var__1" type="float">
+    <input name="in1" type="float" output="nonlocal_out__x" nodename="var__0" />
+    <input name="in2" type="float" value="2" />
+  </add>
+  <add name="theta1" type="float">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" value="10" />
+  </add>
+  <bar name="var__2" type="float">
+    <input name="nonlocal_in__x" type="float" output="nonlocal_out__x" nodename="var__0" />
+  </bar>
+  <add name="var__3" type="float">
+    <input name="in1" type="float" output="nonlocal_out__x" nodename="var__2" />
+    <input name="in2" type="float" value="2" />
+  </add>
+  <add name="theta2" type="float">
+    <input name="in1" type="float" nodename="var__3" />
+    <input name="in2" type="float" value="20" />
+  </add>
+</materialx>

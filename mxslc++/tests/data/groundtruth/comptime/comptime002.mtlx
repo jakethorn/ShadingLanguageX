@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="var__0" type="float" />
+  <constant name="var__1" type="float">
+    <input name="value" type="float" nodename="var__0" />
+  </constant>
+</materialx>

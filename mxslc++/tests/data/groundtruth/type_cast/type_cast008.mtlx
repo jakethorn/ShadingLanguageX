@@ -16,30 +16,20 @@
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <constant name="var__0" type="vector2" />
-  <foo name="var__1" type="integer">
-    <input name="a" type="vector2" nodename="var__0" />
+  <foo name="var__0" type="integer">
+    <input name="a" type="vector2" value="0, 0" />
     <input name="b" type="integer" value="1" />
   </foo>
-  <constant name="var__2" type="vector2" />
-  <foo name="var__3" type="integer">
-    <input name="a" type="vector2" nodename="var__2" />
+  <foo name="var__1" type="integer">
+    <input name="a" type="vector2" value="0, 0" />
     <input name="b" type="string" value="hello" />
   </foo>
-  <combine2 name="var__4" type="vector2">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="2" />
-  </combine2>
-  <foo name="var__5" type="integer">
-    <input name="a" type="vector2" nodename="var__4" />
+  <foo name="var__2" type="integer">
+    <input name="a" type="vector2" value="1, 2" />
     <input name="b" type="integer" value="1" />
   </foo>
-  <combine2 name="var__6" type="vector2">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="2" />
-  </combine2>
-  <foo name="var__7" type="integer">
-    <input name="a" type="vector2" nodename="var__6" />
+  <foo name="var__3" type="integer">
+    <input name="a" type="vector2" value="1, 2" />
     <input name="b" type="string" value="hello" />
   </foo>
 </materialx>

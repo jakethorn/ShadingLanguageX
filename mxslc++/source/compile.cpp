@@ -69,10 +69,10 @@ namespace mxslc
 
             Runtime& runtime = Runtime::create(opts);
             {
-                runtime.enter_scope();
+                runtime.enter_scope("mxsl_stdlib");
                 compile_mxsl_stdlib();
                 {
-                    runtime.enter_scope();
+                    runtime.enter_scope("global");
                     compile_tokens(std::move(tokens));
                     if (opts.has_entry_function())
                         runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());

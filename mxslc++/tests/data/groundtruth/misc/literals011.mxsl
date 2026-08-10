@@ -1,0 +1,4 @@
+
+mutable float f = 5.0;
+f += 5;
+constant(f);

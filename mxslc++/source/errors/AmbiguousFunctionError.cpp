@@ -4,6 +4,8 @@
 
 #include "errors/AmbiguousFunctionError.h"
 #include "runtime/Function.h"
+#include "runtime/FunctionQuery.h"
+#include "runtime/Type.h"
 
 namespace mxslc
 {
@@ -12,38 +14,29 @@ namespace mxslc
 
     }
 
-    AmbiguousFunctionError::AmbiguousFunctionError(const string& func_name, const vector<FuncPtr>& funcs)
-        : AmbiguousFunctionError{format(func_name, funcs, {})}
+    AmbiguousFunctionError::AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs)
+        : AmbiguousFunctionError{format(query, funcs)}
     {
 
     }
 
-    AmbiguousFunctionError::AmbiguousFunctionError(const string& func_name, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors)
-        : AmbiguousFunctionError{format(func_name, funcs, underlying_errors)}
+    string AmbiguousFunctionError::format(const FunctionQuery& query, const vector<FuncPtr>& funcs)
     {
+        const string func_type = query.has_class_type() ? "method" : "function";
+        const string func_name = query.has_class_type() ? (*query.class_type)->to_string() + "." + *query.name : *query.name;
 
-    }
-
-    string AmbiguousFunctionError::format(const string& func_name, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors)
-    {
         string message;
         if (funcs.empty())
         {
-            message = "Definition could not be found for function '" + func_name + "'";
+            message = "No " + func_type + " could be found with the name '" + func_name + "'";
         }
         else
         {
-            message = "Matching definition could not be found for function '" + func_name + "'\n";
-            message += "Possible matches:\n";
+            message = "No " + func_type + " could be found that matches the signature '" + query.to_string() + "'";
+            message += "\nPossible matches:\n";
             for (const FuncPtr& func : funcs)
                 message += func->header() + "\n";
         }
-
-        if (not underlying_errors.empty())
-            message += "\nUnderlying errors:\n";
-
-        for (const string& underlying_error : underlying_errors)
-            message += "\n" + underlying_error;
 
         return message;
     }

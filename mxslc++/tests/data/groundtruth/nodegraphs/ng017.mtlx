@@ -1,32 +1,14 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG__123_vector3">
-    <convert name="var__0" type="vector3">
-      <input name="in" type="float" value="1" />
-    </convert>
-    <convert name="var__1" type="vector3">
-      <input name="in" type="float" value="2" />
-    </convert>
-    <convert name="var__2" type="vector3">
-      <input name="in" type="float" value="3" />
-    </convert>
-    <output name="out__x" type="vector3" nodename="var__0" />
-    <output name="out__y" type="vector3" nodename="var__1" />
-    <output name="out__z" type="vector3" nodename="var__2" />
+    <output name="out__x" type="vector3" value="1, 1, 1" />
+    <output name="out__y" type="vector3" value="2, 2, 2" />
+    <output name="out__z" type="vector3" value="3, 3, 3" />
   </nodegraph>
   <nodegraph name="NG__123_vector4">
-    <convert name="var__0" type="vector4">
-      <input name="in" type="float" value="1" />
-    </convert>
-    <convert name="var__1" type="vector4">
-      <input name="in" type="float" value="2" />
-    </convert>
-    <convert name="var__2" type="vector4">
-      <input name="in" type="float" value="3" />
-    </convert>
-    <output name="out__x" type="vector4" nodename="var__0" />
-    <output name="out__y" type="vector4" nodename="var__1" />
-    <output name="out__z" type="vector4" nodename="var__2" />
+    <output name="out__x" type="vector4" value="1, 1, 1, 1" />
+    <output name="out__y" type="vector4" value="2, 2, 2, 2" />
+    <output name="out__z" type="vector4" value="3, 3, 3, 3" />
   </nodegraph>
   <add name="var__0" type="vector3">
     <input name="in1" type="vector3" output="out__x" nodegraph="NG__123_vector3" />

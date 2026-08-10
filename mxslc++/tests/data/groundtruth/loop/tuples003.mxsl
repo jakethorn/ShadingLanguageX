@@ -1,0 +1,14 @@
+for (int i from 1 to 3)
+{
+    constant(i);
+}
+
+for (float f from 1 to 3)
+{
+    constant(f);
+}
+
+for (float f from 1.0 to 3.0)
+{
+    constant(f);
+}

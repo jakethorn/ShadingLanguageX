@@ -1,1 +1,1 @@
-funcquery005.mxsl, line 16: Definition could not be found for function 'bar'
+funcquery005.mxsl, line 16: No function could be found with the name 'bar'

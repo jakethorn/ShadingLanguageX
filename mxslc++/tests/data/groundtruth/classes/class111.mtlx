@@ -19,17 +19,13 @@
     <output name="out__this__center_" type="vector2" interfacename="this__center_" />
     <output name="out__this__radius_" type="float" interfacename="r" />
   </nodegraph>
-  <combine2 name="s__center_" type="vector2">
-    <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" value="0" />
-  </combine2>
   <Sphere_get_radius name="a" type="float">
-    <input name="this__center_" type="vector2" nodename="s__center_" />
+    <input name="this__center_" type="vector2" value="0, 0" />
     <input name="this__radius_" type="float" value="3" />
   </Sphere_get_radius>
   <Sphere_set_radius name="var__0" type="multioutput">
     <input name="r" type="float" value="4" />
-    <input name="this__center_" type="vector2" nodename="s__center_" />
+    <input name="this__center_" type="vector2" value="0, 0" />
     <input name="this__radius_" type="float" value="3" />
   </Sphere_set_radius>
   <Sphere_get_radius name="b" type="float">

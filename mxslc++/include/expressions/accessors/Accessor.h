@@ -10,7 +10,9 @@
 
 namespace mxslc::expressions
 {
-    class Accessor : protected runtime_utils::RuntimeAware
+    using runtime_utils::RuntimeAware;
+
+    class Accessor : protected RuntimeAware
     {
     public:
         Accessor() = default;

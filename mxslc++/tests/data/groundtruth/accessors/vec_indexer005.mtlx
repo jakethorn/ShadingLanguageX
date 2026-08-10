@@ -11,16 +11,12 @@
       <input name="in" type="vector2" interfacename="nonlocal_in__y" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <combine2 name="var__0" type="vector2">
-      <input name="in1" type="float" value="3" />
-      <input name="in2" type="float" value="3" />
-    </combine2>
-    <extract name="var__1" type="float">
-      <input name="in" type="vector2" nodename="var__0" />
+    <extract name="var__0" type="float">
+      <input name="in" type="vector2" value="3, 3" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <output name="nonlocal_out__y" type="vector2" nodename="var__0" />
-    <output name="out__0" type="float" nodename="var__1" />
+    <output name="nonlocal_out__y" type="vector2" value="3, 3" />
+    <output name="out__0" type="float" nodename="var__0" />
     <output name="out__1" type="float" nodename="x" />
   </nodegraph>
   <foo name="var__0" type="multioutput">

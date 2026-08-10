@@ -13,6 +13,7 @@
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/type_cast.h"
 #include "errors/CompileError.h"
+#include "serialize/Serializer.h"
 
 namespace mxslc::runtime
 {
@@ -49,7 +50,7 @@ namespace mxslc::runtime
         return_expr_{std::move(return_expr)},
         is_parameterless_{not params.has_value()}
     {
-        mods_.validate(TokenType::Inline, TokenType::Default);
+        mods_.validate(TokenType::Inline, TokenType::Default, TokenType::Comptime);
 
         if (return_type_->is_void() and return_expr_ != nullptr)
             throw CompileError{"Void function '" + name_ + "' has a return statement"};
@@ -137,39 +138,55 @@ namespace mxslc::runtime
         if (parameterless_cache_)
             return parameterless_cache_;
 
+        serializer().begin_comptime(is_comptime());
+
         body_->execute();
 
+        VarPtr return_value;
         if (is_void())
         {
-            return nullptr;
+            return_value = nullptr;
         }
         else
         {
             return_expr_->init(return_type_);
-            VarPtr return_value = type_cast(return_type_, return_expr_->evaluate(), /*force*/true);
+            return_value = type_cast(return_type_, return_expr_->evaluate(), /*force*/true);
             if (is_parameterless_)
                 parameterless_cache_ = return_value;
-            return return_value;
         }
+
+        serializer().end_comptime();
+
+        return return_value;
+    }
+
+    void Function::update_nonlocal_variables()
+    {
+        for (VarPtr& var : nonlocal_inputs_)
+            var = scope().get_variable(var->name());
+        for (VarPtr& var : nonlocal_outputs_)
+            var = scope().get_variable(var->name());
     }
 
     string Function::header() const
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         string result;
         result += mods_string;
-        result += return_type_->to_string();
-        result += " " + name_;
+        result += return_type_->to_string() + ' ';
+        if (has_class_type())
+            result += class_type()->to_string() + '.';
+        result += name_;
         if (has_template_type())
-            result += "<" + template_type_->to_string() + ">";
+            result += '<' + template_type_->to_string() + '>';
         if (not is_parameterless_)
         {
-            result += "(";
+            result += '(';
             result += params_.to_string();
-            result += ")";
+            result += ')';
         }
         return result;
     }
@@ -178,9 +195,9 @@ namespace mxslc::runtime
     {
         string result = header();
         if (is_defined())
-            result += "\n" + body_->to_string();
+            result += '\n' + body_->to_string();
         else
-            result += ";";
+            result += ';';
         return result;
     }
 }

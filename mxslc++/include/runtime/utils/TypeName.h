@@ -27,6 +27,7 @@ namespace mxslc::runtime_utils
         inline static const string Color4 = "color4";
         inline static const string Mat3 = "matrix33";
         inline static const string Mat4 = "matrix44";
+        inline static const string Tuple = "tuple";
         inline static const string Void = "void";
         inline static const string Auto = "auto";
 

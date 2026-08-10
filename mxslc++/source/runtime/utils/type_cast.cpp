@@ -19,7 +19,7 @@ namespace mxslc::runtime_utils
         if (value->type()->equals(type, force))
             return value;
 
-        assert(value->type()->is_compatible(type));
+        assert(value->type()->is_compatible_with(type));
 
         if (value->child_count() == type->field_count())
             return create_variable(type, value);

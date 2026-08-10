@@ -45,13 +45,8 @@
     </multiply>
     <output name="out" type="float" nodename="var__2" />
   </nodegraph>
-  <combine3 name="s__position" type="vector3">
-    <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" value="0" />
-    <input name="in3" type="float" value="0" />
-  </combine3>
   <Sphere_area name="var__0" type="float">
-    <input name="this__position" type="vector3" nodename="s__position" />
+    <input name="this__position" type="vector3" value="0, 0, 0" />
     <input name="this__radius" type="float" value="1" />
   </Sphere_area>
 </materialx>

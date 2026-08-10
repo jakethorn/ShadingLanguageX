@@ -15,7 +15,7 @@ namespace mxslc::runtime
     using runtime_utils::TypeName;
     using runtime_utils::Monomorphizable;
 
-    class Type : public Monomorphizable<TypePtr>, public Stringable
+    class Type : public std::enable_shared_from_this<Type>, public Monomorphizable<TypePtr>, public Stringable
     {
         friend class Scope;
 
@@ -25,10 +25,14 @@ namespace mxslc::runtime
         explicit Type(const vector<TypePtr>& fields);
         Type(string name, vector<Field> fields);
         Type(string name, vector<Field> fields, vector<weak_ptr<Function>> methods);
+        Type(string name, TypePtr template_type);
         Type(const TypePtr& field_type, size_t field_count);
 
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
+
+        bool has_template_type() const { return template_type_ != nullptr; }
+        const TypePtr& template_type() const { return template_type_; }
 
         TypePtr monomorphize(const TypePtr& template_type) const override;
 
@@ -57,15 +61,14 @@ namespace mxslc::runtime
         bool is_single() const { return TypeName::is_single(name_); }
         bool is_vector() const { return TypeName::is_vector(name_); }
         bool is_matrix() const { return TypeName::is_matrix(name_); }
+        bool is_tuple() const { return name_ == TypeName::Tuple; }
 
         bool is_resolved() const { return is_resolved_; }
 
-        bool is_compatible(const TypePtr& other) const;
-        bool is_compatible(const vector<TypePtr>& types) const;
+        bool is_compatible_with(const TypePtr& other) const;
+        bool is_compatible_with(const vector<TypePtr>& types) const;
         bool equals(const TypePtr& other, bool field_names = false) const;
         bool is_in(const vector<TypePtr>& types) const;
-
-        TypePtr find_unique_compatible(const vector<TypePtr>& types) const;
 
         string to_string() const override;
         string full_str() const;
@@ -92,12 +95,14 @@ namespace mxslc::runtime
         static TypePtr of() { return resolve(TypeName::of<T>()); }
         static TypePtr of(const mx::NodeGraphPtr& node_graph);
         static TypePtr of(const mx::TypedElementPtr& value);
+        static TypePtr tuple(TypePtr template_type);
         static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
 
     private:
         string name_;
         vector<Field> fields_;
         vector<weak_ptr<Function>> methods_;
+        TypePtr template_type_;
 
         bool is_resolved_{false};
 
