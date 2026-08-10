@@ -76,6 +76,7 @@ namespace mxslc::runtime
         void add_nonlocal_output(VarPtr var) { nonlocal_outputs_.push_back(std::move(var)); }
         const vector<VarPtr>& nonlocal_inputs() const { return nonlocal_inputs_; }
         const vector<VarPtr>& nonlocal_outputs() const { return nonlocal_outputs_; }
+        void update_nonlocal_variables();
 
         TypePtr class_type() const { return class_type_.lock(); }
         void set_class_type(weak_ptr<Type> type) { class_type_ = std::move(type); }

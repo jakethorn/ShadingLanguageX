@@ -203,7 +203,7 @@ namespace mxslc::serialize
 
     void Serializer::write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const
     {
-        runtime().enter_scope();
+        runtime().enter_scope(func->name());
 
         if (func->is_parameterless())
         {

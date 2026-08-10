@@ -17,6 +17,7 @@ namespace mxslc::runtime
     {
     public:
         Scope();
+        explicit Scope(string name);
         explicit Scope(ScopePtr parent);
         Scope(string name, ScopePtr parent);
 

@@ -121,7 +121,7 @@ namespace mxslc::expressions
 
         if (func_->is_inline())
         {
-            runtime().enter_scope();
+            runtime().enter_scope(name_);
             evaluate_arguments();
             VarPtr return_value = inline_invoke();
             update_out_arguments();

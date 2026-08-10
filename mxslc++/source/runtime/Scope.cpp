@@ -19,19 +19,17 @@ namespace mxslc::runtime
 {
     using container_utils::contains;
 
-    Scope::Scope() = default;
-
-    Scope::Scope(ScopePtr parent) : Scope{string{}, std::move(parent)}
+    Scope::Scope() : Scope{string{}, nullptr} { }
+    Scope::Scope(string name) : Scope{std::move(name), nullptr} { }
+    Scope::Scope(ScopePtr parent) : Scope{string{}, std::move(parent)} { }
+    Scope::Scope(string name, ScopePtr parent) : name_{std::move(name)}, parent_{std::move(parent)}
     {
-
-    }
-
-    Scope::Scope(string name, ScopePtr parent) : parent_{std::move(parent)}
-    {
-        name_ = std::move(name);
-        parent_->is_youngest_ = false;
-        graph_ = parent_->graph_;
-        func_ = parent_->func_;
+        if (parent_)
+        {
+            parent_->is_youngest_ = false;
+            graph_ = parent_->graph_;
+            func_ = parent_->func_;
+        }
     }
 
     std::pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const

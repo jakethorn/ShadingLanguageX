@@ -51,7 +51,7 @@ namespace mxslc::statements
             if (not next_value->type()->is_compatible_with(type_))
                 throw CompileError{"Field value does not match loop iterator type"};
 
-            runtime().enter_scope();
+            runtime().enter_scope("loop");
             create_variable(mods_, type_, next_value)->add_to_scope(name_);
             body_->execute();
             runtime().exit_scope();
