@@ -107,6 +107,22 @@ namespace mxslc::serialize
             throw CompileError{"Invalid MaterialX version: " + version};
     }
 
+    void Serializer::set_reduce_graph(const bool value)
+    {
+        reduce_graph_ = value;
+    }
+
+    void Serializer::begin_comptime(const bool is_comptime) const
+    {
+        comptime_scope_.push(comptime_scope_.top() or is_comptime);
+    }
+
+    bool Serializer::end_comptime() const
+    {
+        comptime_scope_.pop();
+        return std::exchange(comptime_violated_, false);
+    }
+
     VarPtr Serializer::write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const
     {
         return write_node(nullptr, func, args, attrs);
@@ -116,11 +132,14 @@ namespace mxslc::serialize
     {
         ParameterValues input_values = args.evaluate(func->parameters());
 
-        if (reduce_graph_)
+        if (reduce_graph_ or comptime_scope_.top())
         {
             if (VarPtr value = serialize_constexpr(func->return_type(), func->name(), input_values))
                 return value;
         }
+
+        if (comptime_scope_.top())
+            comptime_violated_ = true;
 
         const mx::GraphElementPtr& graph = scope().graph();
         const mx::NodePtr node = graph->addNode(node_category(func), get_valid_node_name(graph), serialize_type(func));

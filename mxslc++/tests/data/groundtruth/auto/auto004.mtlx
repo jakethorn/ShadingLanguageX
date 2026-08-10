@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <constant name="stuff__3" type="vector2" />
   <constant name="var__0" type="integer">
     <input name="value" type="integer" value="1" />
   </constant>
@@ -11,6 +10,6 @@
     <input name="value" type="string" value="world" />
   </constant>
   <constant name="var__3" type="vector2">
-    <input name="value" type="vector2" nodename="stuff__3" />
+    <input name="value" type="vector2" value="0, 0" />
   </constant>
 </materialx>

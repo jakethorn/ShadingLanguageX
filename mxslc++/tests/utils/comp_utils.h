@@ -1,7 +1,3 @@
-//
-// Created by jaket on 30/03/2026.
-//
-
 #ifndef MXSLC_COMP_UTILS_H
 #define MXSLC_COMP_UTILS_H
 
@@ -58,26 +54,71 @@ inline string column_compare(const string& left_header, const string& left_text,
     right_lines.insert(right_lines.begin(), string(right_header.size(), '-'));
     right_lines.insert(right_lines.begin(), right_header);
 
+    // Dynamic Programming table to find the longest common sequence of lines
+    size_t n = left_lines.size();
+    size_t m = right_lines.size();
+    std::vector<int> dp((n + 1) * (m + 1), 0);
+    auto get_dp = [&](size_t i, size_t j) -> int& { return dp[i * (m + 1) + j]; };
+
+    // Initialization (Gap penalties)
+    for (size_t i = 0; i <= n; ++i) get_dp(i, 0) = i * 2;
+    for (size_t j = 0; j <= m; ++j) get_dp(0, j) = j * 2;
+
+    // Fill DP table
+    for (size_t i = 1; i <= n; ++i) {
+        for (size_t j = 1; j <= m; ++j) {
+            if (left_lines[i - 1] == right_lines[j - 1]) {
+                get_dp(i, j) = get_dp(i - 1, j - 1);
+            } else {
+                get_dp(i, j) = std::min({
+                    get_dp(i - 1, j) + 2,       // Delete (left side only)
+                    get_dp(i, j - 1) + 2,       // Insert (right side only)
+                    get_dp(i - 1, j - 1) + 3    // Substitute (modified line) - cost preferred over 1 Insert + 1 Delete (4)
+                });
+            }
+        }
+    }
+
+    // Backtrack to build aligned line pairs
+    std::vector<std::pair<string, string>> aligned_lines;
+    size_t i = n, j = m;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && left_lines[i - 1] == right_lines[j - 1] && get_dp(i, j) == get_dp(i - 1, j - 1)) {
+            aligned_lines.push_back({left_lines[i - 1], right_lines[j - 1]});
+            i--; j--;
+        } else if (i > 0 && j > 0 && get_dp(i, j) == get_dp(i - 1, j - 1) + 3) {
+            aligned_lines.push_back({left_lines[i - 1], right_lines[j - 1]}); // Align for intra-line highlighting
+            i--; j--;
+        } else if (i > 0 && get_dp(i, j) == get_dp(i - 1, j) + 2) {
+            aligned_lines.push_back({left_lines[i - 1], ""}); // Missing on the right
+            i--;
+        } else if (j > 0 && get_dp(i, j) == get_dp(i, j - 1) + 2) {
+            aligned_lines.push_back({"", right_lines[j - 1]}); // Missing on the left
+            j--;
+        }
+    }
+    std::reverse(aligned_lines.begin(), aligned_lines.end());
+
     size_t column_width = 0;
-    for (const string& s : left_lines)
-        column_width = std::max(column_width, s.length());
+    for (const auto& pair : aligned_lines)
+        column_width = std::max(column_width, pair.first.length());
     column_width += 4; // Extra padding for safety with ANSI codes
 
-    const size_t n_rows = std::max(left_lines.size(), right_lines.size());
     std::ostringstream output;
 
-    for (size_t i = 0; i < n_rows; ++i)
+    for (size_t r = 0; r < aligned_lines.size(); ++r)
     {
-        const string& L = i < left_lines.size() ? left_lines[i] : "";
-        const string& R = i < right_lines.size() ? right_lines[i] : "";
+        const string& L = aligned_lines[r].first;
+        const string& R = aligned_lines[r].second;
 
         // Row formatting lambda to handle the orange-red-orange logic
         auto append_diff = [&](const string& current, const string& other) {
-            if (!highlight_lines || i < 2) {
+            if (!highlight_lines || r < 2) {
                 output << current;
                 return current.length();
             }
             if (current == other) {
+                if (current.empty()) return size_t(0); // Safely handle blank gaps
                 output << green << current << white;
                 return current.length();
             }

@@ -7,10 +7,9 @@
     <output name="out__texture" type="filename" />
   </nodedef>
   <nodegraph name="NG___Point__" nodedef="ND___Point__">
-    <constant name="value__2" type="vector2" />
     <output name="out__x" type="float" value="0" />
     <output name="out__y" type="float" value="1" />
-    <output name="out__uv" type="vector2" nodename="value__2" />
+    <output name="out__uv" type="vector2" value="0, 0" />
     <output name="out__texture" type="filename" value="image.png" />
   </nodegraph>
   <constant name="var__0" type="string">

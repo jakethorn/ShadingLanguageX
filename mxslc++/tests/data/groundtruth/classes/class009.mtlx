@@ -15,13 +15,9 @@
     <output name="out__this__center" type="vector2" interfacename="this__center" />
     <output name="out__this__radius" type="float" nodename="var__0" />
   </nodegraph>
-  <combine2 name="s__center" type="vector2">
-    <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" value="0" />
-  </combine2>
   <Sphere_expand name="var__0" type="multioutput">
     <input name="amount" type="float" value="1" />
-    <input name="this__center" type="vector2" nodename="s__center" />
+    <input name="this__center" type="vector2" value="0, 0" />
     <input name="this__radius" type="float" value="3" />
   </Sphere_expand>
   <multiply name="var__1" type="vector2">

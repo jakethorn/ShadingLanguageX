@@ -5,7 +5,7 @@
 #include "runtime/Argument.h"
 
 #include "runtime/Parameter.h"
-#include "expressions/RuntimeExpression.h"
+#include "expressions/Literal.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "errors/CompileError.h"
 #include "expressions/interface.h"
@@ -86,6 +86,11 @@ namespace mxslc::runtime
     bool Argument::is_initialized() const
     {
         return expr_->is_initialized();
+    }
+
+    bool Argument::is_literal() const
+    {
+        return cast_expression<Literal>(expr_) != nullptr;
     }
 
     TypePtr Argument::type() const

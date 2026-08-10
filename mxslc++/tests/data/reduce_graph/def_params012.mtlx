@@ -2,12 +2,8 @@
 <materialx version="1.39">
   <nodedef name="ND_foo" node="foo">
     <output name="out" type="float" />
-    <input name="v" type="vector2" />
+    <input name="v" type="vector2" value="1, 0" />
   </nodedef>
-  <combine2 name="var__0" type="vector2">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
-  </combine2>
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <extract name="var__0" type="float">
       <input name="in" type="vector2" interfacename="v" />
@@ -23,32 +19,16 @@
     </add>
     <output name="out" type="float" nodename="var__2" />
   </nodegraph>
-  <combine2 name="var__1" type="vector2">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="0" />
-  </combine2>
   <foo name="f1" type="float">
-    <input name="v" type="vector2" nodename="var__1" />
+    <input name="v" type="vector2" value="1, 0" />
   </foo>
-  <combine2 name="var__2" type="vector2">
-    <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" value="1" />
-  </combine2>
   <foo name="f2" type="float">
-    <input name="v" type="vector2" nodename="var__2" />
+    <input name="v" type="vector2" value="0, 1" />
   </foo>
-  <combine2 name="var__3" type="vector2">
-    <input name="in1" type="float" value="2" />
-    <input name="in2" type="float" value="0" />
-  </combine2>
   <foo name="f3" type="float">
-    <input name="v" type="vector2" nodename="var__3" />
+    <input name="v" type="vector2" value="2, 0" />
   </foo>
-  <combine2 name="var__4" type="vector2">
-    <input name="in1" type="float" value="0" />
-    <input name="in2" type="float" value="2" />
-  </combine2>
   <foo name="f4" type="float">
-    <input name="v" type="vector2" nodename="var__4" />
+    <input name="v" type="vector2" value="0, 2" />
   </foo>
 </materialx>

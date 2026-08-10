@@ -32,6 +32,7 @@ namespace mxslc::runtime_utils
         FuncPtr resolve(const Scope*& scope, vector<FuncPtr>& checked_funcs) const;
 
         void reset_arguments() const;
+        void reset_literal_arguments() const;
         size_t init_arguments(const vector<FuncPtr>& funcs) const;
         size_t init_arguments_with_default_function(const vector<FuncPtr>& funcs) const;
         vector<TypePtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg) const;

@@ -165,6 +165,20 @@ namespace mxslc::runtime
         return func->template_type()->equals(*template_type);
     }
 
+    namespace
+    {
+        bool is_compatible(const TypePtr& param_type, const Argument& arg)
+        {
+            if (param_type->is_compatible_with(arg.type()))
+                return true;
+            if (arg.is_literal() and arg.type()->is<int>() and param_type->is<float>())
+                return true;
+            if (arg.is_literal() and arg.type()->is<string>() and param_type->is<fs::path>())
+                return true;
+            return false;
+        }
+    }
+
     FunctionQuery::Result FunctionQuery::arguments_match(const FuncPtr& func) const
     {
         if (args == nullptr)
@@ -182,7 +196,7 @@ namespace mxslc::runtime
             if (not arg.is_initialized())
                 continue;
             const TypePtr param_type = params[arg].type();
-            if (not param_type->is_compatible_with(arg.type()))
+            if (not is_compatible(param_type, arg))
                 return Result::NoMatch;
             if (param_type->equals(arg.type()))
                 result.score++;

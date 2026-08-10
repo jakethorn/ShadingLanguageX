@@ -44,6 +44,8 @@ namespace mxslc::expressions
         FuncPtr func_;
 
     private:
+        bool is_method_call() const { return method_call_ != nullptr;}
+
         ExprPtr method_call_;
     };
 }

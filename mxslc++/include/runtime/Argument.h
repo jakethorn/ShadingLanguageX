@@ -49,6 +49,7 @@ namespace mxslc::runtime
         void reset() const;
 
         bool is_initialized() const;
+        bool is_literal() const;
 
         TypePtr type() const;
         VarPtr evaluate() const;

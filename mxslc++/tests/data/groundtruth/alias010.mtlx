@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine2 name="a" type="vector2">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="2" />
-  </combine2>
-  <combine2 name="b" type="vector2">
-    <input name="in1" type="float" value="3" />
-    <input name="in2" type="float" value="4" />
-  </combine2>
-  <convert name="c" type="vector2">
-    <input name="in" type="float" value="1" />
-  </convert>
-  <convert name="d" type="vector3">
-    <input name="in" type="float" value="1" />
-  </convert>
-  <convert name="e" type="vector4">
-    <input name="in" type="float" value="1" />
-  </convert>
+  <constant name="var__0" type="vector2">
+    <input name="value" type="vector2" value="1, 2" />
+  </constant>
+  <constant name="var__1" type="vector2">
+    <input name="value" type="vector2" value="3, 4" />
+  </constant>
+  <constant name="var__2" type="vector2">
+    <input name="value" type="vector2" value="1, 1" />
+  </constant>
+  <constant name="var__3" type="vector3">
+    <input name="value" type="vector3" value="1, 1, 1" />
+  </constant>
+  <constant name="var__4" type="vector4">
+    <input name="value" type="vector4" value="1, 1, 1, 1" />
+  </constant>
 </materialx>

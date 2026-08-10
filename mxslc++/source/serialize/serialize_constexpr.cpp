@@ -29,6 +29,7 @@ namespace mxslc::serialize
             {"subtract", wrap(primitive_utils::subtract)},
             {"multiply", wrap(primitive_utils::multiply)},
             {"divide", wrap(primitive_utils::divide)},
+            {"constant", wrap(primitive_utils::constant)},
             {"combine2", wrap(primitive_utils::combine2)},
             {"combine3", wrap(primitive_utils::combine3)},
             {"combine4", wrap(primitive_utils::combine4)},

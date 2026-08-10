@@ -2,6 +2,8 @@
 // Created by jaket on 16/04/2026.
 //
 
+#include <cassert>
+
 #include "expressions/FunctionCall.h"
 
 #include "expressions/MethodCall.h"
@@ -84,30 +86,42 @@ namespace mxslc::expressions
 
     void FunctionCall::init_impl(const vector<TypePtr>& types)
     {
+        if (method_call_)
+        {
+            method_call_->init(types);
+            return;
+        }
+
         if (template_type_)
             template_type_ = scope().resolve_type(template_type_);
 
         func_ = runtime_utils::resolve_function(types, name_, template_type_, args_, is_argumentless_);
 
         for (const Argument& arg : args_)
+        {
+            assert(arg.is_initialized());
             arg.validate(func_->parameters()[arg]);
+        }
 
         if (func_->has_class_type() and method_call_ == nullptr)
         {
             ExprPtr instance = create_expression<ThisExpression>(token_);
             method_call_ = create_expression<MethodCall>(std::move(instance), std::move(name_), std::move(template_type_), std::move(args_), std::move(attrs_), std::move(token_));
-            method_call_->init();
+            method_call_->init(types);
         }
     }
 
     TypePtr FunctionCall::type_impl() const
     {
+        if (method_call_)
+            return method_call_->type();
+
         return func_->return_type();
     }
 
     VarPtr FunctionCall::evaluate_impl() const
     {
-        if (func_->has_class_type())
+        if (method_call_)
             return method_call_->evaluate();
 
         if (func_->is_inline())

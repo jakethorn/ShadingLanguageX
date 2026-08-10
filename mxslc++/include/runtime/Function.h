@@ -45,8 +45,9 @@ namespace mxslc::runtime
 
         ~Function() override;
 
-        bool is_inline() const { return mods_.contains(TokenType::Inline); }
+        bool is_inline() const { return mods_.contains(TokenType::Inline) or is_comptime(); }
         bool is_default() const { return mods_.contains(TokenType::Default); }
+        bool is_comptime() const { return mods_.contains(TokenType::Comptime); }
         const TypePtr& return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }

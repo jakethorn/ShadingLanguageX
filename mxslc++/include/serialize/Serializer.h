@@ -5,6 +5,8 @@
 #ifndef FENNEC_MTLXSERIALIZER_H
 #define FENNEC_MTLXSERIALIZER_H
 
+#include <stack>
+
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
@@ -27,7 +29,10 @@ namespace mxslc::serialize
         bool reduce_graph() const { return reduce_graph_; }
 
         void set_version(const string& version);
-        void set_reduce_graph(const bool value) { reduce_graph_ = value; }
+        void set_reduce_graph(const bool value);
+
+        void begin_comptime(const bool is_comptime) const;
+        bool end_comptime() const;
 
         VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
         VarPtr write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
@@ -63,6 +68,9 @@ namespace mxslc::serialize
 
         mx::DocumentPtr doc_;
         bool reduce_graph_{true};
+
+        mutable std::stack<bool> comptime_scope_{{false}};
+        mutable bool comptime_violated_{false};
     };
 }
 

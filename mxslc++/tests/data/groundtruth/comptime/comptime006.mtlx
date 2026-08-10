@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <separate2 name="k" type="multioutput">
+    <input name="in" type="vector2" value="3, 3" />
+  </separate2>
+  <randomfloat name="now" type="float" />
+  <randomfloat name="then" type="float" />
+  <add name="END" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" output="outy" nodename="k" />
+  </add>
+</materialx>

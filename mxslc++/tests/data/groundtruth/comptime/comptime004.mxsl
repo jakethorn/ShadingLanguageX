@@ -1,0 +1,4 @@
+
+constant(vec2{1, 2});
+constant(vec3{3, 4, 5});
+constant(vec4{6, 7, 8, 9});

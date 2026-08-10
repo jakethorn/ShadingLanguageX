@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine2 name="xy" type="vector2">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="2" />
-  </combine2>
   <separate2 name="var__0" type="multioutput">
-    <input name="in" type="vector2" nodename="xy" />
+    <input name="in" type="vector2" value="1, 2" />
   </separate2>
 </materialx>

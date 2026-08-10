@@ -2,6 +2,8 @@
 // Created by jaket on 27/06/2026.
 //
 
+#include <cassert>
+
 #include "runtime/utils/FunctionResolver.h"
 
 #include "errors/AmbiguousFunctionError.h"
@@ -77,6 +79,13 @@ namespace mxslc::runtime_utils
         }
 
         FuncPtr func = scope->get_function(query_);
+        if (func != nullptr)
+        {
+            reset_literal_arguments();
+            init_count = init_arguments(vector{func});
+            assert(init_count == args_.size());
+        }
+
         scope = nullptr;
         return func;
     }
@@ -86,6 +95,15 @@ namespace mxslc::runtime_utils
         for (const Argument& arg : args_)
         {
             if (arg.is_initialized())
+                arg.reset();
+        }
+    }
+
+    void FunctionResolver::reset_literal_arguments() const
+    {
+        for (const Argument& arg : args_)
+        {
+            if (arg.is_literal())
                 arg.reset();
         }
     }
@@ -108,6 +126,7 @@ namespace mxslc::runtime_utils
                 underlying_errors_.emplace_back(e.message());
             }
         }
+
         return initialized_arg_count;
     }
 

@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <constant name="z__a" type="vector2" />
-  <constant name="z__b" type="vector3" />
   <add name="var__0" type="float">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="2" />
@@ -10,12 +8,9 @@
     <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="3" />
   </add>
-  <convert name="var__1" type="vector3">
-    <input name="in" type="vector2" nodename="z__a" />
-  </convert>
   <add name="g" type="vector3">
-    <input name="in1" type="vector3" nodename="var__1" />
-    <input name="in2" type="vector3" nodename="z__b" />
+    <input name="in1" type="vector3" value="0, 0, 0" />
+    <input name="in2" type="vector3" value="0, 0, 0" />
   </add>
   <normal name="n" type="vector3">
     <input name="space" type="string" value="world" />

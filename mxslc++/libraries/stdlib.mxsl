@@ -509,57 +509,57 @@ inline T __abs__<float, vector2, vector3, vector4, color3, color4>(T in1)
 // bool/int/float
 //
 
-inline boolean __boolean__()
+comptime boolean __boolean__()
 {
     return false;
 }
 
-inline boolean __boolean__(boolean in1)
+comptime boolean __boolean__(boolean in1)
 {
     return in1;
 }
 
-inline boolean __boolean__(integer in1)
+comptime boolean __boolean__(integer in1)
 {
     return convert(in1);
 }
 
-inline boolean __boolean__(float in1)
+comptime boolean __boolean__(float in1)
 {
     return ifequal(in1, 0.0);
 }
 
-inline integer __integer__()
+comptime integer __integer__()
 {
     return 0;
 }
 
-inline integer __integer__(integer in1)
+comptime integer __integer__(integer in1)
 {
     return in1;
 }
 
-inline integer __integer__(boolean in1)
+comptime integer __integer__(boolean in1)
 {
     return convert(in1);
 }
 
-inline integer __integer__(float in1)
+comptime integer __integer__(float in1)
 {
     return round(in1);
 }
 
-inline float __float__()
+comptime float __float__()
 {
     return 0.0;
 }
 
-inline float __float__(float in1)
+comptime float __float__(float in1)
 {
     return in1;
 }
 
-inline float __float__<boolean, integer>(T in1)
+comptime float __float__<boolean, integer>(T in1)
 {
     return convert(in1);
 }
@@ -568,22 +568,22 @@ inline float __float__<boolean, integer>(T in1)
 // vec2
 //
 
-inline vector2 __vector2__<boolean, integer, float, vector3, vector4, color3, color4>(T in1)
+comptime vector2 __vector2__<boolean, integer, float, vector3, vector4, color3, color4>(T in1)
 {
     return convert(in1);
 }
 
-inline vector2 __vector2__(float x, float y)
+comptime default vector2 __vector2__(float x, float y)
 {
     return combine2(x, y);
 }
 
-inline vector2 __vector2__(vector2 in1)
+comptime vector2 __vector2__(vector2 in1)
 {
     return in1;
 }
 
-inline vector2 __vector2__()
+comptime vector2 __vector2__()
 {
     return constant();
 }
@@ -592,34 +592,34 @@ inline vector2 __vector2__()
 // vec3
 //
 
-inline vector3 __vector3__<boolean, integer, float, vector2, vector4, color3, color4>(T in1)
+comptime vector3 __vector3__<boolean, integer, float, vector2, vector4, color3, color4>(T in1)
 {
     return convert(in1);
 }
 
-inline default vector3 __vector3__(float x, float y, float z)
+comptime default vector3 __vector3__(float x, float y, float z)
 {
     return combine3(x, y, z);
 }
 
-inline vector3 __vector3__(float x, vector2 yz)
+comptime vector3 __vector3__(float x, vector2 yz)
 {
     float y, z = separate2(yz);
     return combine3(x, y, z);
 }
 
-inline vector3 __vector3__(vector2 xy, float z)
+comptime vector3 __vector3__(vector2 xy, float z)
 {
     float x, y = separate2(xy);
     return combine3(x, y, z);
 }
 
-inline vector3 __vector3__(vector3 in1)
+comptime vector3 __vector3__(vector3 in1)
 {
     return in1;
 }
 
-inline vector3 __vector3__()
+comptime vector3 __vector3__()
 {
     return constant();
 }
@@ -628,57 +628,57 @@ inline vector3 __vector3__()
 // vec4
 //
 
-inline vector4 __vector4__<boolean, integer, float, vector2, vector3, color3, color4>(T in1)
+comptime vector4 __vector4__<boolean, integer, float, vector2, vector3, color3, color4>(T in1)
 {
     return convert(in1);
 }
 
-inline default vector4 __vector4__(float x, float y, float z, float w)
+comptime default vector4 __vector4__(float x, float y, float z, float w)
 {
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__(float x, float y, vector2 zw)
+comptime vector4 __vector4__(float x, float y, vector2 zw)
 {
     float z, w = separate2(zw);
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__(float x, vector2 yz, float w)
+comptime vector4 __vector4__(float x, vector2 yz, float w)
 {
     float y, z = separate2(yz);
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__(vector2 xy, float z, float w)
+comptime vector4 __vector4__(vector2 xy, float z, float w)
 {
     float x, y = separate2(xy);
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__(vector2 xy, vector2 zw)
+comptime vector4 __vector4__(vector2 xy, vector2 zw)
 {
     return combine2(xy, zw);
 }
 
-inline vector4 __vector4__<vector3, color3>(float x, T yzw)
+comptime vector4 __vector4__<vector3, color3>(float x, T yzw)
 {
     float y, z, w = separate3(yzw);
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__<vector3, color3>(T xyz, float w)
+comptime vector4 __vector4__<vector3, color3>(T xyz, float w)
 {
     float x, y, z = separate3(xyz);
     return combine4(x, y, z, w);
 }
 
-inline vector4 __vector4__(vector4 in1)
+comptime vector4 __vector4__(vector4 in1)
 {
     return in1;
 }
 
-inline vector4 __vector4__()
+comptime vector4 __vector4__()
 {
     return constant();
 }
@@ -687,34 +687,34 @@ inline vector4 __vector4__()
 // color3
 //
 
-inline color3 __color3__<boolean, integer, float, vector2, vector3, vector4, color4>(T in1)
+comptime color3 __color3__<boolean, integer, float, vector2, vector3, vector4, color4>(T in1)
 {
     return convert(in1);
 }
 
-inline default color3 __color3__(float r, float g, float b)
+comptime default color3 __color3__(float r, float g, float b)
 {
     return combine3(r, g, b);
 }
 
-inline color3 __color3__(float r, vector2 gb)
+comptime color3 __color3__(float r, vector2 gb)
 {
     float g, b = separate2(gb);
     return combine3(r, g, b);
 }
 
-inline color3 __color3__(vector2 rg, float b)
+comptime color3 __color3__(vector2 rg, float b)
 {
     float r, g = separate2(rg);
     return combine3(r, g, b);
 }
 
-inline color3 __color3__(color3 in1)
+comptime color3 __color3__(color3 in1)
 {
     return in1;
 }
 
-inline color3 __color3__()
+comptime color3 __color3__()
 {
     return constant();
 }
@@ -723,52 +723,52 @@ inline color3 __color3__()
 // color4
 //
 
-inline color4 __color4__<boolean, integer, float, vector2, vector3, vector4, color3>(T in1)
+comptime color4 __color4__<boolean, integer, float, vector2, vector3, vector4, color3>(T in1)
 {
     return convert(in1);
 }
 
-inline default color4 __color4__(float r, float g, float b, float a)
+comptime default color4 __color4__(float r, float g, float b, float a)
 {
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__(float r, float g, vector2 ba)
+comptime color4 __color4__(float r, float g, vector2 ba)
 {
     float b, a = separate2(ba);
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__(float r, vector2 gb, float a)
+comptime color4 __color4__(float r, vector2 gb, float a)
 {
     float g, b = separate2(gb);
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__(vector2 rg, float b, float a)
+comptime color4 __color4__(vector2 rg, float b, float a)
 {
     float r, g = separate2(rg);
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__<vector3, color3>(float r, T gba)
+comptime color4 __color4__<vector3, color3>(float r, T gba)
 {
     float g, b, a = separate3(gba);
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__<vector3, color3>(T rgb, float a)
+comptime color4 __color4__<vector3, color3>(T rgb, float a)
 {
     float r, g, b = separate3(rgb);
     return combine4(r, g, b, a);
 }
 
-inline color4 __color4__(color4 in1)
+comptime color4 __color4__(color4 in1)
 {
     return in1;
 }
 
-inline color4 __color4__()
+comptime color4 __color4__()
 {
     return constant();
 }

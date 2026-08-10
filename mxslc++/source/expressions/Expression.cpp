@@ -105,13 +105,9 @@ namespace mxslc::expressions
 
         assert(is_initialized_);
 
-        const bool reduce_graph_cache = serializer().reduce_graph();
-        if (is_comptime())
-            serializer().set_reduce_graph(true);
-
+        serializer().begin_comptime(is_comptime());
         VarPtr value = evaluate_impl();
-
-        serializer().set_reduce_graph(reduce_graph_cache);
+        serializer().end_comptime();
 
         if (is_comptime() and not value->is_compile_time())
             throw CompileError{"Expression could not be evaluated at compile-time"};

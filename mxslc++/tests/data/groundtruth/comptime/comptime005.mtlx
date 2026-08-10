@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="vector4">
+    <input name="value" type="vector4" value="6, 7, 8, 9" />
+  </constant>
+</materialx>

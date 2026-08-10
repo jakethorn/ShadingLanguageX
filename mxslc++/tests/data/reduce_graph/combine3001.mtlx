@@ -5,14 +5,9 @@
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <combine3 name="v2" type="vector3">
-    <input name="in1" type="float" value="4" />
-    <input name="in2" type="float" value="5" />
-    <input name="in3" type="float" value="6" />
-  </combine3>
   <multiply name="var__0" type="vector3">
     <input name="in1" type="vector3" nodename="v1" />
-    <input name="in2" type="vector3" nodename="v2" />
+    <input name="in2" type="vector3" value="4, 5, 6" />
   </multiply>
   <randomfloat name="var__1" type="float" />
   <multiply name="v3" type="vector3">
@@ -24,14 +19,9 @@
     <input name="in2" type="float" value="2" />
     <input name="in3" type="float" value="3" />
   </combine3>
-  <combine3 name="c2" type="color3">
-    <input name="in1" type="float" value="4" />
-    <input name="in2" type="float" value="5" />
-    <input name="in3" type="float" value="6" />
-  </combine3>
   <multiply name="var__2" type="color3">
     <input name="in1" type="color3" nodename="c1" />
-    <input name="in2" type="color3" nodename="c2" />
+    <input name="in2" type="color3" value="4, 5, 6" />
   </multiply>
   <randomfloat name="var__3" type="float" />
   <multiply name="c3" type="color3">
