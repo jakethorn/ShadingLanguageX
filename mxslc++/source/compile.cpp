@@ -11,6 +11,7 @@
 #include "parse.h"
 #include "scan.h"
 #include "Token.h"
+#include "debug/Debugger.h"
 #include "runtime/Runtime.h"
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
@@ -20,6 +21,8 @@
 
 namespace mxslc
 {
+    using debug::Debugger;
+
     namespace
     {
         void compile_tokens(vector<Token> tokens)
@@ -62,8 +65,10 @@ namespace mxslc
             throw CompileError{"ShadingLanguageX standard library could not be found.\nSearched directories:\n" + searched_dirs};
         }
 
-        mx::DocumentPtr compile_to_document(vector<Token> tokens, CompileOptions opts, const optional<fs::path>& src_path)
+        mx::DocumentPtr compile_to_document(string source, CompileOptions opts, const optional<fs::path>& src_path)
         {
+            vector<Token> tokens = scan_string(source, src_path);
+
             opts.add_default_search_directories();
             preprocess::preprocess(tokens, opts, src_path);
 
@@ -72,6 +77,9 @@ namespace mxslc
                 runtime.enter_scope("mxsl_stdlib");
                 compile_mxsl_stdlib();
                 {
+                    if (opts.debug_mode())
+                        Debugger::create(std::move(source));
+
                     runtime.enter_scope("global");
                     compile_tokens(std::move(tokens));
                     if (opts.has_entry_function())
@@ -101,7 +109,7 @@ namespace mxslc
 
     mx::DocumentPtr compile_to_document(const fs::path& src_path, const CompileOptions& opts)
     {
-        return compile_to_document(scan_file(src_path), opts, src_path);
+        return compile_to_document(io_utils::read_file(src_path), opts, src_path);
     }
 
     std::string compile_to_string(const fs::path& src_path)
@@ -143,7 +151,7 @@ namespace mxslc
 
     mx::DocumentPtr compile_to_document(const string& source, const CompileOptions& opts)
     {
-        return compile_to_document(scan_string(source), opts, std::nullopt);
+        return compile_to_document(source, opts, std::nullopt);
     }
 
     std::string compile_to_string(const string& source)
