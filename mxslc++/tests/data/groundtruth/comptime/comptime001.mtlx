@@ -8,6 +8,6 @@
     <input name="value" type="float" nodename="var__0" />
   </constant>
   <constant name="var__2" type="float">
-    <input name="value" type="float" value="3" />
+    <input name="value" type="float" value="6" />
   </constant>
 </materialx>
