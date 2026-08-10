@@ -32,7 +32,7 @@ namespace mxslc::expressions
             try_init_expressions(types);
 
             if (initialized_expr_count_ == prev_initialized_expr_count)
-                throw CompileError{initialization_error_message(types)};
+                throw CompileError{init_error_message(types)};
         }
     }
 
@@ -135,7 +135,7 @@ namespace mxslc::expressions
         return subtypes;
     }
 
-    string UnnamedConstructor::initialization_error_message(const vector<TypePtr>& types) const
+    string UnnamedConstructor::init_error_message(const vector<TypePtr>& types) const
     {
         string message = "Cannot assign the unnamed constructor to a variable or parameter of type " + type_utils::to_string(types);
         message += "\nUnderlying errors:\n";

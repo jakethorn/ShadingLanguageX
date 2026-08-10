@@ -29,9 +29,9 @@ namespace mxslc::serialize
         bool reduce_graph() const { return reduce_graph_; }
 
         void set_version(const string& version);
-        void set_reduce_graph(const bool value);
+        void set_reduce_graph(bool value);
 
-        void begin_comptime(const bool is_comptime) const;
+        void begin_comptime(bool is_comptime) const;
         bool end_comptime() const;
 
         VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;

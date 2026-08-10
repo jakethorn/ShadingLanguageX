@@ -79,11 +79,6 @@ namespace mxslc::expressions
         );
     }
 
-    void FunctionCall::init_subexpressions(const vector<TypePtr>& types)
-    {
-
-    }
-
     void FunctionCall::init_impl(const vector<TypePtr>& types)
     {
         if (method_call_)

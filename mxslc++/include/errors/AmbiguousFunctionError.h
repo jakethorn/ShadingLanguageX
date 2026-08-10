@@ -20,10 +20,9 @@ namespace mxslc
     public:
         explicit AmbiguousFunctionError(const string& message);
         AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs);
-        AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors);
 
     private:
-        static string format(const FunctionQuery& query, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors);
+        static string format(const FunctionQuery& query, const vector<FuncPtr>& funcs);
     };
 }
 

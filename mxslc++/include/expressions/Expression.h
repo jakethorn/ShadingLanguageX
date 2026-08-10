@@ -60,9 +60,9 @@ namespace mxslc::expressions
 
         Token token_;
 
-        bool is_initialized_{false};
         TypePtr target_type_;
         string error_message_;
+        bool is_initialized_{false};
 
         ModifierList mods_;
         AttributeList attrs_;

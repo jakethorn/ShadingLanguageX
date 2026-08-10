@@ -68,7 +68,10 @@ namespace mxslc::runtime_utils
 
             if (last_init_count == init_count)
             {
-                init_count = init_arguments_with_default_function(funcs);
+                FuncPtr default_func = get_default_function(funcs);
+                if (default_func)
+                    init_count = init_arguments(default_func);
+
                 if (init_count < args_.size())
                 {
                     scope = funcs[0]->defining_scope()->parent();
@@ -79,12 +82,7 @@ namespace mxslc::runtime_utils
         }
 
         FuncPtr func = scope->get_function(query_);
-        if (func != nullptr)
-        {
-            reset_literal_arguments();
-            init_count = init_arguments(vector{func});
-            assert(init_count == args_.size());
-        }
+        implicitly_cast_literals(func);
 
         scope = nullptr;
         return func;
@@ -93,19 +91,12 @@ namespace mxslc::runtime_utils
     void FunctionResolver::reset_arguments() const
     {
         for (const Argument& arg : args_)
-        {
-            if (arg.is_initialized())
-                arg.reset();
-        }
+            arg.reset();
     }
 
-    void FunctionResolver::reset_literal_arguments() const
+    size_t FunctionResolver::init_arguments(const FuncPtr& func) const
     {
-        for (const Argument& arg : args_)
-        {
-            if (arg.is_literal())
-                arg.reset();
-        }
+        return init_arguments(vector{func});
     }
 
     size_t FunctionResolver::init_arguments(const vector<FuncPtr>& funcs) const
@@ -130,24 +121,6 @@ namespace mxslc::runtime_utils
         return initialized_arg_count;
     }
 
-    size_t FunctionResolver::init_arguments_with_default_function(const vector<FuncPtr>& funcs) const
-    {
-        FuncPtr default_func;
-        for (const FuncPtr& func : funcs)
-        {
-            if (func->is_default())
-            {
-                default_func = func;
-                break;
-            }
-        }
-
-        if (default_func != nullptr)
-            return init_arguments(vector{default_func});
-        else
-            return 0;
-    }
-
     vector<TypePtr> FunctionResolver::get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg) const
     {
         vector<TypePtr> types;
@@ -160,5 +133,39 @@ namespace mxslc::runtime_utils
         }
 
         return types;
+    }
+
+    FuncPtr FunctionResolver::get_default_function(const vector<FuncPtr>& funcs) const
+    {
+        vector<FuncPtr> default_funcs;
+        for (const FuncPtr& func : funcs)
+        {
+            if (func->is_default())
+                default_funcs.push_back(func);
+        }
+
+        if (default_funcs.empty())
+            return nullptr;
+        if (default_funcs.size() == 1)
+            return default_funcs.front();
+        throw CompileError{"More than one default function found during function resolution"};
+    }
+
+    void FunctionResolver::implicitly_cast_literals(const FuncPtr& func) const
+    {
+        // literals need to be initialised one last time to be implicitly cast them to their target type
+        // e.g., float f = 5;
+
+        if (func != nullptr)
+        {
+            // reset only literals
+            for (const Argument& arg : args_)
+            {
+                if (arg.is_literal())
+                    arg.reset();
+            }
+
+            init_arguments(func);
+        }
     }
 }

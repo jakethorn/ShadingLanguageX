@@ -15,18 +15,12 @@ namespace mxslc
     }
 
     AmbiguousFunctionError::AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs)
-        : AmbiguousFunctionError{format(query, funcs, {})}
+        : AmbiguousFunctionError{format(query, funcs)}
     {
 
     }
 
-    AmbiguousFunctionError::AmbiguousFunctionError(const FunctionQuery& query, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors)
-        : AmbiguousFunctionError{format(query, funcs, underlying_errors)}
-    {
-
-    }
-
-    string AmbiguousFunctionError::format(const FunctionQuery& query, const vector<FuncPtr>& funcs, const vector<string>& underlying_errors)
+    string AmbiguousFunctionError::format(const FunctionQuery& query, const vector<FuncPtr>& funcs)
     {
         const string func_type = query.has_class_type() ? "method" : "function";
         const string func_name = query.has_class_type() ? (*query.class_type)->to_string() + "." + *query.name : *query.name;
@@ -43,12 +37,6 @@ namespace mxslc
             for (const FuncPtr& func : funcs)
                 message += func->header() + "\n";
         }
-
-        if (not underlying_errors.empty())
-            message += "\nUnderlying errors:\n";
-
-        for (const string& underlying_error : underlying_errors)
-            message += "\n" + underlying_error;
 
         return message;
     }

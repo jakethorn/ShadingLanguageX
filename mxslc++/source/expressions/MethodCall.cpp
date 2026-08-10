@@ -2,6 +2,8 @@
 // Created by jaket on 06/05/2026.
 //
 
+#include <cassert>
+
 #include "expressions/MethodCall.h"
 
 #include "runtime/Function.h"
@@ -51,7 +53,7 @@ namespace mxslc::expressions
         instance_ = instance_expr_->evaluate();
     }
 
-    void MethodCall::init_impl(const vector<TypePtr> &types)
+    void MethodCall::init_impl(const vector<TypePtr>& types)
     {
         if (template_type_)
             template_type_ = scope().resolve_type(template_type_);
@@ -59,7 +61,10 @@ namespace mxslc::expressions
         func_ = runtime_utils::resolve_method(instance_->type(), types, name_, template_type_, args_, is_argumentless_);
 
         for (const Argument& arg : args_)
+        {
+            assert(arg.is_initialized());
             arg.validate(func_->parameters()[arg]);
+        }
     }
 
     VarPtr MethodCall::evaluate_impl() const

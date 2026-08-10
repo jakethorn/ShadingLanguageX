@@ -13,7 +13,6 @@
 #include "runtime/variables/Variable.h"
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
-#include "errors/AmbiguousFunctionError.h"
 #include "runtime/interface.h"
 
 namespace mxslc::runtime
@@ -128,9 +127,9 @@ namespace mxslc::runtime
     bool Scope::has_function(const FuncPtr& func) const
     {
         const auto it = functions_.find(func->name());
-        if (it == functions_.end())
-            return false;
-        return contains(it->second, func) or (parent_ and parent_->has_function(func));
+        if (it != functions_.end() and contains(it->second, func))
+            return true;
+        return parent_ and parent_->has_function(func);
     }
 
     bool Scope::has_function(const FunctionQuery& query) const

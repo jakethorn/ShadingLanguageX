@@ -82,6 +82,7 @@ namespace mxslc::expressions
     void Expression::reset()
     {
         target_type_ = nullptr;
+        error_message_.clear();
         is_initialized_ = false;
     }
 
