@@ -40,6 +40,7 @@ namespace mxslc::serialize::values
 
     void NodeValue::set_as_node_input(const mx::InputPtr& input) const
     {
+        input->removeAttribute("value");
         input->setConnectedNode(node_);
     }
 

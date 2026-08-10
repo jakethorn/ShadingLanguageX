@@ -36,6 +36,15 @@ namespace mxslc::expressions
             throw CompileError{"Variable of type '" + node_var_->type()->to_string() + "' does not have a port or valid swizzle with the name: " + input_name_};
 
         input_ = mtlx_utils::add_or_get_input(node, input->getType(), input_name_);
+
+        // Only seed defaults for an unconnected, unset port. Connected inputs
+        // should not get a literal value injected alongside their connection.
+        if (not input_->hasValue()
+            and not input_->hasNodeName()
+            and not input_->hasNodeGraphString()
+            and not input_->hasInterfaceName()
+            and input->hasValue())
+            input_->setValueString(input->getValueString());
     }
 
     TypePtr PortAccessor::type() const

@@ -1,0 +1,21 @@
+
+vec3 node_normalmap = normalmap();
+float x = node_normalmap.scale;
+vec3 node_normalmap2 = normalmap(scale=1.0);
+float x2 = node_normalmap2.scale;
+vec3 node_normalmap3 = normalmap(scale=vec2{1.0,1.0});
+vec2 x3 = node_normalmap3.scale;
+vec3 node_image_vector3_10 = image(file = "test.png");
+vec3 node_normalmap4 = normalmap(in = node_image_vector3_10);
+float y = node_normalmap4.scale;
+
+
+float c = randomfloat(1.0);
+float in2 = c.in;
+
+color3 d = randomcolor();
+float din = d.in;
+color3 d2 = randomcolor(in=1);
+int d2in = d2.in;
+color3 d3 = randomcolor(in=1.0);
+float d3in = d3.in;
