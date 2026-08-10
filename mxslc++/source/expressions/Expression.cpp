@@ -109,9 +109,6 @@ namespace mxslc::expressions
         VarPtr value = evaluate_impl();
         serializer().end_comptime();
 
-        if (is_comptime() and not value->is_compile_time())
-            throw CompileError{"Expression could not be evaluated at compile-time"};
-
         if (target_type_)
         {
             assert(value->type()->equals(type_impl()));
