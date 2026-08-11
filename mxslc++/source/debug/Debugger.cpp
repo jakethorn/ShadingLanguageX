@@ -9,7 +9,10 @@
 
 #include "debug/Debugger.h"
 #include "errors/CompileError.h"
+#include "runtime/Scope.h"
 #include "runtime/Runtime.h"
+#include "runtime/Type.h"
+#include "runtime/variables/Variable.h"
 #include "statements/Statement.h"
 
 namespace mxslc::debug
@@ -327,6 +330,15 @@ namespace mxslc::debug
             }
         }
 
+        vector<string> scope_lines;
+        for (const VarPtr& variable : runtime::Runtime::get().scope().get_all_variables())
+        {
+            const string variable_text = variable->type()->to_string() + " " + variable->name()
+                                        + " = " + variable->to_string();
+            const vector<string> variable_lines = lines(variable_text);
+            scope_lines.insert(scope_lines.end(), variable_lines.begin(), variable_lines.end());
+        }
+
         const vector<string> code_lines = lines(code_);
         const vector<string> highlighted_code_lines = lines(highlight_keywords(code_));
         const string current_xml = runtime::Runtime::get().serializer().xml();
@@ -339,20 +351,34 @@ namespace mxslc::debug
             code_width = std::max(code_width, line.size());
         code_width = std::max<size_t>(code_width, 40);
         const size_t line_number_width = std::to_string(code_lines.size()).size();
+        size_t scope_width = 0;
+        for (const string& scope_line : scope_lines)
+            scope_width = std::max(scope_width, scope_line.size());
+        scope_width = std::max<size_t>(scope_width, 40);
 
-        const size_t rendered_lines = std::max(code_lines.size(), xml_lines.size());
+        const size_t content_lines = std::max({scope_lines.size(), code_lines.size(), xml_lines.size()});
+        const size_t rendered_lines = content_lines + 1;
         if (not first_run_)
             std::cout << "\033[" << (previous_rendered_lines_ + 1) << "F";
         first_run_ = false;
 
+        std::cout << "\033[2K"
+                  << "Scope" << string(scope_width - 5, ' ') << " | "
+                  << string(line_number_width + 3, ' ') << "Code" << string(code_width - 4, ' ')
+                  << " |   Output\n";
+
         const size_t line = stmt ? stmt->token().line() : -1;
-        for (size_t i = 0; i < rendered_lines; ++i)
+        for (size_t i = 0; i < content_lines; ++i)
         {
+            const bool has_scope = i < scope_lines.size();
             const bool has_code = i < code_lines.size();
             const bool is_current_line = has_code and i + 1 == line;
             const string line_number = has_code ? std::to_string(i + 1) : string{};
             std::cout << "\033[2K";
-            std::cout << string(line_number_width - line_number.size(), ' ')
+            std::cout << (has_scope ? scope_lines[i] : string{})
+                      << string(scope_width - (has_scope ? scope_lines[i].size() : 0), ' ')
+                      << " | "
+                      << string(line_number_width - line_number.size(), ' ')
                       << (is_current_line ? string{red} + line_number + string{reset} : line_number) << " "
                       << (is_current_line ? string{red} + "●" + string{reset} : string{" "}) << " "
                       << (has_code ? highlighted_code_lines[i] : string{})
