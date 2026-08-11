@@ -331,12 +331,30 @@ namespace mxslc::debug
         }
 
         vector<string> scope_lines;
+        vector<std::pair<Scope*, vector<VarPtr>>> variable_groups;
+        unordered_map<Scope*, size_t> group_indices;
         for (const VarPtr& variable : runtime::Runtime::get().scope().get_all_variables())
         {
-            const string variable_text = variable->type()->to_string() + " " + variable->name()
-                                        + " = " + variable->to_string();
-            const vector<string> variable_lines = lines(variable_text);
-            scope_lines.insert(scope_lines.end(), variable_lines.begin(), variable_lines.end());
+            Scope* defining_scope = variable->defining_scope();
+            const auto [index_it, inserted] = group_indices.emplace(defining_scope, variable_groups.size());
+            if (inserted)
+                variable_groups.emplace_back(defining_scope, vector<VarPtr>{});
+            variable_groups[index_it->second].second.push_back(variable);
+        }
+
+        for (const auto& [defining_scope, variables] : variable_groups)
+        {
+            const string scope_name = defining_scope == nullptr
+                                          ? "<unscoped>"
+                                          : (defining_scope->name().empty() ? "<anonymous>" : defining_scope->name());
+            scope_lines.push_back("[" + scope_name + "]");
+            for (const VarPtr& variable : variables)
+            {
+                const string variable_text = "  " + variable->type()->to_string() + " " + variable->name()
+                                            + " = " + variable->to_string();
+                const vector<string> variable_lines = lines(variable_text);
+                scope_lines.insert(scope_lines.end(), variable_lines.begin(), variable_lines.end());
+            }
         }
 
         const vector<string> code_lines = lines(code_);

@@ -27,6 +27,8 @@ namespace mxslc::runtime
             return std::move(parent_);
         }
 
+        const string& name() const { return name_; }
+
         bool has_parent() const { return parent_ != nullptr; }
         Scope* parent() const { return parent_.get(); }
 
