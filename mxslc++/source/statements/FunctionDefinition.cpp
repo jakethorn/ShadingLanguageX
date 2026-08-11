@@ -135,6 +135,9 @@ namespace mxslc::statements
 
     string FunctionDefinition::to_string() const
     {
+        if (not is_templated())
+            return funcs_.front()->to_string();
+
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
             mods_string += ' ';

@@ -53,9 +53,6 @@ namespace mxslc::serialize::values
 
     string NodeOutputValue::to_string() const
     {
-        if (mx::OutputPtr output = node_->getOutput(output_name_))
-            return output->asString();
-        else
-            return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
+        return "node-output (" + node_->getCategory() + ", " + node_->getName() + "." + output_name_ + ")";
     }
 }

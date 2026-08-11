@@ -156,7 +156,6 @@ namespace mxslc
                              or try_match_int(text, token)
                              or try_match_string(text, token))
             {
-                token.set_line(line);
                 return token;
             }
 
@@ -164,10 +163,11 @@ namespace mxslc
         }
     }
 
-    vector<Token> scan_string(string_view text)
+    vector<Token> scan_string(string_view text, const optional<fs::path>& src_path)
     {
         vector<Token> tokens;
         size_t line = 1;
+        const string filename = src_path ? src_path->filename().string() : "";
 
         while (not text.empty())
         {
@@ -186,6 +186,10 @@ namespace mxslc
                 continue;
             }
 
+            token.set_line(line);
+            if (src_path)
+                token.set_filename(filename);
+
             if (token == TokenType::Newline)
             {
                 ++line;
@@ -199,13 +203,7 @@ namespace mxslc
 
     vector<Token> scan_file(const fs::path& src_path)
     {
-        const string text = io_utils::read_file(src_path);
-        vector<Token> tokens = scan_string(text);
-        const string filename = src_path.filename().string();
-        for (Token& token : tokens)
-        {
-            token.set_filename(filename);
-        }
-        return tokens;
+        string text = io_utils::read_file(src_path);
+        return scan_string(std::move(text), src_path);
     }
 }

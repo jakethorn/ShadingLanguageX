@@ -52,11 +52,6 @@ namespace mxslc::serialize::values
 
     string NodeValue::to_string() const
     {
-        string str = node_->asString();
-        for (const mx::InputPtr& i : node_->getInputs())
-            str += "\n    "s + i->asString();
-        for (const mx::OutputPtr& i : node_->getOutputs())
-            str += "\n    "s + i->asString();
-        return str;
+        return "node (" + node_->getCategory() + ", " + node_->getName() + ")";
     }
 }

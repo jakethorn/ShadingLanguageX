@@ -10,7 +10,7 @@
 
 namespace mxslc
 {
-    vector<Token> scan_string(string_view text);
+    vector<Token> scan_string(string_view text, const optional<fs::path>& src_path = std::nullopt);
     vector<Token> scan_file(const fs::path& src_path);
 }
 

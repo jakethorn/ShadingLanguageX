@@ -18,6 +18,7 @@
 namespace mxslc::runtime
 {
     using container_utils::contains;
+    using container_utils::extend;
 
     Scope::Scope() : Scope{string{}, nullptr} { }
     Scope::Scope(string name) : Scope{std::move(name), nullptr} { }
@@ -64,6 +65,19 @@ namespace mxslc::runtime
         if (parent_)
             return parent_->get_variable(name);
         throw CompileError{"Variable not defined: " + name};
+    }
+
+    vector<VarPtr> Scope::get_all_variables()
+    {
+        vector<VarPtr> vars;
+
+        for (const auto& [name, var] : variables_)
+            vars.push_back(var);
+
+        if (parent_)
+            extend(vars, parent_->get_all_variables());
+
+        return vars;
     }
 
     bool Scope::has_variable(const string& name) const

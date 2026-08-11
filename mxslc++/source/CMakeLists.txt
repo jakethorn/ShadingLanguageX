@@ -116,6 +116,7 @@ add_library(mxslc_lib
         preprocess/preprocess.cpp
         preprocess/Macro.cpp
         preprocess/parse_primitive.cpp
+        debug/Debugger.cpp
 )
 
 set_target_properties(mxslc_lib PROPERTIES

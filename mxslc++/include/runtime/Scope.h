@@ -27,6 +27,8 @@ namespace mxslc::runtime
             return std::move(parent_);
         }
 
+        const string& name() const { return name_; }
+
         bool has_parent() const { return parent_ != nullptr; }
         Scope* parent() const { return parent_.get(); }
 
@@ -41,6 +43,7 @@ namespace mxslc::runtime
 
         void add_variable(string name, VarPtr var);
         VarPtr get_variable(const string& name) const;
+        vector<VarPtr> get_all_variables();
         bool has_variable(const string& name) const;
         bool is_variable_local(const VarPtr& var) const;
         bool is_variable_local(const string& name) const;

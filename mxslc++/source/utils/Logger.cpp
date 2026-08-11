@@ -85,16 +85,16 @@ namespace mxslc
         switch (level)
         {
             case Debug:
-                std::cout << Green << "\n[DEBUG] " << message << White;
+                std::cout << Green << "[DEBUG] " << message << White << "\n";
                 break;
             case Info:
-                std::cout << White << "\n[INFO] " << message << White;
+                std::cout << White << "[INFO] " << message << White << "\n";
                 break;
             case Warning:
-                std::clog << Yellow << "\n[WARNING] " << message << White;
+                std::clog << Yellow << "[WARNING] " << message << White << "\n";
                 break;
             case Error:
-                std::cerr << Red << "\n[ERROR] " << message << White;
+                std::cerr << Red << "[ERROR] " << message << White << "\n";
                 break;
             default: ;
         }
