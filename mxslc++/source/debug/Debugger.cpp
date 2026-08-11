@@ -95,6 +95,17 @@ namespace mxslc::debug
                     continue;
                 }
 
+                if (code[i] == '#' and i + 1 < code.size()
+                    and (std::isalpha(static_cast<unsigned char>(code[i + 1])) or code[i + 1] == '_'))
+                {
+                    const size_t begin = i++;
+                    while (i < code.size()
+                           and (std::isalnum(static_cast<unsigned char>(code[i])) or code[i] == '_'))
+                        ++i;
+                    result += string{yellow} + code.substr(begin, i - begin) + string{reset};
+                    continue;
+                }
+
                 if (std::isdigit(static_cast<unsigned char>(code[i]))
                     or (code[i] == '.' and i + 1 < code.size()
                         and std::isdigit(static_cast<unsigned char>(code[i + 1]))))
