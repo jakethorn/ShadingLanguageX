@@ -379,6 +379,9 @@ namespace mxslc::debug
 
         const size_t content_lines = std::max({scope_lines.size(), code_lines.size(), xml_lines.size()});
         const size_t rendered_lines = content_lines + 2;
+        const size_t scope_offset = content_lines - scope_lines.size();
+        const size_t code_offset = content_lines - code_lines.size();
+        const size_t xml_offset = content_lines - xml_lines.size();
         if (not first_run_)
             std::cout << "\033[" << (previous_rendered_lines_ + 1) << "F";
         first_run_ = false;
@@ -394,23 +397,27 @@ namespace mxslc::debug
         const size_t line = stmt ? stmt->token().line() : -1;
         for (size_t i = 0; i < content_lines; ++i)
         {
-            const bool has_scope = i < scope_lines.size();
-            const bool has_code = i < code_lines.size();
-            const bool is_current_line = has_code and i + 1 == line;
-            const string line_number = has_code ? std::to_string(i + 1) : string{};
+            const bool has_scope = i >= scope_offset;
+            const bool has_code = i >= code_offset;
+            const bool has_xml = i >= xml_offset;
+            const size_t scope_index = i - scope_offset;
+            const size_t code_index = i - code_offset;
+            const size_t xml_index = i - xml_offset;
+            const bool is_current_line = has_code and code_index + 1 == line;
+            const string line_number = has_code ? std::to_string(code_index + 1) : string{};
             std::cout << "\033[2K";
-            std::cout << (has_scope ? scope_lines[i] : string{})
-                      << string(scope_width - (has_scope ? scope_lines[i].size() : 0), ' ')
+            std::cout << (has_scope ? scope_lines[scope_index] : string{})
+                      << string(scope_width - (has_scope ? scope_lines[scope_index].size() : 0), ' ')
                       << " | "
                       << string(line_number_width - line_number.size(), ' ')
                       << (is_current_line ? string{red} + line_number + string{reset} : line_number) << " "
                       << (is_current_line ? string{red} + "●" + string{reset} : string{" "}) << " "
-                      << (has_code ? highlighted_code_lines[i] : string{})
-                      << string(code_width - (has_code ? code_lines[i].size() : 0), ' ')
+                      << (has_code ? highlighted_code_lines[code_index] : string{})
+                      << string(code_width - (has_code ? code_lines[code_index].size() : 0), ' ')
                       << " | "
-                      << (i < xml_lines.size() and xml_changed[i] ? string{green} + "+" + string{reset} : " ")
+                      << (has_xml and xml_changed[xml_index] ? string{green} + "+" + string{reset} : " ")
                       << " "
-                      << (i < xml_lines.size() ? xml_lines[i] : string{})
+                      << (has_xml ? xml_lines[xml_index] : string{})
                       << '\n';
         }
 
