@@ -373,9 +373,12 @@ namespace mxslc::debug
         for (const string& scope_line : scope_lines)
             scope_width = std::max(scope_width, scope_line.size());
         scope_width = std::max<size_t>(scope_width, 40);
+        size_t output_width = 2;
+        for (const string& output_line : current_xml_lines)
+            output_width = std::max(output_width, output_line.size() + 2);
 
         const size_t content_lines = std::max({scope_lines.size(), code_lines.size(), xml_lines.size()});
-        const size_t rendered_lines = content_lines + 1;
+        const size_t rendered_lines = content_lines + 2;
         if (not first_run_)
             std::cout << "\033[" << (previous_rendered_lines_ + 1) << "F";
         first_run_ = false;
@@ -384,6 +387,9 @@ namespace mxslc::debug
                   << "Scope" << string(scope_width - 5, ' ') << " | "
                   << string(line_number_width + 3, ' ') << "Code" << string(code_width - 4, ' ')
                   << " |   Output\n";
+        std::cout << string(scope_width, '-') << "-+-"
+                  << string(line_number_width + 3 + code_width, '-') << "-+-"
+                  << string(output_width, '-') << '\n';
 
         const size_t line = stmt ? stmt->token().line() : -1;
         for (size_t i = 0; i < content_lines; ++i)
