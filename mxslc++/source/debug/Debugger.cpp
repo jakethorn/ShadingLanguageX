@@ -271,14 +271,14 @@ namespace mxslc::debug
 
     unique_ptr<Debugger> Debugger::instance_ = nullptr;
 
-    Debugger::Debugger(string code) : code_{std::move(code)}
+    Debugger::Debugger(string code, optional<fs::path> src_path) : code_{std::move(code)}, src_path_{std::move(src_path)}
     {
 
     }
 
-    Debugger& Debugger::create(string code)
+    Debugger& Debugger::create(string code, optional<fs::path> src_path)
     {
-        instance_ = std::unique_ptr<Debugger>{new Debugger{std::move(code)}};
+        instance_ = std::unique_ptr<Debugger>{new Debugger{std::move(code), std::move(src_path)}};
         return *instance_;
     }
 
@@ -294,8 +294,28 @@ namespace mxslc::debug
         return instance_ != nullptr;
     }
 
-    void Debugger::next_statement(const Statement& stmt)
+    void Debugger::close()
     {
+        if (is_enabled())
+            get().next_statement(nullptr);
+    }
+
+    void Debugger::next_statement(const Statement* stmt)
+    {
+        if (stmt)
+        {
+            if (src_path_)
+            {
+                if (src_path_->filename().string() != stmt->token().filename())
+                    return;
+            }
+            else
+            {
+                if (not stmt->token().filename().empty())
+                    return;
+            }
+        }
+
         const vector<string> code_lines = lines(code_);
         const vector<string> highlighted_code_lines = lines(highlight_keywords(code_));
         const string current_xml = runtime::Runtime::get().serializer().xml();
@@ -311,13 +331,14 @@ namespace mxslc::debug
 
         const size_t rendered_lines = std::max(code_lines.size(), xml_lines.size());
         if (not first_run_)
-            std::cout << "\033[" << (rendered_lines + 1) << "F";
+            std::cout << "\033[" << (previous_rendered_lines_ + 1) << "F";
         first_run_ = false;
 
+        const size_t line = stmt ? stmt->token().line() : -1;
         for (size_t i = 0; i < rendered_lines; ++i)
         {
             const bool has_code = i < code_lines.size();
-            const bool is_current_line = has_code and i + 1 == stmt.token().line();
+            const bool is_current_line = has_code and i + 1 == line;
             const string line_number = has_code ? std::to_string(i + 1) : string{};
             std::cout << "\033[2K";
             std::cout << string(line_number_width - line_number.size(), ' ')
@@ -331,6 +352,15 @@ namespace mxslc::debug
                       << (i < xml_lines.size() ? xml_lines[i] : string{})
                       << '\n';
         }
+
+        // Clear rows left over when a later frame is shorter than the previous one.
+        for (size_t i = rendered_lines; i < previous_rendered_lines_; ++i)
+            std::cout << "\033[2K\n";
+
+        previous_rendered_lines_ = std::max(rendered_lines, previous_rendered_lines_);
+
+        if (not stmt)
+            return;
 
         // 4. Wait for the user to press Enter
         string input;

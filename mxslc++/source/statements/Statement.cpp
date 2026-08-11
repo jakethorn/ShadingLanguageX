@@ -16,7 +16,7 @@ namespace mxslc::statements
         try
         {
             if (Debugger::is_enabled())
-                Debugger::get().next_statement(*this);
+                Debugger::get().next_statement(this);
 
             if (not is_initialized_)
             {

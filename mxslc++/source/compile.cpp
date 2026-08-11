@@ -78,13 +78,16 @@ namespace mxslc
                 compile_mxsl_stdlib();
                 {
                     if (opts.debug_mode())
-                        Debugger::create(std::move(source));
+                        Debugger::create(std::move(source), src_path);
 
                     runtime.enter_scope("global");
                     compile_tokens(std::move(tokens));
                     if (opts.has_entry_function())
                         runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
                     runtime.exit_scope();
+
+                    if (opts.debug_mode())
+                        Debugger::close();
                 }
                 runtime.exit_scope();
             }
