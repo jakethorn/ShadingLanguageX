@@ -1,0 +1,7 @@
+
+
+inline float foo(float x, float y) { return x + y; }
+comptime float bar(float x, float y) { return x + y; }
+
+constant(foo(1,2));
+constant(bar(3,3));

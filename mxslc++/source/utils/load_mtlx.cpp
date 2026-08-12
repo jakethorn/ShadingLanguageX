@@ -24,26 +24,76 @@ namespace mxslc
 
     namespace
     {
-        const unordered_set<string> DEFAULT_NODE_DEFS = {
-            "ND_randomfloat_float",
-            "ND_randomcolor_float",
+        string get_return_type_key(const mx::NodeDefPtr& nd)
+        {
+            const vector<mx::OutputPtr> outputs = nd->getActiveOutputs();
 
-            "ND_invert_float",
-            "ND_invert_vector2",
-            "ND_invert_vector3",
-            "ND_invert_vector4",
-            "ND_invert_color3",
-            "ND_invert_color4",
+            if (outputs.empty())
+                return nd->getType();
 
-            "ND_switch_float",
-            "ND_switch_vector2",
-            "ND_switch_vector3",
-            "ND_switch_vector4",
-            "ND_switch_color3",
-            "ND_switch_color4",
-            "ND_switch_matrix33",
-            "ND_switch_matrix44",
-        };
+            if (outputs.size() == 1)
+                return outputs.front()->getType();
+
+            string key;
+            for (const mx::OutputPtr& output : outputs)
+            {
+                if (not key.empty())
+                    key += "|";
+                key += output->getType();
+            }
+
+            return key;
+        }
+
+        // Scan every nodedef in the loaded MaterialX document and pick the
+        // first definition read for each node category and return type pair as
+        // the "default", but only when there are multiple definitions for that
+        // pair. This keeps defaults focused on ambiguous overload groups.
+        // Versioned nodedefs are reduced to their default version, matching how
+        // they are loaded.
+        unordered_set<string> get_default_node_defs(const mx::DocumentPtr& doc)
+        {
+            unordered_map<string, unordered_map<string, string>> best_by_category_and_type;
+            unordered_map<string, unordered_map<string, size_t>> counts_by_category_and_type;
+            unordered_set<string> defaults;
+
+            for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
+            {
+                if (nd->hasVersionString() and not nd->getDefaultVersion())
+                    continue;
+
+                const string& category = nd->getNodeString();
+                const string return_type = get_return_type_key(nd);
+
+                auto& best_by_type = best_by_category_and_type[category];
+                auto& counts_by_type = counts_by_category_and_type[category];
+
+                if (not contains(best_by_type, return_type))
+                {
+                    best_by_type.emplace(return_type, nd->getName());
+                }
+                else
+                {
+                    string& best_name = best_by_type.at(return_type);
+                    if (nd->getName() < best_name)
+                        best_name = nd->getName();
+                }
+
+                ++counts_by_type[return_type];
+            }
+
+            for (const auto& [category, counts_by_type] : counts_by_category_and_type)
+            {
+                const auto& best_by_type = best_by_category_and_type.at(category);
+                for (const auto& [return_type, count] : counts_by_type)
+                {
+                    if (count > 1)
+                        defaults.insert(best_by_type.at(return_type));
+                }
+            }
+
+            return defaults;
+        }
 
         Parameter to_parameter(const mx::InputPtr& i, const size_t index)
         {
@@ -83,12 +133,12 @@ namespace mxslc
             return names;
         }
 
-        FuncPtr to_function(const mx::NodeDefPtr& nd)
+        FuncPtr to_function(const mx::NodeDefPtr& nd, const unordered_set<string>& default_node_defs)
         {
             const Scope& scope = Runtime::get().scope();
 
             ModifierList mods;
-            if (contains(DEFAULT_NODE_DEFS, nd->getName()))
+            if (contains(default_node_defs, nd->getName()))
                 mods.add(TokenType::Default);
 
             TypePtr type = get_type(nd);
@@ -112,11 +162,13 @@ namespace mxslc
             scope.add_primitive_type(td->getName());
         }
 
+        const unordered_set<string> default_node_defs = get_default_node_defs(doc);
+
         for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
         {
             if (nd->hasVersionString() and not nd->getDefaultVersion())
                 continue;
-            scope.add_function(to_function(nd));
+            scope.add_function(to_function(nd, default_node_defs));
         }
     }
 

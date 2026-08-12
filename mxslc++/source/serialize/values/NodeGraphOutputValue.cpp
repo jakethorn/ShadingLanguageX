@@ -7,9 +7,12 @@
 #include "runtime/Type.h"
 #include "utils/mtlx_utils.h"
 #include "serialize/values/interface.h"
+#include "utils/string_utils.h"
 
 namespace mxslc::serialize::values
 {
+    using string_utils::starts_with;
+
     NodeGraphOutputValue::NodeGraphOutputValue(TypePtr type, const mx::NodeGraphPtr& node_graph, string output_name)
         : NodeGraphOutputValue{std::move(type), node_graph->getName(), std::move(output_name)}
     {
@@ -44,6 +47,10 @@ namespace mxslc::serialize::values
 
     string NodeGraphOutputValue::to_string() const
     {
-        return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
+        string node_graph_name = node_graph_name_;
+        if (not starts_with(node_graph_name, "NG_"))
+            node_graph_name = "NG_" + node_graph_name;
+
+        return "nodegraph-output (" + node_graph_name + "." + output_name_ + ")";
     }
 }

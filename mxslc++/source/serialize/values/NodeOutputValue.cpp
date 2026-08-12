@@ -39,6 +39,7 @@ namespace mxslc::serialize::values
 
     void NodeOutputValue::set_as_node_input(const mx::InputPtr& input) const
     {
+        input->removeAttribute("value");
         input->setOutputString(output_name_);
         input->setConnectedNode(node_);
     }
@@ -52,9 +53,6 @@ namespace mxslc::serialize::values
 
     string NodeOutputValue::to_string() const
     {
-        if (mx::OutputPtr output = node_->getOutput(output_name_))
-            return output->asString();
-        else
-            return "<output name=\"" + output_name_ + "\" type=\"" + type_->name() + "\" />";
+        return "node-output (" + node_->getCategory() + ", " + node_->getName() + "." + output_name_ + ")";
     }
 }

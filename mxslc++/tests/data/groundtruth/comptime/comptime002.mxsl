@@ -1,0 +1,6 @@
+
+
+
+comptime float foo() { return randomfloat(); }
+
+constant(foo());

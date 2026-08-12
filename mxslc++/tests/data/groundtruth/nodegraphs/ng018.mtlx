@@ -1,37 +1,19 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <convert name="var__0" type="vector3">
-    <input name="in" type="float" value="1" />
-  </convert>
-  <convert name="var__1" type="vector3">
-    <input name="in" type="float" value="2" />
-  </convert>
-  <convert name="var__2" type="vector3">
-    <input name="in" type="float" value="3" />
-  </convert>
-  <add name="var__3" type="vector3">
-    <input name="in1" type="vector3" nodename="var__0" />
-    <input name="in2" type="vector3" nodename="var__1" />
+  <add name="var__0" type="vector3">
+    <input name="in1" type="vector3" value="1, 1, 1" />
+    <input name="in2" type="vector3" value="2, 2, 2" />
   </add>
   <add name="b" type="vector3">
-    <input name="in1" type="vector3" nodename="var__3" />
-    <input name="in2" type="vector3" nodename="var__2" />
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="vector3" value="3, 3, 3" />
   </add>
-  <convert name="var__4" type="vector4">
-    <input name="in" type="float" value="1" />
-  </convert>
-  <convert name="var__5" type="vector4">
-    <input name="in" type="float" value="2" />
-  </convert>
-  <convert name="var__6" type="vector4">
-    <input name="in" type="float" value="3" />
-  </convert>
-  <add name="var__7" type="vector4">
-    <input name="in1" type="vector4" nodename="var__4" />
-    <input name="in2" type="vector4" nodename="var__5" />
+  <add name="var__1" type="vector4">
+    <input name="in1" type="vector4" value="1, 1, 1, 1" />
+    <input name="in2" type="vector4" value="2, 2, 2, 2" />
   </add>
   <add name="c" type="vector4">
-    <input name="in1" type="vector4" nodename="var__7" />
-    <input name="in2" type="vector4" nodename="var__6" />
+    <input name="in1" type="vector4" nodename="var__1" />
+    <input name="in2" type="vector4" value="3, 3, 3, 3" />
   </add>
 </materialx>

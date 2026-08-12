@@ -1,13 +1,11 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <constant name="var__0" type="vector3" />
   <min name="a" type="vector3">
-    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in1" type="vector3" value="0, 0, 0" />
     <input name="in2" type="float" value="0" />
   </min>
-  <constant name="var__1" type="vector3" />
   <min name="b" type="vector3">
-    <input name="in1" type="vector3" nodename="var__1" />
+    <input name="in1" type="vector3" value="0, 0, 0" />
     <input name="in2" type="float" value="0" />
   </min>
 </materialx>

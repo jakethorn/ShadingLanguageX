@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_A_add" node="A_add">
+    <output name="out" type="float" />
+    <input name="this__x" type="float" />
+    <input name="this__y" type="float" />
+  </nodedef>
+  <nodegraph name="NG_A_add" nodedef="ND_A_add">
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="this__x" />
+      <input name="in2" type="float" interfacename="this__y" />
+    </add>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <A_add name="var__0" type="float">
+    <input name="this__x" type="float" value="1" />
+    <input name="this__y" type="float" value="2" />
+  </A_add>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" nodename="var__0" />
+  </constant>
+</materialx>

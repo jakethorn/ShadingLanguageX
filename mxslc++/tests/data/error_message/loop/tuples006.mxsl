@@ -1,0 +1,4 @@
+for (int i from {1.0, 7.0, 4.0})
+{
+    constant(i);
+}

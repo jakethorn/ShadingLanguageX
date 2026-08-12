@@ -124,25 +124,33 @@ namespace mxslc::statements
         for (const FuncPtr& func : funcs_)
         {
             if (not scope().has_function(func))
+            {
                 scope().add_function(func);
+
+                if (not func->is_inline())
+                    func->update_nonlocal_variables();
+            }
         }
     }
 
     string FunctionDefinition::to_string() const
     {
+        if (not is_templated())
+            return funcs_.front()->to_string();
+
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         string result;
         result += mods_string;
         result += type_->to_string();
-        result += " " + name_;
+        result += ' ' + name_;
         if (not template_types_.empty())
-            result += "<" + join(template_types_, ", ") + ">";
+            result += '<' + join(template_types_, ", ") + '>';
         if (params_)
-            result += "(" + params_->to_string() + ")";
-        result += "\n";
+            result += '(' + params_->to_string() + ')';
+        result += '\n';
         result += body_->to_string();
 
         return result;

@@ -1,0 +1,14 @@
+for (float f from {1.0, 7.0, 4.0, 2.0})
+{
+    constant(f);
+}
+
+for (float f from {5, 3})
+{
+    constant(f);
+}
+
+for (int i from {3, 5, 0, 9, 4})
+{
+    constant(i);
+}

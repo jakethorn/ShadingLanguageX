@@ -1,38 +1,23 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <combine4 name="a" type="vector4">
-    <input name="in1" type="float" value="1" />
-    <input name="in2" type="float" value="2" />
-    <input name="in3" type="float" value="3" />
-    <input name="in4" type="float" value="4" />
-  </combine4>
   <randomfloat name="var__0" type="float" />
   <multiply name="var__1" type="vector4">
-    <input name="in1" type="vector4" nodename="a" />
+    <input name="in1" type="vector4" value="1, 2, 3, 4" />
     <input name="in2" type="float" nodename="var__0" />
   </multiply>
-  <convert name="b" type="color3">
-    <input name="in" type="vector4" nodename="a" />
-  </convert>
   <randomfloat name="var__2" type="float" />
   <multiply name="var__3" type="color3">
-    <input name="in1" type="color3" nodename="b" />
+    <input name="in1" type="color3" value="1, 2, 3" />
     <input name="in2" type="float" nodename="var__2" />
   </multiply>
-  <convert name="c" type="vector2">
-    <input name="in" type="color3" nodename="b" />
-  </convert>
   <randomfloat name="var__4" type="float" />
   <multiply name="var__5" type="vector2">
-    <input name="in1" type="vector2" nodename="c" />
+    <input name="in1" type="vector2" value="1, 2" />
     <input name="in2" type="float" nodename="var__4" />
   </multiply>
-  <convert name="d" type="color4">
-    <input name="in" type="vector2" nodename="c" />
-  </convert>
   <randomfloat name="var__6" type="float" />
   <multiply name="var__7" type="color4">
-    <input name="in1" type="color4" nodename="d" />
+    <input name="in1" type="color4" value="1, 2, 0, 0" />
     <input name="in2" type="float" nodename="var__6" />
   </multiply>
   <ifequal name="e" type="boolean">

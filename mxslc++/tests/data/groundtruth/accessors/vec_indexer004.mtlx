@@ -4,11 +4,7 @@
     <output name="nonlocal_out__y" type="vector2" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <combine2 name="var__0" type="vector2">
-      <input name="in1" type="float" value="3" />
-      <input name="in2" type="float" value="3" />
-    </combine2>
-    <output name="nonlocal_out__y" type="vector2" nodename="var__0" />
+    <output name="nonlocal_out__y" type="vector2" value="3, 3" />
   </nodegraph>
   <constant name="var__0" type="vector2">
     <input name="value" type="vector2" value="0, 0" />

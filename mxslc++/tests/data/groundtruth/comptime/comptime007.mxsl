@@ -1,0 +1,19 @@
+
+inline float foo1(float in)
+{
+    return 1 + in;
+}
+
+comptime float foo2(float in)
+{
+    return 2 + foo1(in);
+}
+
+inline float foo3(float in)
+{
+    return 3 + foo2(in);
+}
+
+mutable float f = foo3(4);
+f = f + 5;
+constant(f);

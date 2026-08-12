@@ -20,6 +20,7 @@ namespace mxslc::statements
         string to_string() const override;
 
     protected:
+        void init() override;
         void execute_impl() const override;
 
     private:

@@ -9,3 +9,9 @@ inline T foo<vec2, vec3, vec4>()
 vec2 c = foo();
 vec3 d = foo();
 vec4 e = foo();
+
+constant(a);
+constant(b);
+constant(c);
+constant(d);
+constant(e);

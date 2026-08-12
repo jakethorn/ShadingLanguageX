@@ -23,10 +23,10 @@
     <input name="in2" type="float" value="10" />
   </add>
   <bar name="var__2" type="float">
-    <input name="nonlocal_in__x" type="float" output="nonlocal_out__x" nodename="var__0" />
+    <input name="nonlocal_in__x" type="float" value="7" />
   </bar>
   <add name="var__3" type="float">
-    <input name="in1" type="float" value="7" />
+    <input name="in1" type="float" output="nonlocal_out__x" nodename="var__2" />
     <input name="in2" type="float" value="2" />
   </add>
   <add name="theta2" type="float">

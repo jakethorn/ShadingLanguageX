@@ -206,50 +206,14 @@ expression.
 auto pi = 3.14;                        // float
 auto red = color3{1.0, 0.0, 0.0};      // color3
 auto data = {3.14, "world"};           // {float, string}
-auto list = 0:3;                       // {int, int, int, int}
+auto list = 0 to 3;                    // {int, int, int, int}
 auto uv = texcoord<vec2>();            // vec2
 auto uv = texcoord();                  // Error: Ambiguous between vec2 or vec3
-```
 
-```
-using Area = {auto, float};    // OK
-Area area_2d = {vec2{}, 1.0};  // {vec2, float}
-Area area_3d = {vec3{}, 1.0};  // {vec3, float}
-
-vec3 foo(auto space = "world") // OK: vec3 foo(string)
+vec3 foo(auto space = "world")         // OK: vec3 foo(string)
 {
-    // do something
+    // ...
 }
-```
-
-## Type Conversions
-
-ShadingLanguageX supports a limited number of implicit conversions. Integer literals can be implicitly converted to bools or floats and string literals can be implicitly converted to filenames.
-
-Vectors can also be implicitly converted to and from unnamed structs with the correct number of float fields. For example:
-```
-{float, float} a = {1.0, 2.0};
-vec2 b = a;
-float x, y = b;
-
-{float, float} foo(vec2 v)
-{
-    return v * 2.0;
-}
-
-vec2 v2 = foo({3.0, 4.0});
-```
-
-Otherwise, variables will need to be explicitly converted using a 
-[Named Constructor](#named-constructor).
-
-```
-float x = 0;                 // implicit int ➔ float
-filename p = "my_image.exr"; // implicit string ➔ filename
-
-color3 c = color3{1.0};      // explicit float ➔ color3
-bool b = bool{1};            // explicit int ➔ bool
-vec2 n_xy = vec2{normal()};  // explicit vec3 ➔ vec2
 ```
 
 ## User-Defined Types
@@ -284,6 +248,36 @@ class Sphere
         return 4.0 * 3.14 * radius * radius;
     }
 }
+```
+
+## Type Conversions
+
+ShadingLanguageX supports a limited number of implicit conversions. Integer literals can be implicitly converted to bools or floats and string literals can be implicitly converted to filenames.
+
+Vectors can also be implicitly converted to and from unnamed structs with the correct number of float fields. For example:
+```
+{float, float} a = {1.0, 2.0};
+vec2 b = a;
+float x, y = b;
+
+{float, float} foo(vec2 v)
+{
+    return v * 2.0;
+}
+
+vec2 v2 = foo({3.0, 4.0});
+```
+
+Otherwise, variables will need to be explicitly converted using a
+[Named Constructor](#named-constructor).
+
+```
+float x = 0;                 // implicit int ➔ float
+filename p = "my_image.exr"; // implicit string ➔ filename
+
+color3 c = color3{1.0};      // explicit float ➔ color3
+bool b = bool{1};            // explicit int ➔ bool
+vec2 n_xy = vec2{normal()};  // explicit vec3 ➔ vec2
 ```
 
 ## `typeof` Operator
@@ -340,32 +334,33 @@ print foo<mat4>(); // "matrix44"
 Expressions are pieces of code that evaluate to a value, such as `1.0 + 1.0`. This document will cover each expression in detail
 in its own section. The following table gives a quick overview of all the expressions supported by ShadingLanguageX.
 
-| Expression                      | Example                              |
-|---------------------------------|--------------------------------------|
-| Binary Operator                 | `a + b`                              |
-| Unary Operator                  | `-a`                                 |
-| Ternary Relational Operator     | `x < a < y`                          |
-| Absolute Operator               | `\|a\|`                              |
-| Field Access Operator           | `s.radius`                           |
-| Swizzle Operator                | `c.rgb`                              |
-| Port Access Operator            | `s.base_color`                       |
-| Indexing Operator               | `a[0]`                               |
-| Literal                         | `3.14`                               |
-| Identifier                      | `i`                                  |
-| Increment/Decrement Operator    | `i++`                                |
-| Compound Assignment Operator    | `i += 2`                             |
-| Grouping Expression             | `(a + b)`                            |
-| If Expression                   | `if (a < b) { x } else { y }`        |
-| Switch Expression               | `switch (a) { x, y, z }`             |
-| Function Call                   | `my_function(a, b)`                  |
-| Method Call                     | `my_obj.my_function(a, b)`           |
-| Constructor Call                | `vec3{0, 1, 0}`                      |
-| Unnamed Constructor Call        | `{a, b, c}`                          |
-| Range Operator                  | `0:3`                                |
-| Variable Declaration Expression | `foo(out float out_arg)`             |
-| This                            | `this`                               |
-| Null                            | `null`                               |
-| Typeof Operator                 | `typeof(a)`                          |
+| Expression                      | Example                       |
+|---------------------------------|-------------------------------|
+| Binary Operator                 | `a + b`                       |
+| Unary Operator                  | `-a`                          |
+| Ternary Relational Operator     | `x < a < y`                   |
+| Absolute Operator               | `\|a\|`                       |
+| Field Access Operator           | `s.radius`                    |
+| Swizzle Operator                | `c.rgb`                       |
+| Port Access Operator            | `s.base_color`                |
+| Indexing Operator               | `a[0]`                        |
+| Literal                         | `3.14`                        |
+| Identifier                      | `i`                           |
+| Increment/Decrement Operator    | `i++`                         |
+| Compound Assignment Operator    | `i += 2`                      |
+| Grouping Expression             | `(a + b)`                     |
+| If Expression                   | `if (a < b) { x } else { y }` |
+| Switch Expression               | `switch (a) { x, y, z }`      |
+| Function Call                   | `my_function(a, b)`           |
+| Method Call                     | `my_obj.my_function(a, b)`    |
+| Constructor Call                | `vec3{0, 1, 0}`               |
+| Unnamed Constructor Call        | `{a, b, c}`                   |
+| Range Operator                  | `0:3`                         |
+| Variable Declaration Expression | `foo(out float out_arg)`      |
+| This                            | `this`                        |
+| Null                            | `null`                        |
+| Typeof Operator                 | `typeof(a + b)`               |
+| Compile Time Expression         | `comptime a + b`              |
 
 # Statements
 
@@ -454,7 +449,20 @@ although we do not recommend the latter for readability reasons.
 
 # Comments
 
-Comments in ShandingLanguageX take the sole form of: `// this is a comment`.
+Comments in ShadingLanguageX can take the form of: 
+```
+// this is a comment
+```
+or:
+```
+/*
+this
+is
+a
+block
+comment
+*/
+```
 
 # Operators
 
@@ -719,13 +727,39 @@ auto nums = 10:5:20;
 print nums; // "{10, 15, 20}"
 ```
 
-Lastly, a more human readable format is available using the `to` keyword.
+Lastly, a more human-readable format is available using the `to` keyword.
 
 ```
 for (int i from 1 to 100)
 {
     // do something
 }
+```
+
+## Compile Time Expressions
+
+`comptime` is a modifier that can be placed before an expression. It tells the compiler to perform as much as of that expression
+at compile time as possible. It operates exactly the same as the `reduce_graph` compiler option (see User Guide), but for a single expression.
+For example: 
+
+```
+float a = 1 + 1;
+float b = comptime 2 + 2;
+
+float c = a + b;
+```
+```
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="a" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <add name="c" type="float">
+    <input name="in1" type="float" nodename="a" />
+    <input name="in2" type="float" value="4" />
+  </add>
+</materialx>
 ```
 
 ## Precedence
@@ -746,7 +780,7 @@ for (int i from 1 to 100)
 | `a & b` `a \| b`                                                         |
 
 When two operators with equal precedence are used, the leftmost operator will evaluate first.  
-As shown in the table above, precendence can be controlled using the grouping operator `(a)`. For example, in the expression
+As shown in the table above, precedence can be controlled using the grouping operator `(a)`. For example, in the expression
 `a + b * c`, the `b * c` will evaluate first, however, in the expression `(a + b) * c`, the `a + b` will evaluate first.
 
 The order of precedence of compound assignment operator (`a += b`, `a -= b`, etc.) only applies to the left hand side of 
@@ -815,6 +849,17 @@ x = 2; // Error
 
 This isn't particularly useful for primitive data types (except to improve readability of the code) as variables are immutable by default in ShadingLanguageX, but it has some use cases
 with [user-defined types](#user-defined-types).
+
+### Comptime
+
+A `comptime` variable must always have a value that is known at compile time. For example:
+
+```
+mutable comptime float a; // OK
+a = 5;                    // OK
+a = comptime 4 * 7;       // OK
+a = geompropvalue("a");   // Error: geompropvalue is only available at render time
+```
 
 ### Geomprop
 
@@ -1141,7 +1186,7 @@ If not enough arguments are provided, the remaining components will be zero.
 
 # If Expression
 
-Unlike most languages, ShaderLanguageX has limited support for if statements but instead mainly uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
+Unlike most languages, ShadingLanguageX has limited support for if statements but instead mainly uses if expressions. The reason for this is that conditional nodes (`ifequal`, `ifgreater` and `ifgreatereq`) in MaterialX act more like
 ternary operators (`cond ? then : else`) than true if statements that control the logic of the program. 
 This makes if expressions better suited for compiling to MaterialX nodes than if statements.
 
@@ -1249,7 +1294,7 @@ if (a > 0.5) // Error: runtime condition
 > ### Not yet supported in mxslc++
 > # Switch Expression
 > 
-> ShaderLanguageX does not support switch statements, but instead uses switch expressions, for the same reasons as if
+> ShadingLanguageX does not support switch statements, but instead uses switch expressions, for the same reasons as if
 > expressions above. They are similar to switch expressions found in the C# programming language.
 > 
 > ```
@@ -1273,29 +1318,40 @@ if (a > 0.5) // Error: runtime condition
 > }
 > ```
 
-# Compile-Time Evaluation
+# Compile Time Evaluation
 
-Some expressions can be evaluated at compile-time if it's the case that all arguments are also known at compile-time. For example,
-instead of `1 + 1` evaluating to an `add` node, it will simply evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
-is not possible at compile-time because the user value is not known until render-time. The following list shows the MaterialX Nodes that
+Some expressions can be evaluated at compile time, given that: 
+1. All of its arguments are known at compile time.
+2. Either the shader was compiled with the `reduce_graph` option, or the expression is marked as `comptime` or is inside a `comptime` function.
+
+
+
+For example, instead of `1 + 1` evaluating to an `add` node, it will simply evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
+is not possible at compile-time because the user value is not known until render time. The following list shows the MaterialX Nodes that
 are currently optimised to evaluate at compile-time, if possible.
 
-| Nodes       |
-|-------------|
-| `add`       |
-| `subtract`  |
-| `multiply`  |
-| `divide`    |
-| `combine2`  |
-| `combine3`  |
-| `combine4`  |
-| `separate2` |
-| `separate3` |
-| `separate4` |
-| `convert`   |
+| Nodes          |
+|----------------|
+| `add`          |
+| `subtract`     |
+| `multiply`     |
+| `divide`       |
+| `invert`       |
+| `constant`     |
+| `combine2`     |
+| `combine3`     |
+| `combine4`     |
+| `separate2`    |
+| `separate3`    |
+| `separate4`    |
+| `convert`      |
+| `extract`      |
+| `creatematrix` |
+| `invertmatrix` |
+| `switch`       |
 
-This also means that expressions or statements that require compile-time values such as if statements, for loops and 
-indexing operators can use these expressions and not just literals. For example:
+This also means that expressions or statements that require compile time values such as if statements, for loops and 
+some indexing operators can also use these expressions and not just literals. For example:
 
 ```
 {float, float, float} x = {1.0, 2.0, 3.0};
@@ -1307,7 +1363,7 @@ print x[1+1]; // OK: 1+1 is evaluated at compile-time
 Unlike if and switch expressions, loops are compiled as statements in ShadingLanguageX, with the caveat that the number of
 loop iterations must be known at compile-time.
 
-For loops iterate over the fields in a given variable.
+For loops iterate over the fields of a value.
 
 ```
 for (modifier-list type name from value)
@@ -1317,11 +1373,11 @@ for (modifier-list type name from value)
 ```
 
 `modifier-list` is a list of zero or more modifiers.  
-`type` can be any primitive or custom data type.  
+`type` can be any primitive or user-defined data type.  
 `name` can be any valid identifier.  
 `value` can be any valid expression.
 
-The two most common ways to do this are using unnamed structs and ranges.
+The two most common ways to do this are using unnamed structs and ranges:
 
 ### Unnamed Structs
 
@@ -1348,7 +1404,7 @@ See [Range Operator](#range-operator) for more information.
 ```
 // render 10 randomly sized white circles
 mutable color3 c = color3{0.0};
-for (int i from 0:9)
+for (int i from 0 to 9)
 {
     vec2 center = vec2{randomfloat(in=0, seed=i), randomfloat(in=1, seed=i)};
     c = if (distance(center, texcoord()) < randomfloat(in=2, max=0.1, seed=i)) { color3{1.0} };
@@ -1671,6 +1727,30 @@ Instead, directly compiles to:
   <input name="in1" type="float" value="5" />
   <input name="in2" type="float" value="1" />
 </add>
+```
+
+## Comptime Functions
+
+`comptime` functions work similarly to `comptime` variables, in that they try to evaluate as much as possible at compile time.
+As such, they are inline by default.
+
+```
+comptime float foo(float a, float b)
+{
+    return (1 + a - 2 * b / 3) ^ 4;
+}
+
+float f = foo(1, 2);
+```
+```
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="var__0" type="float" />
+  <add name="f" type="float">
+    <input name="in1" type="float" value="0.666667" />
+    <input name="in2" type="float" nodename="var__0" />
+  </add>
+</materialx>
 ```
 
 ## Parameterless Functions

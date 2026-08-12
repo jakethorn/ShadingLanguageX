@@ -280,6 +280,11 @@ options:
             clargs.options.error_on_unused_globals = false;
         }
 
+        void parse_debug(Span<string>&, CommandLineArgs& clargs)
+        {
+            clargs.options.set_debug_mode(true);
+        }
+
         void parse_arg(Span<string>& argv, CommandLineArgs& clargs)
         {
             const string& arg0 = argv.pop_front();
@@ -297,6 +302,8 @@ options:
                 {"--args", parse_function_args},
                 {"-g", parse_globals},
                 {"--globals", parse_globals},
+                {"-d", parse_debug},
+                {"--debug", parse_debug},
                 {"--missing-globals-ok", parse_missing_globals_ok},
                 {"--unused-globals-ok", parse_unused_globals_ok},
                 {"--no-reduce-graph", parse_no_reduce_graph}

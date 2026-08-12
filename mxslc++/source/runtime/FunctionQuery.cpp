@@ -8,6 +8,7 @@
 #include "runtime/Type.h"
 #include "runtime/ArgumentList.h"
 #include "errors/CompileError.h"
+#include "utils/string_utils.h"
 
 namespace mxslc::runtime
 {
@@ -142,7 +143,7 @@ namespace mxslc::runtime
             return Result::Ignore;
         if (func->return_type()->is_in(*return_types))
             return Result{Result::Match, 1};
-        if (func->return_type()->is_compatible(*return_types))
+        if (func->return_type()->is_compatible_with(*return_types))
             return Result::Match;
         return Result::NoMatch;
     }
@@ -159,7 +160,23 @@ namespace mxslc::runtime
         // nullptr means any type
         if (template_type == nullptr or *template_type == nullptr)
             return Result::Ignore;
-        return func->template_type() == *template_type;
+        if (not func->has_template_type())
+            return Result::NoMatch;
+        return func->template_type()->equals(*template_type);
+    }
+
+    namespace
+    {
+        bool is_compatible(const TypePtr& param_type, const Argument& arg)
+        {
+            if (param_type->is_compatible_with(arg.type()))
+                return true;
+            if (arg.is_literal() and arg.type()->is<int>() and param_type->is<float>())
+                return true;
+            if (arg.is_literal() and arg.type()->is<string>() and param_type->is<fs::path>())
+                return true;
+            return false;
+        }
     }
 
     FunctionQuery::Result FunctionQuery::arguments_match(const FuncPtr& func) const
@@ -179,7 +196,7 @@ namespace mxslc::runtime
             if (not arg.is_initialized())
                 continue;
             const TypePtr param_type = params[arg].type();
-            if (not param_type->is_compatible(arg.type()))
+            if (not is_compatible(param_type, arg))
                 return Result::NoMatch;
             if (param_type->equals(arg.type()))
                 result.score++;
@@ -205,5 +222,36 @@ namespace mxslc::runtime
         }
 
         return default_funcs;
+    }
+
+    string FunctionQuery::to_string() const
+    {
+        string result;
+
+        if (return_types != nullptr and not return_types->empty())
+        {
+            string types = type_utils::to_string(*return_types);
+            string_utils::replace_last(types, ", ", " or ");
+            result += types + " ";
+        }
+
+        if (class_type != nullptr and *class_type != nullptr)
+            result += (*class_type)->to_string() + ".";
+
+        if (name != nullptr)
+            result += *name;
+
+        if (template_type != nullptr and *template_type != nullptr)
+            result += "<" + (*template_type)->to_string() + ">";
+
+        if (is_parameterless == nullptr or not *is_parameterless)
+        {
+            result += "(";
+            if (args != nullptr)
+                result += args->to_string();
+            result += ")";
+        }
+
+        return result;
     }
 }

@@ -37,10 +37,8 @@ namespace mxslc::container_utils
         return ts.find(t) != ts.end();
     }
 
-    inline bool contains(const string& str, const char c)
-    {
-        return str.find(c) != std::string::npos;
-    }
+    bool contains(const string& str, char c);
+    bool contains(const vector<TypePtr>& types, const TypePtr& type);
 
     template<typename T>
     void extend(vector<T>& dst, const vector<T>& src)

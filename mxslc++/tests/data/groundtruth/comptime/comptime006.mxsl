@@ -1,0 +1,5 @@
+{float i, float j} k = separate2(vec2{3});
+{float i, float j} m = k;
+float now, then = {randomfloat(), randomfloat()};
+{float i, float j} o = {1.0, k.j};
+float END = o.i + o.j;

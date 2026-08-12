@@ -1,7 +1,3 @@
-funcquery001.mxsl, line 17: Matching definition could not be found for function 'foo'
+funcquery001.mxsl, line 17: No function could be found that matches the signature 'foo(b)'
 Possible matches:
 void foo(A a)
-
-Underlying errors:
-
-Attempting to assign an expression of type B to a variable or parameter of type A

@@ -140,9 +140,9 @@ namespace mxslc
             }
         }
 
-        mods.validate();
+        mods.validate(TokenType::Comptime);
 
-        ExprPtr expr = expression();
+        ExprPtr expr = expression(mods);
 
         if (peek() == '=')
         {
@@ -462,9 +462,9 @@ namespace mxslc
         };
     }
 
-    ExprPtr Parser::expression()
+    ExprPtr Parser::expression(const ModifierList& mods)
     {
-        const bool is_comptime = consume(TokenType::Comptime).has_value();
+        const bool is_comptime = mods.contains(TokenType::Comptime) or consume(TokenType::Comptime).has_value();
 
         ExprPtr expr = logical();
         if (is_comptime)
@@ -778,7 +778,7 @@ namespace mxslc
 
     ExprPtr Parser::unnamed_constructor()
     {
-        const Token& token = peek();
+        const Token token = peek();
         vector<ExprPtr> exprs = list<ExprPtr>('{', '}', [this](const size_t) { return expression(); });
         return create_expression<UnnamedConstructor>(std::move(exprs), token);
     }

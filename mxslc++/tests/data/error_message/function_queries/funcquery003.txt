@@ -1,7 +1,3 @@
-funcquery003.mxsl, line 11: Matching definition could not be found for function 'foo'
+funcquery003.mxsl, line 11: No function could be found that matches the signature 'foo(1)'
 Possible matches:
 void foo(string s)
-
-Underlying errors:
-
-Attempting to assign an expression of type integer to a variable or parameter of type string

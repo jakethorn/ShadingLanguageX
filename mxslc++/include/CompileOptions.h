@@ -61,6 +61,9 @@ namespace mxslc
         void clear_entry_function_arguments();
         const vector<VarPtr>& entry_function_arguments() const { return func_args_; }
 
+        void set_debug_mode(const bool debug_mode) { debug_mode_ = debug_mode; }
+        bool debug_mode() const { return debug_mode_; }
+
         bool has_output_file() const { return output_file.has_value(); }
         bool has_entry_function() const { return func_name.has_value(); }
 
@@ -70,6 +73,7 @@ namespace mxslc
         unordered_map<string, Macro> macros_;
         unordered_map<string, VarPtr> globals_;
         vector<VarPtr> func_args_;
+        bool debug_mode_{false};
     };
 }
 

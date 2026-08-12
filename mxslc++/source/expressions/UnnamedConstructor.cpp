@@ -32,7 +32,7 @@ namespace mxslc::expressions
             try_init_expressions(types);
 
             if (initialized_expr_count_ == prev_initialized_expr_count)
-                throw CompileError{"Invalid constructor call"};
+                throw CompileError{init_error_message(types)};
         }
     }
 
@@ -58,6 +58,8 @@ namespace mxslc::expressions
     bool UnnamedConstructor::expressions_are_initialized()
     {
         bool result = true;
+
+        initialized_expr_count_ = 0;
         for (const ExprPtr& expr : exprs_)
         {
             if (expr->is_initialized())
@@ -80,7 +82,7 @@ namespace mxslc::expressions
         {
             if (exprs_[i]->is_initialized())
                 continue;
-            if (exprs_[i]->try_init(index_types(types, i)))
+            if (exprs_[i]->try_init(types_at_index(types, i)))
                 ++initialized_expr_count_;
         }
     }
@@ -106,35 +108,45 @@ namespace mxslc::expressions
         }
     }
 
-    vector<TypePtr> UnnamedConstructor::index_types(const vector<TypePtr>& types, const size_t index) const
+    vector<TypePtr> UnnamedConstructor::types_at_index(const vector<TypePtr>& types, const size_t index) const
     {
-        if (subexpr_type_)
-            return {subexpr_type_};
-
-        vector<TypePtr> result;
+        vector<TypePtr> subtypes;
 
         for (const TypePtr& type : with_compatible_types(types))
         {
-            bool is_compatible = true;
-
-            if (type->field_count() != exprs_.size())
+            if (type->field_count() == exprs_.size())
             {
-                is_compatible = false;
-            }
-            else
-            {
+                bool is_compatible = true;
                 for (size_t i = 0; i < exprs_.size(); ++i)
                 {
-                    if (exprs_[i]->is_initialized() and type->field_type(i) != exprs_[i]->type())
+                    const TypePtr field_type = type->field_type(i);
+                    if (exprs_[i]->is_initialized() and not exprs_[i]->type()->is_compatible_with(field_type))
                         is_compatible = false;
                 }
+
+                if (is_compatible)
+                    subtypes.push_back(type->field_type(index));
             }
 
-            if (is_compatible)
-                result.push_back(type->field_type(index));
+            if (type->is_tuple())
+                subtypes.push_back(type->template_type());
         }
 
-        return result;
+        return subtypes;
+    }
+
+    string UnnamedConstructor::init_error_message(const vector<TypePtr>& types) const
+    {
+        string message = "Cannot assign the unnamed constructor to a variable or parameter of type " + type_utils::to_string(types);
+        message += "\nUnderlying errors:\n";
+
+        for (size_t i = 0; i < exprs_.size(); ++i)
+        {
+            if (exprs_[i]->has_error())
+                message += "Argument " + std::to_string(i) + ": " + exprs_[i]->error_message() + "\n";
+        }
+
+        return message;
     }
 
     string UnnamedConstructor::to_string() const

@@ -50,7 +50,7 @@ namespace mxslc
         vector<TypePtr> template_list();
         std::tuple<StmtPtr, ExprPtr> function_body();
 
-        ExprPtr expression();
+        ExprPtr expression(const ModifierList& mods = {});
         ExprPtr logical();
         ExprPtr equality();
         ExprPtr relational();

@@ -47,6 +47,6 @@ namespace mxslc::serialize::values
         if (not starts_with(node_graph_name, "NG_"))
             node_graph_name = "NG_" + node_graph_name;
 
-        return "<nodegraph name=\"" + node_graph_name + "\">";
+        return "nodegraph (" + node_graph_name + ")";
     }
 }

@@ -21,7 +21,7 @@ namespace mxslc::runtime
 
     Runtime::Runtime(CompileOptions opts) : opts_{std::move(opts)}
     {
-        scope_ = create_scope();
+        scope_ = create_scope("mtlx_stdlib");
         scope_->set_graph(serializer_.document(), nullptr);
         serializer_.set_version(opts_.version);
         serializer_.set_reduce_graph(opts_.reduce_graph);

@@ -4,22 +4,13 @@
     <output name="out" type="vector2" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <combine2 name="var__0" type="vector2">
-      <input name="in1" type="float" value="1" />
-      <input name="in2" type="float" value="2" />
-    </combine2>
-    <output name="out" type="vector2" nodename="var__0" />
+    <output name="out" type="vector2" value="1, 2" />
   </nodegraph>
   <nodedef name="ND_foo2" node="foo">
     <output name="out" type="vector3" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <combine3 name="var__0" type="vector3">
-      <input name="in1" type="float" value="1" />
-      <input name="in2" type="float" value="2" />
-      <input name="in3" type="float" value="3" />
-    </combine3>
-    <output name="out" type="vector3" nodename="var__0" />
+    <output name="out" type="vector3" value="1, 2, 3" />
   </nodegraph>
   <foo name="var__0" type="vector2" />
 </materialx>

@@ -46,17 +46,35 @@ namespace mxslc::expressions
         );
     }
 
+    namespace
+    {
+        void cast_to_target_type(const vector<TypePtr>& types, vector<Primitive>& result)
+        {
+            for (size_t i = 0; i < result.size(); ++i)
+            {
+                vector<TypePtr> subtypes;
+                for (const TypePtr& type : types)
+                {
+                    if (type->field_count() == result.size())
+                        subtypes.push_back(type->field_type(i));
+                    if (type->is_tuple())
+                        subtypes.push_back(type->template_type());
+                }
+
+                if (not Type::Int->is_in(subtypes) and Type::Float->is_in(subtypes))
+                    result[i] = result[i].cast<float>();
+            }
+        }
+    }
+
     void RangeExpression::init_subexpressions(const vector<TypePtr>& types)
     {
-        if (subexpr_type_ and not (subexpr_type_->is_auto() or subexpr_type_->is<float>() or subexpr_type_->is<int>()))
-            throw CompileError{"Invalid range expression type: " + subexpr_type_->name()};
+        const vector<TypePtr> subexpr_types{Type::Int, Type::Float};
 
-        const vector expr_types = subexpr_type_ ? vector{subexpr_type_} : vector{Type::Int, Type::Float};
-
-        lower_expr_->init(expr_types);
+        lower_expr_->init(subexpr_types);
         if (step_expr_)
-            step_expr_->init(expr_types);
-        upper_expr_->init(expr_types);
+            step_expr_->init(subexpr_types);
+        upper_expr_->init(subexpr_types);
     }
 
     void RangeExpression::init_impl(const vector<TypePtr>& types)
@@ -72,6 +90,7 @@ namespace mxslc::expressions
             lower += step;
         }
 
+        cast_to_target_type(types, result);
         range_ = create_variable(result);
     }
 

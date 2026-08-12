@@ -1,0 +1,8 @@
+
+constant(bool{1});
+constant(float{1});
+constant(vec2{1});
+constant(vec3{1});
+constant(vec4{1});
+constant(color3{1});
+constant(color4{1});

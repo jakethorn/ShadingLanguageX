@@ -17,6 +17,7 @@ namespace mxslc::runtime
     {
     public:
         Scope();
+        explicit Scope(string name);
         explicit Scope(ScopePtr parent);
         Scope(string name, ScopePtr parent);
 
@@ -26,8 +27,10 @@ namespace mxslc::runtime
             return std::move(parent_);
         }
 
+        const string& name() const { return name_; }
+
         bool has_parent() const { return parent_ != nullptr; }
-        Scope& parent() const { return *parent_; }
+        Scope* parent() const { return parent_.get(); }
 
         mx::GraphElementPtr graph() const { return graph_; }
         std::pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
@@ -40,6 +43,7 @@ namespace mxslc::runtime
 
         void add_variable(string name, VarPtr var);
         VarPtr get_variable(const string& name) const;
+        vector<VarPtr> get_all_variables();
         bool has_variable(const string& name) const;
         bool is_variable_local(const VarPtr& var) const;
         bool is_variable_local(const string& name) const;
@@ -49,11 +53,10 @@ namespace mxslc::runtime
          */
 
         void add_function(FuncPtr func);
-        FuncPtr get_function(const FunctionQuery& query, bool throw_on_fail = true) const;
-        vector<FuncPtr> get_functions(const FunctionQuery& query, bool throw_on_fail = true) const;
+        FuncPtr get_function(const FunctionQuery& query) const;
+        vector<FuncPtr> get_functions(const FunctionQuery& query) const;
         bool has_function(const FuncPtr& func) const;
         bool has_function(const FunctionQuery& query) const;
-        Scope& get_defining_scope(const FuncPtr& func);
 
         /*
          * types
@@ -74,7 +77,7 @@ namespace mxslc::runtime
         bool is_youngest_{true};
 
         unordered_map<string, VarPtr> variables_;
-        vector<FuncPtr> functions_;
+        unordered_map<string, vector<FuncPtr>> functions_;
         unordered_map<string, TypePtr> types_;
 
         mx::GraphElementPtr graph_;

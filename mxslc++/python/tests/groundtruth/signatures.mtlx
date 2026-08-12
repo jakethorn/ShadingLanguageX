@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <normalmap name="node_normalmap" type="vector3">
+    <input name="scale" type="float" value="1.0" />
+  </normalmap>
+  <normalmap name="node_normalmap2" type="vector3">
+    <input name="scale" type="float" value="1" />
+  </normalmap>
+  <normalmap name="node_normalmap3" type="vector3">
+    <input name="scale" type="vector2" value="1, 1" />
+  </normalmap>
+  <image name="node_image_vector3_10" type="vector3">
+    <input name="file" type="filename" value="test.png" />
+  </image>
+  <normalmap name="node_normalmap4" type="vector3">
+    <input name="in" type="vector3" nodename="node_image_vector3_10" />
+    <input name="scale" type="float" value="1.0" />
+  </normalmap>
+  <randomfloat name="c" type="float">
+    <input name="in" type="float" value="1" />
+  </randomfloat>
+  <randomcolor name="d" type="color3">
+    <input name="in" type="float" value="0.0" />
+  </randomcolor>
+  <randomcolor name="d2" type="color3">
+    <input name="in" type="integer" value="1" />
+  </randomcolor>
+  <randomcolor name="d3" type="color3">
+    <input name="in" type="float" value="1" />
+  </randomcolor>
+</materialx>

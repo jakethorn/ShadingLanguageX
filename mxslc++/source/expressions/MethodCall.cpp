@@ -2,12 +2,15 @@
 // Created by jaket on 06/05/2026.
 //
 
+#include <cassert>
+
 #include "expressions/MethodCall.h"
 
 #include "runtime/Function.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
+#include "runtime/utils/FunctionResolver.h"
 #include "runtime/variables/Variable.h"
 #include "serialize/serializer_utils.h"
 #include "serialize/values/interface.h"
@@ -48,21 +51,27 @@ namespace mxslc::expressions
     {
         instance_expr_->init();
         instance_ = instance_expr_->evaluate();
-        FunctionCall::init_subexpressions(types);
     }
 
-    void MethodCall::init_impl(const vector<TypePtr> &types)
+    void MethodCall::init_impl(const vector<TypePtr>& types)
     {
-        func_ = get_matching_function(scope(), types);
+        if (template_type_)
+            template_type_ = scope().resolve_type(template_type_);
+
+        func_ = runtime_utils::resolve_method(instance_->type(), types, name_, template_type_, args_, is_argumentless_);
+
         for (const Argument& arg : args_)
+        {
+            assert(arg.is_initialized());
             arg.validate(func_->parameters()[arg]);
+        }
     }
 
     VarPtr MethodCall::evaluate_impl() const
     {
         if (func_->is_inline())
         {
-            runtime().enter_scope();
+            runtime().enter_scope(name_);
             evaluate_arguments();
             const VarPtr local_instance = copy_instance_to_scope();
             VarPtr return_value = inline_invoke();
@@ -78,16 +87,6 @@ namespace mxslc::expressions
             else
                 return serializer().write_node(instance_, func_, args_, attrs_);
         }
-    }
-
-    vector<FuncPtr> MethodCall::get_matching_functions(const Scope& scope, const vector<TypePtr>& return_types) const
-    {
-        return scope.get_functions({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
-    }
-
-    FuncPtr MethodCall::get_matching_function(const Scope& scope, const vector<TypePtr>& return_types) const
-    {
-        return scope.get_function({instance_->type(), return_types, name_, template_type_, args_, is_argumentless_});
     }
 
     VarPtr MethodCall::copy_instance_to_scope() const

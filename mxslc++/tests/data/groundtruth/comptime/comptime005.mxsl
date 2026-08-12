@@ -1,0 +1,2 @@
+
+constant(vec4{6, vec2{7, 8}, 9});

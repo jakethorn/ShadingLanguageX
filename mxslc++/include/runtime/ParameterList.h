@@ -14,7 +14,7 @@ namespace mxslc::runtime
 
     class Argument;
 
-    class ParameterList : public Monomorphizable<ParameterList>, Stringable
+    class ParameterList : public Monomorphizable<ParameterList>, public Stringable
     {
     public:
         ParameterList() = default;
