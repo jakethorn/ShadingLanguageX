@@ -72,6 +72,11 @@ namespace mxslc::io_utils
         if (realpath(path, real_path) == nullptr)
             throw CompileError{"Cannot resolve executable path"};
         return fs::path{real_path}.parent_path();
+#elif defined(__EMSCRIPTEN__)
+        // Emscripten runs on a virtual filesystem rooted at '/', and the
+        // libraries folder is preloaded there, so the current working
+        // directory is the most useful search location.
+        return fs::current_path();
 #else
         // Linux and other Unix-like systems
         char path[PATH_MAX];
@@ -103,6 +108,10 @@ namespace mxslc::io_utils
         if (count == 0 || count == MAX_PATH)
             throw CompileError{"Cannot determine python module path"};
         return fs::path{path}.parent_path();
+#elif defined(__EMSCRIPTEN__)
+        // Same as get_executable_directory(): there is no host file system to
+        // query in the browser, so fall back to the current working directory.
+        return fs::current_path();
 #else
         Dl_info info;
 

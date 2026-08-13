@@ -1,0 +1,12 @@
+{
+  "name": "mxslc-js-tests",
+  "version": "0.1.0",
+  "description": "Playwright unit tests for the mxslc WebAssembly bindings.",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test --project=unit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

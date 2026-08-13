@@ -1,0 +1,32 @@
+import { test, expect } from '@playwright/test';
+import { loadMxslc } from './testHelpers.js';
+
+test.describe('Decompile (MTLX -> SLX)', () =>
+{
+    let mx;
+
+    test.beforeAll(async () =>
+    {
+        mx = await loadMxslc();
+    });
+
+    test('decompiles a MTLX string to an SLX string', () =>
+    {
+        const mtlx = `<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="z" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+  </add>
+  <combine2 name="st" type="vector2">
+    <input name="in1" type="float" nodename="z" />
+    <input name="in2" type="float" value="4" />
+  </combine2>
+</materialx>`;
+
+        const slx = mx.decompileMtlxToSlx(mtlx);
+
+        expect(slx).toContain('z');
+        expect(slx).toContain('st');
+    });
+});

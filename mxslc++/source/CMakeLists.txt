@@ -132,7 +132,9 @@ target_link_libraries(mxslc_lib
         PUBLIC mtlx_lib
 )
 
-if(UNIX AND NOT APPLE)
+# dladdr is used for locating search directories; Emscripten does not provide
+# a libdl and these calls are guarded out for the JS build.
+if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
     target_link_libraries(mxslc_lib
             PUBLIC dl
     )
