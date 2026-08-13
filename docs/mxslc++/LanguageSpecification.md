@@ -373,11 +373,11 @@ the statements supported by ShadingLanguageX.
 |---------------------------|---------------------------------------------|
 | Variable Definition       | `float a = 0.0;`                            |
 | Variable Assignment       | `a = 1.0;`                                  |
-| Function Definition       | `{float, float} zeros() { return {0, 0}; }` |
-| Multi-Variable Definition | `float a, b = zeros();`                     |
+| Function Definition       | `float add(float a, float b) { return a + b; }` |
+| Multi-Variable Definition | `float a, b = {0, 1};`                      |
 | If Statement              | `if (true) { ... } else { ... }`            |
-| For Range Loop            | `for (int i = 0:9) { a++; }`                |
-| For Each Loop             | `for (int i = {1, 5, 3}) { a += i; }`       |
+| For Range Loop            | `for (int i from 0:9) { a++; }`             |
+| For Each Loop             | `for (int i from {1, 5, 3}) { a += i; }`    |
 | Expression Statement      | `standard_surface(base=1.0);`               |
 | Using Statement           | `using Point = {float x, float y};`         |
 | Class Statement           | `class Point { float x; float y; }`         |
@@ -423,7 +423,7 @@ float pi2 = 3.14 * 2.0;
 The following identifiers have a special meaning in ShadingLanguageX and cannot be used for user-defined variables or functions.
 
 `if` `else` `switch` `for` `from` `to` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
-`global` `default` `function` `using` `class` `this` `print` `typeof` `break`
+`global` `default` `using` `class` `this` `print` `typeof` `break`
 
 ### Note
 
@@ -823,7 +823,7 @@ global int iter_count = 50
 
 ## Modifiers
 
-ShadingLanguageX supports three modifiers for variable declarations: `mutable`, `const` and `global`.
+ShadingLanguageX supports five modifiers for variable declarations: `mutable`, `const`, `geomprop`, `global`, and `comptime`.
 
 ### Mutable
 
