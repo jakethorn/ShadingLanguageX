@@ -26,10 +26,15 @@ function clearLog() {
 // CodeMirror MXSL mode (built from the embedded keyword lists)
 // ---------------------------------------------------------------------------
 
+// Mutable set of names highlighted as functions. It is populated from the
+// static keywords list and then augmented with the full MaterialX nodedef
+// category set once the WASM module finishes loading.
+let mxslFunctionSet = null;
+
 function registerMxslMode(dataTypes, control, functions, funcStyle) {
     dataTypes = new Set(dataTypes || []);
     control = new Set(control || []);
-    functions = new Set(functions || []);
+    mxslFunctionSet = new Set(functions || []);
     funcStyle = funcStyle || 'function';
 
     CodeMirror.defineMode('mxsl', function () {
@@ -54,7 +59,7 @@ function registerMxslMode(dataTypes, control, functions, funcStyle) {
                     const word = stream.current();
                     if (dataTypes.has(word)) return 'type';
                     if (control.has(word)) return 'keyword';
-                    if (functions.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
+                    if (mxslFunctionSet.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
                     if (word === word.toUpperCase() && word.length >= 2) return 'atom';
                     return 'variable';
                 }
@@ -233,7 +238,22 @@ function setWasmStatus(label, icon, cls) {
         });
         logMessage('WebAssembly module loaded (' +
             MXSL_KEYWORDS.control.length + ' control keywords, ' +
-            MXSL_KEYWORDS.functions.length + ' functions)', 'success');
+            MXSL_KEYWORDS.functions.length + ' built-in functions)', 'success');
+
+        // Merge the full MaterialX nodedef category set into the highlight set.
+        try {
+            const defs = mx.getMtlxDefinitionNames();
+            const count = defs.size();
+            for (let i = 0; i < count; i++)
+                mxslFunctionSet.add(defs.get(i));
+            logMessage(`Loaded ${count} MaterialX nodedef categories found`, 'success');
+            // Force the MXSL editor to re-tokenize with the updated set.
+            editorMxsl.setOption('mode', 'text/plain');
+            editorMxsl.setOption('mode', 'mxsl');
+        } catch (err) {
+            logMessage('Could not load MaterialX nodedefs: ' + err.message, 'error');
+        }
+
         setWasmStatus('WASM ready', 'bi-check-circle-fill', 'text-success');
     } catch (err) {
         logMessage('Failed to load WebAssembly module: ' + err.message, 'error');

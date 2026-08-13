@@ -97,8 +97,27 @@ cd "$ROOT_DIR/javascript/tests"
 npx playwright install chromium || true
 npm run test
 
+echo "--------------------- Browser Setup ---------------------"
+# Refresh the self-contained browser app with the freshly built WASM artifacts.
+BROWSER_DIR="$ROOT_DIR/javascript/browser"
+mkdir -p "$BROWSER_DIR/lib"
+cp "$BUILD_DIR/mxslc/javascript/bin/JsMxslc.js" \
+   "$BUILD_DIR/mxslc/javascript/bin/JsMxslc.wasm" \
+   "$BUILD_DIR/mxslc/javascript/bin/JsMxslc.data" \
+   "$BROWSER_DIR/lib/"
+echo "Copied WASM artifacts into $BROWSER_DIR/lib/"
+
+echo "--------------------- Run Browser ---------------------"
+# The server is NOT started automatically. Serve the app manually when ready
+# (WASM fetches .wasm/.data over HTTP, so it cannot be opened via file://).
+echo "To run the browser app, from: $BROWSER_DIR"
+echo "    node serve.js            # -> http://localhost:8080"
+echo "  or:"
+echo "    python3 -m http.server 8080"
+
 echo "--------------------- Done ---------------------"
 echo "The WebAssembly module was written to:"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.js"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.wasm"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.data"
+echo "Browser app: $BROWSER_DIR/index.html (run 'node serve.js' from $BROWSER_DIR)"

@@ -17,9 +17,12 @@
 
 #include <emscripten/bind.h>
 
+#include <set>
+
 #include "compile.h"
 #include "CompileOptions.h"
 #include "decompile/decompile.h"
+#include "utils/load_mtlx.h"
 
 #include "common.h"
 
@@ -46,6 +49,30 @@ namespace
     {
         return mxslc::decompile::decompile_to_string(source);
     }
+
+    // Return the sorted set of MaterialX node-definition category names from
+    // the loaded standard library. This reuses mxslc's existing MaterialX
+    // library loader (the same one the compile path uses), so the stdlib is
+    // resolved against the preloaded libraries/ folder in the WASM filesystem.
+    // Mirrors the Flask app's _get_mtlx_definition_names().
+    std::vector<std::string> get_mtlx_definition_names()
+    {
+        mxslc::CompileOptions opts;
+        opts.add_default_search_directories();
+
+        const mx::DocumentPtr doc =
+            mxslc::get_materialx_library(opts.version, opts.search_directories());
+
+        std::set<std::string> names;
+        for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
+        {
+            // Skip non-default versioned nodedefs, matching how mxslc loads them.
+            if (nd->hasVersionString() && !nd->getDefaultVersion())
+                continue;
+            names.insert(nd->getNodeString());
+        }
+        return std::vector<std::string>(names.begin(), names.end());
+    }
 }
 
 EMSCRIPTEN_BINDINGS(mxslc)
@@ -60,4 +87,7 @@ EMSCRIPTEN_BINDINGS(mxslc)
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
     ems::function("compileSlxToMtlxWithOptions", &compile_slx_to_mtlx_with_options);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);
+
+    ems::register_vector<std::string>("StringVector");
+    ems::function("getMtlxDefinitionNames", &get_mtlx_definition_names);
 }

@@ -63,13 +63,10 @@
         <div class="container d-flex align-items-center justify-content-between">
             <h1 class="fs-5 fw-bold m-0">
                 <i class="bi bi-arrow-left-right me-2" style="color:#89b4fa;"></i>
-                MXSL <span class="text-body-secondary">&#x2194;</span> MTLX
-                <span class="badge bg-secondary ms-2 align-middle" style="font-size:.65rem;">Converter</span>
+                MXSL <span class="text-body-secondary">&#x2194;</span> MTLX Converter
+                <!-- <span class="badge ms-2 align-middle" style="font-size:.65rem;">Converter</span> -->
             </h1>
             <div class="d-flex align-items-center gap-3">
-                <span id="wasm-status" class="wasm-status text-body-secondary">
-                    <i class="bi bi-cpu me-1"></i>WASM loading...
-                </span>
                 <div class="text-end">
                     <span class="text-body-secondary small d-block">powered by</span>
                     <strong>ShadingLanguageX <span class="text-body-secondary"></span></strong>
@@ -135,6 +132,9 @@
             <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
                 <i class="bi bi-terminal me-1" style="color:#89b4fa;"></i>
                 <span>Log</span>
+                <span id="wasm-status" class="wasm-status text-body-secondary">
+                    <i class="bi bi-cpu me-1"></i>WASM loading...
+                </span>
                 <button class="btn btn-sm btn-link text-body-secondary ms-auto p-0" onclick="clearLog()" title="Clear log">
                     <i class="bi bi-trash3"></i>
                 </button>
