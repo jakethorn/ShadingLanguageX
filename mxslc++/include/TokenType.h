@@ -69,6 +69,7 @@ namespace mxslc
             For,
             From,
             To,
+            Switch,
             Return,
             Null,
             Ref,
@@ -116,8 +117,8 @@ namespace mxslc
         };
 
         inline static const unordered_set Keywords {
-            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Inline, Default,
-            Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
+            If, Else, For, From, To, Switch, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Inline,
+            Default, Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
         };
 
     private:
@@ -147,6 +148,7 @@ namespace mxslc
             {"for", For},
             {"from", From},
             {"to", To},
+            {"switch", Switch},
             {"return", Return},
             {"null", Null},
             {"ref", Ref},

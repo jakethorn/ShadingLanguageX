@@ -4,8 +4,6 @@
 
 #include "expressions/IfExpression.h"
 
-#include <cassert>
-
 #include "expressions/interface.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
@@ -15,7 +13,7 @@
 namespace mxslc::expressions
 {
     IfExpression::IfExpression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr, Token token)
-        : Expression{std::move(token)}, cond_expr_(std::move(cond_expr)), then_expr_(std::move(then_expr)), else_expr_(std::move(else_expr))
+        : Expression{std::move(token)}, cond_expr_{std::move(cond_expr)}, then_expr_{std::move(then_expr)}, else_expr_{std::move(else_expr)}
     {
 
     }
@@ -54,7 +52,7 @@ namespace mxslc::expressions
     {
         VarPtr runtime_evaluate(const VarPtr& cond, const VarPtr& then, const VarPtr& else_)
         {
-            if (then->type()->is_primitive())
+            if (then->has_value())
             {
                 return runtime_utils::invoke_function("ifequal", ArgumentList{cond, true, then, else_});
             }
@@ -84,6 +82,6 @@ namespace mxslc::expressions
 
     string IfExpression::to_string() const
     {
-        return "if (" + cond_expr_->to_string() + ") { " + then_expr_->to_string() + " }" + " else { " + else_expr_->to_string() + " }";
+        return "if (" + cond_expr_->to_string() + ") { " + then_expr_->to_string() + " } else { " + else_expr_->to_string() + " }";
     }
 }

@@ -50,6 +50,7 @@ options:
   -f, --func FUNC                Name of entry function into the program
   -a, --args ARGS*               Arguments to be passed to the entry function
   -g, --globals NAME VALUE*      Values to be assigned to `global` variables
+  -d, --debug                    Step through the code as it compiles
   --missing-globals-ok           Allow `global` variables to be missing
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time

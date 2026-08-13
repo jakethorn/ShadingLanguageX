@@ -64,6 +64,8 @@ namespace mxslc
         ExprPtr property();
         ExprPtr primary();
         ExprPtr if_expression(ExprPtr else_expr = nullptr);
+        ExprPtr switch_expression();
+        ExprPtr case_expression();
         ExprPtr function_call();
         ExprPtr method_call(ExprPtr instance);
         ExprPtr named_constructor();

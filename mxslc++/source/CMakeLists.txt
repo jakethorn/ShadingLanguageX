@@ -60,6 +60,7 @@ add_library(mxslc_lib
         expressions/TypeOfOperator.cpp
         expressions/RangeExpression.cpp
         expressions/IfExpression.cpp
+        expressions/SwitchExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp

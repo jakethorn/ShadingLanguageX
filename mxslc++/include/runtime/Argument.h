@@ -23,7 +23,9 @@ namespace mxslc::runtime
         Argument(AttributeList attrs, ModifierList mods, string name, ExprPtr expr, size_t index);
         Argument(ModifierList mods, string name, ExprPtr expr, size_t index);
         Argument(ModifierList mods, ExprPtr expr, size_t index);
+
         Argument(string name, ExprPtr expr, size_t index);
+        Argument(string name, VarPtr value, size_t index);
 
         Argument(ExprPtr expr, size_t index);
         Argument(VarPtr value, size_t index);

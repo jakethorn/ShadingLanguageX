@@ -29,6 +29,9 @@ namespace mxslc::runtime
     Argument::Argument(string name, ExprPtr expr, const size_t index)
         : Argument{ModifierList{}, std::move(name), std::move(expr), index} { }
 
+    Argument::Argument(string name, VarPtr value, const size_t index)
+        : Argument{std::move(name), as_expression(std::move(value)), index} { }
+
     Argument::Argument(ExprPtr expr, const size_t index)
         : Argument{string{}, std::move(expr), index} { }
 
@@ -124,7 +127,7 @@ namespace mxslc::runtime
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         if (has_name())
             return mods_string + name_ + " = " + expr_->to_string();

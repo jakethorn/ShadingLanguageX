@@ -743,6 +743,22 @@ namespace mxslc
         return create_expression<IfExpression>(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
     }
 
+    ExprPtr Parser::switch_expression()
+    {
+        Token token = match(TokenType::Switch);
+        match('(');
+        ExprPtr index_expr = expression();
+        match(')');
+        match('{');
+        ExprPtr then_expr = expression();
+        match('}');
+    }
+
+    ExprPtr Parser::case_expression()
+    {
+
+    }
+
     ExprPtr Parser::function_call()
     {
         Token name = match(TokenType::Identifier);

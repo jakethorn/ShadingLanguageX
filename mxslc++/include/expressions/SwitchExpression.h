@@ -1,18 +1,18 @@
 //
-// Created by jaket on 01/08/2026.
+// Created by jaket on 11/08/2026.
 //
 
-#ifndef MXSLC_IFEXPRESSION_H
-#define MXSLC_IFEXPRESSION_H
+#ifndef MXSLC_SWITCHEXPRESSION_H
+#define MXSLC_SWITCHEXPRESSION_H
 
 #include "expressions/Expression.h"
 
 namespace mxslc::expressions
 {
-    class IfExpression final : public Expression
+    class SwitchExpression final : public Expression
     {
     public:
-        IfExpression(ExprPtr cond_expr, ExprPtr then_expr, ExprPtr else_expr, Token token = {});
+        SwitchExpression(ExprPtr index_expr, vector<ExprPtr> case_exprs, ExprPtr default_expr, Token token = {});
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
@@ -25,10 +25,10 @@ namespace mxslc::expressions
         VarPtr evaluate_impl() const override;
 
     private:
-        ExprPtr cond_expr_;
-        ExprPtr then_expr_;
-        ExprPtr else_expr_;
+        ExprPtr index_expr_;
+        vector<ExprPtr> case_exprs_;
+        ExprPtr default_expr_;
     };
 }
 
-#endif //MXSLC_IFEXPRESSION_H
+#endif //MXSLC_SWITCHEXPRESSION_H
