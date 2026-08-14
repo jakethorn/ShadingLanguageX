@@ -1,0 +1,103 @@
+name: Build JavaScript (WASM)
+
+on:
+  push:
+    branches:
+      - wasm_javascript_bindings
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy_branch:
+        description: >-
+          Branch whose build should be deployed to GitHub Pages (e.g. main).
+          On a manual run, set this to the branch you selected above to deploy
+          it; on pushes to main the deploy happens automatically.
+        required: false
+        default: wasm_javascript_bindings
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build_js:
+    name: Build mxslc JavaScript / WASM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out mxslc
+        uses: actions/checkout@v4
+
+      - name: Check out MaterialX
+        uses: actions/checkout@v4
+        with:
+          repository: AcademySoftwareFoundation/MaterialX
+          ref: v1.39.5
+          path: mxslc++/external/MaterialX
+
+      - name: Install Emscripten SDK
+        # Mirrors the version used by MaterialX 1.39.5's own JavaScript CI
+        # (see MaterialX .github/workflows/main.yml -> Install Emscripten).
+        run: |
+          git clone https://github.com/emscripten-core/emsdk --recursive
+          cd emsdk
+          ./emsdk install 4.0.8
+          ./emsdk activate 4.0.8
+
+      - name: Set up Node.js
+        # The Emscripten runtime ships its own Node, but a system Node >= 18 is
+        # required for the Playwright tooling when the emsdk Node is unavailable.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build JavaScript / WASM, run unit tests, build browser
+        # Builds MaterialX to WebAssembly, builds the JsMxslc module with
+        # -DBUILD_JS=ON, runs the Playwright unit tests, and copies the WASM
+        # artifacts into the browser app (browser/lib/).
+        run: >
+          mxslc++/javascript/build_javascript.sh
+          "${{ github.workspace }}/emsdk"
+          "${{ github.workspace }}/mxslc++/external/MaterialX"
+
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mxslc-js
+          path: |
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.js
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.wasm
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.data
+          if-no-files-found: error
+
+      - name: Upload Pages artifact
+        # Stage the full, self-contained browser app (index.html, app.js,
+        # keywords.js and lib/ with the freshly built WASM files) for GitHub
+        # Pages. The build script copies the WASM artifacts into browser/lib/.
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: mxslc++/javascript/browser
+
+  deploy:
+    name: Deploy browser app to GitHub Pages
+    needs: build_js
+    runs-on: ubuntu-latest
+    # Deploy automatically on main, or on a manual (workflow_dispatch) run when
+    # the run's branch matches the deploy_branch input.
+    if: >
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+      ||
+      (github.event_name == 'workflow_dispatch'
+        && github.ref == format('refs/heads/{0}', inputs.deploy_branch))
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
