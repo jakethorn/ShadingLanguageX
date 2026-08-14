@@ -84,7 +84,7 @@ jobs:
     name: Deploy browser app to GitHub Pages
     needs: build_js
     runs-on: ubuntu-latest
-    # Deploy automatically on main, or on a manual (workflow_dispatch) run when
+    # Deploy automatically with main, or manually (workflow_dispatch) run when
     # the run's branch matches the deploy_branch input.
     if: >
       (github.event_name == 'push' && github.ref == 'refs/heads/main')
