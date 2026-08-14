@@ -1,6 +1,6 @@
 // Main application logic for the client-side MXSL <-> MTLX converter.
 // All compile/decompile happens in the browser via the JsMxslc WebAssembly
-// module (no Flask / Python backend).
+// module.
 
 import { MXSL_KEYWORDS } from './keywords.js';
 import Mxslc from './lib/JsMxslc.js';
@@ -26,9 +26,11 @@ function clearLog() {
 // CodeMirror MXSL mode (built from the embedded keyword lists)
 // ---------------------------------------------------------------------------
 
-// Mutable set of names highlighted as functions. It is populated from the
-// static keywords list and then augmented with the full MaterialX nodedef
-// category set once the WASM module finishes loading.
+// Set of names highlighted as functions. Seeded from the static keyword list
+// so the editor has something to highlight before WASM loads, then replaced by
+// the authoritative MaterialX nodedef category set once the WASM module is
+// ready. The static list is kept only as a fallback when the WASM module
+// returns no nodedefs.
 let mxslFunctionSet = null;
 
 function registerMxslMode(dataTypes, control, functions, funcStyle) {
@@ -179,6 +181,7 @@ async function convertMtlxToMxsl() {
 
 // Compile: MXSL source -> MTLX XML
 async function convertMxslToMtlx() {
+    // TODO: Expose compile options in UI.
     const source = editorMxsl.getValue().trim();
     if (!source) {
         logMessage('MXSL editor is empty', 'error');
@@ -187,7 +190,8 @@ async function convertMxslToMtlx() {
     logMessage('Compiling MXSL -> MTLX...', 'info');
     try {
         ensureReady();
-        const result = mx.compileSlxToMtlx(source);
+        const opts = new mx.CompileOptions();
+        const result = mx.compileSlxToMtlx(source, opts);
         editorMtlx.setValue(result);
         logMessage(`MXSL compiled to MTLX (${result.length} chars)`, 'success');
     } catch (err) {
@@ -233,6 +237,8 @@ function setWasmStatus(label, icon, cls) {
 (async function loadWasm() {
     logMessage('Loading WebAssembly module...', 'info');
     try {
+        // The following will fetch JsMxslc.wasm and JsMxslc.data from the same folder as this script.
+        // import.meta.url is the URL of this script, so we can use it to locate the other files. 
         mx = await Mxslc({
             locateFile: (file) => new URL('./lib/' + file, import.meta.url).href,
         });
@@ -240,13 +246,22 @@ function setWasmStatus(label, icon, cls) {
             MXSL_KEYWORDS.control.length + ' control keywords, ' +
             MXSL_KEYWORDS.functions.length + ' built-in functions)', 'success');
 
-        // Merge the full MaterialX nodedef category set into the highlight set.
+        // Use the WASM module's MaterialX nodedef categories as the highlight
+        // set; only fall back to the embedded static keyword list if the WASM
+        // module returns no nodedefs at all.
         try {
             const defs = mx.getMtlxDefinitionNames();
             const count = defs.size();
-            for (let i = 0; i < count; i++)
-                mxslFunctionSet.add(defs.get(i));
-            logMessage(`Loaded ${count} MaterialX nodedef categories found`, 'success');
+            if (count > 0) {
+                const nodedefSet = new Set();
+                for (let i = 0; i < count; i++) 
+                    nodedefSet.add(defs.get(i));
+                mxslFunctionSet = nodedefSet;
+                logMessage(`Loaded ${count} MaterialX definition categories.`, 'success');
+            } else {
+                // No nodedefs returned — keep the static keyword list fallback.
+                logMessage('No MaterialX definition categories returned. Using backup list.', 'info');
+            }
             // Force the MXSL editor to re-tokenize with the updated set.
             editorMxsl.setOption('mode', 'text/plain');
             editorMxsl.setOption('mode', 'mxsl');

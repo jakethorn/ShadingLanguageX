@@ -20,17 +20,26 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 EMSDK_LOCATION="${1:-$ROOT_DIR/../emsdk}"
+if [ ! -d "$EMSDK_LOCATION" ]; then
+    echo "Error: Emscripten SDK folder not found at '$EMSDK_LOCATION'. Provide location as 1st argument or set EMSDK_LOCATION environment variable." >&2
+    exit 1
+fi
 EMSDK_LOCATION="$(cd "$EMSDK_LOCATION" && pwd)"
 
 # MaterialX source tree used to build a WebAssembly install. This is required
 # and is never auto-detected or hard-coded: pass it as the second positional
-# argument (or via the MATERIALX_SRC environment variable), pointing to a
+# argument (or via the MATERIALX_ROOT environment variable), pointing to a
 # complete MaterialX source checkout (the directory containing CMakeLists.txt).
-MATERIALX_SRC="${2:-${MATERIALX_SRC:-}}"
-if [ -z "${MATERIALX_SRC:-}" ]; then
-    echo "Error: MaterialX source is required but not set." >&2
-    echo "  Pass it as the second argument, e.g.:" >&2
+MATERIALX_ROOT="${2:-${MATERIALX_ROOT:-}}"
+if [ -z "${MATERIALX_ROOT:-}" ]; then
+    echo "Error: MaterialX root folder is required but not set." >&2
+    echo "  Provide as second argument e.g.:" >&2
     echo "    javascript/build_javascript.sh [emsdk_location] /path/to/MaterialX" >&2
+    exit 1
+fi
+
+if [ ! -d "$MATERIALX_ROOT" ]; then
+    echo "Error: MaterialX source tree not found at $MATERIALX_ROOT. Provide as second argument or set MATERIALX_ROOT environment variable." >&2
     exit 1
 fi
 
@@ -59,11 +68,7 @@ fi
 echo "Using Node $(node --version)"
 
 echo "--------------------- Build MaterialX (WebAssembly) ---------------------"
-if [ ! -d "$MATERIALX_SRC" ]; then
-    echo "Error: MaterialX source tree not found at $MATERIALX_SRC. Set MATERIALX_SRC." >&2
-    exit 1
-fi
-emcmake cmake -S "$MATERIALX_SRC" -B "$BUILD_DIR/materialx" \
+emcmake cmake -S "$MATERIALX_ROOT" -B "$BUILD_DIR/materialx" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="$MTLX_INSTALL" \
     -DMATERIALX_BUILD_TESTS=OFF \
@@ -107,11 +112,11 @@ cp "$BUILD_DIR/mxslc/javascript/bin/JsMxslc.js" \
    "$BROWSER_DIR/lib/"
 echo "Copied WASM artifacts into $BROWSER_DIR/lib/"
 
-echo "--------------------- Run Browser ---------------------"
+echo "--------------------- Browser Information ---------------------"
 # The server is NOT started automatically. Serve the app manually when ready
 # (WASM fetches .wasm/.data over HTTP, so it cannot be opened via file://).
 echo "To run the browser app, from: $BROWSER_DIR"
-echo "    node serve.js            # -> http://localhost:8080"
+echo "    node serve.js # -> http://localhost:8080"
 echo "  or:"
 echo "    python3 -m http.server 8080"
 
@@ -120,4 +125,4 @@ echo "The WebAssembly module was written to:"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.js"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.wasm"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.data"
-echo "Browser app: $BROWSER_DIR/index.html (run 'node serve.js' from $BROWSER_DIR)"
+echo "Browser app can be found here: $BROWSER_DIR/index.html (run 'node serve.js' from $BROWSER_DIR)"

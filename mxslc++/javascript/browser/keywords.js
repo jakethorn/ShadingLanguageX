@@ -31,8 +31,8 @@ export const MXSL_KEYWORDS = {
         'lightshader', 'material',
     ],
 
-    // Common MaterialX node / function names (highlighted as functions when
-    // immediately followed by "(").
+    // Fallback MaterialX node / function names in case of library load failure.
+    // The keyword list only affects syntax highligjhting with no functional impact on the converter.
     functions: [
         'add', 'subtract', 'multiply', 'divide', 'modulo', 'power', 'sqrt',
         'invert', 'absval', 'floor', 'ceil', 'round', 'sign', 'min', 'max',

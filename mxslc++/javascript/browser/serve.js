@@ -17,6 +17,8 @@ import { fileURLToPath } from 'url';
 const ROOT = fileURLToPath(new URL('./', import.meta.url));
 const PORT = parseInt(process.argv[2] || '8080', 10);
 
+// List of MIME types for common file extensions. The server will serve files with
+// these MIME types, or application/octet-stream for unknown extensions.
 const MIME = {
     '.html': 'text/html; charset=utf-8',
     '.js': 'text/javascript; charset=utf-8',
@@ -33,10 +35,15 @@ const MIME = {
     '.mxsl': 'text/plain; charset=utf-8',
 };
 
-http.createServer(async (req, res) => {
+// Create the HTTP server. It serves files from ROOT.
+const server = http.createServer(async (req, res) => {
     try {
-        // Resolve path safely within ROOT.
-        let pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+        // Resolve the path safely within ROOT. Derive the base URL from the
+        // request's own Host header (falling back to localhost only if absent)
+        // rather than assuming localhost, so the server works when reached via
+        // any host/port, and handles absolute req.url values (e.g. behind a proxy).
+        const base = `http://${req.headers.host || 'localhost'}`;
+        let pathname = decodeURIComponent(new URL(req.url, base).pathname);
         if (pathname === '/') pathname = '/index.html';
         const filePath = normalize(join(ROOT, pathname));
 
@@ -66,7 +73,18 @@ http.createServer(async (req, res) => {
             res.writeHead(500).end('Internal error');
         }
     }
-}).listen(PORT, () => {
+});
+
+// Start the server and log the address. If the server is bound to a wildcard address,
+// also log that it is reachable via localhost and any host/IP.
+server.listen(PORT, () => {
+    const addr = server.address();
+    const bound = (addr && addr.address) || 'localhost';
+    const isWildcard = bound === '0.0.0.0' || bound === '::' || bound === '::0';
+    const displayHost = bound.includes(':') ? `[${bound}]` : bound;
     console.log(`Serving ${ROOT}`);
-    console.log(`  -> http://localhost:${PORT}`);
+    console.log(`  -> http://${displayHost}:${PORT}`);
+    if (isWildcard) {
+        console.log(`  (bound to ${bound}; also reachable via http://localhost:${PORT} and any host/IP)`);
+    }
 });

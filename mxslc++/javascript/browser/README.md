@@ -1,9 +1,8 @@
 # MXSL ⇄ MTLX Converter — Browser (WASM) version
 
-A fully client-side converter between **MXSL** (the ShadingLanguageX shading
-language) and **MTLX** (MaterialX XML). Unlike the Flask + Python reference
-app (`mxslc_web`), everything runs in the browser via the **JsMxslc**
-WebAssembly module — no server-side compile/decompile and no Python backend.
+A fully client-side interactive converter between **MXSL** (the `ShadingLanguageX` shading
+language) and **MTLX** (MaterialX `XML`). All browser interaction uses the **JsMxslc**
+WebAssembly module.
 
 ## Layout
 
@@ -14,16 +13,16 @@ browser/
 ├── keywords.js     # Embedded MXSL keyword lists for syntax highlighting
 ├── serve.js        # Minimal Node static file server
 ├── README.md       # This file
-└── lib/            # Copied WASM build artifacts
+└── lib/            # WASM package
     ├── JsMxslc.js      # ES module (export default Mxslc)
-    ├── JsMxslc.wasm
+    ├── JsMxslc.wasm    # WebAssembly binary
     └── JsMxslc.data    # Preloaded filesystem (libraries/ folder)
 ```
 
-## Running it
+## Execution
 
 The WASM module fetches `JsMxslc.wasm` and `JsMxslc.data` over HTTP, so the
-page **must be served** (not opened as `file://`).
+page must be served (not opened as `file://`).
 
 From this `browser/` folder:
 
@@ -40,22 +39,26 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`.
 
-## What the WASM module is
+The entire contents of the folder may be copied and served as a standalone from any static web server.
 
-The build artifacts come from the mxslc JavaScript (WebAssembly) build. They
-are produced by:
+## The WASM module
 
+Is built by the mxslc JavaScript (WebAssembly) build. The artifacts
+are produced by running the `build_javascript.sh` script from the repo root, passing the
+path to the Emscripten SDK and the MaterialX source tree paths.
+
+Example:
 ```bash
 # from the repo root (mxslc++)
 ./javascript/build_javascript.sh ../../emsdk MaterialX-1.39.5
 ```
 
-The compiled output lands in `javascript/build/mxslc/javascript/bin/`
+The compiled output is saved in `javascript/build/mxslc/javascript/bin/`
 (`JsMxslc.js`, `JsMxslc.wasm`, `JsMxslc.data`).
 
 ### Refreshing the WASM library
 
-After rebuilding, refresh the copies in `lib/`:
+After rebuilding, the `lib/` folder can be updated with the new artifacts:
 
 ```bash
 cp javascript/build/mxslc/javascript/bin/JsMxslc.js \
@@ -64,10 +67,10 @@ cp javascript/build/mxslc/javascript/bin/JsMxslc.js \
    javascript/browser/lib/
 ```
 
-## API used
+## API Usage
 
 The module exposes the mxslc API as a Promise-returning factory. `app.js` loads
-it with:
+this in as follows:
 
 ```js
 import Mxslc from './lib/JsMxslc.js';
@@ -81,10 +84,9 @@ Then conversion calls (all synchronous, throw on error):
 - `mx.compileSlxToMtlx(slx)` → MTLX XML string
 - `mx.decompileMtlxToSlx(mtlx)` → MXSL string
 - `mx.compileSlxToMtlxWithOptions(slx, opts)` / `new mx.CompileOptions()`
+- `mx.getMtlxDefinitionNames()` → array of MaterialX definition categories (e.g. 'add', 'image', 'standard_surface', etc.)
 
 ## Notes
 
-- Syntax highlighting uses **embedded** keyword lists in `keywords.js`
-  (there's no backend to fetch them). Edit that file if the language changes.
-- Conversion runs synchronously on the main thread; the module is ~1.2 MB
-  WASM + ~3.9 MB data, so the first load takes a moment.
+- Syntax highlighting uses the SLX keywords list from `keywords.js` and retrieves the MaterialX node/function names using `getMtlxDefinitionNames()`. In the event the library fails to the load
+there is a set of fallback MaterialX keywords in `keywords.js`.

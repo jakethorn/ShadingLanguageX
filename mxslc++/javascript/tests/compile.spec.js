@@ -12,8 +12,10 @@ test.describe('Compile (SLX -> MTLX)', () =>
 
     test('compiles an SLX string to a valid MTLX document', () =>
     {
+        const opts = new mx.CompileOptions();
         const slx = 'float z = add(1.0, 2.0);';
-        const mtlx = mx.compileSlxToMtlx(slx);
+        const mtlx = mx.compileSlxToMtlx(slx, opts);
+        opts.delete();
 
         expect(mtlx).toContain('<materialx');
     });
@@ -23,7 +25,7 @@ test.describe('Compile (SLX -> MTLX)', () =>
         const opts = new mx.CompileOptions();
         opts.reduceGraph = false;
 
-        const mtlx = mx.compileSlxToMtlxWithOptions('float z = add(1.0, 2.0);', opts);
+        const mtlx = mx.compileSlxToMtlx('float z = add(1.0, 2.0);', opts);
 
         expect(mtlx).toContain('<materialx');
         expect(mtlx).toContain('name="z"');
@@ -39,7 +41,9 @@ test.describe('Compile (SLX -> MTLX)', () =>
             ');',
         ].join('\n');
 
-        const mtlx = mx.compileSlxToMtlx(slx);
+        const opts = new mx.CompileOptions();
+        const mtlx = mx.compileSlxToMtlx(slx, opts);
+        opts.delete();
 
         expect(mtlx).toContain('<materialx');
         expect(mtlx).toContain('standard_surface');
@@ -52,7 +56,7 @@ test.describe('Compile (SLX -> MTLX)', () =>
         opts.errorOnMissingGlobals = false;
         opts.errorOnUnusedGlobals = false;
 
-        const mtlx = mx.compileSlxToMtlxWithOptions('float z = add(1.0, 2.0);', opts);
+        const mtlx = mx.compileSlxToMtlx('float z = add(1.0, 2.0);', opts);
 
         expect(mtlx).toContain('<materialx');
 
@@ -61,6 +65,8 @@ test.describe('Compile (SLX -> MTLX)', () =>
 
     test('throws when the SLX source is invalid', () =>
     {
-        expect(() => mx.compileSlxToMtlx('float = ;')).toThrow();
+        const opts = new mx.CompileOptions();
+        expect(() => mx.compileSlxToMtlx('float = ;', opts)).toThrow();
+        opts.delete();
     });
 });

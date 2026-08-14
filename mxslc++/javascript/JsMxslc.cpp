@@ -11,8 +11,10 @@
 //
 //     import Mxslc from './JsMxslc.js';
 //     const mx = await Mxslc();
+//     const opts = = new mx.CompileOptions();
 //     const mtlx = mx.compileSlxToMtlx('float x = add(1.0, 2.0);');
 //     const slx  = mx.decompileMtlxToSlx(mtlx);
+//     opts.delete();
 //
 
 #include <emscripten/bind.h>
@@ -30,16 +32,10 @@ namespace ems = emscripten;
 
 namespace
 {
-    // Compile an SLX source string to a MaterialX (MTLX) XML string.
-    std::string compile_slx_to_mtlx(const std::string& source)
-    {
-        return mxslc::compile_to_string(source);
-    }
-
     // Compile an SLX source string to a MaterialX (MTLX) XML string using
     // the given compile options.
-    std::string compile_slx_to_mtlx_with_options(const std::string& source,
-                                                 const mxslc::CompileOptions& opts)
+    std::string compile_slx_to_mtlx(const std::string& source,
+                                    const mxslc::CompileOptions& opts)
     {
         return mxslc::compile_to_string(source, opts);
     }
@@ -52,9 +48,8 @@ namespace
 
     // Return the sorted set of MaterialX node-definition category names from
     // the loaded standard library. This reuses mxslc's existing MaterialX
-    // library loader (the same one the compile path uses), so the stdlib is
+    // library loader (the same one the compile path uses), so the library is
     // resolved against the preloaded libraries/ folder in the WASM filesystem.
-    // Mirrors the Flask app's _get_mtlx_definition_names().
     std::vector<std::string> get_mtlx_definition_names()
     {
         mxslc::CompileOptions opts;
@@ -85,7 +80,6 @@ EMSCRIPTEN_BINDINGS(mxslc)
         .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals);
 
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
-    ems::function("compileSlxToMtlxWithOptions", &compile_slx_to_mtlx_with_options);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);
 
     ems::register_vector<std::string>("StringVector");

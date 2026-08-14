@@ -42,14 +42,11 @@ The module is an ES6 module that exports a factory function:
 import Mxslc from './JsMxslc.js';
 const mx = await Mxslc();
 
-// Compile an SLX string to a MTLX (MaterialX XML) string.
-const mtlx = mx.compileSlxToMtlx('float z = add(1.0, 2.0);');
-
 // Compile using a CompileOptions instance.
 const opts = new mx.CompileOptions();
 opts.version = '1.39.5';
 opts.reduceGraph = true;
-const mtlx2 = mx.compileSlxToMtlxWithOptions('float z = add(1.0, 2.0);', opts);
+const mtlx2 = mx.compileSlxToMtlx('float z = add(1.0, 2.0);', opts);
 opts.delete();
 
 // Decompile a MTLX (MaterialX XML) string back to an SLX string.
