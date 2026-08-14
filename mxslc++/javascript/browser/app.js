@@ -18,6 +18,12 @@ function logMessage(message, type = 'info') {
     el.scrollTop = el.scrollHeight;
 }
 
+// Defensively extract a readable message from anything thrown, so an unexpected
+// non-Error value never renders as 'undefined' in the log.
+function errorMessage(err) {
+    return (err && err.message) ? err.message : String(err);
+}
+
 function clearLog() {
     document.getElementById('message-log').value = '';
 }
@@ -175,7 +181,7 @@ async function convertMtlxToMxsl() {
         editorMxsl.setValue(result);
         logMessage(`MTLX decompiled to MXSL (${result.length} chars)`, 'success');
     } catch (err) {
-        logMessage('Decompile error: ' + err.message, 'error');
+        logMessage('Decompile error: ' + errorMessage(err), 'error');
     }
 }
 
@@ -195,7 +201,7 @@ async function convertMxslToMtlx() {
         editorMtlx.setValue(result);
         logMessage(`MXSL compiled to MTLX (${result.length} chars)`, 'success');
     } catch (err) {
-        logMessage('Compile error: ' + err.message, 'error');
+        logMessage('Compile error: ' + errorMessage(err), 'error');
     }
 }
 
@@ -266,12 +272,12 @@ function setWasmStatus(label, icon, cls) {
             editorMxsl.setOption('mode', 'text/plain');
             editorMxsl.setOption('mode', 'mxsl');
         } catch (err) {
-            logMessage('Could not load MaterialX nodedefs: ' + err.message, 'error');
+            logMessage('Could not load MaterialX nodedefs: ' + errorMessage(err), 'error');
         }
 
         setWasmStatus('WASM ready', 'bi-check-circle-fill', 'text-success');
     } catch (err) {
-        logMessage('Failed to load WebAssembly module: ' + err.message, 'error');
+        logMessage('Failed to load WebAssembly module: ' + errorMessage(err), 'error');
         setWasmStatus('WASM failed', 'bi-x-circle-fill', 'text-danger');
     }
 })();
