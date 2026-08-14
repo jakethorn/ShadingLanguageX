@@ -97,8 +97,11 @@ echo "--------------------- Install JavaScript Dependencies --------------------
 cd "$ROOT_DIR/javascript"
 npm install || echo "Warning: npm install reported issues"
 
-echo "--------------------- Run JavaScript Tests ---------------------"
+echo "--------------------- Install Test Dependencies ---------------------"
 cd "$ROOT_DIR/javascript/tests"
+npm install || echo "Warning: npm install (tests) reported issues"
+
+echo "--------------------- Run JavaScript Tests ---------------------"
 npx playwright install chromium || true
 npm run test
 
