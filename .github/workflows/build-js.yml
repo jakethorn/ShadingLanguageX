@@ -28,13 +28,30 @@ jobs:
           ref: v1.39.5
           path: mxslc++/external/MaterialX
 
+      - name: Cache Emscripten SDK
+        id: cache-emsdk
+        uses: actions/cache@v4
+        with:
+          path: emsdk
+          key: emsdk-4.0.8-${{ runner.os }}
+
       - name: Install Emscripten SDK
-        # Mirrors the version used by MaterialX 1.39.5's own JavaScript CI
+        # Only cloned/installed on a cache miss. Mirrors the version used by
+        # MaterialX 1.39.5's own JavaScript CI
         # (see MaterialX .github/workflows/main.yml -> Install Emscripten).
+        if: steps.cache-emsdk.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/emscripten-core/emsdk --recursive
           cd emsdk
           ./emsdk install 4.0.8
+          ./emsdk activate 4.0.8
+
+      - name: Activate Emscripten SDK (cache hit)
+        # The toolchain is restored from cache; just re-activate so emsdk_env.sh
+        # picks it up for this run.
+        if: steps.cache-emsdk.outputs.cache-hit == 'true'
+        run: |
+          cd emsdk
           ./emsdk activate 4.0.8
 
       - name: Set up Node.js
@@ -43,6 +60,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Cache npm dependencies
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            mxslc++/javascript/node_modules
+            mxslc++/javascript/tests/node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('mxslc++/javascript/package-lock.json', 'mxslc++/javascript/tests/package-lock.json') }}
+
+      - name: Cache MaterialX WASM build
+        # Restores the compiled WebAssembly MaterialX build + install so the
+        # build script's MaterialX step is a fast no-op on cache hits.
+        id: cache-mtlx
+        uses: actions/cache@v4
+        with:
+          path: |
+            mxslc++/javascript/build/materialx
+            mxslc++/javascript/build/mtlx_install
+          key: mtlx-wasm-1.39.5-emsdk-4.0.8-${{ runner.os }}
 
       - name: Build JavaScript / WASM, run unit tests, build browser
         # Builds MaterialX to WebAssembly, builds the JsMxslc module with
