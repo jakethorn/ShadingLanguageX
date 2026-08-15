@@ -1,11 +1,35 @@
 name: Build JavaScript (WASM)
 
+# ============================================================================
+#  HOW TO TRIGGER
+# ----------------------------------------------------------------------------
+#  Build only (validation) — happens automatically:
+#    * Opening or updating a pull request
+#    * Any manual dispatch (deploy checkbox OFF)
+#
+#  Build + deploy to GitHub Pages:
+#    * Merge a pull request into `main` (automatic)
+#    * Manual dispatch with the "Deploy to GitHub Pages" checkbox ON, e.g. to
+#      test-deploy the current branch:
+#          gh workflow run build-js.yml --ref <branch> -f deploy=true
+#      (UI: Actions -> Build JavaScript (WASM) -> Run workflow -> tick Deploy)
+#
+#  Note: a manual test-deploy publishes that branch's build to Pages and
+#  overwrites the live site until the next merge to `main`.
+# ============================================================================
+
 on:
-  push:
-    branches:
-      - wasm_javascript_bindings
+  # Runs on PR open/update/merge (build validation) and manual dispatch.
+  # No push trigger: builds happen on PR events, and deploy only on a merged PR
+  # to main (or a manual dispatch with `deploy` enabled, for testing).
   pull_request:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to GitHub Pages (enable to test-deploy this branch)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -112,12 +136,16 @@ jobs:
     name: Deploy browser app to GitHub Pages
     needs: build_js
     runs-on: ubuntu-latest
-    # Deploy automatically on any push (to the branch(es) in `push.branches`)
-    # and on any manual (workflow_dispatch) run. Add `main` to push.branches
-    # later to also auto-deploy on merges to main.
+    # Deploy ONLY when a pull request is merged into main (i.e. a PR "commits"
+    # to main), or on a manual dispatch run with the `deploy` input enabled
+    # (for testing the current branch). The build job still runs on every
+    # PR/manual dispatch for validation, but the Pages deploy is gated.
     if: >
-      github.event_name == 'push' ||
-      github.event_name == 'workflow_dispatch'
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       github.event.pull_request.base.ref == 'main') ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.event.inputs.deploy == 'true')
 
     environment:
       name: github-pages

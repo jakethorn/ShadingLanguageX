@@ -86,6 +86,27 @@ Then conversion calls (all synchronous, throw on error):
 - `mx.compileSlxToMtlxWithOptions(slx, opts)` / `new mx.CompileOptions()`
 - `mx.getMtlxDefinitionNames()` → array of MaterialX definition categories (e.g. 'add', 'image', 'standard_surface', etc.)
 
+## CI / Deployment
+
+The `.github/workflows/build-js.yml` workflow builds the WASM module, runs the
+unit tests, and (when enabled) deploys the `browser/` folder to GitHub Pages.
+
+**Build only (validation)** — happens automatically on:
+- opening or updating a pull request
+- any manual dispatch with the Deploy checkbox **off**
+
+**Build + deploy to Pages** — happens when:
+- a pull request is **merged into `main`** (automatic), or
+- a manual dispatch is run with the **"Deploy to GitHub Pages"** checkbox **on**
+  (e.g. to test-deploy the current branch):
+  ```bash
+  gh workflow run build-js.yml --ref <branch> -f deploy=true
+  ```
+  UI: **Actions → Build JavaScript (WASM) → Run workflow → tick Deploy**.
+
+> Note: a manual test-deploy publishes that branch's build to Pages and
+> overwrites the live site until the next merge to `main`.
+
 ## Notes
 
 - Syntax highlighting uses the SLX keywords list from `keywords.js` and retrieves the MaterialX node/function names using `getMtlxDefinitionNames()`. In the event the library fails to the load
