@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MXSL &#x2194; MTLX Converter (WASM)</title>
+    <title>MXSL &#x2194; MTLX Converter</title>
 
     <script>
         // Detect OS color scheme preference before page renders
@@ -12,6 +12,7 @@
         } else {
             document.documentElement.setAttribute('data-bs-theme', 'light');
         }
+        // Listen for changes
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             document.documentElement.setAttribute('data-bs-theme', e.matches ? 'dark' : 'light');
         });
@@ -32,13 +33,13 @@
         :root { --editor-height: 55vh; }
         @media (max-width: 767.98px) { :root { --editor-height: 40vh; } }
 
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        .CodeMirror { height: var(--editor-height) !important; font-size: .85rem; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: .7rem; }
+        .CodeMirror { height: var(--editor-height) !important; font-size: .65rem; }
         .CodeMirror .cm-function { color: #0699ed; }
 
         .log-area {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: .8rem; line-height: 1.5;
+            font-size: .65rem; line-height: 1.5;
             resize: vertical; min-height: 80px; max-height: 200px;
             outline: none;
         }
@@ -51,14 +52,14 @@
         .btn-load { --bs-btn-color: #6c757d; --bs-btn-border-color: #6c757d;
             --bs-btn-hover-color: #fff; --bs-btn-hover-bg: #6c757d; }
 
-        .wasm-status {
+        .server-status {
             font-size: .75rem; cursor: pointer; user-select: none;
         }
     </style>
 </head>
 <body class="min-vh-100">
 
-    <!-- Header -->
+    <!-- ── Header ──────────────────────────────────────────────── -->
     <header class="border-bottom py-3">
         <div class="container d-flex align-items-center justify-content-between">
             <h1 class="fs-5 fw-bold m-0">
@@ -66,11 +67,9 @@
                 MXSL <span class="text-body-secondary">&#x2194;</span> MTLX Converter
                 <!-- <span class="badge ms-2 align-middle" style="font-size:.65rem;">Converter</span> -->
             </h1>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end">
-                    <span class="text-body-secondary small d-block">powered by</span>
-                    <strong>ShadingLanguageX <span class="text-body-secondary"></span></strong>
-                </div>
+            <div>
+                <span class="text-body-secondary small me-2">powered by</span>
+                <strong>ShadingLanguageX</strong>
             </div>
         </div>
     </header>
@@ -120,6 +119,37 @@
                             To MTLX <i class="bi bi-arrow-left-short me-0 ms-1"></i>
                         </button>
                     </div>
+                    <!-- Compile Options (MXSL → MTLX) -->
+                    <div class="border-top">
+                        <div class="px-3 py-1 d-flex align-items-center gap-2 small cursor-pointer" onclick="toggleOptions()" style="cursor:pointer; user-select:none;">
+                            <i class="bi bi-gear" style="color:#89b4fa; font-size:.75rem;"></i>
+                            <span class="text-body-secondary">Compile Options</span>
+                            <span class="ms-auto text-body-secondary" id="options-toggle-label" style="font-size:.7rem;">show</span>
+                        </div>
+                        <div class="px-3 py-2 d-none border-top" id="options-body">
+                            <div class="d-flex flex-wrap gap-3 align-items-end">
+                                <div id="version_select">
+                                    <label class="form-label small mb-0">MTLX Version</label>
+                                    <select class="form-select form-select-sm" id="opt-version" style="width:auto;">
+                                        <option value="1.39.5" selected>1.39.5</option>
+                                        <option value="1.39.4">1.39.4</option>
+                                    </select>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-reduce-graph" checked>
+                                    <label class="form-check-label small" for="opt-reduce-graph">Reduce graph</label>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-error-missing" checked>
+                                    <label class="form-check-label small" for="opt-error-missing">Error on missing globals</label>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-error-unused" checked>
+                                    <label class="form-check-label small" for="opt-error-unused">Error on unused globals</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -132,8 +162,8 @@
             <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
                 <i class="bi bi-terminal me-1" style="color:#89b4fa;"></i>
                 <span>Log</span>
-                <span id="wasm-status" class="wasm-status text-body-secondary">
-                    <i class="bi bi-cpu me-1"></i>WASM loading...
+                <span id="server-status" class="server-status text-body-secondary">
+                    <i class="bi bi-cpu me-1"></i>Server loading...
                 </span>
                 <button class="btn btn-sm btn-link text-body-secondary ms-auto p-0" onclick="clearLog()" title="Clear log">
                     <i class="bi bi-trash3"></i>
@@ -150,6 +180,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/mode/xml/xml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/mode/clike/clike.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/selection/active-line.min.js"></script>
 

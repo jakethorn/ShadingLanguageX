@@ -49,7 +49,7 @@ path to the Emscripten SDK and the MaterialX source tree paths.
 
 Example:
 ```bash
-# from the repo root (mxslc++)
+# Run from /mxslc++
 ./javascript/build_javascript.sh ../../emsdk MaterialX-1.39.5
 ```
 

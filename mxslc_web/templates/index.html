@@ -23,7 +23,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- CodeMirror 6 (via CDN) -->
+    <!-- CodeMirror 5 (via CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/theme/dracula.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/theme/monokai.min.css" rel="stylesheet">
@@ -33,13 +33,13 @@
         :root { --editor-height: 55vh; }
         @media (max-width: 767.98px) { :root { --editor-height: 40vh; } }
 
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        .CodeMirror { height: var(--editor-height) !important; font-size: .85rem; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: .7rem; }
+        .CodeMirror { height: var(--editor-height) !important; font-size: .65rem; }
         .CodeMirror .cm-function { color: #0699ed; }
 
         .log-area {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: .8rem; line-height: 1.5;
+            font-size: .65rem; line-height: 1.5;
             resize: vertical; min-height: 80px; max-height: 200px;
             outline: none;
         }
@@ -51,6 +51,10 @@
             --bs-btn-hover-color: #000; --bs-btn-hover-bg: #89b4fa; }
         .btn-load { --bs-btn-color: #6c757d; --bs-btn-border-color: #6c757d;
             --bs-btn-hover-color: #fff; --bs-btn-hover-bg: #6c757d; }
+
+        .server-status {
+            font-size: .75rem; cursor: pointer; user-select: none;
+        }
     </style>
 </head>
 <body class="min-vh-100">
@@ -60,8 +64,8 @@
         <div class="container d-flex align-items-center justify-content-between">
             <h1 class="fs-5 fw-bold m-0">
                 <i class="bi bi-arrow-left-right me-2" style="color:#89b4fa;"></i>
-                MXSL <span class="text-body-secondary">&#x2194;</span> MTLX
-                <span class="badge bg-secondary ms-2 align-middle" style="font-size:.65rem;">Converter</span>
+                MXSL <span class="text-body-secondary">&#x2194;</span> MTLX Converter
+                <!-- <span class="badge ms-2 align-middle" style="font-size:.65rem;">Converter</span> -->
             </h1>
             <div>
                 <span class="text-body-secondary small me-2">powered by</span>
@@ -70,7 +74,7 @@
         </div>
     </header>
 
-    <!-- ── Main ────────────────────────────────────────────────── -->
+    <!-- Main -->
     <main class="container-fluid py-3">
         <div class="row g-3">
 
@@ -100,7 +104,7 @@
             <div class="col-md-6 d-flex">
                 <div class="border rounded-3 overflow-hidden w-100 d-flex flex-column">
                     <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
-                        <i class="bi bi-file-earmark-code"></i>     
+                        <i class="bi bi-file-earmark-code"></i>
                         <span>MXSL Shading Language</span>
                         <span class="badge bg-primary ms-auto">MXSL</span>
                     </div>
@@ -115,18 +119,52 @@
                             To MTLX <i class="bi bi-arrow-left-short me-0 ms-1"></i>
                         </button>
                     </div>
+                    <!-- Compile Options (MXSL → MTLX) -->
+                    <div class="border-top">
+                        <div class="px-3 py-1 d-flex align-items-center gap-2 small cursor-pointer" onclick="toggleOptions()" style="cursor:pointer; user-select:none;">
+                            <i class="bi bi-gear" style="color:#89b4fa; font-size:.75rem;"></i>
+                            <span class="text-body-secondary">Compile Options</span>
+                            <span class="ms-auto text-body-secondary" id="options-toggle-label" style="font-size:.7rem;">show</span>
+                        </div>
+                        <div class="px-3 py-2 d-none border-top" id="options-body">
+                            <div class="d-flex flex-wrap gap-3 align-items-end">
+                                <div id="version_select">
+                                    <label class="form-label small mb-0">MTLX Version</label>
+                                    <select class="form-select form-select-sm" id="opt-version" style="width:auto;">
+                                        <option value="1.39.5" selected>1.39.5</option>
+                                        <option value="1.39.4">1.39.4</option>
+                                    </select>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-reduce-graph" checked>
+                                    <label class="form-check-label small" for="opt-reduce-graph">Reduce graph</label>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-error-missing" checked>
+                                    <label class="form-check-label small" for="opt-error-missing">Error on missing globals</label>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-error-unused" checked>
+                                    <label class="form-check-label small" for="opt-error-unused">Error on unused globals</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- ── Log / Message Area ──────────────────────────────────── -->
+    <!-- Log / Message Area -->
     <div class="container-fluid pb-4">
         <div class="border rounded-3 overflow-hidden">
             <div class="px-3 py-2 border-bottom d-flex align-items-center gap-2 fw-semibold small text-uppercase">
                 <i class="bi bi-terminal me-1" style="color:#89b4fa;"></i>
                 <span>Log</span>
+                <span id="server-status" class="server-status text-body-secondary">
+                    <i class="bi bi-cpu me-1"></i>Server loading...
+                </span>
                 <button class="btn btn-sm btn-link text-body-secondary ms-auto p-0" onclick="clearLog()" title="Clear log">
                     <i class="bi bi-trash3"></i>
                 </button>
@@ -135,10 +173,10 @@
         </div>
     </div>
 
-    <!-- ── Hidden file input ───────────────────────────────────── -->
+    <!-- Hidden file input -->
     <input type="file" id="file-input" accept=".mtlx,.mxsl,.xml,.txt" style="display:none;">
 
-    <!-- ── Scripts ─────────────────────────────────────────────── -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/mode/xml/xml.min.js"></script>
@@ -146,268 +184,8 @@
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/selection/active-line.min.js"></script>
 
-    <script>
-        // ============================================================
-        //  MXSL custom CodeMirror mode — built from API keywords
-        // ============================================================
-
-        /** Register a custom MXSL mode with categorized keywords from the API.
-         *  @param {string} [funcStyle='def'] - Token class for function calls:
-         *    'def' uses theme's cm-def color, 'function' uses custom .cm-function color. */
-        function registerMxslMode(dataTypes, control, builtins, functions, funcStyle) {
-            dataTypes = new Set(dataTypes || []);
-            control = new Set(control || []);
-            functions = new Set(functions || []);
-            funcStyle = funcStyle || 'function'; // or 'def'
-
-            CodeMirror.defineMode('mxsl', function() {
-                return {
-                    startState: function() { return { inComment: false }; },
-                    token: function(stream, state) {
-                        // Multi-line comments
-                        if (state.inComment) {
-                            const m = stream.match(/.*?\*\//);
-                            if (m) { state.inComment = false; return 'comment'; }
-                            stream.skipToEnd();
-                            return 'comment';
-                        }
-                        // Skip whitespace
-                        if (stream.eatSpace()) return null;
-
-                        // Single-line comment
-                        if (stream.match(/\/\/.*/)) return 'comment';
-
-                        // Multi-line comment start
-                        if (stream.match(/\/\*/)) { state.inComment = true; return 'comment'; }
-
-                        // String literals
-                        if (stream.match(/"(?:[^"\\]|\\.)*"/)) return 'string';
-                        if (stream.match(/'(?:[^'\\]|\\.)*'/)) return 'string';
-
-                        // Numbers
-                        if (stream.match(/\b\d+\.?\d*(?:[eE][+-]?\d+)?\b/)) return 'number';
-
-                        // Preprocessor / directives
-                        if (stream.match(/#\w+/)) return 'meta';
-
-                        // Operators
-                        if (stream.match(/[+\-*/%=<>!&|^~]+/)) return 'operator';
-
-                        // Identifiers and keywords
-                        if (stream.match(/[a-zA-Z_$][\w$]*/)) {
-                            const word = stream.current();
-                            if (dataTypes.has(word)) return 'type';
-                            if (control.has(word)) return 'keyword';
-                            if (builtins && builtins.includes(word)) return 'builtin';
-                            if (functions.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
-                            if (word === word.toUpperCase() && word.length >= 2) return 'atom';
-                            return 'variable';
-                        }
-
-                        // Braces and punctuation
-                        if (stream.match(/[{}()\[\];,.]/)) return null;
-
-                        stream.next();
-                        return null;
-                    }
-                };
-            });
-        }
-
-        // ============================================================
-        //  CodeMirror initialisation (after keywords are fetched)
-        // ============================================================
-
-        const sharedOptions = {
-            lineNumbers: true,
-            matchBrackets: true,
-            styleActiveLine: true,
-            indentUnit: 4,
-            tabSize: 4,
-            indentWithTabs: false,
-            lineWrapping: true,
-            autofocus: false,
-            extraKeys: {
-                'Ctrl-S': function(cm) { cm.save(); },
-                'Cmd-S': function(cm) { cm.save(); }
-            }
-        };
-
-        let editorMtlx, editorMxsl;
-
-        // Fetch keywords from backend, register MXSL mode, then init editors
-        fetch('/api/keywords')
-            .then(r => r.json())
-            .then(data => {
-                registerMxslMode(data.data_types, data.control, data.builtins, data.functions);
-                logMessage('Loaded ' + (data.all || []).length + ' keywords and ' +
-                    (data.builtins || []).length + ' builtins', 'success');
-
-                // MTLX editor – XML mode
-                editorMtlx = CodeMirror.fromTextArea(
-                    document.getElementById('editor-mtlx'),
-                    Object.assign({}, sharedOptions, {
-                        theme: 'dracula',
-                        mode: 'xml',
-                        placeholder: 'Paste MTLX XML here, or load a file...'
-                    })
-                );
-
-                // MXSL editor – custom mxsl mode with real keywords
-                editorMxsl = CodeMirror.fromTextArea(
-                    document.getElementById('editor-mxsl'),
-                    Object.assign({}, sharedOptions, {
-                        theme: 'darcula',
-                        mode: 'mxsl',
-                        placeholder: 'Paste MXSL code here, or load a file...'
-                    })
-                );
-
-                editorMtlx.refresh();
-                editorMxsl.refresh();
-            })
-            .catch(err => {
-                logMessage('Failed to load keywords: ' + err.message, 'error');
-                // Fallback: init editors with clike mode
-                editorMtlx = CodeMirror.fromTextArea(
-                    document.getElementById('editor-mtlx'),
-                    Object.assign({}, sharedOptions, {
-                        theme: 'darcula',
-                        mode: 'xml',
-                        placeholder: 'Paste MTLX XML here, or load a file...'
-                    })
-                );
-                editorMxsl = CodeMirror.fromTextArea(
-                    document.getElementById('editor-mxsl'),
-                    Object.assign({}, sharedOptions, {
-                        theme: 'monokai',
-                        mode: 'text/x-csrc',
-                        placeholder: 'Paste MXSL code here, or load a file...'
-                    })
-                );
-            });
-
-        // ============================================================
-        //  Status helpers
-        // ============================================================
-
-        function logMessage(message, type) {
-            const el = document.getElementById('message-log');
-            const timestamp = new Date().toLocaleTimeString();
-            const icons = {
-                error: '[\u2716]',
-                success: '[\u2714]',
-                info: '[\u2139]'
-            };
-            const icon = icons[type] || '[\u2139]';
-            const text = `[${timestamp}] ${icon} ${message}\n`;
-            el.value += text;
-            el.scrollTop = el.scrollHeight;
-        }
-
-        function clearLog() {
-            const el = document.getElementById('message-log');
-            el.value = '';
-        }
-
-        // ============================================================
-        //  Load file
-        // ============================================================
-
-        let pendingTarget = null;
-
-        function loadFile(target) {
-            pendingTarget = target;
-            const input = document.getElementById('file-input');
-            input.accept = '.mtlx,.mxsl,.xml,.txt';
-            input.value = '';
-            input.click();
-        }
-
-        document.getElementById('file-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file || !pendingTarget) return;
-
-            logMessage('Loading ' + file.name + '…', 'info');
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const content = ev.target.result;
-                if (pendingTarget === 'mtlx') {
-                    editorMtlx.setValue(content);
-                    logMessage('Loaded ' + file.name + ' into MTLX editor', 'success');
-                } else {
-                    editorMxsl.setValue(content);
-                    logMessage('Loaded ' + file.name + ' into MXSL editor', 'success');
-                }
-                pendingTarget = null;
-            };
-            reader.onerror = function() {
-                logMessage('Failed to read file', 'error');
-                pendingTarget = null;
-            };
-            reader.readAsText(file);
-        });
-
-        // ============================================================
-        //  Convert: MTLX → MXSL (decompile)
-        // ============================================================
-
-        async function convertMtlxToMxsl() {
-            const source = editorMtlx.getValue().trim();
-            if (!source) {
-                logMessage('MTLX editor is empty', 'error');
-                return;
-            }
-
-            logMessage('Decompiling MTLX → MXSL…', 'info');
-            try {
-                const resp = await fetch('/api/decompile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ source })
-                });
-                const data = await resp.json();
-                if (data.error) {
-                    logMessage('Decompile error: ' + data.error, 'error');
-                    return;
-                }
-                editorMxsl.setValue(data.result);
-                logMessage('MTLX decompiled to MXSL (' + data.result.length + ' chars)', 'success');
-            } catch (err) {
-                logMessage('Network error: ' + err.message, 'error');
-            }
-        }
-
-        // ============================================================
-        //  Convert: MXSL → MTLX (compile)
-        // ============================================================
-
-        async function convertMxslToMtlx() {
-            const source = editorMxsl.getValue().trim();
-            if (!source) {
-                logMessage('MXSL editor is empty', 'error');
-                return;
-            }
-
-            logMessage('Compiling MXSL → MTLX…', 'info');
-            try {
-                const resp = await fetch('/api/compile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ source })
-                });
-                const data = await resp.json();
-                if (data.error) {
-                    logMessage('Compile error: ' + data.error, 'error');
-                    return;
-                }
-                editorMtlx.setValue(data.result);
-                logMessage('MXSL compiled to MTLX (' + data.result.length + ' chars)', 'success');
-            } catch (err) {
-                logMessage('Network error: ' + err.message, 'error');
-            }
-        }
-    </script>
+    <!-- Load app.js -->
+    <script src="static/app.js"></script>
 
 </body>
 </html>

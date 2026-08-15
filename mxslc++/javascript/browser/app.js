@@ -92,6 +92,10 @@ const sharedOptions = {
     indentWithTabs: false,
     lineWrapping: true,
     autofocus: false,
+    extraKeys: {
+        'Ctrl-S': function(cm) { cm.save(); },
+        'Cmd-S': function(cm) { cm.save(); }
+    }
 };
 
 let editorMtlx = null;
@@ -155,6 +159,24 @@ function onFileChosen(e) {
     reader.readAsText(file);
 }
 
+function toggleOptions() {
+    const body = document.getElementById('options-body');
+    const label = document.getElementById('options-toggle-label');
+    const isHidden = body.classList.contains('d-none');
+    body.classList.toggle('d-none');
+    label.textContent = isHidden ? 'hide' : 'show';
+}
+
+// Get page options and return a CompileOptions instance 
+function getCompileOptions() {
+    const opts = new mx.CompileOptions();
+    opts.version = document.getElementById('opt-version').value;
+    opts.reduceGraph = document.getElementById('opt-reduce-graph').checked;
+    opts.errorOnMissingGlobals = document.getElementById('opt-error-missing').checked;
+    opts.errorOnUnusedGlobals = document.getElementById('opt-error-unused').checked;
+    return opts;
+}
+
 // ---------------------------------------------------------------------------
 // Conversion (client-side, via WASM)
 // ---------------------------------------------------------------------------
@@ -187,22 +209,24 @@ async function convertMtlxToMxsl() {
 
 // Compile: MXSL source -> MTLX XML
 async function convertMxslToMtlx() {
-    // TODO: Expose compile options in UI.
+    const options = getCompileOptions();
+
     const source = editorMxsl.getValue().trim();
     if (!source) {
         logMessage('MXSL editor is empty', 'error');
         return;
     }
-    logMessage('Compiling MXSL -> MTLX...', 'info');
+    logMessage('Compiling MXSL -> MTLX (version=' + options.version +
+        ', reduce=' + options.reduce_graph + ')...', 'info');
     try {
         ensureReady();
-        const opts = new mx.CompileOptions();
-        const result = mx.compileSlxToMtlx(source, opts);
+        const result = mx.compileSlxToMtlx(source, options);
         editorMtlx.setValue(result);
         logMessage(`MXSL compiled to MTLX (${result.length} chars)`, 'success');
     } catch (err) {
         logMessage('Compile error: ' + errorMessage(err), 'error');
     }
+    options.delete();
 }
 
 // ---------------------------------------------------------------------------
@@ -213,6 +237,7 @@ async function convertMxslToMtlx() {
 
 window.loadFile = loadFile;
 window.clearLog = clearLog;
+window.toggleOptions = toggleOptions;
 window.convertMtlxToMxsl = convertMtlxToMxsl;
 window.convertMxslToMtlx = convertMxslToMtlx;
 
@@ -229,13 +254,16 @@ registerMxslMode(
 
 initEditors();
 
+let version_select = document.getElementById('version_select');
+version_select.style.display = 'none';  // Hide version select for now, until we support multiple versions
+
 document.getElementById('file-input').addEventListener('change', onFileChosen);
 
 function setWasmStatus(label, icon, cls) {
-    const el = document.getElementById('wasm-status');
+    const el = document.getElementById('server-status');
     if (!el) return;
     el.innerHTML = `<i class="bi ${icon} me-1"></i>${label}`;
-    el.className = 'wasm-status ' + (cls || '');
+    el.className = 'server-status ' + (cls || '');
 }
 
 // Load the WebAssembly module. The .wasm and .data files are fetched relative
@@ -275,9 +303,9 @@ function setWasmStatus(label, icon, cls) {
             logMessage('Could not load MaterialX nodedefs: ' + errorMessage(err), 'error');
         }
 
-        setWasmStatus('WASM ready', 'bi-check-circle-fill', 'text-success');
+        setWasmStatus('Wasm ready', 'bi-check-circle-fill', 'text-success');
     } catch (err) {
         logMessage('Failed to load WebAssembly module: ' + errorMessage(err), 'error');
-        setWasmStatus('WASM failed', 'bi-x-circle-fill', 'text-danger');
+        setWasmStatus('Wasm failed', 'bi-x-circle-fill', 'text-danger');
     }
 })();
