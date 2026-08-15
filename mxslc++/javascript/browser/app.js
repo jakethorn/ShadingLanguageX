@@ -70,3 +70,6 @@ const engine = {
 setEngine(engine);
 start();
 
+// Hide version option if the WASM engine is used, since it only supports the
+// version embedded in the WASM library (currently 1.39.5). The Flask backend can support
+document.getElementById('version_select').style.display = 'none';
