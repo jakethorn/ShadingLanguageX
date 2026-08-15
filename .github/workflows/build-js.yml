@@ -43,10 +43,10 @@ jobs:
 
     steps:
       - name: Check out mxslc
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check out MaterialX
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: AcademySoftwareFoundation/MaterialX
           ref: v1.39.5
@@ -54,7 +54,7 @@ jobs:
 
       - name: Cache Emscripten SDK
         id: cache-emsdk
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: emsdk
           key: emsdk-4.0.8-${{ runner.os }}
@@ -81,13 +81,13 @@ jobs:
       - name: Set up Node.js
         # The Emscripten runtime ships its own Node, but a system Node >= 18 is
         # required for the Playwright tooling when the emsdk Node is unavailable.
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
 
       - name: Cache npm dependencies
         id: cache-npm
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             mxslc++/javascript/node_modules
@@ -98,7 +98,7 @@ jobs:
         # Restores the compiled WebAssembly MaterialX build + install so the
         # build script's MaterialX step is a fast no-op on cache hits.
         id: cache-mtlx
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             mxslc++/javascript/build/materialx
@@ -115,7 +115,7 @@ jobs:
           "${{ github.workspace }}/mxslc++/external/MaterialX"
 
       - name: Upload WASM artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mxslc-js
           path: |
@@ -128,7 +128,7 @@ jobs:
         # Stage the full, self-contained browser app (index.html, app.js,
         # keywords.js and lib/ with the freshly built WASM files) for GitHub
         # Pages. The build script copies the WASM artifacts into browser/lib/.
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: mxslc++/javascript/browser
 
@@ -154,5 +154,5 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 

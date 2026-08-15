@@ -123,6 +123,43 @@ function initEditors() {
     );
     editorMtlx.refresh();
     editorMxsl.refresh();
+
+    // Set default text for mxsl
+    let defaultMxsl = `
+    material main()
+    {
+        surfaceshader goldsrf = standard_surface();
+        goldsrf.base = 1.0;
+        goldsrf.base_color = color3{0.944, 0.776, 0.373};
+        goldsrf.specular = 1.0;
+        goldsrf.specular_color = color3{0.998, 0.981, 0.751};
+        goldsrf.specular_roughness = 0.02;
+        goldsrf.metalness = 1.0;
+
+        return surfacematerial(goldsrf);
+    }
+    `;
+    editorMxsl.setValue(defaultMxsl);
+
+    // Set default text for mtlx
+    let defaultMtlx = `
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <standard_surface name="goldsrf" type="surfaceshader">
+    <input name="base" type="float" value="1" />
+    <input name="base_color" type="color3" value="0.944, 0.776, 0.373" />
+    <input name="specular" type="float" value="1" />
+    <input name="specular_color" type="color3" value="0.998, 0.981, 0.751" />
+    <input name="specular_roughness" type="float" value="0.02" />
+    <input name="metalness" type="float" value="1" />
+  </standard_surface>
+  <surfacematerial name="goldmat" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="goldsrf" />
+  </surfacematerial>
+</materialx>
+`;
+    editorMtlx.setValue(defaultMtlx);
+    logMessage('Editors loaded', 'success');
 }
 
 // ============================================================
