@@ -1,13 +1,76 @@
-// Main application logic for the client-side MXSL <-> MTLX converter.
-// All compile/decompile happens in the browser via the JsMxslc WebAssembly
-// module.
+// ============================================================
+//  MXSL <-> MTLX Converter — consolidated UI core (WASM build)
+// ============================================================
+//  Mirror of the canonical shared version (see mxslc_web/static/app.js).
+//  The ONLY app-specific part is the "Engine adapter" block directly below,
+//  which talks to the in-browser JsMxslc WebAssembly module instead of a
+//  backend. Everything after it is identical shared logic.
 
 import { MXSL_KEYWORDS } from './keywords.js';
 import Mxslc from './lib/JsMxslc.js';
 
-// ---------------------------------------------------------------------------
-// Logging / status helpers
-// ---------------------------------------------------------------------------
+// ============================================================
+//  Engine adapter (WASM)
+// ============================================================
+
+let mx = null; // The mxslc API object, resolved after the WASM module loads.
+
+const engine = {
+    // Load the WebAssembly module. The .wasm and .data files are fetched
+    // relative to this script (see locateFile), so this page must be served
+    // over HTTP.
+    async init() {
+        mx = await Mxslc({
+            locateFile: (file) => new URL('./lib/' + file, import.meta.url).href,
+        });
+        logMessage('WebAssembly module loaded (' +
+            MXSL_KEYWORDS.control.length + ' control keywords, ' +
+            MXSL_KEYWORDS.functions.length + ' built-in functions)', 'success');
+    },
+
+    // True once the WASM module is available for conversions.
+    isReady() { return !!mx; },
+
+    // Return the authoritative keyword sets. `functions` is the MaterialX
+    // nodedef-category list from the WASM library and is used first; the
+    // static MXSL_KEYWORDS backup is only consulted if this returns no
+    // functions. Control/data-type keywords always come from the static list
+    // (they are language keywords, not MaterialX nodedefs).
+    getKeywords() {
+        const defs = mx.getMtlxDefinitionNames();
+        const count = defs.size();
+        const functions = [];
+        for (let i = 0; i < count; i++) functions.push(defs.get(i));
+        return Promise.resolve({
+            data_types: MXSL_KEYWORDS.dataTypes,
+            control: MXSL_KEYWORDS.control,
+            builtins: [],
+            functions,
+        });
+    },
+
+    // Compile MXSL source to MTLX XML. Maps the shared plain options object
+    // onto a WASM CompileOptions instance. Returns the MTLX string.
+    compile(source, options) {
+        const opts = new mx.CompileOptions();
+        opts.version = options.version;
+        opts.reduceGraph = options.reduce_graph;
+        opts.errorOnMissingGlobals = options.error_on_missing_globals;
+        opts.errorOnUnusedGlobals = options.error_on_unused_globals;
+        const result = mx.compileSlxToMtlx(source, opts);
+        opts.delete();
+        return result;
+    },
+
+    // Decompile MTLX XML to MXSL source. Returns the MXSL string.
+    decompile(source) {
+        return mx.decompileMtlxToSlx(source);
+    },
+};
+
+// ============================================================
+//  Logging / status helpers
+// ============================================================
 
 function logMessage(message, type = 'info') {
     const el = document.getElementById('message-log');
@@ -18,8 +81,7 @@ function logMessage(message, type = 'info') {
     el.scrollTop = el.scrollHeight;
 }
 
-// Defensively extract a readable message from anything thrown, so an unexpected
-// non-Error value never renders as 'undefined' in the log.
+// Defensively extract a readable message from anything thrown.
 function errorMessage(err) {
     return (err && err.message) ? err.message : String(err);
 }
@@ -28,21 +90,23 @@ function clearLog() {
     document.getElementById('message-log').value = '';
 }
 
-// ---------------------------------------------------------------------------
-// CodeMirror MXSL mode (built from the embedded keyword lists)
-// ---------------------------------------------------------------------------
+// Update the server-status badge in the log header.
+function setServerStatus(label, icon, cls) {
+    const el = document.getElementById('server-status');
+    if (!el) return;
+    el.innerHTML = `<i class="bi ${icon} me-1"></i>${label}`;
+    el.className = 'server-status ' + (cls || '');
+}
 
-// Set of names highlighted as functions. Seeded from the static keyword list
-// so the editor has something to highlight before WASM loads, then replaced by
-// the authoritative MaterialX nodedef category set once the WASM module is
-// ready. The static list is kept only as a fallback when the WASM module
-// returns no nodedefs.
-let mxslFunctionSet = null;
+// ============================================================
+//  CodeMirror MXSL mode
+// ============================================================
 
-function registerMxslMode(dataTypes, control, functions, funcStyle) {
+function registerMxslMode(dataTypes, control, builtins, functions, funcStyle) {
     dataTypes = new Set(dataTypes || []);
     control = new Set(control || []);
-    mxslFunctionSet = new Set(functions || []);
+    builtins = new Set(builtins || []);
+    functions = new Set(functions || []);
     funcStyle = funcStyle || 'function';
 
     CodeMirror.defineMode('mxsl', function () {
@@ -67,7 +131,8 @@ function registerMxslMode(dataTypes, control, functions, funcStyle) {
                     const word = stream.current();
                     if (dataTypes.has(word)) return 'type';
                     if (control.has(word)) return 'keyword';
-                    if (mxslFunctionSet.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
+                    if (builtins.has(word)) return 'builtin';
+                    if (functions.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
                     if (word === word.toUpperCase() && word.length >= 2) return 'atom';
                     return 'variable';
                 }
@@ -79,9 +144,9 @@ function registerMxslMode(dataTypes, control, functions, funcStyle) {
     });
 }
 
-// ---------------------------------------------------------------------------
-// Editors
-// ---------------------------------------------------------------------------
+// ============================================================
+//  Editors
+// ============================================================
 
 const sharedOptions = {
     lineNumbers: true,
@@ -107,7 +172,7 @@ function initEditors() {
         Object.assign({}, sharedOptions, {
             theme: 'dracula',
             mode: 'xml',
-            placeholder: 'Paste MTLX XML here, or load a file...',
+            placeholder: 'Paste MTLX XML here, or load a file...'
         })
     );
     editorMxsl = CodeMirror.fromTextArea(
@@ -115,16 +180,39 @@ function initEditors() {
         Object.assign({}, sharedOptions, {
             theme: 'darcula',
             mode: 'mxsl',
-            placeholder: 'Paste MXSL code here, or load a file...',
+            placeholder: 'Paste MXSL code here, or load a file...'
         })
     );
     editorMtlx.refresh();
     editorMxsl.refresh();
 }
 
-// ---------------------------------------------------------------------------
-// File loading
-// ---------------------------------------------------------------------------
+// ============================================================
+//  Keyword resolution — MaterialX list first, static backup second
+// ============================================================
+
+async function loadKeywords() {
+    try {
+        const kw = await engine.getKeywords();
+        const functions = kw.functions || [];
+        if (functions.length > 0) {
+            registerMxslMode(kw.data_types, kw.control, kw.builtins, functions);
+            logMessage(`Loaded ${functions.length} MaterialX keywords.`, 'success');
+            return 'materialx';
+        }
+        logMessage('No MaterialX keywords returned; using static backup.', 'info');
+    } catch (err) {
+        logMessage('Failed to load MaterialX keywords: ' + errorMessage(err), 'error');
+    }
+    // Backup: static keyword list embedded in keywords.js.
+    registerMxslMode(MXSL_KEYWORDS.dataTypes, MXSL_KEYWORDS.control, [], MXSL_KEYWORDS.functions);
+    logMessage(`Using static keyword backup (${MXSL_KEYWORDS.functions.length} functions).`, 'info');
+    return 'backup';
+}
+
+// ============================================================
+//  File loading
+// ============================================================
 
 let pendingTarget = null;
 
@@ -139,6 +227,7 @@ function loadFile(target) {
 function onFileChosen(e) {
     const file = e.target.files[0];
     if (!file || !pendingTarget) return;
+
     logMessage(`Loading ${file.name}...`, 'info');
     const reader = new FileReader();
     reader.onload = function (ev) {
@@ -167,25 +256,24 @@ function toggleOptions() {
     label.textContent = isHidden ? 'hide' : 'show';
 }
 
-// Get page options and return a CompileOptions instance 
+// Read compile options from the page. The shape is engine-specific; the WASM
+// engine maps these onto its CompileOptions object internally.
 function getCompileOptions() {
-    const opts = new mx.CompileOptions();
-    opts.version = document.getElementById('opt-version').value;
-    opts.reduceGraph = document.getElementById('opt-reduce-graph').checked;
-    opts.errorOnMissingGlobals = document.getElementById('opt-error-missing').checked;
-    opts.errorOnUnusedGlobals = document.getElementById('opt-error-unused').checked;
-    return opts;
+    return {
+        version: document.getElementById('opt-version').value,
+        reduce_graph: document.getElementById('opt-reduce-graph').checked,
+        error_on_missing_globals: document.getElementById('opt-error-missing').checked,
+        error_on_unused_globals: document.getElementById('opt-error-unused').checked,
+    };
 }
 
-// ---------------------------------------------------------------------------
-// Conversion (client-side, via WASM)
-// ---------------------------------------------------------------------------
-
-let mx = null; // The mxslc API object, resolved after the WASM module loads.
+// ============================================================
+//  Conversion
+// ============================================================
 
 function ensureReady() {
-    if (!mx) {
-        throw new Error('WASM module is still loading. Please wait a moment and try again.');
+    if (!engine.isReady()) {
+        throw new Error('Engine is still loading. Please wait a moment and try again.');
     }
 }
 
@@ -199,7 +287,7 @@ async function convertMtlxToMxsl() {
     logMessage('Decompiling MTLX -> MXSL...', 'info');
     try {
         ensureReady();
-        const result = mx.decompileMtlxToSlx(source);
+        const result = await engine.decompile(source);
         editorMxsl.setValue(result);
         logMessage(`MTLX decompiled to MXSL (${result.length} chars)`, 'success');
     } catch (err) {
@@ -210,7 +298,6 @@ async function convertMtlxToMxsl() {
 // Compile: MXSL source -> MTLX XML
 async function convertMxslToMtlx() {
     const options = getCompileOptions();
-
     const source = editorMxsl.getValue().trim();
     if (!source) {
         logMessage('MXSL editor is empty', 'error');
@@ -220,20 +307,19 @@ async function convertMxslToMtlx() {
         ', reduce=' + options.reduce_graph + ')...', 'info');
     try {
         ensureReady();
-        const result = mx.compileSlxToMtlx(source, options);
+        const result = await engine.compile(source, options);
         editorMtlx.setValue(result);
         logMessage(`MXSL compiled to MTLX (${result.length} chars)`, 'success');
     } catch (err) {
         logMessage('Compile error: ' + errorMessage(err), 'error');
     }
-    options.delete();
 }
 
-// ---------------------------------------------------------------------------
-// Expose handlers to the global scope (used by inline onclick in index.html).
-// ES module top-level bindings are module-scoped, so they must be attached to
-// window explicitly.
-// ---------------------------------------------------------------------------
+// ============================================================
+//  Expose handlers (used by inline onclick in index.html).
+//  ES module top-level bindings are module-scoped, so they must be
+//  attached to window explicitly.
+// ============================================================
 
 window.loadFile = loadFile;
 window.clearLog = clearLog;
@@ -241,71 +327,25 @@ window.toggleOptions = toggleOptions;
 window.convertMtlxToMxsl = convertMtlxToMxsl;
 window.convertMxslToMtlx = convertMxslToMtlx;
 
-// ---------------------------------------------------------------------------
-// Bootstrap
-// ---------------------------------------------------------------------------
-
-// Register the custom MXSL CodeMirror mode before creating the editors.
-registerMxslMode(
-    MXSL_KEYWORDS.dataTypes,
-    MXSL_KEYWORDS.control,
-    MXSL_KEYWORDS.functions
-);
-
-initEditors();
-
-let version_select = document.getElementById('version_select');
-version_select.style.display = 'none';  // Hide version select for now, until we support multiple versions
+// ============================================================
+//  Bootstrap
+// ============================================================
 
 document.getElementById('file-input').addEventListener('change', onFileChosen);
 
-function setWasmStatus(label, icon, cls) {
-    const el = document.getElementById('server-status');
-    if (!el) return;
-    el.innerHTML = `<i class="bi ${icon} me-1"></i>${label}`;
-    el.className = 'server-status ' + (cls || '');
-}
-
-// Load the WebAssembly module. The .wasm and .data files are fetched relative
-// to this script (see locateFile), so this page must be served over HTTP.
-(async function loadWasm() {
-    logMessage('Loading WebAssembly module...', 'info');
+(async function bootstrap() {
+    logMessage('Starting...', 'info');
     try {
-        // The following will fetch JsMxslc.wasm and JsMxslc.data from the same folder as this script.
-        // import.meta.url is the URL of this script, so we can use it to locate the other files. 
-        mx = await Mxslc({
-            locateFile: (file) => new URL('./lib/' + file, import.meta.url).href,
-        });
-        logMessage('WebAssembly module loaded (' +
-            MXSL_KEYWORDS.control.length + ' control keywords, ' +
-            MXSL_KEYWORDS.functions.length + ' built-in functions)', 'success');
-
-        // Use the WASM module's MaterialX nodedef categories as the highlight
-        // set; only fall back to the embedded static keyword list if the WASM
-        // module returns no nodedefs at all.
-        try {
-            const defs = mx.getMtlxDefinitionNames();
-            const count = defs.size();
-            if (count > 0) {
-                const nodedefSet = new Set();
-                for (let i = 0; i < count; i++) 
-                    nodedefSet.add(defs.get(i));
-                mxslFunctionSet = nodedefSet;
-                logMessage(`Loaded ${count} MaterialX definition categories.`, 'success');
-            } else {
-                // No nodedefs returned — keep the static keyword list fallback.
-                logMessage('No MaterialX definition categories returned. Using backup list.', 'info');
-            }
-            // Force the MXSL editor to re-tokenize with the updated set.
-            editorMxsl.setOption('mode', 'text/plain');
-            editorMxsl.setOption('mode', 'mxsl');
-        } catch (err) {
-            logMessage('Could not load MaterialX nodedefs: ' + errorMessage(err), 'error');
-        }
-
-        setWasmStatus('Wasm ready', 'bi-check-circle-fill', 'text-success');
+        await engine.init();              // load backend / WASM
+        setServerStatus('Server ready', 'bi-check-circle-fill', 'text-success');
     } catch (err) {
-        logMessage('Failed to load WebAssembly module: ' + errorMessage(err), 'error');
-        setWasmStatus('Wasm failed', 'bi-x-circle-fill', 'text-danger');
+        logMessage('Failed to initialize: ' + errorMessage(err), 'error');
+        setServerStatus('Server failed', 'bi-x-circle-fill', 'text-danger');
     }
+    // Always create the editors. loadKeywords uses the MaterialX list first and
+    // falls back to the static keyword list, so editing works even if the
+    // engine failed to load.
+    await loadKeywords();
+    initEditors();
 })();
+
