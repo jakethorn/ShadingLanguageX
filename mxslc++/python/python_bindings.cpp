@@ -13,6 +13,9 @@
 PYBIND11_MODULE(_mxslc, m)
 {
     m.doc() = "Python bindings for mxslc";
+#ifdef MXSLCXX_PY_VERSION
+    m.attr("__version__") = MXSLCXX_PY_VERSION;
+#endif
 
     bind_compile_options(m);
     bind_variable(m);

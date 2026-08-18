@@ -20,6 +20,10 @@ target_link_libraries(_mxslc PRIVATE
         mxslc_lib
 )
 
+if(DEFINED SKBUILD_PROJECT_VERSION)
+        target_compile_definitions(_mxslc PRIVATE MXSLCXX_PY_VERSION="${SKBUILD_PROJECT_VERSION}")
+endif()
+
 install(TARGETS _mxslc
         LIBRARY DESTINATION mxslc
         RUNTIME DESTINATION mxslc

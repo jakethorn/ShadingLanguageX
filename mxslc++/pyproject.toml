@@ -22,6 +22,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.scripts]
+mxslcxx = "mxslc.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/jakethorn/ShadingLanguageX"
 Repository = "https://github.com/jakethorn/ShadingLanguageX"
