@@ -1,0 +1,158 @@
+name: Build JavaScript (WASM)
+
+# ============================================================================
+#  HOW TO TRIGGER
+# ----------------------------------------------------------------------------
+#  Build only (validation) — happens automatically:
+#    * Opening or updating a pull request
+#    * Any manual dispatch (deploy checkbox OFF)
+#
+#  Build + deploy to GitHub Pages:
+#    * Merge a pull request into `main` (automatic)
+#    * Manual dispatch with the "Deploy to GitHub Pages" checkbox ON, e.g. to
+#      test-deploy the current branch:
+#          gh workflow run build-js.yml --ref <branch> -f deploy=true
+#      (UI: Actions -> Build JavaScript (WASM) -> Run workflow -> tick Deploy)
+#
+#  Note: a manual test-deploy publishes that branch's build to Pages and
+#  overwrites the live site until the next merge to `main`.
+# ============================================================================
+
+on:
+  # Runs on PR open/update/merge (build validation) and manual dispatch.
+  # No push trigger: builds happen on PR events, and deploy only on a merged PR
+  # to main (or a manual dispatch with `deploy` enabled, for testing).
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy to GitHub Pages (enable to test-deploy this branch)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build_js:
+    name: Build mxslc JavaScript / WASM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out mxslc
+        uses: actions/checkout@v7
+
+      - name: Check out MaterialX
+        uses: actions/checkout@v7
+        with:
+          repository: AcademySoftwareFoundation/MaterialX
+          ref: v1.39.5
+          path: mxslc++/external/MaterialX
+
+      - name: Cache Emscripten SDK
+        id: cache-emsdk
+        uses: actions/cache@v6
+        with:
+          path: emsdk
+          key: emsdk-4.0.8-${{ runner.os }}
+
+      - name: Install Emscripten SDK
+        # Only cloned/installed on a cache miss. Mirrors the version used by
+        # MaterialX 1.39.5's own JavaScript CI
+        # (see MaterialX .github/workflows/main.yml -> Install Emscripten).
+        if: steps.cache-emsdk.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/emscripten-core/emsdk --recursive
+          cd emsdk
+          ./emsdk install 4.0.8
+          ./emsdk activate 4.0.8
+
+      - name: Activate Emscripten SDK (cache hit)
+        # The toolchain is restored from cache; just re-activate so emsdk_env.sh
+        # picks it up for this run.
+        if: steps.cache-emsdk.outputs.cache-hit == 'true'
+        run: |
+          cd emsdk
+          ./emsdk activate 4.0.8
+
+      - name: Set up Node.js
+        # The Emscripten runtime ships its own Node, but a system Node >= 18 is
+        # required for the Playwright tooling when the emsdk Node is unavailable.
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Cache npm dependencies
+        id: cache-npm
+        uses: actions/cache@v6
+        with:
+          path: |
+            mxslc++/javascript/node_modules
+            mxslc++/javascript/tests/node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('mxslc++/javascript/package-lock.json', 'mxslc++/javascript/tests/package-lock.json') }}
+
+      - name: Cache MaterialX WASM build
+        # Restores the compiled WebAssembly MaterialX build + install so the
+        # build script's MaterialX step is a fast no-op on cache hits.
+        id: cache-mtlx
+        uses: actions/cache@v6
+        with:
+          path: |
+            mxslc++/javascript/build/materialx
+            mxslc++/javascript/build/mtlx_install
+          key: mtlx-wasm-1.39.5-emsdk-4.0.8-${{ runner.os }}
+
+      - name: Build JavaScript / WASM, run unit tests, build browser
+        # Builds MaterialX to WebAssembly, builds the JsMxslc module with
+        # -DBUILD_JS=ON, runs the Playwright unit tests, and copies the WASM
+        # artifacts into the browser app (browser/lib/).
+        run: >
+          mxslc++/javascript/build_javascript.sh
+          "${{ github.workspace }}/emsdk"
+          "${{ github.workspace }}/mxslc++/external/MaterialX"
+
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: mxslc-js
+          path: |
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.js
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.wasm
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.data
+          if-no-files-found: error
+
+      - name: Upload Pages artifact
+        # Stage the full, self-contained browser app (index.html, app.js,
+        # keywords.js and lib/ with the freshly built WASM files) for GitHub
+        # Pages. The build script copies the WASM artifacts into browser/lib/.
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: mxslc++/javascript/browser
+
+  deploy:
+    name: Deploy browser app to GitHub Pages
+    needs: build_js
+    runs-on: ubuntu-latest
+    # Deploy ONLY when a pull request is merged into main (i.e. a PR "commits"
+    # to main), or on a manual dispatch run with the `deploy` input enabled
+    # (for testing the current branch). The build job still runs on every
+    # PR/manual dispatch for validation, but the Pages deploy is gated.
+    if: >
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       github.event.pull_request.base.ref == 'main') ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.event.inputs.deploy == 'true')
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+

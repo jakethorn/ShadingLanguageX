@@ -1,0 +1,21 @@
+{
+  "name": "mxslc-javascript",
+  "version": "0.1.0",
+  "description": "JavaScript (WebAssembly) bindings for the mxslc compile/decompile pipeline.",
+  "type": "module",
+  "scripts": {
+    "build": "bash build_javascript.sh",
+    "test": "cd tests && npm test",
+    "sync": "bash ../sync_browser.sh",
+    "sync:check": "bash ../sync_browser.sh --check",
+    "prebuild": "bash ../sync_browser.sh"
+  },
+  "keywords": [
+    "mxslc",
+    "ShadingLanguageX",
+    "MaterialX",
+    "wasm",
+    "emscripten"
+  ],
+  "license": "Apache-2.0"
+}
