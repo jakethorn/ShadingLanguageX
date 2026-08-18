@@ -1,0 +1,5 @@
+build/
+node_modules/
+tests/_build/
+tests/test-results/
+tests/playwright-report/

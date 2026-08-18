@@ -8,7 +8,6 @@ from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -28,9 +27,6 @@ def _get_mtlx_definition_names() -> list[str]:
     libraryFolders.extend(mx.getDefaultDataLibraryFolders())
     mx.loadLibraries(libraryFolders, searchPath, stdlib)
     defs = stdlib.getNodeDefs()
-    #print("loaded ", len(defs), "nodedefs from MaterialX stdlib")
-    #for nodedef in defs:
-    #    print(f"Found nodedef: {nodedef.getNodeString()}")
     unique_names = set(nd.getNodeString() for nd in defs)
     return sorted(unique_names)
 
@@ -108,13 +104,19 @@ def _api_compile():
     """Convert MXSL source → MTLX XML."""
     data = request.get_json(force=True)
     source: str = data.get("source", "").strip()
+    opts: dict = data.get("options", {})
 
     if not source:
         return jsonify({"error": "No MXSL source provided."}), 400
 
     try:
         mxslc = _import_mxslc()
-        result = mxslc.compile_string_to_string(source)
+        options = mxslc.CompileOptions()
+        options.version = opts.get("version", "1.39.5")
+        options.reduce_graph = opts.get("reduce_graph", True)
+        options.error_on_missing_globals = opts.get("error_on_missing_globals", True)
+        options.error_on_unused_globals = opts.get("error_on_unused_globals", True)
+        result = mxslc.compile_string_to_string(source, options)
         return jsonify({"result": result})
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
