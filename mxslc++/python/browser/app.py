@@ -118,6 +118,7 @@ def _api_compile():
         options.reduce_graph = opts.get("reduce_graph", True)
         options.error_on_missing_globals = opts.get("error_on_missing_globals", True)
         options.error_on_unused_globals = opts.get("error_on_unused_globals", True)
+        options.single_use_as_nodegraph = opts.get("single_use_as_nodegraph", True)
         result = mxslc.compile_string_to_string(source, options)
         return jsonify({"result": result})
     except Exception as exc:
