@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_bar" node="bar">
-    <output name="out" type="float" />
-  </nodedef>
-  <nodegraph name="NG_bar" nodedef="ND_bar">
+  <nodegraph name="NG_bar">
     <add name="var__0" type="float">
       <input name="in1" type="float" value="7" />
       <input name="in2" type="float" value="1" />

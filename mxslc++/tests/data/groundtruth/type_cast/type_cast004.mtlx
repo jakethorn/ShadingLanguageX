@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <output name="out__0" type="float" />
-    <output name="out__1" type="float" />
-    <output name="out__2" type="float" />
-    <output name="out__3" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <output name="out__0" type="float" value="1" />
     <output name="out__1" type="float" value="2" />
     <output name="out__2" type="float" value="3" />

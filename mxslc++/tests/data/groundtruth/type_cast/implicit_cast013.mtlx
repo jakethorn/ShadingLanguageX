@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <input name="a__x" type="float" value="0" />
-    <input name="a__y" type="float" value="0" />
-    <input name="a__z" type="integer" value="0" />
-    <input name="a__w" type="string" value="" />
-    <output name="out" type="integer" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <output name="out" type="integer" value="0" />
   </nodegraph>
   <foo name="var__0" type="integer">

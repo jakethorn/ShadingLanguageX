@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_some_func" node="some_func">
-    <output name="out" type="float" />
-    <input name="nonlocal_in__b__0" type="float" />
-    <input name="nonlocal_in__b__1" type="float" />
-  </nodedef>
-  <nodegraph name="NG_some_func" nodedef="ND_some_func">
+  <nodegraph name="NG_some_func">
     <output name="out" type="float" interfacename="nonlocal_in__b__0" />
   </nodegraph>
   <multiply name="c" type="float">

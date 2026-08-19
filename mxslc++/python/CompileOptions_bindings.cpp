@@ -25,7 +25,8 @@ void bind_compile_options(py::module_& m)
                 const bool error_on_unused_globals,
                 const optional<string>& func_name,
                 const py::list& func_args,
-                const bool reduce_graph)
+                const bool reduce_graph,
+                const bool single_use_as_nodegraph)
             {
                 auto opts = std::make_unique<CompileOptions>();
                 opts->output_file = output_file;
@@ -51,6 +52,7 @@ void bind_compile_options(py::module_& m)
                     opts->add_entry_function_argument(utils::to_cpp_variable(arg));
 
                 opts->reduce_graph = reduce_graph;
+                opts->single_use_as_nodegraph = single_use_as_nodegraph;
                 return opts;
             }),
             py::arg("output_file") = std::nullopt,
@@ -64,7 +66,8 @@ void bind_compile_options(py::module_& m)
             py::arg("error_on_unused_globals") = CompileOptions{}.error_on_unused_globals,
             py::arg("func_name") = std::nullopt,
             py::arg("func_args") = py::list(),
-            py::arg("reduce_graph") = CompileOptions{}.reduce_graph
+            py::arg("reduce_graph") = CompileOptions{}.reduce_graph,
+            py::arg("single_use_as_nodegraph") = CompileOptions{}.single_use_as_nodegraph
         )
         .def_readwrite("output_file", &CompileOptions::output_file)
         .def_readwrite("version", &CompileOptions::version)
@@ -113,5 +116,6 @@ void bind_compile_options(py::module_& m)
                     opts.add_entry_function_argument(utils::to_cpp_variable(arg));
             }
         )
-        .def_readwrite("reduce_graph", &CompileOptions::reduce_graph);
+        .def_readwrite("reduce_graph", &CompileOptions::reduce_graph)
+        .def_readwrite("single_use_as_nodegraph", &CompileOptions::single_use_as_nodegraph);
 }

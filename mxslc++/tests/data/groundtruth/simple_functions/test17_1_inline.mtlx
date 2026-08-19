@@ -3,11 +3,7 @@
   <randomfloat name="x" type="float">
     <input name="in" type="integer" value="1" />
   </randomfloat>
-  <nodedef name="ND_foo" node="foo">
-    <output name="out" type="float" />
-    <input name="nonlocal_in__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <randomfloat name="var__0" type="float">
       <input name="in" type="integer" value="2" />
     </randomfloat>

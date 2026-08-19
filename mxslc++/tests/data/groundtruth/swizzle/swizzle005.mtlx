@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <output name="out" type="color3" />
-    <input name="nonlocal_in__c" type="color3" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <separate3 name="var__0" type="multioutput">
       <input name="in" type="color3" interfacename="nonlocal_in__c" />
     </separate3>

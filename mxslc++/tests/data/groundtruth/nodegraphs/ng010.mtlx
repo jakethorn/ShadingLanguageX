@@ -10,11 +10,7 @@
     </add>
     <output name="out" type="float" nodename="var__1" />
   </nodegraph>
-  <nodedef name="ND_foo_bar" node="foo_bar">
-    <output name="out" type="float" />
-    <input name="nonlocal_in__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo_bar" nodedef="ND_foo_bar">
+  <nodegraph name="NG_foo_bar">
     <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__x" />
       <input name="in2" type="float" value="1" />

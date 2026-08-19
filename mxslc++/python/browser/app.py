@@ -36,11 +36,13 @@ def _load_keywords() -> dict:
 
     """Load MXSL keywords from the mxslc Python source Keyword enum, categorized."""
     try:
-        kw_path = Path(__file__).resolve().parent.parent / "mxslc" / "mxslc" / "Keyword.py"
+        kw_path = Path(__file__).resolve().parent.parent.parent.parent
+        kw_path = kw_path / "mxslc" / "mxslc" / "Keyword.py"
         if not kw_path.exists():
-            kw_path = Path(__file__).resolve().parent / ".." / "mxslc" / "mxslc" / "Keyword.py"
-        if not kw_path.exists():
+            print('Could not find keywords path', kw_path)
             return {"data_types": [], "control": [], "all": []}
+        else:
+            print('Found keywords path', kw_path)
         spec = importlib.util.spec_from_file_location("Keyword", str(kw_path))
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)

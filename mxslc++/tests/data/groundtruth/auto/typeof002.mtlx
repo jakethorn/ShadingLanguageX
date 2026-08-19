@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND___Point__" node="__Point__">
-    <output name="out__x" type="float" />
-    <output name="out__y" type="float" />
-    <output name="out__uv" type="vector2" />
-    <output name="out__texture" type="filename" />
-  </nodedef>
-  <nodegraph name="NG___Point__" nodedef="ND___Point__">
+  <nodegraph name="NG___Point__">
     <output name="out__x" type="float" value="0" />
     <output name="out__y" type="float" value="1" />
     <output name="out__uv" type="vector2" value="0, 0" />

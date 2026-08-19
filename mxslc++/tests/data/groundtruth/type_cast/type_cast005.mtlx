@@ -1,15 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <output name="out" type="vector3" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <output name="out" type="vector3" value="1, 0, 0" />
   </nodegraph>
-  <nodedef name="ND_foo2" node="foo">
-    <output name="out" type="color3" />
-  </nodedef>
-  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+  <nodegraph name="NG_foo2">
     <output name="out" type="color3" value="0, 1, 0" />
   </nodegraph>
   <foo name="a" type="vector3" />

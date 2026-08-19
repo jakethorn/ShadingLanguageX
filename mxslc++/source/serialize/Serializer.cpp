@@ -112,6 +112,16 @@ namespace mxslc::serialize
         reduce_graph_ = value;
     }
 
+    void Serializer::set_single_use_as_nodegraph(const bool value)
+    {
+        single_use_as_nodegraph_ = value;
+    }
+
+    void Serializer::count_use(const FuncPtr& func) const
+    {
+        usage_[func.get()]++;
+    }
+
     void Serializer::begin_comptime(const bool is_comptime) const
     {
         comptime_scope_.push(comptime_scope_.top() or is_comptime);
@@ -130,6 +140,8 @@ namespace mxslc::serialize
 
     VarPtr Serializer::write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const
     {
+        count_use(func);
+
         ParameterValues input_values = args.evaluate(func->parameters());
 
         if (reduce_graph_ or comptime_scope_.top())
@@ -217,7 +229,54 @@ namespace mxslc::serialize
             attrs.add_to(node_def);
         }
 
+        // Defer the nodegraph-vs-nodedef decision until all code has been
+        // serialized, so the full usage count is known.
+        deferred_.push_back(func);
+
         runtime().exit_scope();
+    }
+
+    void Serializer::finalize()
+    {
+        for (const FuncPtr& func : deferred_)
+        {
+            const mx::NodeGraphPtr node_graph = func->node_graph();
+            if (node_graph == nullptr)
+                continue;
+
+            // Parameterless functions always map to a single bare nodegraph and
+            // never need a nodedef, so they don't participate in the reuse check.
+            if (func->is_parameterless())
+                continue;
+
+            const bool reused = usage_[func.get()] > 1;
+            const bool want_nodegraph = single_use_as_nodegraph_ and not reused;
+
+            if (want_nodegraph)
+            {
+                // Write as a bare nodegraph (no nodedef): remove the nodedef
+                // element and clear the nodegraph's nodedef attribute so it no
+                // longer references the deleted nodedef.
+                if (func->node_def() != nullptr)
+                {
+                    node_graph->setNodeDef(nullptr);
+                    doc_->removeChild(func->node_def()->getName());
+                    func->set_node_def(nullptr);
+                }
+            }
+            else
+            {
+                // Write as a nodedef so it can be referenced and reused.
+                if (func->node_def() == nullptr)
+                {
+                    const mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), TypeName::Int, node_category(func));
+                    node_def->removeOutput("out");
+                    add_outputs_to_node_def(node_def, func->return_type(), RETURN_VALUE_PREFIX);
+                    node_graph->setNodeDef(node_def);
+                    func->set_node_def(node_def);
+                }
+            }
+        }
     }
 
     ValuePtr Serializer::write_node_def_input(const VarPtr& var) const

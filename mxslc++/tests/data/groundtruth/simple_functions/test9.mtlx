@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <output name="outparam__p__x" type="float" />
-    <output name="outparam__p__y" type="float" />
-    <output name="outparam__q__x" type="float" />
-    <output name="outparam__q__y" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="2" />

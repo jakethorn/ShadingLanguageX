@@ -1,23 +1,10 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_Sphere_self" node="Sphere_self">
-    <output name="out__position" type="vector3" />
-    <output name="out__radius" type="float" />
-    <input name="this__position" type="vector3" />
-    <input name="this__radius" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Sphere_self" nodedef="ND_Sphere_self">
+  <nodegraph name="NG_Sphere_self">
     <output name="out__position" type="vector3" interfacename="this__position" />
     <output name="out__radius" type="float" interfacename="this__radius" />
   </nodegraph>
-  <nodedef name="ND_Sphere_move" node="Sphere_move">
-    <output name="out__position" type="vector3" />
-    <output name="out__radius" type="float" />
-    <input name="v" type="vector3" value="0, 0, 0" />
-    <input name="this__position" type="vector3" />
-    <input name="this__radius" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Sphere_move" nodedef="ND_Sphere_move">
+  <nodegraph name="NG_Sphere_move">
     <add name="var__0" type="vector3">
       <input name="in1" type="vector3" interfacename="this__position" />
       <input name="in2" type="vector3" interfacename="v" />

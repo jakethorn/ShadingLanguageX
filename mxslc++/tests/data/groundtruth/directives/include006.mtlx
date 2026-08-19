@@ -6,10 +6,7 @@
   <nodegraph name="NG_bar" nodedef="ND_bar">
     <output name="out" type="float" value="80" />
   </nodegraph>
-  <nodedef name="ND_foo" node="foo">
-    <output name="out" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <bar name="var__0" type="float" />
     <add name="var__1" type="float">
       <input name="in1" type="float" nodename="var__0" />

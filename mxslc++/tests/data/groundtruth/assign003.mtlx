@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_my_function" node="my_function">
-    <output name="out__x" type="float" />
-    <output name="out__y" type="float" />
-    <input name="z" type="float" value="0" />
-  </nodedef>
-  <nodegraph name="NG_my_function" nodedef="ND_my_function">
+  <nodegraph name="NG_my_function">
     <subtract name="var__0" type="float">
       <input name="in1" type="float" interfacename="z" />
       <input name="in2" type="float" value="1" />

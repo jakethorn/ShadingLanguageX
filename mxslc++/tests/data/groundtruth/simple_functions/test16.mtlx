@@ -1,15 +1,9 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <output name="nonlocal_out__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <output name="nonlocal_out__x" type="float" value="10" />
   </nodegraph>
-  <nodedef name="ND_bar" node="bar">
-    <output name="nonlocal_out__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_bar" nodedef="ND_bar">
+  <nodegraph name="NG_bar">
     <foo name="var__0" type="float" />
     <output name="nonlocal_out__x" type="float" output="nonlocal_out__x" nodename="var__0" />
   </nodegraph>

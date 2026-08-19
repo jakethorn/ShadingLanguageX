@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_Sphere_expand" node="Sphere_expand">
-    <input name="amount" type="float" value="0" />
-    <input name="this__center" type="vector2" />
-    <input name="this__radius" type="float" />
-    <output name="out__this__center" type="vector2" />
-    <output name="out__this__radius" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Sphere_expand" nodedef="ND_Sphere_expand">
+  <nodegraph name="NG_Sphere_expand">
     <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="this__radius" />
       <input name="in2" type="float" interfacename="amount" />

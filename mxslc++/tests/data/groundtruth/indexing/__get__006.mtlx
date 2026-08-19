@@ -1,12 +1,7 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <position name="p" type="vector3" />
-  <nodedef name="ND_foo" node="foo">
-    <output name="out" type="vector3" />
-    <input name="nonlocal_in__p" type="vector3" />
-    <output name="nonlocal_out__p" type="vector3" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <separate3 name="var__0" type="multioutput">
       <input name="in" type="vector3" interfacename="nonlocal_in__p" />
     </separate3>
