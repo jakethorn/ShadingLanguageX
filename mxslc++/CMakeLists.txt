@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # -------- MaterialX --------
-set(MTLX_ROOT "" CACHE PATH "Path to installed MaterialX directory")
+set(MTLX_ROOT "C:/Repos/MaterialX/cmake-build-debug/installed")
 message(STATUS "MTLX_ROOT = ${MTLX_ROOT}")
 
 if(NOT MTLX_ROOT)
@@ -47,16 +47,33 @@ endif()
 # -------- mxslc --------
 add_executable(mxslc main.cpp)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_options(mxslc PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
-        target_link_options(mxslc PRIVATE -fsanitize=address,undefined)
-endif()
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#        target_compile_options(mxslc PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+#        target_link_options(mxslc PRIVATE -fsanitize=address,undefined)
+#endif()
 
 target_include_directories(mxslc PRIVATE
         "${CMAKE_SOURCE_DIR}/include"
 )
 
 target_link_libraries(mxslc PRIVATE
+        mtlx_lib
+        mxslc_lib
+)
+
+# -------- mxslc --------
+add_executable(mxsld debug.cpp)
+
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#        target_compile_options(mxslc PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
+#        target_link_options(mxslc PRIVATE -fsanitize=address,undefined)
+#endif()
+
+target_include_directories(mxsld PRIVATE
+        "${CMAKE_SOURCE_DIR}/include"
+)
+
+target_link_libraries(mxsld PRIVATE
         mtlx_lib
         mxslc_lib
 )
