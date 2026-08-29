@@ -100,6 +100,8 @@ add_library(mxslc_lib
         utils/primitive_utils/path_functions.cpp
         utils/primitive_utils/constant.cpp
         utils/primitive_utils/round.cpp
+        utils/primitive_utils/fract.cpp
+        utils/primitive_utils/dotproduct.cpp
         serialize/Serializer.cpp
         serialize/serialize_constexpr.cpp
         serialize/serialize_constexpr_wrapper.cpp

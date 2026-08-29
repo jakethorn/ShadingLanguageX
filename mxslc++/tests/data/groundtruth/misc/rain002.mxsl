@@ -1,0 +1,33 @@
+inline float StaticDrops(mutable vec2 uv, float t)
+{
+	vec2 uv_cat = uv * 40.0;
+    return 4;
+}
+
+inline vec2 DropLayer2(mutable vec2 uv, float t)
+{
+    vec2 UV = uv;
+    return vec2{2, 3};
+}
+
+inline vec2 Drops(vec2 uv, float t)
+{
+    float s = StaticDrops(uv, t);
+    vec2 m1 = DropLayer2(uv, t);
+    return vec2{5, 6};
+}
+
+inline void mainImage(out vec4 fragColor, vec2 fragCoord)
+{
+	vec2 uv = fragCoord;
+    float t = 0;
+
+    vec2 e = vec2{0.001, 0.0};
+    float cx = Drops(uv + e, t).x;
+    float cy = Drops(uv + e.yx, t).x;
+}
+
+mutable vec4 fragColor;
+mainImage(out fragColor, texcoord());
+
+color3 c = color3{fragColor};

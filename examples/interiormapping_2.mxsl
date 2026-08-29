@@ -1,0 +1,59 @@
+//#define USE_RAIN
+
+#ifdef USE_RAIN
+#include "rain_utils.mxsl"
+#endif
+
+inline float raycast(vec3 origin, vec3 view_dir)
+{
+    vec3 dn = (-origin - 1.0) / view_dir;
+    vec3 dp = (-origin + 1.0) / view_dir;
+    vec3 d_min = max(dn, dp);
+    float d_min_z = if (dp.z > 0.0) { dp.z } else { 1000000.0 };
+    return min(d_min.x, min(d_min.y, d_min_z));
+}
+
+// initialize data
+mutable vec2 uv = texcoord();
+#ifdef USE_RAIN
+uv = calculate_rain_uvs(uv);
+#endif
+uv = 1.0 - uv;
+
+vec3 view_dir = -viewdirection("object");
+vec3 origin = vec3{uv * 2.0 - 1.0, -1.0};
+
+// perform raycast
+float room_dist = raycast(origin, view_dir);
+
+mutable vec3 room_pos = origin + view_dir * room_dist;
+room_pos.z *= -1.0;
+
+vec3 wall_uvs = 1.0 - (room_pos + 1.0) / 2.0;
+
+// paint walls
+mutable color3 walls = color3{};
+walls = if (room_pos.x >  0.99) { color3{1, 0, 0} };
+walls = if (room_pos.y < -0.99) { color3{0, 1, 0} };
+walls = if (room_pos.x < -0.99) { color3{0, 0, 1} };
+walls = if (room_pos.z < -0.99) { color3{1, 1, 0} };
+walls = if (room_pos.y >  0.99) { color3{1, 0, 1} };
+
+// ambient occlusion
+mutable vec3 light_pos = vec3{0};
+light_pos.x = sin(time() * 0.667) * 0.75;
+light_pos.y = cos(time() * 0.5) * 0.75;
+
+mutable float ao = (1.0 - clamp(distance(light_pos, room_pos) - 1.0)) ^ 4;
+ao = clamp(ao, 0.01, 1.0);
+
+mutable float ao2 = (1.0 - clamp(distance(vec3{0}, room_pos) - 0.9)) * 0.1;
+
+color3 c = mix(walls, walls * ao2, ao);
+
+// use standard surface
+surfaceshader surface = open_pbr_surface();
+surface.base_color = c;
+surface.specular_roughness = 1.0;
+
+auto parallax_mat = surfacematerial(surface);

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <dotproduct name="a" type="float">
+    <input name="in1" type="vector3" value="1, 2, 3" />
+    <input name="in2" type="vector3" value="1, 2, 3" />
+  </dotproduct>
+  <dotproduct name="b" type="float">
+    <input name="in1" type="vector3" value="1, 2, 3" />
+    <input name="in2" type="vector3" value="1, 2, 3" />
+  </dotproduct>
+  <dotproduct name="c" type="float">
+    <input name="in1" type="vector3" value="4, 2, 3" />
+    <input name="in2" type="vector3" value="4, 2, 3" />
+  </dotproduct>
+  <dotproduct name="d" type="float">
+    <input name="in1" type="vector3" value="4, 2, 3" />
+    <input name="in2" type="vector3" value="4, 2, 3" />
+  </dotproduct>
+</materialx>

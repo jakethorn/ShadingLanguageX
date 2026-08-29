@@ -35,6 +35,10 @@ namespace mxslc::primitive_utils
     Primitive negative(const Primitive& in);
     Primitive logical_not(const Primitive& in);
 
+    // math nodes
+    Primitive fract(const Primitive& in);
+    Primitive dotproduct(const Primitive& in1, const Primitive& in2);
+
     // materialx nodes
     Primitive constant(const Primitive& value, const TypePtr& type = nullptr);
 

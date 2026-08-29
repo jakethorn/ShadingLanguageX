@@ -1,27 +1,27 @@
 #define WAVE_ITERATIONS 12.0
 #define DRAG_MULT 0.38
 
-vec2 wave_dx(vec2 pos, vec2 dir, float freq, float time)
+inline vec2 wave_dx(vec2 pos, vec2 dir, float freq, float time)
 {
     float x = dotproduct(dir, pos) * freq + time;
     float wave = exp(sin(x) - 1.0);
     float dx = wave * cos(x);
-    return vec2(wave, -dx);
+    return vec2{wave, -dx};
 }
 
-float get_waves(vec2 pos)
+inline float get_waves(vec2 pos)
 {
     float wave_phase_shift = magnitude(pos) * 0.1;
-    float iter = 0.0;
-    float freq = 1.0;
-    float time_mult = 2.0;
-    float weight = 1.0;
-    float sum_of_values = 0.0;
-    float sum_of_weights = 0.0;
+    mutable float iter = 0.0;
+    mutable float freq = 1.0;
+    mutable float time_mult = 2.0;
+    mutable float weight = 1.0;
+    mutable float sum_of_values = 0.0;
+    mutable float sum_of_weights = 0.0;
 
-    for (float i = 0.0:WAVE_ITERATIONS)
+    for (float i from 0.0:WAVE_ITERATIONS)
     {
-        vec2 p = vec2(sin(iter), cos(iter));
+        vec2 p = vec2{sin(iter), cos(iter)};
         vec2 res = wave_dx(pos, p, freq, time() * time_mult + wave_phase_shift);
         pos += p * res.y * weight * DRAG_MULT;
         sum_of_values += res.x * weight;
@@ -36,16 +36,12 @@ float get_waves(vec2 pos)
     return sum_of_values / sum_of_weights;
 }
 
-material main()
-{
-    float wave_height = get_waves(position("world").xz * 10.0);
-    surfaceshader surface = standard_surface();
-    surface.base_color = color3(0.1, 0.25, 0.5);
-    surface.specular_roughness = 0.2;
+float wave_height = get_waves(position("world").xz * 10.0);
+surfaceshader surface = standard_surface();
+surface.base_color = color3{0.1, 0.25, 0.5};
+surface.specular_roughness = 0.2;
 
-    return surfacematerial(
-        surface,
-        null,
-        displacement(vec3(0.0, 0.0, 1.0), wave_height / 5.0)
-    );
-}
+material wave_material = surfacematerial(
+    surfaceshader = surface,
+    displacementshader = displacement(vec3{0.0, 0.0, 1.0}, wave_height / 5.0)
+);

@@ -2,28 +2,28 @@
 // shaderart.mxsl (original by Kishimisu, https://www.shadertoy.com/view/mtyGWy)
 //
 
-vec3 palette(float t)
+inline vec3 palette(float t)
 {
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.5, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.263, 0.416, 0.557);
+    vec3 a = vec3{0.5, 0.5, 0.5};
+    vec3 b = vec3{0.5, 0.5, 0.5};
+    vec3 c = vec3{1.0, 1.0, 1.0};
+    vec3 d = vec3{0.263, 0.416, 0.557};
 
     return a + b * cos(6.28318 * (c * t + d));
 }
 
 // only works for positive numbers
-vec2 fract_v2(vec2 v2)
+inline vec2 fract_v2(vec2 v2)
 {
     return v2 % 1.0;
 }
 
-vec2 update_uv(vec2 uv)
+inline vec2 update_uv(vec2 uv)
 {
     return fract_v2(uv * 1.5) - 0.5;
 }
 
-vec3 update_finalColor(vec2 uv, vec2 uv0, float i, vec3 finalColor)
+inline vec3 update_finalColor(vec2 uv, vec2 uv0, float i, vec3 finalColor)
 {
     float d = magnitude(uv) * exp(-magnitude(uv0));
 
@@ -37,34 +37,31 @@ vec3 update_finalColor(vec2 uv, vec2 uv0, float i, vec3 finalColor)
     return finalColor + col * d;
 }
 
-material main()
-{
-    vec2 uv = texcoord();
-    vec2 uv0 = uv;
-    vec3 finalColor = vec3(0.0);
+vec2 uv = texcoord();
+vec2 uv0 = uv;
+vec3 finalColor = vec3{0.0};
 
-    // i = 0
-    float i = 0.0;
-    uv = update_uv(uv);
-    finalColor = update_finalColor(uv, uv0, i, finalColor);
+// i = 0
+float i = 0.0;
+uv = update_uv(uv);
+finalColor = update_finalColor(uv, uv0, i, finalColor);
 
-    // i = 1
-    i += 1.0;
-    uv = update_uv(uv);
-    finalColor = update_finalColor(uv, uv0, i, finalColor);
+// i = 1
+i += 1.0;
+uv = update_uv(uv);
+finalColor = update_finalColor(uv, uv0, i, finalColor);
 
-    // i = 2
-    i += 1.0;
-    uv = update_uv(uv);
-    finalColor = update_finalColor(uv, uv0, i, finalColor);
+// i = 2
+i += 1.0;
+uv = update_uv(uv);
+finalColor = update_finalColor(uv, uv0, i, finalColor);
 
-    // i = 3
-    i += 1.0;
-    uv = update_uv(uv);
-    finalColor = update_finalColor(uv, uv0, i, finalColor);
+// i = 3
+i += 1.0;
+uv = update_uv(uv);
+finalColor = update_finalColor(uv, uv0, i, finalColor);
 
-    surfaceshader surface = standard_surface();
-    surface.base_color = color3(finalColor);
+surfaceshader surface = standard_surface();
+surface.base_color = color3{finalColor};
 
-    return surfacematerial(surface);
-}
+auto mat = surfacematerial(surface);

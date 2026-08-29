@@ -1,12 +1,9 @@
-material main()
-{
-    surfaceshader goldsrf = standard_surface();
-    goldsrf.base = 1.0;
-    goldsrf.base_color = color3(0.944, 0.776, 0.373);
-    goldsrf.specular = 1.0;
-    goldsrf.specular_color = color3(0.998, 0.981, 0.751);
-    goldsrf.specular_roughness = 0.02;
-    goldsrf.metalness = 1.0;
+surfaceshader surface = standard_surface();
+surface.base = 1;
+surface.base_color = color3{0.944, 0.776, 0.373};
+surface.specular = 1;
+surface.specular_color = color3{0.998, 0.981, 0.751};
+surface.specular_roughness = 0.02;
+surface.metalness = 1;
 
-    return surfacematerial(goldsrf);
-}
+material gold_material = surfacematerial(surface);
