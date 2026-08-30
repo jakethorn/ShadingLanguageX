@@ -55,7 +55,7 @@ namespace mxslc::runtime_utils
         size_t init_count = 0;
         while (init_count < args_.size())
         {
-            size_t last_init_count = init_count;
+            const size_t last_init_count = init_count;
 
             vector<FuncPtr> funcs = scope->get_functions(query_);
             if (funcs.empty())

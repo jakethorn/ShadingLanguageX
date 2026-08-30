@@ -38,7 +38,7 @@ namespace mxslc
             for (const mx::OutputPtr& output : outputs)
             {
                 if (not key.empty())
-                    key += "|";
+                    key += '|';
                 key += output->getType();
             }
 

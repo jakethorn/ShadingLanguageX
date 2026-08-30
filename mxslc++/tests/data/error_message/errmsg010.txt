@@ -1,4 +1,4 @@
-errmsg010.mxsl, line 11: No function could be found that matches the signature 'foo(b = 3)'
+errmsg010.mxsl, line 11: The function signature 'foo(b = 3)' is ambiguous
 Possible matches:
 float foo(integer a, float b)
 float foo(vector2 a, float b)

@@ -1,3 +1,3 @@
-funcquery002.mxsl, line 6: No function could be found that matches the signature 'foo(1)'
-Possible matches:
+funcquery002.mxsl, line 6: No function could be found with the signature 'foo(1)'
+Possible match:
 void foo(string s)
