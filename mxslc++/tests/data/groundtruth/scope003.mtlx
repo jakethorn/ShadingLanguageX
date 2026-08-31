@@ -4,13 +4,7 @@
     <input name="in1" type="float" value="6.9" />
     <input name="in2" type="float" value="5" />
   </multiply>
-  <nodedef name="ND_foo" node="foo">
-    <output name="out" type="float" />
-    <input name="x" type="float" value="0" />
-    <input name="y" type="float" value="0" />
-    <output name="nonlocal_out__f" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <divide name="var__0" type="float">
       <input name="in1" type="float" value="8" />
       <input name="in2" type="float" value="9" />

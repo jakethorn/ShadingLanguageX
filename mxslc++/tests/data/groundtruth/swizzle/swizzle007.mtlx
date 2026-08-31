@@ -1,20 +1,12 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_f1" node="f1">
-    <output name="out" type="vector2" />
-    <input name="nonlocal_in__v" type="vector4" />
-  </nodedef>
-  <nodegraph name="NG_f1" nodedef="ND_f1">
+  <nodegraph name="NG_f1">
     <f1_f3 name="var__0" type="vector2">
       <input name="nonlocal_in__v" type="vector4" interfacename="nonlocal_in__v" />
     </f1_f3>
     <output name="out" type="vector2" nodename="var__0" />
   </nodegraph>
-  <nodedef name="ND_f1_f3" node="f1_f3">
-    <output name="out" type="vector2" />
-    <input name="nonlocal_in__v" type="vector4" />
-  </nodedef>
-  <nodegraph name="NG_f1_f3" nodedef="ND_f1_f3">
+  <nodegraph name="NG_f1_f3">
     <separate4 name="var__0" type="multioutput">
       <input name="in" type="vector4" interfacename="nonlocal_in__v" />
     </separate4>

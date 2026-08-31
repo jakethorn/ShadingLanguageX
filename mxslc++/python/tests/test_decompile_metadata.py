@@ -117,8 +117,13 @@ INPUT_METADATA = [
 
 def test_nodedef_metadata_roundtrip():
     """NodeDef and input-level metadata survives a compile -> decompile roundtrip."""
+    # This test relies on nodedefs being emitted, so disable the single-use
+    # nodegraph optimization (single-use functions are otherwise written as bare
+    # nodegraphs and drop their nodedef-level metadata).
+    opts = mxslc.CompileOptions(single_use_as_nodegraph=False)
+
     # Compile MXSL -> MTLX
-    mtlx = mxslc.compile_string_to_string(MXSL_NODEDEF_WITH_METADATA)
+    mtlx = mxslc.compile_string_to_string(MXSL_NODEDEF_WITH_METADATA, opts)
     print("Compiled MTLX:\n", mtlx)
 
     # NodeDef-level metadata is written onto the nodedef element
@@ -154,7 +159,7 @@ def test_nodedef_metadata_roundtrip():
         assert structural not in mxsl, f"Structural attribute {structural!r} should not be emitted:\n{mxsl}"
 
     # Compile MXSL -> MTLX again and check that it matches the original MTLX
-    mtlx_roundtrip = mxslc.compile_string_to_string(mxsl)
+    mtlx_roundtrip = mxslc.compile_string_to_string(mxsl, opts)
     print("Recompiled MTLX:\n", mtlx_roundtrip)
     assert mtlx_roundtrip == mtlx, "Recompiled MTLX does not match original MTLX"
 

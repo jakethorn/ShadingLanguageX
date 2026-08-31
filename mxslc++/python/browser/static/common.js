@@ -239,6 +239,7 @@ function getCompileOptions() {
         reduce_graph: document.getElementById('opt-reduce-graph').checked,
         error_on_missing_globals: document.getElementById('opt-error-missing').checked,
         error_on_unused_globals: document.getElementById('opt-error-unused').checked,
+        single_use_as_nodegraph: document.getElementById('opt-single-use-nodegraph').checked,
     };
 }
 

@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_bar" node="bar">
-    <input name="nonlocal_in__x" type="float" />
-    <output name="nonlocal_out__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_bar" nodedef="ND_bar">
+  <nodegraph name="NG_bar">
     <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__x" />
       <input name="in2" type="float" value="1" />

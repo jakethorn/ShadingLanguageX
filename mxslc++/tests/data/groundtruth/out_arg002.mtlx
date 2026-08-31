@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo1" node="foo1">
-    <output name="outparam__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo1" nodedef="ND_foo1">
+  <nodegraph name="NG_foo1">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
@@ -11,10 +8,7 @@
     <output name="outparam__x" type="float" nodename="var__0" />
   </nodegraph>
   <foo1 name="var__0" type="float" />
-  <nodedef name="ND_foo2" node="foo2">
-    <output name="outparam__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+  <nodegraph name="NG_foo2">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />
@@ -22,10 +16,7 @@
     <output name="outparam__x" type="float" nodename="var__0" />
   </nodegraph>
   <foo2 name="var__1" type="float" />
-  <nodedef name="ND_foo3" node="foo3">
-    <output name="outparam__x" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo3" nodedef="ND_foo3">
+  <nodegraph name="NG_foo3">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="7" />

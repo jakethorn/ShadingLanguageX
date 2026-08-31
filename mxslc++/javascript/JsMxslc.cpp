@@ -111,7 +111,8 @@ EMSCRIPTEN_BINDINGS(mxslc)
         .property("version", &mxslc::CompileOptions::version)
         .property("reduceGraph", &mxslc::CompileOptions::reduce_graph)
         .property("errorOnMissingGlobals", &mxslc::CompileOptions::error_on_missing_globals)
-        .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals);
+        .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals)
+        .property("singleUseAsNodegraph", &mxslc::CompileOptions::single_use_as_nodegraph);
 
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);

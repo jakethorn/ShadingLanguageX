@@ -12,13 +12,7 @@
     </max>
     <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <nodedef name="ND_Sphere_extent" node="Sphere_extent">
-    <output name="out" type="float" />
-    <input name="p__x" type="float" value="0" />
-    <input name="p__y" type="float" value="0" />
-    <input name="this__radius" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Sphere_extent" nodedef="ND_Sphere_extent">
+  <nodegraph name="NG_Sphere_extent">
     <Point_extent name="pe1" type="float">
       <input name="this__x" type="float" interfacename="p__x" />
       <input name="this__y" type="float" interfacename="p__y" />

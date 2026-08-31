@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <output name="nonlocal_out__y" type="vector2" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <output name="nonlocal_out__y" type="vector2" value="3, 3" />
   </nodegraph>
   <constant name="var__0" type="vector2">

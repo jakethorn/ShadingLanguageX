@@ -25,6 +25,7 @@ namespace mxslc::runtime
         scope_->set_graph(serializer_.document(), nullptr);
         serializer_.set_version(opts_.version);
         serializer_.set_reduce_graph(opts_.reduce_graph);
+        serializer_.set_single_use_as_nodegraph(opts_.single_use_as_nodegraph);
     }
 
     Runtime& Runtime::create(CompileOptions opts)

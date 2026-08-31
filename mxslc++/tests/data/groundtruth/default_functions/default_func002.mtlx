@@ -8,12 +8,7 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <output name="out" type="integer" value="0" />
   </nodegraph>
-  <nodedef name="ND_foo2" node="foo">
-    <input name="x" type="integer" value="0" />
-    <input name="f" type="float" value="1.27" />
-    <output name="out" type="integer" />
-  </nodedef>
-  <nodegraph name="NG_foo2" nodedef="ND_foo2">
+  <nodegraph name="NG_foo2">
     <output name="out" type="integer" value="0" />
   </nodegraph>
   <foo name="var__0" type="integer">

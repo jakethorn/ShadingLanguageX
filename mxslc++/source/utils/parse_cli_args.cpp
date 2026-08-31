@@ -53,6 +53,7 @@ options:
   --missing-globals-ok           Allow `global` variables to be missing
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
+  --no-single-use-nodegraph      Always write nodedefs, even for single-use functions
 )";
 
             std::cout << help_message;
@@ -270,6 +271,11 @@ options:
             clargs.options.reduce_graph = false;
         }
 
+        void parse_no_single_use_nodegraph(Span<string>&, CommandLineArgs& clargs)
+        {
+            clargs.options.single_use_as_nodegraph = false;
+        }
+
         void parse_missing_globals_ok(Span<string>&, CommandLineArgs& clargs)
         {
             clargs.options.error_on_missing_globals = false;
@@ -306,7 +312,8 @@ options:
                 {"--debug", parse_debug},
                 {"--missing-globals-ok", parse_missing_globals_ok},
                 {"--unused-globals-ok", parse_unused_globals_ok},
-                {"--no-reduce-graph", parse_no_reduce_graph}
+                {"--no-reduce-graph", parse_no_reduce_graph},
+                {"--no-single-use-nodegraph", parse_no_single_use_nodegraph}
             };
 
             if (contains(parse_map, arg0))

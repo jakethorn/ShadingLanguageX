@@ -37,13 +37,7 @@
     </add>
     <output name="out" type="float" nodename="var__1" />
   </nodegraph>
-  <nodedef name="ND_Sphere_extent2d" node="Sphere_extent2d">
-    <output name="out" type="vector2" />
-    <input name="p__x" type="float" value="0" />
-    <input name="p__y" type="float" value="0" />
-    <input name="this__radius" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Sphere_extent2d" nodedef="ND_Sphere_extent2d">
+  <nodegraph name="NG_Sphere_extent2d">
     <Sphere_extent name="var__0" type="float">
       <input name="p__x" type="float" interfacename="p__x" />
       <input name="p__y" type="float" interfacename="p__y" />

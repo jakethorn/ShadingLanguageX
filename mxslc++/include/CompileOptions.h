@@ -18,6 +18,7 @@ namespace mxslc
 
         string version{DEFAULT_MTLX_VERSION};
         bool reduce_graph{true};
+        bool single_use_as_nodegraph{true};
 
         vector<fs::path> includes;
         vector<fs::path> libraries;

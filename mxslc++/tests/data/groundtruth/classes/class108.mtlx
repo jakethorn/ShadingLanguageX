@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_Point_extent" node="Point_extent">
-    <output name="out" type="float" />
-    <input name="offset" type="float" value="0" />
-    <input name="this__x" type="float" />
-    <input name="this__y" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Point_extent" nodedef="ND_Point_extent">
+  <nodegraph name="NG_Point_extent">
     <Point_extent_max_dim name="var__0" type="float">
       <input name="nonlocal_in__x" type="float" interfacename="this__x" />
       <input name="nonlocal_in__y" type="float" interfacename="this__y" />
@@ -17,25 +11,14 @@
     </subtract>
     <output name="out" type="float" nodename="var__1" />
   </nodegraph>
-  <nodedef name="ND_Point_extent_max_dim" node="Point_extent_max_dim">
-    <output name="out" type="float" />
-    <input name="nonlocal_in__x" type="float" />
-    <input name="nonlocal_in__y" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Point_extent_max_dim" nodedef="ND_Point_extent_max_dim">
+  <nodegraph name="NG_Point_extent_max_dim">
     <max name="var__0" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__x" />
       <input name="in2" type="float" interfacename="nonlocal_in__y" />
     </max>
     <output name="out" type="float" nodename="var__0" />
   </nodegraph>
-  <nodedef name="ND_Sphere_extent" node="Sphere_extent">
-    <output name="out" type="float" />
-    <input name="p__x" type="float" value="0" />
-    <input name="p__y" type="float" value="0" />
-    <input name="this__radius" type="float" />
-  </nodedef>
-  <nodegraph name="NG_Sphere_extent" nodedef="ND_Sphere_extent">
+  <nodegraph name="NG_Sphere_extent">
     <Point_extent name="var__0" type="float">
       <input name="offset" type="float" interfacename="this__radius" />
       <input name="this__x" type="float" interfacename="p__x" />

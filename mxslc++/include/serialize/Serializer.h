@@ -30,6 +30,16 @@ namespace mxslc::serialize
 
         void set_version(const string& version);
         void set_reduce_graph(bool value);
+        void set_single_use_as_nodegraph(bool value);
+
+        // Called once all code has been serialized. Uses the per-function usage
+        // count collected during serialization to decide whether each function is
+        // written as a bare nodegraph (single-use) or as a nodedef (reused), since
+        // a nodegraph cannot be referenced and reused more than once in MaterialX.
+        void finalize();
+
+        // Records a use of a function in the code being serialized.
+        void count_use(const FuncPtr& func) const;
 
         void begin_comptime(bool is_comptime) const;
         bool end_comptime() const;
@@ -68,6 +78,10 @@ namespace mxslc::serialize
 
         mx::DocumentPtr doc_;
         bool reduce_graph_{true};
+
+        bool single_use_as_nodegraph_{true};
+        mutable unordered_map<const Function*, size_t> usage_;
+        mutable vector<FuncPtr> deferred_;
 
         mutable std::stack<bool> comptime_scope_{{false}};
         mutable bool comptime_violated_{false};

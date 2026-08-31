@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo" node="foo">
-    <input name="x" type="float" value="0" />
-    <output name="outparam__y" type="float" />
-  </nodedef>
-  <nodegraph name="NG_foo" nodedef="ND_foo">
+  <nodegraph name="NG_foo">
     <multiply name="var__0" type="float">
       <input name="in1" type="float" interfacename="x" />
       <input name="in2" type="float" value="2" />

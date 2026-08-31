@@ -1,10 +1,5 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_color3_test" node="color3_test">
-    <output name="out" type="color3" />
-    <input name="color1" type="color3" />
-    <input name="color2" type="color3" value="1e-05, 2, 2" />
-  </nodedef>
   <invert name="var__0" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
@@ -22,7 +17,7 @@
     <input name="in2" type="float" nodename="var__1" />
     <input name="in3" type="float" nodename="var__2" />
   </combine3>
-  <nodegraph name="NG_color3_test" nodedef="ND_color3_test">
+  <nodegraph name="NG_color3_test">
     <invert name="var__0" type="float">
       <input name="in" type="float" value="5" />
       <input name="amount" type="float" value="0" />
@@ -80,11 +75,6 @@
     <input name="color1" type="color3" nodename="var__5" />
     <input name="color2" type="color3" value="2e-05, 1, 1" />
   </color3_test>
-  <nodedef name="ND_color4_test" node="color4_test">
-    <output name="out" type="color4" />
-    <input name="color1" type="color4" />
-    <input name="color2" type="color4" value="1e-05, 2, 2, 1" />
-  </nodedef>
   <invert name="var__6" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
@@ -107,7 +97,7 @@
     <input name="in3" type="float" nodename="var__8" />
     <input name="in4" type="float" nodename="var__9" />
   </combine4>
-  <nodegraph name="NG_color4_test" nodedef="ND_color4_test">
+  <nodegraph name="NG_color4_test">
     <invert name="var__0" type="float">
       <input name="in" type="float" value="5" />
       <input name="amount" type="float" value="0" />
@@ -168,11 +158,6 @@
     <input name="color1" type="color4" nodename="var__13" />
     <input name="color2" type="color4" nodename="var__15" />
   </color4_test>
-  <nodedef name="ND_vec3_test" node="vec3_test">
-    <output name="out" type="vector3" />
-    <input name="color1" type="vector3" />
-    <input name="color2" type="vector3" value="1e-05, 2, 2" />
-  </nodedef>
   <invert name="var__16" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
@@ -190,7 +175,7 @@
     <input name="in2" type="float" nodename="var__17" />
     <input name="in3" type="float" nodename="var__18" />
   </combine3>
-  <nodegraph name="NG_vec3_test" nodedef="ND_vec3_test">
+  <nodegraph name="NG_vec3_test">
     <invert name="var__0" type="float">
       <input name="in" type="float" value="5" />
       <input name="amount" type="float" value="0" />
@@ -231,16 +216,11 @@
     <input name="color1" type="vector3" nodename="var__21" />
     <input name="color2" type="vector3" value="2e-05, 1, 1" />
   </vec3_test>
-  <nodedef name="ND_float_test" node="float_test">
-    <output name="out" type="float" />
-    <input name="color1" type="float" />
-    <input name="color2" type="float" value="1e-05" />
-  </nodedef>
   <invert name="var__22" type="float">
     <input name="in" type="float" value="1" />
     <input name="amount" type="float" value="0" />
   </invert>
-  <nodegraph name="NG_float_test" nodedef="ND_float_test">
+  <nodegraph name="NG_float_test">
     <add name="var__0" type="float">
       <input name="in1" type="float" interfacename="color1" />
       <input name="in2" type="float" interfacename="color2" />
@@ -259,11 +239,6 @@
     <input name="color1" type="float" nodename="var__23" />
     <input name="color2" type="float" value="2e-05" />
   </float_test>
-  <nodedef name="ND_int_test" node="int_test">
-    <output name="out" type="integer" />
-    <input name="color1" type="integer" />
-    <input name="color2" type="integer" />
-  </nodedef>
   <subtract name="var__24" type="integer">
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="1" />
@@ -272,7 +247,7 @@
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="3" />
   </subtract>
-  <nodegraph name="NG_int_test" nodedef="ND_int_test">
+  <nodegraph name="NG_int_test">
     <subtract name="v" type="integer">
       <input name="in1" type="integer" value="0" />
       <input name="in2" type="integer" value="3" />

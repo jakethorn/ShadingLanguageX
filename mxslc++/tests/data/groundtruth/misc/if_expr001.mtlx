@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_foo_boolean" node="foo_boolean">
-    <output name="out" type="integer" />
-    <input name="v" type="boolean" value="false" />
-  </nodedef>
-  <nodegraph name="NG_foo_boolean" nodedef="ND_foo_boolean">
+  <nodegraph name="NG_foo_boolean">
     <convert name="var__0" type="integer">
       <input name="in" type="boolean" interfacename="v" />
     </convert>
@@ -20,11 +16,7 @@
     </round>
     <output name="out" type="integer" nodename="var__0" />
   </nodegraph>
-  <nodedef name="ND_bar" node="bar">
-    <output name="out" type="integer" />
-    <input name="v" type="boolean" value="false" />
-  </nodedef>
-  <nodegraph name="NG_bar" nodedef="ND_bar">
+  <nodegraph name="NG_bar">
     <convert name="var__0" type="integer">
       <input name="in" type="boolean" interfacename="v" />
     </convert>

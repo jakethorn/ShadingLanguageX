@@ -7,10 +7,7 @@
     <input name="specular_roughness" type="float" output="nonlocal_out__surface__specular_roughness" nodename="var__1" />
   </standard_surface>
   <randomcolor name="var__0" type="color3" />
-  <nodedef name="ND_set_surface_properties" node="set_surface_properties">
-    <output name="nonlocal_out__surface__specular_roughness" type="float" />
-  </nodedef>
-  <nodegraph name="NG_set_surface_properties" nodedef="ND_set_surface_properties">
+  <nodegraph name="NG_set_surface_properties">
     <output name="nonlocal_out__surface__specular_roughness" type="float" value="1" />
   </nodegraph>
   <set_surface_properties name="var__1" type="float" />

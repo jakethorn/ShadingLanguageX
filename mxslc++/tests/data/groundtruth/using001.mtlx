@@ -1,14 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <nodedef name="ND_atob" node="atob">
-    <output name="out__x" type="float" />
-    <output name="out__y" type="float" />
-    <input name="a__x" type="float" value="0" />
-    <input name="a__y" type="float" value="0" />
-    <input name="b__x" type="float" value="0" />
-    <input name="b__y" type="float" value="0" />
-  </nodedef>
-  <nodegraph name="NG_atob" nodedef="ND_atob">
+  <nodegraph name="NG_atob">
     <subtract name="x" type="float">
       <input name="in1" type="float" interfacename="b__x" />
       <input name="in2" type="float" interfacename="a__x" />
