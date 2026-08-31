@@ -24,9 +24,6 @@ namespace mxslc::expressions
         if (field_index < 0)
             field_index = static_cast<int>(field_count) + field_index;
 
-        if (field_index < 0 or field_index >= field_count)
-            throw CompileError{"Index out of bounds"};
-
         field_ = field_index;
     }
 

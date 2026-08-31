@@ -1,1 +1,1 @@
-errmsg013.mxsl, line 2: Variable or parameterless function not defined or ambiguous: y
+errmsg013.mxsl, line 2: Variable or parameterless function not defined: y

@@ -14,7 +14,7 @@ namespace mxslc::runtime
     class SwizzleVariable final : public Variable
     {
     public:
-        explicit SwizzleVariable(VarPtr value, string swizzle);
+        explicit SwizzleVariable(ExprPtr value_expr, string swizzle);
 
         bool is_temporary() const override { return false; }
         bool is_local() override { return true; }
@@ -25,7 +25,7 @@ namespace mxslc::runtime
         void set_node_name(const string& name) const override;
 
     private:
-        VarPtr value_;
+        ExprPtr value_expr_;
         string swizzle_;
 
         mutable ValuePtr swizzle_value_;

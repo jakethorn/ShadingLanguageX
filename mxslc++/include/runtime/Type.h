@@ -10,6 +10,11 @@
 #include "runtime/Field.h"
 #include "runtime/utils/TypeName.h"
 
+namespace mxslc::type_utils
+{
+    class TypeAPI;
+}
+
 namespace mxslc::runtime
 {
     using runtime_utils::TypeName;
@@ -17,6 +22,7 @@ namespace mxslc::runtime
 
     class Type : public std::enable_shared_from_this<Type>, public Monomorphizable<TypePtr>, public Stringable
     {
+        friend class type_utils::TypeAPI;
         friend class Scope;
 
     public:

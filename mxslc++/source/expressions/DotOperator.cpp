@@ -34,13 +34,13 @@ namespace mxslc::expressions
     {
         if (value_expr_->type()->is_primitive())
         {
-            VarPtr value = value_expr_->evaluate();
-            if (swizzle_utils::is_valid_swizzle(value->type(), token_.lexeme()))
+            if (swizzle_utils::is_valid_swizzle(value_expr_->type(), token_.lexeme()))
             {
-                accessor_ = create_accessor<SwizzleAccessor>(std::move(value), token_.lexeme());
+                accessor_ = create_accessor<SwizzleAccessor>(value_expr_, token_.lexeme());
             }
             else
             {
+                VarPtr value = value_expr_->evaluate();
                 accessor_ = create_accessor<PortAccessor>(std::move(value), token_.lexeme());
             }
         }

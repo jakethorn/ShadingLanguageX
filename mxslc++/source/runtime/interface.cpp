@@ -15,7 +15,7 @@ namespace mxslc::runtime
 {
     using namespace type_utils;
 
-    class VariableFactory
+    class VariableAPI
     {
     public:
         static void copy_children(const VarPtr& var, const vector<VarPtr>& children)
@@ -35,7 +35,7 @@ namespace mxslc::runtime
             type = replace_auto(type, type_of(children));
 
         VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-        VariableFactory::copy_children(var, children);
+        VariableAPI::copy_children(var, children);
         return var;
     }
 
@@ -55,7 +55,7 @@ namespace mxslc::runtime
             type = replace_auto(type, value->type());
 
         VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
-        VariableFactory::copy_value(var, std::move(value));
+        VariableAPI::copy_value(var, std::move(value));
         return var;
     }
 

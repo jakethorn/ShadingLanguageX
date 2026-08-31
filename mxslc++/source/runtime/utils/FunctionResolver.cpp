@@ -11,6 +11,7 @@
 #include "runtime/Function.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
+#include "utils/string_utils.h"
 
 namespace mxslc::runtime_utils
 {
@@ -111,6 +112,14 @@ namespace mxslc::runtime_utils
         return init_arguments(vector{func});
     }
 
+    namespace
+    {
+        bool is_function_resolution_error(const string& error_message)
+        {
+            return not string_utils::starts_with(error_message, "Cannot assign");
+        }
+    }
+
     size_t FunctionResolver::init_arguments(const vector<FuncPtr>& funcs) const
     {
         size_t initialized_arg_count = 0;
@@ -119,15 +128,11 @@ namespace mxslc::runtime_utils
         {
             vector<TypePtr> target_types = get_parameter_types(funcs, arg);
 
-            try
-            {
-                if (arg.is_initialized() or arg.try_init(target_types))
-                    initialized_arg_count++;
-            }
-            catch (const AmbiguousFunctionError& e)
-            {
-                underlying_errors_.emplace_back(e.message());
-            }
+            if (arg.is_initialized() or arg.try_init(target_types))
+                initialized_arg_count++;
+
+            if (arg.has_error() and is_function_resolution_error(arg.error_message()))
+                underlying_errors_.emplace_back(arg.error_message());
         }
 
         return initialized_arg_count;

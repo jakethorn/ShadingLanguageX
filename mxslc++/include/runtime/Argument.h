@@ -56,6 +56,7 @@ namespace mxslc::runtime
 
         void validate(const Parameter& param) const;
 
+        bool has_error() const;
         const string& error_message() const;
 
         string to_string() const override;

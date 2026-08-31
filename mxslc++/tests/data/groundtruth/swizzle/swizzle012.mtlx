@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <creatematrix name="m" type="matrix33" />
-  <extract name="var__0" type="vector3">
+  <constant name="var__0" type="vector2">
+    <input name="value" type="vector2" nodename="var__3" />
+  </constant>
+  <extract name="var__1" type="vector3">
     <input name="in" type="matrix33" nodename="m" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <constant name="var__1" type="vector2">
-    <input name="value" type="vector2" nodename="var__3" />
-  </constant>
   <separate3 name="var__2" type="multioutput">
-    <input name="in" type="vector3" nodename="var__0" />
+    <input name="in" type="vector3" nodename="var__1" />
   </separate3>
   <combine2 name="var__3" type="vector2">
     <input name="in1" type="float" output="outx" nodename="var__2" />

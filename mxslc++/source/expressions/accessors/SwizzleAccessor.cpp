@@ -9,9 +9,10 @@
 
 namespace mxslc::expressions
 {
-    SwizzleAccessor::SwizzleAccessor(VarPtr lhs, string swizzle) : swizzle_(swizzle)
+    SwizzleAccessor::SwizzleAccessor(ExprPtr value_expr, string swizzle)
+        : value_expr_{std::move(value_expr)}, swizzle_{std::move(swizzle)}
     {
-        swizzle_var_ = std::make_shared<SwizzleVariable>(std::move(lhs), std::move(swizzle));
+
     }
 
     TypePtr SwizzleAccessor::type() const
@@ -21,7 +22,6 @@ namespace mxslc::expressions
 
     VarPtr SwizzleAccessor::evaluate() const
     {
-        VarPtr value = value_expr_->evaluate();
-        return std::make_shared<SwizzleVariable>(value, swizzle_);
+        return std::make_shared<SwizzleVariable>(value_expr_, swizzle_);
     }
 }

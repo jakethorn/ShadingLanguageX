@@ -116,13 +116,13 @@ namespace mxslc::statements
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         string result = mods_string;
-        result += type_->to_string() + " " + name_;
+        result += type_->to_string() + ' ' + name_;
         if (expr_)
             result += " = " + expr_->to_string();
-        result += ";";
+        result += ';';
 
         return result;
     }

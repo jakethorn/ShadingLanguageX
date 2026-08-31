@@ -115,6 +115,11 @@ namespace mxslc::runtime
             throw CompileError{"Variable definition expressions can only be passed to out parameter"};
     }
 
+    bool Argument::has_error() const
+    {
+        return expr_->has_error();
+    }
+
     const string& Argument::error_message() const
     {
         return expr_->error_message();
@@ -124,7 +129,7 @@ namespace mxslc::runtime
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         if (has_name())
             return mods_string + name_ + " = " + expr_->to_string();

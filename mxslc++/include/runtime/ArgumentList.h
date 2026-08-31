@@ -23,6 +23,7 @@ namespace mxslc::runtime
         ArgumentList(const vector<ExprPtr>& exprs);
         ArgumentList(const vector<VarPtr>& values);
         ArgumentList(const vector<Primitive>& values);
+        ArgumentList(const ExprPtr& expr);
         ArgumentList(const VarPtr& value);
         ArgumentList(const ValuePtr& value);
 
