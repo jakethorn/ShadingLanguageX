@@ -24,6 +24,11 @@ namespace mxslc::expressions
         return create_expression<CompoundAssignment>(std::move(lhs_expr), token_, std::move(rhs_expr));
     }
 
+    void CompoundAssignment::init_subexpressions(const vector<TypePtr>& types)
+    {
+        lhs_expr_->init();
+    }
+
     void CompoundAssignment::init_impl(const vector<TypePtr>& types)
     {
         static const unordered_map<TokenType, string> OP_NAMES {
@@ -39,7 +44,7 @@ namespace mxslc::expressions
 
         string dunder_name = OP_NAMES.at(token_.type());
         func_call_ = create_expression<FunctionCall>(std::move(dunder_name), ArgumentList{lhs_expr_, rhs_expr_});
-        func_call_->init(types);
+        func_call_->init(lhs_expr_->type());
     }
 
     TypePtr CompoundAssignment::type_impl() const
