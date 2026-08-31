@@ -14,7 +14,7 @@ namespace mxslc::expressions
     class DotOperator final : public Expression
     {
     public:
-        DotOperator(ExprPtr expr, Token property);
+        DotOperator(ExprPtr value_expr, Token property);
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
@@ -27,7 +27,7 @@ namespace mxslc::expressions
         VarPtr evaluate_impl() const override;
 
     private:
-        ExprPtr expr_;
+        ExprPtr value_expr_;
         AccessorPtr accessor_;
     };
 }

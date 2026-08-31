@@ -96,6 +96,7 @@ namespace mxslc::runtime
 
         FunctionQuery(const string& name);
         FunctionQuery(const string& name, const TypePtr& template_type);
+        FunctionQuery(const string& name, const bool& is_parameterless);
 
         FunctionQuery(const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless);
         FunctionQuery(const vector<TypePtr>& return_types, const string& name, const TypePtr& template_type, const ArgumentList& args, const bool& is_parameterless);

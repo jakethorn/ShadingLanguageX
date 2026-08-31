@@ -16,6 +16,18 @@ namespace mxslc::runtime_utils
 {
     using container_utils::extend;
 
+    FuncPtr resolve_function(FunctionQuery query)
+    {
+        ArgumentList args;
+        return resolve_function(std::move(query), args);
+    }
+
+    FuncPtr resolve_function(FunctionQuery query, ArgumentList& args)
+    {
+        const TypePtr class_type = query.class_type ? *query.class_type : nullptr;
+        return FunctionResolver{std::move(query), class_type, args}.resolve();
+    }
+
     FuncPtr resolve_function(const vector<TypePtr>& types, const string& name, const TypePtr& template_type, ArgumentList& args, const bool& is_argumentless)
     {
         const FunctionQuery query{types, name, template_type, args, is_argumentless};

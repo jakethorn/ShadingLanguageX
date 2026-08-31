@@ -4,16 +4,13 @@
 
 #include "expressions/accessors/ChannelAccessor.h"
 
-#include "expressions/Expression.h"
 #include "runtime/variables/ChannelVariable.h"
 
 namespace mxslc::expressions
 {
-    ChannelAccessor::ChannelAccessor(const ExprPtr& value_expr, const ExprPtr& index_expr)
+    ChannelAccessor::ChannelAccessor(ExprPtr value_expr, ExprPtr index_expr)
     {
-        VarPtr value = value_expr->evaluate();
-        VarPtr index = index_expr->evaluate();
-        channel_var_ = std::make_shared<ChannelVariable>(std::move(value), std::move(index));
+        channel_var_ = std::make_shared<ChannelVariable>(std::move(value_expr), std::move(index_expr));
     }
 
     TypePtr ChannelAccessor::type() const

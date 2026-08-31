@@ -18,6 +18,7 @@ namespace mxslc::expressions
         VarPtr evaluate() const override;
 
     private:
+        string swizzle_;
         VarPtr swizzle_var_;
     };
 }

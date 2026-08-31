@@ -12,8 +12,8 @@
 
 namespace mxslc::runtime
 {
-    ChannelVariable::ChannelVariable(VarPtr value, VarPtr index)
-        : Variable{TokenType::Mutable, get_type(value, index)}, value_{std::move(value)}, index_{std::move(index)}
+    ChannelVariable::ChannelVariable(ExprPtr value_expr, ExprPtr index_expr)
+        : Variable{TokenType::Mutable, get_type(value_expr, index_expr)}, value_expr_{std::move(value_expr)}, index_expr_{std::move(index_expr)}
     {
 
     }
@@ -21,13 +21,13 @@ namespace mxslc::runtime
     ValuePtr ChannelVariable::value_impl() const
     {
         if (channel_value_ == nullptr)
-            channel_value_ = runtime_utils::invoke_function("__get__", ArgumentList{value_, index_})->value();
+            channel_value_ = runtime_utils::invoke_function("__get__", ArgumentList{value_expr_, index_expr_})->value();
         return channel_value_;
     }
 
     void ChannelVariable::copy_value_impl(ValuePtr value)
     {
-        runtime_utils::invoke_function("__set__", ArgumentList{value_, index_, as_expression(std::move(value))});
+        runtime_utils::invoke_function("__set__", ArgumentList{value_expr_, index_expr_, as_expression(std::move(value))});
     }
 
     void ChannelVariable::set_node_name(const string& name) const
@@ -35,9 +35,9 @@ namespace mxslc::runtime
 
     }
 
-    TypePtr ChannelVariable::get_type(const VarPtr& value, const VarPtr& index)
+    TypePtr ChannelVariable::get_type(const ExprPtr& value_expr, const ExprPtr& index_expr)
     {
-        const FunctionCallPtr getter = create_expression<FunctionCall>("__get__", ArgumentList{value, index});
+        const FunctionCallPtr getter = create_expression<FunctionCall>("__get__", ArgumentList{value_expr, index_expr});
         getter->init();
         return getter->type();
     }

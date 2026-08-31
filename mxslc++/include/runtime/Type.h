@@ -95,7 +95,8 @@ namespace mxslc::runtime
         static TypePtr of() { return resolve(TypeName::of<T>()); }
         static TypePtr of(const mx::NodeGraphPtr& node_graph);
         static TypePtr of(const mx::TypedElementPtr& value);
-        static TypePtr tuple(TypePtr template_type);
+        static TypePtr tuple_of(TypePtr template_type);
+        static vector<TypePtr> tuples_of(const vector<TypePtr>& template_types);
         static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
 
     private:
