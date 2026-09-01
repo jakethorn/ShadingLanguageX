@@ -1,47 +1,43 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <invert name="var__0" type="float">
-    <input name="in" type="float" value="5" />
-    <input name="amount" type="float" value="0" />
-  </invert>
   <absval name="a" type="float">
-    <input name="in" type="float" nodename="var__0" />
+    <input name="in" type="float" value="-5" />
   </absval>
   <or name="b" type="boolean">
     <input name="in1" type="boolean" value="true" />
     <input name="in2" type="boolean" value="false" />
   </or>
-  <absval name="var__1" type="vector3">
+  <absval name="var__0" type="vector3">
     <input name="in" type="vector3" value="1, 2, 3" />
   </absval>
-  <absval name="var__2" type="vector3">
+  <absval name="var__1" type="vector3">
     <input name="in" type="vector3" value="4, 5, 6" />
   </absval>
   <add name="c" type="vector3">
-    <input name="in1" type="vector3" nodename="var__1" />
-    <input name="in2" type="vector3" nodename="var__2" />
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="vector3" nodename="var__1" />
   </add>
-  <randomfloat name="var__3" type="float" />
-  <absval name="var__4" type="float">
-    <input name="in" type="float" nodename="var__3" />
+  <randomfloat name="var__2" type="float" />
+  <absval name="var__3" type="float">
+    <input name="in" type="float" nodename="var__2" />
   </absval>
-  <or name="var__5" type="boolean">
+  <or name="var__4" type="boolean">
     <input name="in1" type="boolean" value="true" />
     <input name="in2" type="boolean" value="false" />
   </or>
-  <convert name="var__6" type="float">
-    <input name="in" type="boolean" nodename="var__5" />
+  <convert name="var__5" type="float">
+    <input name="in" type="boolean" nodename="var__4" />
   </convert>
-  <add name="var__7" type="float">
-    <input name="in1" type="float" nodename="var__4" />
-    <input name="in2" type="float" nodename="var__6" />
+  <add name="var__6" type="float">
+    <input name="in1" type="float" nodename="var__3" />
+    <input name="in2" type="float" nodename="var__5" />
   </add>
-  <randomfloat name="var__8" type="float" />
-  <absval name="var__9" type="float">
-    <input name="in" type="float" nodename="var__8" />
+  <randomfloat name="var__7" type="float" />
+  <absval name="var__8" type="float">
+    <input name="in" type="float" nodename="var__7" />
   </absval>
   <add name="d" type="float">
-    <input name="in1" type="float" nodename="var__7" />
-    <input name="in2" type="float" nodename="var__9" />
+    <input name="in1" type="float" nodename="var__6" />
+    <input name="in2" type="float" nodename="var__8" />
   </add>
 </materialx>

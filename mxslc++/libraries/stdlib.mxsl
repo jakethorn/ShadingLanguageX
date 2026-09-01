@@ -367,17 +367,17 @@ inline boolean __pow__(boolean in1, boolean in2)
 // unary operators
 //
 
-inline T __pos__<integer, float, vector2, vector3, vector4, color3, color4>(T in1)
+comptime T __pos__<integer, float, vector2, vector3, vector4, color3, color4>(T in1)
 {
     return in1;
 }
 
-inline T __neg__<float, vector2, vector3, vector4, color3, color4>(T in1)
+comptime T __neg__<float, vector2, vector3, vector4, color3, color4>(T in1)
 {
     return invert(in1, 0);
 }
 
-inline integer __neg__(integer in1)
+comptime integer __neg__(integer in1)
 {
     return subtract(0, in1);
 }
