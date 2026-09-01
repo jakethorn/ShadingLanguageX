@@ -7,6 +7,7 @@
 #include "expressions/interface.h"
 #include "runtime/FunctionQuery.h"
 #include "runtime/Scope.h"
+#include "runtime/utils/FunctionResolver.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/invoke.h"
 
@@ -23,10 +24,20 @@ namespace mxslc::expressions
             var_ = scope().get_variable(name_);
 
         if (scope().has_function({types, name_, /*is_parameterless*/true}))
+        {
+            if (var_)
+                throw CompileError{"Identifier '" + name_ + "' is defined as both a variable and a parameterless function"};
+
             var_ = runtime_utils::invoke_function(types, name_);
+        }
 
         if (var_ == nullptr)
-            throw CompileError{"Variable or parameterless function not defined or ambiguous: " + name_};
+        {
+            if (scope().has_function({name_, /*is_parameterless*/true}))
+                runtime_utils::resolve_function({types, name_, /*is_parameterless*/true});
+            else
+                throw CompileError{"Variable or parameterless function not defined: " + name_};
+        }
     }
 
     TypePtr Identifier::type_impl() const

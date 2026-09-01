@@ -1,4 +1,4 @@
-funcquery004.mxsl, line 16: No function could be found that matches the signature 'foo(1)'
+funcquery004.mxsl, line 16: The function signature 'foo(1)' is ambiguous
 Possible matches:
 void foo(string s)
 void foo(integer i, string s = "")

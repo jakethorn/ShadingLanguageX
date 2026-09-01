@@ -28,7 +28,9 @@ namespace mxslc::expressions
 
     void IndexingOperator::init_subexpressions(const vector<TypePtr>& types)
     {
-        value_expr_->init();
+        if (not value_expr_->try_init(Type::tuples_of(types)))
+            value_expr_->init();
+
         index_expr_->init(Type::Int);
     }
 
@@ -40,9 +42,8 @@ namespace mxslc::expressions
         }
         else
         {
-            VarPtr var = value_expr_->evaluate();
             const int index = index_expr_->evaluate()->compile_time_value<int>();
-            accessor_ = create_accessor<FieldAccessor>(std::move(var), index);
+            accessor_ = create_accessor<FieldAccessor>(value_expr_, index);
         }
     }
 

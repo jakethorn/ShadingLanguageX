@@ -23,6 +23,12 @@ namespace mxslc::runtime
 
     }
 
+    FunctionQuery::FunctionQuery(const string& name, const bool& is_parameterless)
+        : name{&name}, is_parameterless{&is_parameterless}
+    {
+
+    }
+
     FunctionQuery::FunctionQuery(const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless)
         : return_types{&return_types}, name{&name}, is_parameterless{&is_parameterless}
     {
@@ -35,7 +41,7 @@ namespace mxslc::runtime
 
     }
 
-    FunctionQuery::FunctionQuery(const TypePtr& class_type,const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless)
+    FunctionQuery::FunctionQuery(const TypePtr& class_type, const vector<TypePtr>& return_types, const string& name, const bool& is_parameterless)
         : class_type{&class_type}, return_types{&return_types}, name{&name}, is_parameterless{&is_parameterless}
     {
 

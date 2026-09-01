@@ -35,6 +35,11 @@ namespace mxslc::runtime
             args_.emplace_back(values[i], i);
     }
 
+    ArgumentList::ArgumentList(const ExprPtr& expr)
+    {
+        args_.emplace_back(expr, 0);
+    }
+
     ArgumentList::ArgumentList(const VarPtr& value)
     {
         args_.emplace_back(value, 0);

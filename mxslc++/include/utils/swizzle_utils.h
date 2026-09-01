@@ -9,7 +9,8 @@
 
 namespace mxslc::swizzle_utils
 {
-    VarPtr swizzle(const VarPtr& value, const string& swizzle);
+    VarPtr evaluate_swizzle(const ExprPtr& value_expr, const string& swizzle);
+    VarPtr evaluate_swizzle(const VarPtr& value, const string& swizzle);
 
     TypePtr get_swizzle_type(const string& swizzle);
     int get_channel_index(char channel);

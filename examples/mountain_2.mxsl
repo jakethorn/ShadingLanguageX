@@ -1,0 +1,21 @@
+vec2 uv = position().xy;
+
+mutable float scale = 2;
+mutable float f = 0;
+
+for (int i from 0 to 3)
+{
+    float scale2 = scale * scale;
+    f += noise2d<float>(texcoord = uv / scale2) * scale2;
+    scale *= 2;
+}
+
+surfaceshader surf = standard_surface(
+    base_color = color3{1},
+    metalness = 0.0,
+    specular_roughness = 1.0
+);
+
+displacementshader disp = displacement(f/64);
+
+auto mountain_material = surfacematerial(surf, displacementshader = disp);

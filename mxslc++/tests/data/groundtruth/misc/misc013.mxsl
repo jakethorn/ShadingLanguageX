@@ -1,0 +1,2 @@
+mutable vec3 v = vec3{1};
+v += 1;

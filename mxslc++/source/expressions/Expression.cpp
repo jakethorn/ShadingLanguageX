@@ -6,6 +6,7 @@
 
 #include "expressions/Expression.h"
 
+#include "errors/AmbiguousFunctionError.h"
 #include "errors/CompileError.h"
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
@@ -51,8 +52,17 @@ namespace mxslc::expressions
         for (const TypePtr& type : target_types)
             assert(type->is_resolved());
 
-        init_subexpressions(target_types);
-        init_impl(target_types);
+        try
+        {
+            init_subexpressions(target_types);
+            init_impl(target_types);
+        }
+        catch (const AmbiguousFunctionError& e)
+        {
+            error_message_ = e.message();
+            is_initialized_ = false;
+            return false;
+        }
 
         if (target_types.empty() or (target_types.size() == 1 and target_types[0]->is_auto()))
         {
@@ -67,6 +77,8 @@ namespace mxslc::expressions
 
         if (not success)
             error_message_ = "Cannot assign an expression of type " + type->to_string() + " to a variable or parameter of type " + type_utils::to_string(target_types);
+        else
+            error_message_ = "";
 
         is_initialized_ = success;
         return success;

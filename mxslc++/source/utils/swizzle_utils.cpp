@@ -12,25 +12,39 @@ namespace mxslc::swizzle_utils
 {
     using container_utils::contains;
 
-    VarPtr swizzle(const VarPtr& value, const string& swizzle)
+    namespace
     {
-        if (swizzle.size() == 1)
+        template <typename T>
+        VarPtr evaluate_swizzle_impl(const T& value, const string& swizzle)
         {
-            return runtime_utils::invoke_function("extract", ArgumentList{value, get_channel_index(swizzle[0])});
+            if (swizzle.size() == 1)
+            {
+                return runtime_utils::invoke_function("extract", ArgumentList{value, get_channel_index(swizzle[0])});
+            }
+
+            const VarPtr separated_values = runtime_utils::invoke_function("separate", value);
+
+            vector<VarPtr> channels;
+            channels.reserve(swizzle.size());
+            for (const char c : swizzle)
+            {
+                const int i = get_channel_index(c);
+                VarPtr channel = separated_values->child(i);
+                channels.push_back(channel);
+            }
+
+            return runtime_utils::invoke_function(get_swizzle_type(swizzle), "combine", channels);
         }
+    }
 
-        const VarPtr separated_values = runtime_utils::invoke_function("separate", value);
+    VarPtr evaluate_swizzle(const ExprPtr& value_expr, const string& swizzle)
+    {
+        return evaluate_swizzle_impl(value_expr, swizzle);
+    }
 
-        vector<VarPtr> channels;
-        channels.reserve(swizzle.size());
-        for (const char c : swizzle)
-        {
-            const int i = get_channel_index(c);
-            VarPtr channel = separated_values->child(i);
-            channels.push_back(channel);
-        }
-
-        return runtime_utils::invoke_function(get_swizzle_type(swizzle), "combine", channels);
+    VarPtr evaluate_swizzle(const VarPtr& value, const string& swizzle)
+    {
+        return evaluate_swizzle_impl(value, swizzle);
     }
 
     TypePtr get_swizzle_type(const string& swizzle)

@@ -14,7 +14,7 @@ namespace mxslc::runtime
     class ChannelVariable final : public Variable
     {
     public:
-        explicit ChannelVariable(VarPtr value, VarPtr index);
+        explicit ChannelVariable(ExprPtr value_expr, ExprPtr index_expr);
 
         bool is_temporary() const override { return false; }
         bool is_local() override { return true; }
@@ -25,10 +25,10 @@ namespace mxslc::runtime
         void set_node_name(const string& name) const override;
 
     private:
-        static TypePtr get_type(const VarPtr& value, const VarPtr& index);
+        static TypePtr get_type(const ExprPtr& value_expr, const ExprPtr& index_expr);
 
-        VarPtr value_;
-        VarPtr index_;
+        ExprPtr value_expr_;
+        ExprPtr index_expr_;
 
         mutable ValuePtr channel_value_;
     };

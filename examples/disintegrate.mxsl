@@ -1,16 +1,12 @@
-material main()
-{
-    vec3 p = position();
-    p += vec3(1.0, 50.0, 0.0);
-    vec2 uv = p.xy * 5.0;
-    float noise = noise2d(0.5, 0.0, uv);
-    color3 fire = color3(1.0, 0.2, 0.0);
-    color3 color = if (noise > 0.1) { fire } else { fire * noise };
-    float opacity = 0.9 - (noise * 4.0);
+vec3 p = position() + vec3{1, 50, 0};
+vec2 uv = p.xy * 5;
+float noise = noise2d(0.5, 0, texcoord=uv);
+color3 fire = color3{1, 0.2, 0};
+color3 color = if (noise > 0.1) { fire } else { fire * noise };
+float opacity = 0.9 - (noise * 4);
 
-    surfaceshader surface = standard_surface();
-    surface.base_color = color;
-    surface.opacity = color3(opacity);
+surfaceshader surface = standard_surface();
+surface.base_color = color;
+surface.opacity = color3{opacity};
 
-    return surfacematerial(surface);
-}
+material disintegrate_mat = surfacematerial(surface);

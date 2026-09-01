@@ -2,6 +2,8 @@
 // Created by jaket on 10/07/2026.
 //
 
+#include <cassert>
+
 #include "runtime/utils/type_utils.h"
 
 #include "runtime/interface.h"
@@ -12,6 +14,15 @@
 
 namespace mxslc::type_utils
 {
+    class TypeAPI
+    {
+    public:
+        static void set_resolved(const TypePtr& type)
+        {
+            type->set_resolved();
+        }
+    };
+
     TypePtr type_of(const vector<VarPtr>& children)
     {
         vector<TypePtr> fields;
@@ -41,8 +52,14 @@ namespace mxslc::type_utils
 
     TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type)
     {
+        assert(original_type->is_resolved());
+        assert(replacement_type->is_resolved());
+
         if (original_type->is_auto())
+        {
             return replacement_type;
+        }
+
         if (original_type->has_fields())
         {
             vector<Field> fields;
@@ -56,8 +73,13 @@ namespace mxslc::type_utils
                     original_field.name()
                 );
             }
-            return create_type(original_type->name(), std::move(fields));
+
+            TypePtr replaced_type = create_type(original_type->name(), std::move(fields));
+            TypeAPI::set_resolved(replaced_type);
+
+            return replaced_type;
         }
+
         return original_type;
     }
 
@@ -76,7 +98,7 @@ namespace mxslc::type_utils
             if (i < types.size() - 1)
                 result += ", ";
         }
-        result += ")";
+        result += ')';
         return result;
     }
 }

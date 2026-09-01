@@ -1,8 +1,8 @@
 
-color3 clerp(color3 a, color3 b, float lower, float upper, float t)
+inline color3 clerp(color3 a, color3 b, float lower, float upper, float t)
 {
-    color3 retval = a;
-    retval = if (t > lower and t < upper) { mix(a, b, (t - lower) / (upper - lower)) };
+    mutable color3 retval = a;
+    retval = if (t > lower & t < upper) { mix(a, b, (t - lower) / (upper - lower)) };
     retval = if (t > upper) { b };
     return retval;
 }
@@ -14,28 +14,29 @@ float height = image("textures\mountain1.png", texcoord=uv);
 // bug: i have to set first parameter to get a float-type output
 float tree_noise = noise2d(1.0, texcoord = uv * 500.0) * 0.5 + 0.5;
 
-color3 water = color3(0.2, 0.2, 1.0);
-color3 beach = color3(0.7, 0.7, 0.3);
-color3 trees = color3(0.1, 0.6, 0.1) * tree_noise;
-color3 rocks = color3(0.5, 0.5, 0.5);
+color3 water = color3{0.2, 0.2, 1.0};
+color3 beach = color3{0.7, 0.7, 0.3};
+color3 trees = color3{0.1, 0.6, 0.1} * tree_noise;
+color3 rocks = color3{0.5, 0.5, 0.5};
 
-color3 c1 = clerp(water, beach, 0.0132, 0.0158, height);
-c1 = if (height > 0.0158) { clerp(trees, rocks, 0.5, 0.8, height) };
+color3 c1 = if (height > 0.0158)
+{
+    clerp(trees, rocks, 0.5, 0.8, height)
+}
+else
+{
+    clerp(water, beach, 0.0132, 0.0158, height)
+};
 
-color3 base_color = color3(uv, 1.0 - height);
-base_color = if (uv.x < 1.0 and uv.y < 1.0) { c1 };
-
-float rough = if (uv.x < 1.0 and uv.y < 1.0 and height <= 0.0132) { 0.0 } else { 1.0 };
+color3 base_color = if (uv.x < 1.0 & uv.y < 1.0) { c1 } else { color3{uv, 1.0 - height} };
+float rough = if (uv.x < 1.0 & uv.y < 1.0 & height <= 0.0132) { 0.0 } else { 1.0 };
 
 // surface properties
 surfaceshader surface = standard_surface();
 surface.base_color = base_color;
 surface.specular_roughness = rough;
 
-// bug compile error here: Branches must be of same data type, but were float and surfaceshader
-// surface.specular_roughness = if (uv.x < 1.0 and uv.y < 1.0 and height <= 0.0132) { 0.0 };
-
 // displacement properties
 displacementshader displacement = displacement(tangent("object"), height * 2.0);
 
-surfacematerial(surface, null, displacement);
+material mountain_material = surfacematerial(surface, displacementshader=displacement);

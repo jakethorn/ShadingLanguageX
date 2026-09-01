@@ -208,6 +208,8 @@ namespace mxslc::runtime
         {
             copy_children(other->children_);
         }
+
+        can_name_nodes_ = other->can_name_nodes_;
     }
 
     bool Variable::equals(const VarPtr& other) const

@@ -30,9 +30,16 @@ namespace mxslc
         {
             message = "No " + func_type + " could be found with the name '" + func_name + "'";
         }
+        else if (funcs.size() == 1)
+        {
+            message = "No " + func_type + " could be found with the signature '" + query.to_string() + "'";
+            message += "\nPossible match:\n";
+            for (const FuncPtr& func : funcs)
+                message += func->header() + "\n";
+        }
         else
         {
-            message = "No " + func_type + " could be found that matches the signature '" + query.to_string() + "'";
+            message = "The " + func_type + " signature '" + query.to_string() + "' is ambiguous";
             message += "\nPossible matches:\n";
             for (const FuncPtr& func : funcs)
                 message += func->header() + "\n";

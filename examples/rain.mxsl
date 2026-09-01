@@ -5,12 +5,12 @@
 
 filename BG_IMG = "textures\skyline.png";
 
-color3 background()
+inline color3 background()
 {
     vec2 uv = 1.0 - texcoord();
     float rx = randomfloat(uv.x, -0.01, 0.01, 0);
     float ry = randomfloat(uv.y, -0.01, 0.01, 1);
-    vec2 r = vec2(rx, ry);
+    vec2 r = vec2{rx, ry};
     vec2 ruv = uv + r;
     float n = noise2d(5.0, 0.0, texcoord=uv * 100.0);
     vec2 m = mix(ruv, uv, n);
@@ -19,7 +19,7 @@ color3 background()
     return c;
 }
 
-color3 blurred = background();
+color3 blurred = background() * 0.8;
 
 //
 // drop and tail
@@ -55,9 +55,9 @@ progress += randomfloat(CHANNEL) * DROP_FREQ;
 progress += time() / 5.0;
 progress %= DROP_FREQ;
 
-float sway = 0.0;
-float tail = 0.0;
-vec2 tail_pos = vec2(0.0, 0.0);
+mutable float sway = 0.0;
+mutable float tail = 0.0;
+mutable vec2 tail_pos = vec2{0};
 for (float f = 0.0 : 10.0)
 {
     float fn = f / 100.0;
@@ -66,13 +66,13 @@ for (float f = 0.0 : 10.0)
     sway = if (progress > fn) { sway + s };
     sway = clamp(sway, CHANNEL_LEFT, CHANNEL_RGHT);
 
-    vec2 tail_pos1 = vec2(CHANNEL_MIDDLE + sway, fn);
+    vec2 tail_pos1 = vec2{CHANNEL_MIDDLE + sway, fn};
     float to_tail = distance(tail_pos1, UV);
     tail += if (to_tail < TAIL_SIZE) { 1.0 } else { 0.0 };
     tail_pos = if (to_tail < TAIL_SIZE) { tail_pos1 };
 }
 
-vec2 drop_pos = vec2(CHANNEL_MIDDLE + sway, progress);
+vec2 drop_pos = vec2{CHANNEL_MIDDLE + sway, progress};
 float to_drop = distance(drop_pos, UV);
 float drop = if (to_drop < DROP_SIZE) { 1.0 } else { 0.0 };
 
@@ -84,36 +84,32 @@ tail = clamp(tail);
 
 float to_tail = distance(tail_pos, UV);
 
-vec2 tail_norm = vec2((tail_pos.x - UV.x) / TAIL_SIZE, 0.0);
-tail_norm = if (in_tail > 0.5) { tail_norm } else { vec2(0.0, 0.0) };
-tail_norm = mix(vec2(0.0, 0.0), tail_norm, tail);
+mutable vec2 tail_norm = vec2{(tail_pos.x - UV.x) / TAIL_SIZE, 0};
+tail_norm = if (in_tail > 0.5) { tail_norm } else { vec2{0} };
+tail_norm = mix(vec2{0}, tail_norm, tail);
 
-vec2 drop_norm = (drop_pos - UV) / DROP_SIZE;
-drop_norm = if (to_drop < DROP_SIZE) { drop_norm } else { vec2(0.0, 0.0) };
+mutable vec2 drop_norm = (drop_pos - UV) / DROP_SIZE;
+drop_norm = if (to_drop < DROP_SIZE) { drop_norm } else { vec2{0} };
 
 vec2 inv_uv = 1.0 - UV;
 
-vec2 tail_uv = vec2(inv_uv.x + (UV.x - tail_pos.x) * TAIL_REFLECT_AREA, inv_uv.y);
+mutable vec2 tail_uv = vec2(inv_uv.x + (UV.x - tail_pos.x) * TAIL_REFLECT_AREA, inv_uv.y);
 tail_uv.x += randomfloat(UV.y, -0.01, 0.01, 2);
 tail_uv = if (in_tail > 0.5) { tail_uv } else { inv_uv };
 
-vec2 drop_uv = inv_uv + (UV - drop_pos) * DROP_REFLECT_AREA;
+mutable vec2 drop_uv = inv_uv + (UV - drop_pos) * DROP_REFLECT_AREA;
 drop_uv = if (to_drop < DROP_SIZE) { drop_uv } else { inv_uv };
 
 vec2 drop_and_tail_norm = if (to_drop < DROP_SIZE) { drop_norm } else { tail_norm };
 
-vec2 clear_uv = inv_uv;
-//clear_uv = if (in_tail > 0.5) { tail_uv };
+mutable vec2 clear_uv = inv_uv;
 clear_uv = if (to_drop < DROP_SIZE) { drop_uv };
 
 //
 // surface
 //
 
-color3 clear = image(BG_IMG, texcoord=clear_uv);
-
-blurred *= 0.8;
-clear *= 1.2;
+color3 clear = image(BG_IMG, texcoord=clear_uv) * 1.2;
 
 float clarity = clamp(drop * DROP_CLARITY + tail * TAIL_CLARITY);
 float roughness = 1.0 - (drop * DROP_SHINE + tail * TAIL_SHINE);
@@ -122,6 +118,6 @@ color3 base_color = mix(blurred, clear, clarity);
 surfaceshader surface = standard_surface();
 surface.base_color = base_color;
 surface.specular_roughness = clamp(0.2 + roughness);
-surface.normal = vec3(normal("world").x, drop_and_tail_norm.yx / 2.0);
+surface.normal = vec3{normal("world").x, drop_and_tail_norm.yx / 2.0};
 
-surfacematerial(surface);
+material rain_material = surfacematerial(surface);

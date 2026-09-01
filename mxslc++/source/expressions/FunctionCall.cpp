@@ -140,6 +140,8 @@ namespace mxslc::expressions
     // inline only
     void FunctionCall::evaluate_arguments() const
     {
+        serializer().begin_comptime(func_->is_comptime());
+
         for (const Parameter& param : func_->parameters())
         {
             ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
@@ -158,6 +160,8 @@ namespace mxslc::expressions
                 default_value->add_to_scope(param.name());
             }
         }
+
+        serializer().end_comptime();
     }
 
     // inline only
@@ -172,6 +176,8 @@ namespace mxslc::expressions
     // inline only
     void FunctionCall::update_out_arguments() const
     {
+        serializer().begin_comptime(func_->is_comptime());
+
         for (const Parameter& param : func_->parameters())
         {
             if (param.is_out())
@@ -181,6 +187,8 @@ namespace mxslc::expressions
                 nonlocal->copy(local);
             }
         }
+
+        serializer().end_comptime();
     }
 
     string FunctionCall::to_string() const

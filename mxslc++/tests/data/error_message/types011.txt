@@ -1,4 +1,4 @@
-types011.mxsl, line 7: No function could be found that matches the signature '(float, color3, color4, vector2, vector3, vector4, boolean, integer, matrix33, matrix44, string or filename) foo<integer>()'
+types011.mxsl, line 7: The function signature '(float, color3, color4, vector2, vector3, vector4, boolean, integer, matrix33, matrix44, string or filename) foo<integer>()' is ambiguous
 Possible matches:
 inline string foo<vector2>()
 inline string foo<vector3>()

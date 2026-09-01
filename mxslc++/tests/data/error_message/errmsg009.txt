@@ -1,4 +1,4 @@
-errmsg009.mxsl, line 11: No function could be found that matches the signature 'foo(1, 2)'
+errmsg009.mxsl, line 11: The function signature 'foo(1, 2)' is ambiguous
 Possible matches:
 float foo(float a)
 float foo(float a, float b, float c)

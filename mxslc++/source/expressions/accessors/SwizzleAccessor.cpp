@@ -5,21 +5,23 @@
 #include "expressions/accessors/SwizzleAccessor.h"
 
 #include "runtime/variables/SwizzleVariable.h"
+#include "utils/swizzle_utils.h"
 
 namespace mxslc::expressions
 {
-    SwizzleAccessor::SwizzleAccessor(VarPtr lhs, string swizzle)
+    SwizzleAccessor::SwizzleAccessor(ExprPtr value_expr, string swizzle)
+        : value_expr_{std::move(value_expr)}, swizzle_{std::move(swizzle)}
     {
-        swizzle_var_ = std::make_shared<SwizzleVariable>(std::move(lhs), std::move(swizzle));
+
     }
 
     TypePtr SwizzleAccessor::type() const
     {
-        return swizzle_var_->type();
+        return swizzle_utils::get_swizzle_type(swizzle_);
     }
 
     VarPtr SwizzleAccessor::evaluate() const
     {
-        return swizzle_var_;
+        return std::make_shared<SwizzleVariable>(value_expr_, swizzle_);
     }
 }

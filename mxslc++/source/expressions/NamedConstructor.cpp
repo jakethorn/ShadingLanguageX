@@ -33,7 +33,10 @@ namespace mxslc::expressions
     void NamedConstructor::init_impl(const vector<TypePtr>& types)
     {
         const TypePtr type = scope().get_type(name_);
-        func_call_ = create_expression<FunctionCall>("__" + type->name() + "__", std::move(args_), token_);
+
+        if (not func_call_)
+            func_call_ = create_expression<FunctionCall>("__" + type->name() + "__", std::move(args_), token_);
+
         func_call_->init(type);
     }
 

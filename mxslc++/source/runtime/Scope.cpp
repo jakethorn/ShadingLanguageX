@@ -146,7 +146,7 @@ namespace mxslc::runtime
 
     bool Scope::has_function(const FunctionQuery& query) const
     {
-        return get_function(query) != nullptr;
+        return not get_functions(query).empty();
     }
 
     void Scope::add_type(TypePtr type)

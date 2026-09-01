@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <extract name="var__0" type="float">
+    <input name="in" type="vector3" value="0, 0, 0" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <multiply name="var__1" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="-1" />
+  </multiply>
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="vector3" value="0, 0, 0" />
+  </separate3>
+  <combine3 name="var__3" type="vector3">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__2" />
+    <input name="in3" type="float" output="outz" nodename="var__2" />
+  </combine3>
+  <combine3 name="var__4" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__2" />
+    <input name="in2" type="float" nodename="var__1" />
+    <input name="in3" type="float" output="outz" nodename="var__2" />
+  </combine3>
+  <combine3 name="var__5" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__2" />
+    <input name="in2" type="float" output="outy" nodename="var__2" />
+    <input name="in3" type="float" nodename="var__1" />
+  </combine3>
+  <switch name="var__6" type="vector3">
+    <input name="in1" type="vector3" nodename="var__3" />
+    <input name="in2" type="vector3" nodename="var__4" />
+    <input name="in3" type="vector3" nodename="var__5" />
+    <input name="which" type="integer" value="2" />
+  </switch>
+  <extract name="var__7" type="float">
+    <input name="in" type="vector3" nodename="var__6" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <multiply name="var__8" type="float">
+    <input name="in1" type="float" nodename="var__7" />
+    <input name="in2" type="float" value="-1" />
+  </multiply>
+  <separate3 name="var__9" type="multioutput">
+    <input name="in" type="vector3" nodename="var__6" />
+  </separate3>
+  <combine3 name="var__10" type="vector3">
+    <input name="in1" type="float" nodename="var__8" />
+    <input name="in2" type="float" output="outy" nodename="var__9" />
+    <input name="in3" type="float" output="outz" nodename="var__9" />
+  </combine3>
+  <combine3 name="var__11" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__9" />
+    <input name="in2" type="float" nodename="var__8" />
+    <input name="in3" type="float" output="outz" nodename="var__9" />
+  </combine3>
+  <combine3 name="var__12" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__9" />
+    <input name="in2" type="float" output="outy" nodename="var__9" />
+    <input name="in3" type="float" nodename="var__8" />
+  </combine3>
+  <switch name="var__13" type="vector3">
+    <input name="in1" type="vector3" nodename="var__10" />
+    <input name="in2" type="vector3" nodename="var__11" />
+    <input name="in3" type="vector3" nodename="var__12" />
+    <input name="which" type="integer" value="2" />
+  </switch>
+  <constant name="var__14" type="float">
+    <input name="value" type="float" nodename="var__15" />
+  </constant>
+  <extract name="var__15" type="float">
+    <input name="in" type="vector3" nodename="var__13" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+</materialx>

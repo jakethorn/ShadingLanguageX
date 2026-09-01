@@ -18,7 +18,10 @@ namespace mxslc::runtime_utils
 {
     using runtime_utils::RuntimeAware;
 
+    FuncPtr resolve_function(FunctionQuery query);
+    FuncPtr resolve_function(FunctionQuery query, ArgumentList& args);
     FuncPtr resolve_function(const vector<TypePtr>& types, const string& name, const TypePtr& template_type, ArgumentList& args, const bool& is_argumentless);
+
     FuncPtr resolve_method(const TypePtr& class_type, const vector<TypePtr>& types, const string& name, const TypePtr& template_type, ArgumentList& args, const bool& is_argumentless);
 
     class FunctionResolver : protected RuntimeAware

@@ -282,13 +282,22 @@ namespace mxslc::runtime
         return resolve(value->getType());
     }
 
-    TypePtr Type::tuple(TypePtr template_type)
+    TypePtr Type::tuple_of(TypePtr template_type)
     {
         assert(template_type->is_resolved());
 
         TypePtr type = create_type(TypeName::Tuple, std::move(template_type));
         type->set_resolved();
         return type;
+    }
+
+    vector<TypePtr> Type::tuples_of(const vector<TypePtr>& template_types)
+    {
+        vector<TypePtr> result;
+        result.reserve(template_types.size());
+        for (const TypePtr& type : template_types)
+            result.push_back(Type::tuple_of(type));
+        return result;
     }
 
     TypePtr Type::unnamed_struct(TypePtr field_type, const size_t field_count)

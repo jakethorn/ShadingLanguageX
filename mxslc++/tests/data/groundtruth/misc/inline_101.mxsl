@@ -1,0 +1,25 @@
+
+comptime default vector3 foo(float x, float y, float z)
+{
+    return combine3(x, y, z);
+}
+
+inline float n31()
+{
+    vec3 a = foo(1, 2, 3);
+    vec3 b = vec3{1, 2, 3};
+	return dotproduct(a, b);
+}
+
+float a = n31();
+float b = n31();
+
+inline float n32(float f)
+{
+    vec3 a = foo(f, 2, 3);
+    vec3 b = vec3{f, 2, 3};
+	return dotproduct(a, b);
+}
+
+float c = n32(4);
+float d = n32(4);

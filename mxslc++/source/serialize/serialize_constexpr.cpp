@@ -42,6 +42,8 @@ namespace mxslc::serialize
             {"creatematrix", wrap_creatematrix()},
             {"invertmatrix", wrap(primitive_utils::invertmatrix)},
             {"switch", wrap_switch()},
+            {"fract", wrap(primitive_utils::fract)},
+            {"dotproduct", wrap(primitive_utils::dotproduct)},
         };
 
         bool is_constexpr(const string& node_name, const ParameterValues& input_values, vector<Primitive>& basic_values)

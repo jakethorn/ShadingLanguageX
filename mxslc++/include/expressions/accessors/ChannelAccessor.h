@@ -13,7 +13,7 @@ namespace mxslc::expressions
     class ChannelAccessor final : public Accessor
     {
     public:
-        ChannelAccessor(const ExprPtr& value_expr, const ExprPtr& index_expr);
+        ChannelAccessor(ExprPtr value_expr, ExprPtr index_expr);
 
         TypePtr type() const override;
         VarPtr evaluate() const override;

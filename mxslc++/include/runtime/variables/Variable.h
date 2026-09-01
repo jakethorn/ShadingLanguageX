@@ -17,7 +17,7 @@ namespace mxslc::runtime
     class Variable : public std::enable_shared_from_this<Variable>, public Stringable, protected RuntimeAware
     {
         friend class Scope;
-        friend class VariableFactory;
+        friend class VariableAPI;
 
     public:
         Variable(ModifierList mods, TypePtr type);

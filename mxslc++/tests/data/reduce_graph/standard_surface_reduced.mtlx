@@ -326,18 +326,18 @@
       <input name="bg" type="EDF" nodename="emission_edf" />
       <input name="mix" type="float" interfacename="coat" />
     </mix>
-    <luminance name="var__16" type="color3">
-      <input name="in" type="color3" interfacename="opacity" />
-    </luminance>
-    <surface name="var__17" type="surfaceshader">
+    <surface name="var__16" type="surfaceshader">
       <input name="bsdf" type="BSDF" nodename="coat_layer" />
       <input name="edf" type="EDF" nodename="blended_coat_emission_edf" />
       <input name="opacity" type="float" nodename="var__18" />
     </surface>
+    <luminance name="var__17" type="color3">
+      <input name="in" type="color3" interfacename="opacity" />
+    </luminance>
     <extract name="var__18" type="float">
-      <input name="in" type="color3" nodename="var__16" />
+      <input name="in" type="color3" nodename="var__17" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <output name="out" type="surfaceshader" nodename="var__17" />
+    <output name="out" type="surfaceshader" nodename="var__16" />
   </nodegraph>
 </materialx>

@@ -1,0 +1,5 @@
+mutable vec3 room_pos = vec3{};
+room_pos[2] *= -1.0;
+room_pos[2] = room_pos[2] * -1.0;
+
+constant(room_pos[2]);

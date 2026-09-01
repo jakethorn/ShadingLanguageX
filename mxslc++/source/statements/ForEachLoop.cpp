@@ -36,7 +36,7 @@ namespace mxslc::statements
     void ForEachLoop::init()
     {
         type_ = scope().resolve_type(type_);
-        iter_expr_->init(Type::tuple(type_));
+        iter_expr_->init(Type::tuple_of(type_));
     }
 
     void ForEachLoop::execute_impl() const
@@ -62,13 +62,13 @@ namespace mxslc::statements
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         string result;
         result += mods_string;
         result += "for (";
         result += type_->to_string();
-        result += " ";
+        result += ' ';
         result += name_;
         result += " from ";
         result += iter_expr_->to_string();

@@ -12,13 +12,14 @@ namespace mxslc::expressions
     class SwizzleAccessor final : public Accessor
     {
     public:
-        SwizzleAccessor(VarPtr lhs, string swizzle);
+        SwizzleAccessor(ExprPtr value_expr, string swizzle);
 
         TypePtr type() const override;
         VarPtr evaluate() const override;
 
     private:
-        VarPtr swizzle_var_;
+        ExprPtr value_expr_;
+        string swizzle_;
     };
 }
 

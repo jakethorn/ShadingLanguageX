@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="var__0" type="vector2" />
+  <add name="var__1" type="vector2">
+    <input name="in1" type="vector2" nodename="var__0" />
+    <input name="in2" type="vector2" value="0.001, 0" />
+  </add>
+  <multiply name="uv_cat" type="vector2">
+    <input name="in1" type="vector2" nodename="var__1" />
+    <input name="in2" type="float" value="40" />
+  </multiply>
+  <extract name="cx" type="float">
+    <input name="in" type="vector2" value="5, 6" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <separate2 name="var__2" type="multioutput">
+    <input name="in" type="vector2" value="0.001, 0" />
+  </separate2>
+  <combine2 name="var__3" type="vector2">
+    <input name="in1" type="float" output="outy" nodename="var__2" />
+    <input name="in2" type="float" output="outx" nodename="var__2" />
+  </combine2>
+  <add name="var__4" type="vector2">
+    <input name="in1" type="vector2" nodename="var__0" />
+    <input name="in2" type="vector2" nodename="var__3" />
+  </add>
+  <multiply name="uv_cat2" type="vector2">
+    <input name="in1" type="vector2" nodename="var__4" />
+    <input name="in2" type="float" value="40" />
+  </multiply>
+  <extract name="cy" type="float">
+    <input name="in" type="vector2" value="5, 6" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+</materialx>

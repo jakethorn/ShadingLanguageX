@@ -21,6 +21,7 @@
 #include "expressions/ThisExpression.h"
 #include "expressions/TypeOfOperator.h"
 #include "expressions/VariableDefinitionExpression.h"
+#include "expressions/NullExpression.h"
 #include "runtime/interface.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -63,6 +64,9 @@ namespace mxslc
             vector<StmtPtr> statements;
             while (not empty())
             {
+                if (consume(';'))
+                    continue;
+
                 debug_info = peek();
 
                 if (consume(TokenType::Break))
@@ -658,6 +662,16 @@ namespace mxslc
             return create_expression<Literal>(std::move(*literal));
         }
 
+        if (optional<Token> token = consume(TokenType::Null))
+        {
+            return create_expression<NullExpression>(std::move(*token));
+        }
+
+        if (optional<Token> token = consume(TokenType::This))
+        {
+            return create_expression<ThisExpression>(std::move(*token));
+        }
+
         if (consume('('))
         {
             ExprPtr expr = expression();
@@ -672,12 +686,6 @@ namespace mxslc
             match('|');
             in_abs_ = false;
             return ExpressionFactory::absolute(std::move(expr), std::move(*token));
-        }
-
-        if (peek() == TokenType::This)
-        {
-            Token token = match(TokenType::This);
-            return create_expression<ThisExpression>(std::move(token));
         }
 
         if (peek() == TokenType::Identifier)

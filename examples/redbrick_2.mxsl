@@ -1,0 +1,212 @@
+// glsl macros
+
+#define dot dotproduct
+#define pow power
+#define mod modulo
+#define abs absval
+#define length magnitude
+#define iTime time()
+#define iResolution vec2{1, 1}
+
+inline T glsl_mix<float, vec2, vec3, vec4>(T bg, T fg, T mix)
+{
+    return mix(fg, bg, mix);
+}
+
+inline T glsl_mix<vec2, vec3, vec4>(T bg, T fg, float mix)
+{
+    return mix(fg, bg, mix);
+}
+
+#define mix glsl_mix
+
+inline T glsl_smoothstep<float, vec2, vec3, vec4>(T low, T high, T in)
+{
+    T t = clamp((in - low) / (high - low), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+inline T glsl_smoothstep<vec2, vec3, vec4>(float low, float high, T in)
+{
+    T t = clamp((in - low) / (high - low), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+#define smoothstep glsl_smoothstep
+
+inline float glsl_step(float edge, float x)
+{
+    return float{x < edge};
+}
+
+#define step glsl_step
+
+// code
+
+class Material
+{
+    int type;
+    vec3 color;
+    vec3 specularColor;
+    float specularAmount;
+    float metallic;
+    float smoothness;
+    float reflectance;
+    float bump;
+    vec3 emission;
+    float ior;
+};
+
+inline vec3 source0( vec3 inPos, vec2 inUV, vec3 inNormal, float inTime, mutable vec3 inInput1, vec3 inInput2, mutable vec3 inInput3 )
+{
+    inInput3 = if (inInput3.x == 0.0) { vec3{10} };
+    mutable vec2 p = inUV * inInput3.x;
+    mutable vec2 f;
+    f = fract(p);
+    p = floor(p);
+    f = f * f * (3.0 - 2.0 * f);
+    vec2 h1 = mod(p, inInput3.x);
+    float h1f = fract(sin(dot(h1, vec2{27.16898, 38.90563})) * 5151.5473453);
+    vec2 h2 = mod(p + vec2{1.0, 0.0}, inInput3.x);
+    float h2f = fract(sin(dot(h2, vec2{27.16898, 38.90563})) * 5151.5473453);
+    vec2 h3 = mod(p + vec2{0.0, 1.0}, inInput3.x);
+    float h3f = fract(sin(dot(h3, vec2{27.16898, 38.90563})) * 5151.5473453);
+    vec2 h4 = mod(p + vec2{1.0, 1.0}, inInput3.x);
+    float h4f = fract(sin(dot(h4, vec2{27.16898, 38.90563})) * 5151.5473453);
+    float noise = mix(mix( h1f, h2f,f.x), mix( h3f, h4f, f.x),f.y);
+    inInput1 = vec3{ noise };
+    return inInput1;
+}
+
+inline vec3 source1( vec3 inPos, vec2 inUV, vec3 inNormal, float inTime, mutable vec3 inInput1, vec3 inInput2, vec3 inInput3 )
+{
+    mutable float scale = float{20};
+    mutable float f = 0.0;
+    vec2 p = mod(inUV, scale);
+    mutable float amp = 0.6;
+    for (int i from 0 to 4)
+    {
+        f += source0( inPos, p, inNormal, inTime, inInput1, inInput2, vec3{scale} ).x * amp;
+        amp *= 0.5;
+        scale *= 2.0;
+    }
+    inInput1 = vec3{ min(f, 1.0) };
+    return inInput1;
+}
+
+inline vec3 source2( vec3 inPos, vec2 inUV, vec3 inNormal, float inTime, mutable vec3 inInput1, vec3 inInput2, vec3 inInput3 )
+{
+    const float BMWIDTH = 0.25 + 0.03;
+    const float BMHEIGHT = 0.08 + 0.03;
+    const float MWF = 0.03 * 0.5 / BMWIDTH;
+    const float MHF = 0.03 * 0.5 / BMHEIGHT;
+    mutable float ss = inUV.x / BMWIDTH;
+    mutable float tt = inUV.y / BMHEIGHT;
+
+    ss = if ( mod( tt * 0.5, 1.0 ) > 0.5 ) { ss + 0.5 };
+
+    float sbrick = floor( ss );
+    float tbrick = floor( tt );
+    vec2 randv2 = fract(cos(( vec2{ (tbrick + 0.5 ), (sbrick + 0.5) } * vec2{1000.0, 1000.0} )));
+    float noise = fract(sin(dot(randv2.xy, vec2{12.9898, 78.233})) * 43758.5453);
+
+    ss = ss - sbrick;
+    tt = tt - tbrick;
+    float w = step( MWF, ss ) - step( 1.0 - MWF, ss );
+    float h = step( MHF, tt ) - step( 1.0 - MHF, tt );
+
+    float sbump = smoothstep(0.0, MWF, ss) - smoothstep(1.0 - MWF, 1.0, ss);
+    float tbump = smoothstep(0.0, MHF, tt) - smoothstep(1.0 - MHF, 1.0, tt);
+    float bump = sbump * tbump;
+    mutable float unevenBump = bump;
+
+    unevenBump -= if ( noise <= 0.25 )
+    {
+        ss * 1.0
+    }
+    else if ( noise <= 0.50 )
+    {
+        tt * 1.0
+    }
+    else if ( noise <= 0.75 )
+    {
+        (BMWIDTH - ss) * 1.0
+    }
+    else
+    {
+        (BMHEIGHT - tt) * 1.0
+    };
+
+    inInput1 = vec3{ noise, bump, clamp( unevenBump, 0.0, 1.0 ) };
+
+    return inInput1;
+}
+
+inline vec3 Kogj( vec3 pos, vec2 uv, vec3 normal, float time, vec3 param )
+{
+    vec3 _Zxur = source0( pos, uv, normal, 0.0, vec3{0}, vec3{0}, vec3{0} );
+    vec3 _Eoks = source1( pos, uv, normal, 0.0, _Zxur, vec3{0}, vec3{0} );
+    return _Eoks;
+}
+
+inline vec3 dhhB( vec3 pos, vec2 uv, vec3 normal, float time, vec3 param )
+{
+    vec3 _BdHg = param * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _bpea = vec3{ _BdHg.y };
+    vec3 _eukA = vec3{ _BdHg.z };
+    vec3 _xeHM = Kogj( _eukA, vec3{uv, 0.0}.xy, normal, time, vec3{0} );
+    vec3 _jIHy = _xeHM * _eukA * vec3{1};
+    vec3 _vRSx = vec3{ uv.x * vec2{ 1.0, 1.0 }.x, uv.y * vec2{ 1.0, 1.0 }.y, 1 };
+    vec3 _sRul = _vRSx * 3.0 * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _YTpn = Kogj( _sRul, _sRul.xy, normal, time, vec3{0} );
+    vec3 _xzCJ = _YTpn * 7.845 * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _vTdO = 1.0 - _bpea;
+    vec3 _bzqA = _vTdO * 0.1 * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _gTOo = _bzqA * _bzqA * _xzCJ;
+    vec3 _jkHH = _gTOo * 5.0 * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _MxCk = _jkHH + _jIHy + vec3{0};
+    vec3 _PZGo = _MxCk * 1.6 * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _fTFt = clamp( _PZGo, vec3{ 0.0, 0.0, 0.0 }, vec3{ 1.1, 1.1, 1.1 } );
+    return _fTFt;
+}
+
+inline void material0( vec3 pos, ref vec3 normal, float time, ref Material mat )
+{
+    mutable vec2 uv;
+    mat.specularColor = vec3{ 1, 1, 1 };
+    mat.specularAmount = 0.0;
+    mat.metallic = 0.0;
+    mat.reflectance = 1.0;
+    uv = pos.xy;
+    mat.bump = 0.5;
+    vec3 _oCzV = source2( pos, uv, normal, 0.0, vec3{0}, vec3{0}, vec3{0} );
+    vec3 _FCZn = vec3{ _oCzV.y };
+    vec3 _UaEB = _FCZn * 0.460 * vec3{ 1.0, 1.0, 1.0 };
+    vec3 _khBL = vec3{ _oCzV.x };
+    vec3 _jZEF = dhhB( _khBL, vec3{uv, 0.0}.xy, normal, time, _oCzV );
+    vec3 _IiAx = mix( vec3{ 0.521, 0.210, 0.210 }, vec3{ 0.872, 0.205, 0.223 }, _khBL );
+    vec3 _eaWS = vec3{ 0.860, 0.730, 0.489 }.xyz;
+    vec3 _ylZT = mix( _eaWS, _IiAx, _FCZn );
+    mat.smoothness = _UaEB.x;
+    mat.bump = _jZEF.x;
+    mat.color = _ylZT;
+}
+
+vec3 p = position();
+mutable vec3 n;
+mutable Material mat;
+material0(p, ref n, 0.0, ref mat);
+
+color3 c = color3{mat.color};
+
+surfaceshader surf = standard_surface(
+    base_color = color3{mat.color},
+    metalness = mat.metallic,
+    specular = mat.specularAmount,
+    specular_color = color3{mat.specularColor},
+    specular_roughness = 1.0 - mat.smoothness
+);
+
+displacementshader disp = displacement(mat.bump, clamp(0.2 * clamp(normal().z) ^ 4, 0.05, 1.0));
+
+material rain_material = surfacematerial(surf, displacementshader=disp);
