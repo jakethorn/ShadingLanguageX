@@ -134,6 +134,12 @@ namespace mxslc
 
         bool try_match_symbol(const string_view text, Token& token)
         {
+            if (text.size() > 1)
+            {
+                if (text[0] == '.' and std::isdigit(text[1]))
+                    return false;
+            }
+
             const char c = text.front();
             if (const TokenType t{c}; t.is_symbol())
             {
