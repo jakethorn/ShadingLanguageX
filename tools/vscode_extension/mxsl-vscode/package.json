@@ -1,9 +1,22 @@
 {
   "name": "mxsl-language",
   "displayName": "MXSL Language Support",
-  "description": "Syntax highlighting for MXSL (MaterialX Shading Language) files",
-  "version": "0.1.0",
+  "description": "Syntax highlighting and MXSL <-> MTLX (MaterialX) conversion for the MXSL Shading Language",
+  "version": "0.2.1",
   "publisher": "shadinglanguagex",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kwokcb/ShadingLanguageX/"
+  },
+  "keywords": [
+    "mxsl",
+    "materialx",
+    "shading language",
+    "slx",
+    "converter",
+    "syntax highlighting"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -48,6 +61,35 @@
           }
         ]
       }
+    },
+    "commands": [
+      {
+        "command": "mxsl.convert",
+        "title": "MXSL: Convert between MXSL and MTLX"
+      },
+      {
+        "command": "mxsl.validate",
+        "title": "MXSL: Validate current file (MXSL <-> MTLX)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "mxsl.convert",
+          "when": "editorLangId == mxsl || editorLangId == xml",
+          "group": "navigation"
+        },
+        {
+          "command": "mxsl.validate",
+          "when": "editorLangId == mxsl || editorLangId == xml",
+          "group": "navigation"
+        }
+      ]
     }
-  }
+  },
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onCommand:mxsl.convert",
+    "onCommand:mxsl.validate"
+  ]
 }
