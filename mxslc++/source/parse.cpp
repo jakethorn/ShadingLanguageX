@@ -460,11 +460,15 @@ namespace mxslc
     StmtPtr Parser::return_statement()
     {
         Token token = match(TokenType::Return);
-        ExprPtr return_expr = expression();
-        StmtPtr return_stmt = create_statement<ReturnStatement>(std::move(return_expr), std::move(token));
-        match(';');
 
-        return return_stmt;
+        ExprPtr return_expr = nullptr;
+        if (not consume(';'))
+        {
+            return_expr = expression();
+            match(';');
+        }
+
+        return create_statement<ReturnStatement>(std::move(return_expr), std::move(token));
     }
 
     ExprPtr Parser::expression(const ModifierList& mods)

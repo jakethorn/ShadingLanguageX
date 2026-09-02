@@ -23,6 +23,18 @@ namespace mxslc::serialize_utils
         };
     }
 
+    constexpr_func wrap_conditional_node(const std::function<Primitive(const Primitive&, const Primitive&)>& pred)
+    {
+        return [pred](const TypePtr& type, const vector<Primitive>& values) -> VarPtr
+        {
+            return create_variable(
+                values.size() == 2 ?
+                pred(values[0], values[1]) :
+                pred(values[0], values[1]) ? values[2] : values[3]
+            );
+        };
+    }
+
     constexpr_func wrap_switch()
     {
         return [](const TypePtr& type, const vector<Primitive>& values) -> VarPtr

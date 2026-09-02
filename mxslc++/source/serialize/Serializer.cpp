@@ -134,7 +134,7 @@ namespace mxslc::serialize
 
         if (reduce_graph_ or comptime_scope_.top())
         {
-            if (VarPtr value = serialize_constexpr(func->return_type(), func->name(), input_values))
+            if (VarPtr value = serialize_constexpr(func, input_values))
                 return value;
         }
 

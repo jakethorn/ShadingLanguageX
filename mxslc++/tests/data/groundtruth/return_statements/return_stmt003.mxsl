@@ -1,0 +1,28 @@
+int foo()
+{
+    for (int i from 0 to 9)
+    {
+        if (i == 5)
+        {
+            return 100;
+        }
+    }
+
+    return 200;
+}
+
+int bar()
+{
+    for (int i from 0 to 9)
+    {
+        if (i == 50)
+        {
+            return 100;
+        }
+    }
+
+    return 200;
+}
+
+constant(foo());
+constant(bar());

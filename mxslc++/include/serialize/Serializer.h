@@ -31,7 +31,7 @@ namespace mxslc::serialize
         void set_version(const string& version);
         void set_reduce_graph(bool value);
 
-        void begin_comptime(bool is_comptime) const;
+        void begin_comptime(bool is_comptime = true) const;
         bool end_comptime() const;
 
         VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;

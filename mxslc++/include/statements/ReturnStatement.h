@@ -9,17 +9,6 @@
 
 namespace mxslc::statements
 {
-    class ReturnClause : public std::exception
-    {
-    public:
-        explicit ReturnClause(VarPtr return_value) : return_value_{std::move(return_value)} { }
-
-        VarPtr return_value() const { return return_value_; }
-
-    private:
-        VarPtr return_value_;
-    };
-
     class ReturnStatement final : public Statement
     {
     public:
@@ -34,6 +23,18 @@ namespace mxslc::statements
 
     private:
         ExprPtr expr_;
+
+    public:
+        class Branch : public std::exception
+        {
+        public:
+            explicit Branch(VarPtr return_value = nullptr) : return_value_{std::move(return_value)} { }
+
+            VarPtr return_value() const { return return_value_; }
+
+        private:
+            VarPtr return_value_;
+        };
     };
 }
 

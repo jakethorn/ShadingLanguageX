@@ -39,6 +39,11 @@ namespace mxslc::primitive_utils
     Primitive fract(const Primitive& in);
     Primitive dotproduct(const Primitive& in1, const Primitive& in2);
 
+    // conditional nodes
+    Primitive ifequal(const Primitive& value1, const Primitive& value2);
+    Primitive ifequal(const Primitive& value1, const Primitive& value2, const Primitive& in1, const Primitive& in2);
+    Primitive switch_(const vector<Primitive>& ins, const Primitive& which, const TypePtr& type = nullptr);
+
     // materialx nodes
     Primitive constant(const Primitive& value, const TypePtr& type = nullptr);
 
@@ -63,7 +68,6 @@ namespace mxslc::primitive_utils
     Primitive creatematrix(const Primitive& in1, const Primitive& in2, const Primitive& in3, const Primitive& in4);
     Primitive invertmatrix(const Primitive& in);
 
-    Primitive switch_(const vector<Primitive>& ins, const Primitive& which, const TypePtr& type = nullptr);
 
     // fs::path functions
     Primitive exists(const Primitive& path);

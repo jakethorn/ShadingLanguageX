@@ -123,12 +123,14 @@ namespace mxslc::runtime
         {
             body_->execute();
         }
-        catch (const ReturnClause& clause)
+        catch (const ReturnStatement::Branch& branch)
         {
-            return_value = clause.return_value();
-            return_value = type_cast(return_type_, return_value, /*force*/true);
-            if (is_parameterless_)
-                parameterless_cache_ = return_value;
+            if (branch.return_value())
+            {
+                return_value = type_cast(return_type_, branch.return_value(), /*force*/true);
+                if (is_parameterless_)
+                    parameterless_cache_ = return_value;
+            }
         }
 
         serializer().end_comptime();

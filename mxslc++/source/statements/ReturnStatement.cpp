@@ -6,6 +6,7 @@
 
 #include "expressions/Expression.h"
 #include "runtime/Function.h"
+#include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
@@ -27,17 +28,38 @@ namespace mxslc::statements
 
     void ReturnStatement::execute_impl() const
     {
+        // unwind stack
+        while (scope().function() == nullptr)
+        {
+            if (scope().parent() == nullptr)
+                throw CompileError{"Stack unwind error. There is likely a return statement in an invalid location."};
+            runtime().exit_scope();
+        }
+
         const FuncPtr func = scope().function();
 
-        if (func->is_void())
-            throw CompileError{"Cannot return from void function '" + func->name() + "'"};
+        if (func->is_void() and expr_)
+            throw CompileError{"Cannot return a value from void function '" + func->name() + "'"};
 
-        expr_->init(func->return_type());
-        throw ReturnClause{expr_->evaluate()};
+        if (not func->is_void() and not expr_)
+            throw CompileError{"Must return a value from non-void function '" + func->name() + "'"};
+
+        if (expr_)
+        {
+            expr_->init(func->return_type());
+            throw Branch{expr_->evaluate()};
+        }
+        else
+        {
+            throw Branch{};
+        }
     }
 
     string ReturnStatement::to_string() const
     {
-        return "return " + expr_->to_string() + ";";
+        if (expr_)
+            return "return " + expr_->to_string() + ";";
+        else
+            return "return;";
     }
 }

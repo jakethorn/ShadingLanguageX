@@ -1,0 +1,9 @@
+float a = comptime invert(5.0);
+float b = comptime invert(5.0, 4.0);
+float c = invert(5.0);
+float d = invert(5.0, 4.0);
+
+constant(a);
+constant(b);
+constant(c);
+constant(d);

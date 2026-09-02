@@ -9,7 +9,7 @@
 
 namespace mxslc::serialize
 {
-    VarPtr serialize_constexpr(const TypePtr& node_type, const string& node_name, const ParameterValues& input_values);
+    VarPtr serialize_constexpr(const FuncPtr& func, const ParameterValues& input_values);
 }
 
 #endif //MXSLC_SERIALIZE_CONSTEXPR_H

@@ -1,0 +1,1 @@
+bad_return_stmt002.mxsl, line 1: Only fields, methods and constructors are allowed in class definitions

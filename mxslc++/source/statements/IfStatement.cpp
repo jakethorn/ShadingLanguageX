@@ -27,7 +27,9 @@ namespace mxslc::statements
         if (not cond_expr_->try_init(Type::Bool))
             cond_expr_->init();
 
+        serializer().begin_comptime();
         const VarPtr cond = cond_expr_->evaluate();
+        serializer().end_comptime();
 
         runtime().enter_scope("if");
         if (cond->compile_time_value())

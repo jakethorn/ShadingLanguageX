@@ -1,0 +1,26 @@
+int foo()
+{
+    if (false)
+    {
+        return 5;
+    }
+    else
+    {
+        return 10;
+    }
+}
+
+int bar()
+{
+    if (true)
+    {
+        return 5;
+    }
+    else
+    {
+        return 10;
+    }
+}
+
+constant(foo());
+constant(bar());

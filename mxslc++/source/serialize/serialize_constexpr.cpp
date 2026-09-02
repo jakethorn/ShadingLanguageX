@@ -6,6 +6,7 @@
 
 #include <cassert>
 
+#include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "utils/primitive_utils.h"
 #include "runtime/Type.h"
@@ -21,6 +22,7 @@ namespace mxslc::serialize
     using serialize_utils::wrap;
     using serialize_utils::wrap_creatematrix;
     using serialize_utils::wrap_switch;
+    using serialize_utils::wrap_conditional_node;
 
     namespace
     {
@@ -29,6 +31,10 @@ namespace mxslc::serialize
             {"subtract", wrap(primitive_utils::subtract)},
             {"multiply", wrap(primitive_utils::multiply)},
             {"divide", wrap(primitive_utils::divide)},
+            {"not", wrap(primitive_utils::logical_not)},
+            {"ifequal", wrap_conditional_node(primitive_utils::equal)},
+            {"ifgreater", wrap_conditional_node(primitive_utils::greater)},
+            {"ifgreatereq", wrap_conditional_node(primitive_utils::greater_equal)},
             {"constant", wrap(primitive_utils::constant)},
             {"combine2", wrap(primitive_utils::combine2)},
             {"combine3", wrap(primitive_utils::combine3)},
@@ -46,30 +52,44 @@ namespace mxslc::serialize
             {"dotproduct", wrap(primitive_utils::dotproduct)},
         };
 
-        bool is_constexpr(const string& node_name, const ParameterValues& input_values, vector<Primitive>& basic_values)
+        bool is_constexpr(const FuncPtr& func, const ParameterValues& input_values, vector<Primitive>& comptime_values)
         {
-            if (not contains(CONSTEXPR_FUNCS, node_name))
+            if (not contains(CONSTEXPR_FUNCS, func->name()))
                 return false;
 
             for (const auto& [param, input_value] : input_values)
             {
                 if (input_value->is_compile_time())
-                    basic_values.push_back(input_value->compile_time_value());
+                {
+                    Primitive value = input_value->compile_time_value();
+                    if (value.is_null())
+                    {
+                        value = Primitive{
+                            func->node_def()->getInput(param.name())->getValue()
+                        };
+                    }
+
+                    comptime_values.push_back(std::move(value));
+                }
                 else
+                {
                     return false;
+                }
             }
 
             return true;
         }
     }
 
-    VarPtr serialize_constexpr(const TypePtr& node_type, const string& node_name, const ParameterValues& input_values)
+    VarPtr serialize_constexpr(const FuncPtr& func, const ParameterValues& input_values)
     {
-        if (vector<Primitive> basic_values; is_constexpr(node_name, input_values, basic_values))
+        const TypePtr& return_type = func->return_type();
+
+        if (vector<Primitive> comptime_values; is_constexpr(func, input_values, comptime_values))
         {
-            if (VarPtr basic_value = CONSTEXPR_FUNCS.at(node_name)(node_type, basic_values))
+            if (VarPtr basic_value = CONSTEXPR_FUNCS.at(func->name())(return_type, comptime_values))
             {
-                assert(basic_value->type()->equals(node_type));
+                assert(basic_value->type()->equals(return_type));
                 return basic_value;
             }
         }

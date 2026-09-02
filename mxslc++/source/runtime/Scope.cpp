@@ -30,7 +30,6 @@ namespace mxslc::runtime
             parent_->is_youngest_ = false;
             graph_ = parent_->graph_;
             graph_func_ = parent_->graph_func_;
-            func_ = parent_->func_;
         }
     }
 

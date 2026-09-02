@@ -1,0 +1,1 @@
+bad_return_stmt004.mxsl, line 3: Must return a value from non-void function 'foo'

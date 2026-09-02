@@ -97,7 +97,7 @@ add_library(mxslc_lib
         utils/primitive_utils/creatematrix.cpp
         utils/primitive_utils/invertmatrix.cpp
         utils/primitive_utils/separate.cpp
-        utils/primitive_utils/switch.cpp
+        utils/primitive_utils/conditional_nodes.cpp
         utils/primitive_utils/path_functions.cpp
         utils/primitive_utils/constant.cpp
         utils/primitive_utils/round.cpp

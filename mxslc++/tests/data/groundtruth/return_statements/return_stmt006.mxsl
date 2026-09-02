@@ -1,0 +1,14 @@
+comptime void foo(int i, out int j)
+{
+    if (i == 5)
+    {
+        j = 6;
+        return;
+    }
+    j = 11;
+}
+
+foo(10, out int k1);
+constant(k1);
+foo(5, out int k2);
+constant(k2);
