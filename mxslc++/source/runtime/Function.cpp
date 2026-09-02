@@ -14,6 +14,7 @@
 #include "runtime/utils/type_cast.h"
 #include "errors/CompileError.h"
 #include "serialize/Serializer.h"
+#include "statements/ReturnStatement.h"
 
 namespace mxslc::runtime
 {
@@ -39,42 +40,19 @@ namespace mxslc::runtime
         string name,
         TypePtr template_type,
         optional<ParameterList> params,
-        StmtPtr body,
-        ExprPtr return_expr
+        StmtPtr body
     ) : mods_{std::move(mods)},
         return_type_{std::move(return_type)},
         name_{std::move(name)},
         template_type_{std::move(template_type)},
         params_{std::move(params).value_or(ParameterList{})},
         body_{std::move(body)},
-        return_expr_{std::move(return_expr)},
         is_parameterless_{not params.has_value()}
     {
         mods_.validate(TokenType::Inline, TokenType::Default, TokenType::Comptime);
 
-        if (return_type_->is_void() and return_expr_ != nullptr)
-            throw CompileError{"Void function '" + name_ + "' has a return statement"};
-        if (not return_type_->is_void() and return_expr_ == nullptr)
-            throw CompileError{"Non-void function '" + name_ + "' does not have a return statement"};
-
         if (return_type_->is_void() and is_parameterless_)
             throw CompileError{"Parameterless function '" + name_ + "' cannot be void"};
-    }
-
-    Function::Function(Function&& other) noexcept
-        : mods_{std::move(other.mods_)},
-        return_type_{std::move(other.return_type_)},
-        name_{std::move(other.name_)},
-        template_type_{std::move(other.template_type_)},
-        params_{std::move(other.params_)},
-        body_{std::move(other.body_)},
-        return_expr_{std::move(other.return_expr_)},
-        node_def_{std::move(other.node_def_)},
-        is_initialized_{other.is_initialized_},
-        nonlocal_inputs_{std::move(other.nonlocal_inputs_)},
-        nonlocal_outputs_{std::move(other.nonlocal_outputs_)}
-    {
-
     }
 
     Function::~Function() = default;
@@ -140,22 +118,23 @@ namespace mxslc::runtime
 
         serializer().begin_comptime(is_comptime());
 
-        body_->execute();
-
-        VarPtr return_value;
-        if (is_void())
+        VarPtr return_value = nullptr;
+        try
         {
-            return_value = nullptr;
+            body_->execute();
         }
-        else
+        catch (const ReturnClause& clause)
         {
-            return_expr_->init(return_type_);
-            return_value = type_cast(return_type_, return_expr_->evaluate(), /*force*/true);
+            return_value = clause.return_value();
+            return_value = type_cast(return_type_, return_value, /*force*/true);
             if (is_parameterless_)
                 parameterless_cache_ = return_value;
         }
 
         serializer().end_comptime();
+
+        if (return_value == nullptr and not is_void())
+            throw CompileError{"Non-void function '" + name_ + "' did not return a value"};
 
         return return_value;
     }

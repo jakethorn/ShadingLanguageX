@@ -9,13 +9,13 @@
 
 namespace mxslc::statements
 {
-    BlockStatement::BlockStatement(Token token, vector<StmtPtr> body)
+    BlockStatement::BlockStatement(vector<StmtPtr> body, Token token)
         : Statement{std::move(token)}, body_{std::move(body)} { }
 
     StmtPtr BlockStatement::monomorphize(const TypePtr& template_type) const
     {
         vector<StmtPtr> body = runtime_utils::monomorphize(body_, template_type);
-        return create_statement<BlockStatement>(token_, std::move(body));
+        return create_statement<BlockStatement>(std::move(body), token_);
     }
 
     void BlockStatement::execute_impl() const

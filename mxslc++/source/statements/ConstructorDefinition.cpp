@@ -39,7 +39,7 @@ namespace mxslc::statements
             return ParameterList{std::move(dup_params)};
         }
 
-        std::tuple<StmtPtr, ExprPtr> get_outer_ctor_body(const TypePtr& class_type, const ParameterList& params)
+        StmtPtr get_outer_ctor_body(const TypePtr& class_type, const ParameterList& params)
         {
             string arg_list;
             for (const Parameter& param : params)
@@ -67,23 +67,21 @@ namespace mxslc::statements
             "__ctor__",
             nullptr, // template_type
             duplicate_parameters(params_),
-            std::move(body_),
-            nullptr // return_expr
+            std::move(body_)
         );
 
         const TypePtr class_type = scope().get_type(class_name_);
         class_type->add_method(inner_ctor_);
         inner_ctor_->set_class_type(class_type);
 
-        auto&& [body, return_expr] = get_outer_ctor_body(class_type, params_);
+        StmtPtr body = get_outer_ctor_body(class_type, params_);
         outer_ctor_ = create_function(
             mods_,
             class_type,
             "__" + class_name_ + "__",
             nullptr, // template_type
             std::move(params_),
-            std::move(body),
-            std::move(return_expr)
+            std::move(body)
         );
     }
 

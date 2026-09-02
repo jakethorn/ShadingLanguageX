@@ -34,7 +34,9 @@ namespace mxslc::runtime
 
         mx::GraphElementPtr graph() const { return graph_; }
         std::pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
-        void set_graph(mx::GraphElementPtr graph, FuncPtr func) { graph_ = std::move(graph); func_ = std::move(func); }
+        void set_graph(mx::GraphElementPtr graph, FuncPtr func) { graph_ = std::move(graph); graph_func_ = func; func_ = func; }
+        FuncPtr function() const { return func_; }
+        void set_function(FuncPtr func) { func_ = std::move(func); }
         bool is_inline() const;
 
         /*
@@ -81,6 +83,7 @@ namespace mxslc::runtime
         unordered_map<string, TypePtr> types_;
 
         mx::GraphElementPtr graph_;
+        FuncPtr graph_func_;
         FuncPtr func_;
     };
 }

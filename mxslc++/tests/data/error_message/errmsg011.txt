@@ -1,1 +1,1 @@
-errmsg011.mxsl, line 1: Non-void function 'foo' does not have a return statement
+errmsg011.mxsl, line 1: Non-void function 'foo' did not return a value

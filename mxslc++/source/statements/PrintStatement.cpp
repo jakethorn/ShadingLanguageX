@@ -3,7 +3,9 @@
 //
 
 #include <iostream>
+
 #include "statements/PrintStatement.h"
+
 #include "expressions/Expression.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
@@ -12,7 +14,7 @@
 
 namespace mxslc::statements
 {
-    PrintStatement::PrintStatement(Token token, vector<ExprPtr> exprs) : Statement{std::move(token)}, exprs_{std::move(exprs)}
+    PrintStatement::PrintStatement(vector<ExprPtr> exprs, Token token) : Statement{std::move(token)}, exprs_{std::move(exprs)}
     {
 
     }
@@ -20,17 +22,17 @@ namespace mxslc::statements
     StmtPtr PrintStatement::monomorphize(const TypePtr& template_type) const
     {
         vector<ExprPtr> exprs = runtime_utils::monomorphize(exprs_, template_type);
-        return create_statement<PrintStatement>(token_, std::move(exprs));
+        return create_statement<PrintStatement>(std::move(exprs), token_);
     }
 
     void PrintStatement::execute_impl() const
     {
-        std::cout << std::endl;
+        std::cout << '\n';
         for (const ExprPtr& expr : exprs_)
         {
             expr->init();
             const VarPtr var = expr->evaluate();
-            std::cout << var->to_string() << std::endl;
+            std::cout << var->to_string() << '\n';
         }
     }
 

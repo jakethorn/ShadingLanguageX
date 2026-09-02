@@ -40,6 +40,7 @@
 #include "statements/interface.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/PrintStatement.h"
+#include "statements/ReturnStatement.h"
 #include "statements/VariableDefinition.h"
 #include "statements/UsingDeclaration.h"
 #include "statements/VariableAssignment.h"
@@ -124,6 +125,11 @@ namespace mxslc
             return if_statement();
         }
 
+        if (peek() == TokenType::Return)
+        {
+            return return_statement();
+        }
+
         ModifierList mods = modifiers();
 
         if (is_typed_definition())
@@ -173,7 +179,7 @@ namespace mxslc
         while (consume(',') and peek() != ';');
         match(';');
 
-        return create_statement<PrintStatement>(std::move(token), std::move(exprs));
+        return create_statement<PrintStatement>(std::move(exprs), std::move(token));
     }
 
     StmtPtr Parser::variable_definition(ModifierList mods, TypePtr type)
@@ -245,7 +251,7 @@ namespace mxslc
         if (not params)
             match(TokenType::FatArrow);
 
-        auto [body, return_expr] = function_body();
+        StmtPtr body = function_body();
 
         return create_statement<FunctionDefinition>(
             std::move(mods),
@@ -254,7 +260,6 @@ namespace mxslc
             std::move(template_types),
             std::move(params),
             std::move(body),
-            std::move(return_expr),
             std::move(name)
         );
     }
@@ -335,7 +340,7 @@ namespace mxslc
         while (not consume('}'))
             body.push_back(statement());
 
-        return create_statement<BlockStatement>(std::move(token), std::move(body));
+        return create_statement<BlockStatement>(std::move(body), std::move(token));
     }
 
     StmtPtr Parser::if_statement()
@@ -441,29 +446,25 @@ namespace mxslc
         return {};
     }
 
-    std::tuple<StmtPtr, ExprPtr> Parser::function_body()
+    StmtPtr Parser::function_body()
     {
         vector<StmtPtr> body;
-        ExprPtr return_expr;
 
         Token token = match('{');
-        while (peek() != '}' and peek() != TokenType::Return)
+        while (not consume('}'))
             body.push_back(statement());
 
-        if (consume(TokenType::Return))
-        {
-            return_expr = expression();
-            match(';');
-        }
+        return create_statement<BlockStatement>(std::move(body), std::move(token));
+    }
 
-        // discard statements after return
-        while (not consume('}'))
-            statement();
+    StmtPtr Parser::return_statement()
+    {
+        Token token = match(TokenType::Return);
+        ExprPtr return_expr = expression();
+        StmtPtr return_stmt = create_statement<ReturnStatement>(std::move(return_expr), std::move(token));
+        match(';');
 
-        return {
-            create_statement<BlockStatement>(std::move(token), std::move(body)),
-            std::move(return_expr)
-        };
+        return return_stmt;
     }
 
     ExprPtr Parser::expression(const ModifierList& mods)

@@ -10,6 +10,7 @@
 #include "utils/load_mtlx.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
+#include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "utils/Logger.h"
 
@@ -79,6 +80,12 @@ namespace mxslc::runtime
     void Runtime::enter_scope(string name)
     {
         scope_ = create_scope(std::move(name), std::move(scope_));
+    }
+
+    void Runtime::enter_scope(FuncPtr func)
+    {
+        scope_ = create_scope(func->name(), std::move(scope_));
+        scope_->set_function(std::move(func));
     }
 
     void Runtime::exit_scope()
