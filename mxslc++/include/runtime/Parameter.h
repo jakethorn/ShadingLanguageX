@@ -21,10 +21,6 @@ namespace mxslc::runtime
     public:
         Parameter(AttributeList attrs, ModifierList mods, TypePtr type, string name, ExprPtr expr, size_t index);
 
-        Parameter(Parameter&&) noexcept;
-
-        ~Parameter() override;
-
         const AttributeList& attributes() const { return attrs_; }
         const ModifierList& modifiers() const { return mods_; }
         bool is_const() const { return mods_.contains(TokenType::Const); }

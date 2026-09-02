@@ -30,6 +30,11 @@ namespace mxslc::statements
         public:
             explicit Branch(VarPtr return_value = nullptr) : return_value_{std::move(return_value)} { }
 
+            const char* what() const noexcept override
+            {
+                return "internal error: 'return' branch escaped the function body";
+            }
+
             VarPtr return_value() const { return return_value_; }
 
         private:

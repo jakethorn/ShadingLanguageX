@@ -4,7 +4,6 @@
 
 # Linker flags for the Emscripten module.
 set(JS_LINK_FLAGS " -s WASM=1 \
-    -s DISABLE_EXCEPTION_CATCHING=0 \
     -s MODULARIZE=1 \
     -s EXPORT_ES6=1 \
     -s EXPORT_NAME='Mxslc' \
@@ -30,10 +29,6 @@ set_target_properties(JsMxslc
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
     LINK_FLAGS "${JS_LINK_FLAGS}"
 )
-
-# C++ exceptions must be enabled for the Emscripten build so that mxslc
-# CompileError / decompile exceptions are translated to JS throws.
-target_compile_options(JsMxslc PRIVATE -fexceptions)
 
 target_include_directories(JsMxslc PRIVATE
     "${CMAKE_SOURCE_DIR}/include"
