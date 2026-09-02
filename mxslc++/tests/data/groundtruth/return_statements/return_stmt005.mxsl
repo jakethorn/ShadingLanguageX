@@ -1,0 +1,19 @@
+mutable string s = "hello";
+
+inline void foo()
+{
+    return;
+    s = "world";
+}
+
+inline void bar()
+{
+    s = "world";
+    return;
+}
+
+constant(s);
+foo();
+constant(s);
+bar();
+constant(s);

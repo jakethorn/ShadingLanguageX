@@ -49,6 +49,7 @@ namespace mxslc::serialize_utils
     }
 
     constexpr_func wrap_creatematrix();
+    constexpr_func wrap_conditional_node(const std::function<Primitive(const Primitive&, const Primitive&)>& pred);
     constexpr_func wrap_switch();
 }
 

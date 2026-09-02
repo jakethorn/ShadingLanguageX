@@ -33,6 +33,7 @@ namespace mxslc::runtime
 
         Scope& scope();
         void enter_scope(string name = "");
+        void enter_scope(FuncPtr func);
         void exit_scope();
 
         Serializer& serializer();

@@ -526,7 +526,7 @@ comptime boolean __boolean__(integer in1)
 
 comptime boolean __boolean__(float in1)
 {
-    return ifequal(in1, 0.0);
+    return not(ifequal(in1, 0.0));
 }
 
 comptime integer __integer__()

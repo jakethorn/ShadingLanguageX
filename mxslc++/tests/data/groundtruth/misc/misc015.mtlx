@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <invert name="c" type="float">
+    <input name="in" type="float" value="5" />
+  </invert>
+  <invert name="d" type="float">
+    <input name="in" type="float" value="5" />
+    <input name="amount" type="float" value="4" />
+  </invert>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" value="-4" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" value="-1" />
+  </constant>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" nodename="c" />
+  </constant>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" nodename="d" />
+  </constant>
+</materialx>

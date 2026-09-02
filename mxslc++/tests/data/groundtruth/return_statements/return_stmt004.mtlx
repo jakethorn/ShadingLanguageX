@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="integer" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <randomfloat name="var__0" type="float">
+      <input name="seed" type="integer" value="0" />
+    </randomfloat>
+    <randomfloat name="var__1" type="float">
+      <input name="seed" type="integer" value="1" />
+    </randomfloat>
+    <randomfloat name="var__2" type="float">
+      <input name="seed" type="integer" value="2" />
+    </randomfloat>
+    <randomfloat name="var__3" type="float">
+      <input name="seed" type="integer" value="3" />
+    </randomfloat>
+    <randomfloat name="var__4" type="float">
+      <input name="seed" type="integer" value="4" />
+    </randomfloat>
+    <randomfloat name="var__5" type="float">
+      <input name="seed" type="integer" value="5" />
+    </randomfloat>
+    <output name="out" type="integer" value="100" />
+  </nodegraph>
+  <foo name="var__0" type="integer" />
+  <constant name="var__1" type="integer">
+    <input name="value" type="integer" nodename="var__0" />
+  </constant>
+</materialx>

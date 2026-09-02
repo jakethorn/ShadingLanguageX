@@ -33,19 +33,6 @@ namespace mxslc::runtime
 
     }
 
-    Parameter::Parameter(Parameter&& other) noexcept
-        : attrs_{std::move(other.attrs_)},
-        mods_{std::move(other.mods_)},
-        type_{std::move(other.type_)},
-        name_{std::move(other.name_)},
-        expr_{std::move(other.expr_)},
-        index_{other.index_}
-    {
-
-    }
-
-    Parameter::~Parameter() = default;
-
     Parameter Parameter::monomorphize(const TypePtr& template_type) const
     {
         auto [type, expr] = runtime_utils::monomorphize_all(template_type, type_, expr_);

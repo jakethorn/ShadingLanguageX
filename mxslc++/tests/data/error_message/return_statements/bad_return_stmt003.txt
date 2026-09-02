@@ -1,0 +1,1 @@
+bad_return_stmt003.mxsl, line 3: Cannot return a value from void function 'foo'

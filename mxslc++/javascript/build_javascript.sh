@@ -81,6 +81,7 @@ emcmake cmake -S "$MATERIALX_ROOT" -B "$BUILD_DIR/materialx" \
     -DMATERIALX_BUILD_GEN_OSL=OFF \
     -DMATERIALX_BUILD_GEN_SLANG=OFF \
     -DMATERIALX_BUILD_RENDER=OFF \
+    -DCMAKE_CXX_FLAGS="-fexceptions" \
     -G Ninja
 cmake --build "$BUILD_DIR/materialx" --target install --config Release --parallel
 

@@ -25,6 +25,16 @@ project(mxslc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# C++ exceptions must be enabled for every translation unit in the JS build.
+# Without -fexceptions, Emscripten compiles with -fignore-exceptions, which
+# discards catch handlers: exceptions used internally (e.g. the return
+# statement's ReturnStatement::Branch) then unwind past the code meant to
+# handle them and escape to the caller.
+if(BUILD_JS)
+        add_compile_options(-fexceptions)
+        add_link_options(-fexceptions)
+endif()
+
 # -------- MaterialX --------
 set(MTLX_ROOT "" CACHE PATH "Path to installed MaterialX directory")
 message(STATUS "MTLX_ROOT = ${MTLX_ROOT}")

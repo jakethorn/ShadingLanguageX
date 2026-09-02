@@ -74,6 +74,7 @@ add_library(mxslc_lib
         statements/DocumentAttribute.cpp
         statements/ClassDefinition.cpp
         statements/ConstructorDefinition.cpp
+        statements/ReturnStatement.cpp
         utils/io_utils.cpp
         utils/string_utils.cpp
         utils/parse_cli_args.cpp
@@ -96,7 +97,7 @@ add_library(mxslc_lib
         utils/primitive_utils/creatematrix.cpp
         utils/primitive_utils/invertmatrix.cpp
         utils/primitive_utils/separate.cpp
-        utils/primitive_utils/switch.cpp
+        utils/primitive_utils/conditional_nodes.cpp
         utils/primitive_utils/path_functions.cpp
         utils/primitive_utils/constant.cpp
         utils/primitive_utils/round.cpp

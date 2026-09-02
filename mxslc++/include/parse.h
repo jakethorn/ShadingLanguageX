@@ -48,7 +48,8 @@ namespace mxslc
         Field field();
         Parameter parameter(size_t index);
         vector<TypePtr> template_list();
-        std::tuple<StmtPtr, ExprPtr> function_body();
+        StmtPtr function_body();
+        StmtPtr return_statement();
 
         ExprPtr expression(const ModifierList& mods = {});
         ExprPtr logical();

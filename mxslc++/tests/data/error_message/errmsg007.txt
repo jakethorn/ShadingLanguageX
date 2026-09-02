@@ -1,1 +1,1 @@
-errmsg007.mxsl, line 1: Void function 'foo' has a return statement
+errmsg007.mxsl, line 3: Cannot return a value from void function 'foo'

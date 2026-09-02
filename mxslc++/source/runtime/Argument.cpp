@@ -41,18 +41,6 @@ namespace mxslc::runtime
     Argument::Argument(Primitive value, const size_t index)
         : Argument{as_expression(std::move(value)), index} { }
 
-    Argument::Argument(Argument&& other) noexcept
-        : attrs_{std::move(other.attrs_)},
-        mods_{std::move(other.mods_)},
-        name_{std::move(other.name_)},
-        expr_{std::move(other.expr_)},
-        index_{other.index_}
-    {
-
-    }
-
-    Argument::~Argument() = default;
-
     Argument Argument::monomorphize(const TypePtr& template_type) const
     {
         return Argument{name_, expr_->monomorphize(template_type), index_};

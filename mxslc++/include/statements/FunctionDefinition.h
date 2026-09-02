@@ -14,8 +14,15 @@ namespace mxslc::statements
     class FunctionDefinition final : public Statement
     {
     public:
-        FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, optional<ParameterList> params, StmtPtr body, ExprPtr return_expr);
-        FunctionDefinition(ModifierList mods, TypePtr type, string name, vector<TypePtr> template_types, optional<ParameterList> params, StmtPtr body, ExprPtr return_expr, Token token);
+        FunctionDefinition(
+            ModifierList mods,
+            TypePtr type,
+            string name,
+            vector<TypePtr> template_types,
+            optional<ParameterList> params,
+            StmtPtr body,
+            Token token = {}
+        );
 
         const vector<FuncPtr>& functions() const { return funcs_; }
 
@@ -38,7 +45,6 @@ namespace mxslc::statements
         vector<TypePtr> template_types_;
         optional<ParameterList> params_;
         StmtPtr body_;
-        ExprPtr return_expr_;
 
         vector<FuncPtr> funcs_;
 

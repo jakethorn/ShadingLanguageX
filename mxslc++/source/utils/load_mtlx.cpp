@@ -95,10 +95,10 @@ namespace mxslc
             return defaults;
         }
 
-        Parameter to_parameter(const mx::InputPtr& i, const size_t index)
+        Parameter to_parameter(const mx::InputPtr& input, const size_t index)
         {
-            const TypePtr type = Runtime::get().scope().get_type(i->getType());
-            const string& name = i->getName();
+            const TypePtr type = Type::of(input);
+            const string& name = input->getName();
             ExprPtr expr = create_expression<NullExpression>();
             return Parameter{AttributeList{}, ModifierList{}, type, name, std::move(expr), index};
         }
@@ -117,8 +117,8 @@ namespace mxslc
         {
             vector<TypePtr> subtypes;
             subtypes.reserve(nd->getOutputCount());
-            for (const mx::OutputPtr& o : nd->getActiveOutputs())
-                subtypes.push_back(create_type(o->getType()));
+            for (const mx::OutputPtr& output : nd->getActiveOutputs())
+                subtypes.push_back(Type::of(output));
 
             const TypePtr type = subtypes.size() == 1 ? subtypes.at(0) : create_type(std::move(subtypes));
             return Runtime::get().scope().resolve_type(type);

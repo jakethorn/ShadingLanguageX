@@ -1,0 +1,11 @@
+int foo()
+{
+    for (int i from 0 to 9)
+    {
+        return 100;
+    }
+
+    return 200;
+}
+
+constant(foo());

@@ -29,14 +29,14 @@ namespace mxslc::runtime
         {
             parent_->is_youngest_ = false;
             graph_ = parent_->graph_;
-            func_ = parent_->func_;
+            graph_func_ = parent_->graph_func_;
         }
     }
 
     std::pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
     {
         if (const mx::NodeGraphPtr& node_graph = std::dynamic_pointer_cast<mx::NodeGraph>(graph_))
-            return {node_graph, func_};
+            return {node_graph, graph_func_};
 
         throw CompileError{"Not in a node graph"};
     }
@@ -45,7 +45,7 @@ namespace mxslc::runtime
     {
         if (parent_ == nullptr)
             return true;
-        return func_ == parent_->func_;
+        return graph_func_ == parent_->graph_func_;
     }
 
     void Scope::add_variable(string name, VarPtr var)

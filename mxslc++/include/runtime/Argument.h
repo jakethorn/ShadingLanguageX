@@ -30,10 +30,6 @@ namespace mxslc::runtime
         Argument(ValuePtr value, size_t index);
         Argument(Primitive value, size_t index);
 
-        Argument(Argument&& other) noexcept;
-
-        ~Argument() override;
-
         const AttributeList& attributes() const { return attrs_; }
         const ModifierList& modifiers() const { return mods_; }
         bool has_name() const { return not name_.empty(); }

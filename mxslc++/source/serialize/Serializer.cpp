@@ -134,7 +134,7 @@ namespace mxslc::serialize
 
         if (reduce_graph_ or comptime_scope_.top())
         {
-            if (VarPtr value = serialize_constexpr(func->return_type(), func->name(), input_values))
+            if (VarPtr value = serialize_constexpr(func, input_values))
                 return value;
         }
 
@@ -203,7 +203,7 @@ namespace mxslc::serialize
 
     void Serializer::write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const
     {
-        runtime().enter_scope(func->name());
+        runtime().enter_scope(func);
 
         if (func->is_parameterless())
         {

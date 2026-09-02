@@ -37,11 +37,8 @@ namespace mxslc::runtime
             string name,
             TypePtr template_type,
             optional<ParameterList> params,
-            StmtPtr body,
-            ExprPtr return_expr
+            StmtPtr body
         );
-
-        Function(Function&& other) noexcept;
 
         ~Function() override;
 
@@ -95,7 +92,6 @@ namespace mxslc::runtime
         TypePtr template_type_;
         ParameterList params_;
         StmtPtr body_;
-        ExprPtr return_expr_;
 
         mx::NodeDefPtr node_def_;
         mx::NodeGraphPtr node_graph_;

@@ -12,7 +12,7 @@ namespace mxslc::statements
     class PrintStatement final : public Statement
     {
     public:
-        PrintStatement(Token token, vector<ExprPtr> exprs);
+        explicit PrintStatement(vector<ExprPtr> exprs, Token token = {});
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
