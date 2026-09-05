@@ -49,7 +49,13 @@ namespace mxslc::runtime
         body_{std::move(body)},
         is_parameterless_{not params.has_value()}
     {
-        mods_.validate(TokenType::Inline, TokenType::Default, TokenType::Comptime);
+        mods_.validate(
+            TokenType::Inline,
+            TokenType::Nodegraph,
+            TokenType::Nodedef,
+            TokenType::Default,
+            TokenType::Comptime
+        );
 
         if (return_type_->is_void() and is_parameterless_)
             throw CompileError{"Parameterless function '" + name_ + "' cannot be void"};

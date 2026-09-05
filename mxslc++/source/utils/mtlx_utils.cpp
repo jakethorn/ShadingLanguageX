@@ -98,4 +98,9 @@ namespace mxslc::mtlx_utils
     {
         port->getParent()->removeChild(port->getName());
     }
+
+    void convert_to_nodegraph(const mx::NodeDefPtr& node_def, const mx::NodeGraphPtr& node_graph)
+    {
+        
+    }
 }

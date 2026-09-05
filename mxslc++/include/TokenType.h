@@ -62,6 +62,8 @@ namespace mxslc
             DoubleAt,
             DoubleAmpersand,
             DoublePipe,
+            DoubleLeftBracket,
+            DoubleRightBracket,
 
             // Keyword
             If,
@@ -78,6 +80,8 @@ namespace mxslc
             Consteval,
             Global,
             Geomprop,
+            Nodegraph,
+            Nodedef,
             Inline,
             Default,
             Comptime,
@@ -112,12 +116,12 @@ namespace mxslc
 
         inline static const unordered_set CompoundSymbols {
             BangEq, EqualsEq, GreaterEq, LessEq, PlusEq, MinusEq, StarEq, SlashEq, PercentEq, CaretEq, AmpersandEq, PipeEq,
-            Arrow, FatArrow, DoubleColon, Increment, Decrement, DoubleAt, DoubleAmpersand, DoublePipe
+            Arrow, FatArrow, DoubleColon, Increment, Decrement, DoubleAt, DoubleAmpersand, DoublePipe, DoubleLeftBracket, DoubleRightBracket
         };
 
         inline static const unordered_set Keywords {
-            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Inline, Default,
-            Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
+            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Nodegraph, Nodedef,
+            Inline, Default, Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break
         };
 
     private:
@@ -142,6 +146,8 @@ namespace mxslc
             {"@@", DoubleAt},
             {"&&", DoubleAmpersand},
             {"||", DoublePipe},
+            {"[[", DoubleLeftBracket},
+            {"]]", DoubleRightBracket},
             {"if", If},
             {"else", Else},
             {"for", For},
@@ -156,6 +162,8 @@ namespace mxslc
             {"consteval", Consteval},
             {"global", Global},
             {"geomprop", Geomprop},
+            {"nodegraph", Nodegraph},
+            {"nodedef", Nodedef},
             {"inline", Inline},
             {"default", Default},
             {"comptime", Comptime},

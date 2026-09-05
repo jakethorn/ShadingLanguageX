@@ -397,17 +397,21 @@ namespace mxslc
 
     ModifierList Parser::modifiers()
     {
+        consume("[[");
         const vector<Token> mod_tokens = consume_while(
             TokenType::Const,
             TokenType::Mutable,
             TokenType::Global,
             TokenType::Geomprop,
+            TokenType::Nodegraph,
+            TokenType::Nodedef,
             TokenType::Inline,
             TokenType::Default,
             TokenType::Comptime,
             TokenType::Ref,
             TokenType::Out
         );
+        consume("]]");
 
         return ModifierList{mod_tokens};
     }

@@ -98,7 +98,7 @@ namespace mxslc::runtime
         return serializer_;
     }
 
-    void Runtime::destroy() const
+    void Runtime::finalise() const
     {
         if (not opts_.error_on_unused_globals)
             return;

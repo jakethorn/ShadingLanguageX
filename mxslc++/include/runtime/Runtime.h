@@ -38,7 +38,7 @@ namespace mxslc::runtime
 
         Serializer& serializer();
 
-        void destroy() const;
+        void finalise() const;
 
     private:
         void load_libraries();

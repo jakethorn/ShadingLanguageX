@@ -92,6 +92,8 @@ namespace mxslc
                 runtime.exit_scope();
             }
 
+            runtime.finalise();
+
             return runtime.serializer().document();
         }
 
