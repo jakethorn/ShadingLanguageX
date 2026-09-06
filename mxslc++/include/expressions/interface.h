@@ -23,12 +23,14 @@ namespace mxslc::expressions
     }
 
 #define TYPE_DEF(T) class T; \
-using T##Ptr = shared_ptr<T>;
+using T##Ptr = shared_ptr<T>; \
+using Const##T##Ptr = shared_ptr<const T>;
 
     TYPE_DEF(CompoundAssignment)
     TYPE_DEF(DotOperator)
     TYPE_DEF(FunctionCall)
     TYPE_DEF(Identifier)
+    TYPE_DEF(IfExpression)
     TYPE_DEF(IncrementOperator)
     TYPE_DEF(IndexingOperator)
     TYPE_DEF(Literal)

@@ -41,6 +41,12 @@ namespace mxslc::serialize::values
         output->setNodeGraphString(name_);
     }
 
+    void NodeGraphValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
+    {
+        const mx::InputPtr input = node_graph->addInput(input_name);
+        input->setNodeGraphString(name_);
+    }
+
     string NodeGraphValue::to_string() const
     {
         string node_graph_name = name_;

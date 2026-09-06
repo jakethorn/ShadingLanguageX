@@ -19,6 +19,7 @@ namespace mxslc::runtime
 
     class Function;
     using FuncPtr = shared_ptr<Function>;
+    using ConstFuncPtr = shared_ptr<const Function>;
 
     class Type;
     using TypePtr = shared_ptr<Type>;

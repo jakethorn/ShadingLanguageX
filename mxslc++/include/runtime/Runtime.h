@@ -43,6 +43,7 @@ namespace mxslc::runtime
     private:
         void load_libraries();
         void load_materialx_library();
+        void check_unused_globals() const;
 
         CompileOptions opts_;
         mx::DocumentPtr mtlx_lib_;

@@ -176,7 +176,7 @@ namespace mxslc::runtime
         }
         else
         {
-            return serializer().write_node_def_input(shared_from_this());
+            return serializer().write_node_def_graph_input(shared_from_this());
         }
     }
 
@@ -379,7 +379,7 @@ namespace mxslc::runtime
         }
         else
         {
-            serializer().write_node_def_output(shared_from_this(), value);
+            serializer().write_node_def_graph_output(shared_from_this(), value);
         }
 
         is_initialized_ = true;

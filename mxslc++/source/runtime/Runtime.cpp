@@ -55,23 +55,6 @@ namespace mxslc::runtime
         return nullptr;
     }
 
-    void Runtime::load_libraries()
-    {
-        for (const fs::path& path : opts_.libraries)
-        {
-            io_utils::search(opts_.search_directories(), path, [](const fs::path& found_path) {
-                load_library(found_path);
-            });
-        }
-    }
-
-    void Runtime::load_materialx_library()
-    {
-        mtlx_lib_ = get_materialx_library(opts_.version, opts_.search_directories());
-        load_library(mtlx_lib_);
-        Logger::debug("Loaded MaterialX version " + opts_.version + " libraries.");
-    }
-
     Scope& Runtime::scope()
     {
         return *scope_;
@@ -99,6 +82,29 @@ namespace mxslc::runtime
     }
 
     void Runtime::finalise() const
+    {
+        serializer_.finalise();
+        check_unused_globals();
+    }
+
+    void Runtime::load_libraries()
+    {
+        for (const fs::path& path : opts_.libraries)
+        {
+            io_utils::search(opts_.search_directories(), path, [](const fs::path& found_path) {
+                load_library(found_path);
+            });
+        }
+    }
+
+    void Runtime::load_materialx_library()
+    {
+        mtlx_lib_ = get_materialx_library(opts_.version, opts_.search_directories());
+        load_library(mtlx_lib_);
+        Logger::debug("Loaded MaterialX version " + opts_.version + " libraries.");
+    }
+
+    void Runtime::check_unused_globals() const
     {
         if (not opts_.error_on_unused_globals)
             return;

@@ -11,13 +11,14 @@
 #include "runtime/ModifierList.h"
 #include "runtime/utils/monomorphize.h"
 #include "runtime/utils/RuntimeAware.h"
+#include "utils/EnableSharedFromThis.h"
 
 namespace mxslc::expressions
 {
     using runtime_utils::Monomorphizable;
     using runtime_utils::RuntimeAware;
 
-    class Expression : public Monomorphizable<ExprPtr>, public Stringable, protected RuntimeAware
+    class Expression : public EnableSharedFromThis<Expression>, public Monomorphizable<ExprPtr>, public Stringable, protected RuntimeAware
     {
     public:
         Expression() = default;
@@ -26,6 +27,8 @@ namespace mxslc::expressions
         ~Expression() override = default;
 
         const Token& token() const { return token_; }
+        const ModifierList& modifiers() const { return mods_; }
+        const AttributeList& attributes() const { return attrs_; }
 
         void set_modifiers(ModifierList mods) { mods_ = std::move(mods); }
         void set_attributes(AttributeList attrs) { attrs_ = std::move(attrs); }

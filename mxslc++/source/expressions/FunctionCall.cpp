@@ -130,10 +130,11 @@ namespace mxslc::expressions
         }
         else
         {
-            if (func_->is_parameterless())
-                return serialize_utils::create_node_graph_value(func_);
+            const ConstFunctionCallPtr self = shared_from_child<FunctionCall>();
+            if (func_->is_nodegraph())
+                return serializer().write_node_graph_value(self);
             else
-                return serializer().write_node(func_, args_, attrs_);
+                return serializer().write_node(self);
         }
     }
 

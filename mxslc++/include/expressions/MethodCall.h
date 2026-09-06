@@ -18,6 +18,8 @@ namespace mxslc::expressions
         MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
         MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
+        VarPtr instance() const { return instance_; }
+
         string to_string() const override;
 
     protected:

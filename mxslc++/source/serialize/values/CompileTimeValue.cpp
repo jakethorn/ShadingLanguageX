@@ -61,6 +61,20 @@ namespace mxslc::serialize::values
         });
     }
 
+    void CompileTimeValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
+    {
+        mx::InputPtr input = node_graph->addInput(input_name, type_->name());
+
+        value_.visit([this, &input](const auto& v) {
+            IF_VISITED_TYPE_IS(std::monostate)
+                mtlx_utils::remove_port(input);
+            else IF_VISITED_TYPE_IS(fs::path)
+                input->setValue(v.string(), type_name());
+            else
+                input->setValue(v, type_name());
+        });
+    }
+
     string CompileTimeValue::to_string() const
     {
         return value_.to_string();

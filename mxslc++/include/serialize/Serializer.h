@@ -2,14 +2,15 @@
 // Created by jaket on 04/01/2026.
 //
 
-#ifndef FENNEC_MTLXSERIALIZER_H
-#define FENNEC_MTLXSERIALIZER_H
+#ifndef FENNEC_SERIALIZER_H
+#define FENNEC_SERIALIZER_H
 
 #include <stack>
 
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
+#include "FunctionCallHistory.h"
 #include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::runtime
@@ -34,21 +35,28 @@ namespace mxslc::serialize
         void begin_comptime(bool is_comptime = true) const;
         bool end_comptime() const;
 
-        VarPtr write_node(const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
-        VarPtr write_node(const VarPtr& instance, const FuncPtr& func, const ArgumentList& args, const AttributeList& attrs) const;
+        VarPtr write_node(const ConstFunctionCallPtr& func_call) const;
+        VarPtr write_node(const ConstMethodCallPtr& method_call) const;
+        VarPtr write_node(const VarPtr& instance, const ConstFunctionCallPtr& func_call) const;
+
+        VarPtr write_node_graph_value(const ConstFunctionCallPtr& func_call) const;
 
         void write_node_def_graph(const FuncPtr& func) const;
         void write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const;
 
-        ValuePtr write_node_def_input(const VarPtr& var) const;
-        void write_node_def_output(const VarPtr& var, const ValuePtr& value) const;
+        ValuePtr write_node_def_graph_input(const VarPtr& var) const;
+        void write_node_def_graph_output(const VarPtr& var, const ValuePtr& value) const;
 
         mx::DocumentPtr document() const { return doc_; }
         string xml() const;
+
+        void finalise() const;
+
         void save(const fs::path& dst_path) const;
 
     private:
         mx::NodeDefPtr write_node_def(const FuncPtr& func) const;
+        mx::NodeGraphPtr write_node_graph(const FuncPtr& func) const;
         mx::NodeGraphPtr write_node_graph(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
 
         void add_instance_to_scope(const FuncPtr& func, const mx::NodeDefPtr& node_def) const;
@@ -59,6 +67,8 @@ namespace mxslc::serialize
         void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
         void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var) const;
         void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var, const AttributeList& attrs) const;
+        void write_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name, const VarPtr& var) const;
+        void write_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
         void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const TypePtr& type) const;
         void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var) const;
         void write_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
@@ -71,7 +81,9 @@ namespace mxslc::serialize
 
         mutable std::stack<bool> comptime_scope_{{false}};
         mutable bool comptime_violated_{false};
+
+        mutable FunctionCallHistory func_call_history_;
     };
 }
 
-#endif //FENNEC_MTLXSERIALIZER_H
+#endif //FENNEC_SERIALIZER_H

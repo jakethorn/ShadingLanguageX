@@ -89,6 +89,8 @@ namespace mxslc::statements
 
             if (not func->is_inline())
                 serializer().write_node_def_graph(func, attrs_);
+            else if (func->is_nodegraph())
+                serializer().write_node_graph(func, attrs_);
         }
     }
 

@@ -22,6 +22,9 @@ namespace mxslc::expressions
         FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
         FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
+        FuncPtr function() const { return func_; }
+        const ArgumentList& arguments() const { return args_; }
+
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;

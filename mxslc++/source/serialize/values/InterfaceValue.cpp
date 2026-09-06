@@ -4,6 +4,8 @@
 
 #include "serialize/values/InterfaceValue.h"
 
+#include <cassert>
+
 #include "runtime/Type.h"
 #include "utils/mtlx_utils.h"
 #include "serialize/values/interface.h"
@@ -35,6 +37,11 @@ namespace mxslc::serialize::values
     {
         const mx::OutputPtr output = add_or_get_output(node_graph, type_, output_name);
         set_interface(output, name_);
+    }
+
+    void InterfaceValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
+    {
+        assert(false);
     }
 
     string InterfaceValue::to_string() const
