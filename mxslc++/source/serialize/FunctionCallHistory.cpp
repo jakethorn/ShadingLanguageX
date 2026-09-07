@@ -2,8 +2,6 @@
 // Created by jaket on 05/09/2026.
 //
 
-#include <cassert>
-
 #include "serialize/FunctionCallHistory.h"
 
 #include "expressions/FunctionCall.h"
@@ -15,13 +13,15 @@ namespace mxslc::serialize
 
     void FunctionCallHistory::add_function(ConstFuncPtr func)
     {
-        //assert(not contains(calls_, func));
-        //calls_.emplace(std::move(func), vector<ConstFunctionCallPtr>{});
+        if (not contains(calls_, func))
+            calls_.emplace(std::move(func), vector<ConstFunctionCallPtr>{});
     }
 
     void FunctionCallHistory::add_call(ConstFunctionCallPtr call)
     {
-        //assert(contains(calls_, call->function()));
-        //calls_[call->function()].push_back(std::move(call));
+        if (not contains(calls_, call->function()))
+            add_function(call->function());
+
+        calls_[call->function()].push_back(std::move(call));
     }
 }

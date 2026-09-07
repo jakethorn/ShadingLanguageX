@@ -41,7 +41,7 @@ namespace mxslc::serialize::values
 
     void InterfaceValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
     {
-        assert(false);
+        throw CompileError{"Invalid node graph input. You cannot reference variables from an enclosing function in a nodegraph function."};
     }
 
     string InterfaceValue::to_string() const
