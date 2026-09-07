@@ -1,0 +1,26 @@
+
+mutable float r = randomfloat(in=1);
+mutable float s = randomfloat(in=2);
+
+color3 c = checkerboard();
+
+[[nodegraph]]
+void foo(float a = c.r, float b = c.b)
+{
+    r = randomfloat(in=a);
+    s = randomfloat(in=b);
+}
+
+constant(r);
+constant(s);
+
+foo();
+
+constant(r);
+constant(s);
+
+r = randomfloat(in=5);
+s = randomfloat(in=6);
+
+constant(r);
+constant(s);

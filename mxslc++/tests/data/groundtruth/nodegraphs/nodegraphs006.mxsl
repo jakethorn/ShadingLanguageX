@@ -1,0 +1,24 @@
+
+mutable float r = randomfloat(seed=1);
+mutable float s = randomfloat(seed=2);
+
+[[nodegraph]]
+void foo()
+{
+    r = randomfloat(seed=3);
+    s = randomfloat(seed=4);
+}
+
+constant(r);
+constant(s);
+
+foo();
+
+constant(r);
+constant(s);
+
+r = randomfloat(seed=5);
+s = randomfloat(seed=6);
+
+constant(r);
+constant(s);

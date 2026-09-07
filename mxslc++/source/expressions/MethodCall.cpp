@@ -60,11 +60,7 @@ namespace mxslc::expressions
 
         func_ = runtime_utils::resolve_method(instance_->type(), types, name_, template_type_, args_, is_argumentless_);
 
-        for (const Argument& arg : args_)
-        {
-            assert(arg.is_initialized());
-            arg.validate(func_->parameters()[arg]);
-        }
+        validate_arguments();
     }
 
     VarPtr MethodCall::evaluate_impl() const

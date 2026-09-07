@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="r" type="float">
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <randomfloat name="s" type="float">
+    <input name="seed" type="integer" value="2" />
+  </randomfloat>
+  <nodegraph name="NG_foo">
+    <randomfloat name="var__0" type="float">
+      <input name="seed" type="integer" value="3" />
+    </randomfloat>
+    <output name="nonlocal_out__r" type="float" nodename="var__0" />
+    <randomfloat name="var__1" type="float">
+      <input name="seed" type="integer" value="4" />
+    </randomfloat>
+    <output name="nonlocal_out__s" type="float" nodename="var__1" />
+  </nodegraph>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodename="r" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" nodename="s" />
+  </constant>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" output="nonlocal_out__r" nodegraph="NG_foo" />
+  </constant>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" output="nonlocal_out__s" nodegraph="NG_foo" />
+  </constant>
+  <randomfloat name="var__4" type="float">
+    <input name="seed" type="integer" value="5" />
+  </randomfloat>
+  <randomfloat name="var__5" type="float">
+    <input name="seed" type="integer" value="6" />
+  </randomfloat>
+  <constant name="var__6" type="float">
+    <input name="value" type="float" nodename="var__4" />
+  </constant>
+  <constant name="var__7" type="float">
+    <input name="value" type="float" nodename="var__5" />
+  </constant>
+</materialx>

@@ -56,7 +56,7 @@ namespace mxslc::runtime
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
         string default_value_string = has_default_value() ? expr_->to_string() : "";
         if (default_value_string.empty() or default_value_string == "null")
@@ -64,6 +64,6 @@ namespace mxslc::runtime
         else
             default_value_string = " = " + default_value_string;
 
-        return mods_string + type_->to_string() + " " + name_ + default_value_string;
+        return mods_string + type_->to_string() + ' ' + name_ + default_value_string;
     }
 }

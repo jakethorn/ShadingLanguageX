@@ -1,0 +1,15 @@
+
+nodedef float bar()
+{
+    float a = randomfloat(in=1);
+    float b = randomfloat(in=2);
+
+    nodegraph float foo(float x = a, float y = b)
+    {
+        return x + y;
+    }
+
+    return foo();
+}
+
+constant(bar());

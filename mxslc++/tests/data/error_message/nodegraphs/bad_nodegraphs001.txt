@@ -1,0 +1,1 @@
+bad_nodegraphs001.mxsl, line 8: Arguments cannot be passed to nodegraph functions

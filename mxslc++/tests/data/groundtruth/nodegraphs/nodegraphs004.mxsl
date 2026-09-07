@@ -1,0 +1,11 @@
+
+mutable float r = randomfloat(seed=1);
+mutable float s = randomfloat(seed=2);
+
+[[nodegraph]]
+float foo()
+{
+    return r + s;
+}
+
+constant(foo());

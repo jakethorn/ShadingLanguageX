@@ -1,0 +1,1 @@
+bad_nodegraphs003.mxsl, line 2: Functions cannot be both inline and nodegraph

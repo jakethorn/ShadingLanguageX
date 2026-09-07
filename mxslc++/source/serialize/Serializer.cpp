@@ -214,7 +214,19 @@ namespace mxslc::serialize
     {
         const FuncPtr func = func_call->function();
         assert(func->is_nodegraph());
-        assert(func_call->arguments().empty());
+
+        const ArgumentList args = func_call->arguments();
+        ParameterValues input_values = args.evaluate(func->parameters());
+
+        for (const auto& [param, input_value] : input_values)
+        {
+            if (param.is_out())
+            {
+                const string output_name = with_prefix(OUT_PARAMETER_PREFIX, param.name());
+                const VarPtr output = serialize_utils::create_node_graph_output_value(func->node_graph(), param.type(), output_name);
+                input_value->copy(output);
+            }
+        }
 
         // outputs to nonlocal variables
         for (const VarPtr& var : func->nonlocal_outputs())
@@ -275,7 +287,7 @@ namespace mxslc::serialize
         const string input_name = with_prefix(NONLOCAL_IN_PREFIX, var->name());
 
         if (func->is_nodegraph())
-            write_node_graph_input(node_graph, input_name, var);
+            write_node_graph_input(node_graph, input_name, create_variable(var->raw_value()));
         else
             write_node_def_input(node_graph->getNodeDef(), input_name, var->type());
 

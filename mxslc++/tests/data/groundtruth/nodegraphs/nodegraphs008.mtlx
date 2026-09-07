@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodegraph name="NG_foo">
+    <input name="a" type="float" value="1" />
+    <input name="b" type="float" value="1" />
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="a" />
+      <input name="in2" type="float" interfacename="b" />
+    </add>
+    <output name="outparam__c" type="float" nodename="var__0" />
+  </nodegraph>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" output="outparam__c" nodegraph="NG_foo" />
+  </constant>
+</materialx>

@@ -1,0 +1,9 @@
+
+[[nodegraph]]
+void foo(float a = 1, float b = 1, out float c)
+{
+    c = a + b;
+}
+
+foo(c = out float x);
+constant(x);

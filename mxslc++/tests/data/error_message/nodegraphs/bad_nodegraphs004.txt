@@ -1,0 +1,1 @@
+bad_nodegraphs004.mxsl, line 7: Invalid node graph input. You cannot reference variables from an enclosing function in a nodegraph function.

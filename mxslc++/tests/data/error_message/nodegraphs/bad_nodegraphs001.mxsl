@@ -1,0 +1,8 @@
+
+[[nodegraph]]
+float foo(float x = 1, float y = 1)
+{
+    return x + y;
+}
+
+constant(foo(3, 4));

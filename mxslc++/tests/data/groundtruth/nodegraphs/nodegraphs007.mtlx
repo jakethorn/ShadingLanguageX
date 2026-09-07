@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="r" type="float">
+    <input name="in" type="integer" value="1" />
+  </randomfloat>
+  <randomfloat name="s" type="float">
+    <input name="in" type="integer" value="2" />
+  </randomfloat>
+  <checkerboard name="c" type="color3" />
+  <nodegraph name="NG_foo">
+    <input name="a" type="color3" nodename="var__0" />
+    <input name="b" type="color3" nodename="var__1" />
+    <randomfloat name="var__0" type="float">
+      <input name="in" type="float" interfacename="a" />
+    </randomfloat>
+    <output name="nonlocal_out__r" type="float" nodename="var__0" />
+    <randomfloat name="var__1" type="float">
+      <input name="in" type="float" interfacename="b" />
+    </randomfloat>
+    <output name="nonlocal_out__s" type="float" nodename="var__1" />
+  </nodegraph>
+  <extract name="var__0" type="float">
+    <input name="in" type="color3" nodename="c" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="var__1" type="float">
+    <input name="in" type="color3" nodename="c" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" nodename="r" />
+  </constant>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" nodename="s" />
+  </constant>
+  <constant name="var__4" type="float">
+    <input name="value" type="float" output="nonlocal_out__r" nodegraph="NG_foo" />
+  </constant>
+  <constant name="var__5" type="float">
+    <input name="value" type="float" output="nonlocal_out__s" nodegraph="NG_foo" />
+  </constant>
+  <randomfloat name="var__6" type="float">
+    <input name="in" type="integer" value="5" />
+  </randomfloat>
+  <randomfloat name="var__7" type="float">
+    <input name="in" type="integer" value="6" />
+  </randomfloat>
+  <constant name="var__8" type="float">
+    <input name="value" type="float" nodename="var__6" />
+  </constant>
+  <constant name="var__9" type="float">
+    <input name="value" type="float" nodename="var__7" />
+  </constant>
+</materialx>

@@ -1,0 +1,11 @@
+
+float r = randomfloat();
+float s = randomfloat();
+
+[[nodegraph]]
+float foo(float x = r, float y = s)
+{
+    return x + y;
+}
+
+constant(foo());

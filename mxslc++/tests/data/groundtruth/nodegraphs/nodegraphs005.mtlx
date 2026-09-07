@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="r" type="float">
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <randomfloat name="s" type="float">
+    <input name="seed" type="integer" value="2" />
+  </randomfloat>
+  <nodegraph name="NG_foo">
+    <input name="nonlocal_in__r" type="color3" nodename="r" />
+    <input name="nonlocal_in__s" type="color3" nodename="s" />
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="nonlocal_in__r" />
+      <input name="in2" type="float" interfacename="nonlocal_in__s" />
+    </add>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodegraph="NG_foo" />
+  </constant>
+  <randomfloat name="var__1" type="float">
+    <input name="seed" type="integer" value="3" />
+  </randomfloat>
+  <randomfloat name="var__2" type="float">
+    <input name="seed" type="integer" value="4" />
+  </randomfloat>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" nodegraph="NG_foo" />
+  </constant>
+</materialx>

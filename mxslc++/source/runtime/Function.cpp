@@ -57,8 +57,32 @@ namespace mxslc::runtime
             TokenType::Comptime
         );
 
-        if (return_type_->is_void() and is_parameterless_)
+        if (is_comptime() and is_nodegraph())
+            throw CompileError{"Functions cannot be both comptime and nodegraph"};
+
+        if (is_comptime() and is_nodedef())
+            throw CompileError{"Functions cannot be both comptime and nodedef"};
+
+        if (is_inline() and is_nodegraph())
+            throw CompileError{"Functions cannot be both inline and nodegraph"};
+
+        if (is_inline() and is_nodedef())
+            throw CompileError{"Functions cannot be both inline and nodedef"};
+
+        if (is_nodegraph() and is_nodedef())
+            throw CompileError{"Functions cannot be both nodegraph and nodedef"};
+
+        if (is_void() and is_parameterless())
             throw CompileError{"Parameterless function '" + name_ + "' cannot be void"};
+
+        if (is_nodegraph())
+        {
+            for (const Parameter& param : params_)
+            {
+                if (param.is_in() and not param.has_default_value())
+                    throw CompileError{"Nodegraph function parameter '" + param.name() + "' must have a default value"};
+            }
+        }
     }
 
     Function::~Function() = default;

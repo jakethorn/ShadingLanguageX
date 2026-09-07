@@ -42,11 +42,11 @@ namespace mxslc::runtime
 
         ~Function() override;
 
-        bool is_inline() const { return mods_.contains(TokenType::Inline) or is_comptime(); }
-        bool is_nodegraph() const { return mods_.contains(TokenType::Nodegraph); }
-        bool is_nodedef() const { return mods_.contains(TokenType::Nodedef); }
-        bool is_default() const { return mods_.contains(TokenType::Default); }
         bool is_comptime() const { return mods_.contains(TokenType::Comptime); }
+        bool is_inline() const { return mods_.contains(TokenType::Inline) or is_comptime(); }
+        bool is_nodegraph() const { return mods_.contains(TokenType::Nodegraph) or (is_parameterless() and not is_inline()); }
+        bool is_nodedef() const { return not is_inline() and not is_nodegraph(); }
+        bool is_default() const { return mods_.contains(TokenType::Default); }
         const TypePtr& return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }
