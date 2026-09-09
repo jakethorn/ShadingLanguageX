@@ -273,15 +273,31 @@ def generate_package_json(with_converter: bool = False) -> dict:
         pkg["contributes"]["commands"] = [
             {
                 "command": "mxsl.convert",
-                "title": "MXSL: Convert between MXSL and MTLX"
+                "title": "MXSL: Convert between MXSL and MTLX",
+                "icon": "$(arrow-swap)"
             },
             {
                 "command": "mxsl.validate",
-                "title": "MXSL: Validate current file (MXSL <-> MTLX)"
+                "title": "MXSL: Validate current file (MXSL <-> MTLX)",
+                "icon": "$(check-all)"
             }
         ]
         pkg["contributes"]["menus"] = {
             "editor/context": [
+                {
+                    "command": "mxsl.convert",
+                    "when": "editorLangId == mxsl || editorLangId == xml",
+                    "group": "navigation"
+                },
+                {
+                    "command": "mxsl.validate",
+                    "when": "editorLangId == mxsl || editorLangId == xml",
+                    "group": "navigation"
+                }
+            ],
+            # Icons shown in the editor title bar (top-right), like the built-in
+            # Markdown preview button. Only appear while editing .mxsl/.mtlx files.
+            "editor/title": [
                 {
                     "command": "mxsl.convert",
                     "when": "editorLangId == mxsl || editorLangId == xml",
