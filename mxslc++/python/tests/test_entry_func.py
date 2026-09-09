@@ -55,21 +55,19 @@ def test_inline_separate_roundtrip():
     its outputs must be addressed by index rather than `.outx`/`.outz` member
     access. Round-trips the document as
 
-        mtlx -> mxsl -> mtlx -> mxsl -> mtlx
+        mtlx -> mxsl -> mtlx
 
     and requires every stage to pass (no exception).
     """
-    mtlx0 = get_data("separate_combine.mtlx")
+    mtlx = get_data("separate_combine.mtlx")
 
-    # mtlx -> mxsl
-    mxsl1 = mxslc.decompile_string_to_string(mtlx0)
+    # mtlx -> mxsl: separate3 outputs must be indexed, never member-named.
+    mxsl1 = mxslc.decompile_string_to_string(mtlx)
+    assert_matches_groundtruth(mxsl1, "separate_combine.mxsl")
+
     # mxsl -> mtlx
     mtlx2 = mxslc.compile_string_to_string(mxsl1)
-    # mtlx -> mxsl
-    mxsl3 = mxslc.decompile_string_to_string(mtlx2)
-    # Final mxsl -> mtlx must simply compile (pass), i.e. the decompiled mxsl is valid.
-    mxslc.compile_string_to_string(mxsl3)
-
+    assert_matches_groundtruth(mtlx2, "separate_combine.mtlx")
 
 def test_compile_multioutput_reference():
     result = mxslc.compile_file_to_string(get_data_path("entry007.mxsl"))
