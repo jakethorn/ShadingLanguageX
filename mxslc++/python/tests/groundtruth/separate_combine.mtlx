@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="v" type="vector3">
+    <input name="value" type="vector3" value="1.0, 2.0, 3.0" />
+  </constant>
+  <separate3 name="var__0" type="multioutput">
+    <input name="in" type="vector3" nodename="v" />
+  </separate3>
+  <combine3 name="result" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__0" />
+    <input name="in2" type="float" value="0.5" />
+    <input name="in3" type="float" output="outz" nodename="var__0" />
+  </combine3>
+</materialx>

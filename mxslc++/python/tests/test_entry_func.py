@@ -49,6 +49,28 @@ def test_decompile_multioutput_reference():
     assert result == get_data("entry007.mxsl")
 
 
+def test_inline_separate_roundtrip():
+    """An mtlx that inlines a separate3 output (outx/outz feeding a combine3) must
+    decompile to compilable mxsl. A separate* node returns an anonymous array, so
+    its outputs must be addressed by index rather than `.outx`/`.outz` member
+    access. Round-trips the document as
+
+        mtlx -> mxsl -> mtlx -> mxsl -> mtlx
+
+    and requires every stage to pass (no exception).
+    """
+    mtlx0 = get_data("separate_combine.mtlx")
+
+    # mtlx -> mxsl
+    mxsl1 = mxslc.decompile_string_to_string(mtlx0)
+    # mxsl -> mtlx
+    mtlx2 = mxslc.compile_string_to_string(mxsl1)
+    # mtlx -> mxsl
+    mxsl3 = mxslc.decompile_string_to_string(mtlx2)
+    # Final mxsl -> mtlx must simply compile (pass), i.e. the decompiled mxsl is valid.
+    mxslc.compile_string_to_string(mxsl3)
+
+
 def test_compile_multioutput_reference():
     result = mxslc.compile_file_to_string(get_data_path("entry007.mxsl"))
     # Remove output="outcolor" from result to match original default output
