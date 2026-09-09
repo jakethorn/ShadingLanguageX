@@ -1,10 +1,16 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG_foo1">
-    <output name="out" type="float" value="1" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <nodegraph name="NG_foo2">
-    <output name="out" type="float" value="2" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="2" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <nodegraph name="NG_bar">
     <add name="var__0" type="float">

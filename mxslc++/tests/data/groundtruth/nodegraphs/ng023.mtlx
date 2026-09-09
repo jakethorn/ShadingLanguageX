@@ -1,8 +1,17 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG_foo">
-    <output name="out__v2" type="vector2" value="1, 1" />
-    <output name="out__v3" type="vector3" value="2, 2, 2" />
-    <output name="out__s" type="string" value="world" />
+    <constant name="out__v2_value" type="vector2">
+      <input name="value" type="vector2" value="1, 1" />
+    </constant>
+    <output name="out__v2" type="vector2" nodename="out__v2_value" />
+    <constant name="out__v3_value" type="vector3">
+      <input name="value" type="vector3" value="2, 2, 2" />
+    </constant>
+    <output name="out__v3" type="vector3" nodename="out__v3_value" />
+    <constant name="out__s_value" type="string">
+      <input name="value" type="string" value="world" />
+    </constant>
+    <output name="out__s" type="string" nodename="out__s_value" />
   </nodegraph>
 </materialx>

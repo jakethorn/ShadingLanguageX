@@ -4,7 +4,10 @@
     <output name="out" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
-    <output name="out" type="float" value="3" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="3" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <multiply name="c" type="float">
     <input name="in1" type="float" value="3" />

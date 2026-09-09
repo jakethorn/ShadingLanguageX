@@ -4,13 +4,19 @@
     <output name="out" type="integer" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="out" type="integer" value="10" />
+    <constant name="out_value" type="integer">
+      <input name="value" type="integer" value="10" />
+    </constant>
+    <output name="out" type="integer" nodename="out_value" />
   </nodegraph>
   <nodedef name="ND_bar" node="bar">
     <output name="out" type="integer" />
   </nodedef>
   <nodegraph name="NG_bar" nodedef="ND_bar">
-    <output name="out" type="integer" value="5" />
+    <constant name="out_value" type="integer">
+      <input name="value" type="integer" value="5" />
+    </constant>
+    <output name="out" type="integer" nodename="out_value" />
   </nodegraph>
   <foo name="var__0" type="integer" />
   <constant name="var__1" type="integer">

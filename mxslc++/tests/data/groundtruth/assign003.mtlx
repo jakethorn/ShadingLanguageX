@@ -10,7 +10,10 @@
       <input name="in1" type="float" interfacename="z" />
       <input name="in2" type="float" value="1" />
     </subtract>
-    <output name="out__x" type="float" value="3" />
+    <constant name="out__x_value" type="float">
+      <input name="value" type="float" value="3" />
+    </constant>
+    <output name="out__x" type="float" nodename="out__x_value" />
     <output name="out__y" type="float" nodename="var__0" />
   </nodegraph>
   <my_function name="p" type="multioutput">

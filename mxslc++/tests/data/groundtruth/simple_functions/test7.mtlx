@@ -15,7 +15,7 @@
     <input name="x" type="float" value="1" />
   </foo>
   <add name="w" type="float">
-    <input name="in1" type="float" output="outparam__y" nodename="var__0" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="3" />
   </add>
 </materialx>

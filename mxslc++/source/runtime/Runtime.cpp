@@ -31,8 +31,8 @@ namespace mxslc::runtime
     Runtime& Runtime::create(CompileOptions opts)
     {
         instance_ = std::make_unique<Runtime>(std::move(opts));
-        instance_->load_libraries();
-        instance_->load_materialx_library();
+        instance_->add_libraries();
+        instance_->add_materialx_library();
         return *instance_;
     }
 
@@ -87,20 +87,22 @@ namespace mxslc::runtime
         check_unused_globals();
     }
 
-    void Runtime::load_libraries()
+    void Runtime::add_libraries()
     {
         for (const fs::path& path : opts_.libraries)
         {
             io_utils::search(opts_.search_directories(), path, [](const fs::path& found_path) {
-                load_library(found_path);
+                add_library_to_scope(found_path);
             });
         }
     }
 
-    void Runtime::load_materialx_library()
+    void Runtime::add_materialx_library()
     {
-        mtlx_lib_ = get_materialx_library(opts_.version, opts_.search_directories());
-        load_library(mtlx_lib_);
+        mtlx_lib_ = load_materialx_library(opts_.version, opts_.search_directories());
+        serializer_.document()->setDataLibrary(mtlx_lib_);
+        add_library_to_scope(mtlx_lib_);
+
         Logger::debug("Loaded MaterialX version " + opts_.version + " libraries.");
     }
 

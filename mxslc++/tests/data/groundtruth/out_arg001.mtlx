@@ -13,16 +13,22 @@
   <foo name="var__0" type="float" />
   <foo name="var__1" type="float" />
   <add name="HERE1" type="float">
-    <input name="in1" type="float" output="outparam__x" nodename="var__0" />
-    <input name="in2" type="float" output="outparam__x" nodename="var__1" />
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" nodename="var__1" />
   </add>
   <nodedef name="ND_foo2" node="foo2">
     <output name="outparam__y__0" type="float" />
     <output name="outparam__y__1" type="float" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <output name="outparam__y__0" type="float" value="2" />
-    <output name="outparam__y__1" type="float" value="8" />
+    <constant name="outparam__y__0_value" type="float">
+      <input name="value" type="float" value="2" />
+    </constant>
+    <output name="outparam__y__0" type="float" nodename="outparam__y__0_value" />
+    <constant name="outparam__y__1_value" type="float">
+      <input name="value" type="float" value="8" />
+    </constant>
+    <output name="outparam__y__1" type="float" nodename="outparam__y__1_value" />
   </nodegraph>
   <foo2 name="var__2" type="multioutput" />
   <foo2 name="var__3" type="multioutput" />

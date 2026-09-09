@@ -5,7 +5,7 @@
       <input name="nonlocal_in__x" type="float" value="7" />
     </foo_bar>
     <add name="var__1" type="float">
-      <input name="in1" type="float" output="nonlocal_out__x" nodename="var__0" />
+      <input name="in1" type="float" nodename="var__0" />
       <input name="in2" type="float" value="2" />
     </add>
     <output name="out" type="float" nodename="var__1" />

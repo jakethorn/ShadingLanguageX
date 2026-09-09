@@ -1,12 +1,18 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG_foo">
-    <output name="out" type="float" value="2" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="2" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <nodegraph name="NG_bar">
     <normal name="var__0" type="vector3" />
     <output name="out__n" type="vector3" nodename="var__0" />
-    <output name="out__space" type="string" value="world" />
+    <constant name="out__space_value" type="string">
+      <input name="value" type="string" value="world" />
+    </constant>
+    <output name="out__space" type="string" nodename="out__space_value" />
   </nodegraph>
   <convert name="var__0" type="vector3">
     <input name="in" type="float" nodegraph="NG_foo" />

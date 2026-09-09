@@ -4,11 +4,14 @@
     <output name="outparam__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="outparam__x" type="float" value="3" />
+    <constant name="outparam__x_value" type="float">
+      <input name="value" type="float" value="3" />
+    </constant>
+    <output name="outparam__x" type="float" nodename="outparam__x_value" />
   </nodegraph>
   <foo name="var__0" type="float" />
   <multiply name="z" type="float">
-    <input name="in1" type="float" output="outparam__x" nodename="var__0" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

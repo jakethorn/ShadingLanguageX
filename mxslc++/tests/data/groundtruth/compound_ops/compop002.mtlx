@@ -15,7 +15,7 @@
     <input name="nonlocal_in__i" type="float" value="5" />
   </foo>
   <multiply name="k" type="float">
-    <input name="in1" type="float" output="nonlocal_out__i" nodename="var__0" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="10" />
   </multiply>
 </materialx>

@@ -1,14 +1,32 @@
 <?xml version="1.0"?>
 <materialx version="1.39">
   <nodegraph name="NG__123_vector3">
-    <output name="out__0" type="vector3" value="1, 1, 1" />
-    <output name="out__1" type="vector3" value="2, 2, 2" />
-    <output name="out__2" type="vector3" value="3, 3, 3" />
+    <constant name="out__0_value" type="vector3">
+      <input name="value" type="vector3" value="1, 1, 1" />
+    </constant>
+    <output name="out__0" type="vector3" nodename="out__0_value" />
+    <constant name="out__1_value" type="vector3">
+      <input name="value" type="vector3" value="2, 2, 2" />
+    </constant>
+    <output name="out__1" type="vector3" nodename="out__1_value" />
+    <constant name="out__2_value" type="vector3">
+      <input name="value" type="vector3" value="3, 3, 3" />
+    </constant>
+    <output name="out__2" type="vector3" nodename="out__2_value" />
   </nodegraph>
   <nodegraph name="NG__123_vector4">
-    <output name="out__0" type="vector4" value="1, 1, 1, 1" />
-    <output name="out__1" type="vector4" value="2, 2, 2, 2" />
-    <output name="out__2" type="vector4" value="3, 3, 3, 3" />
+    <constant name="out__0_value" type="vector4">
+      <input name="value" type="vector4" value="1, 1, 1, 1" />
+    </constant>
+    <output name="out__0" type="vector4" nodename="out__0_value" />
+    <constant name="out__1_value" type="vector4">
+      <input name="value" type="vector4" value="2, 2, 2, 2" />
+    </constant>
+    <output name="out__1" type="vector4" nodename="out__1_value" />
+    <constant name="out__2_value" type="vector4">
+      <input name="value" type="vector4" value="3, 3, 3, 3" />
+    </constant>
+    <output name="out__2" type="vector4" nodename="out__2_value" />
   </nodegraph>
   <add name="var__0" type="vector3">
     <input name="in1" type="vector3" output="out__0" nodegraph="NG__123_vector3" />

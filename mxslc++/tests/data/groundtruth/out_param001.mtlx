@@ -11,7 +11,10 @@
       <input name="in2" type="float" interfacename="x" />
     </multiply>
     <output name="out" type="float" nodename="var__0" />
-    <output name="outparam__y" type="float" interfacename="x" />
+    <dot name="outparam__y_interface" type="float">
+      <input name="in" type="float" interfacename="x" />
+    </dot>
+    <output name="outparam__y" type="float" nodename="outparam__y_interface" />
   </nodegraph>
   <foo name="var__0" type="multioutput">
     <input name="x" type="float" value="3" />

@@ -4,13 +4,16 @@
     <output name="nonlocal_out__y" type="vector2" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="nonlocal_out__y" type="vector2" value="3, 3" />
+    <constant name="nonlocal_out__y_value" type="vector2">
+      <input name="value" type="vector2" value="3, 3" />
+    </constant>
+    <output name="nonlocal_out__y" type="vector2" nodename="nonlocal_out__y_value" />
   </nodegraph>
   <constant name="var__0" type="vector2">
     <input name="value" type="vector2" value="0, 0" />
   </constant>
   <foo name="var__1" type="vector2" />
   <constant name="var__2" type="vector2">
-    <input name="value" type="vector2" output="nonlocal_out__y" nodename="var__1" />
+    <input name="value" type="vector2" nodename="var__1" />
   </constant>
 </materialx>

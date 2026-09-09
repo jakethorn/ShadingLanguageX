@@ -7,10 +7,22 @@
     <output name="outparam__q__y" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="outparam__p__x" type="float" value="1" />
-    <output name="outparam__p__y" type="float" value="2" />
-    <output name="outparam__q__x" type="float" value="5" />
-    <output name="outparam__q__y" type="float" value="6" />
+    <constant name="outparam__p__x_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="outparam__p__x" type="float" nodename="outparam__p__x_value" />
+    <constant name="outparam__p__y_value" type="float">
+      <input name="value" type="float" value="2" />
+    </constant>
+    <output name="outparam__p__y" type="float" nodename="outparam__p__y_value" />
+    <constant name="outparam__q__x_value" type="float">
+      <input name="value" type="float" value="5" />
+    </constant>
+    <output name="outparam__q__x" type="float" nodename="outparam__q__x_value" />
+    <constant name="outparam__q__y_value" type="float">
+      <input name="value" type="float" value="6" />
+    </constant>
+    <output name="outparam__q__y" type="float" nodename="outparam__q__y_value" />
   </nodegraph>
   <foo name="var__0" type="multioutput" />
   <multiply name="x" type="float">

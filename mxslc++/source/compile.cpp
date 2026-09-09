@@ -16,8 +16,11 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
+#include "errors/MaterialXValidateError.h"
 #include "preprocess/preprocess.h"
 #include "runtime/utils/invoke.h"
+#include "utils/Logger.h"
+#include "utils/mtlx_utils.h"
 
 namespace mxslc
 {
@@ -94,7 +97,12 @@ namespace mxslc
 
             runtime.finalise();
 
-            return runtime.serializer().document();
+            const mx::DocumentPtr doc = runtime.serializer().document();
+
+            if (opts.validate_graph)
+                mtlx_utils::validate(doc);
+
+            return doc;
         }
 
         fs::path get_destination_path(const fs::path& src_path, const CompileOptions& opts)

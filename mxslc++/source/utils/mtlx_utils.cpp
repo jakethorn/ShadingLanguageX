@@ -6,8 +6,10 @@
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
+#include "errors/MaterialXValidateError.h"
 #include "utils/io_utils.h"
 #include "utils/load_mtlx.h"
+#include "utils/Logger.h"
 
 namespace mxslc::mtlx_utils
 {
@@ -66,7 +68,7 @@ namespace mxslc::mtlx_utils
 
     mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const string& mtlx_version, const vector<fs::path>& include_dirs)
     {
-        const mx::DocumentPtr mtlx_lib = get_materialx_library(
+        const mx::DocumentPtr mtlx_lib = load_materialx_library(
             mtlx_version,
             include_dirs.empty() ? io_utils::get_default_search_directories() : include_dirs
         );
@@ -89,7 +91,7 @@ namespace mxslc::mtlx_utils
 
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const string& mtlx_version, const vector<fs::path>& include_dirs)
     {
-        const mx::DocumentPtr mtlx_lib = get_materialx_library(
+        const mx::DocumentPtr mtlx_lib = load_materialx_library(
             mtlx_version,
             include_dirs.empty() ? io_utils::get_default_search_directories() : include_dirs
         );
@@ -106,5 +108,45 @@ namespace mxslc::mtlx_utils
     void remove_port(const mx::PortElementPtr& port)
     {
         port->getParent()->removeChild(port->getName());
+    }
+
+    void validate(const mx::DocumentPtr& doc)
+    {
+        const auto [doc_major, doc_minor] = doc->getVersionIntegers();
+        const auto [lib_major, lib_minor, lib_build] = mx::getVersionIntegers();
+        if (doc_major == lib_major and doc_minor == lib_minor)
+        {
+            if (string s = ""; not doc->validate(&s))
+                throw MaterialXValidateError{std::move(s)};
+        }
+        else
+        {
+            Logger::warning("Document version (" + doc->getVersionString() + ") is too old to be validated.");
+        }
+    }
+
+    mx::NodePtr create_dot_node(const mx::GraphElementPtr& graph, const TypePtr& type, const string& interface_name)
+    {
+        return create_dot_node(graph, mx::EMPTY_STRING, type, interface_name);
+    }
+
+    mx::NodePtr create_dot_node(const mx::GraphElementPtr& graph, const string& name, const TypePtr& type, const string& interface_name)
+    {
+        const string valid_name = graph->createValidChildName(name);
+        const mx::NodePtr node = graph->addNode("dot", valid_name, type->name());
+        const mx::InputPtr input = node->addInput("in", type->name());
+        input->setInterfaceName(interface_name);
+        return node;
+    }
+
+    mx::NodePtr create_constant_node(const mx::GraphElementPtr& graph, const TypePtr& type)
+    {
+        return create_constant_node(graph, mx::EMPTY_STRING, type);
+    }
+
+    mx::NodePtr create_constant_node(const mx::GraphElementPtr& graph, const string& name, const TypePtr& type)
+    {
+        const string valid_name = graph->createValidChildName(name);
+        return graph->addNode("constant", valid_name, type->name());
     }
 }

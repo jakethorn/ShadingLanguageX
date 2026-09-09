@@ -7,7 +7,10 @@
     <input name="v__2" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_get_last" nodedef="ND_get_last">
-    <output name="out" type="float" interfacename="v__2" />
+    <dot name="out_interface" type="float">
+      <input name="in" type="float" interfacename="v__2" />
+    </dot>
+    <output name="out" type="float" nodename="out_interface" />
   </nodegraph>
   <get_last name="z" type="float">
     <input name="v__0" type="float" value="1" />

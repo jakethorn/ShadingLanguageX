@@ -6,8 +6,14 @@
     <input name="radius" type="float" value="1" />
   </nodedef>
   <nodegraph name="NG___Circle__" nodedef="ND___Circle__">
-    <output name="out__position" type="vector2" value="0, 0" />
-    <output name="out__radius" type="float" interfacename="radius" />
+    <constant name="out__position_value" type="vector2">
+      <input name="value" type="vector2" value="0, 0" />
+    </constant>
+    <output name="out__position" type="vector2" nodename="out__position_value" />
+    <dot name="out__radius_interface" type="float">
+      <input name="in" type="float" interfacename="radius" />
+    </dot>
+    <output name="out__radius" type="float" nodename="out__radius_interface" />
   </nodegraph>
   <__Circle__ name="c" type="multioutput">
     <input name="radius" type="float" value="3" />

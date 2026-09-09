@@ -4,17 +4,13 @@
 
 #include "serialize/values/InterfaceValue.h"
 
-#include <cassert>
-
 #include "runtime/Type.h"
 #include "utils/mtlx_utils.h"
 #include "serialize/values/interface.h"
+#include "serialize/values/NodeValue.h"
 
 namespace mxslc::serialize::values
 {
-    using mtlx_utils::add_or_get_output;
-    using mtlx_utils::set_interface;
-
     InterfaceValue::InterfaceValue(TypePtr type, string name)
         : Value{std::move(type)}, name_{std::move(name)}
     {
@@ -30,13 +26,15 @@ namespace mxslc::serialize::values
 
     void InterfaceValue::set_as_node_input(const mx::InputPtr& input) const
     {
-        set_interface(input, name_);
+        mtlx_utils::set_interface(input, name_);
     }
 
     void InterfaceValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
     {
-        const mx::OutputPtr output = add_or_get_output(node_graph, type_, output_name);
-        set_interface(output, name_);
+        const mx::NodePtr dot_node = mtlx_utils::create_dot_node(node_graph, output_name + "_interface", type_, name_);
+
+        const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
+        output->setConnectedNode(dot_node);
     }
 
     void InterfaceValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const

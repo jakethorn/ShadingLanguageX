@@ -4,14 +4,17 @@
   <standard_surface name="surface" type="surfaceshader">
     <input name="base" type="float" value="0.5" />
     <input name="base_color" type="color3" nodename="var__0" />
-    <input name="specular_roughness" type="float" output="nonlocal_out__surface__specular_roughness" nodename="var__1" />
+    <input name="specular_roughness" type="float" nodename="var__1" />
   </standard_surface>
   <randomcolor name="var__0" type="color3" />
   <nodedef name="ND_set_surface_properties" node="set_surface_properties">
     <output name="nonlocal_out__surface__specular_roughness" type="float" />
   </nodedef>
   <nodegraph name="NG_set_surface_properties" nodedef="ND_set_surface_properties">
-    <output name="nonlocal_out__surface__specular_roughness" type="float" value="1" />
+    <constant name="nonlocal_out__surface__specular_roughness_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="nonlocal_out__surface__specular_roughness" type="float" nodename="nonlocal_out__surface__specular_roughness_value" />
   </nodegraph>
   <set_surface_properties name="var__1" type="float" />
 </materialx>

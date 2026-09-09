@@ -35,15 +35,18 @@ namespace mxslc::serialize::values
 
     void CompileTimeValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
     {
-        const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
+        const mx::NodePtr constant_node = mtlx_utils::create_constant_node(node_graph, output_name + "_value", type_);
 
-        value_.visit([this, &output](const auto& v) {
+        const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
+        output->setConnectedNode(constant_node);
+
+        value_.visit([this, &output, &constant_node](const auto& v) {
             IF_VISITED_TYPE_IS(std::monostate)
                 mtlx_utils::remove_port(output);
             else IF_VISITED_TYPE_IS(fs::path)
-                output->setValue(v.string(), type_name());
+                constant_node->setInputValue("value", v.string(), type_name());
             else
-                output->setValue(v, type_name());
+                constant_node->setInputValue("value", v, type_name());
         });
     }
 

@@ -4,7 +4,10 @@
     <output name="out" type="integer" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="out" type="integer" value="0" />
+    <constant name="out_value" type="integer">
+      <input name="value" type="integer" value="0" />
+    </constant>
+    <output name="out" type="integer" nodename="out_value" />
   </nodegraph>
   <foo name="i" type="integer" />
   <add name="var__0" type="integer">

@@ -153,7 +153,7 @@ namespace mxslc
         }
     }
 
-    void load_library(const mx::DocumentPtr& doc)
+    void add_library_to_scope(const mx::DocumentPtr& doc)
     {
         Scope& scope = Runtime::get().scope();
 
@@ -172,31 +172,37 @@ namespace mxslc
         }
     }
 
-    void load_library(const fs::path& filepath)
+    void add_library_to_scope(const fs::path& filepath)
     {
         const mx::DocumentPtr doc = mx::createDocument();
         mx::readFromXmlFile(doc, filepath.string());
-        load_library(doc);
+        add_library_to_scope(doc);
     }
 
-    mx::DocumentPtr get_materialx_library(const string& version, const vector<fs::path>& include_dirs)
+    mx::DocumentPtr load_materialx_library(const string& version, const vector<fs::path>& include_dirs)
+    {
+        const mx::DocumentPtr doc = mx::createDocument();
+        load_materialx_library(version, include_dirs, doc);
+        return doc;
+    }
+
+    void load_materialx_library(const string& version, const vector<fs::path>& include_dirs, const mx::DocumentPtr& doc)
     {
         string searched_dirs;
 
         for (const fs::path& include_dir : include_dirs)
         {
             const fs::path lib_dir = include_dir / "libraries";
-            searched_dirs += lib_dir.string() + "\n";
+            searched_dirs += lib_dir.string() + '\n';
 
             if (not fs::is_directory(lib_dir))
                 continue;
 
             const mx::FilePathVec fpv{version};
             const mx::FileSearchPath fsp{lib_dir.string()};
-            const mx::DocumentPtr doc = mx::createDocument();
             const mx::StringSet loaded = mx::loadLibraries(fpv, fsp, doc);
             if (not loaded.empty())
-                return doc;
+                return;
         }
 
         throw CompileError{"MaterialX version " + version + " libraries could not be found.\nSearched directories:\n" + searched_dirs};

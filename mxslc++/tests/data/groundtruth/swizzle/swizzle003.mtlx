@@ -4,14 +4,17 @@
     <output name="outparam__wy" type="vector2" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="outparam__wy" type="vector2" value="3, 2" />
+    <constant name="outparam__wy_value" type="vector2">
+      <input name="value" type="vector2" value="3, 2" />
+    </constant>
+    <output name="outparam__wy" type="vector2" nodename="outparam__wy_value" />
   </nodegraph>
   <foo name="var__0" type="vector2" />
   <separate4 name="var__1" type="multioutput">
     <input name="in" type="vector4" value="0, 0, 0, 0" />
   </separate4>
   <separate2 name="var__2" type="multioutput">
-    <input name="in" type="vector2" output="outparam__wy" nodename="var__0" />
+    <input name="in" type="vector2" nodename="var__0" />
   </separate2>
   <combine4 name="var__3" type="vector4">
     <input name="in1" type="float" output="outx" nodename="var__1" />

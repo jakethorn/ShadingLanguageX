@@ -11,9 +11,11 @@
 
 namespace mxslc
 {
-    void load_library(const mx::DocumentPtr& doc);
-    void load_library(const fs::path& filepath);
-    mx::DocumentPtr get_materialx_library(const string& version, const vector<fs::path>& include_dirs);
+    void add_library_to_scope(const mx::DocumentPtr& doc);
+    void add_library_to_scope(const fs::path& filepath);
+
+    mx::DocumentPtr load_materialx_library(const string& version, const vector<fs::path>& include_dirs);
+    void load_materialx_library(const string& version, const vector<fs::path>& include_dirs, const mx::DocumentPtr& doc);
 }
 
 #endif //FENNEC_LOAD_MTLX_H

@@ -15,15 +15,15 @@
     <input name="b" type="float" value="1" />
   </foo>
   <foo name="var__1" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="var__0" />
+    <input name="b" type="float" nodename="var__0" />
   </foo>
   <foo name="var__2" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="var__1" />
+    <input name="b" type="float" nodename="var__1" />
   </foo>
   <foo name="var__3" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="var__2" />
+    <input name="b" type="float" nodename="var__2" />
   </foo>
   <foo name="var__4" type="float">
-    <input name="b" type="float" output="nonlocal_out__a" nodename="var__3" />
+    <input name="b" type="float" nodename="var__3" />
   </foo>
 </materialx>

@@ -25,7 +25,8 @@ void bind_compile_options(py::module_& m)
                 const bool error_on_unused_globals,
                 const optional<string>& func_name,
                 const py::list& func_args,
-                const bool reduce_graph)
+                const bool reduce_graph,
+                const bool validate_graph)
             {
                 auto opts = std::make_unique<CompileOptions>();
                 opts->output_file = output_file;
@@ -51,6 +52,8 @@ void bind_compile_options(py::module_& m)
                     opts->add_entry_function_argument(utils::to_cpp_variable(arg));
 
                 opts->reduce_graph = reduce_graph;
+                opts->validate_graph = validate_graph;
+
                 return opts;
             }),
             py::arg("output_file") = std::nullopt,
@@ -64,7 +67,8 @@ void bind_compile_options(py::module_& m)
             py::arg("error_on_unused_globals") = CompileOptions{}.error_on_unused_globals,
             py::arg("func_name") = std::nullopt,
             py::arg("func_args") = py::list(),
-            py::arg("reduce_graph") = CompileOptions{}.reduce_graph
+            py::arg("reduce_graph") = CompileOptions{}.reduce_graph,
+            py::arg("validate_graph") = CompileOptions{}.validate_graph
         )
         .def_readwrite("output_file", &CompileOptions::output_file)
         .def_readwrite("version", &CompileOptions::version)
@@ -113,5 +117,6 @@ void bind_compile_options(py::module_& m)
                     opts.add_entry_function_argument(utils::to_cpp_variable(arg));
             }
         )
-        .def_readwrite("reduce_graph", &CompileOptions::reduce_graph);
+        .def_readwrite("reduce_graph", &CompileOptions::reduce_graph)
+        .def_readwrite("validate_graph", &CompileOptions::validate_graph);
 }

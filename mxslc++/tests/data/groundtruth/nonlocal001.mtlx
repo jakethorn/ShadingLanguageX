@@ -5,9 +5,12 @@
     <output name="nonlocal_out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="nonlocal_out__x" type="float" value="2" />
+    <constant name="nonlocal_out__x_value" type="float">
+      <input name="value" type="float" value="2" />
+    </constant>
+    <output name="nonlocal_out__x" type="float" nodename="nonlocal_out__x_value" />
     <multiply name="y" type="float">
-      <input name="in1" type="float" value="2" />
+      <input name="in1" type="float" nodename="nonlocal_out__x_value" />
       <input name="in2" type="float" value="3" />
     </multiply>
     <output name="out" type="float" nodename="y" />

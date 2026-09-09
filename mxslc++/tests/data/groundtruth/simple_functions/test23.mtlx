@@ -10,7 +10,10 @@
       <input name="in2" type="float" value="7" />
     </multiply>
     <output name="out" type="float" nodename="var__0" />
-    <output name="outparam__x" type="float" value="12" />
+    <constant name="outparam__x_value" type="float">
+      <input name="value" type="float" value="12" />
+    </constant>
+    <output name="outparam__x" type="float" nodename="outparam__x_value" />
   </nodegraph>
   <foo1 name="var__0" type="multioutput" />
   <multiply name="HERE1" type="float">

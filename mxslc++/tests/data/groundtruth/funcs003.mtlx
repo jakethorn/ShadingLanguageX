@@ -8,7 +8,10 @@
     <randomcolor name="var__0" type="color3">
       <input name="in" type="integer" value="2" />
     </randomcolor>
-    <output name="out__0" type="float" value="1" />
+    <constant name="out__0_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="out__0" type="float" nodename="out__0_value" />
     <output name="out__1" type="color3" nodename="var__0" />
   </nodegraph>
   <foo name="var__0" type="multioutput" />

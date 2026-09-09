@@ -6,7 +6,10 @@
     <input name="v" type="vector3" value="0, 0, 0" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="out" type="float" value="0" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="0" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <nodedef name="ND_foo2" node="foo">
     <output name="out" type="float" />
@@ -14,7 +17,10 @@
     <input name="v" type="vector2" value="0, 0" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <output name="out" type="float" value="1" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <texcoord name="var__0" type="vector3" />
   <foo name="a" type="float">
@@ -27,7 +33,10 @@
     <input name="s" type="string" value="" />
   </nodedef>
   <nodegraph name="NG_bar" nodedef="ND_bar">
-    <output name="out" type="float" value="0" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="0" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <nodedef name="ND_bar2" node="bar">
     <output name="out" type="float" />
@@ -35,7 +44,10 @@
     <input name="i" type="integer" value="0" />
   </nodedef>
   <nodegraph name="NG_bar2" nodedef="ND_bar2">
-    <output name="out" type="float" value="1" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <texcoord name="var__1" type="vector3" />
   <bar name="b" type="float">

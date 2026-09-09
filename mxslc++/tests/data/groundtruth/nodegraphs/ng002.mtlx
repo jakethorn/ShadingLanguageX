@@ -3,7 +3,10 @@
   <nodegraph name="NG_foo">
     <normal name="var__0" type="vector3" />
     <output name="out__n" type="vector3" nodename="var__0" />
-    <output name="out__space" type="string" value="world" />
+    <constant name="out__space_value" type="string">
+      <input name="value" type="string" value="world" />
+    </constant>
+    <output name="out__space" type="string" nodename="out__space_value" />
   </nodegraph>
   <viewdirection name="var__0" type="vector3">
     <input name="space" type="string" output="out__space" nodegraph="NG_foo" />

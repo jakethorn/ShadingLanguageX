@@ -141,9 +141,9 @@ namespace mxslc::serialize
         assert(func->is_nodedef());
         assert(not func->is_parameterless());
 
+        const mx::NodeDefPtr node_def = func->node_def();
         const ArgumentList args = func_call->arguments();
-
-        ParameterValues input_values = args.evaluate(func->parameters());
+        const ParameterValues input_values = args.evaluate(func->parameters());
 
         if (reduce_graph_ or comptime_scope_.top())
         {
@@ -170,7 +170,7 @@ namespace mxslc::serialize
             if (param.is_out())
             {
                 const string output_name = with_prefix(OUT_PARAMETER_PREFIX, param.name());
-                const VarPtr output = serialize_utils::create_node_output_value(node, param.type(), output_name, input_attrs);
+                const VarPtr output = serialize_utils::create_node_output_value(node, node_def, param.type(), output_name, input_attrs);
                 input_value->copy(output);
             }
         }
@@ -184,7 +184,7 @@ namespace mxslc::serialize
 
             if (func->mutates_instance())
             {
-                const VarPtr output = serialize_utils::create_node_output_value(node, instance->type(), "out_this");
+                const VarPtr output = serialize_utils::create_node_output_value(node, node_def, instance->type(), "out_this");
                 instance->copy(output);
             }
         }
@@ -200,7 +200,7 @@ namespace mxslc::serialize
         for (const VarPtr& var : func->nonlocal_outputs())
         {
             const string output_name = with_prefix(NONLOCAL_OUT_PREFIX, var->name());
-            const VarPtr nonlocal_output = serialize_utils::create_node_output_value(node, var->type(), output_name);
+            const VarPtr nonlocal_output = serialize_utils::create_node_output_value(node, node_def, var->type(), output_name);
             var->copy(nonlocal_output);
         }
 

@@ -53,6 +53,7 @@ options:
   --missing-globals-ok           Allow `global` variables to be missing
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
+  --no-validate-graph            Do not validate the MaterialX graph
 )";
 
             std::cout << help_message;
@@ -69,12 +70,12 @@ options:
         }
         void print_error(const string& message)
         {
-            std::cerr << "Error: " << message << std::endl;
+            std::cerr << "Error: " << message << '\n';
         }
 
         void print_warning(const string& message)
         {
-            std::cerr << "Warning: " << message << std::endl;
+            std::cerr << "Warning: " << message << '\n';
         }
 
         vector<string> get_response_file_args(std::istream& file)
@@ -270,6 +271,11 @@ options:
             clargs.options.reduce_graph = false;
         }
 
+        void parse_no_validate_graph(Span<string>&, CommandLineArgs& clargs)
+        {
+            clargs.options.validate_graph = false;
+        }
+
         void parse_missing_globals_ok(Span<string>&, CommandLineArgs& clargs)
         {
             clargs.options.error_on_missing_globals = false;
@@ -306,7 +312,8 @@ options:
                 {"--debug", parse_debug},
                 {"--missing-globals-ok", parse_missing_globals_ok},
                 {"--unused-globals-ok", parse_unused_globals_ok},
-                {"--no-reduce-graph", parse_no_reduce_graph}
+                {"--no-reduce-graph", parse_no_reduce_graph},
+                {"--no-validate-graph", parse_no_validate_graph}
             };
 
             if (contains(parse_map, arg0))

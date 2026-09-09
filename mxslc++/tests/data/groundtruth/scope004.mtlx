@@ -7,10 +7,22 @@
     <output name="nonlocal_out__c" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="nonlocal_out__a" type="float" value="1" />
-    <output name="nonlocal_out__b" type="float" value="2" />
-    <output name="nonlocal_out__c" type="float" value="3" />
-    <output name="out" type="float" value="0" />
+    <constant name="nonlocal_out__a_value" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="nonlocal_out__a" type="float" nodename="nonlocal_out__a_value" />
+    <constant name="nonlocal_out__b_value" type="float">
+      <input name="value" type="float" value="2" />
+    </constant>
+    <output name="nonlocal_out__b" type="float" nodename="nonlocal_out__b_value" />
+    <constant name="nonlocal_out__c_value" type="float">
+      <input name="value" type="float" value="3" />
+    </constant>
+    <output name="nonlocal_out__c" type="float" nodename="nonlocal_out__c_value" />
+    <constant name="out_value" type="float">
+      <input name="value" type="float" value="0" />
+    </constant>
+    <output name="out" type="float" nodename="out_value" />
   </nodegraph>
   <foo name="var__0" type="multioutput" />
   <divide name="var__1" type="float">

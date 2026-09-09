@@ -41,8 +41,8 @@ namespace mxslc::runtime
         void finalise() const;
 
     private:
-        void load_libraries();
-        void load_materialx_library();
+        void add_libraries();
+        void add_materialx_library();
         void check_unused_globals() const;
 
         CompileOptions opts_;
