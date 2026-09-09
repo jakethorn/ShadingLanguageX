@@ -1,17 +1,21 @@
-## VSCode Extension Builder
+## Visual Studio Code Extension Builder
 
 This folder contains scripts to build a extension for VSCode as well as a pre-built
 extension which is built against MaterialX 1.39.5.
 
 Key features supported include:
 
-- Interactive syntax highlighting for ShaderLanguageX files (.MXSL extension)
-- Extension commands for bi-directional validation and/or conversion between MaterialX (.MTLX) and ShaderLanguageX (.MXSL). Validation emits diagnostic information for any conversion issues.
+- Interactive syntax highlighting for ShaderLanguageX files (`.MXSL` extension)
+- Extension commands for bi-directional validation and/or conversion between MaterialX (`.MTLX`) and ShaderLanguageX (`.MXSL`). Validation emits diagnostic information for any conversion issues.
 
 ### Command Script
 
 The main command script is `gen_extension.py` which can be used to generate and or install
-the extension. 
+the extension.
+
+#### Requirements
+
+- Installed Python module for MaterialX to allow discovery of MaterialX definition names. If not installed, syntax highlighting will not highlight these names, but will still work fully.
 
 The command has the following syntax:
 
@@ -47,6 +51,9 @@ The extension file (`.vsix`) can be also be manually installed.
 
 To build locally the recommended options are to (re)generate the extension (`.vsix` file) and install it. (`-g/--generate` and `-i/--install` respectively). 
 
+For support of MaterialX definition names for syntax highlighting, install the appropriate version of 
+the MaterialX Python module. e.g. Use `pip install MaterialX` from PyPi.
+
 For conversion and validation support the `-c/--converter` option should be specified.
 It will test for the existence of the required Javascript module in the Javascript build area.
 An alternative user location can be specified using the `--js-build-dir` argument.
@@ -58,17 +65,22 @@ Note that the libraries can just be built using the `--build-js` argument.
 
 ### Example Usage
 
-- Generate and install the extension (.vsix)
+- Install pre-built extension (`.vsix`)
+```
+python gen_extension.py --install
+```
+
+- Generate and install 
 ```
 python gen_extension.py --generate --install
 ```
 
 - Also include the convertor, build
 ```
-python gen_extension.py --generate --install --converter --build-js --materialx-root mxslc++/MaterialX-1.39.5 --emsdk-location ../emsd
+python gen_extension.py --generate --install --converter --materialx-root mxslc++/MaterialX-1.39.5 --emsdk-location ../emsd
 ```
 
-- Same options with force rebuild of JS modules.
+- Also force rebuild of JS modules.
 ```
 python gen_extension.py --generate --install --converter --build-js --materialx-root mxslc++/MaterialX-1.39.5 --emsdk-location ../emsd
 ```
