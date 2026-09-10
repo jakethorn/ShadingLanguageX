@@ -9,10 +9,21 @@
 
 #include "common.h"
 
-class MaterialXValidateError : public std::runtime_error
+namespace mxslc
 {
-public:
-    explicit MaterialXValidateError(string message) : std::runtime_error{std::move(message)} { }
-};
+    class MaterialXValidateError : public std::runtime_error
+    {
+    public:
+        explicit MaterialXValidateError(const string& message) : std::runtime_error{format_message(message)} { }
+
+    private:
+        static string format_message(const string& message)
+        {
+            return message +
+                "\nAttention! mxslc produced an invalid MaterialX document."
+                "\nPlease copy the above output along with your code and open a new issue here: github.com/jakethorn/ShadingLanguageX/issues";
+        }
+    };
+}
 
 #endif //MXSLC_MATERIALXVALIDATEERROR_H

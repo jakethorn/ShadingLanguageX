@@ -119,9 +119,9 @@ namespace mxslc::mtlx_utils
         const auto [lib_major, lib_minor, lib_build] = mx::getVersionIntegers();
         if (doc_major == lib_major and doc_minor == lib_minor)
         {
-            string s = mx::writeToXmlString(doc);
-            if (not doc->validate(&s))
-                throw MaterialXValidateError{std::move(s)};
+            string message = mx::writeToXmlString(doc);
+            if (not doc->validate(&message))
+                throw MaterialXValidateError{message};
         }
         else
         {
