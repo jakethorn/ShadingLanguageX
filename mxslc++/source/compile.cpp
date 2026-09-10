@@ -16,10 +16,8 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
-#include "errors/MaterialXValidateError.h"
 #include "preprocess/preprocess.h"
 #include "runtime/utils/invoke.h"
-#include "utils/Logger.h"
 #include "utils/mtlx_utils.h"
 
 namespace mxslc

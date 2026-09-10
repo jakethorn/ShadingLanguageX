@@ -128,29 +128,4 @@ namespace mxslc::mtlx_utils
             Logger::warning("Document version (" + doc->getVersionString() + ") is too old to be validated.");
         }
     }
-
-    mx::NodePtr create_dot_node(const mx::GraphElementPtr& graph, const TypePtr& type, const string& interface_name)
-    {
-        return create_dot_node(graph, mx::EMPTY_STRING, type, interface_name);
-    }
-
-    mx::NodePtr create_dot_node(const mx::GraphElementPtr& graph, const string& name, const TypePtr& type, const string& interface_name)
-    {
-        const string valid_name = graph->createValidChildName(name);
-        const mx::NodePtr node = graph->addNode("dot", valid_name, type->name());
-        const mx::InputPtr input = node->addInput("in", type->name());
-        input->setInterfaceName(interface_name);
-        return node;
-    }
-
-    mx::NodePtr create_constant_node(const mx::GraphElementPtr& graph, const TypePtr& type)
-    {
-        return create_constant_node(graph, mx::EMPTY_STRING, type);
-    }
-
-    mx::NodePtr create_constant_node(const mx::GraphElementPtr& graph, const string& name, const TypePtr& type)
-    {
-        const string valid_name = graph->createValidChildName(name);
-        return graph->addNode("constant", valid_name, type->name());
-    }
 }
