@@ -381,6 +381,11 @@ namespace mxslc::decompile
         return func_name + "(" + func_args + ")";
     }
 
+    string node_graph_output_field_name(const vector<mx::OutputPtr>& outputs, const string& output_name)
+    {
+        return safe_mxsl_name(outputs, remove_prefix(output_name));
+    }
+
     string Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outputs)
     {
         if (outputs.size() == 1)
@@ -396,8 +401,7 @@ namespace mxslc::decompile
                 if (has_prefix(output->getName(), OUT_PARAMETER_PREFIX) or
                     has_prefix(output->getName(), NONLOCAL_OUT_PREFIX))
                     continue;
-                const string var_name = remove_prefix(output->getName());
-                result += get_type_alias(output) + " " + safe_mxsl_name(outputs, var_name) + ", ";
+                result += get_type_alias(output) + " " + node_graph_output_field_name(outputs, output->getName()) + ", ";
             }
             remove_trailing_comma(result);
             return result + "}";
@@ -477,7 +481,7 @@ namespace mxslc::decompile
     {
         const mx::NodeGraphPtr node_graph = document_->getNodeGraph(node_graph_name);
         const vector<mx::OutputPtr> node_graph_outputs = node_graph ? node_graph->getOutputs() : vector<mx::OutputPtr>{};
-        const string safe_output = safe_mxsl_name(node_graph_outputs, output);
+        const string safe_output = node_graph_output_field_name(node_graph_outputs, output);
 
         // For single-output nodegraphs, references use just the identifier
         // (variable or function name) without a .output suffix.

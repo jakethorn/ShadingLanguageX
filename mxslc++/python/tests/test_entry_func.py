@@ -69,6 +69,25 @@ def test_inline_separate_roundtrip():
     mtlx2 = mxslc.compile_string_to_string(mxsl1)
     assert_matches_groundtruth(mtlx2, "separate_combine.mtlx")
 
+
+def test_decompile_inline_ng_output_ref_roundtrip():
+    """A nodegraph whose outputs are inline referenced via round-trip test:
+
+        mtlx -> mxsl -> mtlx
+
+    to ensure consistency of output declarations and references.
+    """
+    mtlx = get_data("decompile_inline_ng_output_ref.mtlx")
+
+    # mtlx -> mxsl: nodegraph output references use unprefixed field names.
+    mxsl = mxslc.decompile_string_to_string(mtlx)
+    assert_matches_groundtruth(mxsl, "decompile_inline_ng_output_ref.mxsl")
+
+    # mxsl -> mtlx
+    mtlx2 = mxslc.compile_string_to_string(mxsl)
+    assert_matches_groundtruth(mtlx2, "decompile_inline_ng_output_ref.mtlx")
+
+
 def test_compile_multioutput_reference():
     result = mxslc.compile_file_to_string(get_data_path("entry007.mxsl"))
     # Remove output="outcolor" from result to match original default output

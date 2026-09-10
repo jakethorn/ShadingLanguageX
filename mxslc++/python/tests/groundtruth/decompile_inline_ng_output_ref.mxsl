@@ -1,0 +1,23 @@
+
+{color3 base_color_output, float specular_roughness_output, vec3 coat_normal_output, vec3 normal_output, vec3 tangent_output} Canyon_Maple_Dark_Wood => 
+{
+	vec3 onthefly_4 = normal(space = "world");
+	vec3 onthefly_6 = tangent(space = "world");
+	vec2 node_texcoord_vector2_8 = texcoord(index = 0);
+	vec2 node_multiply_9 = node_texcoord_vector2_8 * 2;
+	@GLSLFX_usage "normal"
+@expose "true"
+vec3 node_image_vector3_10 = image(file = "textures/Canyon_Maple_Dark_Wood_Normal.png", layer = "", default = vec3{0, 0, 0}, texcoord = node_multiply_9, uaddressmode = "periodic", vaddressmode = "periodic", filtertype = "linear", framerange = "", frameoffset = 0, frameendaction = "constant");
+	@GLSLFX_usage "mask"
+@expose "true"
+vec3 node_image_vector3_12 = image(file = "textures/Canyon_Maple_Dark_Wood_Mask.png", layer = "", default = vec3{0, 0, 0}, texcoord = node_multiply_9, uaddressmode = "periodic", vaddressmode = "periodic", filtertype = "linear", framerange = "", frameoffset = 0, frameendaction = "constant");
+	float node_extract_11 = extract(in = node_image_vector3_12, index = 0);
+	float node_mix_3 = mix(fg = 0.915, bg = 0, mix = node_extract_11);
+	vec3 node_normalmap = normalmap(in = node_image_vector3_10);
+	@GLSLFX_usage "baseColor"
+@expose "true"
+color3 node_image_color3_2 = image(@colorspace "srgb_texture" file = "textures/Canyon_Maple_Dark_Wood_baseColor.png", layer = "", default = color3{0, 0, 0}, texcoord = node_multiply_9, uaddressmode = "periodic", vaddressmode = "periodic", filtertype = "linear", framerange = "", frameoffset = 0, frameendaction = "constant");
+	return {node_image_color3_2, node_mix_3, onthefly_4, node_normalmap, onthefly_6};
+}
+surfaceshader SR_Canyon_Maple_Dark_Wood = standard_surface(base = 0.8, base_color = Canyon_Maple_Dark_Wood.base_color_output, diffuse_roughness = 0, metalness = 0, specular = 1, specular_color = color3{1, 1, 1}, specular_roughness = Canyon_Maple_Dark_Wood.specular_roughness_output, specular_IOR = 1.5, specular_anisotropy = 0, specular_rotation = 0, transmission = 0, transmission_color = color3{1, 1, 1}, transmission_depth = 0, transmission_scatter = color3{0, 0, 0}, transmission_scatter_anisotropy = 0, transmission_dispersion = 0, transmission_extra_roughness = 0, subsurface = 0, subsurface_color = color3{1, 1, 1}, subsurface_radius = color3{1, 1, 1}, subsurface_scale = 1, subsurface_anisotropy = 0, sheen = 0, sheen_color = color3{1, 1, 1}, sheen_roughness = 0.3, coat = 0, coat_color = color3{1, 1, 1}, coat_roughness = 0.1, coat_anisotropy = 0, coat_rotation = 0, coat_IOR = 1.5, coat_normal = Canyon_Maple_Dark_Wood.coat_normal_output, coat_affect_color = 0, coat_affect_roughness = 0, thin_film_thickness = 0, thin_film_IOR = 1.5, emission = 0, emission_color = color3{1, 1, 1}, opacity = color3{1, 1, 1}, thin_walled = false, normal = Canyon_Maple_Dark_Wood.normal_output, tangent = Canyon_Maple_Dark_Wood.tangent_output);
+material Canyon_Maple_Dark_Wood = surfacematerial(surfaceshader = SR_Canyon_Maple_Dark_Wood);
