@@ -15,10 +15,10 @@
       <input name="in" type="vector2" value="3, 3" />
       <input name="index" type="integer" value="0" />
     </extract>
-    <constant name="nonlocal_out__y_value" type="vector2">
+    <constant name="node1" type="vector2">
       <input name="value" type="vector2" value="3, 3" />
     </constant>
-    <output name="nonlocal_out__y" type="vector2" nodename="nonlocal_out__y_value" />
+    <output name="nonlocal_out__y" type="vector2" nodename="node1" />
     <output name="out__0" type="float" nodename="var__0" />
     <output name="out__1" type="float" nodename="x" />
   </nodegraph>

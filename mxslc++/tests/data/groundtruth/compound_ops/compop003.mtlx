@@ -5,10 +5,10 @@
     <input name="i" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <dot name="out_interface" type="float">
+    <dot name="node1" type="float">
       <input name="in" type="float" interfacename="i" />
     </dot>
-    <output name="out" type="float" nodename="out_interface" />
+    <output name="out" type="float" nodename="node1" />
   </nodegraph>
   <power name="var__0" type="float">
     <input name="in1" type="float" value="5" />

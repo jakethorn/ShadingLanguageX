@@ -4,19 +4,19 @@
     <output name="out" type="vector3" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <constant name="out_value" type="vector3">
+    <constant name="node1" type="vector3">
       <input name="value" type="vector3" value="1, 0, 0" />
     </constant>
-    <output name="out" type="vector3" nodename="out_value" />
+    <output name="out" type="vector3" nodename="node1" />
   </nodegraph>
   <nodedef name="ND_foo2" node="foo">
     <output name="out" type="color3" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <constant name="out_value" type="color3">
+    <constant name="node1" type="color3">
       <input name="value" type="color3" value="0, 1, 0" />
     </constant>
-    <output name="out" type="color3" nodename="out_value" />
+    <output name="out" type="color3" nodename="node1" />
   </nodegraph>
   <foo name="a" type="vector3" />
   <foo name="b" type="color3" />

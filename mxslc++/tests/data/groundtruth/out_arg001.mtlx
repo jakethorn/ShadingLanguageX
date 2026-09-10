@@ -21,14 +21,14 @@
     <output name="outparam__y__1" type="float" />
   </nodedef>
   <nodegraph name="NG_foo2" nodedef="ND_foo2">
-    <constant name="outparam__y__0_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="2" />
     </constant>
-    <output name="outparam__y__0" type="float" nodename="outparam__y__0_value" />
-    <constant name="outparam__y__1_value" type="float">
+    <output name="outparam__y__0" type="float" nodename="node1" />
+    <constant name="node2" type="float">
       <input name="value" type="float" value="8" />
     </constant>
-    <output name="outparam__y__1" type="float" nodename="outparam__y__1_value" />
+    <output name="outparam__y__1" type="float" nodename="node2" />
   </nodegraph>
   <foo2 name="var__2" type="multioutput" />
   <foo2 name="var__3" type="multioutput" />

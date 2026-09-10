@@ -6,10 +6,10 @@
     <input name="nonlocal_in__b__1" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
-    <constant name="out_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="3" />
     </constant>
-    <output name="out" type="float" nodename="out_value" />
+    <output name="out" type="float" nodename="node1" />
   </nodegraph>
   <multiply name="c" type="float">
     <input name="in1" type="float" interfacename="nonlocal_in__b__0" />

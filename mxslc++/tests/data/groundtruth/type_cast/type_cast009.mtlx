@@ -21,16 +21,19 @@
     <input name="a" type="vector2" value="0, 0" />
     <input name="b" type="integer" value="1" />
   </foo>
-  <foo name="var__1" type="integer">
-    <input name="a" type="vector2" value="0, 0" />
+  <separate2 name="var__1" type="multioutput">
+    <input name="in" type="vector2" value="0, 0" />
+  </separate2>
+  <foo name="var__2" type="integer">
+    <input name="a__0" type="float" output="outx" nodename="var__1" />
+    <input name="a__1" type="float" output="outy" nodename="var__1" />
     <input name="b" type="string" value="hello" />
   </foo>
-  <foo name="var__2" type="integer">
-    <input name="a__0" type="float" value="1" />
-    <input name="a__1" type="float" value="2" />
+  <foo name="var__3" type="integer">
+    <input name="a" type="vector2" value="1, 2" />
     <input name="b" type="integer" value="1" />
   </foo>
-  <foo name="var__3" type="integer">
+  <foo name="var__4" type="integer">
     <input name="a__0" type="float" value="1" />
     <input name="a__1" type="float" value="2" />
     <input name="b" type="string" value="hello" />

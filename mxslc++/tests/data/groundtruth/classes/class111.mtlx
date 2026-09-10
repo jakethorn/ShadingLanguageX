@@ -6,7 +6,10 @@
     <input name="this__radius_" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_get_radius" nodedef="ND_Sphere_get_radius">
-    <output name="out" type="float" interfacename="this__radius_" />
+    <dot name="node1" type="float">
+      <input name="in" type="float" interfacename="this__radius_" />
+    </dot>
+    <output name="out" type="float" nodename="node1" />
   </nodegraph>
   <nodedef name="ND_Sphere_set_radius" node="Sphere_set_radius">
     <input name="r" type="float" value="0" />
@@ -16,8 +19,14 @@
     <output name="out__this__radius_" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_set_radius" nodedef="ND_Sphere_set_radius">
-    <output name="out__this__center_" type="vector2" interfacename="this__center_" />
-    <output name="out__this__radius_" type="float" interfacename="r" />
+    <dot name="node1" type="vector2">
+      <input name="in" type="vector2" interfacename="this__center_" />
+    </dot>
+    <output name="out__this__center_" type="vector2" nodename="node1" />
+    <dot name="node2" type="float">
+      <input name="in" type="float" interfacename="r" />
+    </dot>
+    <output name="out__this__radius_" type="float" nodename="node2" />
   </nodegraph>
   <Sphere_get_radius name="a" type="float">
     <input name="this__center_" type="vector2" value="0, 0" />
@@ -29,8 +38,8 @@
     <input name="this__radius_" type="float" value="3" />
   </Sphere_set_radius>
   <Sphere_get_radius name="b" type="float">
-    <input name="this__center_" type="vector2" output="out_this__center_" nodename="var__0" />
-    <input name="this__radius_" type="float" output="out_this__radius_" nodename="var__0" />
+    <input name="this__center_" type="vector2" output="out__this__center_" nodename="var__0" />
+    <input name="this__radius_" type="float" output="out__this__radius_" nodename="var__0" />
   </Sphere_get_radius>
   <multiply name="var__1" type="float">
     <input name="in1" type="float" nodename="a" />

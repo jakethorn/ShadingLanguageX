@@ -13,7 +13,8 @@ namespace mxslc::serialize
 {
     inline const string RETURN_VALUE_PREFIX{"out"};
     inline const string OUT_PARAMETER_PREFIX{"outparam"};
-    inline const string CLASS_FIELD_PREFIX{"this"};
+    inline const string THIS_IN_PREFIX{"this"};
+    inline const string THIS_OUT_PREFIX{"out__this"};
     inline const string LOCAL_PREFIX{"local"};
     inline const string NONLOCAL_IN_PREFIX{"nonlocal_in"};
     inline const string NONLOCAL_OUT_PREFIX{"nonlocal_out"};

@@ -4,10 +4,10 @@
     <output name="nonlocal_out__b" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <constant name="nonlocal_out__b_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="2" />
     </constant>
-    <output name="nonlocal_out__b" type="float" nodename="nonlocal_out__b_value" />
+    <output name="nonlocal_out__b" type="float" nodename="node1" />
   </nodegraph>
   <foo name="var__0" type="float" />
 </materialx>

@@ -21,10 +21,10 @@
     <output name="out__y" type="float" nodename="y" />
   </nodegraph>
   <atob name="p" type="multioutput">
-    <input name="a__0" type="float" value="0" />
-    <input name="a__1" type="float" value="0" />
-    <input name="b__0" type="float" value="1" />
-    <input name="b__1" type="float" value="1" />
+    <input name="a__x" type="float" value="0" />
+    <input name="a__y" type="float" value="0" />
+    <input name="b__x" type="float" value="1" />
+    <input name="b__y" type="float" value="1" />
   </atob>
   <combine2 name="var__0" type="vector2">
     <input name="in1" type="float" output="out__x" nodename="p" />

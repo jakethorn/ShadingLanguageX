@@ -4,10 +4,10 @@
     <output name="out" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <constant name="out_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="1" />
     </constant>
-    <output name="out" type="float" nodename="out_value" />
+    <output name="out" type="float" nodename="node1" />
   </nodegraph>
   <nodedef name="ND_bar" node="bar">
     <output name="out" type="float" />

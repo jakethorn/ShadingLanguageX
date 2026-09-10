@@ -44,7 +44,14 @@ namespace mxslc::runtime
         type_ = scope().resolve_type(type_);
 
         if (has_default_value())
-            expr_->init(type());
+        {
+            expr_->init(type_);
+            type_ = expr_->type();
+        }
+        else if (type_->is_auto())
+        {
+            throw CompileError{"Auto parameter '" + name_ + "' must have an initializer"};
+        }
     }
 
     VarPtr Parameter::evaluate() const

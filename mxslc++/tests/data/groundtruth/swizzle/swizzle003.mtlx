@@ -4,10 +4,10 @@
     <output name="outparam__wy" type="vector2" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <constant name="outparam__wy_value" type="vector2">
+    <constant name="node1" type="vector2">
       <input name="value" type="vector2" value="3, 2" />
     </constant>
-    <output name="outparam__wy" type="vector2" nodename="outparam__wy_value" />
+    <output name="outparam__wy" type="vector2" nodename="node1" />
   </nodegraph>
   <foo name="var__0" type="vector2" />
   <separate4 name="var__1" type="multioutput">

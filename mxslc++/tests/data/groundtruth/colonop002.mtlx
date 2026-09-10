@@ -11,10 +11,10 @@
     <output name="nonlocal_out__surface__specular_roughness" type="float" />
   </nodedef>
   <nodegraph name="NG_set_surface_properties" nodedef="ND_set_surface_properties">
-    <constant name="nonlocal_out__surface__specular_roughness_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="1" />
     </constant>
-    <output name="nonlocal_out__surface__specular_roughness" type="float" nodename="nonlocal_out__surface__specular_roughness_value" />
+    <output name="nonlocal_out__surface__specular_roughness" type="float" nodename="node1" />
   </nodegraph>
   <set_surface_properties name="var__1" type="float" />
 </materialx>

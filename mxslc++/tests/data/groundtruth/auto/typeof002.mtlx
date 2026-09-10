@@ -7,22 +7,22 @@
     <output name="out__texture" type="filename" />
   </nodedef>
   <nodegraph name="NG___Point__" nodedef="ND___Point__">
-    <constant name="out__x_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="0" />
     </constant>
-    <output name="out__x" type="float" nodename="out__x_value" />
-    <constant name="out__y_value" type="float">
+    <output name="out__x" type="float" nodename="node1" />
+    <constant name="node2" type="float">
       <input name="value" type="float" value="1" />
     </constant>
-    <output name="out__y" type="float" nodename="out__y_value" />
-    <constant name="out__uv_value" type="vector2">
+    <output name="out__y" type="float" nodename="node2" />
+    <constant name="node3" type="vector2">
       <input name="value" type="vector2" value="0, 0" />
     </constant>
-    <output name="out__uv" type="vector2" nodename="out__uv_value" />
-    <constant name="out__texture_value" type="filename">
+    <output name="out__uv" type="vector2" nodename="node3" />
+    <constant name="node4" type="filename">
       <input name="value" type="filename" value="image.png" />
     </constant>
-    <output name="out__texture" type="filename" nodename="out__texture_value" />
+    <output name="out__texture" type="filename" nodename="node4" />
   </nodegraph>
   <constant name="var__0" type="string">
     <input name="value" type="string" value="integer" />

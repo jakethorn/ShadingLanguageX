@@ -24,6 +24,8 @@ namespace mxslc::serialize::values
         string to_string() const override;
 
     private:
+        mx::NodePtr create_passthrough_node(const mx::NodeGraphPtr& node_graph) const;
+
         string node_graph_name_;
         string output_name_;
     };

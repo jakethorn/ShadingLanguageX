@@ -11,13 +11,16 @@
   <nodegraph name="NG_foo" nodedef="ND_foo">
     <randomfloat name="var__0" type="float" />
     <output name="outparam__p__x" type="float" nodename="var__0" />
-    <output name="outparam__p__y" type="float" interfacename="p__x" />
+    <dot name="node1" type="float">
+      <input name="in" type="float" interfacename="p__x" />
+    </dot>
+    <output name="outparam__p__y" type="float" nodename="node1" />
     <output name="outparam__p__z" type="float" nodename="var__0" />
   </nodegraph>
   <foo name="var__0" type="multioutput">
-    <input name="p__0" type="float" value="1" />
-    <input name="p__1" type="float" value="2" />
-    <input name="p__2" type="float" value="3" />
+    <input name="p__x" type="float" value="1" />
+    <input name="p__y" type="float" value="2" />
+    <input name="p__z" type="float" value="3" />
   </foo>
   <multiply name="var__1" type="float">
     <input name="in1" type="float" output="outparam__p__x" nodename="var__0" />

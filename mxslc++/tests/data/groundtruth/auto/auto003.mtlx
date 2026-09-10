@@ -5,6 +5,9 @@
     <input name="a" type="integer" value="1" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <output name="out" type="auto" interfacename="a" />
+    <dot name="node1" type="integer">
+      <input name="in" type="integer" interfacename="a" />
+    </dot>
+    <output name="out" type="integer" nodename="node1" />
   </nodegraph>
 </materialx>

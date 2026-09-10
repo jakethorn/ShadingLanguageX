@@ -5,8 +5,14 @@
     <output name="out" type="vector3" nodename="var__0" />
   </nodegraph>
   <nodegraph name="NG_bar">
-    <output name="out__n" type="vector3" nodegraph="NG_foo" />
-    <output name="out__space" type="string" value="world" />
+    <dot name="node1" type="vector3">
+      <input name="in" type="vector3" nodegraph="NG_foo" />
+    </dot>
+    <output name="out__n" type="vector3" nodename="node1" />
+    <constant name="node2" type="string">
+      <input name="value" type="string" value="world" />
+    </constant>
+    <output name="out__space" type="string" nodename="node2" />
   </nodegraph>
   <viewdirection name="var__0" type="vector3">
     <input name="space" type="string" output="out__space" nodegraph="NG_bar" />

@@ -1,0 +1,1 @@
+auto003.mxsl, line 1: Auto parameter 'a' must have an initializer

@@ -1,0 +1,4 @@
+int foo(auto a)
+{
+    return a;
+}

@@ -95,7 +95,7 @@ namespace mxslc::runtime_utils
         }
 
         FuncPtr func = scope->get_function(query_);
-        implicitly_cast_literals(func);
+        perform_implicit_casts(func);
 
         scope = nullptr;
         return func;
@@ -168,21 +168,21 @@ namespace mxslc::runtime_utils
         throw CompileError{"More than one default function found during function resolution"};
     }
 
-    void FunctionResolver::implicitly_cast_literals(const FuncPtr& func) const
+    void FunctionResolver::perform_implicit_casts(const FuncPtr& func) const
     {
-        // literals need to be initialised one last time to be implicitly cast them to their target type
-        // e.g., float f = 5;
-
         if (func != nullptr)
         {
-            // reset only literals
             for (const Argument& arg : args_)
             {
-                if (arg.is_literal())
-                    arg.reset();
-            }
+                const TypePtr arg_type = arg.type();
+                const TypePtr param_type = func->parameters()[arg].type();
 
-            init_arguments(func);
+                if (not arg_type->equals(param_type))
+                {
+                    arg.reset();
+                    arg.init(param_type);
+                }
+            }
         }
     }
 }

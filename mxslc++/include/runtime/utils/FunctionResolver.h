@@ -40,7 +40,7 @@ namespace mxslc::runtime_utils
         size_t init_arguments(const vector<FuncPtr>& funcs) const;
         vector<TypePtr> get_parameter_types(const vector<FuncPtr>& funcs, const Argument& arg) const;
         FuncPtr get_default_function(const vector<FuncPtr>& funcs) const;
-        void implicitly_cast_literals(const FuncPtr& func) const;
+        void perform_implicit_casts(const FuncPtr& func) const;
 
         FunctionQuery query_;
         TypePtr class_type_;

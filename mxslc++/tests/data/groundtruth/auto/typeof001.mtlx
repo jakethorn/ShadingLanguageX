@@ -7,14 +7,14 @@
     <input name="y" type="float" value="0" />
   </nodedef>
   <nodegraph name="NG___Point__" nodedef="ND___Point__">
-    <dot name="out__x_interface" type="float">
+    <dot name="node1" type="float">
       <input name="in" type="float" interfacename="x" />
     </dot>
-    <output name="out__x" type="float" nodename="out__x_interface" />
-    <dot name="out__y_interface" type="float">
+    <output name="out__x" type="float" nodename="node1" />
+    <dot name="node2" type="float">
       <input name="in" type="float" interfacename="y" />
     </dot>
-    <output name="out__y" type="float" nodename="out__y_interface" />
+    <output name="out__y" type="float" nodename="node2" />
   </nodegraph>
   <position name="var__0" type="vector3">
     <input name="space" type="string" value="integer" />

@@ -19,14 +19,14 @@
     <input name="vel" type="vector2" value="0, 0" />
   </nodedef>
   <nodegraph name="NG___Foo__" nodedef="ND___Foo__">
-    <dot name="out__pos_interface" type="vector2">
+    <dot name="node1" type="vector2">
       <input name="in" type="vector2" interfacename="pos" />
     </dot>
-    <output name="out__pos" type="vector2" nodename="out__pos_interface" />
-    <dot name="out__vel_interface" type="vector2">
+    <output name="out__pos" type="vector2" nodename="node1" />
+    <dot name="node2" type="vector2">
       <input name="in" type="vector2" interfacename="vel" />
     </dot>
-    <output name="out__vel" type="vector2" nodename="out__vel_interface" />
+    <output name="out__vel" type="vector2" nodename="node2" />
   </nodegraph>
   <__Foo__ name="foo" type="multioutput">
     <input name="pos" type="vector2" value="1, 1" />

@@ -22,10 +22,10 @@
     <randomfloat name="var__5" type="float">
       <input name="seed" type="integer" value="5" />
     </randomfloat>
-    <constant name="out_value" type="integer">
+    <constant name="node1" type="integer">
       <input name="value" type="integer" value="100" />
     </constant>
-    <output name="out" type="integer" nodename="out_value" />
+    <output name="out" type="integer" nodename="node1" />
   </nodegraph>
   <foo name="var__0" type="integer" />
   <constant name="var__1" type="integer">

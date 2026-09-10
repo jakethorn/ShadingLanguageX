@@ -7,14 +7,14 @@
     <input name="this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_self" nodedef="ND_Sphere_self">
-    <dot name="out__position_interface" type="vector3">
+    <dot name="node1" type="vector3">
       <input name="in" type="vector3" interfacename="this__position" />
     </dot>
-    <output name="out__position" type="vector3" nodename="out__position_interface" />
-    <dot name="out__radius_interface" type="float">
+    <output name="out__position" type="vector3" nodename="node1" />
+    <dot name="node2" type="float">
       <input name="in" type="float" interfacename="this__radius" />
     </dot>
-    <output name="out__radius" type="float" nodename="out__radius_interface" />
+    <output name="out__radius" type="float" nodename="node2" />
   </nodegraph>
   <nodedef name="ND_Sphere_move" node="Sphere_move">
     <output name="out__position" type="vector3" />
@@ -29,10 +29,10 @@
       <input name="in2" type="vector3" interfacename="v" />
     </add>
     <output name="out__position" type="vector3" nodename="var__0" />
-    <dot name="out__radius_interface" type="float">
+    <dot name="node1" type="float">
       <input name="in" type="float" interfacename="this__radius" />
     </dot>
-    <output name="out__radius" type="float" nodename="out__radius_interface" />
+    <output name="out__radius" type="float" nodename="node1" />
   </nodegraph>
   <nodedef name="ND_Sphere_area" node="Sphere_area">
     <output name="out" type="float" />

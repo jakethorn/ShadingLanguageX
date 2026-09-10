@@ -4,10 +4,10 @@
     <output name="outparam__c" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <constant name="outparam__c_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="5" />
     </constant>
-    <output name="outparam__c" type="float" nodename="outparam__c_value" />
+    <output name="outparam__c" type="float" nodename="node1" />
   </nodegraph>
   <foo name="var__0" type="float" />
   <separate3 name="var__1" type="multioutput">

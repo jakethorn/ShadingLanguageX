@@ -11,19 +11,19 @@
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="2" />
     </multiply>
-    <constant name="outparam__p__x_value" type="float">
+    <constant name="node1" type="float">
       <input name="value" type="float" value="0" />
     </constant>
-    <output name="outparam__p__x" type="float" nodename="outparam__p__x_value" />
-    <constant name="outparam__p__y_value" type="float">
+    <output name="outparam__p__x" type="float" nodename="node1" />
+    <constant name="node2" type="float">
       <input name="value" type="float" value="2" />
     </constant>
-    <output name="outparam__p__y" type="float" nodename="outparam__p__y_value" />
+    <output name="outparam__p__y" type="float" nodename="node2" />
     <output name="outparam__q__x" type="float" nodename="var__0" />
-    <constant name="outparam__q__y_value" type="float">
+    <constant name="node3" type="float">
       <input name="value" type="float" value="4" />
     </constant>
-    <output name="outparam__q__y" type="float" nodename="outparam__q__y_value" />
+    <output name="outparam__q__y" type="float" nodename="node3" />
   </nodegraph>
   <foo name="var__0" type="multioutput" />
   <multiply name="x" type="float">

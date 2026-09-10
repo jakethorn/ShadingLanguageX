@@ -3,6 +3,9 @@
 //
 
 #include "utils/mtlx_utils.h"
+
+#include <MaterialXFormat/XmlIo.h>
+
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
@@ -116,7 +119,8 @@ namespace mxslc::mtlx_utils
         const auto [lib_major, lib_minor, lib_build] = mx::getVersionIntegers();
         if (doc_major == lib_major and doc_minor == lib_minor)
         {
-            if (string s = ""; not doc->validate(&s))
+            string s = mx::writeToXmlString(doc);
+            if (not doc->validate(&s))
                 throw MaterialXValidateError{std::move(s)};
         }
         else

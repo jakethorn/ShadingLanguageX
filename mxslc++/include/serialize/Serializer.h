@@ -65,6 +65,8 @@ namespace mxslc::serialize
 
         void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var) const;
         void write_node_input(const mx::NodePtr& node, const string& input_name, const VarPtr& var, const AttributeList& attrs) const;
+        void write_node_input(const mx::NodePtr& node, const string& input_name, const TypePtr& input_type, const VarPtr& var) const;
+        void write_node_input(const mx::NodePtr& node, const string& input_name, const TypePtr& input_type, const VarPtr& var, const AttributeList& attrs) const;
         void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var) const;
         void write_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name, const VarPtr& var, const AttributeList& attrs) const;
         void write_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name, const VarPtr& var) const;
