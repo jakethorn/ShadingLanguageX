@@ -4,14 +4,14 @@ import mxslc
 MTLX_IMAGE_WITH_METADATA = """<?xml version="1.0"?>
 <materialx version="1.39">
   <image name="out" type="color3" doc="an image of a sphere">
-    <input name="file" type="filename" value="textures/albedo.tif" colorspace="srgb_texture" unit="feet" unittype="distance" />
+    <input name="file" type="filename" value="textures/albedo.tif" colorspace="srgb_texture" unit="foot" unittype="distance" />
   </image>
 </materialx>
 """
 
 IMAGE_WITH_METADATA_EXPECTED = (
     '@doc "an image of a sphere"\n'
-    'color3 out = image(@colorspace "srgb_texture" @unit "feet" @unittype "distance" file = "textures/albedo.tif");\n'
+    'color3 out = image(@colorspace "srgb_texture" @unit "foot" @unittype "distance" file = "textures/albedo.tif");\n'
 )
 
 def test_emit_node_input_metadata():
@@ -40,7 +40,7 @@ MTLX_SURFACE_SHADER = """<?xml version="1.0"?>
   <standard_surface name="Water_SS_SHD_PBM" type="surfaceshader" doc="Water documentation" uiname="Water" uifolder="Liquid">
     <input name="base_color" type="color3" value="0.969, 0.996, 0.997" colorspace="lin_rec709" />
     <input name="metalness" type="float" value="0" />
-    <input name="transmission_color" type="color3" value="0.969, 0.996, 0.997" unit="feet" unittype="distance" />
+    <input name="transmission_color" type="color3" value="0.969, 0.996, 0.997" unit="foot" unittype="distance" />
   </standard_surface>
   <surfacematerial name="Water_SS_MAT_PBM" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="Water_SS_SHD_PBM" />
@@ -63,7 +63,7 @@ def test_surface_shader_metadata_is_emitted():
 
     # Input-level metadata is emitted inline before the input argument
     assert '@colorspace "lin_rec709"' in result
-    assert '@unit "feet"' in result
+    assert '@unit "foot"' in result
     assert '@unittype "distance"' in result
 
     # Structural attributes are not emitted
