@@ -63,6 +63,40 @@ namespace mxslc::decompile
             return node->getName().rfind("var__", 0) == 0;
         }
 
+        // A `separate`-family node returns an anonymous array (see
+        // primitive_utils::separate*), so its outputs must be addressed by index,
+        // never by named member access such as `.outx`. This only matters for
+        // inline (var__) separate nodes, which are expanded on demand into a bare
+        // call expression with no named fields; declared record variables keep
+        // their named member access.
+        bool is_inline_separate_node(const mx::NodePtr& node)
+        {
+            if (not is_inline_node(node))
+                return false;
+            const string category = node->getCategory();
+            return category == "separate" or category == "separate2"
+                or category == "separate3" or category == "separate4";
+        }
+
+        // Map a separate node's output name (outx/outy/outz/outw, ...) to its
+        // zero-based channel index by comparing aginst the NodeDef's output names.
+        // If no match throw an error. 
+        int separate_output_index(const mx::NodePtr& node, const string& output)
+        {
+            const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
+            if (node_def)
+            {
+                const vector<mx::OutputPtr> outputs = node_def->getActiveOutputs();
+                for (size_t i = 0; i < outputs.size(); ++i)
+                {
+                    if (outputs[i]->getName() == output)
+                        return static_cast<int>(i);
+                }
+            }
+            throw CompileError{"Cannot determine output index for '" + output +
+                               "' of separate node '" + node->getName() + "'"};
+        }
+
         string get_type_alias(const string& type_name)
         {
             static const unordered_map<string, string> type_aliases {
@@ -347,6 +381,11 @@ namespace mxslc::decompile
         return func_name + "(" + func_args + ")";
     }
 
+    string node_graph_output_field_name(const vector<mx::OutputPtr>& outputs, const string& output_name)
+    {
+        return safe_mxsl_name(outputs, remove_prefix(output_name));
+    }
+
     string Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outputs)
     {
         if (outputs.size() == 1)
@@ -362,8 +401,7 @@ namespace mxslc::decompile
                 if (has_prefix(output->getName(), OUT_PARAMETER_PREFIX) or
                     has_prefix(output->getName(), NONLOCAL_OUT_PREFIX))
                     continue;
-                const string var_name = remove_prefix(output->getName());
-                result += get_type_alias(output) + " " + safe_mxsl_name(outputs, var_name) + ", ";
+                result += get_type_alias(output) + " " + node_graph_output_field_name(outputs, output->getName()) + ", ";
             }
             remove_trailing_comma(result);
             return result + "}";
@@ -431,6 +469,11 @@ namespace mxslc::decompile
 
     string Decompiler::node_and_output_to_dot_op(const mx::NodePtr& node, const string& output)
     {
+        // `separate`-family nodes return an anonymous array, so a referenced
+        // output is addressed by index (outx->[0], outz->[2], ...) rather than by
+        // a named member such as `.outx`.
+        if (is_inline_separate_node(node))
+            return node_to_expression(node) + "[" + std::to_string(separate_output_index(node, output)) + "]";
         return (is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node)) + "." + output;
     }
 
@@ -438,7 +481,7 @@ namespace mxslc::decompile
     {
         const mx::NodeGraphPtr node_graph = document_->getNodeGraph(node_graph_name);
         const vector<mx::OutputPtr> node_graph_outputs = node_graph ? node_graph->getOutputs() : vector<mx::OutputPtr>{};
-        const string safe_output = safe_mxsl_name(node_graph_outputs, output);
+        const string safe_output = node_graph_output_field_name(node_graph_outputs, output);
 
         // For single-output nodegraphs, references use just the identifier
         // (variable or function name) without a .output suffix.

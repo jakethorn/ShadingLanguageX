@@ -1,0 +1,8 @@
+vec2 uv = texcoord() / 2;
+color3 albedo = image(file = "textures\albedo.tif", texcoord = uv);
+float matao = image(file = "textures\matao.tif", texcoord = uv);
+float metal = image(file = "textures\metal.tif", texcoord = uv);
+float rough = image(file = "textures\rough.tif", texcoord = uv);
+vec3 normal = image(file = "textures\normal.tif", texcoord = uv);
+surfaceshader surface = standard_surface(base_color = ((albedo * matao) * color3{0.5, 0.1, 0.1}), metalness = metal, specular_roughness = rough, normal = normalmap(in = combine3(in1 = separate3(in = normal)[0], in2 = invert(in = extract(in = normal, index = 1), amount = 0), in3 = separate3(in = normal)[2])));
+material brick_material = surfacematerial(surfaceshader = surface);

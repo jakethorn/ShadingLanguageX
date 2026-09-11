@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="var__0" type="vector2" />
+  <divide name="uv" type="vector2">
+    <input name="in1" type="vector2" nodename="var__0" />
+    <input name="in2" type="float" value="2" />
+  </divide>
+  <image name="albedo" type="color3">
+    <input name="file" type="filename" value="textures\albedo.tif" />
+    <input name="texcoord" type="vector2" nodename="uv" />
+  </image>
+  <image name="matao" type="float">
+    <input name="file" type="filename" value="textures\matao.tif" />
+    <input name="texcoord" type="vector2" nodename="uv" />
+  </image>
+  <image name="metal" type="float">
+    <input name="file" type="filename" value="textures\metal.tif" />
+    <input name="texcoord" type="vector2" nodename="uv" />
+  </image>
+  <image name="rough" type="float">
+    <input name="file" type="filename" value="textures\rough.tif" />
+    <input name="texcoord" type="vector2" nodename="uv" />
+  </image>
+  <image name="normal" type="vector3">
+    <input name="file" type="filename" value="textures\normal.tif" />
+    <input name="texcoord" type="vector2" nodename="uv" />
+  </image>
+  <multiply name="var__1" type="color3">
+    <input name="in1" type="color3" nodename="albedo" />
+    <input name="in2" type="float" nodename="matao" />
+  </multiply>
+  <multiply name="var__2" type="color3">
+    <input name="in1" type="color3" nodename="var__1" />
+    <input name="in2" type="color3" value="0.5, 0.1, 0.1" />
+  </multiply>
+  <separate3 name="var__3" type="multioutput">
+    <input name="in" type="vector3" nodename="normal" />
+  </separate3>
+  <extract name="var__4" type="float">
+    <input name="in" type="vector3" nodename="normal" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <invert name="var__5" type="float">
+    <input name="in" type="float" nodename="var__4" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <separate3 name="var__6" type="multioutput">
+    <input name="in" type="vector3" nodename="normal" />
+  </separate3>
+  <combine3 name="var__7" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__3" />
+    <input name="in2" type="float" nodename="var__5" />
+    <input name="in3" type="float" output="outz" nodename="var__6" />
+  </combine3>
+  <normalmap name="var__8" type="vector3">
+    <input name="in" type="vector3" nodename="var__7" />
+  </normalmap>
+  <standard_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__2" />
+    <input name="metalness" type="float" nodename="metal" />
+    <input name="specular_roughness" type="float" nodename="rough" />
+    <input name="normal" type="vector3" nodename="var__8" />
+  </standard_surface>
+  <surfacematerial name="brick_material" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
+  </surfacematerial>
+</materialx>
