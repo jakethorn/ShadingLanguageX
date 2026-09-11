@@ -11,8 +11,8 @@ export const MXSL_KEYWORDS = {
     // Control / language keywords
     control: [
         'if', 'else', 'for', 'from', 'to', 'return', 'null', 'ref', 'out',
-        'const', 'mutable', 'consteval', 'global', 'geomprop', 'inline',
-        'default', 'comptime', 'using', 'class', 'this', 'uniform', 'varying',
+        'const', 'mutable', 'consteval', 'global', 'geomprop', 'nodegraph', 'nodedef',
+        'inline', 'default', 'comptime', 'using', 'class', 'this', 'uniform', 'varying',
         'namespace', 'print', 'typeof', 'break',
     ],
 
