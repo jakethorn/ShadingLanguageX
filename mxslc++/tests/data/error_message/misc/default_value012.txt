@@ -1,0 +1,3 @@
+default_value012.mxsl, line 2: No function could be found with the signature 'surfacematerial("hello")'
+Possible match:
+material surfacematerial(surfaceshader surfaceshader, surfaceshader backsurfaceshader, displacementshader displacementshader)

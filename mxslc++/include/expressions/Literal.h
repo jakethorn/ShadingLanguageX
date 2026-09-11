@@ -27,6 +27,7 @@ namespace mxslc::expressions
 
     private:
         Primitive value_;
+        ValuePtr default_value_;
     };
 }
 

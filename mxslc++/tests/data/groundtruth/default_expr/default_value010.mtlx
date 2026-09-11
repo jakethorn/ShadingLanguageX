@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <surfacematerial name="var__0" type="material">
+    <input name="surfaceshader" type="surfaceshader" value="" />
+    <input name="displacementshader" type="displacementshader" value="" />
+  </surfacematerial>
+  <surface name="var__1" type="surfaceshader">
+    <input name="bsdf" type="BSDF" value="" />
+    <input name="edf" type="EDF" value="" />
+  </surface>
+  <volume name="var__2" type="volumeshader">
+    <input name="vdf" type="VDF" value="" />
+  </volume>
+  <surfacematerial name="var__3" type="material">
+    <input name="surfaceshader" type="surfaceshader" value="" />
+    <input name="displacementshader" type="displacementshader" value="" />
+  </surfacematerial>
+  <surface name="var__4" type="surfaceshader">
+    <input name="bsdf" type="BSDF" value="" />
+    <input name="edf" type="EDF" value="" />
+  </surface>
+  <volume name="var__5" type="volumeshader">
+    <input name="vdf" type="VDF" value="" />
+  </volume>
+  <surfacematerial name="var__6" type="material">
+    <input name="surfaceshader" type="surfaceshader" value="" />
+    <input name="displacementshader" type="displacementshader" value="" />
+  </surfacematerial>
+  <surface name="var__7" type="surfaceshader">
+    <input name="bsdf" type="BSDF" value="" />
+    <input name="edf" type="EDF" value="" />
+  </surface>
+</materialx>

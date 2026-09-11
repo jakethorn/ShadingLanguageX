@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="integer" />
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <constant name="node1" type="integer">
+      <input name="value" type="integer" value="0" />
+    </constant>
+    <output name="out" type="integer" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="integer" />
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <constant name="node1" type="integer">
+      <input name="value" type="integer" value="0" />
+    </constant>
+    <output name="out" type="integer" nodename="node1" />
+  </nodegraph>
+  <foo name="var__0" type="integer">
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </foo>
+  <foo name="var__1" type="integer">
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </foo>
+  <foo name="var__2" type="integer">
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </foo>
+  <foo name="var__3" type="integer">
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </foo>
+  <bar name="var__4" type="integer">
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </bar>
+</materialx>

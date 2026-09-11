@@ -1,0 +1,10 @@
+surfacematerial(default(surfaceshader), null, default(displacementshader));
+surface(default(BSDF), default(EDF));
+volume(default(VDF));
+
+surfacematerial("", null, "");
+surface("", "");
+volume("");
+
+surfacematerial("", null, default(displacementshader));
+surface(default(BSDF), "");

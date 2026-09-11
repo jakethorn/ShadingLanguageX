@@ -1,0 +1,16 @@
+int foo(lightshader l = "", volumeshader v = "")
+{
+    return default;
+}
+
+int bar(lightshader l = default, volumeshader v = default)
+{
+    return default;
+}
+
+foo();
+foo("", "");
+foo(default, "");
+foo(default, default);
+
+bar("", "");

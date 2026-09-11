@@ -31,6 +31,23 @@ namespace mxslc::container_utils
         return std::find(ts.begin(), ts.end(), t) != ts.end();
     }
 
+    template<typename T0, typename T1>
+    optional<T1> contains_one(const vector<T0>& t0s, const vector<T1>& t1s)
+    {
+        optional<T1> result;
+        for (const T0& t0 : t0s)
+        {
+            if (contains(t1s, t0))
+            {
+                if (not result.has_value())
+                    result = t0;
+                else
+                    return std::nullopt;
+            }
+        }
+        return result;
+    }
+
     template<typename TSet, typename T>
     bool contains(const TSet& ts, const T& t)
     {
