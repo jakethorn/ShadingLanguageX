@@ -4,6 +4,8 @@
 
 #include "runtime/variables/Variable.h"
 
+#include <cassert>
+
 #include "runtime/interface.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
@@ -387,19 +389,26 @@ namespace mxslc::runtime
 
     void Variable::copy_children(const vector<VarPtr>& children)
     {
-        children_.clear();
-        for (size_t i = 0; i < children.size(); ++i)
+        if (is_initialized_)
         {
-            if (is_comptime() and not children[i]->is_compile_time())
-                throw CompileError{"Cannot assign a non-compile-time value to a comptime variable"};
+            assert(children.size() == children_.size());
 
-            VarPtr child = create_variable(type_->field(i).modifiers(), type_->field_type(i), children[i]);
-            child->parent_ = weak_from_this();
-            if (not name_.empty())
-                child->set_name(with_prefix(name_, i));
-            children_.push_back(std::move(child));
+            for (size_t i = 0; i < children.size(); ++i)
+                children_[i]->copy(children[i]);
         }
+        else
+        {
+            children_.clear();
+            for (size_t i = 0; i < children.size(); ++i)
+            {
+                VarPtr child = create_variable(type_->field(i).modifiers(), type_->field_type(i), children[i]);
+                child->parent_ = weak_from_this();
+                if (not name_.empty())
+                    child->set_name(with_prefix(name_, i));
+                children_.push_back(std::move(child));
+            }
 
-        is_initialized_ = true;
+            is_initialized_ = true;
+        }
     }
 }

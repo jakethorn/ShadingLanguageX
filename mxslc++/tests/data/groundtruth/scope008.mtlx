@@ -3,24 +3,34 @@
   <nodedef name="ND_some_func" node="some_func">
     <output name="out" type="float" />
     <input name="nonlocal_in__b__0" type="float" />
+    <output name="nonlocal_out__a__0" type="float" />
     <input name="nonlocal_in__b__1" type="float" />
+    <output name="nonlocal_out__a__1" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
-    <constant name="node1" type="float">
+    <dot name="node1" type="float">
+      <input name="in" type="float" interfacename="nonlocal_in__b__0" />
+    </dot>
+    <output name="nonlocal_out__a__0" type="float" nodename="node1" />
+    <dot name="node2" type="float">
+      <input name="in" type="float" interfacename="nonlocal_in__b__1" />
+    </dot>
+    <output name="nonlocal_out__a__1" type="float" nodename="node2" />
+    <constant name="node3" type="float">
       <input name="value" type="float" value="3" />
     </constant>
-    <output name="out" type="float" nodename="node1" />
+    <output name="out" type="float" nodename="node3" />
   </nodegraph>
   <multiply name="c" type="float">
-    <input name="in1" type="float" interfacename="nonlocal_in__b__0" />
+    <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="6" />
   </multiply>
-  <some_func name="_" type="float">
+  <some_func name="var__0" type="multioutput">
     <input name="nonlocal_in__b__0" type="float" value="5" />
     <input name="nonlocal_in__b__1" type="float" value="6" />
   </some_func>
   <multiply name="d" type="float">
     <input name="in1" type="float" value="5" />
-    <input name="in2" type="float" interfacename="nonlocal_in__b__1" />
+    <input name="in2" type="float" output="nonlocal_out__a__1" nodename="var__0" />
   </multiply>
 </materialx>
