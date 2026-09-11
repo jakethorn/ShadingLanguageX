@@ -115,22 +115,13 @@ namespace mxslc
 
         TypePtr get_type(const mx::NodeDefPtr& nd)
         {
-            vector<TypePtr> subtypes;
-            subtypes.reserve(nd->getOutputCount());
+            vector<Field> fields;
+            fields.reserve(nd->getOutputCount());
             for (const mx::OutputPtr& output : nd->getActiveOutputs())
-                subtypes.push_back(Type::of(output));
+                fields.emplace_back(Type::of(output), output->getName());
 
-            const TypePtr type = subtypes.size() == 1 ? subtypes.at(0) : create_type(std::move(subtypes));
+            const TypePtr type = fields.size() == 1 ? fields[0].type() : create_type(std::move(fields));
             return Runtime::get().scope().resolve_type(type);
-        }
-
-        vector<string> get_output_names(const mx::NodeDefPtr& nd)
-        {
-            vector<string> names;
-            names.reserve(nd->getOutputCount());
-            for (const mx::OutputPtr& o : nd->getActiveOutputs())
-                names.push_back(o->getName());
-            return names;
         }
 
         FuncPtr to_function(const mx::NodeDefPtr& nd, const unordered_set<string>& default_node_defs)
@@ -146,7 +137,6 @@ namespace mxslc
             const string template_type_name = string_utils::get_postfix(nd->getName(), '_');
             TypePtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
             ParameterList params = get_parameters(nd);
-            vector<string> output_names = get_output_names(nd);
             FuncPtr func = create_function(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), nd);
             func->init();
             return func;

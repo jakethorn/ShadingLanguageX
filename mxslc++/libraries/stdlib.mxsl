@@ -67,32 +67,32 @@ inline T max<float, vector2, vector3, vector4, color3, color4>(T in1, T in2, T i
 // separate
 //
 
-inline {float} separate(float in)
+inline {float outx} separate(float in)
 {
     return {in};
 }
 
-inline {float, float} separate(vector2 in)
+inline {float outx, float outy} separate(vector2 in)
 {
     return separate2(in);
 }
 
-inline {float, float, float} separate(vector3 in)
+inline {float outx, float outz, float outz} separate(vector3 in)
 {
     return separate3(in);
 }
 
-inline {float, float, float, float} separate(vector4 in)
+inline {float outx, float outz, float outz, float outw} separate(vector4 in)
 {
     return separate4(in);
 }
 
-inline {float, float, float} separate(color3 in)
+inline {float outr, float outg, float outb} separate(color3 in)
 {
     return separate3(in);
 }
 
-inline {float, float, float, float} separate(color4 in)
+inline {float outr, float outg, float outb, float outa} separate(color4 in)
 {
     return separate4(in);
 }

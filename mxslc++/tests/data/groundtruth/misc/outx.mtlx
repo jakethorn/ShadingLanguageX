@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <separate2 name="var__0" type="multioutput">
+    <input name="in" type="vector2" value="0, 0" />
+  </separate2>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" output="outx" nodename="var__0" />
+  </constant>
+</materialx>
