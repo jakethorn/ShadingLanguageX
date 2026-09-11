@@ -85,7 +85,7 @@ namespace
             opts.add_default_search_directories();
 
             const mx::DocumentPtr doc =
-                mxslc::get_materialx_library(opts.version, opts.search_directories());
+                mxslc::load_materialx_library(opts.version, opts.search_directories());
 
             std::set<std::string> names;
             for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
