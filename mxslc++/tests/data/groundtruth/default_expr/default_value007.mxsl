@@ -1,0 +1,6 @@
+int foo(lightshader l = default, volumeshader v = default)
+{
+    return default;
+}
+
+foo();

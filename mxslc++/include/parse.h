@@ -44,6 +44,7 @@ namespace mxslc
         Attribute attribute();
         AttributeList attributes();
         ModifierList modifiers();
+        ModifierList argument_modifiers();
         TypePtr type();
         Field field();
         Parameter parameter(size_t index);
@@ -65,6 +66,7 @@ namespace mxslc
         ExprPtr property();
         ExprPtr primary();
         ExprPtr if_expression(ExprPtr else_expr = nullptr);
+        ExprPtr default_expression();
         ExprPtr function_call();
         ExprPtr method_call(ExprPtr instance);
         ExprPtr named_constructor();

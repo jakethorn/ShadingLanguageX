@@ -60,6 +60,7 @@ add_library(mxslc_lib
         expressions/TypeOfOperator.cpp
         expressions/RangeExpression.cpp
         expressions/IfExpression.cpp
+        expressions/DefaultExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
@@ -115,6 +116,7 @@ add_library(mxslc_lib
         serialize/values/CompileTimeValue.cpp
         serialize/values/NodeGraphValue.cpp
         serialize/values/NodeGraphOutputValue.cpp
+        serialize/values/StringValue.cpp
         serialize/values/interface.cpp
         serialize/FunctionCallHistory.cpp
         preprocess/preprocess.cpp

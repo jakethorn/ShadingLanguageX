@@ -1,0 +1,4 @@
+{bool, string, vec4} a = default;
+constant(a[0]);
+constant(a[1]);
+constant(a[2]);

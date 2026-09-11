@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <constant name="var__0" type="boolean">
+    <input name="value" type="boolean" value="false" />
+  </constant>
+  <constant name="var__1" type="integer">
+    <input name="value" type="integer" value="0" />
+  </constant>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" value="0.0" />
+  </constant>
+  <constant name="var__3" type="string">
+    <input name="value" type="string" value="" />
+  </constant>
+  <constant name="var__4" type="filename">
+    <input name="value" type="filename" value="" />
+  </constant>
+  <constant name="var__5" type="vector2">
+    <input name="value" type="vector2" value="0.0, 0.0" />
+  </constant>
+  <constant name="var__6" type="vector3">
+    <input name="value" type="vector3" value="0.0, 0.0, 0.0" />
+  </constant>
+  <constant name="var__7" type="vector4">
+    <input name="value" type="vector4" value="0.0, 0.0, 0.0, 0.0" />
+  </constant>
+  <constant name="var__8" type="color3">
+    <input name="value" type="color3" value="0.0, 0.0, 0.0" />
+  </constant>
+  <constant name="var__9" type="color4">
+    <input name="value" type="color4" value="0.0, 0.0, 0.0, 0.0" />
+  </constant>
+  <constant name="var__10" type="matrix33">
+    <input name="value" type="matrix33" value="1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0" />
+  </constant>
+  <constant name="var__11" type="matrix44">
+    <input name="value" type="matrix44" value="1.0,0.0,0.0,0.0, 0.0,1.0,0.0,0.0, 0.0,0.0,1.0,0.0, 0.0,0.0,0.0,1.0" />
+  </constant>
+  <surfacematerial name="var__12" type="material">
+    <input name="surfaceshader" type="surfaceshader" value="" />
+    <input name="displacementshader" type="displacementshader" value="" />
+  </surfacematerial>
+  <surface name="var__13" type="surfaceshader">
+    <input name="bsdf" type="BSDF" value="" />
+    <input name="edf" type="EDF" value="" />
+  </surface>
+  <volume name="var__14" type="volumeshader">
+    <input name="vdf" type="VDF" value="" />
+  </volume>
+</materialx>

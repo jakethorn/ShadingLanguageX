@@ -35,7 +35,7 @@ namespace mxslc::serialize::values
 
     void CompileTimeValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
     {
-        // values cannot be given directly to outputs, so create a dot node as a passthrough
+        // values cannot be given directly to outputs, so create a constant node as a passthrough
         const mx::NodePtr constant_node = node_graph->addNode("constant", mx::EMPTY_STRING, type_->name());
 
         const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);

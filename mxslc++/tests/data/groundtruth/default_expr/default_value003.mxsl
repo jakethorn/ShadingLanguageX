@@ -1,0 +1,18 @@
+int i = 6 + default;
+constant(i);
+
+inline float foo(float f = default)
+{
+    return f ^ 2;
+}
+
+color3 bar(color3 c = default)
+{
+    return c ^ 4;
+}
+
+float x = foo();
+float y = foo(4.0);
+
+color3 m = bar();
+color3 n = bar(color3{0.2, 0.4, 0.6});

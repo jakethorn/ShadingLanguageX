@@ -22,6 +22,7 @@
 #include "expressions/TypeOfOperator.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "expressions/NullExpression.h"
+#include "expressions/DefaultExpression.h"
 #include "runtime/interface.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -416,6 +417,27 @@ namespace mxslc
         return ModifierList{mod_tokens};
     }
 
+    ModifierList Parser::argument_modifiers()
+    {
+        // the same as modifiers(), but without default so it doesn't clash with default expressions
+        consume("[[");
+        const vector<Token> mod_tokens = consume_while(
+            TokenType::Const,
+            TokenType::Mutable,
+            TokenType::Global,
+            TokenType::Geomprop,
+            TokenType::Nodegraph,
+            TokenType::Nodedef,
+            TokenType::Inline,
+            TokenType::Comptime,
+            TokenType::Ref,
+            TokenType::Out
+        );
+        consume("]]");
+
+        return ModifierList{mod_tokens};
+    }
+
     TypePtr Parser::type()
     {
         if (const optional<Token> type = consume(TokenType::Identifier))
@@ -723,6 +745,11 @@ namespace mxslc
             return if_expression();
         }
 
+        if (peek() == TokenType::Default)
+        {
+            return default_expression();
+        }
+
         if (peek() == TokenType::Typeof)
         {
             return typeof_operator();
@@ -758,6 +785,19 @@ namespace mxslc
             throw CompileError{peek(), "Missing else branch in if-expression"};
 
         return create_expression<IfExpression>(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
+    }
+
+    ExprPtr Parser::default_expression()
+    {
+        Token token = match(TokenType::Default);
+
+        TypePtr type_ = nullptr;
+        if (consume('('))
+        {
+            type_ = type();
+            match(')');
+        }
+        return create_expression<DefaultExpression>(std::move(type_), std::move(token));
     }
 
     ExprPtr Parser::function_call()
@@ -828,7 +868,7 @@ namespace mxslc
             match('=');
         }
 
-        const ModifierList mods = modifiers();
+        const ModifierList mods = argument_modifiers();
 
         ExprPtr expr;
         if (is_typed_definition())

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="i" type="integer">
+    <input name="in1" type="integer" value="6" />
+    <input name="in2" type="integer" value="0" />
+  </add>
+  <constant name="var__0" type="integer">
+    <input name="value" type="integer" nodename="i" />
+  </constant>
+  <nodedef name="ND_bar" node="bar">
+    <output name="out" type="color3" />
+    <input name="c" type="color3" value="0.0, 0.0, 0.0" />
+  </nodedef>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <power name="var__0" type="color3">
+      <input name="in1" type="color3" interfacename="c" />
+      <input name="in2" type="float" value="4" />
+    </power>
+    <output name="out" type="color3" nodename="var__0" />
+  </nodegraph>
+  <power name="x" type="float">
+    <input name="in1" type="float" value="0.0" />
+    <input name="in2" type="float" value="2" />
+  </power>
+  <power name="y" type="float">
+    <input name="in1" type="float" value="4" />
+    <input name="in2" type="float" value="2" />
+  </power>
+  <bar name="m" type="color3">
+    <input name="c" type="color3" value="0.0, 0.0, 0.0" />
+  </bar>
+  <bar name="n" type="color3">
+    <input name="c" type="color3" value="0.2, 0.4, 0.6" />
+  </bar>
+</materialx>

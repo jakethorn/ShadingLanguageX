@@ -1,0 +1,11 @@
+inline float foo(float f)
+{
+    return f ^ 2;
+}
+
+color3 foo(color3 c)
+{
+    return c ^ 4;
+}
+
+auto x = foo(default(color3));

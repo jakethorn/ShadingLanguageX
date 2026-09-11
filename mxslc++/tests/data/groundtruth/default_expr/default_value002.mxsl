@@ -1,0 +1,16 @@
+constant(default(bool));
+constant(default(int));
+constant(default(float));
+constant(default(string));
+constant(default(filename));
+constant(default(vec2));
+constant(default(vec3));
+constant(default(vec4));
+constant(default(color3));
+constant(default(color4));
+constant(default(mat3));
+constant(default(mat4));
+
+surfacematerial(default(surfaceshader), null, default(displacementshader));
+surface(default(BSDF), default(EDF));
+volume(default(VDF));

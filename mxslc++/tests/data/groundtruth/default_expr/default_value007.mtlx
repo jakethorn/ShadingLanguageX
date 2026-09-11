@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="integer" />
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <constant name="node1" type="integer">
+      <input name="value" type="integer" value="0" />
+    </constant>
+    <output name="out" type="integer" nodename="node1" />
+  </nodegraph>
+  <foo name="var__0" type="integer">
+    <input name="l" type="lightshader" value="" />
+    <input name="v" type="volumeshader" value="" />
+  </foo>
+</materialx>

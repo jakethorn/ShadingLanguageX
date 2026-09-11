@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="color3" />
+    <input name="c" type="color3" value="0.0, 0.0, 0.0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <power name="var__0" type="color3">
+      <input name="in1" type="color3" interfacename="c" />
+      <input name="in2" type="float" value="4" />
+    </power>
+    <output name="out" type="color3" nodename="var__0" />
+  </nodegraph>
+  <power name="x" type="float">
+    <input name="in1" type="float" value="0.0" />
+    <input name="in2" type="float" value="2" />
+  </power>
+</materialx>

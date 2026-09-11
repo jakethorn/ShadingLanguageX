@@ -1,0 +1,9 @@
+bool a = default(bool);
+constant(a);
+
+bool b = default;
+constant(b);
+
+auto c = default(bool);
+constant(c);
+
