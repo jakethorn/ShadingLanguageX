@@ -27,7 +27,7 @@ from pathlib import Path
 # Paths
 # ---------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-KW_PATH = REPO_ROOT / "mxslc" / "mxslc" / "Keyword.py"
+KW_PATH = REPO_ROOT / "mxslc++" / "browser_shared" / "keywords.js"
 STDLIB_PATH = REPO_ROOT / "mxslc++" / "libraries" / "stdlib.mxsl"
 OUT_DIR = REPO_ROOT / "tools" / "vscode_extension" / "mxsl-vscode"
 
@@ -41,18 +41,23 @@ JS_BUILD_SCRIPT = REPO_ROOT / "mxslc++" / "javascript" / "build_javascript.sh"
 # ---------------------------------------------------------------------------
 
 def load_keywords() -> dict:
-    """Load MXSL keywords from Keyword.py (data types vs control)."""
-    import importlib.util
-
+    """Load MXSL keywords (data types vs control) from the mxslc++ shared
+    browser keyword file (browser_shared/keywords.js). That file is the single
+    source of truth for mxslc++ highlighting and mirrors the mxslc++ TokenType
+    keyword enum (include/TokenType.h), so it includes the [[ ... ]] modifiers
+    such as nodegraph / nodedef."""
     print(f"......Loading keywords from {KW_PATH}")
 
-    spec = importlib.util.spec_from_file_location("Keyword", str(KW_PATH))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    text = KW_PATH.read_text()
 
-    data_types = sorted({str(k) for k in mod.Keyword.DATA_TYPES()})
-    all_kw = sorted({str(k) for k in mod.Keyword})
-    control = sorted(set(all_kw) - set(data_types))
+    def extract_array(name: str) -> list[str]:
+        m = re.search(rf"\b{name}\s*:\s*\[(.*?)\]", text, re.S)
+        if not m:
+            return []
+        return re.findall(r"'([^']*)'", m.group(1))
+
+    data_types = sorted(extract_array("dataTypes"))
+    control = sorted(extract_array("control"))
 
     return {"data_types": data_types, "control": control}
 
@@ -144,6 +149,7 @@ def run_js_build(args) -> None:
         cmd.append(mtlx_root)
 
     try:
+        print("Building with command:", " ".join(cmd))
         result = subprocess.run(cmd, cwd=REPO_ROOT, check=False)
         if result.returncode != 0:
             print(f"  Warning: build_javascript.sh exited with code {result.returncode}")
@@ -267,15 +273,31 @@ def generate_package_json(with_converter: bool = False) -> dict:
         pkg["contributes"]["commands"] = [
             {
                 "command": "mxsl.convert",
-                "title": "MXSL: Convert between MXSL and MTLX"
+                "title": "MXSL: Convert between MXSL and MTLX",
+                "icon": "$(arrow-swap)"
             },
             {
                 "command": "mxsl.validate",
-                "title": "MXSL: Validate current file (MXSL <-> MTLX)"
+                "title": "MXSL: Validate current file (MXSL <-> MTLX)",
+                "icon": "$(check-all)"
             }
         ]
         pkg["contributes"]["menus"] = {
             "editor/context": [
+                {
+                    "command": "mxsl.convert",
+                    "when": "editorLangId == mxsl || editorLangId == xml",
+                    "group": "navigation"
+                },
+                {
+                    "command": "mxsl.validate",
+                    "when": "editorLangId == mxsl || editorLangId == xml",
+                    "group": "navigation"
+                }
+            ],
+            # Icons shown in the editor title bar (top-right), like the built-in
+            # Markdown preview button. Only appear while editing .mxsl/.mtlx files.
+            "editor/title": [
                 {
                     "command": "mxsl.convert",
                     "when": "editorLangId == mxsl || editorLangId == xml",
