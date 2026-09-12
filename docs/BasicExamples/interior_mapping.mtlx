@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="var__0" type="vector2" />
+  <convert name="t_in1" type="vector2">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <subtract name="uv" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in1" />
+    <input name="in2" type="vector2" nodename="var__0" />
+  </subtract>
+  <multiply name="var__1" type="vector2">
+    <input name="in1" type="vector2" nodename="uv" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <subtract name="var__2" type="vector2">
+    <input name="in1" type="vector2" nodename="var__1" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <separate2 name="var__3" type="multioutput">
+    <input name="in" type="vector2" nodename="var__2" />
+  </separate2>
+  <combine3 name="origin" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__3" />
+    <input name="in2" type="float" output="outy" nodename="var__3" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <viewdirection name="view_dir" type="vector3">
+    <input name="space" type="string" value="object" />
+  </viewdirection>
+  <invert name="var__4" type="vector3">
+    <input name="in" type="vector3" nodename="origin" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <subtract name="var__5" type="vector3">
+    <input name="in1" type="vector3" nodename="var__4" />
+    <input name="in2" type="float" value="1" />
+  </subtract>
+  <divide name="dn" type="vector3">
+    <input name="in1" type="vector3" nodename="var__5" />
+    <input name="in2" type="vector3" nodename="view_dir" />
+  </divide>
+  <invert name="var__6" type="vector3">
+    <input name="in" type="vector3" nodename="origin" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <add name="var__7" type="vector3">
+    <input name="in1" type="vector3" nodename="var__6" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <divide name="dp" type="vector3">
+    <input name="in1" type="vector3" nodename="var__7" />
+    <input name="in2" type="vector3" nodename="view_dir" />
+  </divide>
+  <max name="d_min" type="vector3">
+    <input name="in1" type="vector3" nodename="dn" />
+    <input name="in2" type="vector3" nodename="dp" />
+  </max>
+  <extract name="var__8" type="float">
+    <input name="in" type="vector3" nodename="d_min" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="var__9" type="float">
+    <input name="in" type="vector3" nodename="d_min" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <extract name="var__10" type="float">
+    <input name="in" type="vector3" nodename="d_min" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <min name="var__11" type="float">
+    <input name="in1" type="float" nodename="var__8" />
+    <input name="in2" type="float" nodename="var__9" />
+  </min>
+  <min name="var__12" type="float">
+    <input name="in1" type="float" nodename="var__11" />
+    <input name="in2" type="float" nodename="var__10" />
+  </min>
+  <multiply name="var__13" type="vector3">
+    <input name="in1" type="vector3" nodename="view_dir" />
+    <input name="in2" type="float" nodename="var__12" />
+  </multiply>
+  <add name="room_pos" type="vector3">
+    <input name="in1" type="vector3" nodename="origin" />
+    <input name="in2" type="vector3" nodename="var__13" />
+  </add>
+  <extract name="var__14" type="float">
+    <input name="in" type="vector3" nodename="room_pos" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifgreater name="var__15" type="boolean">
+    <input name="value1" type="float" nodename="var__14" />
+    <input name="value2" type="float" value="0.99" />
+  </ifgreater>
+  <extract name="var__16" type="float">
+    <input name="in" type="vector3" nodename="room_pos" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifgreater name="var__17" type="boolean">
+    <input name="value1" type="float" value="-0.99" />
+    <input name="value2" type="float" nodename="var__16" />
+  </ifgreater>
+  <extract name="var__18" type="float">
+    <input name="in" type="vector3" nodename="room_pos" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <ifgreater name="var__19" type="boolean">
+    <input name="value1" type="float" nodename="var__18" />
+    <input name="value2" type="float" value="0.99" />
+  </ifgreater>
+  <extract name="var__20" type="float">
+    <input name="in" type="vector3" nodename="room_pos" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <ifgreater name="var__21" type="boolean">
+    <input name="value1" type="float" value="-0.99" />
+    <input name="value2" type="float" nodename="var__20" />
+  </ifgreater>
+  <extract name="var__22" type="float">
+    <input name="in" type="vector3" nodename="room_pos" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <ifgreater name="var__23" type="boolean">
+    <input name="value1" type="float" value="-0.99" />
+    <input name="value2" type="float" nodename="var__22" />
+  </ifgreater>
+  <ifequal name="var__24" type="color3">
+    <input name="value1" type="boolean" nodename="var__23" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" value="1, 1, 0" />
+    <input name="in2" type="color3" value="0, 0, 0" />
+  </ifequal>
+  <ifequal name="var__25" type="color3">
+    <input name="value1" type="boolean" nodename="var__21" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" value="1, 0, 1" />
+    <input name="in2" type="color3" nodename="var__24" />
+  </ifequal>
+  <ifequal name="var__26" type="color3">
+    <input name="value1" type="boolean" nodename="var__19" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" value="0, 1, 0" />
+    <input name="in2" type="color3" nodename="var__25" />
+  </ifequal>
+  <ifequal name="var__27" type="color3">
+    <input name="value1" type="boolean" nodename="var__17" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" value="1, 0, 0" />
+    <input name="in2" type="color3" nodename="var__26" />
+  </ifequal>
+  <ifequal name="walls" type="color3">
+    <input name="value1" type="boolean" nodename="var__15" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" value="0, 0, 1" />
+    <input name="in2" type="color3" nodename="var__27" />
+  </ifequal>
+  <time name="var__28" type="float" />
+  <multiply name="var__29" type="float">
+    <input name="in1" type="float" nodename="var__28" />
+    <input name="in2" type="float" value="0.667" />
+  </multiply>
+  <sin name="var__30" type="float">
+    <input name="in" type="float" nodename="var__29" />
+  </sin>
+  <multiply name="var__31" type="float">
+    <input name="in1" type="float" nodename="var__30" />
+    <input name="in2" type="float" value="0.75" />
+  </multiply>
+  <time name="var__32" type="float" />
+  <multiply name="var__33" type="float">
+    <input name="in1" type="float" nodename="var__32" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <cos name="var__34" type="float">
+    <input name="in" type="float" nodename="var__33" />
+  </cos>
+  <multiply name="var__35" type="float">
+    <input name="in1" type="float" nodename="var__34" />
+    <input name="in2" type="float" value="0.75" />
+  </multiply>
+  <combine3 name="light_pos" type="vector3">
+    <input name="in1" type="float" nodename="var__31" />
+    <input name="in2" type="float" nodename="var__35" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <distance name="var__36" type="float">
+    <input name="in1" type="vector3" nodename="light_pos" />
+    <input name="in2" type="vector3" nodename="room_pos" />
+  </distance>
+  <divide name="var__37" type="float">
+    <input name="in1" type="float" nodename="var__36" />
+    <input name="in2" type="float" value="1.732" />
+  </divide>
+  <subtract name="var__38" type="float">
+    <input name="in1" type="float" value="1.2" />
+    <input name="in2" type="float" nodename="var__37" />
+  </subtract>
+  <power name="light" type="float">
+    <input name="in1" type="float" nodename="var__38" />
+    <input name="in2" type="float" value="4" />
+  </power>
+  <magnitude name="var__39" type="float">
+    <input name="in" type="vector3" nodename="room_pos" />
+  </magnitude>
+  <divide name="var__40" type="float">
+    <input name="in1" type="float" nodename="var__39" />
+    <input name="in2" type="float" value="17.32" />
+  </divide>
+  <subtract name="ao" type="float">
+    <input name="in1" type="float" value="0.1" />
+    <input name="in2" type="float" nodename="var__40" />
+  </subtract>
+  <open_pbr_surface name="surface" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__42" />
+    <input name="specular_roughness" type="float" value="1" />
+  </open_pbr_surface>
+  <max name="var__41" type="float">
+    <input name="in1" type="float" nodename="light" />
+    <input name="in2" type="float" nodename="ao" />
+  </max>
+  <multiply name="var__42" type="color3">
+    <input name="in1" type="color3" nodename="walls" />
+    <input name="in2" type="float" nodename="var__41" />
+  </multiply>
+  <surfacematerial name="parallax_mat" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="surface" />
+  </surfacematerial>
+</materialx>

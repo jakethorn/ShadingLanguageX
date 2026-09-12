@@ -1,4 +1,0 @@
-#include "../add_include_dir/to_be_included.mxsl"
-
-float f = x + y + z;
-color3 r = red();

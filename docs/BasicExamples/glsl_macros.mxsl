@@ -1,0 +1,40 @@
+#define dot dotproduct
+#define pow power
+#define mod modulo
+#define abs absval
+#define length magnitude
+#define iTime time()
+#define iResolution vec2{1, 1}
+
+inline T glsl_mix<float, vec2, vec3, vec4>(T bg, T fg, T mix)
+{
+    return mix(fg, bg, mix);
+}
+
+inline T glsl_mix<vec2, vec3, vec4>(T bg, T fg, float mix)
+{
+    return mix(fg, bg, mix);
+}
+
+#define mix glsl_mix
+
+inline T glsl_smoothstep<float, vec2, vec3, vec4>(T low, T high, T in)
+{
+    T t = clamp((in - low) / (high - low), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+inline T glsl_smoothstep<vec2, vec3, vec4>(float low, float high, T in)
+{
+    T t = clamp((in - low) / (high - low), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+#define smoothstep glsl_smoothstep
+
+inline float glsl_step(float edge, float x)
+{
+    return float{x < edge};
+}
+
+#define step glsl_step

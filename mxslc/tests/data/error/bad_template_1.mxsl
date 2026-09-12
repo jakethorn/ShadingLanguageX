@@ -1,6 +1,0 @@
-float foo<float, vec2>()
-{
-    return 6.9;
-}
-
-float f = foo<color3>() * 2.0;

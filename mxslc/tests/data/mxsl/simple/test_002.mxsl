@@ -1,4 +1,0 @@
-float dogs = 10.0 + 4.7;
-float dont = dogs ^ 2.0;
-float wear = -1.0 / 0.5;
-float hats = dogs - dont * wear;

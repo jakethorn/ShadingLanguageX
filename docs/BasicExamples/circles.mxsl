@@ -1,0 +1,11 @@
+global int N;
+
+mutable color3 c = color3{1};
+for (int i from 1 to N)
+{
+    vec2 p = {randomfloat(i, seed=0), randomfloat(i, seed=1)};
+    c = if (distance(p, texcoord()) < 0.1) { randomcolor(i) };
+}
+
+surfaceshader s = standard_surface(base_color = c);
+material m = surfacematerial(s);

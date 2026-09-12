@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="var__0" type="vector3" />
+  <separate3 name="var__1" type="multioutput">
+    <input name="in" type="vector3" nodename="var__0" />
+  </separate3>
+  <combine2 name="uv" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__1" />
+  </combine2>
+  <multiply name="scale2" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <divide name="var__2" type="vector2">
+    <input name="in1" type="vector2" nodename="uv" />
+    <input name="in2" type="float" nodename="scale2" />
+  </divide>
+  <noise2d name="var__3" type="float">
+    <input name="texcoord" type="vector2" nodename="var__2" />
+  </noise2d>
+  <multiply name="var__4" type="float">
+    <input name="in1" type="float" nodename="var__3" />
+    <input name="in2" type="float" nodename="scale2" />
+  </multiply>
+  <add name="var__5" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="var__4" />
+  </add>
+  <multiply name="var__6" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <multiply name="scale3" type="float">
+    <input name="in1" type="float" nodename="var__6" />
+    <input name="in2" type="float" nodename="var__6" />
+  </multiply>
+  <divide name="var__7" type="vector2">
+    <input name="in1" type="vector2" nodename="uv" />
+    <input name="in2" type="float" nodename="scale3" />
+  </divide>
+  <noise2d name="var__8" type="float">
+    <input name="texcoord" type="vector2" nodename="var__7" />
+  </noise2d>
+  <multiply name="var__9" type="float">
+    <input name="in1" type="float" nodename="var__8" />
+    <input name="in2" type="float" nodename="scale3" />
+  </multiply>
+  <add name="var__10" type="float">
+    <input name="in1" type="float" nodename="var__5" />
+    <input name="in2" type="float" nodename="var__9" />
+  </add>
+  <multiply name="var__11" type="float">
+    <input name="in1" type="float" nodename="var__6" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <multiply name="scale4" type="float">
+    <input name="in1" type="float" nodename="var__11" />
+    <input name="in2" type="float" nodename="var__11" />
+  </multiply>
+  <divide name="var__12" type="vector2">
+    <input name="in1" type="vector2" nodename="uv" />
+    <input name="in2" type="float" nodename="scale4" />
+  </divide>
+  <noise2d name="var__13" type="float">
+    <input name="texcoord" type="vector2" nodename="var__12" />
+  </noise2d>
+  <multiply name="var__14" type="float">
+    <input name="in1" type="float" nodename="var__13" />
+    <input name="in2" type="float" nodename="scale4" />
+  </multiply>
+  <add name="var__15" type="float">
+    <input name="in1" type="float" nodename="var__10" />
+    <input name="in2" type="float" nodename="var__14" />
+  </add>
+  <multiply name="var__16" type="float">
+    <input name="in1" type="float" nodename="var__11" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <multiply name="scale5" type="float">
+    <input name="in1" type="float" nodename="var__16" />
+    <input name="in2" type="float" nodename="var__16" />
+  </multiply>
+  <divide name="var__17" type="vector2">
+    <input name="in1" type="vector2" nodename="uv" />
+    <input name="in2" type="float" nodename="scale5" />
+  </divide>
+  <noise2d name="var__18" type="float">
+    <input name="texcoord" type="vector2" nodename="var__17" />
+  </noise2d>
+  <multiply name="var__19" type="float">
+    <input name="in1" type="float" nodename="var__18" />
+    <input name="in2" type="float" nodename="scale5" />
+  </multiply>
+  <add name="var__20" type="float">
+    <input name="in1" type="float" nodename="var__15" />
+    <input name="in2" type="float" nodename="var__19" />
+  </add>
+  <multiply name="var__21" type="float">
+    <input name="in1" type="float" nodename="var__16" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <standard_surface name="var__22" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.82, 0.796, 0.761" />
+    <input name="metalness" type="float" value="0" />
+    <input name="specular_roughness" type="float" value="1" />
+  </standard_surface>
+  <displacement name="var__23" type="displacementshader">
+    <input name="displacement" type="float" nodename="var__20" />
+  </displacement>
+  <surfacematerial name="var__24" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="var__22" />
+    <input name="displacementshader" type="displacementshader" nodename="var__23" />
+  </surfacematerial>
+</materialx>

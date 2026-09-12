@@ -1,0 +1,7 @@
+surfaceshader goldsurf = standard_surface();
+goldsurf.base_color = color3{1.059, 0.773, 0.307};
+goldsurf.specular_color = color3{1.001, 0.985, 0.523};
+goldsurf.specular_roughness = 0;
+goldsurf.metalness = 1;
+
+material goldmat = surfacematerial(goldsurf);

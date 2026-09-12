@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<materialx version="1.39">
-  <standard_surface name="node43" type="surfaceshader">
-    <input name="base_color" type="color3" value="1, 0, 0" />
-  </standard_surface>
-  <surfacematerial name="node4" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="node43" />
-  </surfacematerial>
-</materialx>
