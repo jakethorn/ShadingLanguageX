@@ -125,12 +125,36 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Pages artifact
-        # Stage the full, self-contained browser app (index.html, app.js,
-        # keywords.js and lib/ with the freshly built WASM files) for GitHub
-        # Pages. The build script copies the WASM artifacts into browser/lib/.
+        # Upload browser app for GitHub Pages. 
         uses: actions/upload-pages-artifact@v5
         with:
           path: mxslc++/javascript/browser
+
+      # Attempt to build VScode extension. Allow to
+      # continue if fails.
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/vscode_extension/requirements.txt
+
+      - name: Install VS Code extension generator dependencies
+        continue-on-error: true
+        run: pip install -r tools/vscode_extension/requirements.txt
+
+      - name: Generate and package VS Code extension (.vsix)
+        continue-on-error: true
+        run: |
+          python tools/vscode_extension/gen_extension.py \
+            --generate --converter --vsix
+
+      - name: Upload VSCode extension artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: mxslc-vscode
+          path: tools/vscode_extension/mxsl-language-*.vsix
+          if-no-files-found: warn
 
   deploy:
     name: Deploy browser app to GitHub Pages
