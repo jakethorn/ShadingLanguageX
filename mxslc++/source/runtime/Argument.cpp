@@ -123,6 +123,5 @@ namespace mxslc::runtime
             return mods_string + name_ + " = " + expr_->to_string();
         else
             return mods_string + expr_->to_string();
-
     }
 }

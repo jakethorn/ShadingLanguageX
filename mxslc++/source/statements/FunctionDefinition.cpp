@@ -16,6 +16,8 @@
 
 namespace mxslc::statements
 {
+    using container_utils::contains;
+
     FunctionDefinition::FunctionDefinition(
         ModifierList mods,
         TypePtr type,
@@ -32,8 +34,39 @@ namespace mxslc::statements
         params_{std::move(params)},
         body_{std::move(body)}
     {
+
+    }
+
+    void FunctionDefinition::set_attributes(AttributeList attrs)
+    {
+        attrs_ = std::move(attrs);
+    }
+
+    StmtPtr FunctionDefinition::monomorphize(const TypePtr& template_type) const
+    {
+        if (is_templated())
+            throw CompileError{"Nested templated functions is not supported"};
+
+        return create_statement<FunctionDefinition>(
+            mods_,
+            runtime_utils::monomorphize(type_, template_type),
+            name_,
+            template_types_,
+            runtime_utils::monomorphize(params_, template_type),
+            runtime_utils::monomorphize(body_, template_type),
+            token_
+        );
+    }
+
+    void FunctionDefinition::create_functions()
+    {
+        if (not funcs_.empty())
+            return;
+
         if (is_templated())
         {
+            validate_template_types();
+
             for (const TypePtr& template_type : template_types_)
             {
                 funcs_.push_back(create_function(
@@ -59,29 +92,10 @@ namespace mxslc::statements
         }
     }
 
-    void FunctionDefinition::set_attributes(AttributeList attrs)
-    {
-        attrs_ = std::move(attrs);
-    }
-
-    StmtPtr FunctionDefinition::monomorphize(const TypePtr& template_type) const
-    {
-        if (is_templated())
-            throw CompileError{"Nested templated functions is not supported"};
-
-        return create_statement<FunctionDefinition>(
-            mods_,
-            runtime_utils::monomorphize(type_, template_type),
-            name_,
-            template_types_,
-            runtime_utils::monomorphize(params_, template_type),
-            runtime_utils::monomorphize(body_, template_type),
-            token_
-        );
-    }
-
     void FunctionDefinition::init()
     {
+        create_functions();
+
         for (const FuncPtr& func : funcs_)
         {
             func->init();
@@ -104,6 +118,22 @@ namespace mxslc::statements
                     func->update_nonlocal_variables();
             }
         }
+    }
+
+    void FunctionDefinition::validate_template_types()
+    {
+        if (not is_templated())
+            return;
+
+        vector<TypePtr> validated_types;
+        for (TypePtr& template_type : template_types_)
+        {
+            template_type = scope().resolve_type(template_type);
+            if (not contains(validated_types, template_type))
+                validated_types.push_back(template_type);
+        }
+
+        template_types_ = std::move(validated_types);
     }
 
     string FunctionDefinition::to_string() const

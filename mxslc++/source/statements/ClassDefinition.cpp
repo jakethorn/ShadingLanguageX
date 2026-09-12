@@ -102,6 +102,8 @@ namespace mxslc::statements
 
     void ClassDefinition::add_method(const TypePtr& class_type, FunctionDefinition* func_def) const
     {
+        func_def->create_functions();
+
         for (const FuncPtr& func : func_def->functions())
         {
             class_type->add_method(func);

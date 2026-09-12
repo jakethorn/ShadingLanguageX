@@ -24,11 +24,12 @@ namespace mxslc::statements
             Token token = {}
         );
 
-        const vector<FuncPtr>& functions() const { return funcs_; }
-
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void create_functions();
+
+        const vector<FuncPtr>& functions() const { return funcs_; }
 
         string to_string() const override;
 
@@ -38,6 +39,7 @@ namespace mxslc::statements
 
     private:
         bool is_templated() const { return not template_types_.empty(); }
+        void validate_template_types();
 
         ModifierList mods_;
         TypePtr type_;

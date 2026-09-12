@@ -56,7 +56,7 @@ using `pip install mxslcxx`.
 
 ```python
 import mxslc
-mxslc.compile_file("my_shader.mxsl")
+mxslc.compile_file_to_file("my_shader.mxsl")
 ```
 Alternatively, you can download the compiler executable from the most recent release and call it from the command line.
 ```

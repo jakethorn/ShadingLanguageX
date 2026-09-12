@@ -1,1 +1,1 @@
-bad_nodegraphs002.mxsl, line 2: Nodegraph function parameter 'x' must have a default value
+bad_nodegraphs002.mxsl, line 3: Nodegraph function parameter 'x' must have a default value

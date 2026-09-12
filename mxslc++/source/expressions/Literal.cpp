@@ -23,7 +23,7 @@ namespace mxslc::expressions
         if (value_.is_a<int>() and not Type::Int->is_in(types))
         {
             // implicit cast from int to float
-            if (not Type::Int->is_in(types) and Type::Float->is_in(types))
+            if (Type::Float->is_in(types))
             {
                 value_ = value_.cast<float>();
                 return;
@@ -37,18 +37,18 @@ namespace mxslc::expressions
             }
         }
 
-        // implicit cast from string to filename
         if (value_.is_a<string>() and not Type::String->is_in(types))
         {
+            // implicit cast from string to filename
             if (Type::Filename->is_in(types))
             {
                 value_ = value_.cast<fs::path>();
                 return;
             }
 
+            // implicit cast from empty string to DF/shader types
             if (value_ == "")
             {
-                // implicit cast from empty string to DF/shader types
                 const vector df_shader_types{
                     scope().get_type("material"),
                     scope().get_type("surfaceshader"),

@@ -1,0 +1,6 @@
+T foo<float, float, vec2>()
+{
+    return default(T);
+}
+
+float f = foo<float>();
