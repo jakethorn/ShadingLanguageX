@@ -36,11 +36,11 @@ Currently, MaterialX shaders can be made either using the official MaterialX API
 
 
 # Showcases
-|               Procedural Rain               |               Interior Mapping                |        Shader Art (by Kishimisu)        |
+|               Interior Mapping + Procedural Rain               |               Interior Mapping                |        Shader Art (by Kishimisu)        |
 |:-------------------------------------------:|:---------------------------------------------:|:---------------------------------------:|
-|     ![](examples/screenshots/rain.png)      | ![](examples/screenshots/interiormapping.png) | ![](examples/screenshots/shaderart.png) |
+|     ![](docs/BasicExamples/interior_mapping_with_rain.gif)      | ![](examples/screenshots/interiormapping.png) | ![](examples/screenshots/shaderart.png) |
 |            __Procedural Waves__             |           __Displacement Mountain__           |                __Toon__                 |
-|     ![](examples/screenshots/waves.png)     |    ![](examples/screenshots/mountain.png)     |   ![](examples/screenshots/toon.png)    |
+|     ![](examples/screenshots/waves.png)     |    ![](docs/BasicExamples/mountain.png)     |   ![](examples/screenshots/toon.png)    |
 |             __Disintegration__              |              __Colored Squares__              |                __Gold__                 |
 | ![](examples/screenshots/disintergrate.png) |     ![](examples/screenshots/squares.png)     |   ![](examples/screenshots/gold.png)    |
 
