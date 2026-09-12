@@ -1,6 +1,0 @@
-float foo(float a, float b)
-{
-    return a + b;
-}
-
-float f = foo(a = 1.0, 2.0);

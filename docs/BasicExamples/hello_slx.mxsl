@@ -1,0 +1,4 @@
+surfaceshader surf = standard_surface();
+surf.base_color = color3{1, 0, 0};
+
+material mat = surfacematerial(surf);

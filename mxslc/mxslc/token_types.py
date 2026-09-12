@@ -1,7 +1,0 @@
-IDENTIFIER = "<identifier>"
-INT_LITERAL = "<int-literal>"
-FLOAT_LITERAL = "<float-literal>"
-STRING_LITERAL = "<string-literal>"
-COMMENT = "<comment>"
-EOL = "\n"
-WHITESPACE = "<whitespace>"

@@ -1,4 +1,0 @@
-float x = 1.5;
-float y = 0.0;
-float z = 1.0;
-float w = clamp(x, y, z);

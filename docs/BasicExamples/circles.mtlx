@@ -1,0 +1,309 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="var__0" type="float">
+    <input name="in" type="integer" value="1" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__1" type="float">
+    <input name="in" type="integer" value="1" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p" type="vector2">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" nodename="var__1" />
+  </combine2>
+  <texcoord name="var__2" type="vector2" />
+  <distance name="var__3" type="float">
+    <input name="in1" type="vector2" nodename="p" />
+    <input name="in2" type="vector2" nodename="var__2" />
+  </distance>
+  <ifgreater name="var__4" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__3" />
+  </ifgreater>
+  <randomcolor name="var__5" type="color3">
+    <input name="in" type="integer" value="1" />
+  </randomcolor>
+  <ifequal name="var__6" type="color3">
+    <input name="value1" type="boolean" nodename="var__4" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__5" />
+    <input name="in2" type="color3" value="1, 1, 1" />
+  </ifequal>
+  <randomfloat name="var__7" type="float">
+    <input name="in" type="integer" value="2" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__8" type="float">
+    <input name="in" type="integer" value="2" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p2" type="vector2">
+    <input name="in1" type="float" nodename="var__7" />
+    <input name="in2" type="float" nodename="var__8" />
+  </combine2>
+  <texcoord name="var__9" type="vector2" />
+  <distance name="var__10" type="float">
+    <input name="in1" type="vector2" nodename="p2" />
+    <input name="in2" type="vector2" nodename="var__9" />
+  </distance>
+  <ifgreater name="var__11" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__10" />
+  </ifgreater>
+  <randomcolor name="var__12" type="color3">
+    <input name="in" type="integer" value="2" />
+  </randomcolor>
+  <ifequal name="var__13" type="color3">
+    <input name="value1" type="boolean" nodename="var__11" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__12" />
+    <input name="in2" type="color3" nodename="var__6" />
+  </ifequal>
+  <randomfloat name="var__14" type="float">
+    <input name="in" type="integer" value="3" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__15" type="float">
+    <input name="in" type="integer" value="3" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p3" type="vector2">
+    <input name="in1" type="float" nodename="var__14" />
+    <input name="in2" type="float" nodename="var__15" />
+  </combine2>
+  <texcoord name="var__16" type="vector2" />
+  <distance name="var__17" type="float">
+    <input name="in1" type="vector2" nodename="p3" />
+    <input name="in2" type="vector2" nodename="var__16" />
+  </distance>
+  <ifgreater name="var__18" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__17" />
+  </ifgreater>
+  <randomcolor name="var__19" type="color3">
+    <input name="in" type="integer" value="3" />
+  </randomcolor>
+  <ifequal name="var__20" type="color3">
+    <input name="value1" type="boolean" nodename="var__18" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__19" />
+    <input name="in2" type="color3" nodename="var__13" />
+  </ifequal>
+  <randomfloat name="var__21" type="float">
+    <input name="in" type="integer" value="4" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__22" type="float">
+    <input name="in" type="integer" value="4" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p4" type="vector2">
+    <input name="in1" type="float" nodename="var__21" />
+    <input name="in2" type="float" nodename="var__22" />
+  </combine2>
+  <texcoord name="var__23" type="vector2" />
+  <distance name="var__24" type="float">
+    <input name="in1" type="vector2" nodename="p4" />
+    <input name="in2" type="vector2" nodename="var__23" />
+  </distance>
+  <ifgreater name="var__25" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__24" />
+  </ifgreater>
+  <randomcolor name="var__26" type="color3">
+    <input name="in" type="integer" value="4" />
+  </randomcolor>
+  <ifequal name="var__27" type="color3">
+    <input name="value1" type="boolean" nodename="var__25" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__26" />
+    <input name="in2" type="color3" nodename="var__20" />
+  </ifequal>
+  <randomfloat name="var__28" type="float">
+    <input name="in" type="integer" value="5" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__29" type="float">
+    <input name="in" type="integer" value="5" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p5" type="vector2">
+    <input name="in1" type="float" nodename="var__28" />
+    <input name="in2" type="float" nodename="var__29" />
+  </combine2>
+  <texcoord name="var__30" type="vector2" />
+  <distance name="var__31" type="float">
+    <input name="in1" type="vector2" nodename="p5" />
+    <input name="in2" type="vector2" nodename="var__30" />
+  </distance>
+  <ifgreater name="var__32" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__31" />
+  </ifgreater>
+  <randomcolor name="var__33" type="color3">
+    <input name="in" type="integer" value="5" />
+  </randomcolor>
+  <ifequal name="var__34" type="color3">
+    <input name="value1" type="boolean" nodename="var__32" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__33" />
+    <input name="in2" type="color3" nodename="var__27" />
+  </ifequal>
+  <randomfloat name="var__35" type="float">
+    <input name="in" type="integer" value="6" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__36" type="float">
+    <input name="in" type="integer" value="6" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p6" type="vector2">
+    <input name="in1" type="float" nodename="var__35" />
+    <input name="in2" type="float" nodename="var__36" />
+  </combine2>
+  <texcoord name="var__37" type="vector2" />
+  <distance name="var__38" type="float">
+    <input name="in1" type="vector2" nodename="p6" />
+    <input name="in2" type="vector2" nodename="var__37" />
+  </distance>
+  <ifgreater name="var__39" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__38" />
+  </ifgreater>
+  <randomcolor name="var__40" type="color3">
+    <input name="in" type="integer" value="6" />
+  </randomcolor>
+  <ifequal name="var__41" type="color3">
+    <input name="value1" type="boolean" nodename="var__39" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__40" />
+    <input name="in2" type="color3" nodename="var__34" />
+  </ifequal>
+  <randomfloat name="var__42" type="float">
+    <input name="in" type="integer" value="7" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__43" type="float">
+    <input name="in" type="integer" value="7" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p7" type="vector2">
+    <input name="in1" type="float" nodename="var__42" />
+    <input name="in2" type="float" nodename="var__43" />
+  </combine2>
+  <texcoord name="var__44" type="vector2" />
+  <distance name="var__45" type="float">
+    <input name="in1" type="vector2" nodename="p7" />
+    <input name="in2" type="vector2" nodename="var__44" />
+  </distance>
+  <ifgreater name="var__46" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__45" />
+  </ifgreater>
+  <randomcolor name="var__47" type="color3">
+    <input name="in" type="integer" value="7" />
+  </randomcolor>
+  <ifequal name="var__48" type="color3">
+    <input name="value1" type="boolean" nodename="var__46" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__47" />
+    <input name="in2" type="color3" nodename="var__41" />
+  </ifequal>
+  <randomfloat name="var__49" type="float">
+    <input name="in" type="integer" value="8" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__50" type="float">
+    <input name="in" type="integer" value="8" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p8" type="vector2">
+    <input name="in1" type="float" nodename="var__49" />
+    <input name="in2" type="float" nodename="var__50" />
+  </combine2>
+  <texcoord name="var__51" type="vector2" />
+  <distance name="var__52" type="float">
+    <input name="in1" type="vector2" nodename="p8" />
+    <input name="in2" type="vector2" nodename="var__51" />
+  </distance>
+  <ifgreater name="var__53" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__52" />
+  </ifgreater>
+  <randomcolor name="var__54" type="color3">
+    <input name="in" type="integer" value="8" />
+  </randomcolor>
+  <ifequal name="var__55" type="color3">
+    <input name="value1" type="boolean" nodename="var__53" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__54" />
+    <input name="in2" type="color3" nodename="var__48" />
+  </ifequal>
+  <randomfloat name="var__56" type="float">
+    <input name="in" type="integer" value="9" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__57" type="float">
+    <input name="in" type="integer" value="9" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p9" type="vector2">
+    <input name="in1" type="float" nodename="var__56" />
+    <input name="in2" type="float" nodename="var__57" />
+  </combine2>
+  <texcoord name="var__58" type="vector2" />
+  <distance name="var__59" type="float">
+    <input name="in1" type="vector2" nodename="p9" />
+    <input name="in2" type="vector2" nodename="var__58" />
+  </distance>
+  <ifgreater name="var__60" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__59" />
+  </ifgreater>
+  <randomcolor name="var__61" type="color3">
+    <input name="in" type="integer" value="9" />
+  </randomcolor>
+  <ifequal name="var__62" type="color3">
+    <input name="value1" type="boolean" nodename="var__60" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__61" />
+    <input name="in2" type="color3" nodename="var__55" />
+  </ifequal>
+  <randomfloat name="var__63" type="float">
+    <input name="in" type="integer" value="10" />
+    <input name="seed" type="integer" value="0" />
+  </randomfloat>
+  <randomfloat name="var__64" type="float">
+    <input name="in" type="integer" value="10" />
+    <input name="seed" type="integer" value="1" />
+  </randomfloat>
+  <combine2 name="p10" type="vector2">
+    <input name="in1" type="float" nodename="var__63" />
+    <input name="in2" type="float" nodename="var__64" />
+  </combine2>
+  <texcoord name="var__65" type="vector2" />
+  <distance name="var__66" type="float">
+    <input name="in1" type="vector2" nodename="p10" />
+    <input name="in2" type="vector2" nodename="var__65" />
+  </distance>
+  <ifgreater name="var__67" type="boolean">
+    <input name="value1" type="float" value="0.1" />
+    <input name="value2" type="float" nodename="var__66" />
+  </ifgreater>
+  <randomcolor name="var__68" type="color3">
+    <input name="in" type="integer" value="10" />
+  </randomcolor>
+  <ifequal name="var__69" type="color3">
+    <input name="value1" type="boolean" nodename="var__67" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" nodename="var__68" />
+    <input name="in2" type="color3" nodename="var__62" />
+  </ifequal>
+  <standard_surface name="s" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__69" />
+  </standard_surface>
+  <surfacematerial name="m" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="s" />
+  </surfacematerial>
+</materialx>

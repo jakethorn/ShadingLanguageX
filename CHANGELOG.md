@@ -1,10 +1,28 @@
+# (mxslc++) Version 0.3.0
+
+* Added `comptime` modifier for functions, variables and expressions
+* Added debugger
+* Added `nodegraph` and `nodedef` modifiers ([link]())
+* Added MaterialX validation and associated compile option
+* Added `default` expressions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#default-expression))
+* Added BasicExamples document ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/BasicExamples.md))
+* Added wasm/javascript bindings (contributed by [@kwok](https://github.com/kwokcb))
+* Improved function resolution
+* Improved return statement execution
+* Improved template type logic
+* Improved default function logic (contributed by [@kwok](https://github.com/kwokcb))
+* Improved decompiler (contributed by [@kwok](https://github.com/kwokcb))
+* Updated examples
+* (Many) bug fixes
+
+
 # (mxslc++) Version 0.2.1
 
 * If expressions shortcut if the condition is known at compile time
 * If expressions can be used with user-defined types
 * Classes support multi-variable definition statements (e.g., `float x, y;`)
-* Added swizzles ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#swizzle))
-* Added block comments ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#comments))
+* Added swizzles ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#swizzle))
+* Added block comments ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#comments))
 * Added `__LINE__` and `__FILE__` macros
 * Decompiler now decompiles attributes (contributed by [@kwok](https://github.com/kwokcb))
 * Improved float serialization (contributed by [@kwok](https://github.com/kwokcb))
@@ -16,9 +34,9 @@
 
 # (mxslc++) Version 0.2.0
 
-* Added preprocessor directives ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#preprocessor-directives))
-* Added `geomprop` modifier ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#geomprop))
-* Added vector/color component setters ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#component-access))
+* Added preprocessor directives ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#preprocessor-directives))
+* Added `geomprop` modifier ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#geomprop))
+* Added vector/color component setters ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#component-access))
 * Added support for macos (contributed by [@kwok](https://github.com/kwokcb))
 * Added sample flask app (contributed by [@kwok](https://github.com/kwokcb))
 * Various bug fixes
@@ -29,14 +47,14 @@
 * Improved to GitHub actions.
 * Improved function overload evaluation.
 * Improved generated Node names.
-* Added [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md) and generally improved documentation.
-* Added entry functions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md#entry-function)).
+* Added [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md) and generally improved documentation.
+* Added entry functions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md#entry-function)).
 * Added support for `#` comments in response files.
-* Added global variables ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md#globals)).
-* Added decompiler ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/UserGuide.md#decompiler)).
-* Added syntax to generate MaterialX NodeGraphs ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#parameterless-functions)).
-* Added absolute operator ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#absolute-operator)).
-* Added `typeof` operator ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#typeof-operator)).
+* Added global variables ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md#globals)).
+* Added decompiler ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md#decompiler)).
+* Added syntax to generate MaterialX NodeGraphs ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#parameterless-functions)).
+* Added absolute operator ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#absolute-operator)).
+* Added `typeof` operator ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#typeof-operator)).
 * Various bug fixes.
 
 

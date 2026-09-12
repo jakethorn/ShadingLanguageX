@@ -1,9 +1,9 @@
 # mxslc++
 
 This package contains the Python bindings for the ShadingLanguageX C++ compiler. See the
-[User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/UserGuide.md) for information on how to get started and the
-[Language Specification](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc++/LanguageSpecification.md)
-for documentation on what language features the compiler supports.
+[User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md) and
+[Basic Examples](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/BasicExamples.md) for information on how to get started and the
+[Language Specification](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md) for documentation about the syntax and features of ShadingLanguageX.
 
 ```
 pip install mxslcxx

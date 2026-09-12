@@ -1,3 +1,0 @@
-float my_float = 1.0;
-my_float = my_float + 1.0;
-my_float = my_float ^ 3.0;

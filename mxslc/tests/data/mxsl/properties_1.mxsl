@@ -1,9 +1,0 @@
-vec4 v1 = vec4(1.0, 2.0, 3.0, 4.0);
-float x1 = (v1.xyz.xy + 1.0).x + 1.0;
-
-color4 c1 = color4(1.0, 0.0, 1.0, 1.0);
-float x2 = c1.aaa[1] + 1.0;
-
-vec2 v2 = vec2(1.0, 0.0);
-int i = 2 - 1;
-float x3 = v2[i];

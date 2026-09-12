@@ -46,6 +46,7 @@ positional arguments:
 options:
   -h, --help                     Show this help message and exit
   -o, --output-file OUTPUT_FILE  Output path of .mtlx file
+  -d, --debug                    Enable debug mode
   -v, --version VERSION          Target MaterialX version (default: 1.39.5)
   -f, --func FUNC                Name of entry function into the program
   -a, --args ARGS*               Arguments to be passed to the entry function

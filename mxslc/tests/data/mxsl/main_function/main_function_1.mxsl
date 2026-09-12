@@ -1,7 +1,0 @@
-material main()
-{
-    surfaceshader surface = standard_surface();
-    surface.base_color = color3(1.0, 0.0, 0.0);
-
-    return surfacematerial(surface);
-}

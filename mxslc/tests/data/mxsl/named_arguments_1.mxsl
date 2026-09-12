@@ -1,2 +1,0 @@
-
-float n = noise2d(amplitude=1.0, pivot=0.0, texcoord=texcoord());

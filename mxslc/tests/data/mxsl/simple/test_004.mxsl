@@ -1,7 +1,0 @@
-float r = 0.0;
-float g = 1.0;
-float b = 2.0 + r;
-r = 3.0;
-float a = r + g / b;
-r = g;
-b = 1.0 + 2.0 + r;

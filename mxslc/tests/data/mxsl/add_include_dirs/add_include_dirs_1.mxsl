@@ -1,3 +1,0 @@
-#include "colors.mxsl"
-
-surfacematerial(standard_surface(base_color=red));

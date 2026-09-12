@@ -1,3 +1,0 @@
-float x = 1.0;
-vector3 my_vec1 = vector3(x, 0.25 + 0.25, 1.0);
-vector3 my_vec2 = my_vec1 + vector3(1.0, 0.0, 0.0);
