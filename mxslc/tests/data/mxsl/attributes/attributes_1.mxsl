@@ -1,3 +1,0 @@
-@doc "an image of a butterfly"
-@file.colorspace "srgb_texture"
-float x = image("butterfly1.png");

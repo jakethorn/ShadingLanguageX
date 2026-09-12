@@ -1,6 +1,0 @@
-float a = 0.0;
-
-for (float i = 0.0:3.0)
-{
-    a += i;
-}

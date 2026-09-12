@@ -1,0 +1,3043 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <position name="p" type="vector3" />
+  <extract name="var__0" type="float">
+    <input name="in" type="vector3" nodename="p" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__1" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="vector3" nodename="p" />
+  </separate3>
+  <combine3 name="var__3" type="vector3">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" output="outy" nodename="var__2" />
+    <input name="in3" type="float" output="outz" nodename="var__2" />
+  </combine3>
+  <separate3 name="var__4" type="multioutput">
+    <input name="in" type="vector3" nodename="var__3" />
+  </separate3>
+  <combine2 name="var__5" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__4" />
+    <input name="in2" type="float" output="outy" nodename="var__4" />
+  </combine2>
+  <add name="BMWIDTH" type="float">
+    <input name="in1" type="float" value="0.25" />
+    <input name="in2" type="float" value="0.03" />
+  </add>
+  <add name="BMHEIGHT" type="float">
+    <input name="in1" type="float" value="0.08" />
+    <input name="in2" type="float" value="0.03" />
+  </add>
+  <multiply name="var__6" type="float">
+    <input name="in1" type="float" value="0.03" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <divide name="MWF" type="float">
+    <input name="in1" type="float" nodename="var__6" />
+    <input name="in2" type="float" nodename="BMWIDTH" />
+  </divide>
+  <multiply name="var__7" type="float">
+    <input name="in1" type="float" value="0.03" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <divide name="MHF" type="float">
+    <input name="in1" type="float" nodename="var__7" />
+    <input name="in2" type="float" nodename="BMHEIGHT" />
+  </divide>
+  <extract name="var__8" type="float">
+    <input name="in" type="vector2" nodename="var__5" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <divide name="ss" type="float">
+    <input name="in1" type="float" nodename="var__8" />
+    <input name="in2" type="float" nodename="BMWIDTH" />
+  </divide>
+  <extract name="var__9" type="float">
+    <input name="in" type="vector2" nodename="var__5" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <divide name="tt" type="float">
+    <input name="in1" type="float" nodename="var__9" />
+    <input name="in2" type="float" nodename="BMHEIGHT" />
+  </divide>
+  <multiply name="var__10" type="float">
+    <input name="in1" type="float" nodename="tt" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <modulo name="var__11" type="float">
+    <input name="in1" type="float" nodename="var__10" />
+    <input name="in2" type="float" value="1" />
+  </modulo>
+  <ifgreater name="var__12" type="boolean">
+    <input name="value1" type="float" nodename="var__11" />
+    <input name="value2" type="float" value="0.5" />
+  </ifgreater>
+  <add name="var__13" type="float">
+    <input name="in1" type="float" nodename="ss" />
+    <input name="in2" type="float" value="0.5" />
+  </add>
+  <ifequal name="var__14" type="float">
+    <input name="value1" type="boolean" nodename="var__12" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" nodename="var__13" />
+    <input name="in2" type="float" nodename="ss" />
+  </ifequal>
+  <floor name="sbrick" type="float">
+    <input name="in" type="float" nodename="var__14" />
+  </floor>
+  <floor name="tbrick" type="float">
+    <input name="in" type="float" nodename="tt" />
+  </floor>
+  <add name="var__15" type="float">
+    <input name="in1" type="float" nodename="tbrick" />
+    <input name="in2" type="float" value="0.5" />
+  </add>
+  <add name="var__16" type="float">
+    <input name="in1" type="float" nodename="sbrick" />
+    <input name="in2" type="float" value="0.5" />
+  </add>
+  <combine2 name="var__17" type="vector2">
+    <input name="in1" type="float" nodename="var__15" />
+    <input name="in2" type="float" nodename="var__16" />
+  </combine2>
+  <multiply name="var__18" type="vector2">
+    <input name="in1" type="vector2" nodename="var__17" />
+    <input name="in2" type="vector2" value="1000, 1000" />
+  </multiply>
+  <cos name="var__19" type="vector2">
+    <input name="in" type="vector2" nodename="var__18" />
+  </cos>
+  <fract name="randv2" type="vector2">
+    <input name="in" type="vector2" nodename="var__19" />
+  </fract>
+  <dotproduct name="var__20" type="float">
+    <input name="in1" type="vector2" nodename="var__22" />
+    <input name="in2" type="vector2" value="12.9898, 78.233" />
+  </dotproduct>
+  <separate2 name="var__21" type="multioutput">
+    <input name="in" type="vector2" nodename="randv2" />
+  </separate2>
+  <combine2 name="var__22" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__21" />
+    <input name="in2" type="float" output="outy" nodename="var__21" />
+  </combine2>
+  <sin name="var__23" type="float">
+    <input name="in" type="float" nodename="var__20" />
+  </sin>
+  <multiply name="var__24" type="float">
+    <input name="in1" type="float" nodename="var__23" />
+    <input name="in2" type="float" value="43758.5" />
+  </multiply>
+  <fract name="noise" type="float">
+    <input name="in" type="float" nodename="var__24" />
+  </fract>
+  <subtract name="var__25" type="float">
+    <input name="in1" type="float" nodename="var__14" />
+    <input name="in2" type="float" nodename="sbrick" />
+  </subtract>
+  <subtract name="var__26" type="float">
+    <input name="in1" type="float" nodename="tt" />
+    <input name="in2" type="float" nodename="tbrick" />
+  </subtract>
+  <ifgreater name="var__27" type="boolean">
+    <input name="value1" type="float" nodename="MWF" />
+    <input name="value2" type="float" nodename="var__25" />
+  </ifgreater>
+  <convert name="var__28" type="float">
+    <input name="in" type="boolean" nodename="var__27" />
+  </convert>
+  <subtract name="var__29" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="MWF" />
+  </subtract>
+  <ifgreater name="var__30" type="boolean">
+    <input name="value1" type="float" nodename="var__29" />
+    <input name="value2" type="float" nodename="var__25" />
+  </ifgreater>
+  <convert name="var__31" type="float">
+    <input name="in" type="boolean" nodename="var__30" />
+  </convert>
+  <subtract name="w" type="float">
+    <input name="in1" type="float" nodename="var__28" />
+    <input name="in2" type="float" nodename="var__31" />
+  </subtract>
+  <ifgreater name="var__32" type="boolean">
+    <input name="value1" type="float" nodename="MHF" />
+    <input name="value2" type="float" nodename="var__26" />
+  </ifgreater>
+  <convert name="var__33" type="float">
+    <input name="in" type="boolean" nodename="var__32" />
+  </convert>
+  <subtract name="var__34" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="MHF" />
+  </subtract>
+  <ifgreater name="var__35" type="boolean">
+    <input name="value1" type="float" nodename="var__34" />
+    <input name="value2" type="float" nodename="var__26" />
+  </ifgreater>
+  <convert name="var__36" type="float">
+    <input name="in" type="boolean" nodename="var__35" />
+  </convert>
+  <subtract name="h" type="float">
+    <input name="in1" type="float" nodename="var__33" />
+    <input name="in2" type="float" nodename="var__36" />
+  </subtract>
+  <subtract name="var__37" type="float">
+    <input name="in1" type="float" nodename="var__25" />
+    <input name="in2" type="float" value="0" />
+  </subtract>
+  <subtract name="var__38" type="float">
+    <input name="in1" type="float" nodename="MWF" />
+    <input name="in2" type="float" value="0" />
+  </subtract>
+  <divide name="var__39" type="float">
+    <input name="in1" type="float" nodename="var__37" />
+    <input name="in2" type="float" nodename="var__38" />
+  </divide>
+  <clamp name="t" type="float">
+    <input name="in" type="float" nodename="var__39" />
+    <input name="low" type="float" value="0" />
+    <input name="high" type="float" value="1" />
+  </clamp>
+  <multiply name="var__40" type="float">
+    <input name="in1" type="float" nodename="t" />
+    <input name="in2" type="float" nodename="t" />
+  </multiply>
+  <multiply name="var__41" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" nodename="t" />
+  </multiply>
+  <subtract name="var__42" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" nodename="var__41" />
+  </subtract>
+  <multiply name="var__43" type="float">
+    <input name="in1" type="float" nodename="var__40" />
+    <input name="in2" type="float" nodename="var__42" />
+  </multiply>
+  <subtract name="var__44" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="MWF" />
+  </subtract>
+  <subtract name="var__45" type="float">
+    <input name="in1" type="float" nodename="var__25" />
+    <input name="in2" type="float" nodename="var__44" />
+  </subtract>
+  <subtract name="var__46" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="var__44" />
+  </subtract>
+  <divide name="var__47" type="float">
+    <input name="in1" type="float" nodename="var__45" />
+    <input name="in2" type="float" nodename="var__46" />
+  </divide>
+  <clamp name="t2" type="float">
+    <input name="in" type="float" nodename="var__47" />
+    <input name="low" type="float" value="0" />
+    <input name="high" type="float" value="1" />
+  </clamp>
+  <multiply name="var__48" type="float">
+    <input name="in1" type="float" nodename="t2" />
+    <input name="in2" type="float" nodename="t2" />
+  </multiply>
+  <multiply name="var__49" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" nodename="t2" />
+  </multiply>
+  <subtract name="var__50" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" nodename="var__49" />
+  </subtract>
+  <multiply name="var__51" type="float">
+    <input name="in1" type="float" nodename="var__48" />
+    <input name="in2" type="float" nodename="var__50" />
+  </multiply>
+  <subtract name="sbump" type="float">
+    <input name="in1" type="float" nodename="var__43" />
+    <input name="in2" type="float" nodename="var__51" />
+  </subtract>
+  <subtract name="var__52" type="float">
+    <input name="in1" type="float" nodename="var__26" />
+    <input name="in2" type="float" value="0" />
+  </subtract>
+  <subtract name="var__53" type="float">
+    <input name="in1" type="float" nodename="MHF" />
+    <input name="in2" type="float" value="0" />
+  </subtract>
+  <divide name="var__54" type="float">
+    <input name="in1" type="float" nodename="var__52" />
+    <input name="in2" type="float" nodename="var__53" />
+  </divide>
+  <clamp name="t3" type="float">
+    <input name="in" type="float" nodename="var__54" />
+    <input name="low" type="float" value="0" />
+    <input name="high" type="float" value="1" />
+  </clamp>
+  <multiply name="var__55" type="float">
+    <input name="in1" type="float" nodename="t3" />
+    <input name="in2" type="float" nodename="t3" />
+  </multiply>
+  <multiply name="var__56" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" nodename="t3" />
+  </multiply>
+  <subtract name="var__57" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" nodename="var__56" />
+  </subtract>
+  <multiply name="var__58" type="float">
+    <input name="in1" type="float" nodename="var__55" />
+    <input name="in2" type="float" nodename="var__57" />
+  </multiply>
+  <subtract name="var__59" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="MHF" />
+  </subtract>
+  <subtract name="var__60" type="float">
+    <input name="in1" type="float" nodename="var__26" />
+    <input name="in2" type="float" nodename="var__59" />
+  </subtract>
+  <subtract name="var__61" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="var__59" />
+  </subtract>
+  <divide name="var__62" type="float">
+    <input name="in1" type="float" nodename="var__60" />
+    <input name="in2" type="float" nodename="var__61" />
+  </divide>
+  <clamp name="t4" type="float">
+    <input name="in" type="float" nodename="var__62" />
+    <input name="low" type="float" value="0" />
+    <input name="high" type="float" value="1" />
+  </clamp>
+  <multiply name="var__63" type="float">
+    <input name="in1" type="float" nodename="t4" />
+    <input name="in2" type="float" nodename="t4" />
+  </multiply>
+  <multiply name="var__64" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" nodename="t4" />
+  </multiply>
+  <subtract name="var__65" type="float">
+    <input name="in1" type="float" value="3" />
+    <input name="in2" type="float" nodename="var__64" />
+  </subtract>
+  <multiply name="var__66" type="float">
+    <input name="in1" type="float" nodename="var__63" />
+    <input name="in2" type="float" nodename="var__65" />
+  </multiply>
+  <subtract name="tbump" type="float">
+    <input name="in1" type="float" nodename="var__58" />
+    <input name="in2" type="float" nodename="var__66" />
+  </subtract>
+  <multiply name="bump" type="float">
+    <input name="in1" type="float" nodename="sbump" />
+    <input name="in2" type="float" nodename="tbump" />
+  </multiply>
+  <ifgreatereq name="var__67" type="boolean">
+    <input name="value1" type="float" value="0.25" />
+    <input name="value2" type="float" nodename="noise" />
+  </ifgreatereq>
+  <multiply name="var__68" type="float">
+    <input name="in1" type="float" nodename="var__25" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <ifgreatereq name="var__69" type="boolean">
+    <input name="value1" type="float" value="0.5" />
+    <input name="value2" type="float" nodename="noise" />
+  </ifgreatereq>
+  <multiply name="var__70" type="float">
+    <input name="in1" type="float" nodename="var__26" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <ifgreatereq name="var__71" type="boolean">
+    <input name="value1" type="float" value="0.75" />
+    <input name="value2" type="float" nodename="noise" />
+  </ifgreatereq>
+  <subtract name="var__72" type="float">
+    <input name="in1" type="float" nodename="BMWIDTH" />
+    <input name="in2" type="float" nodename="var__25" />
+  </subtract>
+  <multiply name="var__73" type="float">
+    <input name="in1" type="float" nodename="var__72" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <subtract name="var__74" type="float">
+    <input name="in1" type="float" nodename="BMHEIGHT" />
+    <input name="in2" type="float" nodename="var__26" />
+  </subtract>
+  <multiply name="var__75" type="float">
+    <input name="in1" type="float" nodename="var__74" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <ifequal name="var__76" type="float">
+    <input name="value1" type="boolean" nodename="var__71" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" nodename="var__73" />
+    <input name="in2" type="float" nodename="var__75" />
+  </ifequal>
+  <ifequal name="var__77" type="float">
+    <input name="value1" type="boolean" nodename="var__69" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" nodename="var__70" />
+    <input name="in2" type="float" nodename="var__76" />
+  </ifequal>
+  <ifequal name="var__78" type="float">
+    <input name="value1" type="boolean" nodename="var__67" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="float" nodename="var__68" />
+    <input name="in2" type="float" nodename="var__77" />
+  </ifequal>
+  <subtract name="var__79" type="float">
+    <input name="in1" type="float" nodename="bump" />
+    <input name="in2" type="float" nodename="var__78" />
+  </subtract>
+  <clamp name="var__80" type="float">
+    <input name="in" type="float" nodename="var__79" />
+    <input name="low" type="float" value="0" />
+    <input name="high" type="float" value="1" />
+  </clamp>
+  <combine3 name="_oCzV" type="vector3">
+    <input name="in1" type="float" nodename="noise" />
+    <input name="in2" type="float" nodename="bump" />
+    <input name="in3" type="float" nodename="var__80" />
+  </combine3>
+  <extract name="var__81" type="float">
+    <input name="in" type="vector3" nodename="_oCzV" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <convert name="_FCZn" type="vector3">
+    <input name="in" type="float" nodename="var__81" />
+  </convert>
+  <multiply name="var__82" type="vector3">
+    <input name="in1" type="vector3" nodename="_FCZn" />
+    <input name="in2" type="float" value="0.46" />
+  </multiply>
+  <multiply name="_UaEB" type="vector3">
+    <input name="in1" type="vector3" nodename="var__82" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <extract name="var__83" type="float">
+    <input name="in" type="vector3" nodename="_oCzV" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <convert name="_khBL" type="vector3">
+    <input name="in" type="float" nodename="var__83" />
+  </convert>
+  <separate2 name="var__84" type="multioutput">
+    <input name="in" type="vector2" nodename="var__5" />
+  </separate2>
+  <combine3 name="var__85" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__84" />
+    <input name="in2" type="float" output="outy" nodename="var__84" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <separate3 name="var__86" type="multioutput">
+    <input name="in" type="vector3" nodename="var__85" />
+  </separate3>
+  <combine2 name="var__87" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__86" />
+    <input name="in2" type="float" output="outy" nodename="var__86" />
+  </combine2>
+  <multiply name="_BdHg" type="vector3">
+    <input name="in1" type="vector3" nodename="_oCzV" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <extract name="var__88" type="float">
+    <input name="in" type="vector3" nodename="_BdHg" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <convert name="_bpea" type="vector3">
+    <input name="in" type="float" nodename="var__88" />
+  </convert>
+  <extract name="var__89" type="float">
+    <input name="in" type="vector3" nodename="_BdHg" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <convert name="_eukA" type="vector3">
+    <input name="in" type="float" nodename="var__89" />
+  </convert>
+  <separate2 name="var__90" type="multioutput">
+    <input name="in" type="vector2" nodename="var__87" />
+  </separate2>
+  <combine3 name="var__91" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__90" />
+    <input name="in2" type="float" output="outy" nodename="var__90" />
+    <input name="in3" type="float" value="0" />
+  </combine3>
+  <separate3 name="var__92" type="multioutput">
+    <input name="in" type="vector3" nodename="var__91" />
+  </separate3>
+  <combine2 name="var__93" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__92" />
+    <input name="in2" type="float" output="outy" nodename="var__92" />
+  </combine2>
+  <extract name="var__94" type="float">
+    <input name="in" type="vector3" value="0, 0, 0" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__95" type="boolean">
+    <input name="value1" type="float" nodename="var__94" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__96" type="vector3">
+    <input name="value1" type="boolean" nodename="var__95" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" value="0, 0, 0" />
+  </ifequal>
+  <extract name="var__97" type="float">
+    <input name="in" type="vector3" nodename="var__96" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p2" type="vector2">
+    <input name="in1" type="vector2" nodename="var__93" />
+    <input name="in2" type="float" nodename="var__97" />
+  </multiply>
+  <fract name="var__98" type="vector2">
+    <input name="in" type="vector2" nodename="p2" />
+  </fract>
+  <floor name="var__99" type="vector2">
+    <input name="in" type="vector2" nodename="p2" />
+  </floor>
+  <multiply name="var__100" type="vector2">
+    <input name="in1" type="vector2" nodename="var__98" />
+    <input name="in2" type="vector2" nodename="var__98" />
+  </multiply>
+  <multiply name="var__101" type="vector2">
+    <input name="in1" type="vector2" nodename="var__98" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in1" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__102" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in1" />
+    <input name="in2" type="vector2" nodename="var__101" />
+  </subtract>
+  <multiply name="var__103" type="vector2">
+    <input name="in1" type="vector2" nodename="var__100" />
+    <input name="in2" type="vector2" nodename="var__102" />
+  </multiply>
+  <modulo name="h1" type="vector2">
+    <input name="in1" type="vector2" nodename="var__99" />
+    <input name="in2" type="float" nodename="var__105" />
+  </modulo>
+  <extract name="var__105" type="float">
+    <input name="in" type="vector3" nodename="var__96" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__104" type="float">
+    <input name="in1" type="vector2" nodename="h1" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__106" type="float">
+    <input name="in" type="float" nodename="var__104" />
+  </sin>
+  <multiply name="var__107" type="float">
+    <input name="in1" type="float" nodename="var__106" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f" type="float">
+    <input name="in" type="float" nodename="var__107" />
+  </fract>
+  <add name="var__108" type="vector2">
+    <input name="in1" type="vector2" nodename="var__99" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h2" type="vector2">
+    <input name="in1" type="vector2" nodename="var__108" />
+    <input name="in2" type="float" nodename="var__110" />
+  </modulo>
+  <extract name="var__110" type="float">
+    <input name="in" type="vector3" nodename="var__96" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__109" type="float">
+    <input name="in1" type="vector2" nodename="h2" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__111" type="float">
+    <input name="in" type="float" nodename="var__109" />
+  </sin>
+  <multiply name="var__112" type="float">
+    <input name="in1" type="float" nodename="var__111" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f" type="float">
+    <input name="in" type="float" nodename="var__112" />
+  </fract>
+  <add name="var__113" type="vector2">
+    <input name="in1" type="vector2" nodename="var__99" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h3" type="vector2">
+    <input name="in1" type="vector2" nodename="var__113" />
+    <input name="in2" type="float" nodename="var__115" />
+  </modulo>
+  <extract name="var__115" type="float">
+    <input name="in" type="vector3" nodename="var__96" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__114" type="float">
+    <input name="in1" type="vector2" nodename="h3" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__116" type="float">
+    <input name="in" type="float" nodename="var__114" />
+  </sin>
+  <multiply name="var__117" type="float">
+    <input name="in1" type="float" nodename="var__116" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f" type="float">
+    <input name="in" type="float" nodename="var__117" />
+  </fract>
+  <add name="var__118" type="vector2">
+    <input name="in1" type="vector2" nodename="var__99" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h4" type="vector2">
+    <input name="in1" type="vector2" nodename="var__118" />
+    <input name="in2" type="float" nodename="var__120" />
+  </modulo>
+  <extract name="var__120" type="float">
+    <input name="in" type="vector3" nodename="var__96" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__119" type="float">
+    <input name="in1" type="vector2" nodename="h4" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__121" type="float">
+    <input name="in" type="float" nodename="var__119" />
+  </sin>
+  <multiply name="var__122" type="float">
+    <input name="in1" type="float" nodename="var__121" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f" type="float">
+    <input name="in" type="float" nodename="var__122" />
+  </fract>
+  <extract name="var__123" type="float">
+    <input name="in" type="vector2" nodename="var__103" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__124" type="float">
+    <input name="fg" type="float" nodename="h2f" />
+    <input name="bg" type="float" nodename="h1f" />
+    <input name="mix" type="float" nodename="var__123" />
+  </mix>
+  <extract name="var__125" type="float">
+    <input name="in" type="vector2" nodename="var__103" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__126" type="float">
+    <input name="fg" type="float" nodename="h4f" />
+    <input name="bg" type="float" nodename="h3f" />
+    <input name="mix" type="float" nodename="var__125" />
+  </mix>
+  <extract name="var__127" type="float">
+    <input name="in" type="vector2" nodename="var__103" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise2" type="float">
+    <input name="fg" type="float" nodename="var__126" />
+    <input name="bg" type="float" nodename="var__124" />
+    <input name="mix" type="float" nodename="var__127" />
+  </mix>
+  <convert name="_Zxur" type="vector3">
+    <input name="in" type="float" nodename="noise2" />
+  </convert>
+  <modulo name="p3" type="vector2">
+    <input name="in1" type="vector2" nodename="var__93" />
+    <input name="in2" type="float" value="20" />
+  </modulo>
+  <extract name="var__128" type="float">
+    <input name="in" type="vector3" value="20, 20, 20" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__129" type="boolean">
+    <input name="value1" type="float" nodename="var__128" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__130" type="vector3">
+    <input name="value1" type="boolean" nodename="var__129" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" value="20, 20, 20" />
+  </ifequal>
+  <extract name="var__131" type="float">
+    <input name="in" type="vector3" nodename="var__130" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p4" type="vector2">
+    <input name="in1" type="vector2" nodename="p3" />
+    <input name="in2" type="float" nodename="var__131" />
+  </multiply>
+  <fract name="var__132" type="vector2">
+    <input name="in" type="vector2" nodename="p4" />
+  </fract>
+  <floor name="var__133" type="vector2">
+    <input name="in" type="vector2" nodename="p4" />
+  </floor>
+  <multiply name="var__134" type="vector2">
+    <input name="in1" type="vector2" nodename="var__132" />
+    <input name="in2" type="vector2" nodename="var__132" />
+  </multiply>
+  <multiply name="var__135" type="vector2">
+    <input name="in1" type="vector2" nodename="var__132" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in2" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__136" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in2" />
+    <input name="in2" type="vector2" nodename="var__135" />
+  </subtract>
+  <multiply name="var__137" type="vector2">
+    <input name="in1" type="vector2" nodename="var__134" />
+    <input name="in2" type="vector2" nodename="var__136" />
+  </multiply>
+  <modulo name="h5" type="vector2">
+    <input name="in1" type="vector2" nodename="var__133" />
+    <input name="in2" type="float" nodename="var__139" />
+  </modulo>
+  <extract name="var__139" type="float">
+    <input name="in" type="vector3" nodename="var__130" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__138" type="float">
+    <input name="in1" type="vector2" nodename="h5" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__140" type="float">
+    <input name="in" type="float" nodename="var__138" />
+  </sin>
+  <multiply name="var__141" type="float">
+    <input name="in1" type="float" nodename="var__140" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f2" type="float">
+    <input name="in" type="float" nodename="var__141" />
+  </fract>
+  <add name="var__142" type="vector2">
+    <input name="in1" type="vector2" nodename="var__133" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h6" type="vector2">
+    <input name="in1" type="vector2" nodename="var__142" />
+    <input name="in2" type="float" nodename="var__144" />
+  </modulo>
+  <extract name="var__144" type="float">
+    <input name="in" type="vector3" nodename="var__130" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__143" type="float">
+    <input name="in1" type="vector2" nodename="h6" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__145" type="float">
+    <input name="in" type="float" nodename="var__143" />
+  </sin>
+  <multiply name="var__146" type="float">
+    <input name="in1" type="float" nodename="var__145" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f2" type="float">
+    <input name="in" type="float" nodename="var__146" />
+  </fract>
+  <add name="var__147" type="vector2">
+    <input name="in1" type="vector2" nodename="var__133" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h7" type="vector2">
+    <input name="in1" type="vector2" nodename="var__147" />
+    <input name="in2" type="float" nodename="var__149" />
+  </modulo>
+  <extract name="var__149" type="float">
+    <input name="in" type="vector3" nodename="var__130" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__148" type="float">
+    <input name="in1" type="vector2" nodename="h7" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__150" type="float">
+    <input name="in" type="float" nodename="var__148" />
+  </sin>
+  <multiply name="var__151" type="float">
+    <input name="in1" type="float" nodename="var__150" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f2" type="float">
+    <input name="in" type="float" nodename="var__151" />
+  </fract>
+  <add name="var__152" type="vector2">
+    <input name="in1" type="vector2" nodename="var__133" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h8" type="vector2">
+    <input name="in1" type="vector2" nodename="var__152" />
+    <input name="in2" type="float" nodename="var__154" />
+  </modulo>
+  <extract name="var__154" type="float">
+    <input name="in" type="vector3" nodename="var__130" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__153" type="float">
+    <input name="in1" type="vector2" nodename="h8" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__155" type="float">
+    <input name="in" type="float" nodename="var__153" />
+  </sin>
+  <multiply name="var__156" type="float">
+    <input name="in1" type="float" nodename="var__155" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f2" type="float">
+    <input name="in" type="float" nodename="var__156" />
+  </fract>
+  <extract name="var__157" type="float">
+    <input name="in" type="vector2" nodename="var__137" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__158" type="float">
+    <input name="fg" type="float" nodename="h2f2" />
+    <input name="bg" type="float" nodename="h1f2" />
+    <input name="mix" type="float" nodename="var__157" />
+  </mix>
+  <extract name="var__159" type="float">
+    <input name="in" type="vector2" nodename="var__137" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__160" type="float">
+    <input name="fg" type="float" nodename="h4f2" />
+    <input name="bg" type="float" nodename="h3f2" />
+    <input name="mix" type="float" nodename="var__159" />
+  </mix>
+  <extract name="var__161" type="float">
+    <input name="in" type="vector2" nodename="var__137" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise3" type="float">
+    <input name="fg" type="float" nodename="var__160" />
+    <input name="bg" type="float" nodename="var__158" />
+    <input name="mix" type="float" nodename="var__161" />
+  </mix>
+  <convert name="var__162" type="vector3">
+    <input name="in" type="float" nodename="noise3" />
+  </convert>
+  <extract name="var__163" type="float">
+    <input name="in" type="vector3" nodename="var__162" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__164" type="float">
+    <input name="in1" type="float" nodename="var__163" />
+    <input name="in2" type="float" value="0.6" />
+  </multiply>
+  <add name="var__165" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="var__164" />
+  </add>
+  <multiply name="var__166" type="float">
+    <input name="in1" type="float" value="0.6" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__167" type="float">
+    <input name="in1" type="float" value="20" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__168" type="vector3">
+    <input name="in" type="float" nodename="var__167" />
+  </convert>
+  <extract name="var__169" type="float">
+    <input name="in" type="vector3" nodename="var__168" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__170" type="boolean">
+    <input name="value1" type="float" nodename="var__169" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__171" type="vector3">
+    <input name="value1" type="boolean" nodename="var__170" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__168" />
+  </ifequal>
+  <extract name="var__172" type="float">
+    <input name="in" type="vector3" nodename="var__171" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p5" type="vector2">
+    <input name="in1" type="vector2" nodename="p3" />
+    <input name="in2" type="float" nodename="var__172" />
+  </multiply>
+  <fract name="var__173" type="vector2">
+    <input name="in" type="vector2" nodename="p5" />
+  </fract>
+  <floor name="var__174" type="vector2">
+    <input name="in" type="vector2" nodename="p5" />
+  </floor>
+  <multiply name="var__175" type="vector2">
+    <input name="in1" type="vector2" nodename="var__173" />
+    <input name="in2" type="vector2" nodename="var__173" />
+  </multiply>
+  <multiply name="var__176" type="vector2">
+    <input name="in1" type="vector2" nodename="var__173" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in3" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__177" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in3" />
+    <input name="in2" type="vector2" nodename="var__176" />
+  </subtract>
+  <multiply name="var__178" type="vector2">
+    <input name="in1" type="vector2" nodename="var__175" />
+    <input name="in2" type="vector2" nodename="var__177" />
+  </multiply>
+  <modulo name="h9" type="vector2">
+    <input name="in1" type="vector2" nodename="var__174" />
+    <input name="in2" type="float" nodename="var__180" />
+  </modulo>
+  <extract name="var__180" type="float">
+    <input name="in" type="vector3" nodename="var__171" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__179" type="float">
+    <input name="in1" type="vector2" nodename="h9" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__181" type="float">
+    <input name="in" type="float" nodename="var__179" />
+  </sin>
+  <multiply name="var__182" type="float">
+    <input name="in1" type="float" nodename="var__181" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f3" type="float">
+    <input name="in" type="float" nodename="var__182" />
+  </fract>
+  <add name="var__183" type="vector2">
+    <input name="in1" type="vector2" nodename="var__174" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h10" type="vector2">
+    <input name="in1" type="vector2" nodename="var__183" />
+    <input name="in2" type="float" nodename="var__185" />
+  </modulo>
+  <extract name="var__185" type="float">
+    <input name="in" type="vector3" nodename="var__171" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__184" type="float">
+    <input name="in1" type="vector2" nodename="h10" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__186" type="float">
+    <input name="in" type="float" nodename="var__184" />
+  </sin>
+  <multiply name="var__187" type="float">
+    <input name="in1" type="float" nodename="var__186" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f3" type="float">
+    <input name="in" type="float" nodename="var__187" />
+  </fract>
+  <add name="var__188" type="vector2">
+    <input name="in1" type="vector2" nodename="var__174" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h11" type="vector2">
+    <input name="in1" type="vector2" nodename="var__188" />
+    <input name="in2" type="float" nodename="var__190" />
+  </modulo>
+  <extract name="var__190" type="float">
+    <input name="in" type="vector3" nodename="var__171" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__189" type="float">
+    <input name="in1" type="vector2" nodename="h11" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__191" type="float">
+    <input name="in" type="float" nodename="var__189" />
+  </sin>
+  <multiply name="var__192" type="float">
+    <input name="in1" type="float" nodename="var__191" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f3" type="float">
+    <input name="in" type="float" nodename="var__192" />
+  </fract>
+  <add name="var__193" type="vector2">
+    <input name="in1" type="vector2" nodename="var__174" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h12" type="vector2">
+    <input name="in1" type="vector2" nodename="var__193" />
+    <input name="in2" type="float" nodename="var__195" />
+  </modulo>
+  <extract name="var__195" type="float">
+    <input name="in" type="vector3" nodename="var__171" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__194" type="float">
+    <input name="in1" type="vector2" nodename="h12" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__196" type="float">
+    <input name="in" type="float" nodename="var__194" />
+  </sin>
+  <multiply name="var__197" type="float">
+    <input name="in1" type="float" nodename="var__196" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f3" type="float">
+    <input name="in" type="float" nodename="var__197" />
+  </fract>
+  <extract name="var__198" type="float">
+    <input name="in" type="vector2" nodename="var__178" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__199" type="float">
+    <input name="fg" type="float" nodename="h2f3" />
+    <input name="bg" type="float" nodename="h1f3" />
+    <input name="mix" type="float" nodename="var__198" />
+  </mix>
+  <extract name="var__200" type="float">
+    <input name="in" type="vector2" nodename="var__178" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__201" type="float">
+    <input name="fg" type="float" nodename="h4f3" />
+    <input name="bg" type="float" nodename="h3f3" />
+    <input name="mix" type="float" nodename="var__200" />
+  </mix>
+  <extract name="var__202" type="float">
+    <input name="in" type="vector2" nodename="var__178" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise4" type="float">
+    <input name="fg" type="float" nodename="var__201" />
+    <input name="bg" type="float" nodename="var__199" />
+    <input name="mix" type="float" nodename="var__202" />
+  </mix>
+  <convert name="var__203" type="vector3">
+    <input name="in" type="float" nodename="noise4" />
+  </convert>
+  <extract name="var__204" type="float">
+    <input name="in" type="vector3" nodename="var__203" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__205" type="float">
+    <input name="in1" type="float" nodename="var__204" />
+    <input name="in2" type="float" nodename="var__166" />
+  </multiply>
+  <add name="var__206" type="float">
+    <input name="in1" type="float" nodename="var__165" />
+    <input name="in2" type="float" nodename="var__205" />
+  </add>
+  <multiply name="var__207" type="float">
+    <input name="in1" type="float" nodename="var__166" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__208" type="float">
+    <input name="in1" type="float" nodename="var__167" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__209" type="vector3">
+    <input name="in" type="float" nodename="var__208" />
+  </convert>
+  <extract name="var__210" type="float">
+    <input name="in" type="vector3" nodename="var__209" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__211" type="boolean">
+    <input name="value1" type="float" nodename="var__210" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__212" type="vector3">
+    <input name="value1" type="boolean" nodename="var__211" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__209" />
+  </ifequal>
+  <extract name="var__213" type="float">
+    <input name="in" type="vector3" nodename="var__212" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p6" type="vector2">
+    <input name="in1" type="vector2" nodename="p3" />
+    <input name="in2" type="float" nodename="var__213" />
+  </multiply>
+  <fract name="var__214" type="vector2">
+    <input name="in" type="vector2" nodename="p6" />
+  </fract>
+  <floor name="var__215" type="vector2">
+    <input name="in" type="vector2" nodename="p6" />
+  </floor>
+  <multiply name="var__216" type="vector2">
+    <input name="in1" type="vector2" nodename="var__214" />
+    <input name="in2" type="vector2" nodename="var__214" />
+  </multiply>
+  <multiply name="var__217" type="vector2">
+    <input name="in1" type="vector2" nodename="var__214" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in4" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__218" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in4" />
+    <input name="in2" type="vector2" nodename="var__217" />
+  </subtract>
+  <multiply name="var__219" type="vector2">
+    <input name="in1" type="vector2" nodename="var__216" />
+    <input name="in2" type="vector2" nodename="var__218" />
+  </multiply>
+  <modulo name="h13" type="vector2">
+    <input name="in1" type="vector2" nodename="var__215" />
+    <input name="in2" type="float" nodename="var__221" />
+  </modulo>
+  <extract name="var__221" type="float">
+    <input name="in" type="vector3" nodename="var__212" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__220" type="float">
+    <input name="in1" type="vector2" nodename="h13" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__222" type="float">
+    <input name="in" type="float" nodename="var__220" />
+  </sin>
+  <multiply name="var__223" type="float">
+    <input name="in1" type="float" nodename="var__222" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f4" type="float">
+    <input name="in" type="float" nodename="var__223" />
+  </fract>
+  <add name="var__224" type="vector2">
+    <input name="in1" type="vector2" nodename="var__215" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h14" type="vector2">
+    <input name="in1" type="vector2" nodename="var__224" />
+    <input name="in2" type="float" nodename="var__226" />
+  </modulo>
+  <extract name="var__226" type="float">
+    <input name="in" type="vector3" nodename="var__212" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__225" type="float">
+    <input name="in1" type="vector2" nodename="h14" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__227" type="float">
+    <input name="in" type="float" nodename="var__225" />
+  </sin>
+  <multiply name="var__228" type="float">
+    <input name="in1" type="float" nodename="var__227" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f4" type="float">
+    <input name="in" type="float" nodename="var__228" />
+  </fract>
+  <add name="var__229" type="vector2">
+    <input name="in1" type="vector2" nodename="var__215" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h15" type="vector2">
+    <input name="in1" type="vector2" nodename="var__229" />
+    <input name="in2" type="float" nodename="var__231" />
+  </modulo>
+  <extract name="var__231" type="float">
+    <input name="in" type="vector3" nodename="var__212" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__230" type="float">
+    <input name="in1" type="vector2" nodename="h15" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__232" type="float">
+    <input name="in" type="float" nodename="var__230" />
+  </sin>
+  <multiply name="var__233" type="float">
+    <input name="in1" type="float" nodename="var__232" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f4" type="float">
+    <input name="in" type="float" nodename="var__233" />
+  </fract>
+  <add name="var__234" type="vector2">
+    <input name="in1" type="vector2" nodename="var__215" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h16" type="vector2">
+    <input name="in1" type="vector2" nodename="var__234" />
+    <input name="in2" type="float" nodename="var__236" />
+  </modulo>
+  <extract name="var__236" type="float">
+    <input name="in" type="vector3" nodename="var__212" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__235" type="float">
+    <input name="in1" type="vector2" nodename="h16" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__237" type="float">
+    <input name="in" type="float" nodename="var__235" />
+  </sin>
+  <multiply name="var__238" type="float">
+    <input name="in1" type="float" nodename="var__237" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f4" type="float">
+    <input name="in" type="float" nodename="var__238" />
+  </fract>
+  <extract name="var__239" type="float">
+    <input name="in" type="vector2" nodename="var__219" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__240" type="float">
+    <input name="fg" type="float" nodename="h2f4" />
+    <input name="bg" type="float" nodename="h1f4" />
+    <input name="mix" type="float" nodename="var__239" />
+  </mix>
+  <extract name="var__241" type="float">
+    <input name="in" type="vector2" nodename="var__219" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__242" type="float">
+    <input name="fg" type="float" nodename="h4f4" />
+    <input name="bg" type="float" nodename="h3f4" />
+    <input name="mix" type="float" nodename="var__241" />
+  </mix>
+  <extract name="var__243" type="float">
+    <input name="in" type="vector2" nodename="var__219" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise5" type="float">
+    <input name="fg" type="float" nodename="var__242" />
+    <input name="bg" type="float" nodename="var__240" />
+    <input name="mix" type="float" nodename="var__243" />
+  </mix>
+  <convert name="var__244" type="vector3">
+    <input name="in" type="float" nodename="noise5" />
+  </convert>
+  <extract name="var__245" type="float">
+    <input name="in" type="vector3" nodename="var__244" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__246" type="float">
+    <input name="in1" type="float" nodename="var__245" />
+    <input name="in2" type="float" nodename="var__207" />
+  </multiply>
+  <add name="var__247" type="float">
+    <input name="in1" type="float" nodename="var__206" />
+    <input name="in2" type="float" nodename="var__246" />
+  </add>
+  <multiply name="var__248" type="float">
+    <input name="in1" type="float" nodename="var__207" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__249" type="float">
+    <input name="in1" type="float" nodename="var__208" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__250" type="vector3">
+    <input name="in" type="float" nodename="var__249" />
+  </convert>
+  <extract name="var__251" type="float">
+    <input name="in" type="vector3" nodename="var__250" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__252" type="boolean">
+    <input name="value1" type="float" nodename="var__251" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__253" type="vector3">
+    <input name="value1" type="boolean" nodename="var__252" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__250" />
+  </ifequal>
+  <extract name="var__254" type="float">
+    <input name="in" type="vector3" nodename="var__253" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p7" type="vector2">
+    <input name="in1" type="vector2" nodename="p3" />
+    <input name="in2" type="float" nodename="var__254" />
+  </multiply>
+  <fract name="var__255" type="vector2">
+    <input name="in" type="vector2" nodename="p7" />
+  </fract>
+  <floor name="var__256" type="vector2">
+    <input name="in" type="vector2" nodename="p7" />
+  </floor>
+  <multiply name="var__257" type="vector2">
+    <input name="in1" type="vector2" nodename="var__255" />
+    <input name="in2" type="vector2" nodename="var__255" />
+  </multiply>
+  <multiply name="var__258" type="vector2">
+    <input name="in1" type="vector2" nodename="var__255" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in5" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__259" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in5" />
+    <input name="in2" type="vector2" nodename="var__258" />
+  </subtract>
+  <multiply name="var__260" type="vector2">
+    <input name="in1" type="vector2" nodename="var__257" />
+    <input name="in2" type="vector2" nodename="var__259" />
+  </multiply>
+  <modulo name="h17" type="vector2">
+    <input name="in1" type="vector2" nodename="var__256" />
+    <input name="in2" type="float" nodename="var__262" />
+  </modulo>
+  <extract name="var__262" type="float">
+    <input name="in" type="vector3" nodename="var__253" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__261" type="float">
+    <input name="in1" type="vector2" nodename="h17" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__263" type="float">
+    <input name="in" type="float" nodename="var__261" />
+  </sin>
+  <multiply name="var__264" type="float">
+    <input name="in1" type="float" nodename="var__263" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f5" type="float">
+    <input name="in" type="float" nodename="var__264" />
+  </fract>
+  <add name="var__265" type="vector2">
+    <input name="in1" type="vector2" nodename="var__256" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h18" type="vector2">
+    <input name="in1" type="vector2" nodename="var__265" />
+    <input name="in2" type="float" nodename="var__267" />
+  </modulo>
+  <extract name="var__267" type="float">
+    <input name="in" type="vector3" nodename="var__253" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__266" type="float">
+    <input name="in1" type="vector2" nodename="h18" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__268" type="float">
+    <input name="in" type="float" nodename="var__266" />
+  </sin>
+  <multiply name="var__269" type="float">
+    <input name="in1" type="float" nodename="var__268" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f5" type="float">
+    <input name="in" type="float" nodename="var__269" />
+  </fract>
+  <add name="var__270" type="vector2">
+    <input name="in1" type="vector2" nodename="var__256" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h19" type="vector2">
+    <input name="in1" type="vector2" nodename="var__270" />
+    <input name="in2" type="float" nodename="var__272" />
+  </modulo>
+  <extract name="var__272" type="float">
+    <input name="in" type="vector3" nodename="var__253" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__271" type="float">
+    <input name="in1" type="vector2" nodename="h19" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__273" type="float">
+    <input name="in" type="float" nodename="var__271" />
+  </sin>
+  <multiply name="var__274" type="float">
+    <input name="in1" type="float" nodename="var__273" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f5" type="float">
+    <input name="in" type="float" nodename="var__274" />
+  </fract>
+  <add name="var__275" type="vector2">
+    <input name="in1" type="vector2" nodename="var__256" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h20" type="vector2">
+    <input name="in1" type="vector2" nodename="var__275" />
+    <input name="in2" type="float" nodename="var__277" />
+  </modulo>
+  <extract name="var__277" type="float">
+    <input name="in" type="vector3" nodename="var__253" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__276" type="float">
+    <input name="in1" type="vector2" nodename="h20" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__278" type="float">
+    <input name="in" type="float" nodename="var__276" />
+  </sin>
+  <multiply name="var__279" type="float">
+    <input name="in1" type="float" nodename="var__278" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f5" type="float">
+    <input name="in" type="float" nodename="var__279" />
+  </fract>
+  <extract name="var__280" type="float">
+    <input name="in" type="vector2" nodename="var__260" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__281" type="float">
+    <input name="fg" type="float" nodename="h2f5" />
+    <input name="bg" type="float" nodename="h1f5" />
+    <input name="mix" type="float" nodename="var__280" />
+  </mix>
+  <extract name="var__282" type="float">
+    <input name="in" type="vector2" nodename="var__260" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__283" type="float">
+    <input name="fg" type="float" nodename="h4f5" />
+    <input name="bg" type="float" nodename="h3f5" />
+    <input name="mix" type="float" nodename="var__282" />
+  </mix>
+  <extract name="var__284" type="float">
+    <input name="in" type="vector2" nodename="var__260" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise6" type="float">
+    <input name="fg" type="float" nodename="var__283" />
+    <input name="bg" type="float" nodename="var__281" />
+    <input name="mix" type="float" nodename="var__284" />
+  </mix>
+  <convert name="var__285" type="vector3">
+    <input name="in" type="float" nodename="noise6" />
+  </convert>
+  <extract name="var__286" type="float">
+    <input name="in" type="vector3" nodename="var__285" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__287" type="float">
+    <input name="in1" type="float" nodename="var__286" />
+    <input name="in2" type="float" nodename="var__248" />
+  </multiply>
+  <add name="var__288" type="float">
+    <input name="in1" type="float" nodename="var__247" />
+    <input name="in2" type="float" nodename="var__287" />
+  </add>
+  <multiply name="var__289" type="float">
+    <input name="in1" type="float" nodename="var__248" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__290" type="float">
+    <input name="in1" type="float" nodename="var__249" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__291" type="vector3">
+    <input name="in" type="float" nodename="var__290" />
+  </convert>
+  <extract name="var__292" type="float">
+    <input name="in" type="vector3" nodename="var__291" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__293" type="boolean">
+    <input name="value1" type="float" nodename="var__292" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__294" type="vector3">
+    <input name="value1" type="boolean" nodename="var__293" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__291" />
+  </ifequal>
+  <extract name="var__295" type="float">
+    <input name="in" type="vector3" nodename="var__294" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p8" type="vector2">
+    <input name="in1" type="vector2" nodename="p3" />
+    <input name="in2" type="float" nodename="var__295" />
+  </multiply>
+  <fract name="var__296" type="vector2">
+    <input name="in" type="vector2" nodename="p8" />
+  </fract>
+  <floor name="var__297" type="vector2">
+    <input name="in" type="vector2" nodename="p8" />
+  </floor>
+  <multiply name="var__298" type="vector2">
+    <input name="in1" type="vector2" nodename="var__296" />
+    <input name="in2" type="vector2" nodename="var__296" />
+  </multiply>
+  <multiply name="var__299" type="vector2">
+    <input name="in1" type="vector2" nodename="var__296" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in6" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__300" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in6" />
+    <input name="in2" type="vector2" nodename="var__299" />
+  </subtract>
+  <multiply name="var__301" type="vector2">
+    <input name="in1" type="vector2" nodename="var__298" />
+    <input name="in2" type="vector2" nodename="var__300" />
+  </multiply>
+  <modulo name="h21" type="vector2">
+    <input name="in1" type="vector2" nodename="var__297" />
+    <input name="in2" type="float" nodename="var__303" />
+  </modulo>
+  <extract name="var__303" type="float">
+    <input name="in" type="vector3" nodename="var__294" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__302" type="float">
+    <input name="in1" type="vector2" nodename="h21" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__304" type="float">
+    <input name="in" type="float" nodename="var__302" />
+  </sin>
+  <multiply name="var__305" type="float">
+    <input name="in1" type="float" nodename="var__304" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f6" type="float">
+    <input name="in" type="float" nodename="var__305" />
+  </fract>
+  <add name="var__306" type="vector2">
+    <input name="in1" type="vector2" nodename="var__297" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h22" type="vector2">
+    <input name="in1" type="vector2" nodename="var__306" />
+    <input name="in2" type="float" nodename="var__308" />
+  </modulo>
+  <extract name="var__308" type="float">
+    <input name="in" type="vector3" nodename="var__294" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__307" type="float">
+    <input name="in1" type="vector2" nodename="h22" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__309" type="float">
+    <input name="in" type="float" nodename="var__307" />
+  </sin>
+  <multiply name="var__310" type="float">
+    <input name="in1" type="float" nodename="var__309" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f6" type="float">
+    <input name="in" type="float" nodename="var__310" />
+  </fract>
+  <add name="var__311" type="vector2">
+    <input name="in1" type="vector2" nodename="var__297" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h23" type="vector2">
+    <input name="in1" type="vector2" nodename="var__311" />
+    <input name="in2" type="float" nodename="var__313" />
+  </modulo>
+  <extract name="var__313" type="float">
+    <input name="in" type="vector3" nodename="var__294" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__312" type="float">
+    <input name="in1" type="vector2" nodename="h23" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__314" type="float">
+    <input name="in" type="float" nodename="var__312" />
+  </sin>
+  <multiply name="var__315" type="float">
+    <input name="in1" type="float" nodename="var__314" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f6" type="float">
+    <input name="in" type="float" nodename="var__315" />
+  </fract>
+  <add name="var__316" type="vector2">
+    <input name="in1" type="vector2" nodename="var__297" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h24" type="vector2">
+    <input name="in1" type="vector2" nodename="var__316" />
+    <input name="in2" type="float" nodename="var__318" />
+  </modulo>
+  <extract name="var__318" type="float">
+    <input name="in" type="vector3" nodename="var__294" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__317" type="float">
+    <input name="in1" type="vector2" nodename="h24" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__319" type="float">
+    <input name="in" type="float" nodename="var__317" />
+  </sin>
+  <multiply name="var__320" type="float">
+    <input name="in1" type="float" nodename="var__319" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f6" type="float">
+    <input name="in" type="float" nodename="var__320" />
+  </fract>
+  <extract name="var__321" type="float">
+    <input name="in" type="vector2" nodename="var__301" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__322" type="float">
+    <input name="fg" type="float" nodename="h2f6" />
+    <input name="bg" type="float" nodename="h1f6" />
+    <input name="mix" type="float" nodename="var__321" />
+  </mix>
+  <extract name="var__323" type="float">
+    <input name="in" type="vector2" nodename="var__301" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__324" type="float">
+    <input name="fg" type="float" nodename="h4f6" />
+    <input name="bg" type="float" nodename="h3f6" />
+    <input name="mix" type="float" nodename="var__323" />
+  </mix>
+  <extract name="var__325" type="float">
+    <input name="in" type="vector2" nodename="var__301" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise7" type="float">
+    <input name="fg" type="float" nodename="var__324" />
+    <input name="bg" type="float" nodename="var__322" />
+    <input name="mix" type="float" nodename="var__325" />
+  </mix>
+  <convert name="var__326" type="vector3">
+    <input name="in" type="float" nodename="noise7" />
+  </convert>
+  <extract name="var__327" type="float">
+    <input name="in" type="vector3" nodename="var__326" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__328" type="float">
+    <input name="in1" type="float" nodename="var__327" />
+    <input name="in2" type="float" nodename="var__289" />
+  </multiply>
+  <add name="var__329" type="float">
+    <input name="in1" type="float" nodename="var__288" />
+    <input name="in2" type="float" nodename="var__328" />
+  </add>
+  <multiply name="var__330" type="float">
+    <input name="in1" type="float" nodename="var__289" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__331" type="float">
+    <input name="in1" type="float" nodename="var__290" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <min name="var__332" type="float">
+    <input name="in1" type="float" nodename="var__329" />
+    <input name="in2" type="float" value="1" />
+  </min>
+  <convert name="_Eoks" type="vector3">
+    <input name="in" type="float" nodename="var__332" />
+  </convert>
+  <multiply name="var__333" type="vector3">
+    <input name="in1" type="vector3" nodename="_Eoks" />
+    <input name="in2" type="vector3" nodename="_eukA" />
+  </multiply>
+  <multiply name="_jIHy" type="vector3">
+    <input name="in1" type="vector3" nodename="var__333" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <extract name="var__334" type="float">
+    <input name="in" type="vector2" nodename="var__87" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__335" type="float">
+    <input name="in1" type="float" nodename="var__334" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <extract name="var__336" type="float">
+    <input name="in" type="vector2" nodename="var__87" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <multiply name="var__337" type="float">
+    <input name="in1" type="float" nodename="var__336" />
+    <input name="in2" type="float" value="1" />
+  </multiply>
+  <combine3 name="_vRSx" type="vector3">
+    <input name="in1" type="float" nodename="var__335" />
+    <input name="in2" type="float" nodename="var__337" />
+    <input name="in3" type="float" value="1" />
+  </combine3>
+  <multiply name="var__338" type="vector3">
+    <input name="in1" type="vector3" nodename="_vRSx" />
+    <input name="in2" type="float" value="3" />
+  </multiply>
+  <multiply name="_sRul" type="vector3">
+    <input name="in1" type="vector3" nodename="var__338" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <separate3 name="var__339" type="multioutput">
+    <input name="in" type="vector3" nodename="_sRul" />
+  </separate3>
+  <combine2 name="var__340" type="vector2">
+    <input name="in1" type="float" output="outx" nodename="var__339" />
+    <input name="in2" type="float" output="outy" nodename="var__339" />
+  </combine2>
+  <extract name="var__341" type="float">
+    <input name="in" type="vector3" value="0, 0, 0" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__342" type="boolean">
+    <input name="value1" type="float" nodename="var__341" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__343" type="vector3">
+    <input name="value1" type="boolean" nodename="var__342" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" value="0, 0, 0" />
+  </ifequal>
+  <extract name="var__344" type="float">
+    <input name="in" type="vector3" nodename="var__343" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p9" type="vector2">
+    <input name="in1" type="vector2" nodename="var__340" />
+    <input name="in2" type="float" nodename="var__344" />
+  </multiply>
+  <fract name="var__345" type="vector2">
+    <input name="in" type="vector2" nodename="p9" />
+  </fract>
+  <floor name="var__346" type="vector2">
+    <input name="in" type="vector2" nodename="p9" />
+  </floor>
+  <multiply name="var__347" type="vector2">
+    <input name="in1" type="vector2" nodename="var__345" />
+    <input name="in2" type="vector2" nodename="var__345" />
+  </multiply>
+  <multiply name="var__348" type="vector2">
+    <input name="in1" type="vector2" nodename="var__345" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in7" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__349" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in7" />
+    <input name="in2" type="vector2" nodename="var__348" />
+  </subtract>
+  <multiply name="var__350" type="vector2">
+    <input name="in1" type="vector2" nodename="var__347" />
+    <input name="in2" type="vector2" nodename="var__349" />
+  </multiply>
+  <modulo name="h25" type="vector2">
+    <input name="in1" type="vector2" nodename="var__346" />
+    <input name="in2" type="float" nodename="var__352" />
+  </modulo>
+  <extract name="var__352" type="float">
+    <input name="in" type="vector3" nodename="var__343" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__351" type="float">
+    <input name="in1" type="vector2" nodename="h25" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__353" type="float">
+    <input name="in" type="float" nodename="var__351" />
+  </sin>
+  <multiply name="var__354" type="float">
+    <input name="in1" type="float" nodename="var__353" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f7" type="float">
+    <input name="in" type="float" nodename="var__354" />
+  </fract>
+  <add name="var__355" type="vector2">
+    <input name="in1" type="vector2" nodename="var__346" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h26" type="vector2">
+    <input name="in1" type="vector2" nodename="var__355" />
+    <input name="in2" type="float" nodename="var__357" />
+  </modulo>
+  <extract name="var__357" type="float">
+    <input name="in" type="vector3" nodename="var__343" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__356" type="float">
+    <input name="in1" type="vector2" nodename="h26" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__358" type="float">
+    <input name="in" type="float" nodename="var__356" />
+  </sin>
+  <multiply name="var__359" type="float">
+    <input name="in1" type="float" nodename="var__358" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f7" type="float">
+    <input name="in" type="float" nodename="var__359" />
+  </fract>
+  <add name="var__360" type="vector2">
+    <input name="in1" type="vector2" nodename="var__346" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h27" type="vector2">
+    <input name="in1" type="vector2" nodename="var__360" />
+    <input name="in2" type="float" nodename="var__362" />
+  </modulo>
+  <extract name="var__362" type="float">
+    <input name="in" type="vector3" nodename="var__343" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__361" type="float">
+    <input name="in1" type="vector2" nodename="h27" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__363" type="float">
+    <input name="in" type="float" nodename="var__361" />
+  </sin>
+  <multiply name="var__364" type="float">
+    <input name="in1" type="float" nodename="var__363" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f7" type="float">
+    <input name="in" type="float" nodename="var__364" />
+  </fract>
+  <add name="var__365" type="vector2">
+    <input name="in1" type="vector2" nodename="var__346" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h28" type="vector2">
+    <input name="in1" type="vector2" nodename="var__365" />
+    <input name="in2" type="float" nodename="var__367" />
+  </modulo>
+  <extract name="var__367" type="float">
+    <input name="in" type="vector3" nodename="var__343" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__366" type="float">
+    <input name="in1" type="vector2" nodename="h28" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__368" type="float">
+    <input name="in" type="float" nodename="var__366" />
+  </sin>
+  <multiply name="var__369" type="float">
+    <input name="in1" type="float" nodename="var__368" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f7" type="float">
+    <input name="in" type="float" nodename="var__369" />
+  </fract>
+  <extract name="var__370" type="float">
+    <input name="in" type="vector2" nodename="var__350" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__371" type="float">
+    <input name="fg" type="float" nodename="h2f7" />
+    <input name="bg" type="float" nodename="h1f7" />
+    <input name="mix" type="float" nodename="var__370" />
+  </mix>
+  <extract name="var__372" type="float">
+    <input name="in" type="vector2" nodename="var__350" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__373" type="float">
+    <input name="fg" type="float" nodename="h4f7" />
+    <input name="bg" type="float" nodename="h3f7" />
+    <input name="mix" type="float" nodename="var__372" />
+  </mix>
+  <extract name="var__374" type="float">
+    <input name="in" type="vector2" nodename="var__350" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise8" type="float">
+    <input name="fg" type="float" nodename="var__373" />
+    <input name="bg" type="float" nodename="var__371" />
+    <input name="mix" type="float" nodename="var__374" />
+  </mix>
+  <convert name="_Zxur2" type="vector3">
+    <input name="in" type="float" nodename="noise8" />
+  </convert>
+  <modulo name="p10" type="vector2">
+    <input name="in1" type="vector2" nodename="var__340" />
+    <input name="in2" type="float" value="20" />
+  </modulo>
+  <extract name="var__375" type="float">
+    <input name="in" type="vector3" value="20, 20, 20" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__376" type="boolean">
+    <input name="value1" type="float" nodename="var__375" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__377" type="vector3">
+    <input name="value1" type="boolean" nodename="var__376" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" value="20, 20, 20" />
+  </ifequal>
+  <extract name="var__378" type="float">
+    <input name="in" type="vector3" nodename="var__377" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p11" type="vector2">
+    <input name="in1" type="vector2" nodename="p10" />
+    <input name="in2" type="float" nodename="var__378" />
+  </multiply>
+  <fract name="var__379" type="vector2">
+    <input name="in" type="vector2" nodename="p11" />
+  </fract>
+  <floor name="var__380" type="vector2">
+    <input name="in" type="vector2" nodename="p11" />
+  </floor>
+  <multiply name="var__381" type="vector2">
+    <input name="in1" type="vector2" nodename="var__379" />
+    <input name="in2" type="vector2" nodename="var__379" />
+  </multiply>
+  <multiply name="var__382" type="vector2">
+    <input name="in1" type="vector2" nodename="var__379" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in8" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__383" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in8" />
+    <input name="in2" type="vector2" nodename="var__382" />
+  </subtract>
+  <multiply name="var__384" type="vector2">
+    <input name="in1" type="vector2" nodename="var__381" />
+    <input name="in2" type="vector2" nodename="var__383" />
+  </multiply>
+  <modulo name="h29" type="vector2">
+    <input name="in1" type="vector2" nodename="var__380" />
+    <input name="in2" type="float" nodename="var__386" />
+  </modulo>
+  <extract name="var__386" type="float">
+    <input name="in" type="vector3" nodename="var__377" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__385" type="float">
+    <input name="in1" type="vector2" nodename="h29" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__387" type="float">
+    <input name="in" type="float" nodename="var__385" />
+  </sin>
+  <multiply name="var__388" type="float">
+    <input name="in1" type="float" nodename="var__387" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f8" type="float">
+    <input name="in" type="float" nodename="var__388" />
+  </fract>
+  <add name="var__389" type="vector2">
+    <input name="in1" type="vector2" nodename="var__380" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h30" type="vector2">
+    <input name="in1" type="vector2" nodename="var__389" />
+    <input name="in2" type="float" nodename="var__391" />
+  </modulo>
+  <extract name="var__391" type="float">
+    <input name="in" type="vector3" nodename="var__377" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__390" type="float">
+    <input name="in1" type="vector2" nodename="h30" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__392" type="float">
+    <input name="in" type="float" nodename="var__390" />
+  </sin>
+  <multiply name="var__393" type="float">
+    <input name="in1" type="float" nodename="var__392" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f8" type="float">
+    <input name="in" type="float" nodename="var__393" />
+  </fract>
+  <add name="var__394" type="vector2">
+    <input name="in1" type="vector2" nodename="var__380" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h31" type="vector2">
+    <input name="in1" type="vector2" nodename="var__394" />
+    <input name="in2" type="float" nodename="var__396" />
+  </modulo>
+  <extract name="var__396" type="float">
+    <input name="in" type="vector3" nodename="var__377" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__395" type="float">
+    <input name="in1" type="vector2" nodename="h31" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__397" type="float">
+    <input name="in" type="float" nodename="var__395" />
+  </sin>
+  <multiply name="var__398" type="float">
+    <input name="in1" type="float" nodename="var__397" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f8" type="float">
+    <input name="in" type="float" nodename="var__398" />
+  </fract>
+  <add name="var__399" type="vector2">
+    <input name="in1" type="vector2" nodename="var__380" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h32" type="vector2">
+    <input name="in1" type="vector2" nodename="var__399" />
+    <input name="in2" type="float" nodename="var__401" />
+  </modulo>
+  <extract name="var__401" type="float">
+    <input name="in" type="vector3" nodename="var__377" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__400" type="float">
+    <input name="in1" type="vector2" nodename="h32" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__402" type="float">
+    <input name="in" type="float" nodename="var__400" />
+  </sin>
+  <multiply name="var__403" type="float">
+    <input name="in1" type="float" nodename="var__402" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f8" type="float">
+    <input name="in" type="float" nodename="var__403" />
+  </fract>
+  <extract name="var__404" type="float">
+    <input name="in" type="vector2" nodename="var__384" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__405" type="float">
+    <input name="fg" type="float" nodename="h2f8" />
+    <input name="bg" type="float" nodename="h1f8" />
+    <input name="mix" type="float" nodename="var__404" />
+  </mix>
+  <extract name="var__406" type="float">
+    <input name="in" type="vector2" nodename="var__384" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__407" type="float">
+    <input name="fg" type="float" nodename="h4f8" />
+    <input name="bg" type="float" nodename="h3f8" />
+    <input name="mix" type="float" nodename="var__406" />
+  </mix>
+  <extract name="var__408" type="float">
+    <input name="in" type="vector2" nodename="var__384" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise9" type="float">
+    <input name="fg" type="float" nodename="var__407" />
+    <input name="bg" type="float" nodename="var__405" />
+    <input name="mix" type="float" nodename="var__408" />
+  </mix>
+  <convert name="var__409" type="vector3">
+    <input name="in" type="float" nodename="noise9" />
+  </convert>
+  <extract name="var__410" type="float">
+    <input name="in" type="vector3" nodename="var__409" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__411" type="float">
+    <input name="in1" type="float" nodename="var__410" />
+    <input name="in2" type="float" value="0.6" />
+  </multiply>
+  <add name="var__412" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" nodename="var__411" />
+  </add>
+  <multiply name="var__413" type="float">
+    <input name="in1" type="float" value="0.6" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__414" type="float">
+    <input name="in1" type="float" value="20" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__415" type="vector3">
+    <input name="in" type="float" nodename="var__414" />
+  </convert>
+  <extract name="var__416" type="float">
+    <input name="in" type="vector3" nodename="var__415" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__417" type="boolean">
+    <input name="value1" type="float" nodename="var__416" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__418" type="vector3">
+    <input name="value1" type="boolean" nodename="var__417" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__415" />
+  </ifequal>
+  <extract name="var__419" type="float">
+    <input name="in" type="vector3" nodename="var__418" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p12" type="vector2">
+    <input name="in1" type="vector2" nodename="p10" />
+    <input name="in2" type="float" nodename="var__419" />
+  </multiply>
+  <fract name="var__420" type="vector2">
+    <input name="in" type="vector2" nodename="p12" />
+  </fract>
+  <floor name="var__421" type="vector2">
+    <input name="in" type="vector2" nodename="p12" />
+  </floor>
+  <multiply name="var__422" type="vector2">
+    <input name="in1" type="vector2" nodename="var__420" />
+    <input name="in2" type="vector2" nodename="var__420" />
+  </multiply>
+  <multiply name="var__423" type="vector2">
+    <input name="in1" type="vector2" nodename="var__420" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in9" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__424" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in9" />
+    <input name="in2" type="vector2" nodename="var__423" />
+  </subtract>
+  <multiply name="var__425" type="vector2">
+    <input name="in1" type="vector2" nodename="var__422" />
+    <input name="in2" type="vector2" nodename="var__424" />
+  </multiply>
+  <modulo name="h33" type="vector2">
+    <input name="in1" type="vector2" nodename="var__421" />
+    <input name="in2" type="float" nodename="var__427" />
+  </modulo>
+  <extract name="var__427" type="float">
+    <input name="in" type="vector3" nodename="var__418" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__426" type="float">
+    <input name="in1" type="vector2" nodename="h33" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__428" type="float">
+    <input name="in" type="float" nodename="var__426" />
+  </sin>
+  <multiply name="var__429" type="float">
+    <input name="in1" type="float" nodename="var__428" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f9" type="float">
+    <input name="in" type="float" nodename="var__429" />
+  </fract>
+  <add name="var__430" type="vector2">
+    <input name="in1" type="vector2" nodename="var__421" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h34" type="vector2">
+    <input name="in1" type="vector2" nodename="var__430" />
+    <input name="in2" type="float" nodename="var__432" />
+  </modulo>
+  <extract name="var__432" type="float">
+    <input name="in" type="vector3" nodename="var__418" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__431" type="float">
+    <input name="in1" type="vector2" nodename="h34" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__433" type="float">
+    <input name="in" type="float" nodename="var__431" />
+  </sin>
+  <multiply name="var__434" type="float">
+    <input name="in1" type="float" nodename="var__433" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f9" type="float">
+    <input name="in" type="float" nodename="var__434" />
+  </fract>
+  <add name="var__435" type="vector2">
+    <input name="in1" type="vector2" nodename="var__421" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h35" type="vector2">
+    <input name="in1" type="vector2" nodename="var__435" />
+    <input name="in2" type="float" nodename="var__437" />
+  </modulo>
+  <extract name="var__437" type="float">
+    <input name="in" type="vector3" nodename="var__418" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__436" type="float">
+    <input name="in1" type="vector2" nodename="h35" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__438" type="float">
+    <input name="in" type="float" nodename="var__436" />
+  </sin>
+  <multiply name="var__439" type="float">
+    <input name="in1" type="float" nodename="var__438" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f9" type="float">
+    <input name="in" type="float" nodename="var__439" />
+  </fract>
+  <add name="var__440" type="vector2">
+    <input name="in1" type="vector2" nodename="var__421" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h36" type="vector2">
+    <input name="in1" type="vector2" nodename="var__440" />
+    <input name="in2" type="float" nodename="var__442" />
+  </modulo>
+  <extract name="var__442" type="float">
+    <input name="in" type="vector3" nodename="var__418" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__441" type="float">
+    <input name="in1" type="vector2" nodename="h36" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__443" type="float">
+    <input name="in" type="float" nodename="var__441" />
+  </sin>
+  <multiply name="var__444" type="float">
+    <input name="in1" type="float" nodename="var__443" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f9" type="float">
+    <input name="in" type="float" nodename="var__444" />
+  </fract>
+  <extract name="var__445" type="float">
+    <input name="in" type="vector2" nodename="var__425" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__446" type="float">
+    <input name="fg" type="float" nodename="h2f9" />
+    <input name="bg" type="float" nodename="h1f9" />
+    <input name="mix" type="float" nodename="var__445" />
+  </mix>
+  <extract name="var__447" type="float">
+    <input name="in" type="vector2" nodename="var__425" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__448" type="float">
+    <input name="fg" type="float" nodename="h4f9" />
+    <input name="bg" type="float" nodename="h3f9" />
+    <input name="mix" type="float" nodename="var__447" />
+  </mix>
+  <extract name="var__449" type="float">
+    <input name="in" type="vector2" nodename="var__425" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise10" type="float">
+    <input name="fg" type="float" nodename="var__448" />
+    <input name="bg" type="float" nodename="var__446" />
+    <input name="mix" type="float" nodename="var__449" />
+  </mix>
+  <convert name="var__450" type="vector3">
+    <input name="in" type="float" nodename="noise10" />
+  </convert>
+  <extract name="var__451" type="float">
+    <input name="in" type="vector3" nodename="var__450" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__452" type="float">
+    <input name="in1" type="float" nodename="var__451" />
+    <input name="in2" type="float" nodename="var__413" />
+  </multiply>
+  <add name="var__453" type="float">
+    <input name="in1" type="float" nodename="var__412" />
+    <input name="in2" type="float" nodename="var__452" />
+  </add>
+  <multiply name="var__454" type="float">
+    <input name="in1" type="float" nodename="var__413" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__455" type="float">
+    <input name="in1" type="float" nodename="var__414" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__456" type="vector3">
+    <input name="in" type="float" nodename="var__455" />
+  </convert>
+  <extract name="var__457" type="float">
+    <input name="in" type="vector3" nodename="var__456" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__458" type="boolean">
+    <input name="value1" type="float" nodename="var__457" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__459" type="vector3">
+    <input name="value1" type="boolean" nodename="var__458" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__456" />
+  </ifequal>
+  <extract name="var__460" type="float">
+    <input name="in" type="vector3" nodename="var__459" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p13" type="vector2">
+    <input name="in1" type="vector2" nodename="p10" />
+    <input name="in2" type="float" nodename="var__460" />
+  </multiply>
+  <fract name="var__461" type="vector2">
+    <input name="in" type="vector2" nodename="p13" />
+  </fract>
+  <floor name="var__462" type="vector2">
+    <input name="in" type="vector2" nodename="p13" />
+  </floor>
+  <multiply name="var__463" type="vector2">
+    <input name="in1" type="vector2" nodename="var__461" />
+    <input name="in2" type="vector2" nodename="var__461" />
+  </multiply>
+  <multiply name="var__464" type="vector2">
+    <input name="in1" type="vector2" nodename="var__461" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in10" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__465" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in10" />
+    <input name="in2" type="vector2" nodename="var__464" />
+  </subtract>
+  <multiply name="var__466" type="vector2">
+    <input name="in1" type="vector2" nodename="var__463" />
+    <input name="in2" type="vector2" nodename="var__465" />
+  </multiply>
+  <modulo name="h37" type="vector2">
+    <input name="in1" type="vector2" nodename="var__462" />
+    <input name="in2" type="float" nodename="var__468" />
+  </modulo>
+  <extract name="var__468" type="float">
+    <input name="in" type="vector3" nodename="var__459" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__467" type="float">
+    <input name="in1" type="vector2" nodename="h37" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__469" type="float">
+    <input name="in" type="float" nodename="var__467" />
+  </sin>
+  <multiply name="var__470" type="float">
+    <input name="in1" type="float" nodename="var__469" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f10" type="float">
+    <input name="in" type="float" nodename="var__470" />
+  </fract>
+  <add name="var__471" type="vector2">
+    <input name="in1" type="vector2" nodename="var__462" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h38" type="vector2">
+    <input name="in1" type="vector2" nodename="var__471" />
+    <input name="in2" type="float" nodename="var__473" />
+  </modulo>
+  <extract name="var__473" type="float">
+    <input name="in" type="vector3" nodename="var__459" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__472" type="float">
+    <input name="in1" type="vector2" nodename="h38" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__474" type="float">
+    <input name="in" type="float" nodename="var__472" />
+  </sin>
+  <multiply name="var__475" type="float">
+    <input name="in1" type="float" nodename="var__474" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f10" type="float">
+    <input name="in" type="float" nodename="var__475" />
+  </fract>
+  <add name="var__476" type="vector2">
+    <input name="in1" type="vector2" nodename="var__462" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h39" type="vector2">
+    <input name="in1" type="vector2" nodename="var__476" />
+    <input name="in2" type="float" nodename="var__478" />
+  </modulo>
+  <extract name="var__478" type="float">
+    <input name="in" type="vector3" nodename="var__459" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__477" type="float">
+    <input name="in1" type="vector2" nodename="h39" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__479" type="float">
+    <input name="in" type="float" nodename="var__477" />
+  </sin>
+  <multiply name="var__480" type="float">
+    <input name="in1" type="float" nodename="var__479" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f10" type="float">
+    <input name="in" type="float" nodename="var__480" />
+  </fract>
+  <add name="var__481" type="vector2">
+    <input name="in1" type="vector2" nodename="var__462" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h40" type="vector2">
+    <input name="in1" type="vector2" nodename="var__481" />
+    <input name="in2" type="float" nodename="var__483" />
+  </modulo>
+  <extract name="var__483" type="float">
+    <input name="in" type="vector3" nodename="var__459" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__482" type="float">
+    <input name="in1" type="vector2" nodename="h40" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__484" type="float">
+    <input name="in" type="float" nodename="var__482" />
+  </sin>
+  <multiply name="var__485" type="float">
+    <input name="in1" type="float" nodename="var__484" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f10" type="float">
+    <input name="in" type="float" nodename="var__485" />
+  </fract>
+  <extract name="var__486" type="float">
+    <input name="in" type="vector2" nodename="var__466" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__487" type="float">
+    <input name="fg" type="float" nodename="h2f10" />
+    <input name="bg" type="float" nodename="h1f10" />
+    <input name="mix" type="float" nodename="var__486" />
+  </mix>
+  <extract name="var__488" type="float">
+    <input name="in" type="vector2" nodename="var__466" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__489" type="float">
+    <input name="fg" type="float" nodename="h4f10" />
+    <input name="bg" type="float" nodename="h3f10" />
+    <input name="mix" type="float" nodename="var__488" />
+  </mix>
+  <extract name="var__490" type="float">
+    <input name="in" type="vector2" nodename="var__466" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise11" type="float">
+    <input name="fg" type="float" nodename="var__489" />
+    <input name="bg" type="float" nodename="var__487" />
+    <input name="mix" type="float" nodename="var__490" />
+  </mix>
+  <convert name="var__491" type="vector3">
+    <input name="in" type="float" nodename="noise11" />
+  </convert>
+  <extract name="var__492" type="float">
+    <input name="in" type="vector3" nodename="var__491" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__493" type="float">
+    <input name="in1" type="float" nodename="var__492" />
+    <input name="in2" type="float" nodename="var__454" />
+  </multiply>
+  <add name="var__494" type="float">
+    <input name="in1" type="float" nodename="var__453" />
+    <input name="in2" type="float" nodename="var__493" />
+  </add>
+  <multiply name="var__495" type="float">
+    <input name="in1" type="float" nodename="var__454" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__496" type="float">
+    <input name="in1" type="float" nodename="var__455" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__497" type="vector3">
+    <input name="in" type="float" nodename="var__496" />
+  </convert>
+  <extract name="var__498" type="float">
+    <input name="in" type="vector3" nodename="var__497" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__499" type="boolean">
+    <input name="value1" type="float" nodename="var__498" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__500" type="vector3">
+    <input name="value1" type="boolean" nodename="var__499" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__497" />
+  </ifequal>
+  <extract name="var__501" type="float">
+    <input name="in" type="vector3" nodename="var__500" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p14" type="vector2">
+    <input name="in1" type="vector2" nodename="p10" />
+    <input name="in2" type="float" nodename="var__501" />
+  </multiply>
+  <fract name="var__502" type="vector2">
+    <input name="in" type="vector2" nodename="p14" />
+  </fract>
+  <floor name="var__503" type="vector2">
+    <input name="in" type="vector2" nodename="p14" />
+  </floor>
+  <multiply name="var__504" type="vector2">
+    <input name="in1" type="vector2" nodename="var__502" />
+    <input name="in2" type="vector2" nodename="var__502" />
+  </multiply>
+  <multiply name="var__505" type="vector2">
+    <input name="in1" type="vector2" nodename="var__502" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in11" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__506" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in11" />
+    <input name="in2" type="vector2" nodename="var__505" />
+  </subtract>
+  <multiply name="var__507" type="vector2">
+    <input name="in1" type="vector2" nodename="var__504" />
+    <input name="in2" type="vector2" nodename="var__506" />
+  </multiply>
+  <modulo name="h41" type="vector2">
+    <input name="in1" type="vector2" nodename="var__503" />
+    <input name="in2" type="float" nodename="var__509" />
+  </modulo>
+  <extract name="var__509" type="float">
+    <input name="in" type="vector3" nodename="var__500" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__508" type="float">
+    <input name="in1" type="vector2" nodename="h41" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__510" type="float">
+    <input name="in" type="float" nodename="var__508" />
+  </sin>
+  <multiply name="var__511" type="float">
+    <input name="in1" type="float" nodename="var__510" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f11" type="float">
+    <input name="in" type="float" nodename="var__511" />
+  </fract>
+  <add name="var__512" type="vector2">
+    <input name="in1" type="vector2" nodename="var__503" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h42" type="vector2">
+    <input name="in1" type="vector2" nodename="var__512" />
+    <input name="in2" type="float" nodename="var__514" />
+  </modulo>
+  <extract name="var__514" type="float">
+    <input name="in" type="vector3" nodename="var__500" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__513" type="float">
+    <input name="in1" type="vector2" nodename="h42" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__515" type="float">
+    <input name="in" type="float" nodename="var__513" />
+  </sin>
+  <multiply name="var__516" type="float">
+    <input name="in1" type="float" nodename="var__515" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f11" type="float">
+    <input name="in" type="float" nodename="var__516" />
+  </fract>
+  <add name="var__517" type="vector2">
+    <input name="in1" type="vector2" nodename="var__503" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h43" type="vector2">
+    <input name="in1" type="vector2" nodename="var__517" />
+    <input name="in2" type="float" nodename="var__519" />
+  </modulo>
+  <extract name="var__519" type="float">
+    <input name="in" type="vector3" nodename="var__500" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__518" type="float">
+    <input name="in1" type="vector2" nodename="h43" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__520" type="float">
+    <input name="in" type="float" nodename="var__518" />
+  </sin>
+  <multiply name="var__521" type="float">
+    <input name="in1" type="float" nodename="var__520" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f11" type="float">
+    <input name="in" type="float" nodename="var__521" />
+  </fract>
+  <add name="var__522" type="vector2">
+    <input name="in1" type="vector2" nodename="var__503" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h44" type="vector2">
+    <input name="in1" type="vector2" nodename="var__522" />
+    <input name="in2" type="float" nodename="var__524" />
+  </modulo>
+  <extract name="var__524" type="float">
+    <input name="in" type="vector3" nodename="var__500" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__523" type="float">
+    <input name="in1" type="vector2" nodename="h44" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__525" type="float">
+    <input name="in" type="float" nodename="var__523" />
+  </sin>
+  <multiply name="var__526" type="float">
+    <input name="in1" type="float" nodename="var__525" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f11" type="float">
+    <input name="in" type="float" nodename="var__526" />
+  </fract>
+  <extract name="var__527" type="float">
+    <input name="in" type="vector2" nodename="var__507" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__528" type="float">
+    <input name="fg" type="float" nodename="h2f11" />
+    <input name="bg" type="float" nodename="h1f11" />
+    <input name="mix" type="float" nodename="var__527" />
+  </mix>
+  <extract name="var__529" type="float">
+    <input name="in" type="vector2" nodename="var__507" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__530" type="float">
+    <input name="fg" type="float" nodename="h4f11" />
+    <input name="bg" type="float" nodename="h3f11" />
+    <input name="mix" type="float" nodename="var__529" />
+  </mix>
+  <extract name="var__531" type="float">
+    <input name="in" type="vector2" nodename="var__507" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise12" type="float">
+    <input name="fg" type="float" nodename="var__530" />
+    <input name="bg" type="float" nodename="var__528" />
+    <input name="mix" type="float" nodename="var__531" />
+  </mix>
+  <convert name="var__532" type="vector3">
+    <input name="in" type="float" nodename="noise12" />
+  </convert>
+  <extract name="var__533" type="float">
+    <input name="in" type="vector3" nodename="var__532" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__534" type="float">
+    <input name="in1" type="float" nodename="var__533" />
+    <input name="in2" type="float" nodename="var__495" />
+  </multiply>
+  <add name="var__535" type="float">
+    <input name="in1" type="float" nodename="var__494" />
+    <input name="in2" type="float" nodename="var__534" />
+  </add>
+  <multiply name="var__536" type="float">
+    <input name="in1" type="float" nodename="var__495" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__537" type="float">
+    <input name="in1" type="float" nodename="var__496" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="var__538" type="vector3">
+    <input name="in" type="float" nodename="var__537" />
+  </convert>
+  <extract name="var__539" type="float">
+    <input name="in" type="vector3" nodename="var__538" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <ifequal name="var__540" type="boolean">
+    <input name="value1" type="float" nodename="var__539" />
+    <input name="value2" type="float" value="0" />
+  </ifequal>
+  <ifequal name="var__541" type="vector3">
+    <input name="value1" type="boolean" nodename="var__540" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="vector3" value="10, 10, 10" />
+    <input name="in2" type="vector3" nodename="var__538" />
+  </ifequal>
+  <extract name="var__542" type="float">
+    <input name="in" type="vector3" nodename="var__541" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="p15" type="vector2">
+    <input name="in1" type="vector2" nodename="p10" />
+    <input name="in2" type="float" nodename="var__542" />
+  </multiply>
+  <fract name="var__543" type="vector2">
+    <input name="in" type="vector2" nodename="p15" />
+  </fract>
+  <floor name="var__544" type="vector2">
+    <input name="in" type="vector2" nodename="p15" />
+  </floor>
+  <multiply name="var__545" type="vector2">
+    <input name="in1" type="vector2" nodename="var__543" />
+    <input name="in2" type="vector2" nodename="var__543" />
+  </multiply>
+  <multiply name="var__546" type="vector2">
+    <input name="in1" type="vector2" nodename="var__543" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <convert name="t_in12" type="vector2">
+    <input name="in" type="float" value="3" />
+  </convert>
+  <subtract name="var__547" type="vector2">
+    <input name="in1" type="vector2" nodename="t_in12" />
+    <input name="in2" type="vector2" nodename="var__546" />
+  </subtract>
+  <multiply name="var__548" type="vector2">
+    <input name="in1" type="vector2" nodename="var__545" />
+    <input name="in2" type="vector2" nodename="var__547" />
+  </multiply>
+  <modulo name="h45" type="vector2">
+    <input name="in1" type="vector2" nodename="var__544" />
+    <input name="in2" type="float" nodename="var__550" />
+  </modulo>
+  <extract name="var__550" type="float">
+    <input name="in" type="vector3" nodename="var__541" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__549" type="float">
+    <input name="in1" type="vector2" nodename="h45" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__551" type="float">
+    <input name="in" type="float" nodename="var__549" />
+  </sin>
+  <multiply name="var__552" type="float">
+    <input name="in1" type="float" nodename="var__551" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h1f12" type="float">
+    <input name="in" type="float" nodename="var__552" />
+  </fract>
+  <add name="var__553" type="vector2">
+    <input name="in1" type="vector2" nodename="var__544" />
+    <input name="in2" type="vector2" value="1, 0" />
+  </add>
+  <modulo name="h46" type="vector2">
+    <input name="in1" type="vector2" nodename="var__553" />
+    <input name="in2" type="float" nodename="var__555" />
+  </modulo>
+  <extract name="var__555" type="float">
+    <input name="in" type="vector3" nodename="var__541" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__554" type="float">
+    <input name="in1" type="vector2" nodename="h46" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__556" type="float">
+    <input name="in" type="float" nodename="var__554" />
+  </sin>
+  <multiply name="var__557" type="float">
+    <input name="in1" type="float" nodename="var__556" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h2f12" type="float">
+    <input name="in" type="float" nodename="var__557" />
+  </fract>
+  <add name="var__558" type="vector2">
+    <input name="in1" type="vector2" nodename="var__544" />
+    <input name="in2" type="vector2" value="0, 1" />
+  </add>
+  <modulo name="h47" type="vector2">
+    <input name="in1" type="vector2" nodename="var__558" />
+    <input name="in2" type="float" nodename="var__560" />
+  </modulo>
+  <extract name="var__560" type="float">
+    <input name="in" type="vector3" nodename="var__541" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__559" type="float">
+    <input name="in1" type="vector2" nodename="h47" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__561" type="float">
+    <input name="in" type="float" nodename="var__559" />
+  </sin>
+  <multiply name="var__562" type="float">
+    <input name="in1" type="float" nodename="var__561" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h3f12" type="float">
+    <input name="in" type="float" nodename="var__562" />
+  </fract>
+  <add name="var__563" type="vector2">
+    <input name="in1" type="vector2" nodename="var__544" />
+    <input name="in2" type="vector2" value="1, 1" />
+  </add>
+  <modulo name="h48" type="vector2">
+    <input name="in1" type="vector2" nodename="var__563" />
+    <input name="in2" type="float" nodename="var__565" />
+  </modulo>
+  <extract name="var__565" type="float">
+    <input name="in" type="vector3" nodename="var__541" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <dotproduct name="var__564" type="float">
+    <input name="in1" type="vector2" nodename="h48" />
+    <input name="in2" type="vector2" value="27.169, 38.9056" />
+  </dotproduct>
+  <sin name="var__566" type="float">
+    <input name="in" type="float" nodename="var__564" />
+  </sin>
+  <multiply name="var__567" type="float">
+    <input name="in1" type="float" nodename="var__566" />
+    <input name="in2" type="float" value="5151.55" />
+  </multiply>
+  <fract name="h4f12" type="float">
+    <input name="in" type="float" nodename="var__567" />
+  </fract>
+  <extract name="var__568" type="float">
+    <input name="in" type="vector2" nodename="var__548" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__569" type="float">
+    <input name="fg" type="float" nodename="h2f12" />
+    <input name="bg" type="float" nodename="h1f12" />
+    <input name="mix" type="float" nodename="var__568" />
+  </mix>
+  <extract name="var__570" type="float">
+    <input name="in" type="vector2" nodename="var__548" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <mix name="var__571" type="float">
+    <input name="fg" type="float" nodename="h4f12" />
+    <input name="bg" type="float" nodename="h3f12" />
+    <input name="mix" type="float" nodename="var__570" />
+  </mix>
+  <extract name="var__572" type="float">
+    <input name="in" type="vector2" nodename="var__548" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <mix name="noise13" type="float">
+    <input name="fg" type="float" nodename="var__571" />
+    <input name="bg" type="float" nodename="var__569" />
+    <input name="mix" type="float" nodename="var__572" />
+  </mix>
+  <convert name="var__573" type="vector3">
+    <input name="in" type="float" nodename="noise13" />
+  </convert>
+  <extract name="var__574" type="float">
+    <input name="in" type="vector3" nodename="var__573" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__575" type="float">
+    <input name="in1" type="float" nodename="var__574" />
+    <input name="in2" type="float" nodename="var__536" />
+  </multiply>
+  <add name="var__576" type="float">
+    <input name="in1" type="float" nodename="var__535" />
+    <input name="in2" type="float" nodename="var__575" />
+  </add>
+  <multiply name="var__577" type="float">
+    <input name="in1" type="float" nodename="var__536" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <multiply name="var__578" type="float">
+    <input name="in1" type="float" nodename="var__537" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <min name="var__579" type="float">
+    <input name="in1" type="float" nodename="var__576" />
+    <input name="in2" type="float" value="1" />
+  </min>
+  <convert name="_Eoks2" type="vector3">
+    <input name="in" type="float" nodename="var__579" />
+  </convert>
+  <multiply name="var__580" type="vector3">
+    <input name="in1" type="vector3" nodename="_Eoks2" />
+    <input name="in2" type="float" value="7.845" />
+  </multiply>
+  <multiply name="_xzCJ" type="vector3">
+    <input name="in1" type="vector3" nodename="var__580" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <convert name="t_in13" type="vector3">
+    <input name="in" type="float" value="1" />
+  </convert>
+  <subtract name="_vTdO" type="vector3">
+    <input name="in1" type="vector3" nodename="t_in13" />
+    <input name="in2" type="vector3" nodename="_bpea" />
+  </subtract>
+  <multiply name="var__581" type="vector3">
+    <input name="in1" type="vector3" nodename="_vTdO" />
+    <input name="in2" type="float" value="0.1" />
+  </multiply>
+  <multiply name="_bzqA" type="vector3">
+    <input name="in1" type="vector3" nodename="var__581" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <multiply name="var__582" type="vector3">
+    <input name="in1" type="vector3" nodename="_bzqA" />
+    <input name="in2" type="vector3" nodename="_bzqA" />
+  </multiply>
+  <multiply name="_gTOo" type="vector3">
+    <input name="in1" type="vector3" nodename="var__582" />
+    <input name="in2" type="vector3" nodename="_xzCJ" />
+  </multiply>
+  <multiply name="var__583" type="vector3">
+    <input name="in1" type="vector3" nodename="_gTOo" />
+    <input name="in2" type="float" value="5" />
+  </multiply>
+  <multiply name="_jkHH" type="vector3">
+    <input name="in1" type="vector3" nodename="var__583" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <add name="var__584" type="vector3">
+    <input name="in1" type="vector3" nodename="_jkHH" />
+    <input name="in2" type="vector3" nodename="_jIHy" />
+  </add>
+  <add name="_MxCk" type="vector3">
+    <input name="in1" type="vector3" nodename="var__584" />
+    <input name="in2" type="vector3" value="0, 0, 0" />
+  </add>
+  <multiply name="var__585" type="vector3">
+    <input name="in1" type="vector3" nodename="_MxCk" />
+    <input name="in2" type="float" value="1.6" />
+  </multiply>
+  <multiply name="_PZGo" type="vector3">
+    <input name="in1" type="vector3" nodename="var__585" />
+    <input name="in2" type="vector3" value="1, 1, 1" />
+  </multiply>
+  <clamp name="_fTFt" type="vector3">
+    <input name="in" type="vector3" nodename="_PZGo" />
+    <input name="low" type="vector3" value="0, 0, 0" />
+    <input name="high" type="vector3" value="1.1, 1.1, 1.1" />
+  </clamp>
+  <texcoord name="var__586" type="vector2" />
+  <extract name="var__587" type="float">
+    <input name="in" type="vector2" nodename="var__586" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <add name="var__588" type="float">
+    <input name="in1" type="float" nodename="var__587" />
+    <input name="in2" type="float" value="1.5" />
+  </add>
+  <floor name="rx" type="float">
+    <input name="in" type="float" nodename="var__588" />
+  </floor>
+  <extract name="var__589" type="float">
+    <input name="in" type="vector3" nodename="_khBL" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <add name="var__590" type="float">
+    <input name="in1" type="float" nodename="var__589" />
+    <input name="in2" type="float" nodename="rx" />
+  </add>
+  <randomfloat name="var__591" type="float">
+    <input name="in" type="float" nodename="var__590" />
+  </randomfloat>
+  <extract name="var__592" type="float">
+    <input name="in" type="vector3" nodename="_khBL" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <add name="var__593" type="float">
+    <input name="in1" type="float" nodename="var__592" />
+    <input name="in2" type="float" nodename="rx" />
+  </add>
+  <randomfloat name="var__594" type="float">
+    <input name="in" type="float" nodename="var__593" />
+  </randomfloat>
+  <extract name="var__595" type="float">
+    <input name="in" type="vector3" nodename="_khBL" />
+    <input name="index" type="integer" value="2" />
+  </extract>
+  <add name="var__596" type="float">
+    <input name="in1" type="float" nodename="var__595" />
+    <input name="in2" type="float" nodename="rx" />
+  </add>
+  <randomfloat name="var__597" type="float">
+    <input name="in" type="float" nodename="var__596" />
+  </randomfloat>
+  <combine3 name="r" type="vector3">
+    <input name="in1" type="float" nodename="var__591" />
+    <input name="in2" type="float" nodename="var__594" />
+    <input name="in3" type="float" nodename="var__597" />
+  </combine3>
+  <power name="var__598" type="vector3">
+    <input name="in1" type="vector3" nodename="r" />
+    <input name="in2" type="float" value="4" />
+  </power>
+  <mix name="_IiAx" type="vector3">
+    <input name="fg" type="vector3" value="0, 0, 0" />
+    <input name="bg" type="vector3" value="0, 0, 0" />
+    <input name="mix" type="vector3" nodename="var__598" />
+  </mix>
+  <separate3 name="var__599" type="multioutput">
+    <input name="in" type="vector3" value="0.76, 0.63, 0.389" />
+  </separate3>
+  <combine3 name="_eaWS" type="vector3">
+    <input name="in1" type="float" output="outx" nodename="var__599" />
+    <input name="in2" type="float" output="outy" nodename="var__599" />
+    <input name="in3" type="float" output="outz" nodename="var__599" />
+  </combine3>
+  <mix name="_ylZT" type="vector3">
+    <input name="fg" type="vector3" nodename="_IiAx" />
+    <input name="bg" type="vector3" nodename="_eaWS" />
+    <input name="mix" type="vector3" nodename="_FCZn" />
+  </mix>
+  <extract name="var__600" type="float">
+    <input name="in" type="vector3" nodename="_UaEB" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <extract name="var__601" type="float">
+    <input name="in" type="vector3" nodename="_fTFt" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <convert name="c" type="color3">
+    <input name="in" type="vector3" nodename="_ylZT" />
+  </convert>
+  <standard_surface name="s" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="c" />
+  </standard_surface>
+  <surfacematerial name="m" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="s" />
+  </surfacematerial>
+</materialx>

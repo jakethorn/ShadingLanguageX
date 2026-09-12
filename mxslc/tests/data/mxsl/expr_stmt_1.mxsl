@@ -1,2 +1,0 @@
-vec2 uv = texcoord();
-displacement(tangent("object"), uv.x * uv.y);

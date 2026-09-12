@@ -1,5 +1,0 @@
-@out.uniform "true"
-string add_one()
-{
-    return "world";
-}

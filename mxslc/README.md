@@ -1,1 +1,0 @@
-# ShadingLanguageX open-source compiler

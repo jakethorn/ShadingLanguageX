@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <standard_surface name="goldsurf" type="surfaceshader">
+    <input name="base_color" type="color3" value="1.059, 0.773, 0.307" />
+    <input name="specular_color" type="color3" value="1.001, 0.985, 0.523" />
+    <input name="specular_roughness" type="float" value="0" />
+    <input name="metalness" type="float" value="1" />
+  </standard_surface>
+  <surfacematerial name="goldmat" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="goldsurf" />
+  </surfacematerial>
+</materialx>

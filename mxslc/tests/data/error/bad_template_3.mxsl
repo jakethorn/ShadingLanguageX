@@ -1,6 +1,0 @@
-float foo<T>()
-{
-    return 1.0 + 2.0;
-}
-
-float f = foo<T>();

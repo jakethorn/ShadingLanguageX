@@ -1,7 +1,0 @@
-
-float add_one(float in)
-{
-    @doc "dogs dont wear hats"
-    float retval = in + 1.0;
-    return retval;
-}

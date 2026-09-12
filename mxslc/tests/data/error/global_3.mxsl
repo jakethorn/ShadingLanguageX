@@ -1,7 +1,0 @@
-inline float foo()
-{
-    global float x;
-    return x;
-}
-
-auto y = foo();

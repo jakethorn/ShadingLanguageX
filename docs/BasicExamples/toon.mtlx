@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <viewdirection name="i" type="vector3">
+    <input name="space" type="string" value="world" />
+  </viewdirection>
+  <normal name="n" type="vector3">
+    <input name="space" type="string" value="world" />
+  </normal>
+  <invert name="var__0" type="vector3">
+    <input name="in" type="vector3" nodename="i" />
+    <input name="amount" type="float" value="0" />
+  </invert>
+  <dotproduct name="theta" type="float">
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="vector3" nodename="n" />
+  </dotproduct>
+  <absval name="var__1" type="float">
+    <input name="in" type="float" nodename="theta" />
+  </absval>
+  <ifgreater name="var__2" type="boolean">
+    <input name="value1" type="float" nodename="var__1" />
+    <input name="value2" type="float" value="0.65" />
+  </ifgreater>
+  <ifequal name="c" type="color3">
+    <input name="value1" type="boolean" nodename="var__2" />
+    <input name="value2" type="boolean" value="true" />
+    <input name="in1" type="color3" value="1, 0.2, 0.143" />
+    <input name="in2" type="color3" value="0.154, 1, 1" />
+  </ifequal>
+  <surface_unlit name="s" type="surfaceshader">
+    <input name="emission_color" type="color3" nodename="c" />
+  </surface_unlit>
+</materialx>
