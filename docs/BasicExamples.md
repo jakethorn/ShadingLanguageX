@@ -1,10 +1,14 @@
-<h1 align="center">Basic Examples</h1>
+# Basic Examples
 
-<p align="center">
-  <img src="https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/screenshots/combined.png" />
-</p>
+1. [Hello, ShadingLanguageX!](#hello-shadinglanguagex)
+2. [Gold](#gold)
+3. [Toon](#toon)
+4. [Colored Circles](#colored-circles)
+5. [Brick Wall](#brick-wall)
+6. [Interior Mapping](#interior-mapping)
+7. [Brownian Mountains](#brownian-mountains)
 
-## Hello, ShadingLanguageX!
+# Hello, ShadingLanguageX!
 
 #### hello_slx.mxsl
 ```c++
@@ -31,9 +35,11 @@ mxslc.compile_file_to_file("hello_slx.mxsl")
 </materialx>
 ```
 
-[screenshot here]
+![](BasicExamples/hello_slx.png)
 
-## Gold
+---
+
+# Gold
 
 #### gold.mxsl
 ```c++
@@ -66,9 +72,11 @@ mxslc.compile_file_to_file("gold.mxsl")
 </materialx>
 ```
 
-[screenshot here]
+![](BasicExamples/gold.png)
 
-## Toon
+---
+
+# Toon
 
 #### toon.mxsl
 ```c++
@@ -125,9 +133,11 @@ mxslc.compile_file_to_file("toon.mxsl")
 </materialx>
 ```
 
-[screenshot here]
+![](BasicExamples/toon.png)
 
-## Colored Circles
+---
+
+# Colored Circles
 
 #### circles.mxsl
 ```c++
@@ -150,11 +160,13 @@ opts = mxslc.CompileOptions(globals={"N": 5})
 mxslc.compile_file_to_file("circles.mxsl", opts)
 ```
 #### circles.mtlx
-[screenshot here]
+![](BasicExamples/circles_ng.png)
 
-[screenshot here]
+![](BasicExamples/circles.png)
 
-## Brick Walls
+---
+
+# Brick Wall
 
 #### brick_wall.mxsl
 ```c++
@@ -187,9 +199,11 @@ for i, color in enumerate(colors):
     mxslc.compile_file_to_file("brick_wall.mxsl", opts)
 ```
 
-[screenshot here]
+![](BasicExamples/brick_wall.png)
 
-## Interior Mapping
+---
+
+# Interior Mapping
 
 #### interior_mapping.mxsl
 ```c++
@@ -249,9 +263,12 @@ opts = mxslc.CompileOptions(output_file="interior_mapping_with_rain.mtlx", macro
 mxslc.compile_file_to_file("interior_mapping.mxsl", opts)
 ```
 
-[screenshot here]
+![](BasicExamples/interior_mapping.gif)
+![](BasicExamples/interior_mapping_with_rain.gif)
 
-## Brownian Mountains
+---
+
+# Brownian Mountains
 
 #### mountain.mxsl
 ```c++
@@ -286,7 +303,5 @@ surfacematerial(
 import mxslc
 mxslc.compile_file_to_file("mountain.mxsl")
 ```
-#### mountain.mtlx
-[screenshot here]
 
-[screenshot here]
+![](BasicExamples/mountain.png)
