@@ -104,6 +104,11 @@ namespace mxslc::statements
             if (not func->is_inline())
                 serializer().write_node_def_graph(func, attrs_);
         }
+
+        if (!funcs_.empty() && funcs_.front()->is_inline() && not funcs_.front()->is_stdlib() && runtime().options().emit_source_hints)
+        {
+            serializer().add_user_inline_function(this->to_string());
+        }
     }
 
     void FunctionDefinition::execute_impl() const

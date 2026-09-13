@@ -49,6 +49,12 @@ namespace mxslc::serialize
         ValuePtr write_node_def_graph_input(const VarPtr& var) const;
         void write_node_def_graph_output(const VarPtr& var, const ValuePtr& value) const;
 
+        void enter_inline_call() const { ++inline_call_depth_; }
+        void exit_inline_call() const { if (inline_call_depth_ > 0) --inline_call_depth_; }
+        bool is_inside_inline_call() const { return inline_call_depth_ > 0; }
+
+        void add_user_inline_function(string func_str) const { user_inline_funcs_.push_back(std::move(func_str)); }
+
         mx::DocumentPtr document() const { return doc_; }
         string xml() const;
 
@@ -86,6 +92,9 @@ namespace mxslc::serialize
 
         mutable std::stack<bool> comptime_scope_{{false}};
         mutable bool comptime_violated_{false};
+
+        mutable int inline_call_depth_{0};
+        mutable vector<string> user_inline_funcs_;
 
         mutable FunctionCallHistory func_call_history_;
     };

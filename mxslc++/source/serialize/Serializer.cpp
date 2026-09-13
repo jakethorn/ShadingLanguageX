@@ -25,6 +25,7 @@
 #include "expressions/MethodCall.h"
 #include "utils/mtlx_utils.h"
 #include "utils/io_utils.h"
+#include "utils/Stringable.h"
 
 namespace mxslc::serialize
 {
@@ -156,6 +157,9 @@ namespace mxslc::serialize
 
         const mx::GraphElementPtr& graph = scope().graph();
         const mx::NodePtr node = graph->addNode(node_category(func), get_valid_node_name(graph), serialize_type(func));
+
+        if (emit_source_hints_ && is_inside_inline_call())
+            node->setAttribute("mxsl:inlined", "true");
 
         for (const auto& [param, input_value] : input_values)
         {
@@ -322,7 +326,17 @@ namespace mxslc::serialize
 
     void Serializer::finalise() const
     {
-
+        if (emit_source_hints_ && !user_inline_funcs_.empty())
+        {
+            string joined;
+            for (size_t i = 0; i < user_inline_funcs_.size(); ++i)
+            {
+                if (i > 0)
+                    joined += "\n\n";
+                joined += user_inline_funcs_[i];
+            }
+            doc_->setAttribute("mxsl:inline_funcs", joined);
+        }
     }
 
     void Serializer::save(const fs::path& dst_path) const

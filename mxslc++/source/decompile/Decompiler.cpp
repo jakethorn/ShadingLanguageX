@@ -28,6 +28,7 @@
 #include "statements/FunctionDefinition.h"
 #include "statements/ReturnStatement.h"
 #include "statements/VariableDefinition.h"
+#include "statements/VariableAssignment.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/interface.h"
 #include "utils/container_utils.h"
@@ -134,6 +135,57 @@ namespace mxslc::decompile
             }
         }
 
+        // 1b. Identify constructor splices and mark separate nodes as consumed
+        for (const auto& node : nodes)
+        {
+            const string cat = node->getCategory();
+            if (cat == "combine2" || cat == "combine3" || cat == "combine4")
+            {
+                const size_t count = (cat == "combine2") ? 2 : ((cat == "combine3") ? 3 : 4);
+                for (size_t i = 1; i <= count; ++i)
+                {
+                    const mx::InputPtr inp = node->getInput("in" + std::to_string(i));
+                    if (!inp) continue;
+                    if (i + 1 <= count && inp->hasNodeName() && (inp->getOutputString() == "outx" || inp->getOutputString() == "outr"))
+                    {
+                        const mx::InputPtr next_inp = node->getInput("in" + std::to_string(i + 1));
+                        if (next_inp && next_inp->hasNodeName() && next_inp->getNodeName() == inp->getNodeName() &&
+                            (next_inp->getOutputString() == "outy" || next_inp->getOutputString() == "outg"))
+                        {
+                            if (const mx::NodePtr sep_node = parent->getChildOfType<mx::Node>(inp->getNodeName()))
+                            {
+                                if (sep_node->getCategory() == "separate2" || sep_node->getCategory() == "separate")
+                                {
+                                    consumed_nodes_.insert(sep_node);
+                                    ++i;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 1c. Identify convert nodes used as in1 in subtract/divide/modulo/power and mark as consumed
+        for (const auto& node : nodes)
+        {
+            const string cat = node->getCategory();
+            if (cat == "subtract" || cat == "divide" || cat == "modulo" || cat == "power")
+            {
+                const mx::InputPtr in1 = node->getInput("in1");
+                if (in1 && in1->hasNodeName())
+                {
+                    if (const mx::NodePtr convert_node = parent->getChildOfType<mx::Node>(in1->getNodeName()))
+                    {
+                        if (convert_node->getCategory() == "convert" && convert_node->getInput("in"))
+                        {
+                            consumed_nodes_.insert(convert_node);
+                        }
+                    }
+                }
+            }
+        }
+
         // 2. Count references to each node
         for (const auto& node : nodes)
         {
@@ -168,6 +220,12 @@ namespace mxslc::decompile
         if (node->getAttribute("mxsl:multivar") == "true")
             return false;
 
+        if (node->hasAttribute("mxsl:inline_call"))
+            return false;
+
+        if (node->getAttribute("mxsl:inlined") == "true")
+            return true;
+
         if (node->getName().rfind("var__", 0) == 0)
         {
             const auto it = ref_counts_.find(node);
@@ -201,6 +259,13 @@ namespace mxslc::decompile
         for (const mx::NodeGraphPtr& node_graph : document_->getNodeGraphs())
         {
             global_code_ += node_graph_to_function_definition(node_graph);
+        }
+
+        if (document_->hasAttribute("mxsl:inline_funcs"))
+        {
+            const string inline_funcs = document_->getAttribute("mxsl:inline_funcs");
+            if (!inline_funcs.empty())
+                global_code_ += inline_funcs + "\n\n";
         }
 
         analyze_graph(document_);
@@ -386,6 +451,19 @@ namespace mxslc::decompile
         StmtPtr var_def = build_node_variable_definition(node);
         if (var_def)
             target_stmts.push_back(std::move(var_def));
+
+        for (const mx::InputPtr& inp : node->getInputs())
+        {
+            if (inp->getAttribute("mxsl:member_assign") == "true")
+            {
+                ExprPtr lhs = create_expression<DotOperator>(
+                    create_expression<Identifier>(node->getName()),
+                    Token{TokenType::Identifier, inp->getName()}
+                );
+                ExprPtr rhs = port_to_expression(inp);
+                target_stmts.push_back(create_statement<VariableAssignment>(Token{}, std::move(lhs), std::move(rhs)));
+            }
+        }
     }
 
     StmtPtr Decompiler::build_node_variable_definition(const mx::NodePtr& node)

@@ -26,6 +26,8 @@ namespace mxslc::runtime
     void PortVariable::copy_value_impl(const ValuePtr value)
     {
         value->set_as_node_input(input_);
+        if (runtime().options().emit_source_hints)
+            input_->setAttribute("mxsl:member_assign", "true");
     }
 
     void PortVariable::set_node_name(const string& name) const

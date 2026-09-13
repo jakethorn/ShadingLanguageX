@@ -48,6 +48,15 @@ namespace mxslc::runtime
         return graph_func_ == parent_->graph_func_;
     }
 
+    bool Scope::is_stdlib() const
+    {
+        if (name_ == "global")
+            return false;
+        if (name_ == "mxsl_stdlib" || name_ == "mtlx_stdlib")
+            return true;
+        return parent_ ? parent_->is_stdlib() : false;
+    }
+
     void Scope::add_variable(string name, VarPtr var)
     {
         if (contains(variables_, name))

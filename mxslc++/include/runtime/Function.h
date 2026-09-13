@@ -66,6 +66,7 @@ namespace mxslc::runtime
         vector<string> output_names() const;
 
         Scope* defining_scope() const { return defining_scope_; }
+        bool is_stdlib() const;
 
         void init();
 

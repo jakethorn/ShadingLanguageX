@@ -129,6 +129,11 @@ namespace mxslc::runtime
         return names;
     }
 
+    bool Function::is_stdlib() const
+    {
+        return defining_scope_ ? defining_scope_->is_stdlib() : false;
+    }
+
     void Function::init()
     {
         return_type_ = scope().resolve_type(return_type_);

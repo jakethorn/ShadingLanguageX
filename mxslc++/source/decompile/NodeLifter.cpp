@@ -13,6 +13,8 @@
 #include "expressions/Literal.h"
 #include "expressions/NamedConstructor.h"
 #include "expressions/interface.h"
+#include "parse.h"
+#include "scan.h"
 #include "utils/container_utils.h"
 #include "utils/string_utils.h"
 
@@ -229,6 +231,14 @@ namespace mxslc::decompile
             out_dunder_name = "__not__";
             return true;
         }
+        if (node->getCategory() == "invert")
+        {
+            if (node->getAttribute("mxsl:op") == "-")
+            {
+                out_dunder_name = "__neg__";
+                return true;
+            }
+        }
         return false;
     }
 
@@ -243,6 +253,15 @@ namespace mxslc::decompile
         const PortResolver& port_resolver
     )
     {
+        // 0. User inline function call check
+        if (node->hasAttribute("mxsl:inline_call"))
+        {
+            const string call_str = node->getAttribute("mxsl:inline_call");
+            vector<Token> tokens = scan_string(call_str);
+            Parser parser{std::move(tokens)};
+            return parser.expression();
+        }
+
         // 1. Swizzle check
         string swiz_channels;
         mx::InputPtr swiz_in;
@@ -267,11 +286,33 @@ namespace mxslc::decompile
         {
             const size_t count = (node->getCategory() == "combine2") ? 2 : ((node->getCategory() == "combine3") ? 3 : 4);
             ArgumentList args;
+            const mx::ElementPtr parent = node->getParent();
+
             for (size_t i = 1; i <= count; ++i)
             {
                 const mx::InputPtr inp = node->getInput("in" + std::to_string(i));
-                if (inp)
-                    args.add(port_resolver(inp));
+                if (!inp) continue;
+
+                // Check if this input and the next input come from outx and outy of a separate2 node
+                if (i + 1 <= count && inp->hasNodeName() && (inp->getOutputString() == "outx" || inp->getOutputString() == "outr") && parent)
+                {
+                    const mx::InputPtr next_inp = node->getInput("in" + std::to_string(i + 1));
+                    if (next_inp && next_inp->hasNodeName() && next_inp->getNodeName() == inp->getNodeName() &&
+                        (next_inp->getOutputString() == "outy" || next_inp->getOutputString() == "outg"))
+                    {
+                        if (const mx::NodePtr sep_node = parent->getChildOfType<mx::Node>(inp->getNodeName()))
+                        {
+                            if ((sep_node->getCategory() == "separate2" || sep_node->getCategory() == "separate") && sep_node->getInput("in"))
+                            {
+                                args.add(port_resolver(sep_node->getInput("in")));
+                                ++i;
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                args.add(port_resolver(inp));
             }
             return create_expression<NamedConstructor>(std::move(constructor_name), std::move(args));
         }
@@ -300,6 +341,37 @@ namespace mxslc::decompile
             return create_expression<IfExpression>(std::move(cond_expr), std::move(then_expr), std::move(else_expr));
         }
 
+        // 4b. Relational operators (ifgreater, ifgreatereq)
+        if (node->getCategory() == "ifgreater" || node->getCategory() == "ifgreatereq")
+        {
+            const mx::InputPtr v1 = node->getInput("value1");
+            const mx::InputPtr v2 = node->getInput("value2");
+            if (v1 && v2)
+            {
+                const bool is_eq = (node->getCategory() == "ifgreatereq");
+                const string op_hint = node->getAttribute("mxsl:op");
+                bool is_less = (op_hint == "<" || op_hint == "<=");
+                if (!is_less && op_hint.empty())
+                {
+                    if (v1->hasValue() && !v1->hasNodeName() && v2->hasNodeName())
+                        is_less = true;
+                }
+
+                if (is_less)
+                {
+                    string dunder = is_eq ? "__le__" : "__lt__";
+                    ArgumentList cmp_args{port_resolver(v2), port_resolver(v1)};
+                    return create_expression<FunctionCall>(std::move(dunder), std::move(cmp_args));
+                }
+                else
+                {
+                    string dunder = is_eq ? "__ge__" : "__gt__";
+                    ArgumentList cmp_args{port_resolver(v1), port_resolver(v2)};
+                    return create_expression<FunctionCall>(std::move(dunder), std::move(cmp_args));
+                }
+            }
+        }
+
         // 5. Binary op check
         string bin_dunder;
         if (is_binary_op(node, bin_dunder))
@@ -308,7 +380,32 @@ namespace mxslc::decompile
             const mx::InputPtr in2 = node->getInput("in2");
             if (in1 && in2)
             {
-                ArgumentList bin_args{port_resolver(in1), port_resolver(in2)};
+                ExprPtr e1 = port_resolver(in1);
+                ExprPtr e2 = port_resolver(in2);
+
+                // Scalar-vector promotion unwrap for subtract / divide / modulo / power
+                if (bin_dunder == "__sub__" || bin_dunder == "__div__" || bin_dunder == "__mod__" || bin_dunder == "__pow__")
+                {
+                    if (in1->hasNodeName())
+                    {
+                        const mx::ElementPtr parent = node->getParent();
+                        if (parent)
+                        {
+                            if (const mx::NodePtr convert_node = parent->getChildOfType<mx::Node>(in1->getNodeName()))
+                            {
+                                if (convert_node->getCategory() == "convert" && convert_node->getInput("in"))
+                                {
+                                    e1 = port_resolver(convert_node->getInput("in"));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (node->getAttribute("mxsl:swapped") == "true")
+                    std::swap(e1, e2);
+
+                ArgumentList bin_args{std::move(e1), std::move(e2)};
                 return create_expression<FunctionCall>(std::move(bin_dunder), std::move(bin_args));
             }
         }
@@ -325,10 +422,41 @@ namespace mxslc::decompile
             }
         }
 
-        // 7. Generic FunctionCall
+        // 7. Variadic min/max folding
+        if (node->getCategory() == "min" || node->getCategory() == "max")
+        {
+            const mx::InputPtr in1 = node->getInput("in1");
+            const mx::InputPtr in2 = node->getInput("in2");
+            if (in1 && in2)
+            {
+                ExprPtr e1 = port_resolver(in1);
+                ExprPtr e2 = port_resolver(in2);
+
+                vector<Argument> flattened_args;
+                if (const auto fc1 = dynamic_cast<FunctionCall*>(e1.get()))
+                {
+                    if (fc1->name() == node->getCategory())
+                    {
+                        for (const Argument& a : fc1->arguments())
+                            flattened_args.push_back(a);
+                    }
+                }
+
+                if (flattened_args.empty())
+                    flattened_args.emplace_back(std::move(e1), 0);
+
+                flattened_args.emplace_back(std::move(e2), flattened_args.size());
+                return create_expression<FunctionCall>(node->getCategory(), ArgumentList{std::move(flattened_args)});
+            }
+        }
+
+        // 8. Generic FunctionCall
         vector<Argument> args;
         for (const mx::InputPtr& input : node->getInputs())
         {
+            if (input->getAttribute("mxsl:member_assign") == "true")
+                continue;
+
             AttributeList input_attrs = extract_attributes(input);
             ExprPtr arg_expr = port_resolver(input);
 

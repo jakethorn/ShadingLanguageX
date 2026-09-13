@@ -18,6 +18,9 @@
 #include "runtime/Type.h"
 #include "runtime/utils/FunctionResolver.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/values/NodeValue.h"
+#include "serialize/values/NodeOutputValue.h"
+#include "serialize/values/interface.h"
 #include "utils/container_utils.h"
 
 namespace mxslc::expressions
@@ -117,11 +120,56 @@ namespace mxslc::expressions
 
         if (func_->is_inline())
         {
+            const bool is_user_inline = not func_->is_stdlib();
+            if (is_user_inline)
+                serializer().enter_inline_call();
+
             runtime().enter_scope(func_);
             evaluate_arguments();
             VarPtr return_value = inline_invoke();
             update_out_arguments();
             runtime().exit_scope();
+
+            if (is_user_inline)
+                serializer().exit_inline_call();
+
+            if (return_value && runtime().options().emit_source_hints)
+            {
+                mx::NodePtr node = nullptr;
+                if (return_value->has_value())
+                {
+                    const ValuePtr raw_val = return_value->raw_value();
+                    if (const auto node_val = cast_value<NodeValue>(raw_val))
+                        node = node_val->node();
+                    else if (const auto out_val = cast_value<NodeOutputValue>(raw_val))
+                        node = out_val->node();
+                }
+
+                if (node)
+                {
+                    if (is_user_inline)
+                    {
+                        node->setAttribute("mxsl:inline_call", this->to_string());
+                    }
+                    else
+                    {
+                        if (func_->name() == "__lt__")
+                            node->setAttribute("mxsl:op", "<");
+                        else if (func_->name() == "__le__")
+                            node->setAttribute("mxsl:op", "<=");
+                        else if (func_->name() == "__neg__")
+                            node->setAttribute("mxsl:op", "-");
+                        else if ((func_->name() == "__mul__" || func_->name() == "__add__") &&
+                                 func_->parameters().size() == 2 &&
+                                 func_->parameters()[0].type() == Type::Float &&
+                                 func_->parameters()[1].type() != Type::Float)
+                        {
+                            node->setAttribute("mxsl:swapped", "true");
+                        }
+                    }
+                }
+            }
+
             return return_value;
         }
         else

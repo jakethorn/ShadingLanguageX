@@ -38,6 +38,7 @@ namespace mxslc::runtime
         FuncPtr function() const { return func_; }
         void set_function(FuncPtr func) { func_ = std::move(func); }
         bool is_inline() const;
+        bool is_stdlib() const;
 
         /*
          * variables

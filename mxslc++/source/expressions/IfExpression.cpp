@@ -84,6 +84,11 @@ namespace mxslc::expressions
 
     string IfExpression::to_string() const
     {
-        return "if (" + cond_expr_->to_string() + ") { " + then_expr_->to_string() + " }" + " else { " + else_expr_->to_string() + " }";
+        string result = "if (" + cond_expr_->to_string() + ") { " + then_expr_->to_string() + " } else ";
+        if (dynamic_cast<IfExpression*>(else_expr_.get()))
+            result += else_expr_->to_string();
+        else
+            result += "{ " + else_expr_->to_string() + " }";
+        return result;
     }
 }
