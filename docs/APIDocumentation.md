@@ -232,7 +232,7 @@ opts.reduce_graph = False
 
 mtlx = mxslc.compile_string_to_string("float f = 1.0 + 1.0;", opts)
 
-src_path = pathlib.Path("example.mtlx")
+src_path = pathlib.Path("example.mxsl")
 dst_path = mxslc.compile_file_to_file(src_path)
 ```
 

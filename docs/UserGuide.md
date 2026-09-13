@@ -597,7 +597,7 @@ example.mxsl -o output_file.mtlx -v 1.38.10 --no-reduce-graph
 # Decompiler
 
 The decompiler is a tool that can be used to decompile MaterialX files into ShadingLanguageX source files.
-It is available as part of the `mxslc` standalone executable (see [Getting Started](#decompile)) as well as the C++ and Python
+It is available as part of the `mxslc` standalone executable (see [Getting Started](#decompiler)) as well as the C++ and Python
 APIs (see [API Documentation](./APIDocumentation.md)).
 
 ## C++
