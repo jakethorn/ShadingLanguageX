@@ -199,7 +199,7 @@ options.reduce_graph: bool
 opts = mxslc.CompileOptions();
 opts.output_file = "example.mtlx"
 opts.version = "1.39.4"
-opts.macros = ["DEBUG", ["PI", "3.14159"]]
+opts.macros = ["DEBUG", ("PI", "3.14159")]
 opts.search_directories = ["C:/Users/jaket/mtlx_libs"]
 opts.globals = {"roughness": 0.2, "thin_film": True}
 opts.error_on_missing_globals = False
