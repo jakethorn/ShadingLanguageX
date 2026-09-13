@@ -1,0 +1,6 @@
+mutable int i = 0;
+for (int j from 0 to 9)
+{
+	i = i + 2;
+}
+constant(i);

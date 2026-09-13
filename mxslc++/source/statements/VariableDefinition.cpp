@@ -14,6 +14,11 @@
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/invoke.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/Serializer.h"
+#include "serialize/serializer_utils.h"
+#include "serialize/values/NodeValue.h"
+#include "serialize/values/interface.h"
+#include "utils/mtlx_utils.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -87,6 +92,37 @@ namespace mxslc::statements
 
         if (not value)
             value = create_variable(type_);
+
+        if (serializer().emit_source_hints())
+        {
+            const bool is_mutable = mods_.contains(TokenType::Mutable);
+            const bool is_const = mods_.contains(TokenType::Const);
+            if (is_mutable || is_const)
+            {
+                mx::NodePtr node = serialize_utils::get_node(value);
+                if (!node && value->has_value())
+                {
+                    const mx::GraphElementPtr& graph = scope().graph();
+                    if (graph)
+                    {
+                        node = graph->addNode("constant", graph->createValidChildName(name_), type_->name());
+                        node->setAttribute("mxsl:literal", "true");
+                        const mx::InputPtr input = mtlx_utils::add_or_get_input(node, type_->name(), "value");
+                        value->raw_value()->set_as_node_input(input);
+                        input->setAttribute("mxsl:positional", "true");
+                        value = create_variable(serialize::values::create_value<serialize::values::NodeValue>(node));
+                    }
+                }
+                if (node)
+                {
+                    if (is_mutable)
+                        node->setAttribute("mxsl:mutable", "true");
+                    if (is_const)
+                        node->setAttribute("mxsl:const", "true");
+                    serializer().tag_node(node);
+                }
+            }
+        }
 
         const VarPtr var = create_variable(mods_.without(TokenType::Global, TokenType::Geomprop), type_, value);
         var->add_to_scope(name_);

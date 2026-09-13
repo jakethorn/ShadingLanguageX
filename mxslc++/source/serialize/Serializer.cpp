@@ -14,6 +14,7 @@
 #include "serialize/serialize_constexpr.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
+#include "serialize/values/NullValue.h"
 #include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/variables/Variable.h"
@@ -158,9 +159,14 @@ namespace mxslc::serialize
         const mx::GraphElementPtr& graph = scope().graph();
         const mx::NodePtr node = graph->addNode(node_category(func), get_valid_node_name(graph), serialize_type(func));
 
-        if (emit_source_hints_ && is_inside_inline_call())
-            node->setAttribute("mxsl:inlined", "true");
+        if (emit_source_hints_)
+        {
+            if (is_inside_inline_call())
+                node->setAttribute("mxsl:inlined", "true");
+            tag_node(node);
+        }
 
+        vector<string> null_inputs;
         for (const auto& [param, input_value] : input_values)
         {
             const Argument* arg = args[param];
@@ -177,6 +183,19 @@ namespace mxslc::serialize
             if (param.is_in())
             {
                 write_node_input(node, param.name(), param.type(), input_value, input_attrs);
+                if (emit_source_hints_ && arg != nullptr)
+                {
+                    if (input_value && input_value->has_value() &&
+                        serialize::values::cast_value<serialize::values::NullValue>(input_value->raw_value()))
+                    {
+                        string entry = param.name();
+                        if (arg->has_name())
+                            entry += ":named";
+                        else
+                            entry += ":positional";
+                        null_inputs.push_back(entry);
+                    }
+                }
             }
 
             if (param.is_out())
@@ -185,6 +204,11 @@ namespace mxslc::serialize
                 const VarPtr output = serialize_utils::create_node_output_value(node, node_def, param.type(), output_name, input_attrs);
                 input_value->copy(output);
             }
+        }
+
+        if (emit_source_hints_ && !null_inputs.empty())
+        {
+            node->setAttribute("mxsl:null_inputs", Stringable::join(null_inputs, ","));
         }
 
         // inputs from and outputs to instance
@@ -604,5 +628,49 @@ namespace mxslc::serialize
     string Serializer::node_graph_name(const FuncPtr& func) const
     {
         return doc_->createValidChildName("NG_" + node_category(func));
+    }
+
+    void Serializer::begin_loop(const string& loop_code) const
+    {
+        if (!emit_source_hints_)
+            return;
+
+        if (loop_depth_ == 0)
+        {
+            current_loop_id_ = "loop__" + std::to_string(next_loop_id_++);
+            current_loop_code_ = loop_code;
+            current_loop_node_count_ = 0;
+        }
+        ++loop_depth_;
+    }
+
+    void Serializer::end_loop() const
+    {
+        if (!emit_source_hints_)
+            return;
+
+        if (loop_depth_ > 0)
+        {
+            --loop_depth_;
+            if (loop_depth_ == 0)
+            {
+                current_loop_id_.clear();
+                current_loop_code_.clear();
+                current_loop_node_count_ = 0;
+            }
+        }
+    }
+
+    void Serializer::tag_node(const mx::NodePtr& node) const
+    {
+        if (!emit_source_hints_ || loop_depth_ == 0 || !node)
+            return;
+
+        node->setAttribute("mxsl:loop_id", current_loop_id_);
+        if (current_loop_node_count_ == 0)
+        {
+            node->setAttribute("mxsl:loop_code", current_loop_code_);
+        }
+        ++current_loop_node_count_;
     }
 }

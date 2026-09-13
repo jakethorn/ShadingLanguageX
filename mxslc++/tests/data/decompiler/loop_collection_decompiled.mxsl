@@ -1,0 +1,4 @@
+for (string s from {"hello", "world"})
+{
+	constant(s);
+}

@@ -9,6 +9,7 @@
 #include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
+#include "runtime/variables/Variable.h"
 #include "serialize/serialize_name_utils.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
@@ -209,5 +210,37 @@ namespace mxslc::serialize_utils
         }
 
         throw CompileError{"Port does not have a value"};
+    }
+
+    mx::NodePtr get_node(const VarPtr& var)
+    {
+        if (!var)
+            return nullptr;
+
+        if (var->has_value())
+        {
+            const ValuePtr raw_val = var->raw_value();
+            if (const auto node_val = cast_value<NodeValue>(raw_val))
+                return node_val->node();
+            if (const auto out_val = cast_value<NodeOutputValue>(raw_val))
+                return out_val->node();
+        }
+        else if (var->has_children())
+        {
+            mx::NodePtr node = nullptr;
+            for (const VarPtr& child : var->children())
+            {
+                if (const mx::NodePtr child_node = get_node(child))
+                {
+                    if (node == nullptr)
+                        node = child_node;
+                    else if (node != child_node)
+                        return nullptr;
+                }
+            }
+            return node;
+        }
+
+        return nullptr;
     }
 }

@@ -4,6 +4,8 @@
 
 #include "decompile/NodeLifter.h"
 
+#include <sstream>
+
 #include "TokenType.h"
 #include "expressions/DotOperator.h"
 #include "expressions/FunctionCall.h"
@@ -12,10 +14,12 @@
 #include "expressions/IndexingOperator.h"
 #include "expressions/Literal.h"
 #include "expressions/NamedConstructor.h"
+#include "expressions/NullExpression.h"
 #include "expressions/interface.h"
 #include "parse.h"
 #include "scan.h"
 #include "utils/container_utils.h"
+#include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 
 namespace mxslc::decompile
@@ -256,10 +260,29 @@ namespace mxslc::decompile
         // 0. User inline function call check
         if (node->hasAttribute("mxsl:inline_call"))
         {
-            const string call_str = node->getAttribute("mxsl:inline_call");
-            vector<Token> tokens = scan_string(call_str);
-            Parser parser{std::move(tokens)};
-            return parser.expression();
+            try
+            {
+                const string call_str = node->getAttribute("mxsl:inline_call");
+                vector<Token> tokens = scan_string(call_str);
+                tokens.push_back(Token{TokenType::Semicolon, ";"});
+                Parser parser{std::move(tokens)};
+                return parser.expression();
+            }
+            catch (...)
+            {
+            }
+        }
+
+        // Literal check
+        if (node->getAttribute("mxsl:literal") == "true" && node->getInput("value"))
+        {
+            return port_resolver(node->getInput("value"));
+        }
+
+        // Dot passthrough check (only for variable assignments)
+        if (node->getCategory() == "dot" && node->getInput("in") && node->hasAttribute("mxsl:assign"))
+        {
+            return port_resolver(node->getInput("in"));
         }
 
         // 1. Swizzle check
@@ -452,6 +475,117 @@ namespace mxslc::decompile
 
         // 8. Generic FunctionCall
         vector<Argument> args;
+
+        if (node->hasAttribute("mxsl:null_inputs"))
+        {
+            unordered_map<string, bool> null_inputs; // name -> is_named
+            const string null_str = node->getAttribute("mxsl:null_inputs");
+            std::istringstream stream(null_str);
+            string token;
+            while (std::getline(stream, token, ','))
+            {
+                if (token.empty())
+                    continue;
+                const size_t colon = token.find(':');
+                if (colon != string::npos)
+                {
+                    string name = token.substr(0, colon);
+                    string style = token.substr(colon + 1);
+                    null_inputs[name] = (style == "named");
+                }
+                else
+                {
+                    null_inputs[token] = false;
+                }
+            }
+
+            mx::NodeDefPtr node_def = nullptr;
+            try
+            {
+                node_def = mtlx_utils::get_node_def(node);
+            }
+            catch (...)
+            {
+            }
+
+            if (node_def)
+            {
+                vector<mx::InputPtr> def_inputs = node_def->getActiveInputs();
+                if (def_inputs.empty())
+                    def_inputs = node_def->getInputs();
+
+                unordered_set<mx::InputPtr> consumed_inputs;
+
+                for (const mx::InputPtr& def_input : def_inputs)
+                {
+                    const string& name = def_input->getName();
+                    if (const mx::InputPtr input = node->getInput(name))
+                    {
+                        if (input->getAttribute("mxsl:member_assign") == "true")
+                            continue;
+
+                        AttributeList input_attrs = extract_attributes(input);
+                        ExprPtr arg_expr = port_resolver(input);
+
+                        string arg_name;
+                        if (input->getAttribute("mxsl:positional") == "true")
+                            arg_name = "";
+                        else if (input->getAttribute("mxsl:named") == "true")
+                            arg_name = input->getName();
+                        else if (node->getCategory() == "constant" && input->getName() == "value")
+                            arg_name = "";
+                        else
+                            arg_name = input->getName();
+
+                        args.emplace_back(std::move(input_attrs), ModifierList{}, std::move(arg_name), std::move(arg_expr), args.size());
+                        consumed_inputs.insert(input);
+                    }
+                    else if (null_inputs.count(name))
+                    {
+                        const bool is_named = null_inputs.at(name);
+                        ExprPtr arg_expr = create_expression<NullExpression>();
+                        string arg_name = is_named ? name : "";
+                        args.emplace_back(AttributeList{}, ModifierList{}, std::move(arg_name), std::move(arg_expr), args.size());
+                        null_inputs.erase(name);
+                    }
+                }
+
+                // Process any inputs on node that were not in node_def
+                for (const mx::InputPtr& input : node->getInputs())
+                {
+                    if (consumed_inputs.count(input))
+                        continue;
+                    if (input->getAttribute("mxsl:member_assign") == "true")
+                        continue;
+
+                    AttributeList input_attrs = extract_attributes(input);
+                    ExprPtr arg_expr = port_resolver(input);
+
+                    string arg_name;
+                    if (input->getAttribute("mxsl:positional") == "true")
+                        arg_name = "";
+                    else if (input->getAttribute("mxsl:named") == "true")
+                        arg_name = input->getName();
+                    else if (node->getCategory() == "constant" && input->getName() == "value")
+                        arg_name = "";
+                    else
+                        arg_name = input->getName();
+
+                    args.emplace_back(std::move(input_attrs), ModifierList{}, std::move(arg_name), std::move(arg_expr), args.size());
+                }
+
+                // Any leftover null inputs
+                for (const auto& [name, is_named] : null_inputs)
+                {
+                    ExprPtr arg_expr = create_expression<NullExpression>();
+                    string arg_name = is_named ? name : "";
+                    args.emplace_back(AttributeList{}, ModifierList{}, std::move(arg_name), std::move(arg_expr), args.size());
+                }
+
+                return create_expression<FunctionCall>(node->getCategory(), ArgumentList{std::move(args)});
+            }
+        }
+
         for (const mx::InputPtr& input : node->getInputs())
         {
             if (input->getAttribute("mxsl:member_assign") == "true")

@@ -43,6 +43,7 @@ namespace mxslc::decompile
         StmtPtr build_multivar_definition(const mx::NodePtr& node);
         string get_multivar_output_name(const mx::NodePtr& node, const string& output);
         void emit_node(const mx::NodePtr& node, vector<StmtPtr>& target_stmts);
+        void emit_loop(const mx::NodePtr& node, vector<StmtPtr>& target_stmts);
 
         ExprPtr lift_node(const mx::NodePtr& node);
         ExprPtr port_to_expression(const mx::PortElementPtr& port);

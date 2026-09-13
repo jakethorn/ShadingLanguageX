@@ -12,10 +12,42 @@
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "errors/CompileError.h"
+#include "serialize/Serializer.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
 {
+    namespace
+    {
+        struct LoopScopeGuard
+        {
+            explicit LoopScopeGuard(const string& code)
+            {
+                if (Runtime::get().serializer().emit_source_hints())
+                    Runtime::get().serializer().begin_loop(code);
+            }
+            ~LoopScopeGuard()
+            {
+                if (Runtime::get().serializer().emit_source_hints())
+                    Runtime::get().serializer().end_loop();
+            }
+        };
+
+        string type_alias(const string& type_name)
+        {
+            static const unordered_map<string, string> aliases {
+                {"boolean", "bool"},
+                {"integer", "int"},
+                {"vector2", "vec2"},
+                {"vector3", "vec3"},
+                {"vector4", "vec4"},
+                {"matrix33", "mat3"},
+                {"matrix44", "mat4"},
+            };
+            const auto it = aliases.find(type_name);
+            return it != aliases.end() ? it->second : type_name;
+        }
+    }
     ForEachLoop::ForEachLoop(Token token, ModifierList mods, TypePtr type, string name, ExprPtr iter_expr, StmtPtr body)
         : Statement{std::move(token)},
         mods_{std::move(mods)},
@@ -45,6 +77,8 @@ namespace mxslc::statements
         if (iter_value->has_value())
             throw CompileError{"Expression is not iterable"};
 
+        LoopScopeGuard guard{this->to_string()};
+
         for (size_t i = 0; i < iter_value->child_count(); i++)
         {
             VarPtr next_value = iter_value->child(i);
@@ -64,10 +98,9 @@ namespace mxslc::statements
         if (not mods_string.empty())
             mods_string += ' ';
 
-        string result;
+        string result = "for (";
         result += mods_string;
-        result += "for (";
-        result += type_->to_string();
+        result += type_alias(type_->to_string());
         result += ' ';
         result += name_;
         result += " from ";

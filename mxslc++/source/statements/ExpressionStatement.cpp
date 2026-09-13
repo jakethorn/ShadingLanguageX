@@ -9,6 +9,8 @@
 #include "statements/ExpressionStatement.h"
 
 #include "expressions/Expression.h"
+#include "serialize/Serializer.h"
+#include "serialize/serializer_utils.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -35,7 +37,14 @@ namespace mxslc::statements
     void ExpressionStatement::execute_impl() const
     {
         expr_->init();
-        VarPtr _ = expr_->evaluate();
+        VarPtr val = expr_->evaluate();
+        if (serializer().emit_source_hints())
+        {
+            if (const mx::NodePtr node = serialize_utils::get_node(val))
+            {
+                node->setAttribute("mxsl:expr_stmt", "true");
+            }
+        }
     }
 
     string ExpressionStatement::to_string() const

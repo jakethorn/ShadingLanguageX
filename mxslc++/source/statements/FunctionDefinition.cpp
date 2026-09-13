@@ -105,7 +105,7 @@ namespace mxslc::statements
                 serializer().write_node_def_graph(func, attrs_);
         }
 
-        if (!funcs_.empty() && funcs_.front()->is_inline() && not funcs_.front()->is_stdlib() && runtime().options().emit_source_hints)
+        if (!funcs_.empty() && funcs_.front()->is_inline() && not funcs_.front()->is_stdlib() && runtime().options().emit_source_hints && !serializer().is_inside_inline_call())
         {
             serializer().add_user_inline_function(this->to_string());
         }
@@ -147,7 +147,7 @@ namespace mxslc::statements
         if (not attrs_string.empty())
             attrs_string += '\n';
 
-        if (not is_templated())
+        if (not funcs_.empty() && not is_templated())
             return attrs_string + funcs_.front()->to_string();
 
         string mods_string = mods_.to_string();
@@ -162,8 +162,11 @@ namespace mxslc::statements
             result += '<' + join(template_types_, ", ") + '>';
         if (params_)
             result += '(' + params_->to_string() + ')';
+        else
+            result += " =>";
         result += '\n';
-        result += body_->to_string();
+        if (body_)
+            result += body_->to_string();
 
         return result;
     }

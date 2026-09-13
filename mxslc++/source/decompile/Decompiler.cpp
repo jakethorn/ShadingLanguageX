@@ -29,8 +29,12 @@
 #include "statements/ReturnStatement.h"
 #include "statements/VariableDefinition.h"
 #include "statements/VariableAssignment.h"
+#include "statements/ExpressionStatement.h"
+#include "statements/ForEachLoop.h"
 #include "statements/MultiVariableDefinition.h"
 #include "statements/interface.h"
+#include "scan.h"
+#include "parse.h"
 #include "utils/container_utils.h"
 #include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
@@ -96,6 +100,13 @@ namespace mxslc::decompile
                     result.push_back(token);
             }
             return result;
+        }
+
+        string node_identifier(const mx::NodePtr& node)
+        {
+            if (node->hasAttribute("mxsl:assign"))
+                return node->getAttribute("mxsl:assign");
+            return node->getName();
         }
     }
 
@@ -221,6 +232,21 @@ namespace mxslc::decompile
             return false;
 
         if (node->hasAttribute("mxsl:inline_call"))
+            return false;
+
+        if (node->hasAttribute("mxsl:assign"))
+            return false;
+
+        if (node->getAttribute("mxsl:expr_stmt") == "true")
+            return false;
+
+        if (node->getAttribute("mxsl:mutable") == "true")
+            return false;
+
+        if (node->getAttribute("mxsl:const") == "true")
+            return false;
+
+        if (node->hasAttribute("mxsl:loop_id"))
             return false;
 
         if (node->getAttribute("mxsl:inlined") == "true")
@@ -418,10 +444,70 @@ namespace mxslc::decompile
         return func_def + var_def;
     }
 
+    void Decompiler::emit_loop(const mx::NodePtr& node, vector<StmtPtr>& target_stmts)
+    {
+        const string loop_id = node->getAttribute("mxsl:loop_id");
+        const mx::ElementPtr parent = node->getParent();
+        if (!parent)
+            return;
+
+        // Collect all nodes belonging to this loop in parent
+        vector<mx::NodePtr> loop_nodes;
+        string loop_code;
+        for (const mx::NodePtr& child : parent->getChildrenOfType<mx::Node>())
+        {
+            if (child->getAttribute("mxsl:loop_id") == loop_id)
+            {
+                loop_nodes.push_back(child);
+                if (loop_code.empty() && child->hasAttribute("mxsl:loop_code"))
+                    loop_code = child->getAttribute("mxsl:loop_code");
+            }
+        }
+
+        if (loop_code.empty())
+            return;
+
+        // Mark all nodes in this loop as decompiled so dependency resolution doesn't re-enter this loop
+        for (const mx::NodePtr& loop_node : loop_nodes)
+        {
+            decompiled_nodes_.insert(loop_node);
+        }
+
+        // Resolve external dependencies (nodes not in this loop) before emitting the loop
+        for (const mx::NodePtr& loop_node : loop_nodes)
+        {
+            for (const mx::InputPtr& inp : loop_node->getInputs())
+            {
+                if (inp->hasNodeName())
+                {
+                    if (const mx::NodePtr dep = parent->getChildOfType<mx::Node>(inp->getNodeName()))
+                    {
+                        if (dep->getAttribute("mxsl:loop_id") != loop_id)
+                        {
+                            emit_node(dep, target_stmts);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Parse and emit the loop statement
+        vector<Token> tokens = scan_string(loop_code);
+        vector<StmtPtr> loop_stmts = parse(std::move(tokens));
+        for (auto& s : loop_stmts)
+            target_stmts.push_back(std::move(s));
+    }
+
     void Decompiler::emit_node(const mx::NodePtr& node, vector<StmtPtr>& target_stmts)
     {
         if (!node || contains(decompiled_nodes_, node) || is_swizzle_consumed(node) || is_inline_node(node))
             return;
+
+        if (node->hasAttribute("mxsl:loop_id"))
+        {
+            emit_loop(node, target_stmts);
+            return;
+        }
 
         if (contains(resolving_nodes_, node))
             throw CompileError{"Cyclic dependency detected in node: " + node->getName()};
@@ -448,6 +534,26 @@ namespace mxslc::decompile
             return;
         decompiled_nodes_.insert(node);
 
+        if (node->hasAttribute("mxsl:assign"))
+        {
+            const string var_name = node->getAttribute("mxsl:assign");
+            ExprPtr lhs = create_expression<Identifier>(var_name);
+            ExprPtr rhs = lift_node(node);
+            StmtPtr assign_stmt = create_statement<VariableAssignment>(Token{}, std::move(lhs), std::move(rhs));
+            assign_stmt->set_attributes(NodeLifter::extract_attributes(node));
+            target_stmts.push_back(std::move(assign_stmt));
+            return;
+        }
+
+        if (node->getAttribute("mxsl:expr_stmt") == "true")
+        {
+            ExprPtr expr = lift_node(node);
+            StmtPtr expr_stmt = create_statement<ExpressionStatement>(std::move(expr));
+            expr_stmt->set_attributes(NodeLifter::extract_attributes(node));
+            target_stmts.push_back(std::move(expr_stmt));
+            return;
+        }
+
         StmtPtr var_def = build_node_variable_definition(node);
         if (var_def)
             target_stmts.push_back(std::move(var_def));
@@ -457,7 +563,7 @@ namespace mxslc::decompile
             if (inp->getAttribute("mxsl:member_assign") == "true")
             {
                 ExprPtr lhs = create_expression<DotOperator>(
-                    create_expression<Identifier>(node->getName()),
+                    create_expression<Identifier>(node_identifier(node)),
                     Token{TokenType::Identifier, inp->getName()}
                 );
                 ExprPtr rhs = port_to_expression(inp);
@@ -475,7 +581,13 @@ namespace mxslc::decompile
         const TypePtr type = create_type(var_type_str);
         ExprPtr expr = lift_node(node);
 
-        StmtPtr var_def = create_statement<VariableDefinition>(ModifierList{}, type, node->getName(), std::move(expr));
+        ModifierList mods;
+        if (node->getAttribute("mxsl:mutable") == "true")
+            mods.add(TokenType::Mutable);
+        if (node->getAttribute("mxsl:const") == "true")
+            mods.add(TokenType::Const);
+
+        StmtPtr var_def = create_statement<VariableDefinition>(std::move(mods), type, node->getName(), std::move(expr));
         var_def->set_attributes(NodeLifter::extract_attributes(node));
         return var_def;
     }
@@ -491,12 +603,16 @@ namespace mxslc::decompile
         if (outputs.empty())
             outputs = node->getOutputs();
 
+        const bool is_const = (node->getAttribute("mxsl:const") == "true");
         for (size_t i = 0; i < varnames.size(); ++i)
         {
             string type_str = "float";
             if (i < outputs.size())
                 type_str = NodeLifter::get_type_alias(outputs[i]->getType());
-            fields.emplace_back(create_type(type_str), varnames[i]);
+            ModifierList mods;
+            if (is_const)
+                mods.add(TokenType::Const);
+            fields.emplace_back(std::move(mods), create_type(type_str), varnames[i], true);
         }
 
         const TypePtr multi_type = create_type(std::move(fields));
@@ -572,7 +688,7 @@ namespace mxslc::decompile
                 return lift_node(node);
 
             emit_node(node, current_statements_);
-            return create_expression<Identifier>(node->getName());
+            return create_expression<Identifier>(node_identifier(node));
         }
 
         if (port->hasNodeGraphString())
@@ -608,7 +724,7 @@ namespace mxslc::decompile
         if (is_separate_category(node->getCategory()))
         {
             const int idx = separate_output_index(node, output);
-            ExprPtr base = is_inline_node(node) ? lift_node(node) : create_expression<Identifier>(node->getName());
+            ExprPtr base = is_inline_node(node) ? lift_node(node) : create_expression<Identifier>(node_identifier(node));
             return create_expression<IndexingOperator>(std::move(base), create_expression<Literal>(Primitive{idx}));
         }
 
@@ -618,7 +734,7 @@ namespace mxslc::decompile
         else
         {
             emit_node(node, current_statements_);
-            base = create_expression<Identifier>(node->getName());
+            base = create_expression<Identifier>(node_identifier(node));
         }
 
         return create_expression<DotOperator>(std::move(base), Token{TokenType::Identifier, output});

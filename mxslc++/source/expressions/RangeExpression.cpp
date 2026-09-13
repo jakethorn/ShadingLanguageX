@@ -106,6 +106,9 @@ namespace mxslc::expressions
 
     string RangeExpression::to_string() const
     {
+        if (token_.type() == TokenType::To)
+            return lower_expr_->to_string() + " to " + upper_expr_->to_string();
+
         if (step_expr_)
             return lower_expr_->to_string() + ":" + step_expr_->to_string() + ":" + upper_expr_->to_string();
         else

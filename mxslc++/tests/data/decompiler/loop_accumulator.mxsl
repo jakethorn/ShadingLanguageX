@@ -1,0 +1,7 @@
+mutable int sum = 0;
+for (int j from 0 to 4)
+{
+	int k = j * 2;
+	sum = sum + k;
+}
+constant(sum);

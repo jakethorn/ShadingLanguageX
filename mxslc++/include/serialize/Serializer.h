@@ -55,6 +55,11 @@ namespace mxslc::serialize
 
         void add_user_inline_function(string func_str) const { user_inline_funcs_.push_back(std::move(func_str)); }
 
+        void begin_loop(const string& loop_code) const;
+        void end_loop() const;
+        bool is_inside_loop() const { return loop_depth_ > 0; }
+        void tag_node(const mx::NodePtr& node) const;
+
         mx::DocumentPtr document() const { return doc_; }
         string xml() const;
 
@@ -95,6 +100,12 @@ namespace mxslc::serialize
 
         mutable int inline_call_depth_{0};
         mutable vector<string> user_inline_funcs_;
+
+        mutable int loop_depth_{0};
+        mutable size_t next_loop_id_{0};
+        mutable string current_loop_id_;
+        mutable string current_loop_code_;
+        mutable size_t current_loop_node_count_{0};
 
         mutable FunctionCallHistory func_call_history_;
     };

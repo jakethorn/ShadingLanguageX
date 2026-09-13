@@ -97,6 +97,8 @@ namespace mxslc::statements
                     varnames += type_->field(i).name();
                 }
                 node->setAttribute("mxsl:varnames", varnames);
+                if (type_->field_count() > 0 && type_->field(0).modifiers().contains(TokenType::Const))
+                    node->setAttribute("mxsl:const", "true");
             }
         }
 

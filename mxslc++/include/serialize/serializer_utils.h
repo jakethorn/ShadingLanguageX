@@ -36,6 +36,7 @@ namespace mxslc::serialize_utils
     }
 
     ValuePtr copy_value_from_port(const mx::PortElementPtr& port);
+    mx::NodePtr get_node(const VarPtr& var);
 }
 
 #endif //MXSLC_SERIALIZER_UTILS_H

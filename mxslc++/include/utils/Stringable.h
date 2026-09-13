@@ -33,6 +33,7 @@ namespace mxslc
         }
 
     private:
+        static const string& to_string(const string& str) { return str; }
         template<typename T> static string to_string(const T& obj) { return obj.to_string(); }
         template<typename T> static string to_string(const T* obj) { return obj->to_string(); }
         template<typename T> static string to_string(const unique_ptr<T>& ptr) { return ptr->to_string(); }

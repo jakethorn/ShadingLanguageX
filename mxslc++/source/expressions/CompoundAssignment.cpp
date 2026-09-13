@@ -8,6 +8,8 @@
 #include "expressions/interface.h"
 #include "runtime/ArgumentList.h"
 #include "runtime/variables/Variable.h"
+#include "serialize/Serializer.h"
+#include "serialize/serializer_utils.h"
 
 namespace mxslc::expressions
 {
@@ -55,6 +57,13 @@ namespace mxslc::expressions
     VarPtr CompoundAssignment::evaluate_impl() const
     {
         VarPtr value = func_call_->evaluate();
+        if (serializer().emit_source_hints())
+        {
+            if (const mx::NodePtr node = serialize_utils::get_node(value))
+            {
+                node->setAttribute("mxsl:assign", lhs_expr_->to_string());
+            }
+        }
         lhs_expr_->assign(value);
         return value;
     }

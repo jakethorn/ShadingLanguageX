@@ -1,0 +1,5 @@
+mutable float a = sin(1);
+a = a + 2;
+float x = a + 10;
+a = a * 4;
+float b = a * 3;
