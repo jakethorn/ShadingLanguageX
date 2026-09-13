@@ -71,3 +71,50 @@ def test_decompile_quotes_on_inputs():
     assert '"right"' in result
     assert '"match"' in result
     assert '"no_match"' in result
+
+
+def test_decompile_unnamed_tuple_return():
+    """Functions returning unnamed tuples should decompile cleanly without invalid numeric field names or constant nodes."""
+    code = """{float, string} foo()
+{
+    return {10, "hello"};
+}
+"""
+    opts = mxslc.CompileOptions(reduce_graph=False, emit_source_hints=True)
+    mtlx = mxslc.compile_string_to_string(code, opts)
+    decompiled = mxslc.decompile_string_to_string(mtlx)
+    assert "{float, string} foo()" in decompiled
+    assert 'return {10, "hello"};' in decompiled
+    assert "constant(" not in decompiled
+    assert "node1" not in decompiled
+
+
+def test_decompile_named_tuple_return():
+    """Functions returning named tuples should preserve field names and eliminate constant nodes."""
+    code = """{float x, string y} foo()
+{
+    return {10, "hello"};
+}
+"""
+    opts = mxslc.CompileOptions(reduce_graph=False, emit_source_hints=True)
+    mtlx = mxslc.compile_string_to_string(code, opts)
+    decompiled = mxslc.decompile_string_to_string(mtlx)
+    assert "{float x, string y} foo()" in decompiled
+    assert 'return {10, "hello"};' in decompiled
+    assert "constant(" not in decompiled
+
+
+def test_decompile_scalar_literal_return():
+    """Functions returning a scalar literal should eliminate the passthrough constant node."""
+    code = """float foo()
+{
+    return 10;
+}
+"""
+    opts = mxslc.CompileOptions(reduce_graph=False, emit_source_hints=True)
+    mtlx = mxslc.compile_string_to_string(code, opts)
+    decompiled = mxslc.decompile_string_to_string(mtlx)
+    assert "float foo()" in decompiled
+    assert "return 10;" in decompiled
+    assert "constant(" not in decompiled
+

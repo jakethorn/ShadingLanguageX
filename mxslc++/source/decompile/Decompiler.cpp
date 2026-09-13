@@ -46,6 +46,7 @@ namespace mxslc::decompile
     using namespace runtime;
     using string_utils::starts_with;
     using namespace container_utils;
+    using namespace serialize;
 
     namespace
     {
@@ -56,7 +57,7 @@ namespace mxslc::decompile
                 return name;
             for (size_t i = 0; i < outputs.size(); ++i)
             {
-                if (outputs[i]->getName() == name)
+                if (serialize::remove_prefix(outputs[i]->getName()) == name || outputs[i]->getName() == name)
                     return "out" + std::to_string(i + 1);
             }
             return name;
@@ -217,7 +218,19 @@ namespace mxslc::decompile
                 if (output->hasNodeName())
                 {
                     if (mx::NodePtr connected = parent->getChildOfType<mx::Node>(output->getNodeName()))
+                    {
                         ref_counts_[connected]++;
+                        if (connected->getCategory() == "constant" && connected->getInput("value"))
+                        {
+                            if (!connected->hasAttribute("mxsl:assign") &&
+                                !connected->hasAttribute("mxsl:mutable") &&
+                                !connected->hasAttribute("mxsl:const") &&
+                                !connected->hasAttribute("mxsl:expr_stmt"))
+                            {
+                                consumed_nodes_.insert(connected);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -416,7 +429,8 @@ namespace mxslc::decompile
         }
 
         const ExprPtr return_expr = get_node_graph_return_expression(node_graph);
-        current_statements_.push_back(create_statement<ReturnStatement>(return_expr));
+        if (return_expr)
+            current_statements_.push_back(create_statement<ReturnStatement>(return_expr));
 
         const StmtPtr body_block = create_statement<BlockStatement>(std::move(current_statements_));
 
@@ -657,6 +671,10 @@ namespace mxslc::decompile
 
     ExprPtr Decompiler::lift_node(const mx::NodePtr& node)
     {
+        if (consumed_nodes_.count(node) && node->getCategory() == "constant" && node->getInput("value"))
+        {
+            return port_to_expression(node->getInput("value"));
+        }
         return NodeLifter::lift_node(node, [this](const mx::PortElementPtr& p) {
             return port_to_expression(p);
         });
@@ -737,7 +755,14 @@ namespace mxslc::decompile
             base = create_expression<Identifier>(node_identifier(node));
         }
 
-        return create_expression<DotOperator>(std::move(base), Token{TokenType::Identifier, output});
+        const string field_name = serialize::remove_prefix(output);
+        const bool is_digit_index = !field_name.empty() && std::all_of(field_name.begin(), field_name.end(), ::isdigit);
+        if (is_digit_index)
+        {
+            return create_expression<IndexingOperator>(std::move(base), create_expression<Literal>(Primitive{std::stoi(field_name)}));
+        }
+
+        return create_expression<DotOperator>(std::move(base), Token{TokenType::Identifier, field_name});
     }
 
     ExprPtr Decompiler::node_graph_name_and_output_to_dot_op(const string& node_graph_name, const string& output)
@@ -756,6 +781,10 @@ namespace mxslc::decompile
 
         if (node_graph_outputs.size() == 1)
             return create_expression<Identifier>(id_name);
+
+        const bool is_digit_safe = !safe_output.empty() && std::all_of(safe_output.begin(), safe_output.end(), ::isdigit);
+        if (is_digit_safe)
+            return create_expression<IndexingOperator>(create_expression<Identifier>(id_name), create_expression<Literal>(Primitive{std::stoi(safe_output)}));
 
         return create_expression<DotOperator>(create_expression<Identifier>(id_name), Token{TokenType::Identifier, safe_output});
     }
@@ -783,27 +812,41 @@ namespace mxslc::decompile
 
     string Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outputs)
     {
-        if (outputs.size() == 1)
+        vector<mx::OutputPtr> return_outputs;
+        for (const mx::OutputPtr& output : outputs)
         {
-            return NodeLifter::get_type_alias(outputs[0]->getType());
+            if (serialize::has_prefix(output->getName(), OUT_PARAMETER_PREFIX) ||
+                serialize::has_prefix(output->getName(), NONLOCAL_OUT_PREFIX) ||
+                output->getName() == THIS_OUT_PREFIX)
+                continue;
+            return_outputs.push_back(output);
         }
-        else
+
+        if (return_outputs.empty())
+            return "void";
+
+        if (return_outputs.size() == 1 &&
+            (return_outputs[0]->getName() == RETURN_VALUE_PREFIX || !serialize::has_prefix(return_outputs[0]->getName(), RETURN_VALUE_PREFIX)))
         {
-            string result = "{";
-            for (const mx::OutputPtr& output : outputs)
-            {
-                if (serialize::has_prefix(output->getName(), OUT_PARAMETER_PREFIX) ||
-                    serialize::has_prefix(output->getName(), NONLOCAL_OUT_PREFIX))
-                    continue;
-                result += NodeLifter::get_type_alias(output) + " " + node_graph_output_field_name(outputs, output->getName()) + ", ";
-            }
-            if (result.size() >= 2 && result.back() == ' ')
-            {
-                result.pop_back();
-                result.pop_back();
-            }
-            return result + "}";
+            return NodeLifter::get_type_alias(return_outputs[0]->getType());
         }
+
+        string result = "{";
+        for (const mx::OutputPtr& output : return_outputs)
+        {
+            const string raw_field_name = node_graph_output_field_name(return_outputs, output->getName());
+            const bool is_unnamed = !raw_field_name.empty() && std::all_of(raw_field_name.begin(), raw_field_name.end(), ::isdigit);
+            if (is_unnamed)
+                result += NodeLifter::get_type_alias(output) + ", ";
+            else
+                result += NodeLifter::get_type_alias(output) + " " + raw_field_name + ", ";
+        }
+        if (result.size() >= 2 && result.back() == ' ')
+        {
+            result.pop_back();
+            result.pop_back();
+        }
+        return result + "}";
     }
 
     string Decompiler::input_to_argument(const mx::InputPtr& input)
@@ -921,10 +964,17 @@ namespace mxslc::decompile
             vector<ExprPtr> exprs;
             for (mx::OutputPtr& output : outputs)
             {
+                if (serialize::has_prefix(output->getName(), OUT_PARAMETER_PREFIX) ||
+                    serialize::has_prefix(output->getName(), NONLOCAL_OUT_PREFIX) ||
+                    output->getName() == THIS_OUT_PREFIX)
+                    continue;
+
                 mx::OutputPtr ng_out = node_graph->getOutput(output->getName());
                 exprs.push_back(port_to_expression(ng_out ? ng_out : output));
             }
 
+            if (exprs.empty())
+                return nullptr;
             if (exprs.size() == 1)
                 return exprs[0];
             return create_expression<UnnamedConstructor>(std::move(exprs));
@@ -934,8 +984,17 @@ namespace mxslc::decompile
             const vector<mx::OutputPtr> outputs = node_graph->getOutputs();
             vector<ExprPtr> exprs;
             for (const auto& out : outputs)
-                exprs.push_back(port_to_expression(out));
+            {
+                if (serialize::has_prefix(out->getName(), OUT_PARAMETER_PREFIX) ||
+                    serialize::has_prefix(out->getName(), NONLOCAL_OUT_PREFIX) ||
+                    out->getName() == THIS_OUT_PREFIX)
+                    continue;
 
+                exprs.push_back(port_to_expression(out));
+            }
+
+            if (exprs.empty())
+                return nullptr;
             if (exprs.size() == 1)
                 return exprs[0];
             return create_expression<UnnamedConstructor>(std::move(exprs));
