@@ -1,0 +1,3 @@
+@doc "Water material documentation"
+surfaceshader water_shader = standard_surface(@colorspace "lin_rec709" base_color = color3{0.9, 0.95, 1}, metalness = 0);
+material water_mat = surfacematerial(surfaceshader = water_shader);

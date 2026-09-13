@@ -55,6 +55,7 @@ options:
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
   --no-validate-graph            Do not validate the MaterialX graph
+  --decompiler-hints             Add hints to the decompiler in MaterialX element attributes
 )";
 
             std::cout << help_message;
@@ -292,6 +293,11 @@ options:
             clargs.options.set_debug_mode(true);
         }
 
+        void parse_decompiler_hints(Span<string>&, CommandLineArgs& clargs)
+        {
+            clargs.options.emit_source_hints = true;
+        }
+
         void parse_arg(Span<string>& argv, CommandLineArgs& clargs)
         {
             const string& arg0 = argv.pop_front();
@@ -314,7 +320,8 @@ options:
                 {"--missing-globals-ok", parse_missing_globals_ok},
                 {"--unused-globals-ok", parse_unused_globals_ok},
                 {"--no-reduce-graph", parse_no_reduce_graph},
-                {"--no-validate-graph", parse_no_validate_graph}
+                {"--no-validate-graph", parse_no_validate_graph},
+                {"--decompiler-hints", parse_decompiler_hints},
             };
 
             if (contains(parse_map, arg0))

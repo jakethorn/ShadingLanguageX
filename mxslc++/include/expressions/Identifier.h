@@ -13,6 +13,7 @@ namespace mxslc::expressions
     {
     public:
         explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
+        explicit Identifier(string name) : Identifier{Token{TokenType::Identifier, std::move(name)}} { }
 
         const string& name() const { return name_; }
 

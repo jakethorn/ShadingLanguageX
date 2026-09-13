@@ -49,6 +49,7 @@ namespace mxslc::statements
 
     void VariableDefinition::set_attributes(AttributeList attrs)
     {
+        attrs_ = attrs;
         if (expr_)
             expr_->set_attributes(std::move(attrs));
     }
@@ -114,11 +115,15 @@ namespace mxslc::statements
 
     string VariableDefinition::to_string() const
     {
+        string attrs_string = attrs_.to_string();
+        if (not attrs_string.empty())
+            attrs_string += '\n';
+
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
             mods_string += ' ';
 
-        string result = mods_string;
+        string result = attrs_string + mods_string;
         result += type_->to_string() + ' ' + name_;
         if (expr_)
             result += " = " + expr_->to_string();

@@ -7,6 +7,7 @@
 
 #include "statements/Statement.h"
 #include "runtime/ModifierList.h"
+#include "runtime/AttributeList.h"
 
 namespace mxslc::statements
 {
@@ -22,6 +23,7 @@ namespace mxslc::statements
         const string& name() const;
 
         void set_attributes(AttributeList attrs) override;
+        const AttributeList& attributes() const { return attrs_; }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
@@ -39,6 +41,7 @@ namespace mxslc::statements
         TypePtr type_;
         string name_;
         ExprPtr expr_;
+        AttributeList attrs_;
     };
 }
 

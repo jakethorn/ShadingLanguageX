@@ -4,14 +4,14 @@
 	vec3 onthefly_4 = normal(space = "world");
 	vec3 onthefly_6 = tangent(space = "world");
 	vec2 node_texcoord_vector2_8 = texcoord(index = 0);
-	vec2 node_multiply_9 = node_texcoord_vector2_8 * 2;
+	vec2 node_multiply_9 = (node_texcoord_vector2_8 * 2);
 	@GLSLFX_usage "normal"
 @expose "true"
 vec3 node_image_vector3_10 = image(file = "textures/Canyon_Maple_Dark_Wood_Normal.png", layer = "", default = vec3{0, 0, 0}, texcoord = node_multiply_9, uaddressmode = "periodic", vaddressmode = "periodic", filtertype = "linear", framerange = "", frameoffset = 0, frameendaction = "constant");
 	@GLSLFX_usage "mask"
 @expose "true"
 vec3 node_image_vector3_12 = image(file = "textures/Canyon_Maple_Dark_Wood_Mask.png", layer = "", default = vec3{0, 0, 0}, texcoord = node_multiply_9, uaddressmode = "periodic", vaddressmode = "periodic", filtertype = "linear", framerange = "", frameoffset = 0, frameendaction = "constant");
-	float node_extract_11 = extract(in = node_image_vector3_12, index = 0);
+	float node_extract_11 = node_image_vector3_12.x;
 	float node_mix_3 = mix(fg = 0.915, bg = 0, mix = node_extract_11);
 	vec3 node_normalmap = normalmap(in = node_image_vector3_10);
 	@GLSLFX_usage "baseColor"

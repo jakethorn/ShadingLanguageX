@@ -162,6 +162,14 @@ namespace mxslc::serialize
             const Argument* arg = args[param];
             AttributeList input_attrs = arg != nullptr ? args[param]->attributes() : AttributeList{};
 
+            if (emit_source_hints_ && arg != nullptr)
+            {
+                if (!arg->has_name())
+                    input_attrs.add(Attribute{"mxsl:positional", "true"});
+                else
+                    input_attrs.add(Attribute{"mxsl:named", "true"});
+            }
+
             if (param.is_in())
             {
                 write_node_input(node, param.name(), param.type(), input_value, input_attrs);

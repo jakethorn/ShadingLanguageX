@@ -1,0 +1,4 @@
+float choose_val(bool cond, float a, float b)
+{
+    return if (cond) { a } else { b };
+}

@@ -138,14 +138,18 @@ namespace mxslc::statements
 
     string FunctionDefinition::to_string() const
     {
+        string attrs_string = attrs_.to_string();
+        if (not attrs_string.empty())
+            attrs_string += '\n';
+
         if (not is_templated())
-            return funcs_.front()->to_string();
+            return attrs_string + funcs_.front()->to_string();
 
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
             mods_string += ' ';
 
-        string result;
+        string result = attrs_string;
         result += mods_string;
         result += type_->to_string();
         result += ' ' + name_;

@@ -1,0 +1,5 @@
+
+vec2 swiz(vec4 v = vec4{0, 0, 0, 0})
+{
+	return v.xy;
+}

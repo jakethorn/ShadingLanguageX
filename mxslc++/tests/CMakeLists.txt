@@ -24,6 +24,7 @@ add_executable(mxslc_tests
         primitive_to_string_tests.cpp
         global_tests.cpp
         overwrite_data_files_tests.cpp
+        decompile_roundtrip_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

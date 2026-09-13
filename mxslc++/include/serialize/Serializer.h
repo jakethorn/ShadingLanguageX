@@ -31,6 +31,8 @@ namespace mxslc::serialize
 
         void set_version(const string& version);
         void set_reduce_graph(bool value);
+        void set_emit_source_hints(bool value) { emit_source_hints_ = value; }
+        bool emit_source_hints() const { return emit_source_hints_; }
 
         void begin_comptime(bool is_comptime = true) const;
         bool end_comptime() const;
@@ -80,6 +82,7 @@ namespace mxslc::serialize
 
         mx::DocumentPtr doc_;
         bool reduce_graph_{true};
+        bool emit_source_hints_{false};
 
         mutable std::stack<bool> comptime_scope_{{false}};
         mutable bool comptime_violated_{false};

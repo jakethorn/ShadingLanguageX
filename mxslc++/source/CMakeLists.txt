@@ -12,6 +12,7 @@ add_library(mxslc_lib
         errors/AmbiguousFunctionError.cpp
         decompile/decompile.cpp
         decompile/Decompiler.cpp
+        decompile/NodeLifter.cpp
         runtime/Runtime.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp

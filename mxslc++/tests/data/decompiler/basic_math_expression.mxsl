@@ -1,0 +1,4 @@
+float math_expr(float a, float b)
+{
+    return (a + b) * 3.0;
+}

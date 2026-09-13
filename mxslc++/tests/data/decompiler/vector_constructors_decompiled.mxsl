@@ -1,0 +1,5 @@
+
+vec3 make_vec(float x = 0, float y = 0, float z = 0)
+{
+	return vec3{x, y, z};
+}

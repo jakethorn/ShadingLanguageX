@@ -1,0 +1,6 @@
+{color3 col, float alpha} shade_calc(color3 bg, float factor)
+{
+    color3 c = bg * factor;
+    float a = factor;
+    return {c, a};
+}

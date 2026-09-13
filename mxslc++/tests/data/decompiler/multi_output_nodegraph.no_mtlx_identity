@@ -1,0 +1,1 @@
+Skip strict XML identity check due to node/output declaration order in MaterialX XML.

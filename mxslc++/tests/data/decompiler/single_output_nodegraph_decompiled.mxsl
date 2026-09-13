@@ -1,0 +1,7 @@
+
+float compute_scale(float factor = 0)
+{
+	float doubled = (factor * 2);
+	return doubled;
+}
+float result = compute_scale(5);

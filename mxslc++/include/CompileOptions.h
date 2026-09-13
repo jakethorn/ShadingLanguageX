@@ -19,6 +19,7 @@ namespace mxslc
         string version{DEFAULT_MTLX_VERSION};
         bool reduce_graph{true};
         bool validate_graph{true};
+        bool emit_source_hints{false};
 
         vector<fs::path> includes;
         vector<fs::path> libraries;

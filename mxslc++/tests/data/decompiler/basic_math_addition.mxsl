@@ -1,0 +1,4 @@
+float add_two(float a, float b)
+{
+    return a + b;
+}

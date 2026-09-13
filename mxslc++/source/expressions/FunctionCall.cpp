@@ -18,6 +18,7 @@
 #include "runtime/Type.h"
 #include "runtime/utils/FunctionResolver.h"
 #include "runtime/utils/monomorphize.h"
+#include "utils/container_utils.h"
 
 namespace mxslc::expressions
 {
@@ -203,6 +204,37 @@ namespace mxslc::expressions
 
     string FunctionCall::to_string() const
     {
+        static const unordered_map<string, string> BINARY_OPS {
+            {"__add__", "+"},
+            {"__sub__", "-"},
+            {"__mul__", "*"},
+            {"__div__", "/"},
+            {"__mod__", "%"},
+            {"__pow__", "^"},
+            {"__eq__", "=="},
+            {"__ne__", "!="},
+            {"__gt__", ">"},
+            {"__lt__", "<"},
+            {"__ge__", ">="},
+            {"__le__", "<="},
+            {"__and__", "&"},
+            {"__or__", "|"},
+        };
+
+        if (args_.size() == 2 and container_utils::contains(BINARY_OPS, name_))
+        {
+            return "(" + args_[0].to_string() + " " + BINARY_OPS.at(name_) + " " + args_[1].to_string() + ")";
+        }
+
+        if (args_.size() == 1 and name_ == "__not__")
+            return "!" + args_[0].to_string();
+
+        if (args_.size() == 1 and name_ == "__neg__")
+            return "-" + args_[0].to_string();
+
+        if (args_.size() == 1 and name_ == "__pos__")
+            return "+" + args_[0].to_string();
+
         const string template_type_string = template_type_ ? "<" + template_type_->to_string() + ">" : "";
         const string args_string = is_argumentless_ ? "" : "(" + join(args_, ", ") + ")";
         return name_ + template_type_string + args_string;

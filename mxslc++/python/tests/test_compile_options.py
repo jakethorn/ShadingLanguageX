@@ -40,3 +40,30 @@ def test_compile_options_with_invalid_version():
 
     with pytest.raises(RuntimeError, match=f"Invalid MaterialX version: {options.version}"):
         mxslc.compile_string_to_string("float f = 1.0 + 1.0;", options)
+
+
+def test_compile_options_emit_source_hints():
+    opts = mxslc.CompileOptions(emit_source_hints=True, reduce_graph=False)
+    assert opts.emit_source_hints is True
+    assert opts.decompile_hints is True
+
+    # Positional argument in source
+    pos_src = 'string greeting = constant("hello world");\n'
+    pos_mtlx = mxslc.compile_string_to_string(pos_src, opts)
+    assert 'mxsl:positional="true"' in pos_mtlx
+    pos_decompiled = mxslc.decompile_string_to_string(pos_mtlx)
+    assert pos_decompiled.strip() == pos_src.strip()
+
+    # Named argument in source
+    named_src = 'string greeting = constant(value = "hello world");\n'
+    named_mtlx = mxslc.compile_string_to_string(named_src, opts)
+    assert 'mxsl:named="true"' in named_mtlx
+    named_decompiled = mxslc.decompile_string_to_string(named_mtlx)
+    assert named_decompiled.strip() == named_src.strip()
+
+    # Default (emit_source_hints = False) does not emit hints
+    default_opts = mxslc.CompileOptions(reduce_graph=False)
+    default_mtlx = mxslc.compile_string_to_string(pos_src, default_opts)
+    assert 'mxsl:positional' not in default_mtlx
+    assert 'mxsl:named' not in default_mtlx
+

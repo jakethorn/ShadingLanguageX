@@ -1,0 +1,5 @@
+
+float math_expr(float a = 0, float b = 0)
+{
+	return ((a + b) * 3);
+}

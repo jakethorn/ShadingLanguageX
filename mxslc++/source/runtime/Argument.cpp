@@ -115,13 +115,17 @@ namespace mxslc::runtime
 
     string Argument::to_string() const
     {
+        string attrs_string;
+        for (const auto& attr : attrs_.attributes())
+            attrs_string += attr.to_string() + ' ';
+
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
             mods_string += ' ';
 
         if (has_name())
-            return mods_string + name_ + " = " + expr_->to_string();
+            return attrs_string + mods_string + name_ + " = " + expr_->to_string();
         else
-            return mods_string + expr_->to_string();
+            return attrs_string + mods_string + expr_->to_string();
     }
 }
