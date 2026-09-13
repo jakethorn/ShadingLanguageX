@@ -167,11 +167,11 @@ CompileOptions.__init__(
     search_directories: list[str | pathlib.Path] = [],
     includes: list[str | pathlib.Path] = [],
     libraries: list[str | pathlib.Path] = [],
-    globals: dict[str, Variable] = {},
+    globals: dict[str, Variable | bool | int | float | str] = {},
     error_on_missing_globals: bool = True,
     error_on_unused_globals: bool = True,
     func_name: str | None = None,
-    func_args: list[Variable] = [],
+    func_args: list[Variable | bool | int | float | str] = [],
     reduce_graph: bool = True
 )
 ```
@@ -185,11 +185,11 @@ options.macros: list[str | tuple[str, str] | Macro]
 options.search_directories: list[str | pathlib.Path]
 options.includes: list[str | pathlib.Path]
 options.libraries: list[str | pathlib.Path]
-options.globals: dict[str, Variable]
+options.globals: dict[str, Variable | bool | int | float | str]
 options.error_on_missing_globals: bool
 options.error_on_unused_globals: bool
 options.func_name: str | None
-options.func_args: list[Variable]
+options.func_args: list[Variable | bool | int | float | str]
 options.reduce_graph: bool
 ```
 
