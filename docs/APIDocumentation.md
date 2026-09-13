@@ -71,9 +71,9 @@ struct CompileOptions
 mxslc::CompileOptions opts;
 opts.output_file = "example.mtlx";
 opts.version = "1.39.4";
-opts.add_macro("DEBUG")
+opts.add_macro("DEBUG");
 opts.add_macro("PI", "3.14159");
-opts.add_search_directory("C:/Users/jaket/mtlx_libs")
+opts.add_search_directory("C:/Users/jaket/mtlx_libs");
 opts.set_globals({{"roughness", 0.2f}, {"thin_film", true}});
 opts.error_on_missing_globals = false;
 opts.reduce_graph = false;
@@ -150,7 +150,7 @@ namespace mxslc
 }
 ```
 
-The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs is used by
+The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs used by
 the given element or an element preceding it in the graph.
 
 ## Python
