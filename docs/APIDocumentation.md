@@ -163,15 +163,15 @@ the given element or an element preceding it in the graph.
 CompileOptions.__init__(
     output_file: str | pathlib.Path | None = None,
     version: str = "1.39.5",
-    macros: list[str | tuple[str, str] | Macro] = [],
-    search_directories: list[str | pathlib.Path] = [],
-    includes: list[str | pathlib.Path] = [],
-    libraries: list[str | pathlib.Path] = [],
-    globals: dict[str, Variable | bool | int | float | str] = {},
+    macros: list[str | tuple[str, str] | Macro] | None = None,
+    search_directories: list[str | pathlib.Path] | None = None,
+    includes: list[str | pathlib.Path] | None = None,
+    libraries: list[str | pathlib.Path] | None = None,
+    globals: dict[str, Variable | bool | int | float | str] | None = None,
     error_on_missing_globals: bool = True,
     error_on_unused_globals: bool = True,
     func_name: str | None = None,
-    func_args: list[Variable | bool | int | float | str] = [],
+    func_args: list[Variable | bool | int | float | str] | None = None,
     reduce_graph: bool = True
 )
 ```
