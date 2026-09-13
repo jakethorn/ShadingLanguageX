@@ -441,7 +441,7 @@ allow vectors, colors and matrices as well as user-defined types to be passed as
 
 ### Globals
 
-Certain variables in the shader can also be assigned a value from the command line using the `-g/--globals` option, similar to passing arguments to the
+Certain variables in the shader can also be assigned a value from the command line using the `-g, --globals` option, similar to passing arguments to the
 entry function. These are called global variables.
 
 ```
