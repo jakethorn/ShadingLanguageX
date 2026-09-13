@@ -55,6 +55,9 @@ namespace mxslc::runtime
         bool has_error() const;
         const string& error_message() const;
 
+        const ExprPtr& expr() const { return expr_; }
+        int precedence() const;
+
         string to_string() const override;
 
     private:

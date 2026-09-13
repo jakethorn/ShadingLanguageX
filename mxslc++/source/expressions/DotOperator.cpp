@@ -62,6 +62,9 @@ namespace mxslc::expressions
 
     string DotOperator::to_string() const
     {
-        return value_expr_->to_string() + "." + token_.lexeme();
+        string val_str = value_expr_->to_string();
+        if (value_expr_->precedence() < 9)
+            val_str = "(" + val_str + ")";
+        return val_str + "." + token_.lexeme();
     }
 }

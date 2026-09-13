@@ -5,6 +5,7 @@
 #include "decompile/Decompiler.h"
 
 #include <MaterialXFormat/XmlIo.h>
+#include <sstream>
 
 #include "TokenType.h"
 #include "common.h"
@@ -20,12 +21,14 @@
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/interface.h"
 #include "runtime/Type.h"
+#include "runtime/Field.h"
 #include "runtime/interface.h"
 #include "serialize/serialize_name_utils.h"
 #include "statements/BlockStatement.h"
 #include "statements/FunctionDefinition.h"
 #include "statements/ReturnStatement.h"
 #include "statements/VariableDefinition.h"
+#include "statements/MultiVariableDefinition.h"
 #include "statements/interface.h"
 #include "utils/container_utils.h"
 #include "utils/mtlx_utils.h"
@@ -79,6 +82,19 @@ namespace mxslc::decompile
             }
             throw CompileError{"Cannot determine output index for '" + output +
                                "' of separate node '" + node->getName() + "'"};
+        }
+
+        vector<string> split_varnames(const string& str)
+        {
+            vector<string> result;
+            std::istringstream stream(str);
+            string token;
+            while (std::getline(stream, token, ','))
+            {
+                if (!token.empty())
+                    result.push_back(token);
+            }
+            return result;
         }
     }
 
@@ -149,6 +165,9 @@ namespace mxslc::decompile
         if (consumed_nodes_.count(node))
             return true;
 
+        if (node->getAttribute("mxsl:multivar") == "true")
+            return false;
+
         if (node->getName().rfind("var__", 0) == 0)
         {
             const auto it = ref_counts_.find(node);
@@ -185,13 +204,13 @@ namespace mxslc::decompile
         }
 
         analyze_graph(document_);
-        vector<StmtPtr> top_level_stmts;
+        current_statements_.clear();
         for (const mx::NodePtr& node : document_->getNodes())
         {
-            emit_node(node, top_level_stmts);
+            emit_node(node, current_statements_);
         }
 
-        for (const StmtPtr& stmt : top_level_stmts)
+        for (const StmtPtr& stmt : current_statements_)
         {
             global_code_ += stmt->to_string() + "\n";
         }
@@ -210,11 +229,11 @@ namespace mxslc::decompile
         decompiled_nodes_.clear();
         analyze_graph(document_);
 
-        vector<StmtPtr> stmts;
-        emit_node(node, stmts);
+        current_statements_.clear();
+        emit_node(node, current_statements_);
 
         string code;
-        for (const StmtPtr& s : stmts)
+        for (const StmtPtr& s : current_statements_)
             code += s->to_string() + "\n";
 
         return code;
@@ -371,6 +390,9 @@ namespace mxslc::decompile
 
     StmtPtr Decompiler::build_node_variable_definition(const mx::NodePtr& node)
     {
+        if (node->getAttribute("mxsl:multivar") == "true")
+            return build_multivar_definition(node);
+
         const string var_type_str = get_node_data_type(node);
         const TypePtr type = create_type(var_type_str);
         ExprPtr expr = lift_node(node);
@@ -378,6 +400,65 @@ namespace mxslc::decompile
         StmtPtr var_def = create_statement<VariableDefinition>(ModifierList{}, type, node->getName(), std::move(expr));
         var_def->set_attributes(NodeLifter::extract_attributes(node));
         return var_def;
+    }
+
+    StmtPtr Decompiler::build_multivar_definition(const mx::NodePtr& node)
+    {
+        const string varnames_attr = node->getAttribute("mxsl:varnames");
+        const vector<string> varnames = split_varnames(varnames_attr);
+
+        vector<Field> fields;
+        const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
+        vector<mx::OutputPtr> outputs = node_def ? node_def->getActiveOutputs() : vector<mx::OutputPtr>{};
+        if (outputs.empty())
+            outputs = node->getOutputs();
+
+        for (size_t i = 0; i < varnames.size(); ++i)
+        {
+            string type_str = "float";
+            if (i < outputs.size())
+                type_str = NodeLifter::get_type_alias(outputs[i]->getType());
+            fields.emplace_back(create_type(type_str), varnames[i]);
+        }
+
+        const TypePtr multi_type = create_type(std::move(fields));
+        ExprPtr expr;
+        if (is_separate_category(node->getCategory()) && node->getInput("in"))
+            expr = port_to_expression(node->getInput("in"));
+        else
+            expr = lift_node(node);
+
+        StmtPtr multi_var_def = create_statement<MultiVariableDefinition>(multi_type, std::move(expr));
+        multi_var_def->set_attributes(NodeLifter::extract_attributes(node));
+        return multi_var_def;
+    }
+
+    string Decompiler::get_multivar_output_name(const mx::NodePtr& node, const string& output)
+    {
+        const string varnames_attr = node->getAttribute("mxsl:varnames");
+        const vector<string> varnames = split_varnames(varnames_attr);
+        if (varnames.empty())
+            return "";
+
+        if (is_separate_category(node->getCategory()))
+        {
+            const int idx = separate_output_index(node, output);
+            if (idx >= 0 && static_cast<size_t>(idx) < varnames.size())
+                return varnames[idx];
+        }
+
+        const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
+        vector<mx::OutputPtr> outputs = node_def ? node_def->getActiveOutputs() : vector<mx::OutputPtr>{};
+        if (outputs.empty())
+            outputs = node->getOutputs();
+
+        for (size_t i = 0; i < outputs.size() && i < varnames.size(); ++i)
+        {
+            if (outputs[i]->getName() == output)
+                return varnames[i];
+        }
+
+        return "";
     }
 
     ExprPtr Decompiler::lift_node(const mx::NodePtr& node)
@@ -437,6 +518,14 @@ namespace mxslc::decompile
         mx::InputPtr extract_in;
         if (NodeLifter::is_extract_swizzle(node, extract_chan, extract_in))
             return lift_node(node);
+
+        if (node->getAttribute("mxsl:multivar") == "true")
+        {
+            emit_node(node, current_statements_);
+            const string var_name = get_multivar_output_name(node, output);
+            if (!var_name.empty())
+                return create_expression<Identifier>(var_name);
+        }
 
         if (is_separate_category(node->getCategory()))
         {

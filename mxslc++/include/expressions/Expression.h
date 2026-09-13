@@ -54,6 +54,7 @@ namespace mxslc::expressions
         const string& error_message() const { return error_message_; }
 
         string to_string() const override = 0;
+        virtual int precedence() const { return 9; }
 
     protected:
         virtual void init_subexpressions(const vector<TypePtr>& types) { }

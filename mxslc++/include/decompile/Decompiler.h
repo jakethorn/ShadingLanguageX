@@ -40,6 +40,8 @@ namespace mxslc::decompile
         string node_graph_to_function_definition(const mx::NodeGraphPtr& node_graph);
 
         StmtPtr build_node_variable_definition(const mx::NodePtr& node);
+        StmtPtr build_multivar_definition(const mx::NodePtr& node);
+        string get_multivar_output_name(const mx::NodePtr& node, const string& output);
         void emit_node(const mx::NodePtr& node, vector<StmtPtr>& target_stmts);
 
         ExprPtr lift_node(const mx::NodePtr& node);

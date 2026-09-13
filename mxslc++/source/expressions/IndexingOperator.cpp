@@ -59,6 +59,9 @@ namespace mxslc::expressions
 
     string IndexingOperator::to_string() const
     {
-        return value_expr_->to_string() + "[" + index_expr_->to_string() + "]";
+        string val_str = value_expr_->to_string();
+        if (value_expr_->precedence() < 9)
+            val_str = "(" + val_str + ")";
+        return val_str + "[" + index_expr_->to_string() + "]";
     }
 }

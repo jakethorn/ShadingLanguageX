@@ -77,10 +77,24 @@ TEST_P(decompiler_tests, decompiler_output_matches_groundtruth)
         ? read_file(expected_decompiled_path)
         : original_mxsl;
 
-    const bool mxsl_passed = (trim(actual_decompiled) == trim(expected_output));
+    string normalized_actual = normalize_newlines(trim(actual_decompiled));
+    string normalized_expected = normalize_newlines(trim(expected_output));
+    const bool mxsl_passed = (normalized_actual == normalized_expected);
     EXPECT_TRUE(mxsl_passed);
     if (!mxsl_passed)
+    {
+        std::cout << "ACTUAL (" << actual_decompiled.size() << "):\n" << actual_decompiled << "\n---\nEXPECTED (" << expected_output.size() << "):\n" << expected_output << "\n";
+        for (size_t i = 0; i < std::min(actual_decompiled.size(), expected_output.size()); ++i)
+        {
+            if (actual_decompiled[i] != expected_output[i])
+            {
+                std::cout << "Diff at index " << i << ": actual '" << actual_decompiled[i] << "' (" << int(actual_decompiled[i])
+                          << ") vs expected '" << expected_output[i] << "' (" << int(expected_output[i]) << ")\n";
+                break;
+            }
+        }
         print_debug_info(input_path, actual_decompiled, expected_output);
+    }
 
     // 4. Recompile Decompiled MXSL to MaterialX (MTLX 2)
     string mtlx2;

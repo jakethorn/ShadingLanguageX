@@ -1,7 +1,7 @@
 
 {color3 col, float alpha} shade_calc(color3 bg = color3{0, 0, 0}, float factor = 0)
 {
-	color3 c = (bg * factor);
+	color3 c = bg * factor;
 	float node1 = dot(in = factor);
 	return {c, node1};
 }

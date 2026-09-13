@@ -202,6 +202,33 @@ namespace mxslc::expressions
         serializer().end_comptime();
     }
 
+    int FunctionCall::precedence() const
+    {
+        if (args_.size() == 2)
+        {
+            if (name_ == "__or__" || name_ == "__and__")
+                return 1;
+            if (name_ == "__eq__" || name_ == "__ne__")
+                return 2;
+            if (name_ == "__lt__" || name_ == "__le__" || name_ == "__gt__" || name_ == "__ge__")
+                return 3;
+            if (name_ == "__add__" || name_ == "__sub__")
+                return 5;
+            if (name_ == "__mul__" || name_ == "__div__" || name_ == "__mod__")
+                return 6;
+            if (name_ == "__pow__")
+                return 7;
+        }
+
+        if (args_.size() == 1)
+        {
+            if (name_ == "__not__" || name_ == "__neg__" || name_ == "__pos__")
+                return 8;
+        }
+
+        return 9;
+    }
+
     string FunctionCall::to_string() const
     {
         static const unordered_map<string, string> BINARY_OPS {
@@ -223,17 +250,44 @@ namespace mxslc::expressions
 
         if (args_.size() == 2 and container_utils::contains(BINARY_OPS, name_))
         {
-            return "(" + args_[0].to_string() + " " + BINARY_OPS.at(name_) + " " + args_[1].to_string() + ")";
+            const int prec = precedence();
+            const auto& left = args_[0];
+            const auto& right = args_[1];
+
+            string left_str = left.to_string();
+            if (left.precedence() < prec)
+                left_str = "(" + left_str + ")";
+
+            string right_str = right.to_string();
+            if (right.precedence() < prec)
+            {
+                right_str = "(" + right_str + ")";
+            }
+            else if (right.precedence() == prec)
+            {
+                auto right_func = cast_expression<FunctionCall>(right.expr());
+                const bool is_associative = (name_ == "__add__" && right_func && right_func->name() == "__add__") ||
+                                            (name_ == "__mul__" && right_func && right_func->name() == "__mul__");
+                if (!is_associative)
+                    right_str = "(" + right_str + ")";
+            }
+
+            return left_str + " " + BINARY_OPS.at(name_) + " " + right_str;
         }
 
-        if (args_.size() == 1 and name_ == "__not__")
-            return "!" + args_[0].to_string();
-
-        if (args_.size() == 1 and name_ == "__neg__")
-            return "-" + args_[0].to_string();
-
-        if (args_.size() == 1 and name_ == "__pos__")
-            return "+" + args_[0].to_string();
+        if (args_.size() == 1 and (name_ == "__not__" or name_ == "__neg__" or name_ == "__pos__"))
+        {
+            static const unordered_map<string, string> UNARY_OPS {
+                {"__not__", "!"},
+                {"__neg__", "-"},
+                {"__pos__", "+"},
+            };
+            const string op = UNARY_OPS.at(name_);
+            string child_str = args_[0].to_string();
+            if (args_[0].precedence() < 8)
+                child_str = "(" + child_str + ")";
+            return op + child_str;
+        }
 
         const string template_type_string = template_type_ ? "<" + template_type_->to_string() + ">" : "";
         const string args_string = is_argumentless_ ? "" : "(" + join(args_, ", ") + ")";

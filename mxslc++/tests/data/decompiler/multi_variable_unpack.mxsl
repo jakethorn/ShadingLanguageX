@@ -1,0 +1,2 @@
+float u, v = texcoord() * 20;
+float seed = floor(u) + floor(v) * 20;

@@ -104,6 +104,9 @@ namespace mxslc::expressions
 
     string MethodCall::to_string() const
     {
-        return instance_expr_->to_string() + "." + FunctionCall::to_string();
+        string inst_str = instance_expr_->to_string();
+        if (instance_expr_->precedence() < 9)
+            inst_str = "(" + inst_str + ")";
+        return inst_str + "." + FunctionCall::to_string();
     }
 }

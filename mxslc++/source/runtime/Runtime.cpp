@@ -56,6 +56,11 @@ namespace mxslc::runtime
         return nullptr;
     }
 
+    const CompileOptions& Runtime::options() const
+    {
+        return opts_;
+    }
+
     Scope& Runtime::scope()
     {
         return *scope_;

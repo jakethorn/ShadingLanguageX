@@ -14,6 +14,9 @@
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
 #include "statements/VariableDefinition.h"
+#include "CompileOptions.h"
+#include "serialize/values/interface.h"
+#include "serialize/values/NodeOutputValue.h"
 
 namespace mxslc::statements
 {
@@ -60,6 +63,43 @@ namespace mxslc::statements
             value = expr_->evaluate();
         }
 
+        if (runtime().options().emit_source_hints && value)
+        {
+            mx::NodePtr node = nullptr;
+            bool all_same_node = (value->child_count() > 0);
+            for (size_t i = 0; i < value->child_count(); ++i)
+            {
+                if (const auto node_output = serialize::values::cast_value<serialize::values::NodeOutputValue>(value->child(i)->raw_value()))
+                {
+                    if (node == nullptr)
+                        node = node_output->node();
+                    else if (node != node_output->node())
+                    {
+                        all_same_node = false;
+                        break;
+                    }
+                }
+                else
+                {
+                    all_same_node = false;
+                    break;
+                }
+            }
+
+            if (all_same_node && node != nullptr)
+            {
+                node->setAttribute("mxsl:multivar", "true");
+                string varnames;
+                for (size_t i = 0; i < type_->field_count(); ++i)
+                {
+                    if (i > 0)
+                        varnames += ",";
+                    varnames += type_->field(i).name();
+                }
+                node->setAttribute("mxsl:varnames", varnames);
+            }
+        }
+
         for (size_t i = 0; i < type_->field_count(); ++i)
         {
             Field field = type_->field(i);
@@ -82,7 +122,30 @@ namespace mxslc::statements
 
     string MultiVariableDefinition::to_string() const
     {
-        string result = join(type_->fields(), ", ");
+        string result;
+        for (size_t i = 0; i < type_->field_count(); ++i)
+        {
+            if (i > 0)
+                result += ", ";
+
+            const Field& field = type_->field(i);
+            const bool same_as_prev = (i > 0) &&
+                                      (field.type()->to_string() == type_->field(i - 1).type()->to_string()) &&
+                                      (field.modifiers() == type_->field(i - 1).modifiers());
+
+            if (same_as_prev)
+            {
+                result += field.name();
+            }
+            else
+            {
+                string mods_str = field.modifiers().to_string();
+                if (!mods_str.empty())
+                    result += mods_str + " ";
+                result += field.type()->to_string() + " " + field.name();
+            }
+        }
+
         if (expr_)
             result += " = " + expr_->to_string();
         result += ";";

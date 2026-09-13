@@ -22,12 +22,14 @@ namespace mxslc::expressions
         FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
         FunctionCall(string name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
 
+        const string& name() const { return name_; }
         FuncPtr function() const { return func_; }
         const ArgumentList& arguments() const { return args_; }
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
+        int precedence() const override;
 
     protected:
         void init_impl(const vector<TypePtr>& types) override;

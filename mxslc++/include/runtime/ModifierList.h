@@ -51,6 +51,9 @@ namespace mxslc::runtime
         size_t size() const { return mods_.size(); }
         bool empty() const { return mods_.empty(); }
 
+        bool operator==(const ModifierList& other) const { return mods_ == other.mods_; }
+        bool operator!=(const ModifierList& other) const { return !(*this == other); }
+
         string to_string() const override;
 
     private:

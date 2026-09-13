@@ -28,6 +28,12 @@ inline string trim(const string& s)
     return s.substr(start, end - start + 1);
 }
 
+inline string normalize_newlines(string str)
+{
+    str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
+    return str;
+}
+
 inline vector<string> split_lines(const string& str)
 {
     vector<string> lines;

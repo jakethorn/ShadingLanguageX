@@ -8,6 +8,7 @@
 #include "expressions/Literal.h"
 #include "expressions/VariableDefinitionExpression.h"
 #include "errors/CompileError.h"
+#include "expressions/Expression.h"
 #include "expressions/interface.h"
 
 namespace mxslc::runtime
@@ -111,6 +112,11 @@ namespace mxslc::runtime
     const string& Argument::error_message() const
     {
         return expr_->error_message();
+    }
+
+    int Argument::precedence() const
+    {
+        return expr_ ? expr_->precedence() : 9;
     }
 
     string Argument::to_string() const

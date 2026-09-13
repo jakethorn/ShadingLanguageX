@@ -27,6 +27,7 @@ namespace mxslc::runtime
         static Runtime& get();
 
         VarPtr global(const string& name) const;
+        const CompileOptions& options() const;
         vector<fs::path> include_directories() const { return opts_.search_directories(); }
 
         mx::DocumentPtr materialx_library() { return mtlx_lib_; }
