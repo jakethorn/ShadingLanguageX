@@ -214,15 +214,15 @@ mxslc.compile_file_to_file("example.mxsl", opts);
 mxslc.compile_string_to_string(source: str) -> str
 mxslc.compile_string_to_string(source: str, opts: mxslc.CompileOptions) -> str
 
-mxslc.compile_file_to_string(src_path: pathlib.Path) -> str
-mxslc.compile_file_to_string(src_path: pathlib.Path, opts: mxslc.CompileOptions) -> str
+mxslc.compile_file_to_string(src_path: str | pathlib.Path) -> str
+mxslc.compile_file_to_string(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> str
 
 mxslc.compile_string_to_file(source: str, opts: mxslc.CompileOptions) -> pathlib.Path
-mxslc.compile_string_to_file(source: str, dst_path: pathlib.Path) -> pathlib.Path
+mxslc.compile_string_to_file(source: str, dst_path: str | pathlib.Path) -> pathlib.Path
 
-mxslc.compile_file_to_file(src_path: pathlib.Path) -> pathlib.Path
-mxslc.compile_file_to_file(src_path: pathlib.Path, opts: mxslc.CompileOptions) -> pathlib.Path
-mxslc.compile_file_to_file(src_path: pathlib.Path, dst_path: pathlib.Path) -> pathlib.Path
+mxslc.compile_file_to_file(src_path: str | pathlib.Path) -> pathlib.Path
+mxslc.compile_file_to_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> pathlib.Path
+mxslc.compile_file_to_file(src_path: str | pathlib.Path, dst_path: str | pathlib.Path) -> pathlib.Path
 ```
 
 ```python
@@ -241,12 +241,12 @@ dst_path = mxslc.compile_file_to_file(src_path)
 ```python
 mxslc.decompile_string_to_string(source: str) -> str
 
-mxslc.decompile_file_to_string(src_path: pathlib.Path) -> str
+mxslc.decompile_file_to_string(src_path: str | pathlib.Path) -> str
 
-mxslc.decompile_string_to_file(source: str, dst_path: pathlib.Path) -> pathlib.Path
+mxslc.decompile_string_to_file(source: str, dst_path: str | pathlib.Path) -> pathlib.Path
 
-mxslc.decompile_file_to_file(src_path: pathlib.Path) -> pathlib.Path
-mxslc.decompile_file_to_file(src_path: pathlib.Path, dst_path: pathlib.Path) -> pathlib.Path
+mxslc.decompile_file_to_file(src_path: str | pathlib.Path) -> pathlib.Path
+mxslc.decompile_file_to_file(src_path: str | pathlib.Path, dst_path: str | pathlib.Path) -> pathlib.Path
 ```
 
 ### `mxslc.Decompiler`
