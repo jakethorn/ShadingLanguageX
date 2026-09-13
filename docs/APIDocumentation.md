@@ -259,6 +259,8 @@ Decompiler.__init__(
 )
 ```
 
+Use `str` for inline MaterialX source text, and use `pathlib.Path` for filesystem input files.
+
 #### Methods
 
 ```python
