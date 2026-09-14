@@ -109,7 +109,7 @@ compiles to:
   </surfacematerial>
 </materialx>
 ```
-![](../../examples/screenshots/toon.png)
+![](../examples/screenshots/toon.png)
 
 ShadingLanguageX shaders can also be compiled with a designated entry function. The function name needs
 to be passed to the compiler, either using the `-f/--func` option in the command line, or using the `CompileOptions`
@@ -153,7 +153,7 @@ opts = mxslc.CompileOptions(func_name="my_function", func_args=[mx.Color3(1.0, 0
 mxslc.compile_file_to_file(src_path, opts)
 ```
 
-![](../../examples/screenshots/gold.png)
+![](../examples/screenshots/gold.png)
 
 # Data Types
 

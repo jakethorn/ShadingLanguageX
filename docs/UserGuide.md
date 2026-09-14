@@ -1,21 +1,18 @@
-# User Guide
+<h1 align="center">User Guide</h1>
 
 <p align="center">
-  <img
-    src="https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/screenshots/combined.png"
-    alt="ShadingLanguageX example output"
-  />
+  <img src="https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/screenshots/combined.png" />
 </p>
 
-## Table of Contents
+# Table of Contents
 
-- [What is ShadingLanguageX?](#what-is-shadinglanguagex)
-- [Language Features](#language-features)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-- [API Documentation](./APIDocumentation.md)
-- [Decompiler](#decompiler)
-- [MaterialX Libraries](#materialx-libraries)
+1. [What is ShadingLanguageX?](#what-is-shadinglanguagex)
+2. [Language Features](#language-features)
+3. [Installation](#installation)
+4. [Getting Started](#getting-started)
+5. [API Documentation](#getting-started)
+6. [Decompiler](#decompiler)
+7. [MaterialX Libraries](#materialx-libraries)
 
 # What is ShadingLanguageX?
 
@@ -37,7 +34,8 @@ ShadingLanguageX can aid artists and developers when creating complex shaders, p
 operator overloading, templated functions, preprocessor directives, graph optimisations and more. For example, preprocessor
 directives like `#include` can be used to re-use code across shaders and `#define` `#if` `#ifdef` to create
 shader variants.
-You can see more in-depth examples [here](https://github.com/jakethorn/ShadingLanguageX/tree/main/examples) and the language specification [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md).
+You can see more in-depth examples [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/BasicExamples.md) 
+and the language specification [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md).
 ShadingLanguageX files are compiled to .mtlx files using the `mxslc` compiler. See below for details on how to install
 and get started using `mxslc`.
 
@@ -283,7 +281,7 @@ python -m pytest python/tests -vv
 
 ShadingLanguageX files are compiled using `mxslc`. The compiler is available as an executable, C++ library or Python
 module. The following examples demonstrate `mxslc` by calling the executable from the command line, but the
-same functionality and options are available in the C++ and Python APIs (see below).
+same functionality and options are available in the C++ and Python APIs (see the [API Documentation](./APIDocumentation.md)).
 
 The following is a typical ShadingLanguageX file, which uses functions generated from the MaterialX standard library,
 such as `texcoord`, `floor` and `randomcolor`. Finally it creates a material using the `surfacematerial` function.
@@ -304,6 +302,14 @@ The following command will compile `example.mxsl` and create a file called `exam
 
 ```bash
 > ./mxslc example.mxsl
+```
+
+Or from Python:
+
+```python
+import mxslc
+
+mxslc.compile_file_to_file("example.mxsl")
 ```
 
 ```xml
@@ -343,7 +349,7 @@ The following command will compile `example.mxsl` and create a file called `exam
 </materialx>
 ```
 
-![](../../examples/screenshots/squares.png)
+![](../examples/screenshots/squares.png)
 
 ## Compile Options
 
@@ -472,7 +478,7 @@ standard_surface(
 ```
 
 Once again, the command line options are limited to passing basic types; however, the C++ and Python APIs
-allow vectors, colors, matrices as well as user-defined types to be passed as well (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/mxslc%2B%2B/LanguageSpecification.md#global)).
+allow vectors, colors, matrices as well as user-defined types to be passed as well (see [here](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#global)).
 
 There are two additional options that are related to globals, `--missing-globals-ok` and `--unused-globals-ok`, which
 suppress compile errors either if a global variable is not provided a value or if a global value is provided, but never used.
@@ -594,11 +600,15 @@ example.mxsl -o output_file.mtlx -v 1.38.10 --no-reduce-graph
 > ./mxslc @example.rsp
 ```
 
+# API Documentation
+
+The API documentation has been moved [here](./APIDocumentation.md).
+
 # Decompiler
 
 The decompiler is a tool that can be used to decompile MaterialX files into ShadingLanguageX source files.
 It is available as part of the `mxslc` standalone executable (see [Getting Started](#decompiler)) as well as the C++ and Python
-APIs (see [API Documentation](./APIDocumentation.md)).
+APIs (see the [API Documentation](./APIDocumentation.md)).
 
 ## C++
 
