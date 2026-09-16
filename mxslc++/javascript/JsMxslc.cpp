@@ -389,10 +389,15 @@ EMSCRIPTEN_BINDINGS(mxslc)
                 if (not is_array(value))
                     throw std::invalid_argument("CompileOptions.macros must be an array");
 
-                opts.clear_macros();
                 const unsigned length = value["length"].as<unsigned>();
+                vector<mxslc::Macro> macros;
+                macros.reserve(length);
                 for (unsigned i = 0; i < length; ++i)
-                    opts.add_macro(to_cpp_macro(value[i]));
+                    macros.push_back(to_cpp_macro(value[i]));
+
+                opts.clear_macros();
+                for (mxslc::Macro& macro : macros)
+                    opts.add_macro(std::move(macro));
             }
         )
         .property("searchDirectories",
@@ -407,10 +412,15 @@ EMSCRIPTEN_BINDINGS(mxslc)
                 if (not is_array(value))
                     throw std::invalid_argument("CompileOptions.searchDirectories must be an array");
 
-                opts.clear_search_directories();
                 const unsigned length = value["length"].as<unsigned>();
+                vector<fs::path> dirs;
+                dirs.reserve(length);
                 for (unsigned i = 0; i < length; ++i)
-                    opts.add_search_directory(value[i].as<string>());
+                    dirs.emplace_back(value[i].as<string>());
+
+                opts.clear_search_directories();
+                for (fs::path& dir : dirs)
+                    opts.add_search_directory(std::move(dir));
             }
         )
         .property("includes",
@@ -424,11 +434,13 @@ EMSCRIPTEN_BINDINGS(mxslc)
                 if (not is_array(value))
                     throw std::invalid_argument("CompileOptions.includes must be an array");
 
-                opts.includes.clear();
                 const unsigned length = value["length"].as<unsigned>();
-                opts.includes.reserve(length);
+                vector<fs::path> includes;
+                includes.reserve(length);
                 for (unsigned i = 0; i < length; ++i)
-                    opts.includes.emplace_back(value[i].as<string>());
+                    includes.emplace_back(value[i].as<string>());
+
+                opts.includes = std::move(includes);
             }
         )
         .property("libraries",
@@ -442,11 +454,13 @@ EMSCRIPTEN_BINDINGS(mxslc)
                 if (not is_array(value))
                     throw std::invalid_argument("CompileOptions.libraries must be an array");
 
-                opts.libraries.clear();
                 const unsigned length = value["length"].as<unsigned>();
-                opts.libraries.reserve(length);
+                vector<fs::path> libraries;
+                libraries.reserve(length);
                 for (unsigned i = 0; i < length; ++i)
-                    opts.libraries.emplace_back(value[i].as<string>());
+                    libraries.emplace_back(value[i].as<string>());
+
+                opts.libraries = std::move(libraries);
             }
         )
         .property("globals",
@@ -460,14 +474,17 @@ EMSCRIPTEN_BINDINGS(mxslc)
                 if (is_nullish(value) or is_array(value) or value.typeOf().as<string>() != "object")
                     throw std::invalid_argument("CompileOptions.globals must be an object");
 
-                opts.clear_globals();
                 const ems::val names = ems::val::global("Object").call<ems::val>("keys", value);
                 const unsigned length = names["length"].as<unsigned>();
+                unordered_map<string, VarPtr> globals;
+                globals.reserve(length);
                 for (unsigned i = 0; i < length; ++i)
                 {
                     const string name = names[i].as<string>();
-                    opts.add_global(name, to_cpp_variable(value[name]));
+                    globals.emplace(name, to_cpp_variable(value[name]));
                 }
+
+                opts.set_globals(std::move(globals));
             }
         )
         .property("errorOnMissingGlobals", &mxslc::CompileOptions::error_on_missing_globals)
@@ -492,10 +509,13 @@ EMSCRIPTEN_BINDINGS(mxslc)
                 if (not is_array(value))
                     throw std::invalid_argument("CompileOptions.funcArgs must be an array");
 
-                opts.clear_entry_function_arguments();
                 const unsigned length = value["length"].as<unsigned>();
+                vector<VarPtr> args;
+                args.reserve(length);
                 for (unsigned i = 0; i < length; ++i)
-                    opts.add_entry_function_argument(to_cpp_variable(value[i]));
+                    args.push_back(to_cpp_variable(value[i]));
+
+                opts.set_entry_function_arguments(std::move(args));
             }
         )
         .property("reduceGraph", &mxslc::CompileOptions::reduce_graph)
