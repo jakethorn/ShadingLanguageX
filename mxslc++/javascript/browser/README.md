@@ -82,8 +82,10 @@ const mx = await Mxslc({
 Then conversion calls (all synchronous, throw on error):
 
 - `mx.compileSlxToMtlx(slx)` → MTLX XML string
+- `mx.compileSlxFileToMtlx(srcPath)` → MTLX XML string from a file already present in the WASM filesystem
+- `mx.compileSlxFileToMtlxFile(srcPath, opts)` → output path string, writing to the WASM filesystem
 - `mx.decompileMtlxToSlx(mtlx)` → MXSL string
-- `mx.compileSlxToMtlxWithOptions(slx, opts)` / `new mx.CompileOptions()`
+- `new mx.CompileOptions()` with properties such as `outputFile`, `macros`, `searchDirectories`, `includes`, `libraries`, `globals`, `funcName`, `funcArgs`, `reduceGraph`, `validateGraph`, `errorOnMissingGlobals`, and `errorOnUnusedGlobals`
 - `mx.getMtlxDefinitionNames()` → array of MaterialX definition categories (e.g. 'add', 'image', 'standard_surface', etc.)
 
 ## CI / Deployment

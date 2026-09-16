@@ -4,8 +4,8 @@ This folder contains the Emscripten (WebAssembly) bindings for the mxslc
 compile / decompile pipeline, modeled on the JavaScript build used by
 MaterialX itself (see the `javascript/` folder of a MaterialX checkout).
 
-It provides a small, string-oriented JavaScript API for converting between
-ShadingLanguageX (SLX) source strings and MaterialX (MTLX) XML strings.
+It provides a JavaScript API for converting between ShadingLanguageX (SLX)
+source strings or files and MaterialX (MTLX) XML strings or files.
 
 ## Building
 
@@ -47,6 +47,12 @@ const opts = new mx.CompileOptions();
 opts.version = '1.39.5';
 opts.reduceGraph = true;
 const mtlx2 = mx.compileSlxToMtlx('float z = add(1.0, 2.0);', opts);
+
+// Compile a file that already exists in the WASM filesystem.
+opts.outputFile = '/tmp/out.mtlx';
+const mtlx3 = mx.compileSlxFileToMtlx('/tmp/in.mxsl', opts);
+const outPath = mx.compileSlxFileToMtlxFile('/tmp/in.mxsl', opts);
+
 opts.delete();
 
 // Decompile a MTLX (MaterialX XML) string back to an SLX string.
@@ -57,10 +63,27 @@ const slx = mx.decompileMtlxToSlx(mtlx);
 
 `CompileOptions` exposes the following writable properties:
 
+- `outputFile` (`string | null`) - destination path used by file-output compile calls.
 - `version` (string) - the MaterialX library version to load.
+- `macros` (`Array<string | [string] | [string, string]>`)
+- `searchDirectories` (`string[]`)
+- `includes` (`string[]`)
+- `libraries` (`string[]`)
+- `globals` (`Record<string, unknown>`)
 - `reduceGraph` (boolean)
+- `validateGraph` (boolean)
 - `errorOnMissingGlobals` (boolean)
 - `errorOnUnusedGlobals` (boolean)
+- `funcName` (`string | null`)
+- `funcArgs` (`unknown[]`)
+
+### File-based compile API
+
+File-based compile calls operate on paths inside the Emscripten/WASM
+filesystem:
+
+- `mx.compileSlxFileToMtlx(srcPath, opts?)` → MTLX XML string
+- `mx.compileSlxFileToMtlxFile(srcPath, opts?)` → output path string
 
 ## Testing
 
