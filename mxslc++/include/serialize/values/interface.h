@@ -23,6 +23,7 @@ using T##Ptr = shared_ptr<T>;
     TYPE_DEF(NodeValue)
     TYPE_DEF(NullValue)
     TYPE_DEF(StringValue)
+    TYPE_DEF(DefaultGeomPropValue)
 
 #undef TYPE_DEF
 
