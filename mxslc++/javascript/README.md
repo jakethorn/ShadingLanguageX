@@ -53,6 +53,36 @@ opts.delete();
 const slx = mx.decompileMtlxToSlx(mtlx);
 ```
 
+### Multi-file projects (`compileProjectToMtlx`)
+
+`compileSlxToMtlx` compiles a single, self-contained source string: a root
+file that uses `#include` or `#library` has nothing to resolve those
+directives against, because in a browser the referenced files only ever
+exist as in-memory strings (e.g. dropped alongside the root file), never as
+real paths on disk for the compiler's normal search-directory resolution to
+find. `compileProjectToMtlx(rootSource, files, opts)` takes a third
+argument shaped for exactly that case: a plain object mapping a relative
+path — exactly as it would appear inside the directive — to that file's
+source text.
+
+```js
+const opts = new mx.CompileOptions();
+const mtlx = mx.compileProjectToMtlx(
+    '#include "colors.mxsl"\nstandard_surface(base_color=RED);',
+    { 'colors.mxsl': 'const color3 RED = color3{1, 0, 0};' },
+    opts,
+);
+opts.delete();
+```
+
+Pass `undefined`, `null`, or `{}` for `files` to compile a self-contained
+root with no extra files — equivalent to `compileSlxToMtlx`. Each entry is
+staged into a scratch directory inside the WASM's in-memory filesystem for
+the duration of the call; that directory is cleared at the start of every
+`compileProjectToMtlx` call, so files staged by an earlier, unrelated
+compile never leak into a later one. Every path must be relative and must
+not contain a `..` segment.
+
 ### CompileOptions
 
 `CompileOptions` exposes the following writable properties:
