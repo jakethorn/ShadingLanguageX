@@ -1,0 +1,4 @@
+vec3 foo(vec3 a = geomprop(Tworld), vec3 b = geomprop(Bobject), vec2 c = geomprop(UV0))
+{
+    return a + b + vec3{c, 0};
+}

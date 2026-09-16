@@ -28,6 +28,7 @@ using Const##T##Ptr = shared_ptr<const T>;
 
     TYPE_DEF(CompoundAssignment)
     TYPE_DEF(DefaultExpression)
+    TYPE_DEF(DefaultGeomPropExpression)
     TYPE_DEF(DotOperator)
     TYPE_DEF(FunctionCall)
     TYPE_DEF(Identifier)

@@ -65,6 +65,7 @@ add_library(mxslc_lib
         expressions/RangeExpression.cpp
         expressions/IfExpression.cpp
         expressions/DefaultExpression.cpp
+        expressions/DefaultGeomPropExpression.cpp
         expressions/SwitchExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
@@ -125,6 +126,7 @@ add_library(mxslc_lib
         serialize/values/NodeGraphValue.cpp
         serialize/values/NodeGraphOutputValue.cpp
         serialize/values/StringValue.cpp
+        serialize/values/DefaultGeomPropValue.cpp
         serialize/values/interface.cpp
         serialize/FunctionCallHistory.cpp
         preprocess/preprocess.cpp

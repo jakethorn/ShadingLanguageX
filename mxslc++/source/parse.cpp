@@ -24,6 +24,7 @@
 #include "expressions/VariableDefinitionExpression.h"
 #include "expressions/NullExpression.h"
 #include "expressions/DefaultExpression.h"
+#include "expressions/DefaultGeomPropExpression.h"
 #include "runtime/interface.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -432,7 +433,7 @@ namespace mxslc
 
         const vector<Token> name_tokens = consume_until(TokenType::String);
         string name = Stringable::join(name_tokens);
-        
+
         string value = match(TokenType::String).literal<string>();
 
         return Attribute{std::move(child), std::move(name), std::move(value)};
@@ -838,6 +839,11 @@ namespace mxslc
             return default_expression();
         }
 
+        if (peek() == TokenType::Geomprop)
+        {
+            return default_geom_prop_expression();
+        }
+
         if (peek() == TokenType::Typeof)
         {
             return typeof_operator();
@@ -900,6 +906,18 @@ namespace mxslc
             match(')');
         }
         return create_expression<DefaultExpression>(std::move(type_), std::move(token));
+    }
+
+    ExprPtr Parser::default_geom_prop_expression()
+    {
+        Token token = match(TokenType::Geomprop);
+
+        match('(');
+        Token name_token = match(TokenType::Identifier, TokenType::String);
+        string name = name_token.type() == TokenType::Identifier ? name_token.lexeme() : name_token.literal<string>();
+        match(')');
+
+        return create_expression<DefaultGeomPropExpression>(std::move(name), std::move(token));
     }
 
     ExprPtr Parser::function_call()
