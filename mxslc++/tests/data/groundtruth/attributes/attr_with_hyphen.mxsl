@@ -1,0 +1,3 @@
+@nodedef "ND_combine3_vector3"
+@Autodesk-hidden "true"
+vec3 combine1 = combine3(in1 = 0, in2 = 0, in3 = 0);
