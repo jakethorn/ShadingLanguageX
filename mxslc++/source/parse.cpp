@@ -383,8 +383,12 @@ namespace mxslc
             child = match_identifier_or_keyword().lexeme();
             match('.');
         }
-        string name = match_identifier_or_keyword().lexeme();
+
+        const vector<Token> name_tokens = consume_until(TokenType::String);
+        string name = Stringable::join(name_tokens);
+        
         string value = match(TokenType::String).literal<string>();
+
         return Attribute{std::move(child), std::move(name), std::move(value)};
     }
 
