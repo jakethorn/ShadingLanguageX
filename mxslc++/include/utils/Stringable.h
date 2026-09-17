@@ -18,7 +18,7 @@ namespace mxslc
         virtual string to_string() const = 0;
 
         template<typename Container>
-        static string join(const Container& items, const string& delimiter)
+        static string join(const Container& items, const string& delimiter = "")
         {
             string result;
 
