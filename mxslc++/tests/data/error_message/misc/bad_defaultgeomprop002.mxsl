@@ -1,0 +1,4 @@
+float foo(string s = geomprop(UV0))
+{
+    return 0;
+}

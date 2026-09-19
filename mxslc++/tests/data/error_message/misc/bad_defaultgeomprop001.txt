@@ -1,0 +1,1 @@
+bad_defaultgeomprop001.mxsl, line 1: defaultgeomprop attributes can only be used on NodeDef inputs

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="vector3" />
+    <input name="a" type="vector3" defaultgeomprop="Tworld" />
+    <input name="b" type="vector3" defaultgeomprop="Bobject" />
+    <input name="c" type="vector2" defaultgeomprop="UV0" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="var__0" type="vector3">
+      <input name="in1" type="vector3" interfacename="a" />
+      <input name="in2" type="vector3" interfacename="b" />
+    </add>
+    <separate2 name="var__1" type="multioutput">
+      <input name="in" type="vector2" interfacename="c" />
+    </separate2>
+    <combine3 name="var__2" type="vector3">
+      <input name="in1" type="float" output="outx" nodename="var__1" />
+      <input name="in2" type="float" output="outy" nodename="var__1" />
+      <input name="in3" type="float" value="0" />
+    </combine3>
+    <add name="var__3" type="vector3">
+      <input name="in1" type="vector3" nodename="var__0" />
+      <input name="in2" type="vector3" nodename="var__2" />
+    </add>
+    <output name="out" type="vector3" nodename="var__3" />
+  </nodegraph>
+</materialx>

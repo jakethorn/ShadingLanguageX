@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodegraph name="NG_foo">
+    <input name="a" type="vector3" defaultgeomprop="Tworld" />
+    <dot name="node1" type="vector3">
+      <input name="in" type="vector3" interfacename="a" />
+    </dot>
+    <output name="out" type="vector3" nodename="node1" />
+  </nodegraph>
+</materialx>
