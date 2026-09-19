@@ -244,22 +244,26 @@ namespace mxslc::preprocess
 
     void Preprocessor::include_file(const fs::path& path)
     {
-        io_utils::search(opts_.search_directories(), path, [this](const fs::path& found_path) {
-            check_for_circular_dependency(found_path);
-            if (already_included(found_path))
-            {
-                Logger::debug("Skipping already included file: " + found_path.string());
-                return;
-            }
-            vector<Token> tokens = scan_file(found_path);
-            Preprocessor preprocessor{this, std::move(tokens), opts_, found_path, true};
-            preprocessor.preprocess();
-            add_tokens(preprocessor.tokens());
-            included_files_.push_back(found_path);
-            extend(included_files_, std::move(preprocessor.included_files_));
-            set_current_working_directory();
-            define_file_macros();
-        });
+        const SourceRef source = opts_.resolve_source(path);
+
+        check_for_circular_dependency(source.path);
+        if (already_included(source.path))
+        {
+            Logger::debug("Skipping already included file: " + source.path.string());
+            return;
+        }
+
+        vector<Token> tokens = source.is_in_memory()
+            ? scan_string(*source.contents, source.path)
+            : scan_file(source.path);
+
+        Preprocessor preprocessor{this, std::move(tokens), opts_, source.path, true};
+        preprocessor.preprocess();
+        add_tokens(preprocessor.tokens());
+        included_files_.push_back(source.path);
+        extend(included_files_, std::move(preprocessor.included_files_));
+        set_current_working_directory();
+        define_file_macros();
     }
 
     void Preprocessor::define_macro(string name) const
@@ -335,7 +339,10 @@ namespace mxslc::preprocess
 
     void Preprocessor::set_current_working_directory() const
     {
-        if (path_)
+        // An in-memory source need not have a directory of its own (its name
+        // may just be the flat path from the directive), in which case there is
+        // nothing useful to add to the search path.
+        if (path_ and not path_->parent_path().empty())
             opts_.set_current_working_directory(path_->parent_path());
     }
 
@@ -378,7 +385,11 @@ namespace mxslc::preprocess
 
     void Preprocessor::check_for_circular_dependency(const fs::path& path) const
     {
-        CompileError e{"Circular dependency detected in " + path_->filename().string() + " when including " + path.filename().string()};
+        // The root of a compile started from a string has no file of its own,
+        // so path_ may be unset. The message is built eagerly, so it must not
+        // dereference path_ unconditionally.
+        CompileError e{"Circular dependency detected" + (path_ ? " in " + path_->filename().string() : string{}) +
+            " when including " + path.filename().string()};
 
         if (path_ == path)
             throw e;

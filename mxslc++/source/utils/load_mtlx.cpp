@@ -5,6 +5,7 @@
 #include "utils/load_mtlx.h"
 
 #include <MaterialXFormat/Util.h>
+#include <MaterialXFormat/XmlIo.h>
 
 #include "expressions/interface.h"
 #include "expressions/NullExpression.h"
@@ -166,6 +167,13 @@ namespace mxslc
     {
         const mx::DocumentPtr doc = mx::createDocument();
         mx::readFromXmlFile(doc, filepath.string());
+        add_library_to_scope(doc);
+    }
+
+    void add_library_to_scope(const string& xml)
+    {
+        const mx::DocumentPtr doc = mx::createDocument();
+        mx::readFromXmlString(doc, xml);
         add_library_to_scope(doc);
     }
 

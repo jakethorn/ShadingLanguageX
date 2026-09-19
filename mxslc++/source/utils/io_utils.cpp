@@ -133,13 +133,10 @@ namespace mxslc::io_utils
         return dirs;
     }
 
-    void search(const vector<fs::path>& search_dirs, const fs::path& path, const std::function<void(const fs::path&)>& on_found)
+    fs::path search(const vector<fs::path>& search_dirs, const fs::path& path)
     {
         if (fs::is_regular_file(path))
-        {
-            on_found(path);
-            return;
-        }
+            return path;
 
         if (path.is_absolute())
             throw CompileError{"File " + path.string() + " could not be found."};
@@ -150,10 +147,7 @@ namespace mxslc::io_utils
         {
             fs::path full_path = dir / path;
             if (fs::is_regular_file(full_path))
-            {
-                on_found(full_path);
-                return;
-            }
+                return full_path;
 
             searched_paths += full_path.string() + "\n";
         }

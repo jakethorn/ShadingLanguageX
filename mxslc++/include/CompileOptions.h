@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "preprocess/Macro.h"
 #include "Primitive.h"
+#include "SourceRef.h"
 
 namespace mxslc
 {
@@ -36,6 +37,22 @@ namespace mxslc
         void set_current_working_directory(fs::path dir);
         void clear_search_directories();
         vector<fs::path> search_directories() const;
+
+        // In-memory sources, keyed by the path as written in an #include or
+        // #library directive. They take precedence over the file system, so a
+        // caller can compile a multi-file project without staging it to disk.
+        // Keys may be nested ("sub/a.mxsl"); a relative directive resolves
+        // against the directory of the file that included it, as on disk.
+        void add_source(string name, const string& contents);
+        void set_sources(unordered_map<string, string> sources);
+        void remove_source(const string& name);
+        void clear_sources();
+        const string& get_source(const string& name) const;
+        bool has_source(const string& name) const;
+        const unordered_map<string, string>& sources() const { return sources_; }
+
+        // Resolve a directive path to an in-memory source or a file on disk.
+        SourceRef resolve_source(const fs::path& path) const;
 
         void add_macro(Macro macro);
         void add_macro(string macro);
@@ -69,8 +86,11 @@ namespace mxslc
         bool has_entry_function() const { return func_name.has_value(); }
 
     private:
+        static string normalise_source_name(const string& name);
+
         optional<fs::path> cwd_;
         vector<fs::path> search_dirs_;
+        unordered_map<string, string> sources_;
         unordered_map<string, Macro> macros_;
         unordered_map<string, VarPtr> globals_;
         vector<VarPtr> func_args_;

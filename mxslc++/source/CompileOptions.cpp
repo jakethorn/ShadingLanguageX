@@ -44,6 +44,74 @@ namespace mxslc
         return dirs;
     }
 
+    string CompileOptions::normalise_source_name(const string& name)
+    {
+        // Keys are matched literally against the text of the directive, but the
+        // separator is normalised so that the same key matches on all platforms.
+        return fs::path{name}.lexically_normal().generic_string();
+    }
+
+    void CompileOptions::add_source(string name, const string& contents)
+    {
+        sources_.insert_or_assign(normalise_source_name(name), contents);
+    }
+
+    void CompileOptions::set_sources(unordered_map<string, string> sources)
+    {
+        sources_.clear();
+        for (auto& [name, contents] : sources)
+            add_source(std::move(name), contents);
+    }
+
+    void CompileOptions::remove_source(const string& name)
+    {
+        sources_.erase(normalise_source_name(name));
+    }
+
+    void CompileOptions::clear_sources()
+    {
+        sources_.clear();
+    }
+
+    const string& CompileOptions::get_source(const string& name) const
+    {
+        const string key = normalise_source_name(name);
+        const auto it = sources_.find(key);
+        if (it == sources_.end())
+            throw CompileError{"Source does not exist: " + name};
+
+        return it->second;
+    }
+
+    bool CompileOptions::has_source(const string& name) const
+    {
+        return container_utils::contains(sources_, normalise_source_name(name));
+    }
+
+    SourceRef CompileOptions::resolve_source(const fs::path& path) const
+    {
+        // In-memory sources win over the file system, so a source supplied by
+        // the caller is never shadowed by a file of the same name. The
+        // candidates mirror the order the file system is searched in, so a
+        // relative path also resolves against the directory of the file that
+        // included it and against the additional search directories. The bare
+        // path is kept as a fallback so flat keys continue to resolve.
+        for (const fs::path& dir : search_directories())
+        {
+            const string key = normalise_source_name((dir / path).string());
+            const auto it = sources_.find(key);
+            if (it != sources_.end())
+                return SourceRef{fs::path{key}, it->second};
+        }
+
+        const string key = normalise_source_name(path.string());
+        const auto it = sources_.find(key);
+        if (it != sources_.end())
+            return SourceRef{fs::path{key}, it->second};
+
+        return SourceRef{io_utils::search(search_directories(), path), std::nullopt};
+    }
+
     void CompileOptions::add_macro(Macro macro)
     {
         macros_.insert_or_assign(macro.name(), std::move(macro));

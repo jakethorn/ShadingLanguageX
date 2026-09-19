@@ -11,9 +11,19 @@
 //
 //     import Mxslc from './JsMxslc.js';
 //     const mx = await Mxslc();
-//     const opts = = new mx.CompileOptions();
-//     const mtlx = mx.compileSlxToMtlx('float x = add(1.0, 2.0);');
+//     const opts = new mx.CompileOptions();
+//     const mtlx = mx.compileSlxToMtlx('float x = add(1.0, 2.0);', opts);
 //     const slx  = mx.decompileMtlxToSlx(mtlx);
+//     opts.delete();
+//
+// A root source that #includes sibling files the browser only has as
+// in-memory strings can supply them through the compile options, rather than
+// them having to exist on the (virtual) file system:
+//
+//     const opts = new mx.CompileOptions();
+//     opts.addSource('colors.mxsl', 'const color3 RED = color3{1, 0, 0};');
+//     const mtlx = mx.compileSlxToMtlx(
+//         '#include "colors.mxsl"\nstandard_surface(base_color=RED);', opts);
 //     opts.delete();
 //
 
@@ -43,6 +53,22 @@ namespace
         ems::val err = ems::val::global("Error").new_(std::string(e.what()));
         err.set("name", std::string(name));
         err.throw_();
+    }
+
+    // Bound as prototype methods: embind passes the instance as the first
+    // argument. They exist because embind has no conversion from a JavaScript
+    // string to fs::path, which the CompileOptions search API takes.
+    void add_search_directory(mxslc::CompileOptions& opts, const std::string& dir)
+    {
+        opts.add_search_directory(fs::path{dir});
+    }
+
+    std::vector<std::string> get_search_directories(mxslc::CompileOptions& opts)
+    {
+        std::vector<std::string> dirs;
+        for (const fs::path& dir : opts.search_directories())
+            dirs.push_back(dir.string());
+        return dirs;
     }
 
     // Compile an SLX source string to a MaterialX (MTLX) XML string using
@@ -111,7 +137,14 @@ EMSCRIPTEN_BINDINGS(mxslc)
         .property("version", &mxslc::CompileOptions::version)
         .property("reduceGraph", &mxslc::CompileOptions::reduce_graph)
         .property("errorOnMissingGlobals", &mxslc::CompileOptions::error_on_missing_globals)
-        .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals);
+        .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals)
+        // In-memory sources resolved by #include / #library, plus the
+        // file-system search directories used for everything else.
+        .function("addSource", &mxslc::CompileOptions::add_source)
+        .function("clearSources", &mxslc::CompileOptions::clear_sources)
+        .function("addSearchDirectory", &add_search_directory)
+        .function("clearSearchDirectories", &mxslc::CompileOptions::clear_search_directories)
+        .function("searchDirectories", &get_search_directories);
 
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);

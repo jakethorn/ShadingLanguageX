@@ -18,7 +18,7 @@ namespace mxslc::io_utils
     fs::path get_python_module_directory();
     vector<fs::path> get_default_search_directories(const optional<fs::path>& src_path = std::nullopt);
 
-    void search(const vector<fs::path>& search_dirs, const fs::path& path, const std::function<void(const fs::path&)>& on_found);
+    fs::path search(const vector<fs::path>& search_dirs, const fs::path& path);
 }
 
 #endif //FENNEC_IO_UTILS_H

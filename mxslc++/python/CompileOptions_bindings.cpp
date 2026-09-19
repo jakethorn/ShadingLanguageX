@@ -26,7 +26,8 @@ void bind_compile_options(py::module_& m)
                 const optional<string>& func_name,
                 const py::list& func_args,
                 const bool reduce_graph,
-                const bool validate_graph)
+                const bool validate_graph,
+                const unordered_map<string, string>& sources)
             {
                 auto opts = std::make_unique<CompileOptions>();
                 opts->output_file = output_file;
@@ -37,6 +38,8 @@ void bind_compile_options(py::module_& m)
 
                 for (const fs::path& dir : search_directories)
                     opts->add_search_directory(dir);
+
+                opts->set_sources(sources);
 
                 opts->includes = includes;
                 opts->libraries = libraries;
@@ -68,7 +71,8 @@ void bind_compile_options(py::module_& m)
             py::arg("func_name") = std::nullopt,
             py::arg("func_args") = py::list(),
             py::arg("reduce_graph") = CompileOptions{}.reduce_graph,
-            py::arg("validate_graph") = CompileOptions{}.validate_graph
+            py::arg("validate_graph") = CompileOptions{}.validate_graph,
+            py::arg("sources") = py::dict()
         )
         .def_readwrite("output_file", &CompileOptions::output_file)
         .def_readwrite("version", &CompileOptions::version)
@@ -92,6 +96,19 @@ void bind_compile_options(py::module_& m)
                     opts.add_search_directory(dir);
             }
         )
+        .def_property("sources",
+            [](const CompileOptions& opts) {
+                return opts.sources();
+            },
+            [](CompileOptions& opts, const unordered_map<string, string>& sources) {
+                opts.set_sources(sources);
+            }
+        )
+        .def("add_source", &CompileOptions::add_source, py::arg("name"), py::arg("contents"))
+        .def("remove_source", &CompileOptions::remove_source, py::arg("name"))
+        .def("clear_sources", &CompileOptions::clear_sources)
+        .def("has_source", &CompileOptions::has_source, py::arg("name"))
+        .def("get_source", &CompileOptions::get_source, py::arg("name"))
         .def_readwrite("includes", &CompileOptions::includes)
         .def_readwrite("libraries", &CompileOptions::libraries)
         .def_property("globals",

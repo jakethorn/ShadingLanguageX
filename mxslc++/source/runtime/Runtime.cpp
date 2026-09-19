@@ -91,9 +91,11 @@ namespace mxslc::runtime
     {
         for (const fs::path& path : opts_.libraries)
         {
-            io_utils::search(opts_.search_directories(), path, [](const fs::path& found_path) {
-                add_library_to_scope(found_path);
-            });
+            const SourceRef source = opts_.resolve_source(path);
+            if (source.is_in_memory())
+                add_library_to_scope(*source.contents);
+            else
+                add_library_to_scope(source.path);
         }
     }
 
