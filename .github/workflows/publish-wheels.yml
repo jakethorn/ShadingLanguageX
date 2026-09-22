@@ -226,3 +226,88 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+
+  build_and_publish_js:
+    name: Build and publish JavaScript / WASM
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out mxslc
+        uses: actions/checkout@v4
+
+      - name: Check out MaterialX
+        uses: actions/checkout@v4
+        with:
+          repository: AcademySoftwareFoundation/MaterialX
+          ref: v1.39.5
+          path: mxslc++/external/MaterialX
+
+      - name: Cache Emscripten SDK
+        id: cache-emsdk
+        uses: actions/cache@v4
+        with:
+          path: emsdk
+          key: emsdk-4.0.8-${{ runner.os }}
+
+      - name: Install Emscripten SDK
+        if: steps.cache-emsdk.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/emscripten-core/emsdk --recursive
+          cd emsdk
+          ./emsdk install 4.0.8
+          ./emsdk activate 4.0.8
+
+      - name: Activate Emscripten SDK (cache hit)
+        if: steps.cache-emsdk.outputs.cache-hit == 'true'
+        run: |
+          cd emsdk
+          ./emsdk activate 4.0.8
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Cache npm dependencies
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            mxslc++/javascript/node_modules
+            mxslc++/javascript/tests/node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('mxslc++/javascript/package-lock.json', 'mxslc++/javascript/tests/package-lock.json') }}
+
+      - name: Cache MaterialX WASM build
+        id: cache-mtlx
+        uses: actions/cache@v4
+        with:
+          path: |
+            mxslc++/javascript/build/materialx
+            mxslc++/javascript/build/mtlx_install
+          key: mtlx-wasm-1.39.5-emsdk-4.0.8-${{ runner.os }}
+
+      - name: Build JavaScript / WASM, run unit tests, build browser
+        run: >
+          mxslc++/javascript/build_javascript.sh
+          "${{ github.workspace }}/emsdk"
+          "${{ github.workspace }}/mxslc++/external/MaterialX"
+
+      - name: Package JavaScript Assets
+        run: |
+          tar -czf mxslc-js.tar.gz -C mxslc++/javascript/build/mxslc/javascript/bin JsMxslc.js JsMxslc.wasm JsMxslc.data
+          zip -j mxslc-js.zip mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.js mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.wasm mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.data
+
+      - name: Upload assets to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name || github.ref_name }}"
+          echo "Target tag: $TAG_NAME"
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "Uploading JS/WASM assets to release $TAG_NAME..."
+            gh release upload "$TAG_NAME" mxslc-js.tar.gz mxslc-js.zip --clobber
+          else
+            echo "Warning: Release $TAG_NAME does not exist. Skipping asset upload."
+          fi
