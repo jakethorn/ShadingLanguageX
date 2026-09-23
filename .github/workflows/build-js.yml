@@ -19,6 +19,11 @@ name: Build JavaScript (WASM)
 #
 #  Note: a manual test-deploy publishes that branch's build to Pages and
 #  overwrites the live site until the next merge to `main`.
+#
+# Build only (called from another workflow):
+#   * release-js.yml calls this workflow to build the release artifacts.
+#     The deploy job never runs in that case: github.event_name is the
+#     caller's event (e.g. 'release'), which the deploy condition rejects.
 # ============================================================================
 
 on:
@@ -42,6 +47,15 @@ on:
         default: false
         type: boolean
 
+  # Build only, called from another workflow (see release-js.yml).
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref of mxslc to build (defaults to the triggering ref)'
+        required: false
+        default: ''
+        type: string
+
 permissions:
   contents: read
   pages: write
@@ -55,6 +69,9 @@ jobs:
     steps:
       - name: Check out mxslc
         uses: actions/checkout@v7
+        with:
+          # Empty (the default) checks out the triggering ref.
+          ref: ${{ inputs.ref }}
 
       - name: Check out MaterialX
         uses: actions/checkout@v7
