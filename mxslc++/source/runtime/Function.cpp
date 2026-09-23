@@ -23,6 +23,21 @@ namespace mxslc::runtime
         TypePtr return_type,
         string name,
         TypePtr template_type,
+        ParameterList params
+    ) : mods_{std::move(mods)},
+        return_type_{std::move(return_type)},
+        name_{std::move(name)},
+        template_type_{std::move(template_type)},
+        params_{std::move(params)}
+    {
+
+    }
+
+    Function::Function(
+        ModifierList mods,
+        TypePtr return_type,
+        string name,
+        TypePtr template_type,
         ParameterList params,
         mx::NodeDefPtr node_def
     ) : mods_{std::move(mods)},
@@ -73,7 +88,7 @@ namespace mxslc::runtime
             throw CompileError{"Functions cannot be both nodegraph and nodedef"};
 
         if (is_void() and is_parameterless())
-            throw CompileError{"Parameterless function '" + name_ + "' cannot be void"};
+            throw CompileError{"Parameterless function '" + this->name() + "' cannot be void"};
 
         if (is_nodegraph())
         {
@@ -89,7 +104,7 @@ namespace mxslc::runtime
 
     bool Function::is_void() const
     {
-        return return_type_->is_void();
+        return return_type()->is_void();
     }
 
     size_t Function::min_arity() const
@@ -157,7 +172,7 @@ namespace mxslc::runtime
         {
             if (branch.return_value())
             {
-                return_value = type_cast(return_type_, branch.return_value(), /*force*/true);
+                return_value = type_cast(return_type(), branch.return_value(), /*force*/true);
                 if (is_parameterless_)
                     parameterless_cache_ = return_value;
             }
@@ -166,7 +181,7 @@ namespace mxslc::runtime
         serializer().end_comptime();
 
         if (return_value == nullptr and not is_void())
-            throw CompileError{"Non-void function '" + name_ + "' did not return a value"};
+            throw CompileError{"Non-void function '" + name() + "' did not return a value"};
 
         return return_value;
     }
@@ -187,10 +202,10 @@ namespace mxslc::runtime
 
         string result;
         result += mods_string;
-        result += return_type_->to_string() + ' ';
+        result += return_type()->to_string() + ' ';
         if (has_class_type())
             result += class_type()->to_string() + '.';
-        result += name_;
+        result += name();
         if (has_template_type())
             result += '<' + template_type_->to_string() + '>';
         if (not is_parameterless_)

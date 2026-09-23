@@ -18,7 +18,7 @@ namespace mxslc::runtime
     {
         string result = type_->to_string();
         if (has_name())
-            result += " " + name();
+            result += ' ' + name();
         return result;
     }
 }

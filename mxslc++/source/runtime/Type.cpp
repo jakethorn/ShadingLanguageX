@@ -340,11 +340,11 @@ namespace mxslc::runtime
         {
             string result = name_;
             if (has_template_type())
-                result += "<" + template_type_->to_string() + ">";
+                result += '<' + template_type_->to_string() + '>';
             return result;
         }
 
-        return "{" + join(fields_, ", ") + "}";
+        return '{' + join(fields_, ", ") + '}';
     }
 
     string Type::full_str() const
@@ -356,7 +356,7 @@ namespace mxslc::runtime
         if (not has_fields())
             return result;
 
-        result += "{";
+        result += '{';
         for (const Field& field : fields_)
         {
             result += field.to_string();
@@ -366,7 +366,7 @@ namespace mxslc::runtime
         result.pop_back();
         result.pop_back();
 
-        result += "}";
+        result += '}';
         return result;
     }
 }

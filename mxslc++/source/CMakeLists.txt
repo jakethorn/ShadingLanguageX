@@ -27,6 +27,11 @@ add_library(mxslc_lib
         runtime/variables/PortVariable.cpp
         runtime/variables/ChannelVariable.cpp
         runtime/variables/SwizzleVariable.cpp
+        runtime/functions/Append.cpp
+        runtime/functions/Extend.cpp
+        runtime/functions/BuiltinFunction.cpp
+        runtime/functions/Len.cpp
+        runtime/functions/Insert.cpp
         runtime/Attribute.cpp
         runtime/AttributeList.cpp
         runtime/interface.cpp
@@ -36,6 +41,7 @@ add_library(mxslc_lib
         runtime/utils/type_cast.cpp
         runtime/utils/FunctionResolver.cpp
         runtime/utils/type_utils.cpp
+        runtime/utils/tuple_methods.cpp
         expressions/interface.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp

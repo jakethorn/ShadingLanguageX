@@ -27,6 +27,14 @@ namespace mxslc::runtime
             TypePtr return_type,
             string name,
             TypePtr template_type,
+            ParameterList params
+        );
+
+        Function(
+            ModifierList mods,
+            TypePtr return_type,
+            string name,
+            TypePtr template_type,
             ParameterList params,
             mx::NodeDefPtr node_def
         );
@@ -47,7 +55,7 @@ namespace mxslc::runtime
         bool is_nodegraph() const { return mods_.contains(TokenType::Nodegraph) or (is_parameterless() and not is_inline()); }
         bool is_nodedef() const { return not is_inline() and not is_nodegraph(); }
         bool is_default() const { return mods_.contains(TokenType::Default); }
-        const TypePtr& return_type() const { return return_type_; }
+        virtual TypePtr return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }
         bool has_template_type() const { return template_type_ != nullptr; }
@@ -60,6 +68,7 @@ namespace mxslc::runtime
         mx::NodeDefPtr node_def() const { return node_def_; }
         mx::NodeGraphPtr node_graph() const { return node_graph_; }
         bool is_initialized() const { return is_initialized_; }
+        virtual bool is_builtin() const { return false; }
 
         void set_node_def(mx::NodeDefPtr node_def);
         void set_node_graph(mx::NodeGraphPtr node_graph);
@@ -67,9 +76,8 @@ namespace mxslc::runtime
 
         Scope* defining_scope() const { return defining_scope_; }
 
-        void init();
-
-        VarPtr invoke() const;
+        virtual void init();
+        virtual VarPtr invoke() const;
 
         void add_nonlocal_input(VarPtr var) { nonlocal_inputs_.push_back(std::move(var)); }
         void add_nonlocal_output(VarPtr var) { nonlocal_outputs_.push_back(std::move(var)); }

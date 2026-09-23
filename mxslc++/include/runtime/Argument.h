@@ -38,6 +38,7 @@ namespace mxslc::runtime
 
         Argument monomorphize(const TypePtr& template_type) const override;
 
+        void init() const;
         void init(const TypePtr& type) const;
         void init(const vector<TypePtr>& types) const;
         bool try_init(const vector<TypePtr>& types) const;

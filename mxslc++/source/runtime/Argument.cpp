@@ -46,6 +46,11 @@ namespace mxslc::runtime
         return Argument{name_, expr_->monomorphize(template_type), index_};
     }
 
+    void Argument::init() const
+    {
+        expr_->init();
+    }
+
     void Argument::init(const TypePtr& type) const
     {
         expr_->init(type);

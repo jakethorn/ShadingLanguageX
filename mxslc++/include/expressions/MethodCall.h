@@ -12,11 +12,9 @@ namespace mxslc::expressions
     class MethodCall final : public FunctionCall
     {
     public:
-        MethodCall(ExprPtr instance_expr, string method_name, optional<ArgumentList> args);
-        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args);
-        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, Token token);
-        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs);
-        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token);
+        MethodCall(ExprPtr instance_expr, string method_name, optional<ArgumentList> args, Token token = {});
+        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, Token token = {});
+        MethodCall(ExprPtr instance_expr, string method_name, TypePtr template_type, optional<ArgumentList> args, AttributeList attrs, Token token = {});
 
         VarPtr instance() const { return instance_; }
 
