@@ -8,3 +8,5 @@ These examples were written while __ShadingLanguageX__ was being developed. It's
 |        ![](screenshots/waves.png)     |       ![](screenshots/mountain.png)     |      ![](screenshots/toon.png)    |
 |          __Disintegration__           |           __Colored Squares__           |             __Gold__              |
 |    ![](screenshots/disintergrate.png) |        ![](screenshots/squares.png)     |      ![](screenshots/gold.png)    |
+|         __B-Spline Curve__            |                                         |                                   |
+|      ![](screenshots/bspline.png)     |                                         |                                   |
