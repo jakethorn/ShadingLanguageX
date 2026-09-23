@@ -1,0 +1,127 @@
+//
+// bspline.mxsl
+//
+// Draws a uniform cubic B-spline curve in UV space.
+//
+// The curve is defined by six control points and evaluated as three connected
+// cubic B-spline spans using the standard uniform cubic basis functions. For
+// rendering, each span is sampled into a fixed-resolution polyline and the
+// shortest point-to-segment distance is used to create a continuous stroke.
+//
+// Control points are rendered as circular handles, with both the curve and
+// handles anti-aliased using smooth distance-based masks. The resulting colors
+// are composited over the background and returned as an unlit surface color.
+//
+// Note: ShadingLanguageX requires loop iteration counts to be known
+// at compile time, so each segment of the curve is sampled with a fixed number
+// of steps and every pixel is coloured by its shortest distance to the curve.
+
+#define STEPS 32             // samples taken along each curve segment
+#define LINE_RADIUS 0.006    // Line thickness
+#define HANDLE_RADIUS 0.011  // Handle size
+#define AA 0.0012            // anti-aliasing band width (in UV units)
+
+// The four uniform cubic B-spline basis functions, evaluated at t in [0, 1].
+vec4 bspline_basis(float t)
+{
+    float t2 = t * t;
+    float t3 = t2 * t;
+
+    return vec4{
+        (-t3 + 3.0 * t2 - 3.0 * t + 1.0) / 6.0,
+        ( 3.0 * t3 - 6.0 * t2 + 4.0) / 6.0,
+        (-3.0 * t3 + 3.0 * t2 + 3.0 * t + 1.0) / 6.0,
+         t3 / 6.0
+    };
+}
+
+// Evaluate one segment of a uniform cubic B-spline.
+// p0..p3 are the control points that influence the segment and t is the
+// local parameter in [0, 1].
+vec2 bspline_segment(vec2 p0, vec2 p1, vec2 p2, vec2 p3, float t)
+{
+    vec4 b = bspline_basis(t);
+    return p0 * b.x + p1 * b.y + p2 * b.z + p3 * b.w;
+}
+
+// Shortest distance from point p to the line segment ab.
+float dist_to_line(vec2 p, vec2 a, vec2 b)
+{
+    vec2 ab = b - a;
+    float t = clamp(dotproduct(p - a, ab) / max(dotproduct(ab, ab), 1e-8), 0.0, 1.0);
+    return magnitude(p - (a + ab * t));
+}
+
+// Shortest distance from point p to a single B-spline segment. The curve is
+// sampled with a fixed number of steps and the distance is measured against
+// the resulting polyline (point-to-line-segment) to generate a continuous line.
+float distance_to_segment(vec2 p0, vec2 p1, vec2 p2, vec2 p3, vec2 p)
+{
+    mutable vec2 prev = bspline_segment(p0, p1, p2, p3, 0.0);
+    mutable float best = 1e6;
+    for (int i from 1 to STEPS)
+    {
+        float t = float{i} / float{STEPS};
+        vec2 q = bspline_segment(p0, p1, p2, p3, t);
+        best = min(best, dist_to_line(p, prev, q));
+        prev = q;
+    }
+    return best;
+}
+
+// Colour a UV position for a uniform cubic B-spline defined by six control points.
+// This function passes accepts a set of control points
+// or colours to draw a different curve. 
+// The shaded colour is returned.
+color3 bspline_curve(
+    vec2 p0, vec2 p1, vec2 p2, vec2 p3, vec2 p4, vec2 p5,
+    vec2 uv,
+    color3 curve_color = color3{1.00, 0.55, 0.10},
+    color3 handle_color = color3{0.25, 0.80, 0.95},
+    color3 background = color3{0.02, 0.03, 0.06}
+)
+{
+    // Distance to the whole curve is the minimum distance over its segments.
+    float d0 = distance_to_segment(p0, p1, p2, p3, uv);
+    float d1 = distance_to_segment(p1, p2, p3, p4, uv);
+    float d2 = distance_to_segment(p2, p3, p4, p5, uv);
+    float curve_dist = min(d0, min(d1, d2));
+
+    // Distance to the nearest control point.
+    float handle_dist = min(
+        magnitude(uv - p0),
+        min(magnitude(uv - p1),
+        min(magnitude(uv - p2),
+        min(magnitude(uv - p3),
+        min(magnitude(uv - p4), magnitude(uv - p5))))));
+
+    // Anti-aliased line and dot.
+    float curve_line = 1.0 - smoothstep(curve_dist, LINE_RADIUS - AA, LINE_RADIUS + AA);
+    float handle_dot = 1.0 - smoothstep(handle_dist, HANDLE_RADIUS - AA, HANDLE_RADIUS + AA);
+
+    mutable color3 col = mix(handle_color, background, handle_dot);
+    col = mix(curve_color, col, curve_line);
+
+    return col;
+}
+
+// Example control points for a the curve. 
+// A uniform (non-clamped) cubic B-spline with six control points produces
+// three connected cubic spans. The curve does not generally interpolate
+// the control points.
+vec2 c0 = vec2{0.10, 0.45};
+vec2 c1 = vec2{0.25, 0.85};
+vec2 c2 = vec2{0.45, 0.15};
+vec2 c3 = vec2{0.65, 0.85};
+vec2 c4 = vec2{0.85, 0.20};
+vec2 c5 = vec2{0.95, 0.60};
+
+// Assumes a uniform layout for UVs such as on a plane.
+vec2 uv = texcoord();
+
+// Draw the curve. 
+color3 col = bspline_curve(c0, c1, c2, c3, c4, c5, uv);
+
+material bspline_material = surfacematerial(
+    surface_unlit(emission_color = col)
+);
