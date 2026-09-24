@@ -26,6 +26,7 @@ namespace mxslc::serialize::values
 
     void InterfaceValue::set_as_node_input(const mx::InputPtr& input) const
     {
+        mtlx_utils::clear_binding(input, name_);
         mtlx_utils::set_interface(input, name_);
     }
 

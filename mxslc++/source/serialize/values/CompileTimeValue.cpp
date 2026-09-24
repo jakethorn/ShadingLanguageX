@@ -23,6 +23,8 @@ namespace mxslc::serialize::values
 
     void CompileTimeValue::set_as_node_input(const mx::InputPtr& input) const
     {
+        mtlx_utils::clear_binding(input, value_.to_string());
+
         value_.visit([this, &input](const auto& v) {
             IF_VISITED_TYPE_IS(std::monostate)
                 mtlx_utils::remove_port(input);

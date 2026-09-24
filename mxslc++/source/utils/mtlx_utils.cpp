@@ -102,6 +102,18 @@ namespace mxslc::mtlx_utils
         return get_node_def(node_graph, mtlx_lib);
     }
 
+    void clear_binding(const mx::PortElementPtr& port, const string& new_value)
+    {
+        if (new_value.empty())
+            return;
+
+        port->removeAttribute(mx::ValueElement::VALUE_ATTRIBUTE);
+        port->removeAttribute(mx::PortElement::OUTPUT_ATTRIBUTE);
+        port->removeAttribute(mx::PortElement::NODE_NAME_ATTRIBUTE);
+        port->removeAttribute(mx::ValueElement::INTERFACE_NAME_ATTRIBUTE);
+        port->removeAttribute(mx::PortElement::NODE_GRAPH_ATTRIBUTE);
+    }
+
     void set_interface(const mx::PortElementPtr& port, const string& interface_name)
     {
         port->removeAttribute("value");

@@ -25,6 +25,7 @@ add_executable(mxslc_tests
         global_tests.cpp
         overwrite_data_files_tests.cpp
         compile_options_sources_tests.cpp
+        value_override_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

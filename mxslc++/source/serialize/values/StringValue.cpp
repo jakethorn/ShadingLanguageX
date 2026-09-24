@@ -21,6 +21,8 @@ namespace mxslc::serialize::values
 
     void StringValue::set_as_node_input(const mx::InputPtr& input) const
     {
+        mtlx_utils::clear_binding(input, value_);
+
         input->setValueString(value_);
     }
 

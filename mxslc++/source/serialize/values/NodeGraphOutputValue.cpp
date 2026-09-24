@@ -34,6 +34,7 @@ namespace mxslc::serialize::values
 
     void NodeGraphOutputValue::set_as_node_input(const mx::InputPtr& input) const
     {
+        mtlx_utils::clear_binding(input, node_graph_name_);
         input->setOutputString(output_name_);
         input->setNodeGraphString(node_graph_name_);
     }
@@ -50,6 +51,7 @@ namespace mxslc::serialize::values
     void NodeGraphOutputValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
     {
         const mx::InputPtr input = mtlx_utils::add_or_get_input(node_graph, type_, input_name);
+        mtlx_utils::clear_binding(input, node_graph_name_);
         input->setOutputString(output_name_);
         input->setNodeGraphString(node_graph_name_);
     }
