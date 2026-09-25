@@ -1,0 +1,122 @@
+name: Release JavaScript (WASM)
+
+# ============================================================================
+# HOW TO TRIGGER
+# ----------------------------------------------------------------------------
+# Automatically:
+#   * Publishing a GitHub release
+#
+# Manually (to attach, or re-attach, assets to an existing release):
+#   gh workflow run release-js.yml -f tag=mxslcxx-<version>
+#
+# WHAT IT DOES
+# ----------------------------------------------------------------------------
+# 1. Calls build-js.yml on the release tag. That builds MaterialX and the
+#    JsMxslc module with Emscripten, runs the Playwright unit tests, and
+#    uploads the WASM, GitHub Pages and VS Code extension artifacts. Nothing
+#    is released unless that build and its tests pass.
+# 2. Downloads those artifacts, repackages them, and uploads them to the
+#    release as:
+#      * mxslc_JsMxslc_package.zip  - JsMxslc.js/.wasm/.data + LICENSE
+#      * mxslc_github_pages.zip     - the self-contained browser app
+#      * mxslc_vscode_extension.zip - the .vsix (skipped with a warning if
+#                                     the optional extension build failed)
+#    Existing assets with the same name are replaced.
+# ============================================================================
+
+on:
+  release:
+    types:
+      - published
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to build and attach assets to (e.g. mxslcxx-0.3.1)'
+        required: true
+        type: string
+
+concurrency:
+  group: release-js-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build-js.yml
+    with:
+      ref: refs/tags/${{ github.event.release.tag_name || inputs.tag }}
+    # A called workflow can't be granted less than it declares, and
+    # build-js.yml declares pages/id-token for its deploy job (which is
+    # skipped here, since the event isn't a push to main).
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+  release:
+    name: Upload release assets
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+
+    steps:
+      - name: Check out LICENSE
+        uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          sparse-checkout: LICENSE
+          sparse-checkout-cone-mode: false
+
+      - name: Download build artifacts
+        # Every artifact from the build job, each into artifacts/<name>/.
+        uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+
+      - name: Show artifacts
+        run: ls -laR artifacts
+
+      - name: Package release assets
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          # WASM bindings, flat at the zip root.
+          zip -j dist/mxslc_JsMxslc_package.zip \
+            artifacts/mxslc-js/JsMxslc.js \
+            artifacts/mxslc-js/JsMxslc.wasm \
+            artifacts/mxslc-js/JsMxslc.data \
+            LICENSE
+
+          # upload-pages-artifact stores the site as artifact.tar; unpack it
+          # so the release zip holds the browser app itself.
+          mkdir -p site
+          tar -xf artifacts/github-pages/artifact.tar -C site
+          (cd site && zip -r ../dist/mxslc_github_pages.zip .)
+
+          # The VS Code extension build is continue-on-error in build-js.yml,
+          # so its artifact may be missing.
+          shopt -s nullglob
+          vsix=(artifacts/mxslc-vscode/*.vsix)
+          if [ ${#vsix[@]} -gt 0 ]; then
+            zip -j dist/mxslc_vscode_extension.zip "${vsix[@]}"
+          else
+            echo "::warning::No VS Code extension (.vsix) was built; mxslc_vscode_extension.zip will not be attached."
+          fi
+
+          ls -la dist
+          for f in dist/*.zip; do echo "== $f"; unzip -l "$f"; done
+
+      - name: Upload assets to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
