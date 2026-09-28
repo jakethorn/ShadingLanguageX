@@ -20,6 +20,12 @@ namespace mxslc::statements
 
     }
 
+    void ReturnStatement::set_attributes(AttributeList attrs)
+    {
+        if (expr_)
+            expr_->set_attributes(std::move(attrs));
+    }
+
     StmtPtr ReturnStatement::monomorphize(const TypePtr& template_type) const
     {
         ExprPtr expr = runtime_utils::monomorphize(expr_, template_type);

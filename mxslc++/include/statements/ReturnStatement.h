@@ -14,6 +14,8 @@ namespace mxslc::statements
     public:
         explicit ReturnStatement(ExprPtr expr, Token token = {});
 
+        void set_attributes(AttributeList attrs) override;
+
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
