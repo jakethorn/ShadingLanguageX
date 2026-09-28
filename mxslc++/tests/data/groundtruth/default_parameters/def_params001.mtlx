@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_my_clamp" node="my_clamp">
+    <output name="out" type="float" />
+    <input name="x" type="float" value="1" />
+    <input name="min" type="float" value="2" />
+    <input name="max" type="float" value="3" />
+  </nodedef>
+  <nodegraph name="NG_my_clamp" nodedef="ND_my_clamp">
+    <max name="var__0" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" interfacename="min" />
+    </max>
+    <min name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
+      <input name="in2" type="float" interfacename="max" />
+    </min>
+    <output name="out" type="float" nodename="var__1" />
+  </nodegraph>
+  <clamp name="a1" type="float" />
+  <my_clamp name="b1" type="float" />
+  <clamp name="a2" type="float">
+    <input name="in" type="float" value="5" />
+  </clamp>
+  <my_clamp name="b2" type="float">
+    <input name="x" type="float" value="5" />
+  </my_clamp>
+  <clamp name="a3" type="float">
+    <input name="in" type="float" value="1" />
+    <input name="low" type="float" value="2" />
+    <input name="high" type="float" value="3" />
+  </clamp>
+  <my_clamp name="b3" type="float">
+    <input name="x" type="float" value="1" />
+    <input name="min" type="float" value="2" />
+    <input name="max" type="float" value="3" />
+  </my_clamp>
+</materialx>

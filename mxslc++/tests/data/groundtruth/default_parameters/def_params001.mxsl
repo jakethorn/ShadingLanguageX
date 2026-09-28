@@ -1,0 +1,13 @@
+float my_clamp(float x = 1, float min = 2, float max = 3)
+{
+	return min(max(x, min), max);
+}
+
+float a1 = clamp();
+float b1 = my_clamp();
+
+float a2 = clamp(5);
+float b2 = my_clamp(5);
+
+float a3 = clamp(1, 2 ,3);
+float b3 = my_clamp(1, 2, 3);

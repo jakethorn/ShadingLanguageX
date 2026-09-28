@@ -32,7 +32,6 @@
     <input name="xy__0" type="float" value="1" />
     <input name="xy__1" type="float" value="2" />
     <input name="z" type="float" value="3" />
-    <input name="space" type="string" value="world" />
   </foo>
   <foo name="m" type="multioutput">
     <input name="xy__0" type="float" value="4" />

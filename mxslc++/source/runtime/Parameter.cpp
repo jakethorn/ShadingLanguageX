@@ -56,7 +56,10 @@ namespace mxslc::runtime
 
     VarPtr Parameter::evaluate() const
     {
-        return expr_->evaluate();
+        VarPtr value = expr_->evaluate();
+        if (not initial_value_)
+            initial_value_ = value;
+        return value;
     }
 
     string Parameter::to_string() const

@@ -18,7 +18,6 @@
   </nodegraph>
   <foo name="var__0" type="integer">
     <input name="x" type="integer" value="1" />
-    <input name="s" type="string" value="world" />
   </foo>
   <foo name="var__1" type="integer">
     <input name="x" type="integer" value="1" />

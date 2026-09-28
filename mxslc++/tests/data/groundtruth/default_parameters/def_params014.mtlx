@@ -11,9 +11,7 @@
     </add>
     <output name="nonlocal_out__a" type="float" nodename="var__0" />
   </nodegraph>
-  <foo name="var__0" type="float">
-    <input name="b" type="float" value="1" />
-  </foo>
+  <foo name="var__0" type="float" />
   <foo name="var__1" type="float">
     <input name="b" type="float" nodename="var__0" />
   </foo>

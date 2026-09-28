@@ -160,7 +160,15 @@ namespace mxslc::serialize
         for (const auto& [param, input_value] : input_values)
         {
             const Argument* arg = args[param];
-            AttributeList input_attrs = arg != nullptr ? args[param]->attributes() : AttributeList{};
+
+            if (arg == nullptr and
+                input_value->is_compile_time() and
+                input_value->equals(param.initial_value()))
+            {
+                continue;
+            }
+
+            AttributeList input_attrs = arg != nullptr ? arg->attributes() : AttributeList{};
 
             if (param.is_in())
             {
