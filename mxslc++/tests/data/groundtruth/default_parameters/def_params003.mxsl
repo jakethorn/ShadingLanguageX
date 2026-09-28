@@ -1,0 +1,9 @@
+mutable float k = 1.0;
+
+float scaled(float x, float by = k)
+{
+    return x * by;
+}
+
+k = 3.0;
+float a = scaled(time());

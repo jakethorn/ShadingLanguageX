@@ -9,6 +9,7 @@
 #include "runtime/Type.h"
 #include "runtime/utils/monomorphize.h"
 #include "errors/CompileError.h"
+#include "runtime/variables/Variable.h"
 
 namespace mxslc::runtime
 {
@@ -58,7 +59,7 @@ namespace mxslc::runtime
     {
         VarPtr value = expr_->evaluate();
         if (not initial_value_)
-            initial_value_ = value;
+            initial_value_ = value->copy();
         return value;
     }
 

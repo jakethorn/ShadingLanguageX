@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_scaled" node="scaled">
+    <output name="out" type="float" />
+    <input name="x" type="float" value="0" />
+    <input name="by" type="float" value="1" />
+  </nodedef>
+  <nodegraph name="NG_scaled" nodedef="ND_scaled">
+    <multiply name="var__0" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" interfacename="by" />
+    </multiply>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <time name="var__0" type="float" />
+  <scaled name="a" type="float">
+    <input name="x" type="float" nodename="var__0" />
+    <input name="by" type="float" value="3" />
+  </scaled>
+</materialx>
