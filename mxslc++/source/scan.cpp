@@ -51,12 +51,25 @@ namespace mxslc
             return try_match(TokenType::String, pattern, text, token);
         }
 
+        bool is_identifier_start_char(const char c)
+        {
+            return std::isalpha(static_cast<unsigned char>(c)) || c == '_';
+        }
+
+        bool is_identifier_char(const char c)
+        {
+            return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+        }
+
         bool try_match_bool(const string_view text, Token& token)
         {
             if (text.front() == 't')
             {
                 if (text.size() >= 4 && text.compare(0, 4, "true") == 0)
                 {
+                    if (text.size() >= 5 && is_identifier_char(text[4]))
+                        return false;
+
                     token = Token{TokenType::Bool, string{text.substr(0, 4)}};
                     return true;
                 }
@@ -66,6 +79,9 @@ namespace mxslc
             {
                 if (text.size() >= 5 && text.compare(0, 5, "false") == 0)
                 {
+                    if (text.size() >= 6 && is_identifier_char(text[5]))
+                        return false;
+
                     token = Token{TokenType::Bool, string{text.substr(0, 5)}};
                     return true;
                 }
