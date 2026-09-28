@@ -40,6 +40,8 @@ namespace mxslc::runtime
         VarPtr initial_value() const { return initial_value_; }
 
         string to_string() const override;
+        // null defaults can be hidden in function signatures, e.g., in error messages, as they only mark the parameter as optional
+        string to_string(bool show_null_default) const;
 
     private:
         AttributeList attrs_;

@@ -1,0 +1,6 @@
+vec3 i = viewdirection();
+vec3 n = normal("world");
+float theta = dotproduct(-i, n);
+color3 c = if (|theta| > 0.65) { color3{1.0, 0.2, 0.143} } else { color3{0.154, 1.0, 1.0} };
+surfaceshader s = surface_unlit(emission_color = c);
+material m = surfacematerial(s);

@@ -1,0 +1,11 @@
+mutable float grid = 0.0;
+
+for (int x from 0 to 1)
+{
+    for (int y from 0 to 1)
+    {
+        grid += randomfloat(x, seed = y);
+    }
+}
+
+float g = grid * 0.25;

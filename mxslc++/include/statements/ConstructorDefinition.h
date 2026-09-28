@@ -21,6 +21,7 @@ namespace mxslc::statements
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
+        bool is_block() const override { return true; }
 
     protected:
         void init() override;

@@ -24,6 +24,6 @@ namespace mxslc::statements
 
     string UsingDeclaration::to_string() const
     {
-        return "using " + name_ + " = " + type_->to_string();
+        return "using " + name_ + " = " + type_->to_string() + ";";
     }
 }

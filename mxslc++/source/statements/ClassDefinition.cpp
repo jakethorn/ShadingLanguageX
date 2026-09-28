@@ -17,6 +17,7 @@
 #include "runtime/interface.h"
 #include "statements/interface.h"
 #include "statements/MultiVariableDefinition.h"
+#include "utils/string_utils.h"
 
 namespace mxslc::statements
 {
@@ -131,10 +132,8 @@ namespace mxslc::statements
         if (parent_)
             result += " : " + parent_->to_string();
 
-        result += "\n{\n\t";
-
-        result += join(body_, "\n\n\t");
-
+        result += "\n{\n";
+        result += string_utils::indent(join_statements(body_));
         result += "\n}";
 
         return result;

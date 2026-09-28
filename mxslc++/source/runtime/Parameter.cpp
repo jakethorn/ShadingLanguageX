@@ -65,16 +65,24 @@ namespace mxslc::runtime
 
     string Parameter::to_string() const
     {
-        string mods_string = mods_.to_string();
+        return to_string(true);
+    }
+
+    string Parameter::to_string(const bool show_null_default) const
+    {
+        string attrs_string = attrs_.to_string(" ");
+        if (not attrs_string.empty())
+            attrs_string += ' ';
+
+        // out and ref parameters are implicitly mutable
+        string mods_string = (is_out() ? mods_.without(TokenType::Mutable) : mods_).to_string();
         if (not mods_string.empty())
             mods_string += ' ';
 
-        string default_value_string = has_default_value() ? expr_->to_string() : "";
-        if (default_value_string.empty() or default_value_string == "null")
-            default_value_string = "";
-        else
-            default_value_string = " = " + default_value_string;
+        string default_value_string = has_default_value() ? " = " + expr_->to_string() : "";
+        if (not show_null_default and default_value_string == " = null")
+            default_value_string.clear();
 
-        return mods_string + type_->to_string() + ' ' + name_ + default_value_string;
+        return attrs_string + mods_string + type_->to_string() + ' ' + name_ + default_value_string;
     }
 }

@@ -21,6 +21,7 @@ namespace mxslc::expressions
         VarPtr instance() const { return instance_; }
 
         string to_string() const override;
+        Precedence precedence() const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

@@ -1,0 +1,26 @@
+vec2 uv = texcoord();
+mutable color3 c = color3{1.0, 1.0, 1.0};
+
+for (int i from 1 to 4)
+{
+    vec2 center = vec2{randomfloat(i, seed = 0), randomfloat(i, seed = 1)};
+    c = if (distance(center, uv) < 0.1) { randomcolor(i) };
+}
+
+mutable float height = 0.0;
+mutable float scale = 1.0;
+
+for (int octave from 0 to 3)
+{
+    height += noise2d(1.0, 0.0, uv * scale) / scale;
+    scale *= 2.0;
+}
+
+mutable vec3 blur = vec3{0.0, 0.0, 0.0};
+
+for (float w from {0.25, 0.5, 1.0})
+{
+    blur += position() * w;
+}
+
+surfaceshader s = standard_surface(base_color = c * height, normal = normalize(blur));

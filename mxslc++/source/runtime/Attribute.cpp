@@ -24,7 +24,7 @@ namespace mxslc::runtime
 
     string Attribute::to_string() const
     {
-        string name_string = name_ + (has_child() ? "." + child_ : "");
+        const string name_string = (has_child() ? child_ + "." : "") + name_;
         return "@" + name_string + " \"" + value_ + "\"";
     }
 }

@@ -55,6 +55,10 @@ namespace mxslc::expressions
 
     string VariableDefinitionExpression::to_string() const
     {
-        return var_def_->to_string() + " " + identifier_->to_string();
+        // the definition without its semicolon, e.g., the `float x` in `foo(float x)`
+        string var_def_string = var_def_->to_string();
+        if (not var_def_string.empty() and var_def_string.back() == ';')
+            var_def_string.pop_back();
+        return var_def_string;
     }
 }

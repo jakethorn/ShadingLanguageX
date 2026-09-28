@@ -1,0 +1,7 @@
+vec2 uv = texcoord();
+float threshold = 0.5;
+color3 red = color3{1.0, 0.0, 0.0};
+color3 c = if (uv.x > threshold) { red } else { color3{uv, threshold} };
+const float PI = 3.14159;
+float theta = uv.y * PI * 2.0;
+vec2 dir = vec2{cos(theta), sin(theta)};

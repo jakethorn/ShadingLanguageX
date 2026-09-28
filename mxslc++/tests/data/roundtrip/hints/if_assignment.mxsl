@@ -1,0 +1,5 @@
+vec2 uv = texcoord();
+mutable color3 c = image("textures/albedo.png", texcoord = uv);
+c = if (uv.x > 0.5) { c * 0.5 };
+c = if (uv.y > 0.9) { color3{1.0, 0.0, 0.0} } else if (uv.y > 0.8) { color3{0.0, 1.0, 0.0} };
+surfaceshader s = standard_surface(base_color = c);

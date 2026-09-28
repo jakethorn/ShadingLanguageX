@@ -35,7 +35,9 @@ namespace mxslc
 
         bool try_match_float(const string_view text, Token& token)
         {
-            static const regex pattern{R"((([0-9]*\.[0-9]+)|([0-9]+\.[0-9]*)|([0-9]+[eE][+-]?[0-9]+))[fF]?)", std::regex_constants::optimize};
+            // a mantissa with a decimal point and an optional exponent, e.g., 2.5, .5, 2., 2.5e6, .5e-3
+            // or a mantissa without a decimal point and a required exponent, e.g., 2e6
+            static const regex pattern{R"((([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?|[0-9]+[eE][+-]?[0-9]+)[fF]?)", std::regex_constants::optimize};
             return try_match(TokenType::Float, pattern, text, token);
         }
 

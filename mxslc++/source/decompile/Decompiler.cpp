@@ -2,172 +2,111 @@
 // Created by jaket on 19/06/2026.
 //
 
-
 #include <MaterialXFormat/XmlIo.h>
 
 #include "decompile/Decompiler.h"
-#include "common.h"
-#include "TokenType.h"
-#include "utils/mtlx_utils.h"
-#include "utils/container_utils.h"
+#include "decompile/DocumentDecompiler.h"
+#include "constants.h"
 #include "errors/CompileError.h"
-#include "serialize/serialize_name_utils.h"
+#include "utils/io_utils.h"
+#include "utils/load_mtlx.h"
 #include "utils/string_utils.h"
 
 namespace mxslc::decompile
 {
     using string_utils::starts_with;
-    using namespace container_utils;
 
     namespace
     {
-        // Attributes that the decompiler already re-expresses in ShadingLanguageX
-        // syntax (element identity, type, port values and connections) or that are
-        // internal graph-layout metadata (xpos/ypos/width/height), and therefore
-        // should note be re-emitted as `@` declarations.  
-        const unordered_set<string>& structural_attributes()
+        vector<int> version_numbers(const string& version)
         {
-            static const unordered_set<string> attributes {
-                // Identity, value and connection attributes
-                mx::Element::NAME_ATTRIBUTE,
-                mx::TypedElement::TYPE_ATTRIBUTE,
-                mx::ValueElement::VALUE_ATTRIBUTE,
-                mx::ValueElement::INTERFACE_NAME_ATTRIBUTE,
-                mx::PortElement::NODE_NAME_ATTRIBUTE,
-                mx::PortElement::NODE_GRAPH_ATTRIBUTE,
-                mx::PortElement::OUTPUT_ATTRIBUTE,
-                // Ignore layout attributes
-                mx::Element::XPOS_ATTRIBUTE,
-                mx::Element::YPOS_ATTRIBUTE,
-                mx::Backdrop::WIDTH_ATTRIBUTE,
-                mx::Backdrop::HEIGHT_ATTRIBUTE,
-            };
-            return attributes;
-        }
-
-        string safe_mxsl_name(const vector<mx::OutputPtr>& outputs, const string& name)
-        {
-            const TokenType type{name};
-            if (type == TokenType::Unknown or type == TokenType::Identifier)
-                return name;
-            for (size_t i = 0; i < outputs.size(); ++i)
+            vector<int> numbers;
+            size_t start = 0;
+            while (start < version.size())
             {
-                if (outputs[i]->getName() == name)
-                    return "out" + std::to_string(i + 1);
+                size_t end = version.find('.', start);
+                if (end == string::npos)
+                    end = version.size();
+                numbers.push_back(std::atoi(version.substr(start, end - start).c_str()));
+                start = end + 1;
             }
-            return name;
+            return numbers;
         }
 
-        bool is_inline_node(const mx::NodePtr& node)
+        // documents only store the major and minor version, e.g., 1.39, so the latest available patch version is used
+        string find_library_version(const string& document_version, const vector<fs::path>& search_directories)
         {
-            return node->getName().rfind("var__", 0) == 0;
-        }
+            const string prefix = document_version + ".";
+            if (document_version.empty() or starts_with(DEFAULT_MTLX_VERSION, prefix))
+                return DEFAULT_MTLX_VERSION;
 
-        // A `separate`-family node returns an anonymous array (see
-        // primitive_utils::separate*), so its outputs must be addressed by index,
-        // never by named member access such as `.outx`. This only matters for
-        // inline (var__) separate nodes, which are expanded on demand into a bare
-        // call expression with no named fields; declared record variables keep
-        // their named member access.
-        bool is_inline_separate_node(const mx::NodePtr& node)
-        {
-            if (not is_inline_node(node))
-                return false;
-            const string category = node->getCategory();
-            return category == "separate" or category == "separate2"
-                or category == "separate3" or category == "separate4";
-        }
-
-        // Map a separate node's output name (outx/outy/outz/outw, ...) to its
-        // zero-based channel index by comparing aginst the NodeDef's output names.
-        // If no match throw an error. 
-        int separate_output_index(const mx::NodePtr& node, const string& output)
-        {
-            const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
-            if (node_def)
+            string best_version;
+            for (const fs::path& directory : search_directories)
             {
-                const vector<mx::OutputPtr> outputs = node_def->getActiveOutputs();
-                for (size_t i = 0; i < outputs.size(); ++i)
+                const fs::path libraries_dir = directory / "libraries";
+                std::error_code error;
+                if (not fs::is_directory(libraries_dir, error))
+                    continue;
+
+                for (const fs::directory_entry& entry : fs::directory_iterator{libraries_dir, error})
                 {
-                    if (outputs[i]->getName() == output)
-                        return static_cast<int>(i);
+                    const string version = entry.path().filename().string();
+                    if (entry.is_directory() and starts_with(version, prefix) and version_numbers(version) > version_numbers(best_version))
+                        best_version = version;
                 }
             }
-            throw CompileError{"Cannot determine output index for '" + output +
-                               "' of separate node '" + node->getName() + "'"};
+
+            return best_version.empty() ? DEFAULT_MTLX_VERSION : best_version;
         }
 
-        string get_type_alias(const string& type_name)
+        mx::ElementPtr find_element(const mx::DocumentPtr& document, const mx::ElementPtr& element, const string& type_name)
         {
-            static const unordered_map<string, string> type_aliases {
-                {"boolean", "bool"},
-                {"integer", "int"},
-                {"vector2", "vec2"},
-                {"vector3", "vec3"},
-                {"vector4", "vec4"},
-                {"matrix33", "mat3"},
-                {"matrix44", "mat4"},
-            };
-
-            if (contains(type_aliases, type_name))
-                return type_aliases.at(type_name);
-            return type_name;
-        }
-
-        string get_type_alias(const mx::TypedElementPtr& typed_element)
-        {
-            return get_type_alias(typed_element->getType());
-        }
-
-        void remove_trailing_comma(string& str)
-        {
-            if (str.size() >= 2)
-                str.resize(str.size() - 2);
+            if (element == nullptr)
+                throw CompileError{"Cannot decompile null " + type_name};
+            if (element->getDocument() == document)
+                return element;
+            // the element belongs to the original document, find its copy
+            if (mx::ElementPtr copy = document->getDescendant(element->getNamePath()))
+                return copy;
+            throw CompileError{"Cannot find " + type_name + ": " + element->getNamePath()};
         }
     }
 
-    Decompiler::Decompiler(const fs::path& src_path)
+    Decompiler::Decompiler(const fs::path& src_path) : document_{mx::createDocument()}
     {
-        document_ = mx::createDocument();
         mx::readFromXmlFile(document_, src_path.string());
+        load_data_library(io_utils::get_default_search_directories(src_path));
     }
 
-    Decompiler::Decompiler(const string& source)
+    Decompiler::Decompiler(const string& source) : document_{mx::createDocument()}
     {
-        document_ = mx::createDocument();
         mx::readFromXmlString(document_, source);
+        load_data_library(io_utils::get_default_search_directories());
     }
 
-    Decompiler::Decompiler(mx::DocumentPtr document) : document_{std::move(document)}
+    Decompiler::Decompiler(const mx::DocumentPtr& document) : document_{mx::createDocument()}
     {
+        document_->copyContentFrom(document);
+        load_data_library(io_utils::get_default_search_directories());
+    }
 
+    void Decompiler::load_data_library(const vector<fs::path>& search_directories) const
+    {
+        // the node defs of the standard library are needed to know the order and default values of node inputs
+        const string version = find_library_version(document_->getVersionString(), search_directories);
+        try
+        {
+            document_->setDataLibrary(load_materialx_library(version, search_directories));
+        }
+        catch (const CompileError&)
+        {
+            // without the libraries, nodes are decompiled as function calls with named arguments
+        }
     }
 
     string Decompiler::decompile_document()
     {
-        global_code_ = "";
-        decompiled_nodes_.clear();
-
-        // Document-level metadata, e.g. `@@doc "..."`.  Everything except the
-        // structural `version` attribute is emitted.
-        for (const string& attr_name : document_->getAttributeNames())
-        {
-            if (attr_name != "version")
-                global_code_ += "@@" + attr_name + " \"" + document_->getAttribute(attr_name) + "\"\n";
-        }
-
-        for (const mx::NodeGraphPtr& node_graph : document_->getNodeGraphs())
-        {
-            global_code_ += node_graph_to_function_definition(node_graph);
-        }
-
-        for (const mx::NodePtr& node : document_->getNodes())
-        {
-            if (not is_inline_node(node))
-                global_code_ += node_to_variable_definition(node);
-        }
-
-        return global_code_;
+        return DocumentDecompiler{document_}.decompile_document();
     }
 
     string Decompiler::decompile_node(const string& node_name, const bool with_dependencies)
@@ -177,13 +116,8 @@ namespace mxslc::decompile
 
     string Decompiler::decompile_node(const mx::NodePtr& node, const bool with_dependencies)
     {
-        global_code_ = "";
-        decompiled_nodes_.clear();
-
-        string code = node_to_variable_definition(node);
-        if (with_dependencies)
-            code = global_code_ + code;
-        return code;
+        const mx::NodePtr copy = find_element(document_, node, "Node")->asA<mx::Node>();
+        return DocumentDecompiler{document_}.decompile_node(copy, with_dependencies);
     }
 
     string Decompiler::decompile_node_def(const string& node_def_name, const bool with_dependencies)
@@ -193,13 +127,8 @@ namespace mxslc::decompile
 
     string Decompiler::decompile_node_def(const mx::NodeDefPtr& node_def, const bool with_dependencies)
     {
-        global_code_ = "";
-        decompiled_nodes_.clear();
-
-        string code = node_def_to_function_definition(node_def);
-        if (with_dependencies)
-            code = global_code_ + code;
-        return code;
+        const mx::ElementPtr copy = find_element(document_, node_def, "NodeDef");
+        return DocumentDecompiler{document_}.decompile_function(copy, with_dependencies);
     }
 
     string Decompiler::decompile_node_graph(const string& node_graph_name, const bool with_dependencies)
@@ -209,435 +138,12 @@ namespace mxslc::decompile
 
     string Decompiler::decompile_node_graph(const mx::NodeGraphPtr& node_graph, const bool with_dependencies)
     {
-        global_code_ = "";
-        decompiled_nodes_.clear();
+        const mx::NodeGraphPtr copy = find_element(document_, node_graph, "NodeGraph")->asA<mx::NodeGraph>();
 
-        string code = node_graph_to_function_definition(node_graph);
-        if (with_dependencies)
-            code = global_code_ + code;
-        return code;
-    }
+        // node graphs that implement a node def are decompiled as the function of the node def
+        if (const mx::NodeDefPtr node_def = copy->getNodeDef(); node_def and node_def->getDocument() == document_)
+            return DocumentDecompiler{document_}.decompile_function(node_def, with_dependencies);
 
-    string Decompiler::node_to_variable_definition(const string& node_name)
-    {
-        return node_to_variable_definition(document_->getNode(node_name));
-    }
-
-    string Decompiler::node_to_variable_definition(const mx::NodePtr& node)
-    {
-        if (contains(decompiled_nodes_, node))
-            return "";
-        decompiled_nodes_.insert(node);
-
-        if (const mx::NodeDefPtr node_def = node->getNodeDef())
-            global_code_ += node_def_to_function_definition(node_def);
-
-        const string var_type = get_node_data_type(node);
-        const string var_name = node->getName();
-
-        string var_expr = node_to_expression(node);
-        if (var_expr.front() == '(' and var_expr.back() == ')')
-            var_expr = var_expr.substr(1, var_expr.size() - 2);
-
-        return node_to_attributes(node) + var_type + " " + var_name + " = " + var_expr + ";\n";
-    }
-
-    string Decompiler::node_to_attributes(const mx::NodePtr& node)
-    {
-        string result;
-
-        // Node-level attributes, e.g. `@doc "..."`.  Input-level metadata
-        // attributes are instead emitted inline within the node constructor
-        // call (see `input_to_argument`).
-        for (const string& attr_name : node->getAttributeNames())
-        {
-            if (not contains(structural_attributes(), attr_name))
-                result += "@" + attr_name + " \"" + node->getAttribute(attr_name) + "\"\n";
-        }
-
-        return result;
-    }
-
-    string Decompiler::node_def_to_attributes(const mx::NodeDefPtr& node_def)
-    {
-        string result;
-
-        // NodeDef-level attributes, e.g. `@nodegroup "math"`, `@version "1.0"`,
-        // `@isdefaultversion "true"`, `@doc "..."`.  These are emitted as `@`
-        // declarations above the function definition so that they are re-applied
-        // to the NodeDef element when compiled back to MTLX.  The `node` attribute
-        // is skipped because it is re-expressed as the function name, and all other
-        // structural attributes are skipped because they are re-expressed by the
-        // function signature and body.
-        for (const string& attr_name : node_def->getAttributeNames())
-        {
-            if (attr_name == mx::NodeDef::NODE_ATTRIBUTE)
-                continue;
-            if (not contains(structural_attributes(), attr_name))
-                result += "@" + attr_name + " \"" + node_def->getAttribute(attr_name) + "\"\n";
-        }
-
-        return result;
-    }
-
-    string Decompiler::node_def_to_function_definition(const string& node_def_name)
-    {
-        return node_def_to_function_definition(document_->getNodeDef(node_def_name));
-    }
-
-    string Decompiler::node_def_to_function_definition(const mx::NodeDefPtr& node_def)
-    {
-        for (const mx::NodeGraphPtr& node_graph : document_->getNodeGraphs())
-        {
-            if (node_graph->getNodeDef() == node_def)
-                return node_graph_to_function_definition(node_graph);
-        }
-        throw CompileError{"Cannot decompile NodeDef: " + node_def->getName()};
-    }
-
-    string Decompiler::node_graph_to_function_definition(const string& node_graph_name)
-    {
-        return node_graph_to_function_definition(document_->getNodeGraph(node_graph_name));
-    }
-
-    string Decompiler::node_graph_to_function_definition(const mx::NodeGraphPtr& node_graph)
-    {
-        if (contains(decompiled_node_graphs_, node_graph->getName()))
-            return "";
-        decompiled_node_graphs_.insert(node_graph->getName());
-
-        const string signature = get_node_graph_signature(node_graph);
-
-        in_function_ = true;
-
-        function_code_ = "";
-        for (const mx::NodePtr& node : node_graph->getNodes())
-        {
-            if (not is_inline_node(node))
-                function_code_ += "\t" + node_to_variable_definition(node);
-        }
-        function_code_ += "\treturn " + get_node_graph_return_expression(node_graph) + ";";
-
-        in_function_ = false;
-
-        // If this nodegraph implements a NodeDef, emit the NodeDef's metadata
-        // attributes (e.g. `@nodegroup`, `@version`, `@doc`) as `@` declarations
-        // above the function definition.
-        const string attrs = node_graph->hasNodeDefString() ? node_def_to_attributes(node_graph->getNodeDef()) : "";
-        const string func_def = "\n" + attrs + signature + "\n{\n" + function_code_ + "\n}\n";
-
-        // If the nodegraph has interface inputs, also emit a variable that calls
-        // the function with default argument values for external references.
-        const vector<mx::InputPtr> inputs = node_graph->getInputs();
-        string var_def;
-        if (not inputs.empty())
-        {
-            const string func_name = get_node_graph_identifier(node_graph);
-            const string var_name = func_name + "_out";
-            const string var_type = outputs_to_data_type(node_graph->getOutputs());
-            const string args = inputs_to_arguments(inputs);
-            var_def = var_type + " " + var_name + " = " + func_name + "(" + args + ");\n";
-            node_graph_var_names_[node_graph->getName()] = var_name;
-        }
-
-        return func_def + var_def;
-    }
-
-    string Decompiler::node_to_expression(const mx::NodePtr& node)
-    {
-        const string func_name = node->getCategory();
-
-        static const unordered_map<string, string> binary_op_names {
-            {"add", "+"},
-            {"subtract", "-"},
-            {"multiply", "*"},
-            {"divide", "/"},
-            {"modulo", "%"},
-            {"power", "^"},
-            {"and", "&"},
-            {"or", "|"},
-            {"xor", "^"}
-        };
-
-        if (contains(binary_op_names, func_name))
-        {
-            const string& op = binary_op_names.at(func_name);
-            const vector<mx::InputPtr> inputs = node->getInputs();
-            return "(" + port_to_expression(inputs[0]) + " " + op + " " + port_to_expression(inputs[1]) + ")";
-        }
-
-        static const unordered_map<string, string> unary_op_names {
-            {"not", "!"}
-        };
-
-        if (contains(unary_op_names, func_name))
-        {
-            const string& op = unary_op_names.at(func_name);
-            const vector<mx::InputPtr> inputs = node->getInputs();
-            return port_to_expression(inputs[0]) + op;
-        }
-
-        const string func_args = inputs_to_arguments(node->getInputs());
-        return func_name + "(" + func_args + ")";
-    }
-
-    string node_graph_output_field_name(const vector<mx::OutputPtr>& outputs, const string& output_name)
-    {
-        return safe_mxsl_name(outputs, remove_prefix(output_name));
-    }
-
-    string Decompiler::outputs_to_data_type(const vector<mx::OutputPtr>& outputs)
-    {
-        if (outputs.size() == 1)
-        {
-            return get_type_alias(outputs[0]->getType());
-        }
-        else
-        {
-            string result = "{";
-            for (const mx::OutputPtr& output : outputs)
-            {
-                // Ignore outputs that are generated from out parameters and setting nonlocals
-                if (has_prefix(output->getName(), OUT_PARAMETER_PREFIX) or
-                    has_prefix(output->getName(), NONLOCAL_OUT_PREFIX))
-                    continue;
-                result += get_type_alias(output) + " " + node_graph_output_field_name(outputs, output->getName()) + ", ";
-            }
-            remove_trailing_comma(result);
-            return result + "}";
-        }
-    }
-
-    string Decompiler::port_to_expression(const mx::PortElementPtr& port)
-    {
-        if (port->hasValue())
-            return value_to_constructor(port->getValue());
-        if (port->hasInterfaceName())
-            return interface_name_to_identifier(port->getInterfaceName());
-        if (port->hasNodeName())
-        {
-            const mx::NodePtr node = port->getConnectedNode();
-            if (port->hasOutputString())
-                return node_and_output_to_dot_op(node, port->getOutputString());
-            // Handle getting "default" output if no output provided for multioutput
-            // node reference.
-            if (node->isMultiOutputType())
-            {
-                const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
-                const vector<mx::OutputPtr> outputs = node_def->getActiveOutputs();
-                if (not outputs.empty())
-                    return node_and_output_to_dot_op(node, outputs[0]->getName());
-            }
-            return is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node);
-        }
-        if (port->hasNodeGraphString())
-        {
-            if (port->hasOutputString())
-                return node_graph_name_and_output_to_dot_op(port->getNodeGraphString(), port->getOutputString());
-            return node_graph_name_to_identifier(port->getNodeGraphString());
-        }
-        throw CompileError{"Cannot decompile PortElement: " + port->asString()};
-    }
-
-    string Decompiler::outputs_to_expression(const vector<mx::OutputPtr>& outputs)
-    {
-        if (outputs.size() == 1)
-            return port_to_expression(outputs[0]);
-
-        string result = "{";
-        for (const mx::OutputPtr& output : outputs)
-            result += port_to_expression(output) + ", ";
-        if (result.size() >= 2)
-            result.resize(result.size() - 2);
-        return result + "}";
-    }
-
-    string Decompiler::value_to_constructor(const mx::ValuePtr& value)
-    {
-        const string type_name = get_type_alias(value->getTypeString());
-        if (contains(vector{"vec2", "vec3", "vec4", "color3", "color4"}, type_name))
-            return type_name + "{" + value->getValueString() + "}";
-        if (type_name == "string" or type_name == "filename")
-            return "\"" + value->getValueString() + "\"";
-        return value->getValueString();
-    }
-
-    string Decompiler::interface_name_to_identifier(const string& interface_name)
-    {
-        return interface_name;
-    }
-
-    string Decompiler::node_and_output_to_dot_op(const mx::NodePtr& node, const string& output)
-    {
-        // `separate`-family nodes return an anonymous array, so a referenced
-        // output is addressed by index (outx->[0], outz->[2], ...) rather than by
-        // a named member such as `.outx`.
-        if (is_inline_separate_node(node))
-            return node_to_expression(node) + "[" + std::to_string(separate_output_index(node, output)) + "]";
-        return (is_inline_node(node) ? node_to_expression(node) : node_to_identifier(node)) + "." + output;
-    }
-
-    string Decompiler::node_graph_name_and_output_to_dot_op(const string& node_graph_name, const string& output)
-    {
-        const mx::NodeGraphPtr node_graph = document_->getNodeGraph(node_graph_name);
-        const vector<mx::OutputPtr> node_graph_outputs = node_graph ? node_graph->getOutputs() : vector<mx::OutputPtr>{};
-        const string safe_output = node_graph_output_field_name(node_graph_outputs, output);
-
-        // For single-output nodegraphs, references use just the identifier
-        // (variable or function name) without a .output suffix.
-        if (node_graph_outputs.size() == 1)
-            return node_graph_name_to_identifier(node_graph_name);
-        return node_graph_name_to_identifier(node_graph_name) + "." + safe_output;
-    }
-
-    string Decompiler::node_to_identifier(const mx::NodePtr& node)
-    {
-        if (not contains(decompiled_nodes_, node))
-        {
-            const string code = node_to_variable_definition(node);
-            if (in_function_)
-                function_code_ += "\t" + code;
-            else
-                global_code_ += code;
-        }
-        return node->getName();
-    }
-
-    string Decompiler::node_graph_name_to_identifier(const string& node_graph_name)
-    {
-        if (not contains(decompiled_node_graphs_, node_graph_name))
-            global_code_ += node_graph_to_function_definition(node_graph_name);
-
-        if (contains(node_graph_var_names_, node_graph_name))
-            return node_graph_var_names_.at(node_graph_name);
-
-        if (starts_with(node_graph_name, "NG_"))
-            return node_graph_name.substr(3);
-        return node_graph_name;
-    }
-
-    string Decompiler::input_to_argument(const mx::InputPtr& input)
-    {
-        // Input-level metadata attributes, e.g. `@colorspace "srgb_texture"`,
-        // are emitted inline before the argument value so that they are
-        // re-applied to the input element when compiled back to MTLX.
-        string result;
-        for (const string& attr_name : input->getAttributeNames())
-        {
-            if (not contains(structural_attributes(), attr_name))
-                result += "@" + attr_name + " \"" + input->getAttribute(attr_name) + "\" ";
-        }
-        return result + input->getName() + " = " + port_to_expression(input);
-    }
-
-    string Decompiler::inputs_to_arguments(const vector<mx::InputPtr>& inputs)
-    {
-        string result;
-        for (const mx::InputPtr& input : inputs)
-            result += input_to_argument(input) + ", ";
-        if (result.size() >= 2)
-            result.resize(result.size() - 2);
-        return result;
-    }
-
-    string Decompiler::input_to_parameter(const mx::InputPtr& input)
-    {
-        // Input-level metadata attributes, e.g. `@uiname "..."`, `@uifolder "..."`,
-        // `@uimin "..."`, are emitted inline before the parameter so that they are
-        // re-applied to the NodeDef input element when compiled back to MTLX.
-        string result;
-        for (const string& attr_name : input->getAttributeNames())
-        {
-            if (not contains(structural_attributes(), attr_name))
-                result += "@" + attr_name + " \"" + input->getAttribute(attr_name) + "\" ";
-        }
-        result += input->getType() + " " + input->getName();
-        if (input->hasValue())
-            result += " = " + value_to_constructor(input->getValue());
-        return result;
-    }
-
-    string Decompiler::inputs_to_parameters(const vector<mx::InputPtr>& inputs)
-    {
-        string result;
-        for (const mx::InputPtr& input : inputs)
-            result += input_to_parameter(input) + ", ";
-        if (result.size() >= 2)
-            result.resize(result.size() - 2);
-        return result;
-    }
-
-    string Decompiler::get_node_data_type(const mx::NodePtr& node)
-    {
-        if (node->isMultiOutputType())
-        {
-            const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
-            return outputs_to_data_type(node_def->getActiveOutputs());
-        }
-        else
-        {
-            return get_type_alias(node);
-        }
-    }
-
-    string Decompiler::get_node_def_data_type(const mx::NodeDefPtr& node_def)
-    {
-        if (node_def->isMultiOutputType())
-            return outputs_to_data_type(node_def->getActiveOutputs());
-        else
-            return node_def->getType();
-    }
-
-    string Decompiler::get_node_graph_signature(const mx::NodeGraphPtr& node_graph)
-    {
-        if (node_graph->hasNodeDefString())
-        {
-            const mx::NodeDefPtr node_def = node_graph->getNodeDef();
-            if (node_def == nullptr)
-                throw CompileError{"Cannot find NodeDef for " + node_graph->getName()};
-            const string return_type = get_node_def_data_type(node_def);
-            const string func_name = node_def->getNodeString();
-            const string func_params = inputs_to_parameters(node_def->getActiveInputs());
-            return return_type + " " + func_name + "(" + func_params + ")";
-        }
-        else
-        {
-            const string return_type = outputs_to_data_type(node_graph->getOutputs());
-            const vector<mx::InputPtr> inputs = node_graph->getInputs();
-            const string func_params = inputs_to_parameters(inputs);
-            const string func_name = get_node_graph_identifier(node_graph);
-            if (func_params.empty())
-                return return_type + " " + func_name + " => ";
-            else
-                return return_type + " " + func_name + "(" + func_params + ")";
-        }
-    }
-
-    string Decompiler::get_node_graph_identifier(const mx::NodeGraphPtr& node_graph)
-    {
-        return node_graph_name_to_identifier(node_graph->getName());
-    }
-
-    string Decompiler::get_node_graph_return_expression(const mx::NodeGraphPtr& node_graph)
-    {
-        if (node_graph->hasNodeDefString())
-        {
-            const mx::NodeDefPtr node_def = node_graph->getNodeDef();
-            if (node_def == nullptr)
-                throw CompileError{"Cannot find NodeDef for " + node_graph->getName()};
-            vector<mx::OutputPtr> outputs = node_def->getActiveOutputs();
-            for (mx::OutputPtr& output : outputs)
-            {
-                const mx::OutputPtr node_graph_output = node_graph->getOutput(output->getName());
-                if (node_graph_output != nullptr)
-                    output = node_graph_output;
-            }
-            return outputs_to_expression(outputs);
-        }
-        else
-        {
-            return outputs_to_expression(node_graph->getOutputs());
-        }
+        return DocumentDecompiler{document_}.decompile_function(copy, with_dependencies);
     }
 }
-

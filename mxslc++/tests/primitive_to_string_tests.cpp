@@ -35,15 +35,15 @@ TEST(primitive_tests, filename_to_string)
 
 TEST(primitive_tests, vec2_to_string)
 {
-    ASSERT_EQ(Primitive{mx::Vector2{}}.to_string(), "vec2{0, 0}");
+    ASSERT_EQ(Primitive{mx::Vector2{}}.to_string(), "vec2{0.0, 0.0}");
 }
 
 TEST(primitive_tests, vec3_to_string)
 {
-    ASSERT_EQ(Primitive{mx::Vector3{}}.to_string(), "vec3{0, 0, 0}");
+    ASSERT_EQ(Primitive{mx::Vector3{}}.to_string(), "vec3{0.0, 0.0, 0.0}");
 }
 
 TEST(primitive_tests, vec4_to_string)
 {
-    ASSERT_EQ(Primitive{mx::Vector4{}}.to_string(), "vec4{0, 0, 0, 0}");
+    ASSERT_EQ(Primitive{mx::Vector4{}}.to_string(), "vec4{0.0, 0.0, 0.0, 0.0}");
 }

@@ -87,4 +87,11 @@ namespace mxslc::expressions
     {
         return value_.to_string();
     }
+
+    Precedence Literal::precedence() const
+    {
+        // negative numbers print with a leading minus sign, so they bind like unary expressions
+        const string str = to_string();
+        return not str.empty() and str.front() == '-' ? Precedence::Unary : Precedence::Primary;
+    }
 }

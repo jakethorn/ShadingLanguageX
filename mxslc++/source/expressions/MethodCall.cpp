@@ -104,6 +104,11 @@ namespace mxslc::expressions
 
     string MethodCall::to_string() const
     {
-        return instance_expr_->to_string() + "." + FunctionCall::to_string();
+        return instance_expr_->to_operand_string(Precedence::Postfix) + "." + FunctionCall::to_string();
+    }
+
+    Precedence MethodCall::precedence() const
+    {
+        return Precedence::Postfix;
     }
 }

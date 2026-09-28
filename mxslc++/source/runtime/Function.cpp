@@ -193,10 +193,14 @@ namespace mxslc::runtime
         result += name_;
         if (has_template_type())
             result += '<' + template_type_->to_string() + '>';
-        if (not is_parameterless_)
+        if (is_parameterless_)
+        {
+            result += " =>";
+        }
+        else
         {
             result += '(';
-            result += params_.to_string();
+            result += params_.to_string(/*show_null_defaults*/false);
             result += ')';
         }
         return result;

@@ -1,0 +1,6 @@
+color3 c = randomcolor();
+surfaceshader s = standard_surface();
+s.base_color = c;
+s.specular_roughness = 0.2;
+s.metalness = 1.0;
+material m = surfacematerial(s);

@@ -59,6 +59,11 @@ namespace mxslc::expressions
 
     string IndexingOperator::to_string() const
     {
-        return value_expr_->to_string() + "[" + index_expr_->to_string() + "]";
+        return value_expr_->to_operand_string(Precedence::Postfix) + "[" + index_expr_->to_string() + "]";
+    }
+
+    Precedence IndexingOperator::precedence() const
+    {
+        return Precedence::Postfix;
     }
 }

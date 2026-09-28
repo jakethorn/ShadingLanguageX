@@ -20,6 +20,11 @@ namespace mxslc::runtime
 
     string AttributeList::to_string() const
     {
-        return join(attrs_, "\n");
+        return to_string("\n");
+    }
+
+    string AttributeList::to_string(const string& delimiter) const
+    {
+        return join(attrs_, delimiter);
     }
 }

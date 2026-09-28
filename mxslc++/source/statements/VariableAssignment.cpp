@@ -5,6 +5,8 @@
 #include "statements/VariableAssignment.h"
 
 #include "expressions/Expression.h"
+#include "expressions/IfExpression.h"
+#include "expressions/interface.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
@@ -39,6 +41,9 @@ namespace mxslc::statements
 
     string VariableAssignment::to_string() const
     {
-        return lhs_expr_->to_string() + " = " + rhs_expr_->to_string() + ";";
+        // `x = if (cond) { y } else { x };` is printed as `x = if (cond) { y };`
+        const IfExpressionPtr if_expr = cast_expression<IfExpression>(rhs_expr_);
+        const string rhs_string = if_expr ? if_expr->to_string(lhs_expr_) : rhs_expr_->to_string();
+        return with_attributes(rhs_expr_->attributes(), lhs_expr_->to_string() + " = " + rhs_string + ";");
     }
 }

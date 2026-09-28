@@ -1,0 +1,5 @@
+geomprop float height;
+geomprop vec2 offset = vec2{0.5, 0.5};
+geomprop color3 tint;
+vec2 uv = texcoord() + offset;
+color3 c = tint * height;
