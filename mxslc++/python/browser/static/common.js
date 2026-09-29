@@ -223,22 +223,36 @@ function onFileChosen(e) {
     reader.readAsText(file);
 }
 
-function toggleOptions() {
-    const body = document.getElementById('options-body');
-    const label = document.getElementById('options-toggle-label');
+function toggleSection(bodyId, labelId) {
+    const body = document.getElementById(bodyId);
+    const label = document.getElementById(labelId);
     const isHidden = body.classList.contains('d-none');
     body.classList.toggle('d-none');
     label.textContent = isHidden ? 'hide' : 'show';
 }
 
-// Read compile options from the page. The shape is engine-specific; the WASM
-// engine maps these onto its CompileOptions object internally.
+function toggleOptions() {
+    toggleSection('options-body', 'options-toggle-label');
+}
+
+function toggleDecompileOptions() {
+    toggleSection('decompile-options-body', 'decompile-options-toggle-label');
+}
+
+// Read compile options from the page. 
 function getCompileOptions() {
     return {
         version: document.getElementById('opt-version').value,
         reduce_graph: document.getElementById('opt-reduce-graph').checked,
         error_on_missing_globals: document.getElementById('opt-error-missing').checked,
         error_on_unused_globals: document.getElementById('opt-error-unused').checked,
+    };
+}
+
+// Read decompile options from the page. 
+function getDecompileOptions() {
+    return {
+        emit_function_modifiers: document.getElementById('opt-emit-modifiers').checked,
     };
 }
 
@@ -254,15 +268,17 @@ function ensureReady() {
 
 // Decompile: MTLX XML -> MXSL source
 async function convertMtlxToMxsl() {
+    const options = getDecompileOptions();
     const source = editorMtlx.getValue().trim();
     if (!source) {
         logMessage('MTLX editor is empty', 'error');
         return;
     }
-    logMessage('Decompiling MTLX -> MXSL...', 'info');
+    logMessage('Decompiling MTLX -> MXSL (emit modifiers=' +
+        options.emit_function_modifiers + ')...', 'info');
     try {
         ensureReady();
-        const result = await engine.decompile(source);
+        const result = await engine.decompile(source, options);
         editorMxsl.setValue(result);
         logMessage(`MTLX decompiled to MXSL (${result.length} chars)`, 'success');
     } catch (err) {
@@ -299,6 +315,7 @@ async function convertMxslToMtlx() {
 window.loadFile = loadFile;
 window.clearLog = clearLog;
 window.toggleOptions = toggleOptions;
+window.toggleDecompileOptions = toggleDecompileOptions;
 window.convertMtlxToMxsl = convertMtlxToMxsl;
 window.convertMxslToMtlx = convertMxslToMtlx;
 

@@ -21,6 +21,7 @@ PYBIND11_MODULE(_mxslc, m)
     bind_variable(m);
     bind_create_variable(m);
     bind_compile_functions(m);
+    bind_decompile_options(m);
     bind_decompile_functions(m);
     bind_decompiler(m);
     bind_macro(m);

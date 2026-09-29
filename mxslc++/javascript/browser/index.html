@@ -97,6 +97,22 @@
                             <i class="bi bi-arrow-right-short me-1"></i> To MXSL
                         </button>
                     </div>
+                    <!-- Decompile Options (MTLX → MXSL) -->
+                    <div class="border-top">
+                        <div class="px-3 py-1 d-flex align-items-center gap-2 small" onclick="toggleDecompileOptions()" style="cursor:pointer; user-select:none;">
+                            <i class="bi bi-gear" style="color:#a6e3a1; font-size:.75rem;"></i>
+                            <span class="text-body-secondary">Decompile Options</span>
+                            <span class="ms-auto text-body-secondary" id="decompile-options-toggle-label" style="font-size:.7rem;">show</span>
+                        </div>
+                        <div class="px-3 py-2 d-none border-top" id="decompile-options-body">
+                            <div class="d-flex flex-wrap gap-3 align-items-end">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" id="opt-emit-modifiers" checked>
+                                    <label class="form-check-label small" for="opt-emit-modifiers">Emit function modifiers</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -36,6 +36,7 @@
 #include "compile.h"
 #include "CompileOptions.h"
 #include "decompile/decompile.h"
+#include "decompile/DecompileOptions.h"
 #include "utils/load_mtlx.h"
 
 #include "common.h"
@@ -86,17 +87,31 @@ namespace
         }
     }
 
-    // Decompile a MaterialX (MTLX) XML string to an SLX source string.
-    std::string decompile_mtlx_to_slx(const std::string& source)
+    // Overload for callers that do not need to pass options.
+    std::string compile_slx_to_mtlx(const std::string& source)
+    {
+        return compile_slx_to_mtlx(source, mxslc::CompileOptions{});
+    }
+
+    // Decompile a MaterialX (MTLX) XML string to an SLX source string using
+    // the given decompile options.
+    std::string decompile_mtlx_to_slx(const std::string& source,
+                                      const mxslc::decompile::DecompileOptions& opts)
     {
         try
         {
-            return mxslc::decompile::decompile_to_string(source);
+            return mxslc::decompile::decompile_to_string(source, opts);
         }
         catch (const std::exception& e)
         {
             rethrow_as_js_error(e, "Error");
         }
+    }
+
+    // Overload for callers that do not need to pass options.
+    std::string decompile_mtlx_to_slx(const std::string& source)
+    {
+        return decompile_mtlx_to_slx(source, mxslc::decompile::DecompileOptions{});
     }
 
     // Return the sorted set of MaterialX node-definition category names from
@@ -146,8 +161,18 @@ EMSCRIPTEN_BINDINGS(mxslc)
         .function("clearSearchDirectories", &mxslc::CompileOptions::clear_search_directories)
         .function("searchDirectories", &get_search_directories);
 
-    ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
-    ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);
+    ems::class_<mxslc::decompile::DecompileOptions>("DecompileOptions")
+        .constructor<>()
+        .property("emitFunctionModifiers", &mxslc::decompile::DecompileOptions::emit_function_modifiers);
+
+    ems::function("compileSlxToMtlx",
+        ems::select_overload<std::string(const std::string&)>(&compile_slx_to_mtlx));
+    ems::function("compileSlxToMtlx",
+        ems::select_overload<std::string(const std::string&, const mxslc::CompileOptions&)>(&compile_slx_to_mtlx));
+    ems::function("decompileMtlxToSlx",
+        ems::select_overload<std::string(const std::string&)>(&decompile_mtlx_to_slx));
+    ems::function("decompileMtlxToSlx",
+        ems::select_overload<std::string(const std::string&, const mxslc::decompile::DecompileOptions&)>(&decompile_mtlx_to_slx));
 
     ems::register_vector<std::string>("StringVector");
     ems::function("getMtlxDefinitionNames", &get_mtlx_definition_names);

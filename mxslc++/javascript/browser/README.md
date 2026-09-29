@@ -81,9 +81,10 @@ const mx = await Mxslc({
 
 Then conversion calls (all synchronous, throw on error):
 
-- `mx.compileSlxToMtlx(slx)` → MTLX XML string
-- `mx.decompileMtlxToSlx(mtlx)` → MXSL string
-- `mx.compileSlxToMtlxWithOptions(slx, opts)` / `new mx.CompileOptions()`
+- `mx.compileSlxToMtlx(slx)` → MTLX XML string (uses default `CompileOptions`)
+- `mx.compileSlxToMtlx(slx, opts)` → MTLX XML string, with `opts = new mx.CompileOptions()`
+- `mx.decompileMtlxToSlx(mtlx)` → MXSL string (uses default `DecompileOptions`)
+- `mx.decompileMtlxToSlx(mtlx, opts)` → MXSL string, with `opts = new mx.DecompileOptions()`
 - `mx.getMtlxDefinitionNames()` → array of MaterialX definition categories (e.g. 'add', 'image', 'standard_surface', etc.)
 
 ## CI / Deployment

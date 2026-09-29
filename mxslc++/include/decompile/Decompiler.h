@@ -8,15 +8,16 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
+#include "decompile/DecompileOptions.h"
 
 namespace mxslc::decompile
 {
     class Decompiler
     {
     public:
-        explicit Decompiler(const fs::path& src_path);
-        explicit Decompiler(const string& source);
-        explicit Decompiler(mx::DocumentPtr document);
+        explicit Decompiler(const fs::path& src_path, DecompileOptions options = {});
+        explicit Decompiler(const string& source, DecompileOptions options = {});
+        explicit Decompiler(mx::DocumentPtr document, DecompileOptions options = {});
 
         string decompile_document();
         string decompile_node(const string& node_name, bool with_dependencies = false);
@@ -37,6 +38,7 @@ namespace mxslc::decompile
         string node_to_expression(const mx::NodePtr& node);
         string node_to_attributes(const mx::NodePtr& node);
         string node_def_to_attributes(const mx::NodeDefPtr& node_def);
+        string node_graph_to_attributes(const mx::NodeGraphPtr& node_graph);
         string outputs_to_data_type(const vector<mx::OutputPtr>& outputs);
         string port_to_expression(const mx::PortElementPtr& port);
         string outputs_to_expression(const vector<mx::OutputPtr>& outputs);
@@ -57,6 +59,7 @@ namespace mxslc::decompile
         string get_node_graph_identifier(const mx::NodeGraphPtr& node_graph);
         string get_node_graph_return_expression(const mx::NodeGraphPtr& node_graph);
 
+        DecompileOptions options_;
         mx::DocumentPtr document_;
         string global_code_;
         string function_code_;

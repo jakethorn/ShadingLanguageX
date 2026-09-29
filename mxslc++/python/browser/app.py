@@ -126,13 +126,16 @@ def _api_decompile():
     """Convert MTLX XML → MXSL source."""
     data = request.get_json(force=True)
     source: str = data.get("source", "").strip()
+    opts: dict = data.get("options", {})
 
     if not source:
         return jsonify({"error": "No MTLX source provided."}), 400
 
     try:
         mxslc = _import_mxslc()
-        result = mxslc.decompile_string_to_string(source)
+        options = mxslc.DecompileOptions()
+        options.emit_function_modifiers = opts.get("emit_function_modifiers", False)
+        result = mxslc.decompile_string_to_string(source, options)
         return jsonify({"result": result})
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400

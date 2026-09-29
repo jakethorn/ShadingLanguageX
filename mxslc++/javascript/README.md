@@ -42,6 +42,9 @@ The module is an ES6 module that exports a factory function:
 import Mxslc from './JsMxslc.js';
 const mx = await Mxslc();
 
+// Compile with default options.
+const mtlx1 = mx.compileSlxToMtlx('float z = add(1.0, 2.0);');
+
 // Compile using a CompileOptions instance.
 const opts = new mx.CompileOptions();
 opts.version = '1.39.5';

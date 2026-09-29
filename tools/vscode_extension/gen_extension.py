@@ -221,7 +221,7 @@ def generate_package_json(with_converter: bool = False) -> dict:
         "name": "mxsl-language",
         "displayName": "MXSL Language Support",
         "description": "Syntax highlighting and MXSL <-> MTLX (MaterialX) conversion for the MXSL Shading Language",
-        "version": "0.2.1",
+        "version": "0.3.1",
         "publisher": "shadinglanguagex",
         "license": "Apache-2.0",
         "repository": {

@@ -126,19 +126,20 @@ namespace mxslc::decompile
         }
     }
 
-    Decompiler::Decompiler(const fs::path& src_path)
+    Decompiler::Decompiler(const fs::path& src_path, DecompileOptions options) : options_{std::move(options)}
     {
         document_ = mx::createDocument();
         mx::readFromXmlFile(document_, src_path.string());
     }
 
-    Decompiler::Decompiler(const string& source)
+    Decompiler::Decompiler(const string& source, DecompileOptions options) : options_{std::move(options)}
     {
         document_ = mx::createDocument();
         mx::readFromXmlString(document_, source);
     }
 
-    Decompiler::Decompiler(mx::DocumentPtr document) : document_{std::move(document)}
+    Decompiler::Decompiler(mx::DocumentPtr document, DecompileOptions options)
+        : options_{std::move(options)}, document_{std::move(document)}
     {
 
     }
@@ -280,6 +281,28 @@ namespace mxslc::decompile
         return result;
     }
 
+    string Decompiler::node_graph_to_attributes(const mx::NodeGraphPtr& node_graph)
+    {
+        string result;
+
+        // NodeGraph-level attributes, e.g. `@fileprefix "..."`, `@colorspace
+        // "..."`, `@namespace "..."`, `@doc "..."`.  These are emitted as `@`
+        // declarations above the function definition so that they are re-applied
+        // to the NodeGraph element when compiled back to MTLX.  The `nodedef`
+        // attribute is skipped because it is re-expressed by the modifier, and all
+        // other structural attributes are skipped because they are re-expressed by
+        // the function signature and body.
+        for (const string& attr_name : node_graph->getAttributeNames())
+        {
+            if (attr_name == mx::InterfaceElement::NODE_DEF_ATTRIBUTE)
+                continue;
+            if (not contains(structural_attributes(), attr_name))
+                result += "@" + attr_name + " \"" + node_graph->getAttribute(attr_name) + "\"\n";
+        }
+
+        return result;
+    }
+
     string Decompiler::node_def_to_function_definition(const string& node_def_name)
     {
         return node_def_to_function_definition(document_->getNodeDef(node_def_name));
@@ -320,11 +343,19 @@ namespace mxslc::decompile
 
         in_function_ = false;
 
-        // If this nodegraph implements a NodeDef, emit the NodeDef's metadata
-        // attributes (e.g. `@nodegroup`, `@version`, `@doc`) as `@` declarations
-        // above the function definition.
-        const string attrs = node_graph->hasNodeDefString() ? node_def_to_attributes(node_graph->getNodeDef()) : "";
-        const string func_def = "\n" + attrs + signature + "\n{\n" + function_code_ + "\n}\n";
+        // Emit metadata attributes as appropriate
+        const string attrs = node_graph->hasNodeDefString()
+            ? node_def_to_attributes(node_graph->getNodeDef())
+            : node_graph_to_attributes(node_graph);
+
+        // Optionally emit the `[[nodedef]]` or `[[nodegraph]]` modifier 
+        // after attributtes.
+        const bool emit_nodegraph_modifier = options_.emit_function_modifiers and not node_graph->hasNodeDefString();
+        string modifier;
+        if (options_.emit_function_modifiers)
+            modifier = node_graph->hasNodeDefString() ? "[[nodedef]]\n" : "[[nodegraph]]\n";
+
+        const string func_def = "\n" + attrs + modifier + signature + "\n{\n" + function_code_ + "\n}\n";
 
         // If the nodegraph has interface inputs, also emit a variable that calls
         // the function with default argument values for external references.
@@ -335,7 +366,9 @@ namespace mxslc::decompile
             const string func_name = get_node_graph_identifier(node_graph);
             const string var_name = func_name + "_out";
             const string var_type = outputs_to_data_type(node_graph->getOutputs());
-            const string args = inputs_to_arguments(inputs);
+            // A `[[nodegraph]]` function cannot be passed arguments, so the call
+            // must rely on the parameters' default values instead.
+            const string args = emit_nodegraph_modifier ? "" : inputs_to_arguments(inputs);
             var_def = var_type + " " + var_name + " = " + func_name + "(" + args + ");\n";
             node_graph_var_names_[node_graph->getName()] = var_name;
         }

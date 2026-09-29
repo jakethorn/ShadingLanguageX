@@ -5,12 +5,13 @@
 #include "Decompiler_bindings.h"
 
 #include "decompile/Decompiler.h"
+#include "decompile/DecompileOptions.h"
 
 void bind_decompiler(py::module_& m)
 {
     py::class_<Decompiler>(m, "Decompiler")
-        .def(py::init<const fs::path&>(), py::arg("src_path"))
-        .def(py::init<const string&>(), py::arg("source"))
+        .def(py::init<const fs::path&, const DecompileOptions&>(), py::arg("src_path"), py::arg("options") = DecompileOptions{})
+        .def(py::init<const string&, const DecompileOptions&>(), py::arg("source"), py::arg("options") = DecompileOptions{})
         .def(
             "decompile_document",
             &Decompiler::decompile_document

@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from . import __version__, compile_file_to_file, decompile_file_to_file
+from . import __version__, compile_file_to_file, decompile_file_to_file, DecompileOptions
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -17,6 +17,8 @@ def _build_parser() -> argparse.ArgumentParser:
     decompile_parser = subparsers.add_parser("decompile", help="Decompile .mtlx to .mxsl")
     decompile_parser.add_argument("input", help="Source .mtlx path")
     decompile_parser.add_argument("-o", "--output", help="Destination .mxsl path")
+    decompile_parser.add_argument("--modifiers", action="store_true", help="Emit [[]] modifiers for converted graphs",
+    )
 
     # Add version subcommand for convenience
     version_parser = subparsers.add_parser("version", help="Show version information")  
@@ -40,7 +42,9 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         if args.command == "decompile":
-            result = decompile_file_to_file(args.input, args.output) if args.output else decompile_file_to_file(args.input)
+            options = DecompileOptions()
+            options.emit_function_modifiers = args.modifiers
+            result = decompile_file_to_file(args.input, args.output, options)
             print(result)
             return 0
     except Exception as exc:

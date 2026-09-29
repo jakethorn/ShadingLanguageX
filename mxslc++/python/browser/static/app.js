@@ -45,12 +45,13 @@ const engine = {
         return data.result;
     },
 
-    // Decompile MTLX XML to MXSL source. Returns the MXSL string.
-    async decompile(source) {
+    // Decompile MTLX XML to MXSL source using the given options.
+    // Returns the MXSL string.
+    async decompile(source, options) {
         const r = await fetch('/api/decompile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ source })
+            body: JSON.stringify({ source, options })
         });
         const data = await r.json();
         if (data.error) throw new Error(data.error);
