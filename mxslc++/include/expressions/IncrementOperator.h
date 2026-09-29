@@ -14,9 +14,6 @@ namespace mxslc::expressions
     public:
         IncrementOperator(ExprPtr value_expr, Token op, bool prefix);
 
-        const ExprPtr& value_expression() const { return value_expr_; }
-        bool is_prefix() const { return prefix_; }
-
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;

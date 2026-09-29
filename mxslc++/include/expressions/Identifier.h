@@ -15,8 +15,6 @@ namespace mxslc::expressions
         explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
 
         const string& name() const { return name_; }
-        // the variable the identifier refers to, once it is initialized
-        const VarPtr& variable() const { return var_; }
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 

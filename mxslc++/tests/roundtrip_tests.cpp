@@ -2,19 +2,23 @@
 // Created by jaket on 06/01/2026.
 //
 
+// Each roundtrip test is a pair of files: the original code, <name>.mxsl, and the code it is decompiled to,
+// <name>.decompiled.mxsl, which is created by the decompiler (see overwrite_data_files) and then reviewed. The decompiled
+// code does not have to be the same as the original code, e.g., inline functions and loops are unrolled, but it must
+// compile to the same graph.
+
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <string>
 #include <vector>
 #include "compile.h"
+#include "CompileOptions.h"
 #include "decompile/decompile.h"
-#include "utils/parse_cli_args.h"
 #include "utils/comp_utils.h"
 #include "utils/data_utils.h"
 #include "utils/graph_utils.h"
 
 namespace fs = std::filesystem;
-using namespace std::string_literals;
 using std::string;
 using std::vector;
 
@@ -22,53 +26,71 @@ using roundtrip_tests = testing::TestWithParam<fs::path>;
 
 namespace
 {
-    // files in the hints folder can only be decompiled to their original code with decompile hints
-    bool requires_decompile_hints(const fs::path& path)
+    const string DECOMPILED_EXTENSION = ".decompiled.mxsl";
+
+    fs::path decompiled_path(const fs::path& original_path)
     {
-        return path.parent_path().filename() == "hints";
+        return fs::path{original_path}.replace_extension(DECOMPILED_EXTENSION);
     }
 
-    mxslc::CompileOptions roundtrip_options(const bool decompile_hints)
+    bool is_decompiled_file(const fs::path& path)
+    {
+        const string name = path.filename().string();
+        return name.size() >= DECOMPILED_EXTENSION.size() and name.compare(name.size() - DECOMPILED_EXTENSION.size(), DECOMPILED_EXTENSION.size(), DECOMPILED_EXTENSION) == 0;
+    }
+
+    mxslc::CompileOptions roundtrip_options()
     {
         mxslc::CompileOptions opts;
         opts.reduce_graph = false;
-        opts.decompile_hints = decompile_hints;
         return opts;
     }
-}
 
-TEST_P(roundtrip_tests, roundtrip_output_matches_groundtruth)
-{
-    const fs::path& input_path = GetParam();
-    const string expected_output = read_file(input_path);
-
-    // files that do not require hints must be decompiled the same with or without them
-    const vector<bool> hint_options = requires_decompile_hints(input_path) ? vector{true} : vector{false, true};
-    for (const bool decompile_hints : hint_options)
+    string decompile(const string& code)
     {
-        const string mtlx = mxslc::compile_to_string(input_path, roundtrip_options(decompile_hints));
-        const string actual_output = mxslc::decompile_to_string(mtlx);
-
-        // whitespace and comments do not have to be roundtripped
-        const bool passed = code_tokens(actual_output) == code_tokens(expected_output);
-        EXPECT_TRUE(passed) << "decompile_hints = " << std::boolalpha << decompile_hints;
-        if (not passed)
-            print_debug_info(input_path, actual_output, expected_output);
+        return mxslc::decompile_to_string(mxslc::compile_to_document(code, roundtrip_options()));
     }
 }
 
-TEST_P(roundtrip_tests, roundtrip_output_compiles_to_equivalent_graph)
+TEST_P(roundtrip_tests, decompiled_code_matches_expected)
 {
-    // even without hints, the decompiled code must compile to the same graph as the original code
-    const fs::path& input_path = GetParam();
-    const mxslc::CompileOptions opts = roundtrip_options(false);
+    const fs::path& original_path = GetParam();
+    const string actual_output = decompile(read_file(original_path));
 
-    const mx::DocumentPtr original = mxslc::compile_to_document(input_path, opts);
-    const string decompiled = mxslc::decompile_to_string(original);
-    const mx::DocumentPtr recompiled = mxslc::compile_to_document(decompiled, opts);
+    if constexpr (overwrite_data_files())
+        write_file(decompiled_path(original_path), actual_output);
+
+    // whitespace and comments do not have to be the same
+    const string expected_output = read_file(decompiled_path(original_path));
+    const bool passed = code_tokens(actual_output) == code_tokens(expected_output);
+    EXPECT_TRUE(passed);
+    if (not passed)
+        print_debug_info(original_path, actual_output, expected_output);
+}
+
+TEST_P(roundtrip_tests, decompiled_code_compiles_to_the_same_graph)
+{
+    const fs::path& original_path = GetParam();
+
+    const mx::DocumentPtr original = mxslc::compile_to_document(read_file(original_path), roundtrip_options());
+    const string decompiled = read_file(decompiled_path(original_path));
+    const mx::DocumentPtr recompiled = mxslc::compile_to_document(decompiled, roundtrip_options());
 
     const vector<string> differences = GraphComparator::differences(original, recompiled);
     EXPECT_TRUE(differences.empty()) << "different elements: " << testing::PrintToString(differences) << "\n" << decompiled;
+}
+
+TEST_P(roundtrip_tests, decompiling_decompiled_code_gives_the_same_code)
+{
+    // the decompiled code is already in the form that the decompiler creates
+    const fs::path& original_path = GetParam();
+    const string decompiled = read_file(decompiled_path(original_path));
+    const string redecompiled = decompile(decompiled);
+
+    const bool passed = code_tokens(redecompiled) == code_tokens(decompiled);
+    EXPECT_TRUE(passed);
+    if (not passed)
+        print_debug_info(decompiled_path(original_path), redecompiled, decompiled);
 }
 
 vector<fs::path> get_roundtrip_files()
@@ -79,9 +101,10 @@ vector<fs::path> get_roundtrip_files()
         return {};
 
     vector<fs::path> files;
-    for (const auto& p : fs::recursive_directory_iterator(test_dir))
-        if (p.path().extension() == ".mxsl")
+    for (const auto& p : fs::directory_iterator(test_dir))
+        if (p.path().extension() == ".mxsl" and not is_decompiled_file(p.path()))
             files.push_back(p.path());
+    std::sort(files.begin(), files.end());
 
     return files;
 }

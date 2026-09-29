@@ -1,0 +1,19 @@
+int foo_boolean(bool v)
+{
+    return int{v};
+}
+
+int foo_float(float v)
+{
+    return round(v);
+}
+
+int bar(bool v)
+{
+    return int{v};
+}
+
+int a = foo_float(1.0);
+int b = foo_boolean(false);
+int c = foo_float(2.0);
+int d = bar(true);

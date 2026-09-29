@@ -1,0 +1,8 @@
+int foo(int x, int y, int z)
+{
+    return x + y + z;
+}
+
+int var_0 = 0 + 1;
+int x = foo(var_0, 17, var_0 + 1);
+int end = x + 10;

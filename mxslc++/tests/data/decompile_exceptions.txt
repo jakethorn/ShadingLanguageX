@@ -1,0 +1,32 @@
+# Groundtruth files that do not yet compile to the same graph after they are decompiled, one name per line, see
+# groundtruth_decompile_tests.cpp
+
+# classes are not decompiled
+class008
+class108
+
+# the MaterialX version of a #version directive is not decompiled, e.g., the swizzle node of 1.38
+goodversion002
+goodversion003
+goodversion004
+goodversion005
+
+# functions are only told apart by their `default` modifier, which is not part of the graph
+default_func002
+
+# functions that are defined in functions, which access the variables of the outer function
+ng010
+ng011
+ng013
+scope201
+
+# a nonlocal variable that is read through the ref parameter of an inline function, without using its value
+scope202
+
+# node graph functions that assign nonlocal variables, e.g., `[[nodegraph]] void foo() { r = ...; }`
+nodegraphs006
+nodegraphs007
+nodegraphs008
+
+# a nonlocal variable that is assigned a compile-time value between the calls of a function that reads it
+scope002

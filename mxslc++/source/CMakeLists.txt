@@ -10,15 +10,12 @@ add_library(mxslc_lib
         CompileOptions.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
+        decompile/Code.cpp
         decompile/decompile.cpp
         decompile/Decompiler.cpp
         decompile/DocumentDecompiler.cpp
         decompile/GraphDecompiler.cpp
         decompile/decompile_utils.cpp
-        decompile/DocumentHints.cpp
-        decompile/GraphComparator.cpp
-        decompile/GraphDecompilerHints.cpp
-        decompile/HintedGraph.cpp
         runtime/Runtime.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
@@ -126,7 +123,6 @@ add_library(mxslc_lib
         serialize/values/StringValue.cpp
         serialize/values/interface.cpp
         serialize/FunctionCallHistory.cpp
-        serialize/HintRecorder.cpp
         preprocess/preprocess.cpp
         preprocess/Macro.cpp
         preprocess/parse_primitive.cpp

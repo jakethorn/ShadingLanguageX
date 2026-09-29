@@ -1,0 +1,5 @@
+vec3 p = position();
+bool below = 0.5 > p.y;
+bool at_most = p.z >= p.x;
+float m = if (0.0 > p.x) { 0.0 } else { p.x };
+float n = if (p.z >= p.y) { p.y } else { p.z };

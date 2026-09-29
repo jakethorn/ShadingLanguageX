@@ -1,0 +1,6 @@
+vec3 ray__origin = position();
+vec3 ray__dir = viewdirection();
+vec3 hit = ray__origin + ray__dir * 2.0;
+vec2 data__uv = texcoord();
+float data__t = time();
+color3 c = color3{data__uv, data__t};

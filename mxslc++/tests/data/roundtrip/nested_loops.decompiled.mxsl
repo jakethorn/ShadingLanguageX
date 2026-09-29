@@ -1,0 +1,1 @@
+float g = (0.0 + randomfloat(0, seed = 0) + randomfloat(0, seed = 1) + randomfloat(0, seed = 2) + randomfloat(1, seed = 0) + randomfloat(1, seed = 1) + randomfloat(1, seed = 2) + randomfloat(2, seed = 0) + randomfloat(2, seed = 1) + randomfloat(2, seed = 2)) * 0.25;

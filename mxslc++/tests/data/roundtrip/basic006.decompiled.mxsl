@@ -1,0 +1,16 @@
+{vec2, vec2, vec2} _123_vector2 =>
+{
+    return {vec2{1.0}, vec2{2.0}, vec2{3.0}};
+}
+
+{vec3, vec3, vec3} _123_vector3 =>
+{
+    return {vec3{1.0}, vec3{2.0}, vec3{3.0}};
+}
+
+{vec4, vec4, vec4} _123_vector4 =>
+{
+    return {vec4{1.0}, vec4{2.0}, vec4{3.0}};
+}
+
+vec2 a = _123_vector2[0] + _123_vector2[1] + _123_vector2[2];

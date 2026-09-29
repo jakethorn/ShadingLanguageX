@@ -4,6 +4,7 @@
 
 #include "statements/BlockStatement.h"
 
+#include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
 #include "utils/string_utils.h"
 
@@ -14,13 +15,7 @@ namespace mxslc::statements
 
     StmtPtr BlockStatement::monomorphize(const TypePtr& template_type) const
     {
-        vector<StmtPtr> body;
-        for (const StmtPtr& stmt : body_)
-        {
-            StmtPtr copy = stmt->monomorphize(template_type);
-            copy->set_origin(*stmt);
-            body.push_back(std::move(copy));
-        }
+        vector<StmtPtr> body = runtime_utils::monomorphize(body_, template_type);
         return create_statement<BlockStatement>(std::move(body), token_);
     }
 

@@ -18,7 +18,6 @@
 #include "runtime/Type.h"
 #include "runtime/utils/FunctionResolver.h"
 #include "runtime/utils/monomorphize.h"
-#include "serialize/Serializer.h"
 
 namespace mxslc::expressions
 {
@@ -121,8 +120,6 @@ namespace mxslc::expressions
             evaluate_arguments();
             VarPtr return_value = inline_invoke();
             update_out_arguments();
-            serializer().hints().bind_return_value(return_value);
-            serializer().hints().exit_call();
             runtime().exit_scope();
             return return_value;
         }
@@ -155,9 +152,6 @@ namespace mxslc::expressions
     {
         serializer().begin_comptime(func_->is_comptime());
 
-        // the arguments are evaluated before the call is entered, because they are part of the calling code
-        vector<VarPtr> arg_values;
-        vector<VarPtr> param_values;
         for (const Parameter& param : func_->parameters())
         {
             ModifierList mods = param.modifiers().without(TokenType::Ref, TokenType::Out);
@@ -166,27 +160,15 @@ namespace mxslc::expressions
                 const VarPtr arg_value = args_.evaluate(param);
                 const VarPtr arg_value_copy = create_variable(std::move(mods), param.type(), arg_value);
                 arg_value_copy->disable_node_naming();
-                arg_values.push_back(arg_value);
-                param_values.push_back(arg_value_copy);
+                arg_value_copy->add_to_scope(param.name());
             }
             else
             {
                 const VarPtr default_value = param.has_default_value() ? param.evaluate() : create_variable(param.type());
                 default_value->set_modifiers(std::move(mods));
                 default_value->disable_node_naming();
-                arg_values.push_back(nullptr);
-                param_values.push_back(default_value);
+                default_value->add_to_scope(param.name());
             }
-        }
-
-        serializer().hints().enter_call(func_, args_, arg_values);
-
-        for (size_t i = 0; i < func_->parameters().size(); ++i)
-        {
-            const Parameter& param = func_->parameters()[i];
-            param_values[i]->add_to_scope(param.name());
-            if (param.is_in())
-                serializer().hints().define_parameter(param_values[i], param.name(), arg_values[i]);
         }
 
         serializer().end_comptime();
@@ -213,8 +195,6 @@ namespace mxslc::expressions
                 const VarPtr nonlocal = args_.evaluate(param);
                 const VarPtr local = scope().get_variable(param.name());
                 nonlocal->copy(local);
-                serializer().hints().bind_out_parameter(local, param.name());
-                serializer().hints().bind_variable(nonlocal, nonlocal->name());
             }
         }
 

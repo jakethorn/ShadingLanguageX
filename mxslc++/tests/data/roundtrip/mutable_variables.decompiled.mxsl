@@ -1,0 +1,10 @@
+vec3 p = position();
+float x = p.x;
+float var_3 = x * 2.0 + p.y - 1.0;
+float t = time();
+bool flag = p.x > 0.5;
+vec3 q = normal();
+{float outx, float outy, float outz} var_19 = separate3(q);
+{float outx, float outy, float outz} var_23 = separate3(vec3{var_19.outx, (var_3 * var_3 / 4.0) ^ 2.0 % 3.0, var_19.outz});
+{float outx, float outy} var_24 = separate2(p.zx);
+color3 c = if (flag & p.y > 0.5 | p.z > 0.5) { color3{vec3{var_24.outx, var_23.outy, var_24.outy} * (t + 1.0 + 1.0 - 1.0 - 1.0)} } else { color3{} };

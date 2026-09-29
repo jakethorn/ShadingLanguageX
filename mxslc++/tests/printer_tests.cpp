@@ -3,6 +3,7 @@
 //
 
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -56,6 +57,9 @@ INSTANTIATE_TEST_SUITE_P(
     printer_tests,
     testing::ValuesIn(get_printer_files()),
     [](const testing::TestParamInfo<fs::path>& info) {
-        return info.param.stem().string();
+        // e.g., basic001_decompiled for basic001.decompiled.mxsl
+        string name = info.param.stem().string();
+        std::replace(name.begin(), name.end(), '.', '_');
+        return name;
     }
 );

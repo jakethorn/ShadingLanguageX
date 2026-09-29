@@ -11,7 +11,6 @@
 
 #include "common.h"
 #include "FunctionCallHistory.h"
-#include "HintRecorder.h"
 #include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::runtime
@@ -26,7 +25,7 @@ namespace mxslc::serialize
     {
     public:
         Serializer() : Serializer{mx::createDocument()} { }
-        explicit Serializer(mx::DocumentPtr doc) : doc_{std::move(doc)}, hints_{doc_} { }
+        explicit Serializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
         bool reduce_graph() const { return reduce_graph_; }
 
@@ -49,7 +48,6 @@ namespace mxslc::serialize
         void write_node_def_graph_output(const VarPtr& var, const ValuePtr& value) const;
 
         mx::DocumentPtr document() const { return doc_; }
-        HintRecorder& hints() const { return hints_; }
         string xml() const;
 
         void finalise() const;
@@ -87,7 +85,6 @@ namespace mxslc::serialize
         mutable bool comptime_violated_{false};
 
         mutable FunctionCallHistory func_call_history_;
-        mutable HintRecorder hints_;
     };
 }
 

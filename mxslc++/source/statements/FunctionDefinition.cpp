@@ -12,7 +12,6 @@
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
 #include "runtime/utils/monomorphize.h"
-#include "serialize/Serializer.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -35,23 +34,7 @@ namespace mxslc::statements
         params_{std::move(params)},
         body_{std::move(body)}
     {
-        // the fields are moved into the functions once they are created, so the header is kept as it is written
-        string mods_string = mods_.to_string();
-        if (not mods_string.empty())
-            mods_string += ' ';
 
-        header_string_ = mods_string + (type_ ? type_->to_string() : "") + ' ' + name_;
-        if (not template_types_.empty())
-            header_string_ += '<' + join(template_types_, ", ") + '>';
-        if (params_)
-            header_string_ += '(' + params_->to_string(/*show_null_defaults*/false) + ')';
-        else
-            header_string_ += " =>";
-    }
-
-    StmtPtr FunctionDefinition::with_body(StmtPtr body) const
-    {
-        return create_statement<FunctionDefinition>(mods_, type_, name_, template_types_, params_, std::move(body), token_);
     }
 
     void FunctionDefinition::set_attributes(AttributeList attrs)
@@ -115,7 +98,6 @@ namespace mxslc::statements
 
         for (const FuncPtr& func : funcs_)
         {
-            serializer().hints().define_function(func);
             func->init();
             scope().add_function(func);
 
@@ -152,11 +134,6 @@ namespace mxslc::statements
         }
 
         template_types_ = std::move(validated_types);
-    }
-
-    string FunctionDefinition::hint_skeleton() const
-    {
-        return header_string_ + " {}";
     }
 
     string FunctionDefinition::to_string() const

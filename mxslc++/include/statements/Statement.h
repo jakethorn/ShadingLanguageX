@@ -22,9 +22,6 @@ namespace mxslc::statements
         ~Statement() override = default;
 
         const Token& token() const { return token_; }
-        // the statement that this statement is a copy of, e.g., in the body of a templated function, see monomorphize
-        const Statement& origin() const { return origin_ ? *origin_ : *this; }
-        void set_origin(const Statement& stmt) { origin_ = &stmt.origin(); }
 
         virtual void set_attributes(AttributeList attrs) { }
 
@@ -35,11 +32,6 @@ namespace mxslc::statements
         // statements with a body, e.g., functions and loops, are separated from other statements by an empty line
         virtual bool is_block() const { return false; }
 
-        // statements that are recorded by the decompile hints, see serialize/decompile_hints.h
-        virtual bool is_hinted() const { return false; }
-        // the statement without the parts that can be recovered from the graph, called after the statement is executed
-        virtual string hint_skeleton() const { return ""; }
-
     protected:
         static string with_attributes(const AttributeList& attrs, const string& statement);
 
@@ -48,9 +40,6 @@ namespace mxslc::statements
 
         Token token_;
         bool is_initialized_{false};
-
-    private:
-        const Statement* origin_{nullptr};
     };
 
     string join_statements(const vector<StmtPtr>& statements);

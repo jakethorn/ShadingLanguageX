@@ -1,0 +1,5 @@
+vec2 var_0 = texcoord();
+vec2 uv_cat = (var_0 + vec2{0.001, 0.0}) * 40.0;
+float cx = vec2{5.0, 6.0}.x;
+vec2 uv_cat2 = (var_0 + vec2{0.001, 0.0}.yx) * 40.0;
+float cy = vec2{5.0, 6.0}.x;

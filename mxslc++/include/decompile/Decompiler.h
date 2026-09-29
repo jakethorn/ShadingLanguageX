@@ -11,8 +11,6 @@
 
 namespace mxslc::decompile
 {
-    enum class HintUsage;
-
     class Decompiler
     {
     public:
@@ -29,15 +27,10 @@ namespace mxslc::decompile
         string decompile_node_graph(const mx::NodeGraphPtr& node_graph, bool with_dependencies = false);
 
     private:
-        void load_data_library(const vector<fs::path>& search_directories);
-        // true if the code compiles to the same graph as the document
-        bool is_equivalent(const string& code) const;
-        string decompile_document(HintUsage hint_usage) const;
+        void load_data_library(const vector<fs::path>& search_directories) const;
 
         // a copy of the source document with the MaterialX libraries of its version set as its data library
         mx::DocumentPtr document_;
-        // the MaterialX version of the libraries of the document, e.g., 1.39.4
-        string library_version_;
     };
 }
 

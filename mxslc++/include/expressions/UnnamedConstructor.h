@@ -15,8 +15,6 @@ namespace mxslc::expressions
         explicit UnnamedConstructor(vector<ExprPtr> exprs) : Expression{}, exprs_{std::move(exprs)} { }
         UnnamedConstructor(vector<ExprPtr> exprs, Token token) : Expression{std::move(token)}, exprs_{std::move(exprs)} { }
 
-        const vector<ExprPtr>& expressions() const { return exprs_; }
-
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;

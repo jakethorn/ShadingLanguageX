@@ -28,8 +28,8 @@ add_executable(mxslc_tests
         decompiler_tests.cpp
         roundtrip_tests.cpp
         printer_tests.cpp
-        edited_graph_tests.cpp
         groundtruth_roundtrip_diff.cpp
+        groundtruth_decompile_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

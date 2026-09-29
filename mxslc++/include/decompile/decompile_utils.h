@@ -8,59 +8,41 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
-#include "Token.h"
-#include "runtime/AttributeList.h"
+#include "decompile/Code.h"
 
 namespace mxslc::decompile_utils
 {
-    // vector3 -> vec3, boolean -> bool, etc.
+    using decompile::Code;
+
+    // the ShadingLanguageX name of a MaterialX type, e.g., vec3 for vector3
     string type_alias(const string& type_name);
-    TypePtr create_type_from(const string& type_name);
 
-    // nodes named var__N were created for temporaries, i.e., sub-expressions, by the compiler
+    // nodes of temporary values are named var__<n> by the compiler
     bool is_temporary_name(const string& name);
-
-    // true if the name is a valid ShadingLanguageX identifier that is not reserved
     bool is_valid_identifier(const string& name);
-    // converts a MaterialX name into a valid identifier, e.g., `default` -> `default_`
+    // a valid identifier that is as close to the name as possible, e.g., node_1 for node-1
     string to_identifier(const string& name);
 
-    // attributes that are not otherwise expressed by the decompiled code, e.g., doc or colorspace
-    AttributeList user_attributes(const mx::ElementPtr& element, const string& child_name = "");
+    // the attributes of an element that are not expressed by the code, e.g., `@uiname "Color"`, which are attributes of
+    // the child if it is named, e.g., `@out.doc "..."` for the output of a node def
+    vector<string> user_attributes(const mx::ElementPtr& element, const string& child_name = "");
 
-    ExprPtr create_literal(const mx::ValuePtr& value);
-    ExprPtr create_identifier(const string& name);
-    Token create_symbol(const string& symbol);
-
-    // true if values of the type can be written as literals, e.g., 1.0 or vec3{1.0, 0.0, 0.0}, but not surfaceshader
+    // e.g., `1.0`, `"text"`, `vec3{1.0, 2.0, 3.0}`, `vec3{}` if all components are zero and `color3{1.0}` if all
+    // components are the same, or nothing if the value has no literal syntax
+    optional<Code> literal(const mx::ValuePtr& value);
+    // the value of an input, output or parameter, which can also be the default of its type, e.g., `default(surfaceshader)`
+    optional<Code> literal(const mx::ValueElementPtr& element);
     bool has_literal_syntax(const string& type_name);
-
-    // true if the value is the default value of its type, e.g., 0.0 or vec3{0.0, 0.0, 0.0}
-    // e.g., {"x", "0"} for "x__0" and "__"
-    vector<string> split_string(const string& str, const string& delimiter);
-    bool is_zero_value(const mx::ValueElementPtr& element);
-    // true if the value is zero, false, or an empty string
+    // true if the value is zero, false or an empty string
     bool is_zero(const mx::ValuePtr& value);
+    bool is_zero_value(const mx::ValueElementPtr& element);
 
-    // outx -> x, outr -> r, etc.
+    // the channel of an output of a separate node, e.g., 'y' for outy
     optional<char> swizzle_channel(const string& output_name);
     bool is_color_type(const string& type_name);
-    // true if the input is connected to a node, a node graph or an interface input
+    // the fields of structs without names are indexed, e.g., the 0 of out__0
+    bool is_index(const string& field_name);
     bool is_connected(const mx::InputPtr& input);
-
-    // sets whether the type of the expression being created is known from its context, until it is destroyed
-    class TypedContext
-    {
-    public:
-        TypedContext(bool& flag, const bool value) : flag_{flag}, saved_{flag} { flag_ = value; }
-        ~TypedContext() { flag_ = saved_; }
-        TypedContext(const TypedContext&) = delete;
-        TypedContext& operator=(const TypedContext&) = delete;
-
-    private:
-        bool& flag_;
-        bool saved_;
-    };
 }
 
 #endif //MXSLC_DECOMPILE_UTILS_H

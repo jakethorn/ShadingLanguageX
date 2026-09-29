@@ -1,0 +1,6 @@
+vec2 uv = texcoord();
+{float outx, float outy} var_0 = separate2(uv);
+{float outx, float outy, float outz} var_2 = separate3(position());
+float pair__0 = var_0.outx * 2.0;
+float pair__1 = var_0.outy * 2.0;
+float a = pair__0 + pair__1 + var_2.outx * var_2.outy * var_2.outz;

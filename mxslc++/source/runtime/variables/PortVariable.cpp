@@ -5,7 +5,6 @@
 #include "runtime/variables/PortVariable.h"
 
 #include "runtime/Runtime.h"
-#include "serialize/Serializer.h"
 #include "runtime/Type.h"
 #include "serialize/serializer_utils.h"
 #include "serialize/values/Value.h"
@@ -27,7 +26,6 @@ namespace mxslc::runtime
     void PortVariable::copy_value_impl(const ValuePtr value)
     {
         value->set_as_node_input(input_);
-        serializer().hints().bind_input(input_);
     }
 
     void PortVariable::set_node_name(const string& name) const

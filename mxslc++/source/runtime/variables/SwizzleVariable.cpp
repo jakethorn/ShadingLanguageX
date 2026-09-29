@@ -6,17 +6,13 @@
 #include "runtime/ArgumentList.h"
 #include "expressions/RuntimeExpression.h"
 #include "runtime/interface.h"
-#include "serialize/Serializer.h"
 #include "runtime/utils/invoke.h"
 #include "utils/swizzle_utils.h"
 
 namespace mxslc::runtime
 {
     SwizzleVariable::SwizzleVariable(ExprPtr value_expr, string swizzle)
-        : Variable{TokenType::Mutable, swizzle_utils::get_swizzle_type(swizzle)},
-        value_expr_{std::move(value_expr)},
-        swizzle_{std::move(swizzle)},
-        hint_frames_{serializer().hints().snapshot()}
+        : Variable{TokenType::Mutable, swizzle_utils::get_swizzle_type(swizzle)}, value_expr_{std::move(value_expr)}, swizzle_{std::move(swizzle)}
     {
 
     }
@@ -24,14 +20,7 @@ namespace mxslc::runtime
     ValuePtr SwizzleVariable::value_impl() const
     {
         if (swizzle_value_ == nullptr)
-        {
-            // swizzles are evaluated when they are used, but their nodes are part of the code that created them, and only
-            // the separate and combine calls of the swizzle itself are hidden, not the code of the value that is swizzled
-            const serialize::HintRecorder::RestoredSnapshot hint_frames{serializer().hints(), hint_frames_};
-            const VarPtr value = value_expr_->evaluate();
-            const serialize::HintRecorder::HiddenFrame hidden_frame{serializer().hints()};
-            swizzle_value_ = swizzle_utils::evaluate_swizzle(value, swizzle_)->value();
-        }
+            swizzle_value_ = swizzle_utils::evaluate_swizzle(value_expr_, swizzle_)->value();
         return swizzle_value_;
     }
 
@@ -39,9 +28,6 @@ namespace mxslc::runtime
     {
         if (swizzle_utils::has_duplicate_channels(swizzle_))
             throw CompileError{"Swizzle cannot have duplicate channels during assignment"};
-
-        // the separate and combine calls are part of the assignment, not of the code
-        const serialize::HintRecorder::HiddenFrame hidden_frame{serializer().hints()};
 
         // lhs.swizzle = rhs
         // TODO this separate is useless if all child values are overridden anyway

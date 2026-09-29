@@ -47,7 +47,7 @@ mxsl="$base.mxsl"
 rm -f "$mtlx" "$mxsl"
 
 # Match the roundtrip tests, which compile without graph reduction.
-"$mxslc" compile "$input" -o "$mtlx" --no-reduce-graph --decompile-hints
+"$mxslc" compile "$input" -o "$mtlx" --no-reduce-graph
 [[ -f "$mtlx" ]] || { echo "Error: compile pass failed" >&2; exit 1; }
 
 "$mxslc" decompile "$mtlx" -o "$mxsl"

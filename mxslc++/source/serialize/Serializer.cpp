@@ -156,7 +156,6 @@ namespace mxslc::serialize
 
         const mx::GraphElementPtr& graph = scope().graph();
         const mx::NodePtr node = graph->addNode(node_category(func), get_valid_node_name(graph), serialize_type(func));
-        hints_.write_node(node, args, func);
 
         for (const auto& [param, input_value] : input_values)
         {
@@ -174,7 +173,6 @@ namespace mxslc::serialize
             if (param.is_in())
             {
                 write_node_input(node, param.name(), param.type(), input_value, input_attrs);
-                hints_.write_input(node, param.name(), input_value);
             }
 
             if (param.is_out())
@@ -182,7 +180,6 @@ namespace mxslc::serialize
                 const string output_name = with_prefix(OUT_PARAMETER_PREFIX, param.name());
                 const VarPtr output = serialize_utils::create_node_output_value(node, node_def, param.type(), output_name, input_attrs);
                 input_value->copy(output);
-                hints_.bind_variable(input_value, input_value->name());
             }
         }
 
@@ -260,23 +257,19 @@ namespace mxslc::serialize
     void Serializer::write_node_def_graph(const FuncPtr& func, const AttributeList& attrs) const
     {
         runtime().enter_scope(func);
-        hints_.enter_function_body();
 
         if (func->is_nodegraph())
         {
             const mx::NodeGraphPtr node_graph = write_node_graph(func);
             attrs.add_to(node_graph);
-            hints_.write_function(node_graph);
         }
         else
         {
             const mx::NodeDefPtr node_def = write_node_def(func);
             write_node_graph(func, node_def);
             attrs.add_to(node_def);
-            hints_.write_function(node_def);
         }
 
-        hints_.exit_function_body();
         runtime().exit_scope();
 
         // start function call history
@@ -329,7 +322,7 @@ namespace mxslc::serialize
 
     void Serializer::finalise() const
     {
-        hints_.finalise();
+
     }
 
     void Serializer::save(const fs::path& dst_path) const

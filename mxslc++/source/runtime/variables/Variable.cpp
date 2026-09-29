@@ -257,7 +257,6 @@ namespace mxslc::runtime
     void Variable::add_to_scope(string name)
     {
         scope().add_variable(name, shared_from_this());
-        serializer().hints().define_variable(shared_from_this(), name);
 
         if (name == "this")
         {
