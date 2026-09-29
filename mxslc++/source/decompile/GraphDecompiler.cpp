@@ -116,48 +116,52 @@ namespace mxslc::decompile
             return code::member(value, to_identifier(field_name));
         }
 
-        class TypedContext
+        // sets a member of the decompiler while an expression is created, e.g., whether its type is known
+        template<typename T>
+        class ScopedValue
         {
         public:
-            TypedContext(bool& flag, const bool value) : flag_{flag}, saved_{flag} { flag_ = value; }
-            ~TypedContext() { flag_ = saved_; }
-            TypedContext(const TypedContext&) = delete;
-            TypedContext& operator=(const TypedContext&) = delete;
+            ScopedValue(T& member, T value) : member_{member}, saved_{member} { member_ = std::move(value); }
+            ~ScopedValue() { member_ = saved_; }
+            ScopedValue(const ScopedValue&) = delete;
+            ScopedValue& operator=(const ScopedValue&) = delete;
 
         private:
-            bool& flag_;
-            bool saved_;
+            T& member_;
+            T saved_;
         };
 
-        bool is_type_name(const string& name)
+        using TypedContext = ScopedValue<bool>;
+
+        // e.g., the 1.0 of `x + 1.0`, which is written `x++;` if it is assigned to x
+        bool is_one(const mx::InputPtr& input)
         {
-            static const unordered_set<string> type_names {
-                "boolean", "integer", "float", "vector2", "vector3", "vector4", "color3", "color4", "matrix33", "matrix44",
-                "string", "filename", "surfaceshader", "displacementshader", "volumeshader", "lightshader", "material",
-                "BSDF", "EDF", "VDF"
-            };
-            return contains(type_names, name);
+            if (input == nullptr or is_connected(input) or not input->hasValue())
+                return false;
+            const mx::ValuePtr value = input->getValue();
+            return (value->isA<float>() and value->asA<float>() == 1.0f) or (value->isA<int>() and value->asA<int>() == 1);
         }
 
-        string variable_definition(const string& mods, const string& type, const string& name, const optional<Code>& value)
+        Layout variable_definition(const string& mods, const string& type, const string& name, const optional<Code>& value)
         {
-            string result = mods.empty() ? "" : mods + " ";
-            result += type + " " + name;
-            if (value)
-                result += " = " + value->text;
-            return result + ";";
+            string declaration = mods.empty() ? "" : mods + " ";
+            declaration += type + " " + name;
+            if (not value)
+                return declaration + ";";
+            return Layout::concat({declaration + " = ", value->layout, ";"});
         }
 
-        string expression_statement(const Code& expr)
+        Layout expression_statement(const Code& expr)
         {
-            // statements beginning with `if` are if statements, so if expressions are wrapped in parentheses
-            const bool is_if_expr = expr.precedence == Precedence::Lowest and string_utils::starts_with(expr.text, "if (");
-            return (is_if_expr ? "(" + expr.text + ")" : expr.text) + ";";
+            // statements beginning with `if` are if statements, so if-expressions are wrapped in parentheses
+            if (expr.is_if_expression())
+                return Layout::concat({"(", expr.layout, ");"});
+            return Layout::concat({expr.layout, ";"});
         }
     }
 
-    GraphDecompiler::GraphDecompiler(DocumentDecompiler& document, mx::GraphElementPtr graph, const unordered_set<string>& reserved_names)
-        : document_{document}, graph_{std::move(graph)}, nodes_{graph_->getNodes()}
+    GraphDecompiler::GraphDecompiler(DocumentDecompiler& document, mx::GraphElementPtr graph, unordered_set<string> reserved_names)
+        : document_{document}, graph_{std::move(graph)}, nodes_{graph_->getNodes()}, reserved_names_{std::move(reserved_names)}
     {
         for (const mx::NodePtr& node : nodes_)
         {
@@ -178,9 +182,14 @@ namespace mxslc::decompile
             }
         }
 
-        find_absorbed_nodes();
-        find_statements();
-        create_identifiers(reserved_names);
+        find_assignments();
+        do
+        {
+            find_absorbed_nodes();
+            find_statements();
+            create_identifiers();
+        }
+        while (remove_invalid_assignment());
     }
 
     bool GraphDecompiler::is_statement(const mx::NodePtr& node) const
@@ -193,6 +202,229 @@ namespace mxslc::decompile
         if (contains(uses_, node))
             return uses_.at(node).size();
         return 0;
+    }
+
+    optional<string> GraphDecompiler::declared_variable(const mx::NodePtr& node) const
+    {
+        const Assignments* assignments = assignments_of(node);
+        if (assignments and assignments->is_declared)
+            return assignments->variable;
+        return std::nullopt;
+    }
+
+    bool GraphDecompiler::is_assigned(const string& variable) const
+    {
+        return std::any_of(assignments_.begin(), assignments_.end(), [&](const Assignments& assignments) {
+            return assignments.variable == variable and not assignments.nodes.empty();
+        });
+    }
+
+    bool GraphDecompiler::has_assigned_value(const mx::PortElementPtr& port, const string& variable) const
+    {
+        const mx::NodePtr node = graph_->getNode(port->getNodeName());
+        const Assignments* assignments = node ? assignments_of(node) : nullptr;
+        return assignments and assignments->identifier == variable;
+    }
+
+    void GraphDecompiler::find_assignments()
+    {
+        unordered_map<mx::NodePtr, size_t> positions;
+        for (size_t i = 0; i < nodes_.size(); ++i)
+            positions[nodes_[i]] = i;
+
+        // the values that the compiler named after the variable that they are assigned to, e.g., var__x__1
+        unordered_map<string, size_t> indices;
+        for (const mx::NodePtr& node : nodes_)
+        {
+            // calls that only assign to out parameters or nonlocal variables are not values of the variable, e.g.,
+            // the node of `foo();` is named var__x__1 if foo assigns to x
+            const optional<string> variable = assigned_variable(node->getName());
+            if (not variable or node->getType() == mx::MULTI_OUTPUT_TYPE_STRING or return_outputs(node).empty() or not out_parameter_outputs(node).empty())
+                continue;
+
+            if (not contains(indices, *variable))
+            {
+                indices[*variable] = assignments_.size();
+                assignments_.push_back(Assignments{*variable, {}, contains(reserved_names_, to_identifier(*variable))});
+            }
+            assignments_[indices.at(*variable)].nodes.push_back(node);
+        }
+
+        for (Assignments& assignments : assignments_)
+        {
+            // the first value of a variable is the node of its definition, which is named after it, e.g., x, unless it
+            // has no node, e.g., `mutable float x = 0.0;`
+            if (const mx::NodePtr definition = graph_->getNode(assignments.variable); definition and not assignments.is_declared)
+            {
+                // definitions that cannot be written as the declaration of a mutable variable keep their later values
+                // as separate values, e.g., `geomprop float x;`
+                if (definition->getType() == mx::MULTI_OUTPUT_TYPE_STRING or is_geomprop_definition(definition))
+                {
+                    assignments.nodes.clear();
+                    continue;
+                }
+                assignments.nodes.push_back(definition);
+            }
+
+            std::sort(assignments.nodes.begin(), assignments.nodes.end(), [&](const mx::NodePtr& a, const mx::NodePtr& b) {
+                return positions.at(a) < positions.at(b);
+            });
+
+            // a variable has a single type, other values, e.g., of a local variable of an inline function that is
+            // called with different types, are separate values
+            const string type = assignments.nodes.front()->getType();
+            const auto is_other_type = [&](const mx::NodePtr& node) { return node->getType() != type; };
+            assignments.nodes.erase(std::remove_if(assignments.nodes.begin(), assignments.nodes.end(), is_other_type), assignments.nodes.end());
+        }
+
+        for (size_t i = 0; i < assignments_.size(); ++i)
+        {
+            for (const mx::NodePtr& node : assignments_[i].nodes)
+                assignment_indices_[node] = i;
+        }
+    }
+
+    const GraphDecompiler::Assignments* GraphDecompiler::assignments_of(const mx::NodePtr& node) const
+    {
+        if (contains(assignment_indices_, node))
+            return &assignments_.at(assignment_indices_.at(node));
+        return nullptr;
+    }
+
+    mx::NodePtr GraphDecompiler::previous_assignment(const mx::NodePtr& node) const
+    {
+        const Assignments* assignments = assignments_of(node);
+        if (assignments == nullptr)
+            return nullptr;
+
+        const auto it = std::find(assignments->nodes.begin(), assignments->nodes.end(), node);
+        return it == assignments->nodes.begin() ? nullptr : *(it - 1);
+    }
+
+    bool GraphDecompiler::is_previous_value(const mx::NodePtr& node, const mx::InputPtr& input) const
+    {
+        if (input == nullptr)
+            return false;
+        if (const mx::NodePtr previous = previous_assignment(node))
+            return connected_node(input) == previous;
+
+        // the first value assigned to a parameter or nonlocal variable, which the graph gets from its interface
+        const Assignments* assignments = assignments_of(node);
+        const string& interface_name = input->getInterfaceName();
+        if (assignments == nullptr or not assignments->is_declared or interface_name.empty())
+            return false;
+        const bool is_nonlocal = serialize::has_prefix(interface_name, serialize::NONLOCAL_IN_PREFIX);
+        return (is_nonlocal ? serialize::remove_prefix(interface_name) : interface_name) == assignments->variable;
+    }
+
+    void GraphDecompiler::remove_assignment(const mx::NodePtr& node)
+    {
+        Assignments& assignments = assignments_.at(assignment_indices_.at(node));
+        assignments.nodes.erase(std::find(assignments.nodes.begin(), assignments.nodes.end(), node));
+        assignment_indices_.erase(node);
+    }
+
+    bool GraphDecompiler::remove_invalid_assignment()
+    {
+        const vector<mx::NodePtr> order = ordered_statements();
+        unordered_map<mx::NodePtr, size_t> positions;
+        for (size_t i = 0; i < order.size(); ++i)
+            positions[order[i]] = i;
+
+        // the value of the variable before the statement at the position, or null if nothing is assigned to it yet
+        const auto current_value = [&](const Assignments& assignments, const size_t position) {
+            mx::NodePtr result;
+            for (const mx::NodePtr& node : assignments.nodes)
+            {
+                if (positions.at(node) < position and (result == nullptr or positions.at(node) > positions.at(result)))
+                    result = node;
+            }
+            return result;
+        };
+
+        // the values that are used at the position must be the values that their variables have at that position
+        const auto remove_overwritten_value = [&](const vector<mx::NodePtr>& dependencies, const unordered_set<string>& interface_names, const size_t position) {
+            for (const mx::NodePtr& dependency : dependencies)
+            {
+                const Assignments* assignments = assignments_of(dependency);
+                if (assignments == nullptr)
+                    continue;
+
+                const mx::NodePtr current = current_value(*assignments, position);
+                if (current == dependency)
+                    continue;
+
+                // the definition of a variable keeps its name, so the value that overwrites it is separated instead
+                remove_assignment(dependency->getName() == assignments->variable ? current : dependency);
+                return true;
+            }
+
+            // parameters and nonlocal variables cannot be used as the value of the interface after they are assigned
+            for (const Assignments& assignments : assignments_)
+            {
+                if (not assignments.is_declared or not contains(interface_names, assignments.variable))
+                    continue;
+                if (const mx::NodePtr current = current_value(assignments, position))
+                {
+                    remove_assignment(current);
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        for (size_t i = 0; i < order.size(); ++i)
+        {
+            unordered_set<string> interface_names;
+            unordered_set<mx::NodePtr> visited;
+            for (const mx::InputPtr& input : order[i]->getInputs())
+                collect_interface_dependencies(input, interface_names, visited);
+
+            if (remove_overwritten_value(statement_dependencies(order[i]), interface_names, i))
+                return true;
+        }
+
+        // the outputs of the graph are the values after all of its statements, e.g., the return value of a function
+        for (const mx::OutputPtr& output : graph_->getOutputs())
+        {
+            vector<mx::NodePtr> statements;
+            vector<mx::ElementPtr> functions;
+            unordered_set<mx::NodePtr> visited;
+            collect_dependencies(output, statements, functions, visited);
+
+            if (remove_overwritten_value(statements, interface_dependencies(output), order.size()))
+                return true;
+        }
+
+        return false;
+    }
+
+    unordered_set<string> GraphDecompiler::interface_dependencies(const mx::PortElementPtr& port) const
+    {
+        unordered_set<string> names;
+        unordered_set<mx::NodePtr> visited;
+        collect_interface_dependencies(port, names, visited);
+        return names;
+    }
+
+    void GraphDecompiler::collect_interface_dependencies(const mx::PortElementPtr& port, unordered_set<string>& names, unordered_set<mx::NodePtr>& visited) const
+    {
+        // nonlocal variables are read through inputs named nonlocal_in__<name>
+        if (const string& interface_name = port->getAttribute(mx::ValueElement::INTERFACE_NAME_ATTRIBUTE); not interface_name.empty())
+        {
+            const bool is_nonlocal = serialize::has_prefix(interface_name, serialize::NONLOCAL_IN_PREFIX);
+            names.insert(is_nonlocal ? serialize::remove_prefix(interface_name) : interface_name);
+        }
+
+        // statements are checked separately
+        const mx::NodePtr node = port->getNodeName().empty() ? nullptr : graph_->getNode(port->getNodeName());
+        if (node == nullptr or is_statement(node) or contains(visited, node))
+            return;
+
+        visited.insert(node);
+        for (const mx::InputPtr& input : node->getInputs())
+            collect_interface_dependencies(input, names, visited);
     }
 
     vector<mx::NodePtr> GraphDecompiler::ordered_statements() const
@@ -298,7 +530,8 @@ namespace mxslc::decompile
 
     bool GraphDecompiler::is_absorbable_by(const mx::NodePtr& helper, const mx::NodePtr& consumer, const size_t expected_uses) const
     {
-        if (helper == nullptr or helper == consumer or not contains(uses_, helper))
+        // the values of variables are always written as statements
+        if (helper == nullptr or helper == consumer or not contains(uses_, helper) or assignments_of(helper))
             return false;
 
         const vector<Use>& uses = uses_.at(helper);
@@ -420,6 +653,80 @@ namespace mxslc::decompile
         return runs;
     }
 
+    optional<GraphDecompiler::SwizzleAssignment> GraphDecompiler::find_swizzle_assignment(const mx::NodePtr& node) const
+    {
+        const mx::NodePtr previous = previous_assignment(node);
+        const string channels = swizzle_channels(node->getType());
+        if (previous == nullptr or not is_combine(node) or channels.size() != channel_count(node))
+            return std::nullopt;
+
+        // the channels that keep the previous value of the variable, which come from a single separate node
+        mx::NodePtr previous_separate;
+        size_t kept_count = 0;
+        vector<size_t> assigned_channels;
+        for (size_t i = 0; i < channels.size(); ++i)
+        {
+            const mx::InputPtr input = node->getInput("in" + std::to_string(i + 1));
+            const mx::NodePtr separate = connected_node(input);
+            const bool is_kept = separate and is_separate(separate) and connected_node(separate->getInput("in")) == previous and
+                swizzle_channel(input->getOutputString()) == channels[i] and (previous_separate == nullptr or separate == previous_separate);
+
+            if (is_kept)
+            {
+                previous_separate = separate;
+                ++kept_count;
+            }
+            else
+            {
+                assigned_channels.push_back(i);
+            }
+        }
+
+        if (assigned_channels.empty() or not is_absorbable_by(previous_separate, node, kept_count))
+            return std::nullopt;
+
+        if (assigned_channels.size() == 1)
+        {
+            const size_t channel = assigned_channels.front();
+            return SwizzleAssignment{previous_separate, nullptr, "in" + std::to_string(channel + 1), string{channels[channel]}};
+        }
+
+        // `q.xz = v;` is compiled to `combine3(separate2(v).outx, separate3(q).outy, separate2(v).outy)`
+        const mx::NodePtr value_separate = connected_node(node->getInput("in" + std::to_string(assigned_channels.front() + 1)));
+        if (value_separate == nullptr or not is_separate(value_separate) or value_separate->getInput("in") == nullptr)
+            return std::nullopt;
+        if (channel_count(value_separate) != assigned_channels.size() or not is_absorbable_by(value_separate, node, assigned_channels.size()))
+            return std::nullopt;
+
+        // the channels of the swizzle are in the order of the channels of the value
+        const string value_channels = swizzle_channels(value_separate->getInput("in")->getType());
+        string swizzle(assigned_channels.size(), ' ');
+        for (const size_t i : assigned_channels)
+        {
+            const mx::InputPtr input = node->getInput("in" + std::to_string(i + 1));
+            if (connected_node(input) != value_separate)
+                return std::nullopt;
+
+            const optional<char> value_channel = swizzle_channel(input->getOutputString());
+            const size_t index = value_channel ? value_channels.find(*value_channel) : string::npos;
+            if (index >= swizzle.size() or swizzle[index] != ' ')
+                return std::nullopt;
+            swizzle[index] = channels[i];
+        }
+
+        return SwizzleAssignment{previous_separate, value_separate, "", swizzle};
+    }
+
+    optional<string> GraphDecompiler::compound_operator(const mx::NodePtr& node) const
+    {
+        const string& category = node->getCategory();
+        if (not contains(binary_operators(), category) or is_integer_arithmetic(node) or float_first_convert(node))
+            return std::nullopt;
+        if (not is_previous_value(node, node->getInput("in1")))
+            return std::nullopt;
+        return binary_operators().at(category);
+    }
+
     // `a > b` is compiled to `ifgreater(a, b)` with a boolean output
     bool GraphDecompiler::is_comparison(const mx::NodePtr& node) const
     {
@@ -478,8 +785,20 @@ namespace mxslc::decompile
 
     void GraphDecompiler::find_absorbed_nodes()
     {
+        absorbed_.clear();
+        swizzle_assignments_.clear();
+
         for (const mx::NodePtr& node : nodes_)
         {
+            if (const optional<SwizzleAssignment> assignment = find_swizzle_assignment(node))
+            {
+                absorbed_.insert(assignment->previous_separate);
+                if (assignment->value_separate)
+                    absorbed_.insert(assignment->value_separate);
+                swizzle_assignments_[node] = *assignment;
+                continue;
+            }
+
             if (const mx::NodePtr convert = float_first_convert(node))
                 absorbed_.insert(convert);
 
@@ -497,8 +816,17 @@ namespace mxslc::decompile
 
     void GraphDecompiler::find_statements()
     {
+        statements_.clear();
+
         for (const mx::NodePtr& node : nodes_)
         {
+            // the values of variables, e.g., `x = x * 2.0;`
+            if (assignments_of(node))
+            {
+                statements_.insert(node);
+                continue;
+            }
+
             if (contains(absorbed_, node) or is_output_constant(node))
                 continue;
 
@@ -515,21 +843,43 @@ namespace mxslc::decompile
         }
     }
 
-    void GraphDecompiler::create_identifiers(const unordered_set<string>& reserved_names)
+    void GraphDecompiler::create_identifiers()
     {
-        used_identifiers_ = reserved_names;
+        used_identifiers_ = reserved_names_;
+        identifiers_.clear();
+        output_identifiers_.clear();
 
-        // named nodes take priority over the names generated for temporaries
+        // the variables that are declared outside of the graph use their own names
+        for (Assignments& assignments : assignments_)
+            assignments.identifier = assignments.is_declared ? to_identifier(assignments.variable) : "";
+
+        // variables and named nodes take priority over the names generated for temporaries
         for (const mx::NodePtr& node : nodes_)
         {
-            if (not is_temporary_name(node->getName()))
+            if (contains(assignment_indices_, node))
+            {
+                Assignments& assignments = assignments_.at(assignment_indices_.at(node));
+                if (assignments.identifier.empty())
+                    assignments.identifier = unique_identifier(to_identifier(assignments.variable));
+                identifiers_[node] = assignments.identifier;
+            }
+            else if (not is_temporary_name(node->getName()))
+            {
                 identifiers_[node] = unique_identifier(to_identifier(node->getName()));
+            }
         }
 
         for (const mx::NodePtr& node : nodes_)
         {
-            if (is_temporary_name(node->getName()))
-                identifiers_[node] = unique_identifier("var_" + node->getName().substr(5));
+            if (contains(identifiers_, node))
+                continue;
+
+            // e.g., var_3 for var__3, and x_2 for var__x__2 if it cannot be written as an assignment to x
+            const string& name = node->getName();
+            if (const optional<string> variable = assigned_variable(name))
+                identifiers_[node] = unique_identifier(to_identifier(*variable + "_" + name.substr(name.rfind("__") + 2)));
+            else
+                identifiers_[node] = unique_identifier("var_" + name.substr(5));
         }
 
         // out arguments are declared as part of the function call, e.g., `sincos(x, float s, float c);`
@@ -632,16 +982,20 @@ namespace mxslc::decompile
         return node_def and node_def->getActiveInput(param_name) and node_def->getActiveOutput(serialize::with_prefix(serialize::OUT_PARAMETER_PREFIX, param_name));
     }
 
-    vector<string> GraphDecompiler::create_statements(const mx::NodePtr& node)
+    vector<Layout> GraphDecompiler::create_statements(const mx::NodePtr& node)
     {
-        vector<string> result;
-        string stmt;
+        vector<Layout> result;
+        Layout stmt;
 
         if (is_geomprop_definition(node))
         {
             const mx::InputPtr default_input = node->getInput("default");
             const optional<Code> default_value = default_input ? create_port_expression(default_input) : std::nullopt;
             stmt = variable_definition("geomprop", node_type(node), identifier(node), default_value);
+        }
+        else if (assignments_of(node))
+        {
+            stmt = create_assignment(node);
         }
         else if (not out_parameter_outputs(node).empty())
         {
@@ -697,6 +1051,47 @@ namespace mxslc::decompile
 
         result.push_back(code::with_attributes(user_attributes(node), stmt));
         return result;
+    }
+
+    Layout GraphDecompiler::create_assignment(const mx::NodePtr& node)
+    {
+        const Assignments& assignments = *assignments_of(node);
+        const string& variable = assignments.identifier;
+        const mx::NodePtr previous = previous_assignment(node);
+
+        // the first value of a variable declares it, e.g., `mutable float x = a;`
+        if (previous == nullptr and not assignments.is_declared)
+        {
+            const bool is_assigned_by_function = graph_->isA<mx::Document>() and document_.is_mutable_variable(variable);
+            const bool is_mutable = assignments.nodes.size() > 1 or is_assigned_by_function;
+            return variable_definition(is_mutable ? "mutable" : "", node_type(node), variable, create_node_expression(node));
+        }
+
+        // `q.y = a;`
+        if (contains(swizzle_assignments_, node))
+        {
+            const SwizzleAssignment& swizzle = swizzle_assignments_.at(node);
+            const optional<Code> value = swizzle.value_separate
+                ? create_input_expression(swizzle.value_separate, "in")
+                : create_input_expression(node, swizzle.value_input);
+            if (value)
+                return Layout::concat({variable + "." + swizzle.channels + " = ", value->layout, ";"});
+        }
+
+        // `x += a;`, or `x++;` if a is one
+        if (const optional<string> op = compound_operator(node))
+        {
+            const bool is_increment = (*op == "+" or *op == "-") and (node->getType() == "float" or node->getType() == "integer");
+            if (is_increment and is_one(node->getInput("in2")))
+                return variable + *op + *op + ";";
+            if (const optional<Code> rhs = create_operand_expression(node, "in2"))
+                return Layout::concat({variable + " " + *op + "= ", rhs->layout, ";"});
+        }
+
+        // `x = if (c) { a };`, whose else branch is the previous value of x
+        const ScopedValue<mx::NodePtr> implied_else{implied_else_, is_if_expression(node) ? previous : nullptr};
+        const optional<Code> value = create_node_expression(node);
+        return Layout::concat({variable + " = ", value ? value->layout : "null", ";"});
     }
 
     optional<Code> GraphDecompiler::create_port_expression(const mx::PortElementPtr& port)
@@ -767,10 +1162,10 @@ namespace mxslc::decompile
         return std::nullopt;
     }
 
-    optional<Code> GraphDecompiler::create_operand_expression(const mx::NodePtr& node, const string& input_name, const mx::NodePtr& operation)
+    optional<Code> GraphDecompiler::create_operand_expression(const mx::NodePtr& node, const string& input_name)
     {
         const mx::InputPtr input = node->getInput(input_name);
-        const bool is_typed = is_typed_context_ and input and input->getType() == operation->getType();
+        const bool is_typed = is_typed_context_ and input and input->getType() == node->getType();
         TypedContext context{is_typed_context_, is_typed};
         return create_input_expression(node, input_name);
     }
@@ -849,7 +1244,7 @@ namespace mxslc::decompile
             const bool is_zero_amount = amount and amount->getNodeName().empty() and amount->hasValue() and is_zero_value(amount);
             if (is_zero_amount and is_connected(node->getInput("in")))
             {
-                if (const optional<Code> in = create_operand_expression(node, "in", node))
+                if (const optional<Code> in = create_operand_expression(node, "in"))
                     return code::unary("-", *in);
             }
         }
@@ -866,13 +1261,13 @@ namespace mxslc::decompile
                     return code::binary(*lhs, "!=", *rhs);
             }
 
-            if (const optional<Code> in = create_operand_expression(node, "in", node))
+            if (const optional<Code> in = create_operand_expression(node, "in"))
                 return code::unary("!", *in);
         }
 
         if (category == "absval")
         {
-            if (const optional<Code> in = create_operand_expression(node, "in", node))
+            if (const optional<Code> in = create_operand_expression(node, "in"))
                 return code::absolute(*in);
         }
 
@@ -925,9 +1320,9 @@ namespace mxslc::decompile
         if (const mx::NodePtr convert = float_first_convert(node))
             lhs = create_untyped_expression(convert, "in");
         else
-            lhs = create_operand_expression(node, "in1", node);
+            lhs = create_operand_expression(node, "in1");
 
-        const optional<Code> rhs = create_operand_expression(node, "in2", node);
+        const optional<Code> rhs = create_operand_expression(node, "in2");
 
         if (not lhs or not rhs)
             return std::nullopt;
@@ -951,10 +1346,25 @@ namespace mxslc::decompile
 
     optional<Code> GraphDecompiler::create_if_expression(const mx::NodePtr& node)
     {
+        // only the last else branch can be implied, e.g., not the else branch of an if-expression in a then branch
+        const mx::NodePtr implied_else = implied_else_;
+        const ScopedValue<mx::NodePtr> context{implied_else_, nullptr};
+
         const optional<Code> condition = create_untyped_expression(node, "value1");
-        const optional<Code> then_code = create_operand_expression(node, "in1", node);
-        const optional<Code> else_code = create_operand_expression(node, "in2", node);
-        if (not condition or not then_code or not else_code)
+        const optional<Code> then_code = create_operand_expression(node, "in1");
+        if (not condition or not then_code)
+            return std::nullopt;
+
+        const mx::NodePtr else_node = connected_node(node->getInput("in2"));
+        if (implied_else and else_node == implied_else)
+            return code::if_expression(*condition, *then_code, std::nullopt);
+
+        // e.g., `x = if (a) { 1.0 } else if (b) { 2.0 };`
+        if (else_node and not is_statement(else_node) and is_if_expression(else_node))
+            implied_else_ = implied_else;
+
+        const optional<Code> else_code = create_operand_expression(node, "in2");
+        if (not else_code)
             return std::nullopt;
         return code::if_expression(*condition, *then_code, *else_code);
     }
@@ -971,17 +1381,12 @@ namespace mxslc::decompile
             return std::nullopt;
 
         // `v.y` is compiled to `extract(v, 1)`
-        const string& in_type = in->getType();
-        const bool is_vector = in_type == "vector2" or in_type == "vector3" or in_type == "vector4";
-        const bool is_color = is_color_type(in_type);
+        const string channels = swizzle_channels(in->getType());
         const mx::InputPtr index_input = node->getInput("index");
         const optional<int> index = index_input ? int_value(index_input) : 0;
 
-        if ((is_vector or is_color) and index and *index >= 0 and *index < 4)
-        {
-            const char channel = (is_color ? "rgba" : "xyzw")[*index];
-            return code::member(*in_code, string{channel});
-        }
+        if (index and *index >= 0 and static_cast<size_t>(*index) < channels.size())
+            return code::member(*in_code, string{channels[*index]});
 
         // `v[i]` is compiled to `extract(v, i)`
         return code::index(*in_code, *index_code);
@@ -1046,7 +1451,7 @@ namespace mxslc::decompile
         const string func_template_type = is_typed_context_ ? "" : template_type(node, node_def);
 
         TypedContext context{is_typed_context_, true};
-        vector<string> args;
+        vector<Layout> args;
         unordered_set<string> handled_inputs;
 
         // arguments are positional until an input is skipped, after which they must be named

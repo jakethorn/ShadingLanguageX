@@ -124,6 +124,6 @@ namespace mxslc::statements
             result += " = " + expr_->to_string();
         result += ';';
 
-        return with_attributes(expr_ ? expr_->attributes() : AttributeList{}, result);
+        return result;
     }
 }

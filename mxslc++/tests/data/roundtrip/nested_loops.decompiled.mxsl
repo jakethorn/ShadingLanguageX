@@ -1,1 +1,10 @@
-float g = (0.0 + randomfloat(0, seed = 0) + randomfloat(0, seed = 1) + randomfloat(0, seed = 2) + randomfloat(1, seed = 0) + randomfloat(1, seed = 1) + randomfloat(1, seed = 2) + randomfloat(2, seed = 0) + randomfloat(2, seed = 1) + randomfloat(2, seed = 2)) * 0.25;
+mutable float grid = 0.0 + randomfloat(0, seed = 0);
+grid += randomfloat(0, seed = 1);
+grid += randomfloat(0, seed = 2);
+grid += randomfloat(1, seed = 0);
+grid += randomfloat(1, seed = 1);
+grid += randomfloat(1, seed = 2);
+grid += randomfloat(2, seed = 0);
+grid += randomfloat(2, seed = 1);
+grid += randomfloat(2, seed = 2);
+float g = grid * 0.25;

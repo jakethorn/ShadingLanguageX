@@ -32,7 +32,6 @@ namespace mxslc::statements
         const vector<FuncPtr>& functions() const { return funcs_; }
 
         string to_string() const override;
-        bool is_block() const override { return true; }
 
     protected:
         void init() override;

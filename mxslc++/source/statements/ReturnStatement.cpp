@@ -64,7 +64,7 @@ namespace mxslc::statements
     string ReturnStatement::to_string() const
     {
         if (expr_)
-            return with_attributes(expr_->attributes(), "return " + expr_->to_string() + ";");
+            return "return " + expr_->to_string() + ";";
         else
             return "return;";
     }

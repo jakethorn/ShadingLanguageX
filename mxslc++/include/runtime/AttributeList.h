@@ -19,11 +19,7 @@ namespace mxslc::runtime
         void add_to(const mx::ElementPtr& element) const;
         void add_to(const mx::ElementPtr& element, const string& child_name) const;
 
-        bool empty() const { return attrs_.empty(); }
-        const vector<Attribute>& attributes() const { return attrs_; }
-
         string to_string() const override;
-        string to_string(const string& delimiter) const;
 
     private:
         vector<Attribute> attrs_;

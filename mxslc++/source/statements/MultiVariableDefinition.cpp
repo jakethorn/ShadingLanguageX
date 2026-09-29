@@ -82,38 +82,10 @@ namespace mxslc::statements
 
     string MultiVariableDefinition::to_string() const
     {
-        const vector<Field>& fields = type_->fields();
-
-        // `float a, b` if all fields share the same modifiers and type, otherwise `float a, int b`
-        bool is_uniform = true;
-        for (const Field& field : fields)
-        {
-            if (field.modifiers().to_string() != fields.front().modifiers().to_string() or
-                field.type()->to_string() != fields.front().type()->to_string())
-                is_uniform = false;
-        }
-
-        string result;
-        for (size_t i = 0; i < fields.size(); ++i)
-        {
-            if (i > 0)
-                result += ", ";
-
-            if (i == 0 or not is_uniform)
-            {
-                const string mods_string = fields[i].modifiers().to_string();
-                if (not mods_string.empty())
-                    result += mods_string + ' ';
-                result += fields[i].type()->to_string() + ' ';
-            }
-
-            result += fields[i].name();
-        }
-
+        string result = join(type_->fields(), ", ");
         if (expr_)
             result += " = " + expr_->to_string();
         result += ";";
-
-        return with_attributes(expr_ ? expr_->attributes() : AttributeList{}, result);
+        return result;
     }
 }

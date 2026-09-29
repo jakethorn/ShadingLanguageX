@@ -21,12 +21,12 @@
       <input name="in1" type="float" output="outx" nodename="var__0" />
       <input name="in2" type="float" value="200" />
     </combine2>
-    <switch name="var__3" type="vector2">
+    <switch name="var__y__1" type="vector2">
       <input name="in1" type="vector2" nodename="var__1" />
       <input name="in2" type="vector2" nodename="var__2" />
       <input name="which" type="integer" value="1" />
     </switch>
-    <output name="nonlocal_out__y" type="vector2" nodename="var__3" />
+    <output name="nonlocal_out__y" type="vector2" nodename="var__y__1" />
   </nodegraph>
   <foo name="var__0" type="multioutput">
     <input name="nonlocal_in__y" type="vector2" value="0, 0" />

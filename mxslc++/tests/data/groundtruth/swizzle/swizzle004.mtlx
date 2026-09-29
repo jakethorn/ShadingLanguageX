@@ -18,7 +18,7 @@
   <separate3 name="var__4" type="multioutput">
     <input name="in" type="color3" nodename="var__2" />
   </separate3>
-  <combine3 name="var__5" type="color3">
+  <combine3 name="var__c__1" type="color3">
     <input name="in1" type="float" output="outb" nodename="var__4" />
     <input name="in2" type="float" output="outg" nodename="var__4" />
     <input name="in3" type="float" output="outr" nodename="var__4" />

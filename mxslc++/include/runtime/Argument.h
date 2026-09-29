@@ -34,7 +34,6 @@ namespace mxslc::runtime
         const ModifierList& modifiers() const { return mods_; }
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
-        const ExprPtr& expression() const { return expr_; }
         size_t index() const { return index_; }
 
         Argument monomorphize(const TypePtr& template_type) const override;

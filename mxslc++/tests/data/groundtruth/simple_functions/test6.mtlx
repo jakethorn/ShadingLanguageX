@@ -5,11 +5,11 @@
     <output name="outparam__y" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <multiply name="var__0" type="float">
+    <multiply name="var__y__1" type="float">
       <input name="in1" type="float" interfacename="x" />
       <input name="in2" type="float" value="2" />
     </multiply>
-    <output name="outparam__y" type="float" nodename="var__0" />
+    <output name="outparam__y" type="float" nodename="var__y__1" />
   </nodegraph>
   <foo name="var__0" type="float">
     <input name="x" type="float" value="1" />

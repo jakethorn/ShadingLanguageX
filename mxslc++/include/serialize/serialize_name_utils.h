@@ -29,6 +29,11 @@ namespace mxslc::serialize
     string remove_prefix(const string& str);
 
     string get_valid_node_name(const mx::GraphElementPtr& graph);
+    // temporary values are named var__<n>, see get_valid_node_name
+    bool is_temporary_node_name(const string& name);
+    // the values assigned to a variable after it is defined are named after it, e.g., var__x__1 for the first value
+    // assigned to x, whose number is incremented to make the name unique
+    string assigned_node_name(const string& variable_name);
 
     template<typename T>
     string with_prefix(const string& prefix, const T& t)

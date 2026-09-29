@@ -8,7 +8,7 @@
     <output name="out__this__radius" type="float" />
   </nodedef>
   <nodegraph name="NG_Sphere_expand" nodedef="ND_Sphere_expand">
-    <add name="var__0" type="float">
+    <add name="var__radius__1" type="float">
       <input name="in1" type="float" interfacename="this__radius" />
       <input name="in2" type="float" interfacename="amount" />
     </add>
@@ -16,7 +16,7 @@
       <input name="in" type="vector2" interfacename="this__center" />
     </dot>
     <output name="out__this__center" type="vector2" nodename="node1" />
-    <output name="out__this__radius" type="float" nodename="var__0" />
+    <output name="out__this__radius" type="float" nodename="var__radius__1" />
   </nodegraph>
   <Sphere_expand name="var__0" type="multioutput">
     <input name="amount" type="float" value="1" />

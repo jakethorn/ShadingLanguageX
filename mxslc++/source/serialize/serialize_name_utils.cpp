@@ -4,6 +4,8 @@
 
 #include "serialize/serialize_name_utils.h"
 
+#include <algorithm>
+
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
 
@@ -42,5 +44,18 @@ namespace mxslc::serialize
     string get_valid_node_name(const mx::GraphElementPtr& graph)
     {
         return graph->createValidChildName(with_prefix(TEMPORARY_VARIABLE_PREFIX, "0"));
+    }
+
+    bool is_temporary_node_name(const string& name)
+    {
+        if (not has_prefix(name, TEMPORARY_VARIABLE_PREFIX))
+            return false;
+        const string number = remove_prefix(name);
+        return not number.empty() and std::all_of(number.begin(), number.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); });
+    }
+
+    string assigned_node_name(const string& variable_name)
+    {
+        return with_prefix(TEMPORARY_VARIABLE_PREFIX, variable_name + "__1");
     }
 }

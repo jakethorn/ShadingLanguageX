@@ -29,20 +29,14 @@ namespace mxslc::statements
         void execute();
 
         string to_string() const override = 0;
-        // statements with a body, e.g., functions and loops, are separated from other statements by an empty line
-        virtual bool is_block() const { return false; }
 
     protected:
-        static string with_attributes(const AttributeList& attrs, const string& statement);
-
         virtual void init() { }
         virtual void execute_impl() const = 0;
 
         Token token_;
         bool is_initialized_{false};
     };
-
-    string join_statements(const vector<StmtPtr>& statements);
 }
 
 #endif //FENNEC_STATEMENT_H

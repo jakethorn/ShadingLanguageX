@@ -61,11 +61,6 @@ namespace mxslc::expressions
 
     string CompoundAssignment::to_string() const
     {
-        return lhs_expr_->to_operand_string(Precedence::Increment) + " " + token_.lexeme() + " " + rhs_expr_->to_string();
-    }
-
-    Precedence CompoundAssignment::precedence() const
-    {
-        return Precedence::Compound;
+        return lhs_expr_->to_string() + " " + token_.lexeme() + " " + rhs_expr_->to_string();
     }
 }

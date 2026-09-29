@@ -45,7 +45,6 @@ namespace mxslc::runtime
         auto end() const { return params_.end(); }
 
         string to_string() const override;
-        string to_string(bool show_null_defaults) const;
 
     private:
         vector<Parameter> params_;

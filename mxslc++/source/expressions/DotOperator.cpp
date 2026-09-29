@@ -62,11 +62,6 @@ namespace mxslc::expressions
 
     string DotOperator::to_string() const
     {
-        return value_expr_->to_operand_string(Precedence::Postfix) + "." + token_.lexeme();
-    }
-
-    Precedence DotOperator::precedence() const
-    {
-        return Precedence::Postfix;
+        return value_expr_->to_string() + "." + token_.lexeme();
     }
 }

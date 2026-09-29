@@ -10,7 +10,7 @@
     </dot>
     <output name="nonlocal_out__b" type="float" nodename="node1" />
   </nodegraph>
-  <foo name="var__0" type="float">
+  <foo name="var__b__1" type="float">
     <input name="x" type="float" value="2" />
   </foo>
 </materialx>

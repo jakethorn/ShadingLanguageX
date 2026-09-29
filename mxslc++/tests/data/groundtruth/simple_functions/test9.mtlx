@@ -7,7 +7,7 @@
     <output name="outparam__q__y" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <multiply name="var__0" type="float">
+    <multiply name="var__q__x__1" type="float">
       <input name="in1" type="float" value="3" />
       <input name="in2" type="float" value="2" />
     </multiply>
@@ -19,7 +19,7 @@
       <input name="value" type="float" value="2" />
     </constant>
     <output name="outparam__p__y" type="float" nodename="node2" />
-    <output name="outparam__q__x" type="float" nodename="var__0" />
+    <output name="outparam__q__x" type="float" nodename="var__q__x__1" />
     <constant name="node3" type="float">
       <input name="value" type="float" value="4" />
     </constant>

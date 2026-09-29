@@ -48,13 +48,8 @@ namespace mxslc::expressions
 
     string IncrementOperator::to_string() const
     {
-        const string value = value_expr_->to_operand_string(Precedence::Postfix);
+        const string value = value_expr_->to_string();
         const string op = token_.lexeme();
         return prefix_ ? op + value : value + op;
-    }
-
-    Precedence IncrementOperator::precedence() const
-    {
-        return Precedence::Increment;
     }
 }

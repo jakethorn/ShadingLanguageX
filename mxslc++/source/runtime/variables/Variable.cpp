@@ -78,7 +78,8 @@ namespace mxslc::runtime
             children_[i]->set_name(name_, type_, i);
         }
 
-        set_node_name(name_);
+        node_name_ = name_;
+        set_node_name(node_name_);
     }
 
     void Variable::set_name(const string& name, const TypePtr& parent_type, const size_t index)
@@ -91,7 +92,23 @@ namespace mxslc::runtime
 
         const Field& field = parent_type->field(index);
         const string child_name = field.has_name() ? field.name() : std::to_string(index);
-        set_node_name(name + "__" + child_name);
+        node_name_ = name + "__" + child_name;
+        set_node_name(node_name_);
+    }
+
+    bool Variable::can_name_assigned_nodes() const
+    {
+        // the fields of a parameter are also parameters
+        return can_name_assigned_nodes_ and (not has_parent() or parent()->can_name_assigned_nodes());
+    }
+
+    void Variable::set_assigned_node_name(const ValuePtr& value) const
+    {
+        if (not can_name_assigned_nodes() or node_name_.empty() or is_temporary())
+            return;
+
+        if (const NodeValuePtr node_value = cast_value<NodeValue>(value))
+            node_value->set_assigned_node_name(node_name_);
     }
 
     bool Variable::is_assignable() const
@@ -194,6 +211,7 @@ namespace mxslc::runtime
 
     void Variable::copy(const VarPtr& other)
     {
+        const bool is_assignment = is_initialized_;
         if (is_initialized_)
         {
             if (is_temporary())
@@ -204,7 +222,11 @@ namespace mxslc::runtime
 
         if (other->has_value())
         {
-            copy_value(other->value());
+            const ValuePtr value = other->value();
+            // named before it is copied, which can connect it to the output of a function, e.g., for nonlocal variables
+            if (is_assignment and other->can_name_nodes_)
+                set_assigned_node_name(value);
+            copy_value(value);
         }
         else
         {

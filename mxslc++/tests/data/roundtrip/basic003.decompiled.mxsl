@@ -1,13 +1,16 @@
+[[nodedef]]
 int foo_boolean(bool v)
 {
     return int{v};
 }
 
+[[nodedef]]
 int foo_float(float v)
 {
     return round(v);
 }
 
+[[nodedef]]
 int bar(bool v)
 {
     return int{v};

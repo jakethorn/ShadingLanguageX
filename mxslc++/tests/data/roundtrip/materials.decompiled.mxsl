@@ -2,6 +2,11 @@ vec2 uv = texcoord() * 2.0;
 color3 albedo = image("textures/albedo.png", texcoord = uv);
 float roughness = image("textures/roughness.png", texcoord = uv);
 vec3 bump = image("textures/normal.png", texcoord = uv);
-surfaceshader surface = standard_surface(base_color = albedo, metalness = 0.5, specular_roughness = roughness, normal = normalmap(bump));
+surfaceshader surface = standard_surface(
+    base_color = albedo,
+    metalness = 0.5,
+    specular_roughness = roughness,
+    normal = normalmap(bump)
+);
 displacementshader d = displacement(roughness * 0.1);
 surfacematerial(surface, displacementshader = d);

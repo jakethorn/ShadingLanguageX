@@ -27,7 +27,6 @@ add_executable(mxslc_tests
         compile_options_sources_tests.cpp
         decompiler_tests.cpp
         roundtrip_tests.cpp
-        printer_tests.cpp
         groundtruth_roundtrip_diff.cpp
         groundtruth_decompile_tests.cpp
 )

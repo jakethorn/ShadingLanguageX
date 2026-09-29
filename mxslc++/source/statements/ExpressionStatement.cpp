@@ -9,8 +9,6 @@
 #include "statements/ExpressionStatement.h"
 
 #include "expressions/Expression.h"
-#include "expressions/IfExpression.h"
-#include "expressions/interface.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -42,9 +40,6 @@ namespace mxslc::statements
 
     string ExpressionStatement::to_string() const
     {
-        // statements beginning with `if` are if statements, so if expressions are wrapped in parentheses
-        const bool is_if_expr = cast_expression<IfExpression>(expr_) != nullptr;
-        const string expr_string = is_if_expr ? "(" + expr_->to_string() + ")" : expr_->to_string();
-        return with_attributes(expr_->attributes(), expr_string + ";");
+        return expr_->to_string() + ";";
     }
 }

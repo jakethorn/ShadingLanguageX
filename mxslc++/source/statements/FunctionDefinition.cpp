@@ -138,9 +138,8 @@ namespace mxslc::statements
 
     string FunctionDefinition::to_string() const
     {
-        // the fields of non-templated functions are moved into the function once it is created
-        if (not is_templated() and not funcs_.empty())
-            return with_attributes(attrs_, funcs_.front()->to_string());
+        if (not is_templated())
+            return funcs_.front()->to_string();
 
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
@@ -154,11 +153,9 @@ namespace mxslc::statements
             result += '<' + join(template_types_, ", ") + '>';
         if (params_)
             result += '(' + params_->to_string() + ')';
-        else
-            result += " =>";
         result += '\n';
         result += body_->to_string();
 
-        return with_attributes(attrs_, result);
+        return result;
     }
 }

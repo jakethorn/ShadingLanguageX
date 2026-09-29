@@ -5,7 +5,8 @@ float facing_ratio =>
     return dotproduct(n, v);
 }
 
-nodegraph color3 tinted(color3 base = color3{1.0, 0.5, 0.25}, float amount = 0.5)
+[[nodegraph]]
+color3 tinted(color3 base = color3{1.0, 0.5, 0.25}, float amount = 0.5)
 {
     return base * amount;
 }

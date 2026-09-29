@@ -1,0 +1,11 @@
+inline float twice(float x)
+{
+    mutable float r = x;
+    r *= 2.0;
+    return r;
+}
+
+mutable {float lo, float hi} range = {time(), time() + 1.0};
+range.lo = range.lo * 0.5;
+range.hi += twice(range.lo);
+float width = range.hi - range.lo + twice(range.hi);

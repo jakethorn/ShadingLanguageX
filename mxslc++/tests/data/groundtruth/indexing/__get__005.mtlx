@@ -25,19 +25,19 @@
       <input name="in2" type="float" output="outy" nodename="var__0" />
       <input name="in3" type="float" value="3" />
     </combine3>
-    <switch name="var__4" type="vector3">
+    <switch name="var__p__1" type="vector3">
       <input name="in1" type="vector3" nodename="var__1" />
       <input name="in2" type="vector3" nodename="var__2" />
       <input name="in3" type="vector3" nodename="var__3" />
       <input name="which" type="integer" value="0" />
     </switch>
-    <output name="nonlocal_out__p" type="vector3" nodename="var__4" />
+    <output name="nonlocal_out__p" type="vector3" nodename="var__p__1" />
     <extract name="y" type="float">
-      <input name="in" type="vector3" nodename="var__4" />
+      <input name="in" type="vector3" nodename="var__p__1" />
       <input name="index" type="integer" value="0" />
     </extract>
     <extract name="z" type="float">
-      <input name="in" type="vector3" nodename="var__4" />
+      <input name="in" type="vector3" nodename="var__p__1" />
       <input name="index" type="integer" value="0" />
     </extract>
     <constant name="node1" type="float">

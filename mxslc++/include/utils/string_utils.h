@@ -16,7 +16,6 @@ namespace mxslc::string_utils
 
     void replace_last(string& str, const string& old_str, const string& new_str);
     string float_to_string(float value);
-    string indent(const string& str, const string& indentation = "    ");
 }
 
 #endif //FENNEC_STRING_UTILS_H

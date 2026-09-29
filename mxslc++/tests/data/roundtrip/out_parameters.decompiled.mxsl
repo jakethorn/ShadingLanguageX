@@ -1,3 +1,4 @@
+[[nodedef]]
 void sincos(float r, out float s, out float c)
 {
     s = sin(r);

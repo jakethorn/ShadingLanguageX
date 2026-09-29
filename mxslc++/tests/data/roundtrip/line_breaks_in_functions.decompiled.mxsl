@@ -1,0 +1,26 @@
+[[nodedef]]
+float blend(
+float a,
+float b,
+float c,
+float d,
+float e,
+float f,
+float g,
+float h,
+float weight = 0.5)
+{
+    float total = a * weight
+        + b * weight
+        + c * weight
+        + d * weight
+        + e * weight
+        + f * weight
+        + g * weight;
+    return if (total > 1.0) {
+            if (h > 0.5) { total * h * weight * a * b * c * d * e * f * g } else { total }
+        }
+        else { h };
+}
+
+float r = blend(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0);

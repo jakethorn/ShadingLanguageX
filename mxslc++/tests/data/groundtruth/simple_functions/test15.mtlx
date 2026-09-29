@@ -9,9 +9,9 @@
     </constant>
     <output name="nonlocal_out__x" type="float" nodename="node1" />
   </nodegraph>
-  <foo name="var__0" type="float" />
+  <foo name="var__x__1" type="float" />
   <multiply name="y" type="float">
-    <input name="in1" type="float" nodename="var__0" />
+    <input name="in1" type="float" nodename="var__x__1" />
     <input name="in2" type="float" value="2" />
   </multiply>
 </materialx>

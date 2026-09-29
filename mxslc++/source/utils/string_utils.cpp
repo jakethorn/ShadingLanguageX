@@ -58,25 +58,4 @@ namespace mxslc::string_utils
             result.insert(result.find('e'), ".0");
         return result;
     }
-
-    string indent(const string& str, const string& indentation)
-    {
-        string result;
-        size_t start = 0;
-        while (start <= str.size())
-        {
-            size_t end = str.find('\n', start);
-            if (end == string::npos)
-                end = str.size();
-
-            const string line = str.substr(start, end - start);
-            if (not line.empty())
-                result += indentation + line;
-            if (end < str.size())
-                result += '\n';
-
-            start = end + 1;
-        }
-        return result;
-    }
 }

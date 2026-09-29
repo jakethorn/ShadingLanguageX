@@ -84,24 +84,6 @@ namespace mxslc::expressions
 
     string IfExpression::to_string() const
     {
-        return to_string(nullptr);
-    }
-
-    string IfExpression::to_string(const ExprPtr& implied_else_expr) const
-    {
-        string result = "if (" + cond_expr_->to_string() + ") { " + then_expr_->to_string() + " }";
-
-        if (const IfExpressionPtr else_if = cast_expression<IfExpression>(else_expr_))
-            return result + " else " + else_if->to_string(implied_else_expr);
-
-        if (implied_else_expr and else_expr_->to_string() == implied_else_expr->to_string())
-            return result;
-
-        return result + " else { " + else_expr_->to_string() + " }";
-    }
-
-    Precedence IfExpression::precedence() const
-    {
-        return Precedence::Lowest;
+        return "if (" + cond_expr_->to_string() + ") { " + then_expr_->to_string() + " }" + " else { " + else_expr_->to_string() + " }";
     }
 }

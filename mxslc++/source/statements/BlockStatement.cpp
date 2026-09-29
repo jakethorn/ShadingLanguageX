@@ -6,7 +6,6 @@
 
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
-#include "utils/string_utils.h"
 
 namespace mxslc::statements
 {
@@ -27,8 +26,6 @@ namespace mxslc::statements
 
     string BlockStatement::to_string() const
     {
-        if (body_.empty())
-            return "{\n}";
-        return "{\n" + string_utils::indent(join_statements(body_)) + "\n}";
+        return "{\n\t" + join(body_, "\n\t") + "\n}";
     }
 }

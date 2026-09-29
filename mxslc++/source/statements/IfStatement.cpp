@@ -50,8 +50,7 @@ namespace mxslc::statements
         result += then_body_->to_string();
         if (else_body_)
         {
-            const bool is_else_if = dynamic_cast<const IfStatement*>(else_body_.get()) != nullptr;
-            result += is_else_if ? "\nelse " : "\nelse\n";
+            result += "else\n";
             result += else_body_->to_string();
         }
         return result;

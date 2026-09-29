@@ -32,26 +32,4 @@ namespace mxslc::statements
             throw;
         }
     }
-
-    string Statement::with_attributes(const AttributeList& attrs, const string& statement)
-    {
-        if (attrs.empty())
-            return statement;
-        return attrs.to_string() + "\n" + statement;
-    }
-
-    string join_statements(const vector<StmtPtr>& statements)
-    {
-        string result;
-        for (size_t i = 0; i < statements.size(); ++i)
-        {
-            if (i > 0)
-            {
-                const bool is_block_boundary = statements[i - 1]->is_block() or statements[i]->is_block();
-                result += is_block_boundary ? "\n\n" : "\n";
-            }
-            result += statements[i]->to_string();
-        }
-        return result;
-    }
 }

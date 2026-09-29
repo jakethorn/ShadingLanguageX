@@ -1,2 +1,2 @@
-float var_0 = randomfloat();
-float z = var_0 * 1.0 * var_0;
+float xyz__0 = randomfloat();
+float z = xyz__0 * 1.0 * xyz__0;

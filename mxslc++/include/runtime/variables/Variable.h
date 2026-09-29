@@ -32,7 +32,7 @@ namespace mxslc::runtime
         const TypePtr& type() const;
 
         const string& name() const;
-        void disable_node_naming() { can_name_nodes_ = false; }
+        void disable_node_naming() { can_name_nodes_ = false; can_name_assigned_nodes_ = false; }
 
         virtual bool is_assignable() const;
         virtual bool is_temporary() const;
@@ -86,6 +86,9 @@ namespace mxslc::runtime
 
         void set_name(string name);
         void set_name(const string& name, const TypePtr& parent_type, size_t index);
+        bool can_name_assigned_nodes() const;
+        // e.g., var__x__1 for the node of the first value assigned to x after it is defined
+        void set_assigned_node_name(const ValuePtr& value) const;
 
         ModifierList mods_;
         TypePtr type_;
@@ -93,8 +96,12 @@ namespace mxslc::runtime
         vector<VarPtr> children_;
         ValuePtr value_;
         string name_;
+        // the name of the nodes of the variable, e.g., ray__origin for the origin field of ray
+        string node_name_;
         Scope* defining_scope_{nullptr};
         bool can_name_nodes_{true};
+        // the parameters of inline functions do not name the values assigned to them, as they belong to the caller
+        bool can_name_assigned_nodes_{true};
         bool is_initialized_{false};
         bool is_external_{false};
     };

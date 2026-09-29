@@ -42,14 +42,15 @@ namespace mxslc::decompile
         void emit_node(const mx::NodePtr& node);
         void emit_function(const mx::ElementPtr& function);
         void emit_dependencies(const vector<mx::ElementPtr>& functions);
-        // nonlocal variables without a node, e.g., those with a constant value, must still be declared
+        // nonlocal variables without a node, e.g., those with a constant value, must still be declared, the node def is
+        // the function that uses it, or null if it is declared for a value that is assigned to it
         void emit_nonlocal_variable(const mx::NodeDefPtr& node_def, const string& name, const string& type_name);
 
-        string create_function_definition(const mx::NodeDefPtr& node_def);
-        string create_function_definition(const mx::NodeGraphPtr& node_graph);
+        Layout create_function_definition(const mx::NodeDefPtr& node_def, GraphDecompiler& body);
+        Layout create_function_definition(const mx::NodeGraphPtr& node_graph, GraphDecompiler& body);
         // the statements of the body of a function, and the value of an output, e.g., its return value
-        static vector<string> create_body_statements(GraphDecompiler& body);
-        static string output_value(GraphDecompiler& body, const mx::OutputPtr& output);
+        static vector<Layout> create_body_statements(GraphDecompiler& body);
+        static Layout output_value(GraphDecompiler& body, const mx::OutputPtr& output);
 
         mx::DocumentPtr document_;
         unordered_set<string> mutable_variables_;

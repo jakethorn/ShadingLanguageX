@@ -60,32 +60,91 @@ namespace mxslc::decompile
         }
 
         // e.g., `@uiname "Color" color3 c = color3{1.0}`
-        string parameter(const vector<string>& attrs, const string& mods, const string& type, const string& name, const optional<string>& default_value)
+        Layout parameter(const vector<string>& attrs, const string& mods, const string& type, const string& name, const optional<Layout>& default_value)
         {
-            string result;
+            string declaration;
             for (const string& attr : attrs)
-                result += attr + " ";
+                declaration += attr + " ";
             if (not mods.empty())
-                result += mods + " ";
-            result += type + " " + name;
-            if (default_value)
-                result += " = " + *default_value;
+                declaration += mods + " ";
+            declaration += type + " " + name;
+            if (not default_value)
+                return declaration;
+            return Layout::concat({declaration + " = ", *default_value});
+        }
+
+        // the nonlocal variables that the function of the node def reads (nonlocal_in__<name> inputs) or assigns to
+        // (nonlocal_out__<name> outputs)
+        unordered_set<string> nonlocal_variables(const mx::NodeDefPtr& node_def)
+        {
+            unordered_set<string> result;
+            for (const mx::InputPtr& input : node_def->getActiveInputs())
+            {
+                if (serialize::has_prefix(input->getName(), serialize::NONLOCAL_IN_PREFIX))
+                    result.insert(serialize::remove_prefix(input->getName()));
+            }
+            for (const mx::OutputPtr& output : node_def->getActiveOutputs())
+            {
+                if (serialize::has_prefix(output->getName(), serialize::NONLOCAL_OUT_PREFIX))
+                    result.insert(serialize::remove_prefix(output->getName()));
+            }
             return result;
         }
 
-        string join(const vector<string>& strings, const string& delimiter)
+        // the nonlocal variables that have no node in the document, e.g., `mutable float x = 0.0;`, which are declared
+        // before the first function that uses them or the first value that is assigned to them
+        unordered_set<string> find_nonlocal_declarations(const mx::DocumentPtr& document)
         {
-            string result;
-            for (size_t i = 0; i < strings.size(); ++i)
-                result += (i > 0 ? delimiter : "") + strings[i];
+            unordered_set<string> result;
+            for (const mx::NodeDefPtr& node_def : document->getNodeDefs())
+            {
+                for (const string& name : nonlocal_variables(node_def))
+                {
+                    if (document->getNode(name) == nullptr)
+                        result.insert(name);
+                }
+            }
             return result;
+        }
+
+        // the variables that are declared outside of the body of the function of a node def, i.e., its parameters (its
+        // inputs and the outputs of its out parameters, which are named outparam__<name>) and its nonlocal variables
+        unordered_set<string> declared_variables(const mx::NodeDefPtr& node_def)
+        {
+            unordered_set<string> result = nonlocal_variables(node_def);
+            for (const mx::InputPtr& input : node_def->getActiveInputs())
+            {
+                if (not serialize::has_prefix(input->getName(), serialize::NONLOCAL_IN_PREFIX))
+                    result.insert(to_identifier(input->getName()));
+            }
+            for (const mx::OutputPtr& output : node_def->getActiveOutputs())
+            {
+                if (serialize::has_prefix(output->getName(), serialize::OUT_PARAMETER_PREFIX))
+                    result.insert(to_identifier(serialize::remove_prefix(output->getName())));
+            }
+            return result;
+        }
+
+        unordered_set<string> declared_variables(const mx::NodeGraphPtr& node_graph)
+        {
+            unordered_set<string> result;
+            for (const mx::InputPtr& input : node_graph->getInputs())
+                result.insert(to_identifier(input->getName()));
+            return result;
+        }
+
+        // e.g., `return x;`, or `return {x, y};` for multiple outputs
+        Layout return_statement(vector<Layout> values)
+        {
+            const Layout value = values.size() == 1 ? values.front() : Layout::list("{", std::move(values), "}");
+            return Layout::concat({"return ", value, ";"});
         }
     }
 
     DocumentDecompiler::DocumentDecompiler(mx::DocumentPtr document)
         : document_{std::move(document)},
         mutable_variables_{find_mutable_variables(document_)},
-        graph_decompiler_{*this, document_}
+        graph_decompiler_{*this, document_, find_nonlocal_declarations(document_)}
     {
 
     }
@@ -125,8 +184,8 @@ namespace mxslc::decompile
             return writer_.str();
         }
 
-        for (const string& stmt : graph_decompiler_.create_statements(node))
-            writer_.add(stmt);
+        for (Layout& stmt : graph_decompiler_.create_statements(node))
+            writer_.add(std::move(stmt));
         return writer_.str();
     }
 
@@ -213,8 +272,12 @@ namespace mxslc::decompile
 
         emit_dependencies(graph_decompiler_.function_dependencies(node));
 
-        for (const string& stmt : graph_decompiler_.create_statements(node))
-            writer_.add(stmt);
+        // nonlocal variables without a node are declared before the first value that is assigned to them
+        if (const optional<string> variable = graph_decompiler_.declared_variable(node))
+            emit_nonlocal_variable(nullptr, *variable, node->getType());
+
+        for (Layout& stmt : graph_decompiler_.create_statements(node))
+            writer_.add(std::move(stmt));
     }
 
     void DocumentDecompiler::emit_function(const mx::ElementPtr& function)
@@ -236,7 +299,8 @@ namespace mxslc::decompile
                     dependencies.push_back(f);
         };
 
-        GraphDecompiler body{*this, node_graph};
+        // the variables of the body cannot hide the parameters and nonlocal variables of the function
+        GraphDecompiler body{*this, node_graph, node_def ? declared_variables(node_def) : declared_variables(node_graph)};
         for (const mx::NodePtr& node : body.nodes())
             add_dependencies(body.function_dependencies(node));
         for (const mx::OutputPtr& output : node_graph->getOutputs())
@@ -267,9 +331,9 @@ namespace mxslc::decompile
         }
 
         if (node_def)
-            writer_.add(create_function_definition(node_def), /*is_block*/true);
+            writer_.add(create_function_definition(node_def, body), /*is_block*/true);
         else
-            writer_.add(create_function_definition(node_graph), /*is_block*/true);
+            writer_.add(create_function_definition(node_graph, body), /*is_block*/true);
     }
 
     void DocumentDecompiler::emit_dependencies(const vector<mx::ElementPtr>& functions)
@@ -290,11 +354,13 @@ namespace mxslc::decompile
             return;
         emitted_nonlocal_variables_.insert(name);
 
-        // the value of the variable is passed to each call of the function, use the value of the first call
+        // the value of the variable is passed to each call of the function, use the value of the first call, or of the
+        // first call of any function if the variable is declared for a value that is assigned to it
         optional<Code> value;
         for (const mx::NodePtr& node : document_->getNodes())
         {
-            if (node->getNodeDef() != node_def)
+            const mx::NodeDefPtr call_node_def = node->getNodeDef();
+            if (node_def ? call_node_def != node_def : not is_document_node_def(call_node_def))
                 continue;
             const mx::InputPtr input = node->getInput(serialize::with_prefix(serialize::NONLOCAL_IN_PREFIX, name));
             if (input and input->getNodeName().empty() and input->hasValue())
@@ -304,14 +370,16 @@ namespace mxslc::decompile
             }
         }
 
-        string stmt = is_mutable_variable(name) ? "mutable " : "";
-        stmt += type_alias(type_name) + " " + name;
+        const bool is_mutable = is_mutable_variable(name) or graph_decompiler_.is_assigned(name);
+        string declaration = is_mutable ? "mutable " : "";
+        declaration += type_alias(type_name) + " " + name;
         if (value)
-            stmt += " = " + value->text;
-        writer_.add(stmt + ";");
+            writer_.add(Layout::concat({declaration + " = ", value->layout, ";"}));
+        else
+            writer_.add(declaration + ";");
     }
 
-    string DocumentDecompiler::create_function_definition(const mx::NodeDefPtr& node_def)
+    Layout DocumentDecompiler::create_function_definition(const mx::NodeDefPtr& node_def, GraphDecompiler& body)
     {
         const mx::NodeGraphPtr node_graph = implementation(node_def);
 
@@ -334,8 +402,7 @@ namespace mxslc::decompile
         }
 
         // parameters without a default value are declared with the default of their type, e.g., 0.0
-        vector<string> params;
-        unordered_set<string> param_names;
+        vector<Layout> params;
         for (const mx::InputPtr& input : node_def->getActiveInputs())
         {
             if (serialize::has_prefix(input->getName(), serialize::NONLOCAL_IN_PREFIX))
@@ -344,17 +411,15 @@ namespace mxslc::decompile
             // ref parameters are both an input and an out parameter output
             const bool is_ref = node_def->getActiveOutput(serialize::with_prefix(serialize::OUT_PARAMETER_PREFIX, input->getName())) != nullptr;
 
-            optional<string> default_value;
+            optional<Layout> default_value;
             if (is_ref)
                 default_value = std::nullopt;
             else if (not has_literal_syntax(input->getType()) or not input->hasValue())
                 default_value = "null";
             else if (not is_zero_value(input))
-                default_value = literal(input)->text;
+                default_value = literal(input)->layout;
 
-            const string name = to_identifier(input->getName());
-            param_names.insert(name);
-            params.push_back(parameter(user_attributes(input), is_ref ? "ref" : "", type_alias(input->getType()), name, default_value));
+            params.push_back(parameter(user_attributes(input), is_ref ? "ref" : "", type_alias(input->getType()), to_identifier(input->getName()), default_value));
         }
 
         for (const mx::OutputPtr& output : out_parameter_outputs)
@@ -363,12 +428,10 @@ namespace mxslc::decompile
                 continue;
 
             const string name = to_identifier(serialize::remove_prefix(output->getName()));
-            param_names.insert(name);
             params.push_back(parameter(user_attributes(output), "out", type_alias(output->getType()), name, std::nullopt));
         }
 
-        GraphDecompiler body{*this, node_graph, param_names};
-        vector<string> body_statements = create_body_statements(body);
+        vector<Layout> body_statements = create_body_statements(body);
 
         for (const mx::OutputPtr& output : node_graph->getOutputs())
         {
@@ -382,71 +445,72 @@ namespace mxslc::decompile
             if (not value)
                 continue;
 
+            // the value is already assigned to the variable, e.g., `total += x;`
             const string var_name = is_out_parameter ? to_identifier(serialize::remove_prefix(name)) : serialize::remove_prefix(name);
-            body_statements.push_back(var_name + " = " + value->text + ";");
+            if (body.has_assigned_value(output, var_name))
+                continue;
+
+            body_statements.push_back(Layout::concat({var_name + " = ", value->layout, ";"}));
         }
 
         if (not return_outputs.empty())
         {
-            vector<string> return_values;
+            vector<Layout> return_values;
             for (const mx::OutputPtr& output : return_outputs)
                 return_values.push_back(output_value(body, node_graph->getOutput(output->getName())));
-            const string return_value = return_values.size() == 1 ? return_values.front() : "{" + join(return_values, ", ") + "}";
-            body_statements.push_back("return " + return_value + ";");
+            body_statements.push_back(return_statement(std::move(return_values)));
         }
 
-        const string header = return_type(return_outputs) + " " + function_name(node_def) + "(" + join(params, ", ") + ")";
-        return code::with_attributes(attrs, code::block(header, body_statements));
+        // the modifier is written above the function, after its attributes
+        const Layout header = Layout::concat({return_type(return_outputs) + " " + function_name(node_def), Layout::parameter_list(std::move(params))});
+        return code::with_attributes(attrs, Layout::block(Layout::lines({"[[nodedef]]", header}), std::move(body_statements)));
     }
 
-    string DocumentDecompiler::create_function_definition(const mx::NodeGraphPtr& node_graph)
+    Layout DocumentDecompiler::create_function_definition(const mx::NodeGraphPtr& node_graph, GraphDecompiler& body)
     {
         // node graph functions have default values for all of their parameters and are called without arguments
-        vector<string> params;
-        unordered_set<string> param_names;
+        vector<Layout> params;
         for (const mx::InputPtr& input : node_graph->getInputs())
         {
             const optional<Code> default_value = graph_decompiler_.create_port_expression(input);
-            const string name = to_identifier(input->getName());
-            param_names.insert(name);
-            params.push_back(parameter(user_attributes(input), "", type_alias(input->getType()), name, default_value ? default_value->text : "null"));
+            const Layout value = default_value ? default_value->layout : "null";
+            params.push_back(parameter(user_attributes(input), "", type_alias(input->getType()), to_identifier(input->getName()), value));
         }
 
-        GraphDecompiler body{*this, node_graph, param_names};
-        vector<string> body_statements = create_body_statements(body);
+        vector<Layout> body_statements = create_body_statements(body);
 
         const vector<mx::OutputPtr> outputs = node_graph->getOutputs();
         if (not outputs.empty())
         {
-            vector<string> return_values;
+            vector<Layout> return_values;
             for (const mx::OutputPtr& output : outputs)
                 return_values.push_back(output_value(body, output));
-            const string return_value = return_values.size() == 1 ? return_values.front() : "{" + join(return_values, ", ") + "}";
-            body_statements.push_back("return " + return_value + ";");
+            body_statements.push_back(return_statement(std::move(return_values)));
         }
 
-        // parameterless functions are node graphs by default, e.g., `float f => { ... }`
-        const bool is_parameterless = params.empty();
-        const string header = is_parameterless
-            ? return_type(outputs) + " " + function_name(node_graph) + " =>"
-            : "nodegraph " + return_type(outputs) + " " + function_name(node_graph) + "(" + join(params, ", ") + ")";
-        return code::with_attributes(user_attributes(node_graph), code::block(header, body_statements));
+        // parameterless functions are node graphs by default, e.g., `float f => { ... }`, and the modifier of other node
+        // graph functions is written above them, after their attributes
+        const string declaration = return_type(outputs) + " " + function_name(node_graph);
+        const Layout header = params.empty()
+            ? declaration + " =>"
+            : Layout::lines({"[[nodegraph]]", Layout::concat({declaration, Layout::parameter_list(std::move(params))})});
+        return code::with_attributes(user_attributes(node_graph), Layout::block(header, std::move(body_statements)));
     }
 
-    vector<string> DocumentDecompiler::create_body_statements(GraphDecompiler& body)
+    vector<Layout> DocumentDecompiler::create_body_statements(GraphDecompiler& body)
     {
-        vector<string> result;
+        vector<Layout> result;
         for (const mx::NodePtr& node : body.ordered_statements())
         {
-            for (string& stmt : body.create_statements(node))
+            for (Layout& stmt : body.create_statements(node))
                 result.push_back(std::move(stmt));
         }
         return result;
     }
 
-    string DocumentDecompiler::output_value(GraphDecompiler& body, const mx::OutputPtr& output)
+    Layout DocumentDecompiler::output_value(GraphDecompiler& body, const mx::OutputPtr& output)
     {
         const optional<Code> value = output ? body.create_port_expression(output) : std::nullopt;
-        return value ? value->text : "null";
+        return value ? value->layout : "null";
     }
 }

@@ -9,10 +9,14 @@
 
 namespace mxslc::decompile
 {
+    // lines longer than this are broken over multiple lines where possible
+    constexpr size_t MAX_LINE_LENGTH = 100;
+
     // How tightly an expression binds, matching the order in which the parser handles operators, e.g., Factor binds
     // tighter than Term, so `a + b * c` needs no parentheses.
     enum class Precedence
     {
+        // if-expressions
         Lowest,
         Logical,
         Equality,
@@ -28,15 +32,71 @@ namespace mxslc::decompile
         Primary
     };
 
+    // Code that is written on a single line if it fits within the maximum line length, otherwise its lists and chains
+    // are broken over multiple lines, starting with the outermost, e.g.,
+    //     surfaceshader surface = standard_surface(
+    //         base_color = if (x > 0.5) { color3{1.0} }
+    //             else { color3{} },
+    //         specular_roughness = 0.1
+    //     );
+    class Layout
+    {
+    public:
+        // text that is never broken, e.g., `float x = `
+        Layout(string text = "");
+        Layout(const char* text);
+
+        // parts that are written one after another, e.g., `x` `.y`
+        static Layout concat(vector<Layout> parts);
+        // items separated by commas, e.g., `foo(a, b)`, which are written on their own indented lines if they do not
+        // fit, and the list is closed on the line after them
+        static Layout list(string open, vector<Layout> items, string close);
+        // the parameters of a function, which are written on their own lines without indentation if they do not fit,
+        // and the list is closed after the last parameter
+        static Layout parameter_list(vector<Layout> params);
+        // links that are written on their own indented lines after the first if they do not fit, e.g., `a` `+ b` `+ c`
+        // or `if (x) { a }` `else { b }`
+        static Layout chain(vector<Layout> links);
+        // a branch of an if-expression, e.g., `{ a }`, whose value is written on its own indented line if it does not fit
+        static Layout branch(Layout value);
+        // lines that are always written separately, e.g., the attributes of a statement and the statement
+        static Layout lines(vector<Layout> lines);
+        // e.g., `float f(float x)` `{` `return x;` `}`
+        static Layout block(Layout header, vector<Layout> body);
+
+        // the links of a chain, or this layout if it is not a chain
+        vector<Layout> links() const;
+
+        // the layout broken over lines so that they fit within the maximum line length where possible
+        string str() const;
+
+    private:
+        enum class Kind { Text, Concat, List, ParameterList, Chain, Branch, Lines, Block };
+        struct Node;
+        friend class Renderer;
+
+        Layout(Kind kind, string text, vector<Layout> parts, string close = "");
+
+        // the length of the layout written on a single line
+        size_t width() const;
+        // the length of the layout up to the first place where it can be broken
+        size_t head_width() const;
+        bool is_breakable() const;
+
+        shared_ptr<const Node> node_;
+    };
+
     // The code of an expression and how tightly it binds, which decides where parentheses are needed when it is the
     // operand of another expression.
     struct Code
     {
-        string text;
+        Layout layout;
         Precedence precedence{Precedence::Primary};
 
         // the code as an operand that must bind at least as tightly as the precedence, e.g., `(a + b)` of `(a + b) * c`
-        string operand(Precedence min_precedence) const;
+        Layout operand(Precedence min_precedence) const;
+        // if-expressions are the only code with the lowest precedence
+        bool is_if_expression() const { return precedence == Precedence::Lowest; }
     };
 
     namespace code
@@ -57,22 +117,22 @@ namespace mxslc::decompile
         // `vec3{a, b}`
         Code construct(const string& type, const vector<Code>& args);
         // `f<T>(a, b)`, whose arguments are complete, see argument
-        Code call(const string& function, const string& template_type, const vector<string>& args);
-        // `if (c) { a } else { b }`
-        Code if_expression(const Code& condition, const Code& then_code, const Code& else_code);
+        Code call(const string& function, const string& template_type, const vector<Layout>& args);
+        // `if (c) { a } else { b }`, whose else branch can be implied by the variable it is assigned to, e.g.,
+        // `x = if (c) { a };`
+        Code if_expression(const Code& condition, const Code& then_code, const optional<Code>& else_code);
 
         // an argument of a call, e.g., `@uiname "Color" base_color = c`
-        string argument(const vector<string>& attributes, const string& name, const Code& value);
+        Layout argument(const vector<string>& attributes, const string& name, const Code& value);
         // a statement with its attributes on the lines before it
-        string with_attributes(const vector<string>& attributes, const string& statement);
+        Layout with_attributes(const vector<string>& attributes, const Layout& statement);
     }
 
     // Statements and function definitions, which are separated by an empty line if either of them has a body.
     class CodeWriter
     {
     public:
-        void add(string code, bool is_block = false);
-        bool empty() const { return items_.empty(); }
+        void add(Layout code, bool is_block = false);
         // keeps only the last statement, e.g., the function that was decompiled without its dependencies
         void keep_last();
         string str() const;
@@ -80,18 +140,12 @@ namespace mxslc::decompile
     private:
         struct Item
         {
-            string code;
+            Layout code;
             bool is_block;
         };
 
         vector<Item> items_;
     };
-
-    namespace code
-    {
-        // e.g., `float f(float x)\n{\n    return x;\n}`
-        string block(const string& header, const vector<string>& body);
-    }
 }
 
 #endif //MXSLC_DECOMPILE_CODE_H

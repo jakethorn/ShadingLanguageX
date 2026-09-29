@@ -98,14 +98,6 @@ namespace mxslc::expressions
         is_initialized_ = false;
     }
 
-    string Expression::to_operand_string(const Precedence min_precedence) const
-    {
-        string str = to_string();
-        if (precedence() < min_precedence)
-            return "(" + str + ")";
-        return str;
-    }
-
     TypePtr Expression::type() const
     {
         TRY_START

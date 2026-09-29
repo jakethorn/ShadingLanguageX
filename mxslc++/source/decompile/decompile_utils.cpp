@@ -6,6 +6,7 @@
 
 #include "Primitive.h"
 #include "TokenType.h"
+#include "serialize/serialize_name_utils.h"
 #include "utils/container_utils.h"
 #include "utils/string_utils.h"
 
@@ -39,6 +40,44 @@ namespace mxslc::decompile_utils
             return attributes;
         }
 
+        struct TypeInfo
+        {
+            // the ShadingLanguageX name of the type, e.g., vec3 for vector3
+            string alias;
+            // e.g., `1.0`, `"text"` or `vec3{1.0, 2.0, 3.0}`, but not matrices or shaders
+            bool has_literal_syntax;
+            // the channels of vectors and colors, which are accessed by swizzles, e.g., `v.x` or `c.r`
+            string channels;
+        };
+
+        // the MaterialX types that can be used in ShadingLanguageX
+        const unordered_map<string, TypeInfo>& types()
+        {
+            static const unordered_map<string, TypeInfo> types {
+                {"boolean", {"bool", true, ""}},
+                {"integer", {"int", true, ""}},
+                {"float", {"float", true, ""}},
+                {"vector2", {"vec2", true, "xy"}},
+                {"vector3", {"vec3", true, "xyz"}},
+                {"vector4", {"vec4", true, "xyzw"}},
+                {"color3", {"color3", true, "rgb"}},
+                {"color4", {"color4", true, "rgba"}},
+                {"matrix33", {"mat3", false, ""}},
+                {"matrix44", {"mat4", false, ""}},
+                {"string", {"string", true, ""}},
+                {"filename", {"filename", true, ""}},
+                {"surfaceshader", {"surfaceshader", false, ""}},
+                {"displacementshader", {"displacementshader", false, ""}},
+                {"volumeshader", {"volumeshader", false, ""}},
+                {"lightshader", {"lightshader", false, ""}},
+                {"material", {"material", false, ""}},
+                {"BSDF", {"BSDF", false, ""}},
+                {"EDF", {"EDF", false, ""}},
+                {"VDF", {"VDF", false, ""}},
+            };
+            return types;
+        }
+
         const unordered_set<string>& reserved_words()
         {
             // identifiers that are not keywords, but still have a special meaning
@@ -65,24 +104,54 @@ namespace mxslc::decompile_utils
 
     string type_alias(const string& type_name)
     {
-        static const unordered_map<string, string> type_aliases {
-            {"boolean", "bool"},
-            {"integer", "int"},
-            {"vector2", "vec2"},
-            {"vector3", "vec3"},
-            {"vector4", "vec4"},
-            {"matrix33", "mat3"},
-            {"matrix44", "mat4"},
-        };
-
-        if (contains(type_aliases, type_name))
-            return type_aliases.at(type_name);
+        if (contains(types(), type_name))
+            return types().at(type_name).alias;
         return type_name;
+    }
+
+    bool is_type_name(const string& name)
+    {
+        return contains(types(), name);
+    }
+
+    bool has_literal_syntax(const string& type_name)
+    {
+        return contains(types(), type_name) and types().at(type_name).has_literal_syntax;
+    }
+
+    string swizzle_channels(const string& type_name)
+    {
+        if (contains(types(), type_name))
+            return types().at(type_name).channels;
+        return "";
+    }
+
+    bool is_color_type(const string& type_name)
+    {
+        const string channels = swizzle_channels(type_name);
+        return not channels.empty() and channels.front() == 'r';
     }
 
     bool is_temporary_name(const string& name)
     {
         return starts_with(name, "var__");
+    }
+
+    optional<string> assigned_variable(const string& node_name)
+    {
+        if (not is_temporary_name(node_name))
+            return std::nullopt;
+
+        // e.g., x__2 of var__x__2, variables can also contain double underscores, e.g., var__ray__origin__2
+        const string rest = serialize::remove_prefix(node_name);
+        const size_t split = rest.rfind("__");
+        if (split == string::npos or split == 0)
+            return std::nullopt;
+
+        const string number = rest.substr(split + 2);
+        if (number.empty() or not std::all_of(number.begin(), number.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); }))
+            return std::nullopt;
+        return rest.substr(0, split);
     }
 
     bool is_valid_identifier(const string& name)
@@ -138,8 +207,7 @@ namespace mxslc::decompile_utils
 
         // zero vectors and colors are written as their default value, e.g., `vec3{}`, and those whose components are all
         // the same as that component, e.g., `color3{1.0}`
-        static const unordered_set<string> vector_types {"vector2", "vector3", "vector4", "color3", "color4"};
-        if (contains(vector_types, value->getTypeString()))
+        if (not swizzle_channels(value->getTypeString()).empty())
         {
             const vector<float> values = components(value);
             const bool is_uniform = not values.empty() and std::all_of(values.begin(), values.end(), [&](const float f) { return f == values.front(); });
@@ -172,14 +240,6 @@ namespace mxslc::decompile_utils
         return literal(element->getValue());
     }
 
-    bool has_literal_syntax(const string& type_name)
-    {
-        static const unordered_set<string> type_names {
-            "boolean", "integer", "float", "vector2", "vector3", "vector4", "color3", "color4", "string", "filename"
-        };
-        return contains(type_names, type_name);
-    }
-
     bool is_zero(const mx::ValuePtr& value)
     {
         if (value == nullptr)
@@ -204,11 +264,6 @@ namespace mxslc::decompile_utils
         if (output_name.size() == 4 and starts_with(output_name, "out") and string{"xyzwrgba"}.find(output_name[3]) != string::npos)
             return output_name[3];
         return std::nullopt;
-    }
-
-    bool is_color_type(const string& type_name)
-    {
-        return type_name == "color3" or type_name == "color4";
     }
 
     bool is_index(const string& field_name)

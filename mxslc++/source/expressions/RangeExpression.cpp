@@ -106,18 +106,9 @@ namespace mxslc::expressions
 
     string RangeExpression::to_string() const
     {
-        const string lower = lower_expr_->to_operand_string(Precedence::Term);
-        const string upper = upper_expr_->to_operand_string(Precedence::Term);
-
         if (step_expr_)
-            return lower + ":" + step_expr_->to_operand_string(Precedence::Term) + ":" + upper;
-        if (token_ == TokenType::To)
-            return lower + " to " + upper;
-        return lower + ":" + upper;
-    }
-
-    Precedence RangeExpression::precedence() const
-    {
-        return Precedence::Range;
+            return lower_expr_->to_string() + ":" + step_expr_->to_string() + ":" + upper_expr_->to_string();
+        else
+            return lower_expr_->to_string() + ":" + upper_expr_->to_string();
     }
 }

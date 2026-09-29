@@ -59,14 +59,6 @@ namespace mxslc::runtime
 
     string ParameterList::to_string() const
     {
-        return to_string(true);
-    }
-
-    string ParameterList::to_string(const bool show_null_defaults) const
-    {
-        string result;
-        for (size_t i = 0; i < params_.size(); ++i)
-            result += (i > 0 ? ", " : "") + params_[i].to_string(show_null_defaults);
-        return result;
+        return join(params_, ", ");
     }
 }

@@ -1,6 +1,17 @@
 float var_1 = vec3{}.z * -1.0;
 {float outx, float outy, float outz} var_2 = separate3(vec3{});
-vec3 var_6 = switch(vec3{var_1, var_2.outy, var_2.outz}, vec3{var_2.outx, var_1, var_2.outz}, vec3{var_2.outx, var_2.outy, var_1}, which = 2);
-float var_8 = var_6.z * -1.0;
-{float outx, float outy, float outz} var_9 = separate3(var_6);
-constant(switch(vec3{var_8, var_9.outy, var_9.outz}, vec3{var_9.outx, var_8, var_9.outz}, vec3{var_9.outx, var_9.outy, var_8}, which = 2).z);
+mutable vec3 room_pos = switch(
+    vec3{var_1, var_2.outy, var_2.outz},
+    vec3{var_2.outx, var_1, var_2.outz},
+    vec3{var_2.outx, var_2.outy, var_1},
+    which = 2
+);
+float var_7 = room_pos.z * -1.0;
+{float outx, float outy, float outz} var_8 = separate3(room_pos);
+room_pos = switch(
+    vec3{var_7, var_8.outy, var_8.outz},
+    vec3{var_8.outx, var_7, var_8.outz},
+    vec3{var_8.outx, var_8.outy, var_7},
+    which = 2
+);
+constant(room_pos.z);

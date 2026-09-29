@@ -1,0 +1,10 @@
+vec3 p = position();
+mutable float x = p.x;
+float a = x * 2.0;
+x = x + p.y;
+float b = a + x;
+
+mutable float y = p.z;
+float old = y;
+y = y * 3.0;
+float c = old + y;

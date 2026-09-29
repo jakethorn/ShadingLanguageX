@@ -18,25 +18,6 @@ namespace mxslc::expressions
     using runtime_utils::Monomorphizable;
     using runtime_utils::RuntimeAware;
 
-    // How tightly an expression binds when printed as source code, matching the order in which the parser
-    // handles them, e.g., Factor binds tighter than Term, so `a + b * c` needs no parentheses
-    enum class Precedence
-    {
-        Lowest,
-        Logical,
-        Equality,
-        Relational,
-        Range,
-        Term,
-        Factor,
-        Exponent,
-        Unary,
-        Compound,
-        Increment,
-        Postfix,
-        Primary
-    };
-
     class Expression : public EnableSharedFromThis<Expression>, public Monomorphizable<ExprPtr>, public Stringable, protected RuntimeAware
     {
     public:
@@ -73,8 +54,6 @@ namespace mxslc::expressions
         const string& error_message() const { return error_message_; }
 
         string to_string() const override = 0;
-        virtual Precedence precedence() const { return Precedence::Primary; }
-        string to_operand_string(Precedence min_precedence) const;
 
     protected:
         virtual void init_subexpressions(const vector<TypePtr>& types) { }

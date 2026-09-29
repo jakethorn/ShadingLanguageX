@@ -17,9 +17,6 @@ namespace mxslc::expressions
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
-        // omits the final else branch if it is the same as implied_else_expr, e.g., `x = if (cond) { y };`
-        string to_string(const ExprPtr& implied_else_expr) const;
-        Precedence precedence() const override;
 
     protected:
         void init_subexpressions(const vector<TypePtr>& types) override;

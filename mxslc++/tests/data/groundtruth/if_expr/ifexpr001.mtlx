@@ -39,7 +39,7 @@
     <input name="value1" type="float" value="0.5" />
     <input name="value2" type="float" nodename="var__5" />
   </ifgreater>
-  <ifequal name="var__7" type="float">
+  <ifequal name="var__x__1" type="float">
     <input name="value1" type="boolean" nodename="var__6" />
     <input name="value2" type="boolean" value="true" />
     <input name="in1" type="float" value="1" />

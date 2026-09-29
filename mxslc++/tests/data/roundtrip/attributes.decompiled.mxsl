@@ -2,6 +2,7 @@
 
 @doc "adds one to in"
 @nodegroup "math"
+[[nodedef]]
 float add_one(@doc "the value to increment" float in)
 {
     return in + 1.0;

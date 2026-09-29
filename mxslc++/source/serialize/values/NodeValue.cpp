@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "utils/mtlx_utils.h"
+#include "serialize/serialize_name_utils.h"
 #include "serialize/values/interface.h"
 #include "runtime/Type.h"
 
@@ -28,6 +29,18 @@ namespace mxslc::serialize::values
 
         node_->setName(
             node_->getParent()->createValidChildName(name)
+        );
+    }
+
+    void NodeValue::set_assigned_node_name(const string& variable_name) const
+    {
+        // renaming a node does not update the ports that connect to it, so only nodes without connections are renamed
+        if (is_node_name_set_ or not is_temporary_node_name(node_->getName()) or not node_->getDownstreamPorts().empty())
+            return;
+        is_node_name_set_ = true;
+
+        node_->setName(
+            node_->getParent()->createValidChildName(assigned_node_name(variable_name))
         );
     }
 
