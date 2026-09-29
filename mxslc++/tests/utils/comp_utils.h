@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "data_utils.h"
+#include "scan.h"
 
 using std::string;
 using std::vector;
@@ -26,6 +27,16 @@ inline string trim(const string& s)
     const size_t end = s.find_last_not_of(WHITESPACE);
 
     return s.substr(start, end - start + 1);
+}
+
+// the tokens of the code without whitespace and comments, so that code can be compared regardless of its formatting
+inline vector<string> code_tokens(const string& code)
+{
+    vector<string> lexemes;
+    for (const mxslc::Token& token : mxslc::scan_string(code))
+        if (token != mxslc::TokenType::Newline)
+            lexemes.push_back(token.lexeme());
+    return lexemes;
 }
 
 inline vector<string> split_lines(const string& str)

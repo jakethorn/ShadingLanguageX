@@ -15,11 +15,18 @@ namespace mxslc::statements
         explicit ExpressionStatement(ExprPtr expr);
         ~ExpressionStatement() override;
 
+        const ExprPtr& expression() const { return expr_; }
+        // the variable assigned to by the expression, e.g., x in `x += 1.0;`
+        ExprPtr assigned_expression() const;
+
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
+
+        bool is_hinted() const override { return true; }
+        string hint_skeleton() const override;
 
     protected:
         void execute_impl() const override;

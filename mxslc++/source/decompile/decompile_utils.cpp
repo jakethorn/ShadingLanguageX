@@ -8,10 +8,13 @@
 #include "TokenType.h"
 #include "expressions/Identifier.h"
 #include "expressions/Literal.h"
+#include "expressions/NamedConstructor.h"
 #include "expressions/interface.h"
+#include "runtime/ArgumentList.h"
 #include "runtime/Attribute.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
+#include "serialize/decompile_hints.h"
 #include "utils/container_utils.h"
 #include "utils/string_utils.h"
 
@@ -114,8 +117,8 @@ namespace mxslc::decompile_utils
         vector<Attribute> attrs;
         for (const string& attr_name : element->getAttributeNames())
         {
-            // ignore namespaced attributes, e.g., xmlns:xi
-            if (contains(structural_attributes(), attr_name) or attr_name.find(':') != string::npos)
+            // ignore namespaced attributes, e.g., xmlns:xi, and decompile hints
+            if (contains(structural_attributes(), attr_name) or attr_name.find(':') != string::npos or starts_with(attr_name, serialize::hints::PREFIX))
                 continue;
             if (attr_name == mx::InterfaceElement::NODE_DEF_ATTRIBUTE and element->isA<mx::NodeGraph>())
                 continue;
@@ -128,6 +131,23 @@ namespace mxslc::decompile_utils
     {
         if (value == nullptr)
             return nullptr;
+
+        // zero vectors and colors are written as their default value, e.g., `vec3{}`, and those whose components are all
+        // the same as that component, e.g., `color3{1.0}`
+        static const unordered_set<string> vector_types {"vector2", "vector3", "vector4", "color3", "color4"};
+        if (contains(vector_types, value->getTypeString()))
+        {
+            if (is_zero(value))
+                return create_expression<NamedConstructor>(type_alias(value->getTypeString()), ArgumentList{});
+
+            const vector<string> components = mx::splitString(value->getValueString(), ",");
+            const auto is_same = [&](const string& component) { return std::stof(component) == std::stof(components.front()); };
+            if (not components.empty() and std::all_of(components.begin(), components.end(), is_same))
+            {
+                const vector<ExprPtr> args{create_expression<Literal>(Primitive{std::stof(components.front())})};
+                return create_expression<NamedConstructor>(type_alias(value->getTypeString()), ArgumentList{args});
+            }
+        }
 
         Primitive primitive{value};
         if (primitive.is_null())
@@ -156,9 +176,26 @@ namespace mxslc::decompile_utils
         return contains(type_names, type_name);
     }
 
+    vector<string> split_string(const string& str, const string& delimiter)
+    {
+        vector<string> result;
+        size_t start = 0;
+        for (size_t end = str.find(delimiter); end != string::npos; end = str.find(delimiter, start))
+        {
+            result.push_back(str.substr(start, end - start));
+            start = end + delimiter.size();
+        }
+        result.push_back(str.substr(start));
+        return result;
+    }
+
     bool is_zero_value(const mx::ValueElementPtr& element)
     {
-        const mx::ValuePtr value = element->getValue();
+        return is_zero(element->getValue());
+    }
+
+    bool is_zero(const mx::ValuePtr& value)
+    {
         if (value == nullptr)
             return false;
 
@@ -197,5 +234,10 @@ namespace mxslc::decompile_utils
     bool is_color_type(const string& type_name)
     {
         return type_name == "color3" or type_name == "color4";
+    }
+
+    bool is_connected(const mx::InputPtr& input)
+    {
+        return input and (not input->getNodeName().empty() or not input->getNodeGraphString().empty() or not input->getInterfaceName().empty());
     }
 }

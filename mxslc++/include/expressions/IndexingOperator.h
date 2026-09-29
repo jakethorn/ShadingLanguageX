@@ -16,6 +16,8 @@ namespace mxslc::expressions
     public:
         IndexingOperator(ExprPtr value_expr, ExprPtr index_expr);
 
+        const ExprPtr& value_expression() const { return value_expr_; }
+
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;

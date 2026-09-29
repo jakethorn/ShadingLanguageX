@@ -12,6 +12,9 @@
 #include "runtime/utils/monomorphize.h"
 #include "statements/interface.h"
 #include "serialize/values/Value.h"
+#include "serialize/decompile_hints.h"
+#include "serialize/HintRecorder.h"
+#include "serialize/Serializer.h"
 
 namespace mxslc::statements
 {
@@ -53,12 +56,20 @@ namespace mxslc::statements
         if (expr_)
         {
             expr_->init(func->return_type());
-            throw Branch{expr_->evaluate()};
+            VarPtr value = expr_->evaluate();
+            if (serializer().hints().is_enabled())
+                hint_value_ = serialize::HintRecorder::expression_skeleton(expr_, value);
+            throw Branch{std::move(value)};
         }
         else
         {
             throw Branch{};
         }
+    }
+
+    string ReturnStatement::hint_skeleton() const
+    {
+        return expr_ ? "return " + hint_value_ + ";" : "return;";
     }
 
     string ReturnStatement::to_string() const

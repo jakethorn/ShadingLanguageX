@@ -30,9 +30,24 @@ namespace mxslc::statements
         void create_functions();
 
         const vector<FuncPtr>& functions() const { return funcs_; }
+        const string& name() const { return name_; }
+        const vector<TypePtr>& template_types() const { return template_types_; }
+        const AttributeList& attributes() const { return attrs_; }
+        // only valid before the functions are created
+        const StmtPtr& body() const { return body_; }
+        StmtPtr release_body() { return std::move(body_); }
+        // only valid before the functions are created
+        const optional<ParameterList>& parameters() const { return params_; }
+        // only valid before the functions are created
+        bool is_inline() const { return mods_.contains(TokenType::Inline) or mods_.contains(TokenType::Comptime); }
+        // a copy of an uninitialized definition with a different body
+        StmtPtr with_body(StmtPtr body) const;
 
         string to_string() const override;
         bool is_block() const override { return true; }
+
+        bool is_hinted() const override { return true; }
+        string hint_skeleton() const override;
 
     protected:
         void init() override;
@@ -52,6 +67,7 @@ namespace mxslc::statements
         vector<FuncPtr> funcs_;
 
         AttributeList attrs_;
+        string header_string_;
     };
 }
 

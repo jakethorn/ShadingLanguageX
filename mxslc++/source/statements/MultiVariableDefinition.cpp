@@ -12,6 +12,7 @@
 #include "runtime/Scope.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/decompile_hints.h"
 #include "statements/interface.h"
 #include "statements/VariableDefinition.h"
 
@@ -58,6 +59,8 @@ namespace mxslc::statements
         {
             expr_->init(type_);
             value = expr_->evaluate();
+            // compile-time values are not part of the graph, so their code is recorded
+            hint_value_ = value and value->is_compile_time() ? expr_->to_string() : hints::PLACEHOLDER;
         }
 
         for (size_t i = 0; i < type_->field_count(); ++i)
@@ -71,16 +74,38 @@ namespace mxslc::statements
                 child_expr = as_expression(std::move(child));
             }
 
-            create_statement<VariableDefinition>(
+            const auto var_def = create_statement<VariableDefinition>(
                 field.modifiers(),
                 field.type(),
                 field.name(),
                 std::move(child_expr)
-            )->execute();
+            );
+            var_def->disable_hints();
+            var_def->execute();
         }
     }
 
     string MultiVariableDefinition::to_string() const
+    {
+        string result = declaration_string();
+        if (expr_)
+            result += " = " + expr_->to_string();
+        result += ";";
+
+        return with_attributes(expr_ ? expr_->attributes() : AttributeList{}, result);
+    }
+
+    StmtPtr MultiVariableDefinition::with_expression(ExprPtr expr) const
+    {
+        return create_statement<MultiVariableDefinition>(type_, std::move(expr), token_);
+    }
+
+    string MultiVariableDefinition::hint_skeleton() const
+    {
+        return declaration_string() + (expr_ ? " = " + hint_value_ : "") + ";";
+    }
+
+    string MultiVariableDefinition::declaration_string() const
     {
         const vector<Field>& fields = type_->fields();
 
@@ -110,10 +135,6 @@ namespace mxslc::statements
             result += fields[i].name();
         }
 
-        if (expr_)
-            result += " = " + expr_->to_string();
-        result += ";";
-
-        return with_attributes(expr_ ? expr_->attributes() : AttributeList{}, result);
+        return result;
     }
 }

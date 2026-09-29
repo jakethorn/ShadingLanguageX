@@ -15,6 +15,7 @@ namespace mxslc::serialize::values
         NodeOutputValue(TypePtr type, mx::NodePtr node, string output_name);
 
         mx::NodePtr node() const { return node_; }
+        const string& output_name() const { return output_name_; }
         void set_node_name(const string& name) const;
 
         bool equals(const ValuePtr& other) const override;

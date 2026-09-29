@@ -1,0 +1,2 @@
+geomprop vec4 foo, bar;
+geomprop vec4 boo, far = {vec4{2.0}, vec4{3.0}};

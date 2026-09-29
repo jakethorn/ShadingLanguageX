@@ -6,6 +6,7 @@
 
 #include "debug/Debugger.h"
 #include "errors/CompileError.h"
+#include "serialize/Serializer.h"
 
 namespace mxslc::statements
 {
@@ -17,6 +18,8 @@ namespace mxslc::statements
         {
             if (Debugger::is_enabled())
                 Debugger::get().next_statement(this);
+
+            const StatementHintFrame hint_frame{serializer().hints(), *this};
 
             if (not is_initialized_)
             {

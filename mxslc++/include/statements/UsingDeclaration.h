@@ -12,12 +12,17 @@ namespace mxslc::statements
     class UsingDeclaration final : public Statement
     {
     public:
-        UsingDeclaration(Token token, string name, TypePtr type)
-            : Statement{std::move(token)}, name_{std::move(name)}, type_{std::move(type)} { }
+        UsingDeclaration(Token token, string name, TypePtr type);
+
+        const string& name() const { return name_; }
+        const TypePtr& type() const { return type_; }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
+
+        bool is_hinted() const override { return true; }
+        string hint_skeleton() const override { return "using " + name_ + " = " + type_string_ + ";"; }
 
     protected:
         void execute_impl() const override;
@@ -25,6 +30,8 @@ namespace mxslc::statements
     private:
         string name_;
         TypePtr type_;
+        // the type as it is written, before it is resolved
+        string type_string_;
     };
 }
 

@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "Variable.h"
+#include "serialize/HintRecorder.h"
 
 namespace mxslc::runtime
 {
@@ -29,6 +30,7 @@ namespace mxslc::runtime
         string swizzle_;
 
         mutable ValuePtr swizzle_value_;
+        serialize::HintRecorder::Snapshot hint_frames_;
     };
 }
 

@@ -20,12 +20,21 @@ namespace mxslc::statements
         const ModifierList& modifiers() const;
         TypePtr type() const;
         const string& name() const;
+        // the type as it is written, i.e., before it is resolved
+        const TypePtr& declared_type() const { return type_; }
+        const ExprPtr& expression() const { return expr_; }
+        StmtPtr with_expression(ExprPtr expr) const;
 
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
+
+        bool is_hinted() const override { return is_hinted_; }
+        string hint_skeleton() const override;
+        // variable definitions that are part of another statement are recorded by that statement
+        void disable_hints() { is_hinted_ = false; }
 
     protected:
         void init() override;
@@ -39,6 +48,9 @@ namespace mxslc::statements
         TypePtr type_;
         string name_;
         ExprPtr expr_;
+        // the type as it is written, before it is resolved, e.g., an alias
+        string type_string_;
+        bool is_hinted_{true};
     };
 }
 

@@ -73,6 +73,7 @@ namespace mxslc
                         Debugger::create(std::move(source), src_path);
 
                     runtime.enter_scope("global");
+                    runtime.serializer().hints().set_enabled(opts.decompile_hints);
                     parse_and_execute(std::move(tokens));
                     if (opts.has_entry_function())
                         runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());

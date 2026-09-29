@@ -49,19 +49,22 @@ TEST_P(groundtruth_tests, compiler_output_matches_groundtruth)
         print_debug_info(input_path, actual_output, expected_output);
 }
 
-vector<fs::path> get_groundtruth_files()
+namespace
 {
-    const fs::path test_dir = get_test_data("groundtruth");
+    vector<fs::path> get_groundtruth_files()
+    {
+        const fs::path test_dir = get_test_data("groundtruth");
 
-    if (not fs::exists(test_dir))
-        return {};
+        if (not fs::exists(test_dir))
+            return {};
 
-    vector<fs::path> files;
-    for (const auto& p : fs::recursive_directory_iterator(test_dir))
-        if (p.path().extension() == ".mxsl")
-            files.push_back(p.path());
+        vector<fs::path> files;
+        for (const auto& p : fs::recursive_directory_iterator(test_dir))
+            if (p.path().extension() == ".mxsl")
+                files.push_back(p.path());
 
-    return files;
+        return files;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

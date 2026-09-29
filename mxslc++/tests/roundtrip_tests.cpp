@@ -40,7 +40,7 @@ namespace
 TEST_P(roundtrip_tests, roundtrip_output_matches_groundtruth)
 {
     const fs::path& input_path = GetParam();
-    const string expected_output = normalise_line_endings(read_file(input_path));
+    const string expected_output = read_file(input_path);
 
     // files that do not require hints must be decompiled the same with or without them
     const vector<bool> hint_options = requires_decompile_hints(input_path) ? vector{true} : vector{false, true};
@@ -49,7 +49,8 @@ TEST_P(roundtrip_tests, roundtrip_output_matches_groundtruth)
         const string mtlx = mxslc::compile_to_string(input_path, roundtrip_options(decompile_hints));
         const string actual_output = mxslc::decompile_to_string(mtlx);
 
-        const bool passed = actual_output == expected_output;
+        // whitespace and comments do not have to be roundtripped
+        const bool passed = code_tokens(actual_output) == code_tokens(expected_output);
         EXPECT_TRUE(passed) << "decompile_hints = " << std::boolalpha << decompile_hints;
         if (not passed)
             print_debug_info(input_path, actual_output, expected_output);

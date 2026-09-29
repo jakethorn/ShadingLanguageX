@@ -36,11 +36,31 @@ namespace mxslc::decompile_utils
     bool has_literal_syntax(const string& type_name);
 
     // true if the value is the default value of its type, e.g., 0.0 or vec3{0.0, 0.0, 0.0}
+    // e.g., {"x", "0"} for "x__0" and "__"
+    vector<string> split_string(const string& str, const string& delimiter);
     bool is_zero_value(const mx::ValueElementPtr& element);
+    // true if the value is zero, false, or an empty string
+    bool is_zero(const mx::ValuePtr& value);
 
     // outx -> x, outr -> r, etc.
     optional<char> swizzle_channel(const string& output_name);
     bool is_color_type(const string& type_name);
+    // true if the input is connected to a node, a node graph or an interface input
+    bool is_connected(const mx::InputPtr& input);
+
+    // sets whether the type of the expression being created is known from its context, until it is destroyed
+    class TypedContext
+    {
+    public:
+        TypedContext(bool& flag, const bool value) : flag_{flag}, saved_{flag} { flag_ = value; }
+        ~TypedContext() { flag_ = saved_; }
+        TypedContext(const TypedContext&) = delete;
+        TypedContext& operator=(const TypedContext&) = delete;
+
+    private:
+        bool& flag_;
+        bool saved_;
+    };
 }
 
 #endif //MXSLC_DECOMPILE_UTILS_H

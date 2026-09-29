@@ -14,6 +14,8 @@ namespace mxslc::expressions
     public:
         CompoundAssignment(ExprPtr lhs_expr, Token op, ExprPtr rhs_expr);
 
+        const ExprPtr& lhs_expression() const { return lhs_expr_; }
+
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;

@@ -9,6 +9,9 @@
 #include "expressions/interface.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/monomorphize.h"
+#include "expressions/Identifier.h"
+#include "serialize/Serializer.h"
+#include "serialize/decompile_hints.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -37,6 +40,36 @@ namespace mxslc::statements
         lhs_expr_->init();
         rhs_expr_->init(lhs_expr_->type());
         lhs_expr_->assign(rhs_expr_->evaluate());
+
+        if (const VarPtr var = serialize::HintRecorder::assigned_variable(lhs_expr_))
+        {
+            serializer().hints().bind_variable(var, var->name());
+
+            // a copy of a variable, e.g., `uv = fragCoord;`
+            const IdentifierPtr source = cast_expression<Identifier>(rhs_expr_);
+            if (source and cast_expression<Identifier>(lhs_expr_))
+                serializer().hints().copy_variable(var, source->variable());
+        }
+    }
+
+    StmtPtr VariableAssignment::with_rhs(ExprPtr rhs_expr) const
+    {
+        return create_statement<VariableAssignment>(token_, lhs_expr_, std::move(rhs_expr));
+    }
+
+    string VariableAssignment::hint_skeleton() const
+    {
+        // compile-time values are not part of the graph, so their code is recorded, e.g., `x = foo();`, as is the code of
+        // copies of variables, e.g., `uv = fragCoord;`
+        const VarPtr var = serialize::HintRecorder::assigned_variable(lhs_expr_);
+        const bool is_copy = cast_expression<Identifier>(lhs_expr_) and cast_expression<Identifier>(rhs_expr_);
+        if ((var and var->is_compile_time()) or is_copy)
+            return lhs_expr_->to_string() + " = " + rhs_expr_->to_string() + ";";
+
+        string rhs = hints::PLACEHOLDER;
+        if (const IdentifierPtr identifier = cast_expression<Identifier>(lhs_expr_))
+            rhs = serialize::HintRecorder::expression_skeleton(rhs_expr_, identifier->variable());
+        return lhs_expr_->to_string() + " = " + rhs + ";";
     }
 
     string VariableAssignment::to_string() const

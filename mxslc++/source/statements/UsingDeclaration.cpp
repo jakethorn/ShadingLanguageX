@@ -11,6 +11,12 @@
 
 namespace mxslc::statements
 {
+    UsingDeclaration::UsingDeclaration(Token token, string name, TypePtr type)
+        : Statement{std::move(token)}, name_{std::move(name)}, type_{std::move(type)}, type_string_{type_ ? type_->to_string() : ""}
+    {
+
+    }
+
     StmtPtr UsingDeclaration::monomorphize(const TypePtr& template_type) const
     {
         TypePtr type = type_->monomorphize(template_type);

@@ -19,4 +19,4 @@ mutable vec3 q = normal();
 q.y = x;
 q.xz = p.zx;
 q = q * t;
-color3 c = if (flag) { color3{q} } else { color3{0.0, 0.0, 0.0} };
+color3 c = if (flag) { color3{q} } else { color3{} };

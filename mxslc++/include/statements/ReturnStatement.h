@@ -19,12 +19,18 @@ namespace mxslc::statements
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
         string to_string() const override;
+        const ExprPtr& expression() const { return expr_; }
+
+        bool is_hinted() const override { return true; }
+        string hint_skeleton() const override;
 
     protected:
         void execute_impl() const override;
 
     private:
         ExprPtr expr_;
+        // the returned value as it is written in the skeleton, see HintRecorder::expression_skeleton
+        mutable string hint_value_{"_"};
 
     public:
         class Branch : public std::exception

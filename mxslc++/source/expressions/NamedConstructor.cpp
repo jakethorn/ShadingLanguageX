@@ -52,6 +52,9 @@ namespace mxslc::expressions
 
     string NamedConstructor::to_string() const
     {
-        return name_ + "{" + args_.to_string() + "}";
+        // the arguments are moved to the constructor call once the expression is initialized
+        const auto func_call = cast_expression<FunctionCall>(func_call_);
+        const ArgumentList& args = func_call ? func_call->arguments() : args_;
+        return name_ + "{" + args.to_string() + "}";
     }
 }

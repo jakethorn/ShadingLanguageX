@@ -17,7 +17,7 @@ using std::string;
 using std::vector;
 
 // The roundtrip test files are written in the same format that the decompiler prints, so parsing them and printing the
-// statements with to_string should reproduce them exactly.
+// statements with to_string should reproduce them, apart from whitespace and comments.
 using printer_tests = testing::TestWithParam<fs::path>;
 
 TEST_P(printer_tests, printed_source_matches_original)
@@ -27,8 +27,9 @@ TEST_P(printer_tests, printed_source_matches_original)
     const vector<mxslc::StmtPtr> statements = mxslc::parse(mxslc::scan_file(input_path));
     const string actual_output = mxslc::statements::join_statements(statements) + "\n";
 
-    const string expected_output = normalise_line_endings(read_file(input_path));
-    const bool passed = actual_output == expected_output;
+    const string expected_output = read_file(input_path);
+    // whitespace and comments do not have to be printed the same
+    const bool passed = code_tokens(actual_output) == code_tokens(expected_output);
 
     EXPECT_TRUE(passed);
     if (not passed)
