@@ -8,7 +8,7 @@
 
 #include "decompile/Decompiler.h"
 #include "decompile/decompile_utils.h"
-#include "serialize/serialize_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 #include "utils/container_utils.h"
 #include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
@@ -193,10 +193,8 @@ namespace mxslc::decompile
         unordered_map<string, size_t> indices;
         for (const mx::NodePtr& node : nodes_)
         {
-            // calls that only assign to out parameters or nonlocal variables are not values of the variable, e.g.,
-            // the node of `foo();` is named var__x__1 if foo assigns to x
             const optional<string> variable = get_assigned_variable_name(node->getName());
-            if (not variable or node->getType() == mx::MULTI_OUTPUT_TYPE_STRING or get_return_outputs(node).empty() or not get_out_parameter_outputs(node).empty())
+            if (not variable or node->getType() == mx::MULTI_OUTPUT_TYPE_STRING)
                 continue;
 
             if (not contains(indices, *variable))

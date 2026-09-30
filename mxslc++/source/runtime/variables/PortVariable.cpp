@@ -28,8 +28,4 @@ namespace mxslc::runtime
         value->set_as_node_input(input_);
     }
 
-    void PortVariable::set_node_name(const string& name) const
-    {
-
-    }
 }

@@ -12,6 +12,7 @@
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/type_cast.h"
+#include "serialize/node_name_utils.h"
 
 #define TRY_START try {
 #define TRY_END } catch (CompileError& e) { e.set_debug_info(token_); throw; }
@@ -139,7 +140,9 @@ namespace mxslc::expressions
     {
         TRY_START
 
-        evaluate()->copy(value);
+        const VarPtr var = evaluate();
+        name_assigned_nodes(var, value);
+        var->copy(value);
 
         TRY_END
     }

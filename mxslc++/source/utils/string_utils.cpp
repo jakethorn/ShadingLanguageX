@@ -37,7 +37,6 @@ namespace mxslc::string_utils
 
     string format_float(const float value)
     {
-        // shortest representation that reads back as the same float, always recognisable as a float literal
         const float magnitude = std::fabs(value);
         const bool use_fixed = magnitude == 0.0f or (magnitude >= 1e-5f and magnitude < 1e16f);
 

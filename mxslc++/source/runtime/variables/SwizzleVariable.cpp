@@ -46,8 +46,4 @@ namespace mxslc::runtime
         value_expr_->assign(values);
     }
 
-    void SwizzleVariable::set_node_name(const string& name) const
-    {
-
-    }
 }

@@ -18,6 +18,7 @@
 #include "runtime/Type.h"
 #include "runtime/utils/FunctionResolver.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/node_name_utils.h"
 
 namespace mxslc::expressions
 {
@@ -159,14 +160,14 @@ namespace mxslc::expressions
             {
                 const VarPtr arg_value = args_.evaluate(param);
                 const VarPtr arg_value_copy = create_variable(std::move(mods), param.type(), arg_value);
-                arg_value_copy->disable_node_naming();
+                disable_node_naming(arg_value_copy);
                 arg_value_copy->add_to_scope(param.name());
             }
             else
             {
                 const VarPtr default_value = param.has_default_value() ? param.evaluate() : create_variable(param.type());
                 default_value->set_modifiers(std::move(mods));
-                default_value->disable_node_naming();
+                disable_node_naming(default_value);
                 default_value->add_to_scope(param.name());
             }
         }
@@ -194,6 +195,7 @@ namespace mxslc::expressions
             {
                 const VarPtr nonlocal = args_.evaluate(param);
                 const VarPtr local = scope().get_variable(param.name());
+                name_assigned_nodes(nonlocal, local);
                 nonlocal->copy(local);
             }
         }

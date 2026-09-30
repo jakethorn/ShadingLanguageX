@@ -11,17 +11,17 @@
     </add>
     <output name="nonlocal_out__a" type="float" nodename="var__a__1" />
   </nodegraph>
-  <foo name="var__a__1" type="float" />
-  <foo name="var__a__2" type="float">
-    <input name="b" type="float" nodename="var__a__1" />
+  <foo name="var__0" type="float" />
+  <foo name="var__1" type="float">
+    <input name="b" type="float" nodename="var__0" />
   </foo>
-  <foo name="var__a__3" type="float">
-    <input name="b" type="float" nodename="var__a__2" />
+  <foo name="var__2" type="float">
+    <input name="b" type="float" nodename="var__1" />
   </foo>
-  <foo name="var__a__4" type="float">
-    <input name="b" type="float" nodename="var__a__3" />
+  <foo name="var__3" type="float">
+    <input name="b" type="float" nodename="var__2" />
   </foo>
-  <foo name="var__a__5" type="float">
-    <input name="b" type="float" nodename="var__a__4" />
+  <foo name="var__4" type="float">
+    <input name="b" type="float" nodename="var__3" />
   </foo>
 </materialx>

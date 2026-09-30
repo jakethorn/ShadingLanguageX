@@ -15,6 +15,8 @@ namespace mxslc::serialize::values
         explicit NodeValue(mx::NodePtr node);
 
         mx::NodePtr node() const { return node_; }
+
+        void disable_node_naming() const { is_node_name_set_ = true; }
         void set_node_name(const string& name) const;
         void set_assigned_node_name(const string& variable_name) const;
 

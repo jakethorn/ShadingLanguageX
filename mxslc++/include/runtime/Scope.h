@@ -35,9 +35,15 @@ namespace mxslc::runtime
         mx::GraphElementPtr graph() const { return graph_; }
         std::pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
         void set_graph(mx::GraphElementPtr graph, FuncPtr func) { graph_ = std::move(graph); graph_func_ = func; func_ = func; }
+
         FuncPtr function() const { return func_; }
         void set_function(FuncPtr func) { func_ = std::move(func); }
+
+        // true for global scope, inline functions, loops and if statements
         bool is_inline() const;
+
+        // true if current scope is or is inside of an inline function
+        bool is_inside_inline_function() const;
 
         /*
          * variables

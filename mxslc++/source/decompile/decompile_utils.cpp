@@ -6,7 +6,7 @@
 
 #include "Primitive.h"
 #include "TokenType.h"
-#include "serialize/serialize_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 #include "utils/container_utils.h"
 #include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"

@@ -11,11 +11,9 @@
 #include "runtime/Type.h"
 #include "serialize/Serializer.h"
 #include "serialize/values/interface.h"
-#include "serialize/values/NodeOutputValue.h"
-#include "serialize/values/NodeValue.h"
-#include "utils/string_utils.h"
 #include "errors/CompileError.h"
-#include "serialize/serialize_name_utils.h"
+#include "serialize/node_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 #include "serialize/values/CompileTimeValue.h"
 #include "serialize/values/NullValue.h"
 
@@ -75,40 +73,17 @@ namespace mxslc::runtime
         name_ = std::move(name);
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_name(name_, type_, i);
+            children_[i]->set_name(name_, i);
         }
-
-        node_name_ = name_;
-        set_node_name(node_name_);
     }
 
-    void Variable::set_name(const string& name, const TypePtr& parent_type, const size_t index)
+    void Variable::set_name(const string& parent_name, const size_t index)
     {
-        name_ = with_prefix(name, index);
+        name_ = with_prefix(parent_name, index);
         for (size_t i = 0; i < children_.size(); ++i)
         {
-            children_[i]->set_name(name_, type_, i);
+            children_[i]->set_name(name_, i);
         }
-
-        const Field& field = parent_type->field(index);
-        const string child_name = field.has_name() ? field.name() : std::to_string(index);
-        node_name_ = name + "__" + child_name;
-        set_node_name(node_name_);
-    }
-
-    bool Variable::can_name_assigned_nodes() const
-    {
-        // the fields of a parameter are also parameters
-        return can_name_assigned_nodes_ and (not has_parent() or parent()->can_name_assigned_nodes());
-    }
-
-    void Variable::set_assigned_node_name(const ValuePtr& value) const
-    {
-        if (not can_name_assigned_nodes() or node_name_.empty() or is_temporary())
-            return;
-
-        if (const NodeValuePtr node_value = cast_value<NodeValue>(value))
-            node_value->set_assigned_node_name(node_name_);
     }
 
     bool Variable::is_assignable() const
@@ -211,7 +186,6 @@ namespace mxslc::runtime
 
     void Variable::copy(const VarPtr& other)
     {
-        const bool is_assignment = is_initialized_;
         if (is_initialized_)
         {
             if (is_temporary())
@@ -222,18 +196,12 @@ namespace mxslc::runtime
 
         if (other->has_value())
         {
-            const ValuePtr value = other->value();
-            // named before it is copied, which can connect it to the output of a function, e.g., for nonlocal variables
-            if (is_assignment and other->can_name_nodes_)
-                set_assigned_node_name(value);
-            copy_value(value);
+            copy_value(other->value());
         }
         else
         {
             copy_children(other->children_);
         }
-
-        can_name_nodes_ = other->can_name_nodes_;
     }
 
     bool Variable::equals(const VarPtr& other) const
@@ -279,6 +247,9 @@ namespace mxslc::runtime
     void Variable::add_to_scope(string name)
     {
         scope().add_variable(name, shared_from_this());
+        // the definition of the variable names the nodes of its value after it, unlike the variables that are added
+        // to a scope to access the ports of a node, see PortAccessor
+        name_nodes(shared_from_this());
 
         if (name == "this")
         {
@@ -353,45 +324,6 @@ namespace mxslc::runtime
         }
     }
 
-    void Variable::set_node_name(const string& name) const
-    {
-        if (not can_name_nodes_)
-            return;
-
-        if (const NodeValuePtr node_value = cast_value<NodeValue>(value_impl()))
-        {
-            node_value->set_node_name(name);
-            return;
-        }
-
-        mx::NodePtr node;
-        for (const VarPtr& child : children_)
-        {
-            ValuePtr value = child->value_impl();
-            if (const NodeOutputValuePtr output_value = cast_value<NodeOutputValue>(value))
-            {
-                if (node == nullptr)
-                {
-                    node = output_value->node();
-                }
-                else
-                {
-                    if (output_value->node() != node)
-                        return;
-                }
-            }
-        }
-
-        for (const VarPtr& child : children_)
-        {
-            ValuePtr value = child->value_impl();
-            if (const NodeOutputValuePtr output_value = cast_value<NodeOutputValue>(value))
-            {
-                output_value->set_node_name(name);
-            }
-        }
-    }
-
     void Variable::copy_value(ValuePtr value)
     {
         if (is_comptime() and not is_value_compile_time(value))
@@ -425,9 +357,13 @@ namespace mxslc::runtime
             {
                 VarPtr child = create_variable(type_->field(i).modifiers(), type_->field_type(i), children[i]);
                 child->parent_ = weak_from_this();
+                children_.push_back(child);
                 if (not name_.empty())
+                {
                     child->set_name(with_prefix(name_, i));
-                children_.push_back(std::move(child));
+                    // the first value of a field names its nodes, like the definition of a variable, see add_to_scope
+                    name_nodes(child);
+                }
             }
 
             is_initialized_ = true;

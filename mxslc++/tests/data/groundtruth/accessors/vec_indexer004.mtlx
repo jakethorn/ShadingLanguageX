@@ -12,8 +12,8 @@
   <constant name="var__0" type="vector2">
     <input name="value" type="vector2" value="0, 0" />
   </constant>
-  <foo name="var__y__1" type="vector2" />
-  <constant name="var__1" type="vector2">
-    <input name="value" type="vector2" nodename="var__y__1" />
+  <foo name="var__1" type="vector2" />
+  <constant name="var__2" type="vector2">
+    <input name="value" type="vector2" nodename="var__1" />
   </constant>
 </materialx>

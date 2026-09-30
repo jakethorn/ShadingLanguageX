@@ -15,6 +15,7 @@ namespace mxslc::string_utils
     bool starts_with(const string& str, const char* prefix);
 
     void replace_last(string& str, const string& old_str, const string& new_str);
+
     string format_float(float value);
 }
 

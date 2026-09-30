@@ -6,6 +6,7 @@
 #define MXSLC_NAMEDCONSTRUCTOR_H
 
 #include "expressions/Expression.h"
+#include "expressions/interface.h"
 #include "runtime/ArgumentList.h"
 
 namespace mxslc::expressions
@@ -29,7 +30,7 @@ namespace mxslc::expressions
         string name_;
         ArgumentList args_;
 
-        ExprPtr func_call_;
+        FunctionCallPtr func_call_ = nullptr;
     };
 }
 

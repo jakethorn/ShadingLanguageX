@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "utils/mtlx_utils.h"
-#include "serialize/serialize_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 #include "serialize/values/interface.h"
 #include "runtime/Type.h"
 

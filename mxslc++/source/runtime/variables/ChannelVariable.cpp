@@ -30,10 +30,6 @@ namespace mxslc::runtime
         runtime_utils::invoke_function("__set__", ArgumentList{value_expr_, index_expr_, as_expression(std::move(value))});
     }
 
-    void ChannelVariable::set_node_name(const string& name) const
-    {
-
-    }
 
     TypePtr ChannelVariable::get_type(const ExprPtr& value_expr, const ExprPtr& index_expr)
     {

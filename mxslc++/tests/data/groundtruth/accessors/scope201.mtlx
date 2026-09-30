@@ -13,10 +13,10 @@
   <constant name="var__0" type="float">
     <input name="value" type="float" value="2" />
   </constant>
-  <foo name="var__f__1" type="float">
+  <foo name="var__1" type="float">
     <input name="nonlocal_in__f" type="float" value="2" />
   </foo>
-  <constant name="var__1" type="float">
-    <input name="value" type="float" nodename="var__f__1" />
+  <constant name="var__2" type="float">
+    <input name="value" type="float" nodename="var__1" />
   </constant>
 </materialx>

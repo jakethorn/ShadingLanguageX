@@ -10,7 +10,7 @@
 
 #include "scan.h"
 #include "serialize/serializer_utils.h"
-#include "serialize/serialize_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 #include "serialize/serialize_constexpr.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"

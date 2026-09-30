@@ -11,11 +11,11 @@
     </multiply>
     <output name="nonlocal_out__i" type="float" nodename="var__i__1" />
   </nodegraph>
-  <foo name="var__i__1" type="float">
+  <foo name="var__0" type="float">
     <input name="nonlocal_in__i" type="float" value="5" />
   </foo>
   <multiply name="k" type="float">
-    <input name="in1" type="float" nodename="var__i__1" />
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="10" />
   </multiply>
 </materialx>

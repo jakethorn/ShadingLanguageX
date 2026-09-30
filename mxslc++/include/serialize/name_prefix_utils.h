@@ -2,8 +2,8 @@
 // Created by jaket on 31/07/2026.
 //
 
-#ifndef MXSLC_SERIALIZE_NAME_UTILS_H
-#define MXSLC_SERIALIZE_NAME_UTILS_H
+#ifndef MXSLC_NAME_PREFIX_UTILS_H
+#define MXSLC_NAME_PREFIX_UTILS_H
 
 #include <MaterialXCore/Node.h>
 
@@ -41,4 +41,4 @@ namespace mxslc::serialize
     }
 }
 
-#endif //MXSLC_SERIALIZE_NAME_UTILS_H
+#endif //MXSLC_NAME_PREFIX_UTILS_H
