@@ -1,3 +1,0 @@
-color3 c = randomcolor();
-surfaceshader s = standard_surface(base_color = c);
-material m = surfacematerial(surfaceshader = s);

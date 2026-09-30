@@ -2,8 +2,6 @@
 // Created by jaket on 28/09/2026.
 //
 
-#if false
-
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <string>
@@ -23,6 +21,12 @@ using groundtruth_roundtrip_diffs = testing::TestWithParam<fs::path>;
 
 TEST_P(groundtruth_roundtrip_diffs, see_groundtruth_roundtrip_diffs)
 {
+    // This isn't really a test, but a convenient way to see the roundtrip diffs for all groundtruth tests,
+    // set the #if check to false and run to see the diffs.
+#if true
+    GTEST_SKIP();
+#endif
+
     const fs::path& input_path = GetParam();
 
     mxslc::CompileOptions opts;
@@ -71,5 +75,3 @@ INSTANTIATE_TEST_SUITE_P(
         return info.param.stem().string();
     }
 );
-
-#endif

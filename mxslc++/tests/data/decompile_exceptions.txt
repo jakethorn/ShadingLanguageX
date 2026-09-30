@@ -1,5 +1,5 @@
-# Groundtruth files that do not yet compile to the same graph after they are decompiled, one name per line, see
-# groundtruth_decompile_tests.cpp
+# Not all groundtruth files are meant to be decompiled, for example, those with classes or preprecessor directives.
+# This list is read by the groundtruth_decompile_tests to skip the listed files.
 
 # classes are not decompiled
 class008
