@@ -2,7 +2,7 @@
 // Created by jaket on 29/09/2026.
 //
 
-#include "decompile/Code.h"
+#include "decompile/SourceCode.h"
 
 #include <algorithm>
 
@@ -12,12 +12,12 @@ namespace mxslc::decompile
     {
         constexpr size_t INDENT_WIDTH = 4;
 
-        Precedence next(const Precedence precedence)
+        Precedence get_next_precedence(const Precedence precedence)
         {
             return static_cast<Precedence>(static_cast<int>(precedence) + 1);
         }
 
-        Precedence binary_precedence(const string& op)
+        Precedence get_binary_precedence(const string& op)
         {
             static const unordered_map<string, Precedence> precedences {
                 {"+", Precedence::Term},
@@ -47,40 +47,40 @@ namespace mxslc::decompile
         }
     }
 
-    struct Layout::Node
+    struct SourceCode::Node
     {
         Kind kind;
-        // the text of text layouts, and the opening bracket of lists
+        // the text of Text nodes, and the opening bracket of lists
         string text;
-        vector<Layout> parts;
+        vector<SourceCode> parts;
         // the closing bracket of lists
         string close;
         size_t width;
     };
 
-    // Writes layouts greedily from the outside in: a list or chain is written on a single line if it fits, together
+    // Writes source code greedily from the outside in: a list or chain is written on a single line if it fits, together
     // with the code that follows it up to the next place where a line can be broken, otherwise it is broken and its
     // parts are written in the same way.
-    class Renderer
+    class SourceCodeRenderer
     {
     public:
-        void write(const Layout& layout, const size_t indent, const size_t trailing)
+        void write(const SourceCode& code, const size_t indent, const size_t trailing)
         {
-            const Layout::Node& node = *layout.node_;
-            const vector<Layout>& parts = node.parts;
+            const SourceCode::Node& node = *code.node_;
+            const vector<SourceCode>& parts = node.parts;
             switch (node.kind)
             {
-            case Layout::Kind::Text:
+            case SourceCode::Kind::Text:
                 write_text(node.text);
                 break;
-            case Layout::Kind::Concat:
+            case SourceCode::Kind::Concat:
                 for (size_t i = 0; i < parts.size(); ++i)
-                    write(parts[i], indent, rest_width(parts, i + 1, trailing));
+                    write(parts[i], indent, get_rest_width(parts, i + 1, trailing));
                 break;
-            case Layout::Kind::List:
-                if (parts.empty() or fits(layout, trailing))
+            case SourceCode::Kind::List:
+                if (parts.empty() or fits(code, trailing))
                 {
-                    write_flat(layout);
+                    write_flat(code);
                     break;
                 }
                 write_text(node.text);
@@ -95,10 +95,10 @@ namespace mxslc::decompile
                 new_line(indent);
                 write_text(node.close);
                 break;
-            case Layout::Kind::ParameterList:
-                if (parts.empty() or fits(layout, trailing))
+            case SourceCode::Kind::ParameterList:
+                if (parts.empty() or fits(code, trailing))
                 {
-                    write_flat(layout);
+                    write_flat(code);
                     break;
                 }
                 write_text(node.text);
@@ -110,10 +110,10 @@ namespace mxslc::decompile
                     write_text(is_last ? node.close : ",");
                 }
                 break;
-            case Layout::Kind::Chain:
-                if (fits(layout, trailing))
+            case SourceCode::Kind::Chain:
+                if (fits(code, trailing))
                 {
-                    write_flat(layout);
+                    write_flat(code);
                     break;
                 }
                 // the first link is also indented, so that the lines it is broken over are nested inside the chain
@@ -124,10 +124,10 @@ namespace mxslc::decompile
                     write(parts[i], indent + INDENT_WIDTH, i + 1 == parts.size() ? trailing : 0);
                 }
                 break;
-            case Layout::Kind::Branch:
-                if (fits(layout, trailing))
+            case SourceCode::Kind::Branch:
+                if (fits(code, trailing))
                 {
-                    write_flat(layout);
+                    write_flat(code);
                     break;
                 }
                 write_text("{");
@@ -136,7 +136,7 @@ namespace mxslc::decompile
                 new_line(indent);
                 write_text("}");
                 break;
-            case Layout::Kind::Lines:
+            case SourceCode::Kind::Lines:
                 for (size_t i = 0; i < parts.size(); ++i)
                 {
                     if (i > 0)
@@ -144,7 +144,7 @@ namespace mxslc::decompile
                     write(parts[i], indent, i + 1 == parts.size() ? trailing : 0);
                 }
                 break;
-            case Layout::Kind::Block:
+            case SourceCode::Kind::Block:
                 write(parts.front(), indent, 0);
                 new_line(indent);
                 write_text("{");
@@ -162,17 +162,17 @@ namespace mxslc::decompile
         const string& str() const { return out_; }
 
     private:
-        void write_flat(const Layout& layout)
+        void write_flat(const SourceCode& code)
         {
-            const Layout::Node& node = *layout.node_;
-            const vector<Layout>& parts = node.parts;
+            const SourceCode::Node& node = *code.node_;
+            const vector<SourceCode>& parts = node.parts;
             switch (node.kind)
             {
-            case Layout::Kind::Text:
+            case SourceCode::Kind::Text:
                 write_text(node.text);
                 break;
-            case Layout::Kind::List:
-            case Layout::Kind::ParameterList:
+            case SourceCode::Kind::List:
+            case SourceCode::Kind::ParameterList:
                 write_text(node.text);
                 for (size_t i = 0; i < parts.size(); ++i)
                 {
@@ -182,7 +182,7 @@ namespace mxslc::decompile
                 }
                 write_text(node.close);
                 break;
-            case Layout::Kind::Chain:
+            case SourceCode::Kind::Chain:
                 for (size_t i = 0; i < parts.size(); ++i)
                 {
                     if (i > 0)
@@ -190,20 +190,20 @@ namespace mxslc::decompile
                     write_flat(parts[i]);
                 }
                 break;
-            case Layout::Kind::Branch:
+            case SourceCode::Kind::Branch:
                 write_text("{ ");
                 write_flat(parts.front());
                 write_text(" }");
                 break;
             default:
-                for (const Layout& part : parts)
+                for (const SourceCode& part : parts)
                     write_flat(part);
                 break;
             }
         }
 
         // the length of the parts from the start up to the first place where a line can be broken
-        static size_t rest_width(const vector<Layout>& parts, const size_t start, const size_t trailing)
+        static size_t get_rest_width(const vector<SourceCode>& parts, const size_t start, const size_t trailing)
         {
             size_t width = 0;
             for (size_t i = start; i < parts.size(); ++i)
@@ -215,9 +215,9 @@ namespace mxslc::decompile
             return width + trailing;
         }
 
-        bool fits(const Layout& layout, const size_t trailing) const
+        bool fits(const SourceCode& code, const size_t trailing) const
         {
-            return column_ + layout.width() + trailing <= MAX_LINE_LENGTH;
+            return column_ + code.width() + trailing <= MAX_LINE_LENGTH;
         }
 
         void write_text(const string& text)
@@ -236,20 +236,20 @@ namespace mxslc::decompile
         size_t column_{0};
     };
 
-    Layout::Layout(string text) : Layout{Kind::Text, std::move(text), {}}
+    SourceCode::SourceCode(string text) : SourceCode{Kind::Text, std::move(text), {}}
     {
 
     }
 
-    Layout::Layout(const char* text) : Layout{string{text}}
+    SourceCode::SourceCode(const char* text) : SourceCode{string{text}}
     {
 
     }
 
-    Layout::Layout(const Kind kind, string text, vector<Layout> parts, string close)
+    SourceCode::SourceCode(const Kind kind, string text, vector<SourceCode> parts, string close)
     {
         size_t width = text.size() + close.size();
-        for (const Layout& part : parts)
+        for (const SourceCode& part : parts)
             width += part.width();
         if ((kind == Kind::List or kind == Kind::ParameterList) and not parts.empty())
             width += 2 * (parts.size() - 1);
@@ -261,69 +261,69 @@ namespace mxslc::decompile
         node_ = std::make_shared<const Node>(Node{kind, std::move(text), std::move(parts), std::move(close), width});
     }
 
-    Layout Layout::concat(vector<Layout> parts)
+    SourceCode SourceCode::concat(vector<SourceCode> parts)
     {
-        return Layout{Kind::Concat, "", std::move(parts)};
+        return SourceCode{Kind::Concat, "", std::move(parts)};
     }
 
-    Layout Layout::list(string open, vector<Layout> items, string close)
+    SourceCode SourceCode::list(string open, vector<SourceCode> items, string close)
     {
-        return Layout{Kind::List, std::move(open), std::move(items), std::move(close)};
+        return SourceCode{Kind::List, std::move(open), std::move(items), std::move(close)};
     }
 
-    Layout Layout::parameter_list(vector<Layout> params)
+    SourceCode SourceCode::parameter_list(vector<SourceCode> params)
     {
-        return Layout{Kind::ParameterList, "(", std::move(params), ")"};
+        return SourceCode{Kind::ParameterList, "(", std::move(params), ")"};
     }
 
-    Layout Layout::chain(vector<Layout> links)
+    SourceCode SourceCode::chain(vector<SourceCode> links)
     {
-        return Layout{Kind::Chain, "", std::move(links)};
+        return SourceCode{Kind::Chain, "", std::move(links)};
     }
 
-    Layout Layout::branch(Layout value)
+    SourceCode SourceCode::branch(SourceCode value)
     {
-        return Layout{Kind::Branch, "", {std::move(value)}};
+        return SourceCode{Kind::Branch, "", {std::move(value)}};
     }
 
-    Layout Layout::lines(vector<Layout> lines)
+    SourceCode SourceCode::lines(vector<SourceCode> lines)
     {
-        return Layout{Kind::Lines, "", std::move(lines)};
+        return SourceCode{Kind::Lines, "", std::move(lines)};
     }
 
-    Layout Layout::block(Layout header, vector<Layout> body)
+    SourceCode SourceCode::block(SourceCode header, vector<SourceCode> body)
     {
         body.insert(body.begin(), std::move(header));
-        return Layout{Kind::Block, "", std::move(body)};
+        return SourceCode{Kind::Block, "", std::move(body)};
     }
 
-    vector<Layout> Layout::links() const
+    vector<SourceCode> SourceCode::links() const
     {
         if (node_->kind == Kind::Chain)
             return node_->parts;
         return {*this};
     }
 
-    string Layout::str() const
+    string SourceCode::str() const
     {
-        Renderer renderer;
+        SourceCodeRenderer renderer;
         renderer.write(*this, 0, 0);
         return renderer.str();
     }
 
-    size_t Layout::width() const
+    size_t SourceCode::width() const
     {
         return node_->width;
     }
 
-    size_t Layout::head_width() const
+    size_t SourceCode::head_width() const
     {
         switch (node_->kind)
         {
         case Kind::Concat:
         {
             size_t width = 0;
-            for (const Layout& part : node_->parts)
+            for (const SourceCode& part : node_->parts)
             {
                 if (part.is_breakable())
                     return width + part.head_width();
@@ -345,14 +345,14 @@ namespace mxslc::decompile
         }
     }
 
-    bool Layout::is_breakable() const
+    bool SourceCode::is_breakable() const
     {
         switch (node_->kind)
         {
         case Kind::Text:
             return false;
         case Kind::Concat:
-            return std::any_of(node_->parts.begin(), node_->parts.end(), [](const Layout& part) { return part.is_breakable(); });
+            return std::any_of(node_->parts.begin(), node_->parts.end(), [](const SourceCode& part) { return part.is_breakable(); });
         case Kind::Chain:
             return node_->parts.size() > 1 or (node_->parts.size() == 1 and node_->parts.front().is_breakable());
         case Kind::List:
@@ -363,122 +363,119 @@ namespace mxslc::decompile
         }
     }
 
-    Layout Code::operand(const Precedence min_precedence) const
+    SourceCode ExpressionCode::operand(const Precedence min_precedence) const
     {
-        return precedence < min_precedence ? Layout::concat({"(", layout, ")"}) : layout;
+        return precedence < min_precedence ? SourceCode::concat({"(", code, ")"}) : code;
     }
 
-    namespace code
+    ExpressionCode format_identifier(const string& name)
     {
-        Code identifier(const string& name)
-        {
-            return Code{name, Precedence::Primary};
-        }
-
-        Code literal(const string& text)
-        {
-            return Code{text, not text.empty() and text.front() == '-' ? Precedence::Unary : Precedence::Primary};
-        }
-
-        Code binary(const Code& lhs, const string& op, const Code& rhs)
-        {
-            const Precedence precedence = binary_precedence(op);
-            // relational operators do not chain, `a < b < c` is a ternary relational expression
-            const Precedence lhs_precedence = precedence == Precedence::Relational ? next(precedence) : precedence;
-
-            // operators with the same precedence are broken over lines together, e.g., `a` `+ b` `- c`
-            const bool is_chained = lhs.precedence == precedence and lhs_precedence == precedence;
-            vector<Layout> links = is_chained ? lhs.layout.links() : vector{lhs.operand(lhs_precedence)};
-            links.push_back(Layout::concat({op + " ", rhs.operand(next(precedence))}));
-            return Code{Layout::chain(std::move(links)), precedence};
-        }
-
-        Code unary(const string& op, const Code& operand)
-        {
-            return Code{Layout::concat({op, operand.operand(Precedence::Compound)}), Precedence::Unary};
-        }
-
-        Code absolute(const Code& operand)
-        {
-            return Code{Layout::concat({"|", operand.operand(next(Precedence::Logical)), "|"}), Precedence::Primary};
-        }
-
-        Code member(const Code& value, const string& name)
-        {
-            return Code{Layout::concat({value.operand(Precedence::Postfix), "." + name}), Precedence::Postfix};
-        }
-
-        Code index(const Code& value, const Code& index)
-        {
-            return Code{Layout::concat({value.operand(Precedence::Postfix), "[", index.layout, "]"}), Precedence::Postfix};
-        }
-
-        Code construct(const string& type, const vector<Code>& args)
-        {
-            vector<Layout> items;
-            for (const Code& arg : args)
-                items.push_back(arg.layout);
-            return Code{Layout::list(type + "{", std::move(items), "}"), Precedence::Primary};
-        }
-
-        Code call(const string& function, const string& template_type, const vector<Layout>& args)
-        {
-            const string template_string = template_type.empty() ? "" : "<" + template_type + ">";
-            return Code{Layout::list(function + template_string + "(", args, ")"), Precedence::Primary};
-        }
-
-        Code if_expression(const Code& condition, const Code& then_code, const optional<Code>& else_code)
-        {
-            vector<Layout> links {Layout::concat({"if (", condition.layout, ") ", Layout::branch(then_code.layout)})};
-
-            // e.g., `if (a) { x } else if (b) { y } else { z }`
-            if (else_code and else_code->is_if_expression())
-            {
-                const vector<Layout> else_links = else_code->layout.links();
-                links.push_back(Layout::concat({"else ", else_links.front()}));
-                links.insert(links.end(), else_links.begin() + 1, else_links.end());
-            }
-            else if (else_code)
-            {
-                links.push_back(Layout::concat({"else ", Layout::branch(else_code->layout)}));
-            }
-
-            return Code{Layout::chain(std::move(links)), Precedence::Lowest};
-        }
-
-        Layout argument(const vector<string>& attributes, const string& name, const Code& value)
-        {
-            string prefix = join(attributes, " ");
-            if (not prefix.empty())
-                prefix += " ";
-            if (not name.empty())
-                prefix += name + " = ";
-            return prefix.empty() ? value.layout : Layout::concat({prefix, value.layout});
-        }
-
-        Layout with_attributes(const vector<string>& attributes, const Layout& statement)
-        {
-            if (attributes.empty())
-                return statement;
-
-            vector<Layout> lines(attributes.begin(), attributes.end());
-            lines.push_back(statement);
-            return Layout::lines(std::move(lines));
-        }
+        return ExpressionCode{name, Precedence::Primary};
     }
 
-    void CodeWriter::add(Layout code, const bool is_block)
+    ExpressionCode format_literal(const string& text)
+    {
+        return ExpressionCode{text, not text.empty() and text.front() == '-' ? Precedence::Unary : Precedence::Primary};
+    }
+
+    ExpressionCode format_binary_expression(const ExpressionCode& lhs, const string& op, const ExpressionCode& rhs)
+    {
+        const Precedence precedence = get_binary_precedence(op);
+        // relational operators do not chain, `a < b < c` is a ternary relational expression
+        const Precedence lhs_precedence = precedence == Precedence::Relational ? get_next_precedence(precedence) : precedence;
+
+        // operators with the same precedence are broken over lines together, e.g., `a` `+ b` `- c`
+        const bool is_chained = lhs.precedence == precedence and lhs_precedence == precedence;
+        vector<SourceCode> links = is_chained ? lhs.code.links() : vector{lhs.operand(lhs_precedence)};
+        links.push_back(SourceCode::concat({op + " ", rhs.operand(get_next_precedence(precedence))}));
+        return ExpressionCode{SourceCode::chain(std::move(links)), precedence};
+    }
+
+    ExpressionCode format_unary_expression(const string& op, const ExpressionCode& operand)
+    {
+        return ExpressionCode{SourceCode::concat({op, operand.operand(Precedence::Compound)}), Precedence::Unary};
+    }
+
+    ExpressionCode format_absolute_value(const ExpressionCode& operand)
+    {
+        return ExpressionCode{SourceCode::concat({"|", operand.operand(get_next_precedence(Precedence::Logical)), "|"}), Precedence::Primary};
+    }
+
+    ExpressionCode format_member_access(const ExpressionCode& value, const string& name)
+    {
+        return ExpressionCode{SourceCode::concat({value.operand(Precedence::Postfix), "." + name}), Precedence::Postfix};
+    }
+
+    ExpressionCode format_indexing(const ExpressionCode& value, const ExpressionCode& index)
+    {
+        return ExpressionCode{SourceCode::concat({value.operand(Precedence::Postfix), "[", index.code, "]"}), Precedence::Postfix};
+    }
+
+    ExpressionCode format_constructor(const string& type, const vector<ExpressionCode>& args)
+    {
+        vector<SourceCode> items;
+        for (const ExpressionCode& arg : args)
+            items.push_back(arg.code);
+        return ExpressionCode{SourceCode::list(type + "{", std::move(items), "}"), Precedence::Primary};
+    }
+
+    ExpressionCode format_function_call(const string& function, const string& template_type, const vector<SourceCode>& args)
+    {
+        const string template_string = template_type.empty() ? "" : "<" + template_type + ">";
+        return ExpressionCode{SourceCode::list(function + template_string + "(", args, ")"), Precedence::Primary};
+    }
+
+    ExpressionCode format_if_expression(const ExpressionCode& condition, const ExpressionCode& then_code, const optional<ExpressionCode>& else_code)
+    {
+        vector<SourceCode> links {SourceCode::concat({"if (", condition.code, ") ", SourceCode::branch(then_code.code)})};
+
+        // e.g., `if (a) { x } else if (b) { y } else { z }`
+        if (else_code and else_code->is_if_expression())
+        {
+            const vector<SourceCode> else_links = else_code->code.links();
+            links.push_back(SourceCode::concat({"else ", else_links.front()}));
+            links.insert(links.end(), else_links.begin() + 1, else_links.end());
+        }
+        else if (else_code)
+        {
+            links.push_back(SourceCode::concat({"else ", SourceCode::branch(else_code->code)}));
+        }
+
+        return ExpressionCode{SourceCode::chain(std::move(links)), Precedence::Lowest};
+    }
+
+    SourceCode format_argument(const vector<string>& attributes, const string& name, const ExpressionCode& value)
+    {
+        string prefix = join(attributes, " ");
+        if (not prefix.empty())
+            prefix += " ";
+        if (not name.empty())
+            prefix += name + " = ";
+        return prefix.empty() ? value.code : SourceCode::concat({prefix, value.code});
+    }
+
+    SourceCode add_attributes(const vector<string>& attributes, const SourceCode& statement)
+    {
+        if (attributes.empty())
+            return statement;
+
+        vector<SourceCode> lines(attributes.begin(), attributes.end());
+        lines.push_back(statement);
+        return SourceCode::lines(std::move(lines));
+    }
+
+    void SourceCodeWriter::add(SourceCode code, const bool is_block)
     {
         items_.push_back(Item{std::move(code), is_block});
     }
 
-    void CodeWriter::keep_last()
+    void SourceCodeWriter::keep_last()
     {
         if (items_.size() > 1)
             items_.erase(items_.begin(), items_.end() - 1);
     }
 
-    string CodeWriter::str() const
+    string SourceCodeWriter::str() const
     {
         if (items_.empty())
             return "";

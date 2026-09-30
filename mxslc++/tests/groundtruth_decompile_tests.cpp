@@ -27,7 +27,7 @@ using groundtruth_decompile_tests = testing::TestWithParam<fs::path>;
 
 namespace
 {
-    const std::unordered_set<string>& known_exceptions()
+    const std::unordered_set<string>& get_known_exceptions()
     {
         static const std::unordered_set<string> exceptions = [] {
             std::unordered_set<string> result;
@@ -45,7 +45,7 @@ namespace
         return exceptions;
     }
 
-    mxslc::CompileOptions compile_options(const fs::path& input_path)
+    mxslc::CompileOptions get_compile_options(const fs::path& input_path)
     {
         mxslc::CompileOptions opts;
         opts.reduce_graph = false;
@@ -71,7 +71,7 @@ TEST_P(groundtruth_decompile_tests, decompiled_code_compiles_to_the_same_graph)
     mx::DocumentPtr original;
     try
     {
-        original = mxslc::compile_to_document(input_path, compile_options(input_path));
+        original = mxslc::compile_to_document(input_path, get_compile_options(input_path));
     }
     catch (const std::exception&)
     {
@@ -88,7 +88,7 @@ TEST_P(groundtruth_decompile_tests, decompiled_code_compiles_to_the_same_graph)
         mxslc::CompileOptions opts;
         opts.reduce_graph = false;
         const mx::DocumentPtr recompiled = mxslc::compile_to_document(decompiled, opts);
-        differences = GraphComparator::differences(original, recompiled);
+        differences = GraphComparator::find_differences(original, recompiled);
     }
     catch (const std::exception& e)
     {
@@ -96,7 +96,7 @@ TEST_P(groundtruth_decompile_tests, decompiled_code_compiles_to_the_same_graph)
     }
     const bool passed = error.empty() and differences.empty();
 
-    if (known_exceptions().count(name) > 0)
+    if (get_known_exceptions().count(name) > 0)
     {
         if (passed)
             FAIL() << name << " compiles to the same graph now, remove it from decompile_exceptions.txt";

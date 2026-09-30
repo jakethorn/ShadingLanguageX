@@ -200,7 +200,7 @@ namespace mxslc
         {
             string result;
             for (size_t i = 0; i < count; ++i)
-                result += (i > 0 ? ", " : "") + string_utils::float_to_string(v[i]);
+                result += (i > 0 ? ", " : "") + string_utils::format_float(v[i]);
             return result;
         }
 
@@ -213,7 +213,7 @@ namespace mxslc
                 result += i > 0 ? ", " : "";
                 result += row_type + "{";
                 for (size_t j = 0; j < count; ++j)
-                    result += (j > 0 ? ", " : "") + string_utils::float_to_string(m[i][j]);
+                    result += (j > 0 ? ", " : "") + string_utils::format_float(m[i][j]);
                 result += "}";
             }
             return result;
@@ -223,7 +223,7 @@ namespace mxslc
     string Primitive::to_string() const
     {
         return visit([](const auto& v) -> string {
-            using string_utils::float_to_string;
+            using string_utils::format_float;
             IF_VISITED_TYPE_IS(std::monostate)
                 return "null";
             else IF_VISITED_TYPE_IS(bool)
@@ -231,7 +231,7 @@ namespace mxslc
             else IF_VISITED_TYPE_IS(int)
                 return std::to_string(v);
             else IF_VISITED_TYPE_IS(float)
-                return float_to_string(v);
+                return format_float(v);
             else IF_VISITED_TYPE_IS(string)
                 return "\"" + v + "\"";
             else IF_VISITED_TYPE_IS(fs::path)

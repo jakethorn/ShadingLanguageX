@@ -13,6 +13,21 @@
 
 namespace mxslc::serialize::values
 {
+    namespace
+    {
+        bool is_temporary_name(const string& name)
+        {
+            // temporary node name format: <TEMPORARY_VARIABLE_PREFIX>__<n>
+            return has_prefix(name, TEMPORARY_VARIABLE_PREFIX) and std::isdigit(remove_prefix(name).front());
+        }
+
+        string get_assigned_node_name(const string& variable_name)
+        {
+            // assigned node name format: <TEMPORARY_VARIABLE_PREFIX>__<variable_name>__<n>
+            return with_prefix(TEMPORARY_VARIABLE_PREFIX, variable_name + "__1");
+        }
+    }
+
     NodeValue::NodeValue(mx::NodePtr node) : Value{Type::of(node)}, node_{std::move(node)}
     {
         assert(not node_->isMultiOutputType());
@@ -35,12 +50,12 @@ namespace mxslc::serialize::values
     void NodeValue::set_assigned_node_name(const string& variable_name) const
     {
         // renaming a node does not update the ports that connect to it, so only nodes without connections are renamed
-        if (is_node_name_set_ or not is_temporary_node_name(node_->getName()) or not node_->getDownstreamPorts().empty())
+        if (is_node_name_set_ or not is_temporary_name(node_->getName()) or not node_->getDownstreamPorts().empty())
             return;
         is_node_name_set_ = true;
 
         node_->setName(
-            node_->getParent()->createValidChildName(assigned_node_name(variable_name))
+            node_->getParent()->createValidChildName(get_assigned_node_name(variable_name))
         );
     }
 

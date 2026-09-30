@@ -8,6 +8,7 @@
 #include "TokenType.h"
 #include "serialize/serialize_name_utils.h"
 #include "utils/container_utils.h"
+#include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 
 namespace mxslc::decompile_utils
@@ -17,8 +18,7 @@ namespace mxslc::decompile_utils
 
     namespace
     {
-        // attributes that are expressed by the decompiled code itself or that have no meaning in ShadingLanguageX
-        const unordered_set<string>& structural_attributes()
+        const unordered_set<string>& get_structural_attributes()
         {
             static const unordered_set<string> attributes {
                 mx::Element::NAME_ATTRIBUTE,
@@ -28,10 +28,8 @@ namespace mxslc::decompile_utils
                 mx::PortElement::NODE_NAME_ATTRIBUTE,
                 mx::PortElement::NODE_GRAPH_ATTRIBUTE,
                 mx::PortElement::OUTPUT_ATTRIBUTE,
-                "channels",
                 mx::NodeDef::NODE_ATTRIBUTE,
                 mx::Input::DEFAULT_GEOM_PROP_ATTRIBUTE,
-                // layout
                 mx::Element::XPOS_ATTRIBUTE,
                 mx::Element::YPOS_ATTRIBUTE,
                 mx::Backdrop::WIDTH_ATTRIBUTE,
@@ -51,7 +49,7 @@ namespace mxslc::decompile_utils
         };
 
         // the MaterialX types that can be used in ShadingLanguageX
-        const unordered_map<string, TypeInfo>& types()
+        const unordered_map<string, TypeInfo>& get_type_infos()
         {
             static const unordered_map<string, TypeInfo> types {
                 {"boolean", {"bool", true, ""}},
@@ -78,80 +76,47 @@ namespace mxslc::decompile_utils
             return types;
         }
 
-        const unordered_set<string>& reserved_words()
+        const unordered_set<string>& get_reserved_words()
         {
             // identifiers that are not keywords, but still have a special meaning
             static const unordered_set<string> words {"true", "false", "T", "auto", "void"};
             return words;
         }
-
-        // the components of a numeric value, e.g., {1, 2, 3} for "1, 2, 3", empty if the value is not numeric
-        vector<float> components(const mx::ValuePtr& value)
-        {
-            vector<float> result;
-            for (const string& component : mx::splitString(value->getValueString(), ","))
-            {
-                const string trimmed = mx::trimSpaces(component);
-                char* end = nullptr;
-                const float f = std::strtof(trimmed.c_str(), &end);
-                if (trimmed.empty() or end != trimmed.c_str() + trimmed.size())
-                    return {};
-                result.push_back(f);
-            }
-            return result;
-        }
     }
 
-    string type_alias(const string& type_name)
+    string get_type_alias(const string& type_name)
     {
-        if (contains(types(), type_name))
-            return types().at(type_name).alias;
+        if (contains(get_type_infos(), type_name))
+            return get_type_infos().at(type_name).alias;
         return type_name;
+    }
+
+    string get_type_alias(const mx::TypedElementPtr& elem)
+    {
+        return get_type_alias(elem->getType());
     }
 
     bool is_type_name(const string& name)
     {
-        return contains(types(), name);
+        return contains(get_type_infos(), name);
     }
 
     bool has_literal_syntax(const string& type_name)
     {
-        return contains(types(), type_name) and types().at(type_name).has_literal_syntax;
+        return contains(get_type_infos(), type_name) and get_type_infos().at(type_name).has_literal_syntax;
     }
 
-    string swizzle_channels(const string& type_name)
+    string get_swizzle_channels(const string& type_name)
     {
-        if (contains(types(), type_name))
-            return types().at(type_name).channels;
+        if (contains(get_type_infos(), type_name))
+            return get_type_infos().at(type_name).channels;
         return "";
     }
 
     bool is_color_type(const string& type_name)
     {
-        const string channels = swizzle_channels(type_name);
+        const string channels = get_swizzle_channels(type_name);
         return not channels.empty() and channels.front() == 'r';
-    }
-
-    bool is_temporary_name(const string& name)
-    {
-        return starts_with(name, "var__");
-    }
-
-    optional<string> assigned_variable(const string& node_name)
-    {
-        if (not is_temporary_name(node_name))
-            return std::nullopt;
-
-        // e.g., x__2 of var__x__2, variables can also contain double underscores, e.g., var__ray__origin__2
-        const string rest = serialize::remove_prefix(node_name);
-        const size_t split = rest.rfind("__");
-        if (split == string::npos or split == 0)
-            return std::nullopt;
-
-        const string number = rest.substr(split + 2);
-        if (number.empty() or not std::all_of(number.begin(), number.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); }))
-            return std::nullopt;
-        return rest.substr(0, split);
     }
 
     bool is_valid_identifier(const string& name)
@@ -165,10 +130,10 @@ namespace mxslc::decompile_utils
                 return false;
         }
 
-        return not TokenType{name}.is_keyword() and not contains(reserved_words(), name);
+        return not TokenType{name}.is_keyword() and not contains(get_reserved_words(), name);
     }
 
-    string to_identifier(const string& name)
+    string make_identifier(const string& name)
     {
         string result;
         for (const char c : name)
@@ -183,13 +148,13 @@ namespace mxslc::decompile_utils
         return result;
     }
 
-    vector<string> user_attributes(const mx::ElementPtr& element, const string& child_name)
+    vector<string> get_user_attributes(const mx::ElementPtr& element, const string& child_name)
     {
         vector<string> result;
         for (const string& attr_name : element->getAttributeNames())
         {
             // ignore namespaced attributes, e.g., xmlns:xi
-            if (contains(structural_attributes(), attr_name) or attr_name.find(':') != string::npos)
+            if (contains(get_structural_attributes(), attr_name) or attr_name.find(':') != string::npos)
                 continue;
             if (attr_name == mx::InterfaceElement::NODE_DEF_ATTRIBUTE and element->isA<mx::NodeGraph>())
                 continue;
@@ -200,47 +165,116 @@ namespace mxslc::decompile_utils
         return result;
     }
 
-    optional<Code> literal(const mx::ValuePtr& value)
+    optional<ExpressionCode> format_value(const mx::ValuePtr& value)
     {
         if (value == nullptr)
             return std::nullopt;
 
         // zero vectors and colors are written as their default value, e.g., `vec3{}`, and those whose components are all
         // the same as that component, e.g., `color3{1.0}`
-        if (not swizzle_channels(value->getTypeString()).empty())
+        if (not get_swizzle_channels(value->getTypeString()).empty())
         {
-            const vector<float> values = components(value);
+            const vector<float> values = get_float_components(value);
             const bool is_uniform = not values.empty() and std::all_of(values.begin(), values.end(), [&](const float f) { return f == values.front(); });
             if (is_uniform)
             {
-                const string type = type_alias(value->getTypeString());
+                const string type = get_type_alias(value->getTypeString());
                 if (values.front() == 0.0f)
-                    return decompile::code::construct(type, {});
-                return decompile::code::construct(type, {decompile::code::literal(Primitive{values.front()}.to_string())});
+                    return decompile::format_constructor(type, {});
+                return decompile::format_constructor(type, {decompile::format_literal(Primitive{values.front()}.to_string())});
             }
         }
 
         // matrices have no literal syntax, but the identity matrix is their default value
         const string& type = value->getTypeString();
         if ((type == "matrix33" and value->asA<mx::Matrix33>() == mx::Matrix33::IDENTITY) or (type == "matrix44" and value->asA<mx::Matrix44>() == mx::Matrix44::IDENTITY))
-            return Code{"default(" + type_alias(type) + ")"};
+            return ExpressionCode{"default(" + get_type_alias(type) + ")"};
 
         const Primitive primitive{value};
         if (primitive.is_null())
             return std::nullopt;
-        return decompile::code::literal(primitive.to_string());
+        return decompile::format_literal(primitive.to_string());
     }
 
-    optional<Code> literal(const mx::ValueElementPtr& element)
+    optional<ExpressionCode> format_value(const mx::ValueElementPtr& element)
     {
         // the defaults of types without literal syntax, e.g., shaders, and of filenames, which would otherwise be strings
         const string& type = element->getType();
         if ((not has_literal_syntax(type) or type == "filename") and element->getValueString().empty())
-            return Code{"default(" + type_alias(type) + ")"};
-        return literal(element->getValue());
+            return ExpressionCode{"default(" + get_type_alias(type) + ")"};
+        return format_value(element->getValue());
     }
 
-    bool is_zero(const mx::ValuePtr& value)
+    bool is_index(const string& field_name)
+    {
+        return not field_name.empty() and std::all_of(field_name.begin(), field_name.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); });
+    }
+
+    bool is_separate(const mx::NodePtr& node)
+    {
+        const string& category = node->getCategory();
+        return category == "separate2" or category == "separate3" or category == "separate4";
+    }
+
+    bool is_combine(const mx::NodePtr& node)
+    {
+        const string& category = node->getCategory();
+        return category == "combine2" or category == "combine3" or category == "combine4";
+    }
+
+    size_t get_channel_count(const mx::NodePtr& node)
+    {
+        if (is_separate(node) or is_combine(node))
+            return static_cast<size_t>(node->getCategory().back() - '0');
+        return 0;
+    }
+
+    optional<char> get_separate_channel(const string& output_name)
+    {
+        if (output_name.size() == 4 and string_utils::starts_with(output_name, "out") and string{"xyzwrgba"}.find(output_name[3]) != string::npos)
+            return output_name[3];
+        return std::nullopt;
+    }
+
+    bool is_connected(const mx::InputPtr& input)
+    {
+        return input and (not input->getNodeName().empty() or not input->getNodeGraphString().empty() or not input->getInterfaceName().empty());
+    }
+
+    bool has_bool_value(const mx::InputPtr& input, const bool expected)
+    {
+        if (input == nullptr or is_connected(input) or not input->hasValue())
+            return false;
+        const mx::ValuePtr value = input->getValue();
+        return value and value->isA<bool>() and value->asA<bool>() == expected;
+    }
+
+    optional<int> get_int_value(const mx::InputPtr& input)
+    {
+        if (input == nullptr or is_connected(input) or not input->hasValue())
+            return std::nullopt;
+        const mx::ValuePtr value = input->getValue();
+        if (value and value->isA<int>())
+            return value->asA<int>();
+        return std::nullopt;
+    }
+
+    vector<float> get_float_components(const mx::ValuePtr& value)
+    {
+        vector<float> result;
+        for (const string& component : mx::splitString(value->getValueString(), ","))
+        {
+            const string trimmed = mx::trimSpaces(component);
+            char* end = nullptr;
+            const float f = std::strtof(trimmed.c_str(), &end);
+            if (trimmed.empty() or end != trimmed.c_str() + trimmed.size())
+                return {};
+            result.push_back(f);
+        }
+        return result;
+    }
+
+    bool is_zero_value(const mx::ValuePtr& value)
     {
         if (value == nullptr)
             return false;
@@ -250,29 +284,39 @@ namespace mxslc::decompile_utils
             return value->asA<string>().empty();
 
         // numeric values, e.g., "0" or "0, 0, 0"
-        const vector<float> values = components(value);
+        const vector<float> values = get_float_components(value);
         return not values.empty() and std::all_of(values.begin(), values.end(), [](const float f) { return f == 0.0f; });
     }
 
     bool is_zero_value(const mx::ValueElementPtr& element)
     {
-        return is_zero(element->getValue());
+        return is_zero_value(element->getValue());
     }
 
-    optional<char> swizzle_channel(const string& output_name)
+    optional<string> get_assigned_variable_name(const string& node_name)
     {
-        if (output_name.size() == 4 and starts_with(output_name, "out") and string{"xyzwrgba"}.find(output_name[3]) != string::npos)
-            return output_name[3];
-        return std::nullopt;
+        if (not has_prefix(node_name, TEMPORARY_VARIABLE_PREFIX))
+            return std::nullopt;
+
+        // e.g., x__2 of var__x__2, variables can also contain double underscores, e.g., var__ray__origin__2
+        const string rest = remove_prefix(node_name);
+        const size_t split = rest.rfind("__");
+        if (split == string::npos or split == 0)
+            return std::nullopt;
+
+        const string number = rest.substr(split + 2);
+        if (number.empty() or not std::all_of(number.begin(), number.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); }))
+            return std::nullopt;
+        return rest.substr(0, split);
     }
 
-    bool is_index(const string& field_name)
+    bool is_generated_node_name(const string& name)
     {
-        return not field_name.empty() and std::all_of(field_name.begin(), field_name.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); });
+        return has_prefix(name, TEMPORARY_VARIABLE_PREFIX);
     }
 
-    bool is_connected(const mx::InputPtr& input)
+    bool is_return_output(const mx::OutputPtr& output)
     {
-        return input and (not input->getNodeName().empty() or not input->getNodeGraphString().empty() or not input->getInterfaceName().empty());
+        return not has_prefix(output, OUT_PARAMETER_PREFIX) and not has_prefix(output, NONLOCAL_OUT_PREFIX);
     }
 }

@@ -35,7 +35,7 @@ namespace mxslc::string_utils
             str.replace(i, old_str.length(), new_str);
     }
 
-    string float_to_string(const float value)
+    string format_float(const float value)
     {
         // shortest representation that reads back as the same float, always recognisable as a float literal
         const float magnitude = std::fabs(value);

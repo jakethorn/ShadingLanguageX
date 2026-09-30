@@ -22,6 +22,7 @@
 namespace mxslc
 {
     using container_utils::contains;
+    using string_utils::starts_with;
 
     namespace
     {
@@ -177,6 +178,16 @@ namespace mxslc
         add_library_to_scope(doc);
     }
 
+    namespace
+    {
+        string get_latest_version(const string& version)
+        {
+            if (version == "1.38") return "1.38.10";
+            if (version == "1.39") return "1.39.5";
+            return version;
+        }
+    }
+
     mx::DocumentPtr load_materialx_library(const string& version, const vector<fs::path>& include_dirs)
     {
         const mx::DocumentPtr doc = mx::createDocument();
@@ -186,6 +197,8 @@ namespace mxslc
 
     void load_materialx_library(const string& version, const vector<fs::path>& include_dirs, const mx::DocumentPtr& doc)
     {
+        const string latest_version = get_latest_version(version);
+
         string searched_dirs;
 
         for (const fs::path& include_dir : include_dirs)
@@ -196,13 +209,13 @@ namespace mxslc
             if (not fs::is_directory(lib_dir))
                 continue;
 
-            const mx::FilePathVec fpv{version};
+            const mx::FilePathVec fpv{latest_version};
             const mx::FileSearchPath fsp{lib_dir.string()};
             const mx::StringSet loaded = mx::loadLibraries(fpv, fsp, doc);
             if (not loaded.empty())
                 return;
         }
 
-        throw CompileError{"MaterialX version " + version + " libraries could not be found.\nSearched directories:\n" + searched_dirs};
+        throw CompileError{"MaterialX version " + latest_version + " libraries could not be found.\nSearched directories:\n" + searched_dirs};
     }
 }

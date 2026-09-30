@@ -33,6 +33,11 @@ namespace mxslc::serialize
         return string_utils::starts_with(str, prefix + "__");
     }
 
+    bool has_prefix(const mx::ElementPtr& elem, const string& prefix)
+    {
+        return has_prefix(elem->getName(), prefix);
+    }
+
     string remove_prefix(const string& str)
     {
         const size_t pos = str.find("__");
@@ -41,21 +46,25 @@ namespace mxslc::serialize
         return str;
     }
 
+    string remove_prefix(const string& str, const string& prefix)
+    {
+        if (string_utils::starts_with(str, prefix + "__"))
+            return remove_prefix(str);
+        return str;
+    }
+
+    string without_prefix(const mx::ElementPtr& elem)
+    {
+        return remove_prefix(elem->getName());
+    }
+
+    string without_prefix(const mx::ElementPtr& elem, const string& prefix)
+    {
+        return remove_prefix(elem->getName(), prefix);
+    }
+
     string get_valid_node_name(const mx::GraphElementPtr& graph)
     {
         return graph->createValidChildName(with_prefix(TEMPORARY_VARIABLE_PREFIX, "0"));
-    }
-
-    bool is_temporary_node_name(const string& name)
-    {
-        if (not has_prefix(name, TEMPORARY_VARIABLE_PREFIX))
-            return false;
-        const string number = remove_prefix(name);
-        return not number.empty() and std::all_of(number.begin(), number.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); });
-    }
-
-    string assigned_node_name(const string& variable_name)
-    {
-        return with_prefix(TEMPORARY_VARIABLE_PREFIX, variable_name + "__1");
     }
 }

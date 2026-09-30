@@ -16,7 +16,6 @@ namespace mxslc::serialize::values
 
         mx::NodePtr node() const { return node_; }
         void set_node_name(const string& name) const;
-        // e.g., var__x__1 for the value of an assignment to x, see assigned_node_name
         void set_assigned_node_name(const string& variable_name) const;
 
         bool equals(const ValuePtr& other) const override;

@@ -26,12 +26,12 @@ namespace test_utils
     {
     public:
         // returns the names of the elements that differ, empty if the documents are equivalent
-        static vector<string> differences(const mx::DocumentPtr& a, const mx::DocumentPtr& b);
+        static vector<string> find_differences(const mx::DocumentPtr& a, const mx::DocumentPtr& b);
     };
 
     namespace graph_comparator_detail
     {
-        inline string value_string(const mx::ValueElementPtr& element)
+        inline string get_value_string(const mx::ValueElementPtr& element)
         {
             // e.g., "0.0, 0.0" and "0, 0" are the same value
             const mx::ValuePtr value = element->getValue();
@@ -39,13 +39,13 @@ namespace test_utils
         }
 
         // "out" is the name of the output of single output nodes, so connecting to it by name is the same as not naming it
-        inline string output_string(const mx::PortElementPtr& port)
+        inline string get_output_string(const mx::PortElementPtr& port)
         {
             const string& output = port->getOutputString();
             return output == "out" ? "" : output;
         }
 
-        inline string attribute_string(const mx::ElementPtr& element, const vector<string>& ignored)
+        inline string get_attribute_string(const mx::ElementPtr& element, const vector<string>& ignored)
         {
             vector<string> attrs;
             for (const string& name : element->getAttributeNames())
@@ -77,19 +77,19 @@ namespace test_utils
                 {
                     string desc = input->getName() + ":" + input->getType() + "=";
                     if (not input->getNodeName().empty())
-                        desc += "node(" + signature(input->getNodeName()) + ")." + output_string(input);
+                        desc += "node(" + signature(input->getNodeName()) + ")." + get_output_string(input);
                     else if (not input->getNodeGraphString().empty())
-                        desc += "nodegraph(" + input->getNodeGraphString() + ")." + output_string(input);
+                        desc += "nodegraph(" + input->getNodeGraphString() + ")." + get_output_string(input);
                     else if (not input->getInterfaceName().empty())
                         desc += "interface(" + input->getInterfaceName() + ")";
                     else
-                        desc += "value(" + value_string(input) + ")";
-                    desc += "[" + attribute_string(input, {"name", "type", "value", "nodename", "nodegraph", "output", "interfacename"}) + "]";
+                        desc += "value(" + get_value_string(input) + ")";
+                    desc += "[" + get_attribute_string(input, {"name", "type", "value", "nodename", "nodegraph", "output", "interfacename"}) + "]";
                     inputs.push_back(desc);
                 }
                 std::sort(inputs.begin(), inputs.end());
 
-                string desc = node->getCategory() + ":" + node->getType() + "[" + attribute_string(node, {"name", "type"}) + "](";
+                string desc = node->getCategory() + ":" + node->getType() + "[" + get_attribute_string(node, {"name", "type"}) + "](";
                 for (const string& input : inputs)
                     desc += input + ",";
                 desc += ")";
@@ -105,12 +105,12 @@ namespace test_utils
                 parts.push_back("node " + signature(node->getName()));
             for (const mx::OutputPtr& output : graph->getOutputs())
             {
-                const string source = output->getNodeName().empty() ? "interface(" + output->getInterfaceName() + ")" + value_string(output) : signature(output->getNodeName()) + "." + output_string(output);
+                const string source = output->getNodeName().empty() ? "interface(" + output->getInterfaceName() + ")" + get_value_string(output) : signature(output->getNodeName()) + "." + get_output_string(output);
                 parts.push_back("output " + output->getName() + ":" + output->getType() + "=" + source);
             }
             for (const mx::InputPtr& input : graph->getInputs())
             {
-                const string source = input->getNodeName().empty() ? value_string(input) : "node(" + input->getNodeName() + ")";
+                const string source = input->getNodeName().empty() ? get_value_string(input) : "node(" + input->getNodeName() + ")";
                 parts.push_back("input " + input->getName() + ":" + input->getType() + "=" + source);
             }
             std::sort(parts.begin(), parts.end());
@@ -124,13 +124,13 @@ namespace test_utils
         inline string describe_node_def(const mx::NodeDefPtr& node_def)
         {
             // the order of inputs is the order of the parameters, but the position of outputs does not matter
-            string result = attribute_string(node_def, {"name"}) + "\n";
+            string result = get_attribute_string(node_def, {"name"}) + "\n";
             for (const mx::InputPtr& input : node_def->getInputs())
-                result += "input " + input->getName() + ":" + input->getType() + "=" + value_string(input) + "[" + attribute_string(input, {"name", "type", "value"}) + "]\n";
+                result += "input " + input->getName() + ":" + input->getType() + "=" + get_value_string(input) + "[" + get_attribute_string(input, {"name", "type", "value"}) + "]\n";
 
             vector<string> outputs;
             for (const mx::OutputPtr& output : node_def->getOutputs())
-                outputs.push_back("output " + output->getName() + ":" + output->getType() + "[" + attribute_string(output, {"name", "type"}) + "]");
+                outputs.push_back("output " + output->getName() + ":" + output->getType() + "[" + get_attribute_string(output, {"name", "type"}) + "]");
             std::sort(outputs.begin(), outputs.end());
             for (const string& output : outputs)
                 result += output + "\n";
@@ -141,20 +141,20 @@ namespace test_utils
         inline std::map<string, string> describe(const mx::DocumentPtr& doc)
         {
             std::map<string, string> result;
-            result["document attributes"] = attribute_string(doc, {});
+            result["document attributes"] = get_attribute_string(doc, {});
             result["document nodes"] = describe_graph(doc);
             for (const mx::ElementPtr& element : doc->getChildren())
             {
                 if (const mx::NodeDefPtr node_def = element->asA<mx::NodeDef>())
                     result["nodedef " + node_def->getName()] = describe_node_def(node_def);
                 else if (const mx::NodeGraphPtr node_graph = element->asA<mx::NodeGraph>())
-                    result["nodegraph " + node_graph->getName()] = attribute_string(node_graph, {"name"}) + "\n" + describe_graph(node_graph);
+                    result["nodegraph " + node_graph->getName()] = get_attribute_string(node_graph, {"name"}) + "\n" + describe_graph(node_graph);
             }
             return result;
         }
     }
 
-    inline vector<string> GraphComparator::differences(const mx::DocumentPtr& a, const mx::DocumentPtr& b)
+    inline vector<string> GraphComparator::find_differences(const mx::DocumentPtr& a, const mx::DocumentPtr& b)
     {
         using namespace graph_comparator_detail;
         const std::map<string, string> desc_a = describe(a);

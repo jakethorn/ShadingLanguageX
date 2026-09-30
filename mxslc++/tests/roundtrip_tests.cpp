@@ -28,7 +28,7 @@ namespace
 {
     const string DECOMPILED_EXTENSION = ".decompiled.mxsl";
 
-    fs::path decompiled_path(const fs::path& original_path)
+    fs::path get_decompiled_path(const fs::path& original_path)
     {
         return fs::path{original_path}.replace_extension(DECOMPILED_EXTENSION);
     }
@@ -39,7 +39,7 @@ namespace
         return name.size() >= DECOMPILED_EXTENSION.size() and name.compare(name.size() - DECOMPILED_EXTENSION.size(), DECOMPILED_EXTENSION.size(), DECOMPILED_EXTENSION) == 0;
     }
 
-    mxslc::CompileOptions roundtrip_options()
+    mxslc::CompileOptions get_roundtrip_options()
     {
         mxslc::CompileOptions opts;
         opts.reduce_graph = false;
@@ -48,7 +48,7 @@ namespace
 
     string decompile(const string& code)
     {
-        return mxslc::decompile_to_string(mxslc::compile_to_document(code, roundtrip_options()));
+        return mxslc::decompile_to_string(mxslc::compile_to_document(code, get_roundtrip_options()));
     }
 }
 
@@ -58,11 +58,11 @@ TEST_P(roundtrip_tests, decompiled_code_matches_expected)
     const string actual_output = decompile(read_file(original_path));
 
     if constexpr (overwrite_data_files())
-        write_file(decompiled_path(original_path), actual_output);
+        write_file(get_decompiled_path(original_path), actual_output);
 
     // whitespace and comments do not have to be the same
-    const string expected_output = read_file(decompiled_path(original_path));
-    const bool passed = code_tokens(actual_output) == code_tokens(expected_output);
+    const string expected_output = read_file(get_decompiled_path(original_path));
+    const bool passed = get_code_tokens(actual_output) == get_code_tokens(expected_output);
     EXPECT_TRUE(passed);
     if (not passed)
         print_debug_info(original_path, actual_output, expected_output);
@@ -72,11 +72,11 @@ TEST_P(roundtrip_tests, decompiled_code_compiles_to_the_same_graph)
 {
     const fs::path& original_path = GetParam();
 
-    const mx::DocumentPtr original = mxslc::compile_to_document(read_file(original_path), roundtrip_options());
-    const string decompiled = read_file(decompiled_path(original_path));
-    const mx::DocumentPtr recompiled = mxslc::compile_to_document(decompiled, roundtrip_options());
+    const mx::DocumentPtr original = mxslc::compile_to_document(read_file(original_path), get_roundtrip_options());
+    const string decompiled = read_file(get_decompiled_path(original_path));
+    const mx::DocumentPtr recompiled = mxslc::compile_to_document(decompiled, get_roundtrip_options());
 
-    const vector<string> differences = GraphComparator::differences(original, recompiled);
+    const vector<string> differences = GraphComparator::find_differences(original, recompiled);
     EXPECT_TRUE(differences.empty()) << "different elements: " << testing::PrintToString(differences) << "\n" << decompiled;
 }
 
@@ -84,13 +84,13 @@ TEST_P(roundtrip_tests, decompiling_decompiled_code_gives_the_same_code)
 {
     // the decompiled code is already in the form that the decompiler creates
     const fs::path& original_path = GetParam();
-    const string decompiled = read_file(decompiled_path(original_path));
+    const string decompiled = read_file(get_decompiled_path(original_path));
     const string redecompiled = decompile(decompiled);
 
-    const bool passed = code_tokens(redecompiled) == code_tokens(decompiled);
+    const bool passed = get_code_tokens(redecompiled) == get_code_tokens(decompiled);
     EXPECT_TRUE(passed);
     if (not passed)
-        print_debug_info(decompiled_path(original_path), redecompiled, decompiled);
+        print_debug_info(get_decompiled_path(original_path), redecompiled, decompiled);
 }
 
 vector<fs::path> get_roundtrip_files()

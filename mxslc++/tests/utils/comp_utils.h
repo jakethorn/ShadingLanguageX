@@ -30,7 +30,7 @@ inline string trim(const string& s)
 }
 
 // the tokens of the code without whitespace and comments, so that code can be compared regardless of its formatting
-inline vector<string> code_tokens(const string& code)
+inline vector<string> get_code_tokens(const string& code)
 {
     vector<string> lexemes;
     for (const mxslc::Token& token : mxslc::scan_string(code))

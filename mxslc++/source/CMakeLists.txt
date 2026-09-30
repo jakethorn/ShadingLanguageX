@@ -10,10 +10,9 @@ add_library(mxslc_lib
         CompileOptions.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
-        decompile/Code.cpp
+        decompile/SourceCode.cpp
         decompile/decompile.cpp
         decompile/Decompiler.cpp
-        decompile/DocumentDecompiler.cpp
         decompile/GraphDecompiler.cpp
         decompile/decompile_utils.cpp
         runtime/Runtime.cpp

@@ -52,7 +52,7 @@ TEST_P(decompiler_tests, decompiler_output_compiles_to_equivalent_graph)
     const string decompiled = mxslc::decompile_to_string(input_path);
     const mx::DocumentPtr recompiled = mxslc::compile_to_document(decompiled, opts);
 
-    const vector<string> differences = GraphComparator::differences(original, recompiled);
+    const vector<string> differences = GraphComparator::find_differences(original, recompiled);
     EXPECT_TRUE(differences.empty()) << "different elements: " << testing::PrintToString(differences) << "\n" << decompiled;
 }
 

@@ -4,6 +4,8 @@
 
 #include "utils/mtlx_utils.h"
 
+#include <algorithm>
+
 #include <MaterialXFormat/XmlIo.h>
 
 #include "runtime/Type.h"
@@ -100,6 +102,16 @@ namespace mxslc::mtlx_utils
         );
 
         return get_node_def(node_graph, mtlx_lib);
+    }
+
+    mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def)
+    {
+        for (const mx::NodeGraphPtr& node_graph : node_def->getDocument()->getNodeGraphs())
+        {
+            if (node_graph->getNodeDef() == node_def)
+                return node_graph;
+        }
+        return nullptr;
     }
 
     void set_interface(const mx::PortElementPtr& port, const string& interface_name)
