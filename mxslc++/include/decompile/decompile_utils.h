@@ -41,6 +41,9 @@ namespace mxslc::decompile_utils
 
     // the fields of structs without names are indexed, e.g., the 0 of out__0
     bool is_index(const string& field_name);
+    // the return type of a function with these outputs, e.g., `float`, `{float a, vec2 b}` or `{float, vec2}` if its
+    // fields have no names
+    string get_return_type(const vector<mx::OutputPtr>& outputs);
 
     // e.g., separate3
     bool is_separate(const mx::NodePtr& node);

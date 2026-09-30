@@ -198,9 +198,9 @@ namespace mxslc::decompile_utils
 
     optional<ExpressionCode> format_value(const mx::ValueElementPtr& element)
     {
-        // the defaults of types without literal syntax, e.g., shaders, and of filenames, which would otherwise be strings
+        // the defaults of types without literal syntax, e.g., shaders
         const string& type = element->getType();
-        if ((not has_literal_syntax(type) or type == "filename") and element->getValueString().empty())
+        if (not has_literal_syntax(type) and element->getValueString().empty())
             return ExpressionCode{"default(" + get_type_alias(type) + ")"};
         return format_value(element->getValue());
     }
@@ -208,6 +208,24 @@ namespace mxslc::decompile_utils
     bool is_index(const string& field_name)
     {
         return not field_name.empty() and std::all_of(field_name.begin(), field_name.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); });
+    }
+
+    string get_return_type(const vector<mx::OutputPtr>& outputs)
+    {
+        if (outputs.empty())
+            return "void";
+        if (outputs.size() == 1)
+            return get_type_alias(outputs.front());
+
+        string fields;
+        for (const mx::OutputPtr& output : outputs)
+        {
+            const string field_name = without_prefix(output, RETURN_VALUE_PREFIX);
+            fields += (fields.empty() ? "" : ", ") + get_type_alias(output);
+            if (not is_index(field_name))
+                fields += " " + make_identifier(field_name);
+        }
+        return "{" + fields + "}";
     }
 
     bool is_separate(const mx::NodePtr& node)

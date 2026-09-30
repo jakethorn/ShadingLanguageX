@@ -869,22 +869,9 @@ namespace mxslc::decompile
 
     string GraphDecompiler::get_variable_type(const mx::NodePtr& node) const
     {
-        const vector<mx::OutputPtr> outputs = get_return_outputs(node);
-
         if (node->getType() != mx::MULTI_OUTPUT_TYPE_STRING)
             return get_type_alias(node->getType());
-        if (outputs.size() == 1)
-            return get_type_alias(outputs.front()->getType());
-
-        string fields;
-        for (const mx::OutputPtr& output : outputs)
-        {
-            const string field_name = without_prefix(output, RETURN_VALUE_PREFIX);
-            fields += (fields.empty() ? "" : ", ") + get_type_alias(output->getType());
-            if (not is_index(field_name))
-                fields += " " + make_identifier(field_name);
-        }
-        return "{" + fields + "}";
+        return get_return_type(get_return_outputs(node));
     }
 
     vector<mx::OutputPtr> GraphDecompiler::get_return_outputs(const mx::NodePtr& node) const
@@ -1155,8 +1142,11 @@ namespace mxslc::decompile
             bool accepts_arguments = true;
             for (const mx::InputPtr& input : node->getInputs())
             {
+                // filenames are written as string literals, which are also accepted by string parameters, e.g.,
+                // `constant<filename>("a.png")`
                 const mx::InputPtr param = overload->getActiveInput(input->getName());
-                if (param == nullptr or param->getType() != input->getType())
+                const bool is_string_literal = input->getType() == "filename" and not is_connected(input);
+                if (param == nullptr or (param->getType() != input->getType() and not (is_string_literal and param->getType() == "string")))
                     accepts_arguments = false;
             }
 

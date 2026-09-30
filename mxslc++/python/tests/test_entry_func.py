@@ -90,7 +90,4 @@ def test_decompile_inline_ng_output_ref_roundtrip():
 
 def test_compile_multioutput_reference():
     result = mxslc.compile_file_to_string(get_data_path("entry007.mxsl"))
-    # Remove output="outcolor" from result to match original default output
-    result = result.replace('output="outcolor" ', "")
-
     assert_matches_groundtruth(result, "entry007.mtlx")

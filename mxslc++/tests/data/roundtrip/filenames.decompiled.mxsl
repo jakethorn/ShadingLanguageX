@@ -1,0 +1,20 @@
+[[nodedef]]
+filename get_default_path()
+{
+    return "";
+}
+
+[[nodedef]]
+float get_file_weight(filename path = "textures/weight.png")
+{
+    return 1.0;
+}
+
+string empty_text = constant("");
+constant<filename>("");
+constant<filename>("textures/albedo.png");
+filename empty_path = constant("");
+color3 albedo = image("");
+color3 detail = image("textures/detail.png");
+color3 fallback = image(get_default_path());
+float weight = get_file_weight() + get_file_weight("");

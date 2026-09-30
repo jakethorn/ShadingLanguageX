@@ -11,7 +11,9 @@ MTLX_IMAGE_WITH_METADATA = """<?xml version="1.0"?>
 
 IMAGE_WITH_METADATA_EXPECTED = (
     '@doc "an image of a sphere"\n'
-    'color3 out = image(@colorspace "srgb_texture" @unit "foot" @unittype "distance" file = "textures/albedo.tif");\n'
+    'color3 out_ = image(\n'
+    '    @colorspace "srgb_texture" @unit "foot" @unittype "distance" "textures/albedo.tif"\n'
+    ');\n'
 )
 
 def test_emit_node_input_metadata():
@@ -29,7 +31,7 @@ MTLX_STRUCTURAL_ATTRIBUTES = """<?xml version="1.0"?>
 
 def test_structural_attributes():
     result = mxslc.decompile_string_to_string(MTLX_STRUCTURAL_ATTRIBUTES)
-    assert result == 'color3 out = image(file = "textures/albedo.tif");\n', f"Got:\n{result!r}"
+    assert result == 'color3 out_ = image("textures/albedo.tif");\n', f"Got:\n{result!r}"
 
     for structural in ("@name", "@type", "@value", "@nodename", "@xpos", "@ypos", "@width", "@height"):
         assert structural not in result, f"Structural attribute {structural!r} should not be emitted"

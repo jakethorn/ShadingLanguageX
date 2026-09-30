@@ -5,12 +5,12 @@ import pytest
 STRING_CONSTANT_MTLX = """<?xml version="1.0"?>
 <materialx version="1.39">
   <constant name="out" type="string">
-    <input name="in" type="string" value="hello world" />
+    <input name="value" type="string" value="hello world" />
   </constant>
 </materialx>
 """
 
-STRING_CONSTANT_EXPECTED = 'string out = constant(in = "hello world");\n'
+STRING_CONSTANT_EXPECTED = 'string out_ = constant("hello world");\n'
 
 FILENAME_IMAGE_MTLX = """<?xml version="1.0"?>
 <materialx version="1.39">
@@ -20,17 +20,17 @@ FILENAME_IMAGE_MTLX = """<?xml version="1.0"?>
 </materialx>
 """
 
-FILENAME_IMAGE_EXPECTED = 'color3 out = image(file = "textures/albedo.tif");\n'
+FILENAME_IMAGE_EXPECTED = 'color3 out_ = image("textures/albedo.tif");\n'
 
 EMPTY_STRING_MTLX = """<?xml version="1.0"?>
 <materialx version="1.39">
   <constant name="out" type="string">
-    <input name="in" type="string" value="" />
+    <input name="value" type="string" value="" />
   </constant>
 </materialx>
 """
 
-EMPTY_STRING_EXPECTED = 'string out = constant(in = "");\n'
+EMPTY_STRING_EXPECTED = 'string out_ = constant("");\n'
 
 def test_decompile_string_constant():
     """Decompiling a string constant should preserve quotes around string values."""

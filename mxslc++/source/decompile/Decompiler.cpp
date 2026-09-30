@@ -59,26 +59,6 @@ namespace mxslc::decompile
             throw CompileError{"Cannot find element at path: " + element->getNamePath()};
         }
 
-        string get_return_type(const vector<mx::OutputPtr>& outputs)
-        {
-            if (outputs.empty())
-                return "void";
-            if (outputs.size() == 1)
-                return get_type_alias(outputs.front());
-
-            string fields;
-            for (const mx::OutputPtr& output : outputs)
-            {
-                fields += fields.empty() ? "" : ", ";
-                fields += get_type_alias(output);
-
-                string field_name = without_prefix(output, RETURN_VALUE_PREFIX);
-                if (not is_index(field_name))
-                    fields += " " + field_name;
-            }
-            return "{" + fields + "}";
-        }
-
         unordered_set<string> find_nonlocal_inputs(const mx::NodeDefPtr& node_def)
         {
             unordered_set<string> nonlocal_inputs;
