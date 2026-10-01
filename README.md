@@ -8,6 +8,12 @@
 __ShadingLanguageX__ is a high level programming language for [MaterialX](https://materialx.org/) that makes it easier to express complex shading algorithms.  
 Click [here](https://youtu.be/n0-5Tx9cS58?si=tRpTGt7ZWPGW0eh0) to see the ASWF talk from SIGGRAPH 2025.
 
+<p align="center">
+  <a href="https://raccoon.website/shadinglanguagex/"><img alt="Try online demo" height="40" src="https://img.shields.io/badge/%E2%96%B6%20Try%20online%20demo-e3b341?style=for-the-badge"></a>
+  &nbsp;
+  <a href="https://raccoon.website/shadinglanguagex/gallery/"><img alt="Online gallery" height="40" src="https://img.shields.io/badge/Online%20gallery-2b3445?style=for-the-badge"></a>
+</p>
+
 ```
 // squares.mxsl
 
