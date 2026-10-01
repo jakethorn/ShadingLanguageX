@@ -30,3 +30,6 @@ nodegraphs008
 
 # a nonlocal variable that is assigned a compile-time value between the calls of a function that reads it
 scope002
+
+# library directives cannot be decompiled
+load_lib001
