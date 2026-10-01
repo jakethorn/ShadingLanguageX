@@ -69,7 +69,13 @@ skip = "*-musllinux_* *-win32"
 
 test-requires = [
     "pytest",
-    "mcp>=2.2.0,<3",
 ]
+
+# Install the MCP SDK through the package's own [mcp] extra rather than a
+# version specifier in test-requires: on Windows cibuildwheel runs the
+# test-requires install through cmd.exe, which treats the "<" and ">" in
+# "mcp>=2.2.0,<3" as redirections. The extra's python_version marker also
+# keeps the cp39 builds in publish-wheels.yml installable.
+test-extras = ["mcp"]
 
 test-command = "python -m pytest {project}/python/tests"
