@@ -58,15 +58,16 @@ namespace mxslc::mtlx_utils
         if (node_def)
             return node_def;
 
-        const mx::NodePtr copy = mtlx_lib->addNode(node->getCategory());
+        // resolve the node def from a copy of the node in a scratch document, as the MaterialX library is shared
+        // between compiles and must not be modified
+        const mx::DocumentPtr scratch = mx::createDocument();
+        scratch->setDataLibrary(mtlx_lib);
+        const mx::NodePtr copy = scratch->addNode(node->getCategory());
         copy->copyContentFrom(node);
 
         node_def = copy->getNodeDef();
         if (node_def)
-        {
-            mtlx_lib->removeNode(copy->getName());
             return node_def;
-        }
 
         throw CompileError{"Cannot find NodeDef for " + node->getCategory()};
     }
