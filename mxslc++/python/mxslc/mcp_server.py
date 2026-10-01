@@ -2,12 +2,17 @@ from __future__ import annotations
 
 import sys
 
-from . import CompileOptions, compile_string_to_string, decompile_string_to_string
+from . import (
+    DEFAULT_MTLX_VERSION,
+    CompileOptions,
+    compile_string_to_string,
+    decompile_string_to_string,
+)
 
 
 def compile_mxsl(
     source: str,
-    version: str = "1.39.5",
+    version: str = DEFAULT_MTLX_VERSION,
     func_name: str | None = None,
     sources: dict[str, str] | None = None,
 ) -> str:
