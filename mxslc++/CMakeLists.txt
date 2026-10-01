@@ -93,7 +93,7 @@ endif()
 if(NOT BUILD_JS)
         add_executable(mxslc main.cpp)
 
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
                 target_compile_options(mxslc PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
                 target_link_options(mxslc PRIVATE -fsanitize=address,undefined)
         endif()
