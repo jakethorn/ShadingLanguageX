@@ -69,6 +69,7 @@ skip = "*-musllinux_* *-win32"
 
 test-requires = [
     "pytest",
+    "mcp>=2.2.0,<3",
 ]
 
 test-command = "python -m pytest {project}/python/tests"

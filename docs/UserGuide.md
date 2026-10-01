@@ -192,7 +192,22 @@ pip install "mxslcxx[mcp]"
 mxslcxx-mcp
 ```
 
-The server provides `compile_mxsl` and `decompile_mtlx` tools for converting source strings.
+Configure an MCP client to launch the server:
+
+```json
+{
+  "mcpServers": {
+    "shadinglanguagex": {
+      "command": "mxslcxx-mcp"
+    }
+  }
+}
+```
+
+The server provides `compile_mxsl` and `decompile_mtlx` tools. The compile tool accepts a
+MaterialX `version`, an optional entry-function `func_name`, and `sources`, a mapping of
+virtual include paths to source contents. The SDK's stdio transport redirects native
+compiler output away from the JSON-RPC stream.
 
 ## Build from Source
 
