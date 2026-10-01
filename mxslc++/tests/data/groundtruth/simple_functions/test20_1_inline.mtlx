@@ -4,8 +4,8 @@
     <output name="nonlocal_out__p__0" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <randomfloat name="var__0" type="float" />
-    <output name="nonlocal_out__p__0" type="float" nodename="var__0" />
+    <randomfloat name="var__p__0__1" type="float" />
+    <output name="nonlocal_out__p__0" type="float" nodename="var__p__0__1" />
   </nodegraph>
   <foo name="var__0" type="float" />
   <multiply name="x" type="float">

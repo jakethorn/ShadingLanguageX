@@ -1,0 +1,9 @@
+inline void polar(vec2 v, out float radius, out float angle)
+{
+    radius = magnitude(v);
+    angle = atan2(v.y, v.x);
+}
+
+vec2 uv = texcoord() * 2.0 - 1.0;
+polar(uv, float r, float a);
+color3 c = color3{r, a, 0.0};

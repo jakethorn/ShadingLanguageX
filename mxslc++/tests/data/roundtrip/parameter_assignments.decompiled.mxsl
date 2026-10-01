@@ -1,0 +1,18 @@
+[[nodedef]]
+void offset(ref float v, out float w)
+{
+    float before = v * 2.0;
+    v++;
+    w = v + before;
+}
+
+[[nodedef]]
+float doubled(float a)
+{
+    return a + a * 2.0;
+}
+
+float t = time();
+mutable float v = t;
+offset(v, float w);
+float d = doubled(w) + v;

@@ -26,30 +26,11 @@ namespace mxslc
 
     namespace
     {
-        void compile_tokens(vector<Token> tokens)
-        {
-            const vector<StmtPtr> stmts = parse(std::move(tokens));
-            for (const StmtPtr& stmt : stmts)
-                stmt->execute();
-        }
-
-        void compile_file(const fs::path& src_path)
-        {
-            vector<Token> tokens = scan_file(src_path);
-            compile_tokens(std::move(tokens));
-        }
-
-        void compile_string(const string& source)
-        {
-            vector<Token> tokens = scan_string(source);
-            compile_tokens(std::move(tokens));
-        }
-
-        void compile_mxsl_stdlib()
+        fs::path get_stdlib_path(const CompileOptions& opts)
         {
             string searched_dirs;
 
-            for (const fs::path& include_dir : Runtime::get().include_directories())
+            for (const fs::path& include_dir : opts.search_directories())
             {
                 const fs::path lib_dir = include_dir / "libraries";
                 searched_dirs += lib_dir.string() + "\n";
@@ -59,30 +40,40 @@ namespace mxslc
                 if (not fs::is_regular_file(stdlib_path))
                     continue;
 
-                compile_file(stdlib_path);
-                return;
+                return stdlib_path;
             }
 
             throw CompileError{"ShadingLanguageX standard library could not be found.\nSearched directories:\n" + searched_dirs};
         }
 
+        void parse_and_execute(vector<Token> tokens)
+        {
+            const vector<StmtPtr> stmts = parse(std::move(tokens));
+            for (const StmtPtr& stmt : stmts)
+                stmt->execute();
+        }
+
         mx::DocumentPtr compile_to_document(string source, CompileOptions opts, const optional<fs::path>& src_path)
         {
-            vector<Token> tokens = scan_string(source, src_path);
-
             opts.add_default_search_directories();
+
+            const fs::path stdlib_path = get_stdlib_path(opts);
+            vector<Token> stdlib_tokens = scan_file(stdlib_path);
+            preprocess::preprocess(stdlib_tokens, opts, stdlib_path);
+
+            vector<Token> tokens = scan_string(source, src_path);
             preprocess::preprocess(tokens, opts, src_path);
 
             Runtime& runtime = Runtime::create(opts);
             {
                 runtime.enter_scope("mxsl_stdlib");
-                compile_mxsl_stdlib();
+                parse_and_execute(std::move(stdlib_tokens));
                 {
                     if (opts.debug_mode())
                         Debugger::create(std::move(source), src_path);
 
                     runtime.enter_scope("global");
-                    compile_tokens(std::move(tokens));
+                    parse_and_execute(std::move(tokens));
                     if (opts.has_entry_function())
                         runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
                     runtime.exit_scope();

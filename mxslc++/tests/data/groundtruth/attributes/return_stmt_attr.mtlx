@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <clamp name="var__0" type="float" dogsdont="wearhats" />
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+</materialx>

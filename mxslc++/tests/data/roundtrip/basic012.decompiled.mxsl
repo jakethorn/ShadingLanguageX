@@ -1,0 +1,10 @@
+float x__0 = 3.0;
+vec2 y = vec2{};
+
+[[nodedef]]
+float foo()
+{
+    return x__0 + y.y;
+}
+
+constant(foo());

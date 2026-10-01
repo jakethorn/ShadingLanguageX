@@ -25,6 +25,8 @@ namespace mxslc::mtlx_utils
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib);
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const string& mtlx_version = DEFAULT_MTLX_VERSION, const vector<fs::path>& include_dirs = {});
 
+    mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def);
+
     void set_interface(const mx::PortElementPtr& port, const string& interface_name);
     void remove_port(const mx::PortElementPtr& port);
     void validate(const mx::DocumentPtr& doc);

@@ -1,0 +1,2 @@
+float xyz__0 = randomfloat();
+float z = xyz__0 * 1.0 * xyz__0;

@@ -1,0 +1,3 @@
+vec2 a;
+float b = separate2(a).outx;
+constant(b);

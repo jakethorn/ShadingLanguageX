@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <constant name="node1" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+    <output name="out" type="float" nodename="node1" />
+  </nodegraph>
+  <nodedef name="ND_my_clamp" node="my_clamp">
+    <output name="out" type="float" />
+    <input name="x" type="float" />
+    <input name="min" type="float" value="2" />
+    <input name="max" type="float" value="3" />
+  </nodedef>
+  <foo name="var__0" type="float" />
+  <nodegraph name="NG_my_clamp" nodedef="ND_my_clamp">
+    <max name="var__0" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" interfacename="min" />
+    </max>
+    <min name="var__1" type="float">
+      <input name="in1" type="float" nodename="var__0" />
+      <input name="in2" type="float" interfacename="max" />
+    </min>
+    <output name="out" type="float" nodename="var__1" />
+  </nodegraph>
+  <foo name="var__1" type="float" />
+  <my_clamp name="b1" type="float">
+    <input name="x" type="float" nodename="var__1" />
+  </my_clamp>
+  <foo name="var__2" type="float" />
+  <my_clamp name="b2" type="float">
+    <input name="x" type="float" nodename="var__2" />
+    <input name="min" type="float" value="4" />
+    <input name="max" type="float" value="5" />
+  </my_clamp>
+</materialx>

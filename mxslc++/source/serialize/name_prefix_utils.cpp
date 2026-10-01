@@ -2,7 +2,7 @@
 // Created by jaket on 31/07/2026.
 //
 
-#include "serialize/serialize_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 
 #include "runtime/Type.h"
 #include "utils/string_utils.h"
@@ -31,12 +31,34 @@ namespace mxslc::serialize
         return string_utils::starts_with(str, prefix + "__");
     }
 
+    bool has_prefix(const mx::ElementPtr& elem, const string& prefix)
+    {
+        return has_prefix(elem->getName(), prefix);
+    }
+
     string remove_prefix(const string& str)
     {
         const size_t pos = str.find("__");
         if (pos != string::npos)
             return str.substr(pos + 2);
         return str;
+    }
+
+    string remove_prefix(const string& str, const string& prefix)
+    {
+        if (string_utils::starts_with(str, prefix + "__"))
+            return remove_prefix(str);
+        return str;
+    }
+
+    string without_prefix(const mx::ElementPtr& elem)
+    {
+        return remove_prefix(elem->getName());
+    }
+
+    string without_prefix(const mx::ElementPtr& elem, const string& prefix)
+    {
+        return remove_prefix(elem->getName(), prefix);
     }
 
     string get_valid_node_name(const mx::GraphElementPtr& graph)

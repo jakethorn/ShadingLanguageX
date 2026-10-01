@@ -18,13 +18,13 @@
   <constant name="var__0" type="float">
     <input name="value" type="float" nodegraph="NG_foo" />
   </constant>
-  <randomfloat name="var__1" type="float">
+  <randomfloat name="var__r__1" type="float">
     <input name="seed" type="integer" value="3" />
   </randomfloat>
-  <randomfloat name="var__2" type="float">
+  <randomfloat name="var__s__1" type="float">
     <input name="seed" type="integer" value="4" />
   </randomfloat>
-  <constant name="var__3" type="float">
+  <constant name="var__1" type="float">
     <input name="value" type="float" nodegraph="NG_foo" />
   </constant>
 </materialx>

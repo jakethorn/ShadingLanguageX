@@ -1,0 +1,10 @@
+[[nodedef]]
+int foo(int x, int y, int z)
+{
+    return x + y + z;
+}
+
+int i_1 = 0 + 1;
+int i = i_1 + 1;
+int x = foo(i_1, 17, i);
+int end = x + 10;

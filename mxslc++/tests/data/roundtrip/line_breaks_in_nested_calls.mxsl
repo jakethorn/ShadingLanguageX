@@ -1,0 +1,2 @@
+vec3 p = position();
+color3 c = mix(mix(color3{1.0, 0.0, 0.0}, color3{0.0, 1.0, 0.0}, smoothstep(0.0, 1.0, p.x)), mix(color3{0.0, 0.0, 1.0}, color3{1.0, 1.0, 0.0}, smoothstep(0.0, 1.0, p.y)), clamp(p.z, 0.0, 1.0));

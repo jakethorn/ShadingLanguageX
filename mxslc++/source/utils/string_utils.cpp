@@ -4,6 +4,10 @@
 
 #include "utils/string_utils.h"
 
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+
 #include "runtime/Type.h"
 
 namespace mxslc::string_utils
@@ -29,5 +33,28 @@ namespace mxslc::string_utils
     {
         if (const size_t i = str.rfind(old_str); i != string::npos)
             str.replace(i, old_str.length(), new_str);
+    }
+
+    string format_float(const float value)
+    {
+        const float magnitude = std::fabs(value);
+        const bool use_fixed = magnitude == 0.0f or (magnitude >= 1e-5f and magnitude < 1e16f);
+
+        char buffer[64];
+        for (int precision = 1; precision <= 40; ++precision)
+        {
+            if (use_fixed)
+                std::snprintf(buffer, sizeof(buffer), "%.*f", precision, value);
+            else
+                std::snprintf(buffer, sizeof(buffer), "%.*e", precision - 1, value);
+
+            if (std::strtof(buffer, nullptr) == value)
+                break;
+        }
+
+        string result{buffer};
+        if (not use_fixed and result.find('.') == string::npos)
+            result.insert(result.find('e'), ".0");
+        return result;
     }
 }

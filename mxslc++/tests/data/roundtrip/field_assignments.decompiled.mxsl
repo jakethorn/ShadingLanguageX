@@ -1,0 +1,5 @@
+mutable float range__lo = time();
+mutable float range__hi = time() + 1.0;
+range__lo *= 0.5;
+range__hi += range__lo * 2.0;
+float width = range__hi - range__lo + range__hi * 2.0;

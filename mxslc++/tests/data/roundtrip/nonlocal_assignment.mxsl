@@ -1,0 +1,10 @@
+mutable float total = time();
+
+void accumulate(float x)
+{
+    total = total + x;
+}
+
+accumulate(1.0);
+accumulate(2.0);
+float result = total * 2.0;

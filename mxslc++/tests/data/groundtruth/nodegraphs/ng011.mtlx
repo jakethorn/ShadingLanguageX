@@ -15,11 +15,11 @@
     <output name="nonlocal_out__x" type="float" />
   </nodedef>
   <nodegraph name="NG_foo_bar" nodedef="ND_foo_bar">
-    <add name="var__0" type="float">
+    <add name="var__x__1" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__x" />
       <input name="in2" type="float" value="1" />
     </add>
-    <output name="nonlocal_out__x" type="float" nodename="var__0" />
+    <output name="nonlocal_out__x" type="float" nodename="var__x__1" />
   </nodegraph>
   <add name="theta1" type="float">
     <input name="in1" type="float" nodegraph="NG_foo" />

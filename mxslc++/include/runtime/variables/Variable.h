@@ -32,7 +32,6 @@ namespace mxslc::runtime
         const TypePtr& type() const;
 
         const string& name() const;
-        void disable_node_naming() { can_name_nodes_ = false; }
 
         virtual bool is_assignable() const;
         virtual bool is_temporary() const;
@@ -55,6 +54,7 @@ namespace mxslc::runtime
         VarPtr copy();
         void copy(const VarPtr& other);
         bool equals(const VarPtr& other) const;
+        bool is_initialized() const { return is_initialized_; }
 
         void uninitialize();
 
@@ -78,14 +78,13 @@ namespace mxslc::runtime
     protected:
         virtual ValuePtr value_impl() const { return value_; }
         virtual void copy_value_impl(ValuePtr value) { value_ = std::move(value); }
-        virtual void set_node_name(const string& name) const;
 
     private:
         void copy_value(ValuePtr value);
         void copy_children(const vector<VarPtr>& children);
 
         void set_name(string name);
-        void set_name(const string& name, const TypePtr& parent_type, size_t index);
+        void set_name(const string& parent_name, size_t index);
 
         ModifierList mods_;
         TypePtr type_;
@@ -94,7 +93,6 @@ namespace mxslc::runtime
         ValuePtr value_;
         string name_;
         Scope* defining_scope_{nullptr};
-        bool can_name_nodes_{true};
         bool is_initialized_{false};
         bool is_external_{false};
     };

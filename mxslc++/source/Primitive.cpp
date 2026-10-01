@@ -8,6 +8,7 @@
 
 #include "common.h"
 #include "utils/primitive_utils.h"
+#include "utils/string_utils.h"
 #include "runtime/Type.h"
 
 namespace mxslc
@@ -192,60 +193,65 @@ namespace mxslc
         return cast<bool>();
     }
 
+    namespace
+    {
+        template<typename T>
+        string vector_components(const T& v)
+        {
+            string result;
+            for (size_t i = 0; i < T::numElements(); ++i)
+                result += (i > 0 ? ", " : "") + string_utils::format_float(v[i]);
+            return result;
+        }
+
+        template<typename T>
+        string matrix_rows(const T& m)
+        {
+            const string row_type = T::numColumns() == 3 ? "vec3" : "vec4";
+
+            string result;
+            for (size_t i = 0; i < T::numRows(); ++i)
+            {
+                result += i > 0 ? ", " : "";
+                result += row_type + "{";
+                for (size_t j = 0; j < T::numColumns(); ++j)
+                    result += (j > 0 ? ", " : "") + string_utils::format_float(m[i][j]);
+                result += "}";
+            }
+            return result;
+        }
+    }
+
     string Primitive::to_string() const
     {
-        return visit([](const auto& v) {
-            std::stringstream ss;
-
+        return visit([](const auto& v) -> string {
             IF_VISITED_TYPE_IS(std::monostate)
-            {
-                ss << "null";
-            }
-            else IF_VISITED_TYPE_IS(mx::Vector2)
-            {
-                ss << "vec2{" << v[0] << ", " << v[1] << "}";
-            }
-            else IF_VISITED_TYPE_IS(mx::Vector3)
-            {
-                ss << "vec3{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
-            }
-            else IF_VISITED_TYPE_IS(mx::Vector4)
-            {
-                ss << "vec4{" << v[0] << ", " << v[1] << ", " <<  v[2] << ", " << v[3] << "}";
-            }
-            else IF_VISITED_TYPE_IS(mx::Color3)
-            {
-                ss << "color3{" << v[0] << ", " << v[1] << ", " << v[2] << "}";
-            }
-            else IF_VISITED_TYPE_IS(mx::Color4)
-            {
-                ss << "Color4{" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << "}";
-            }
-            else IF_VISITED_TYPE_IS(mx::Matrix33)
-            {
-                ss << "Matrix33{"
-                    << "{" << v[0][0] << ", " << v[0][1] << ", " << v[0][2] << "}, "
-                    << "{" << v[1][0] << ", " << v[1][1] << ", " << v[1][2] << "}, "
-                    << "{" << v[2][0] << ", " << v[2][1] << ", " << v[2][2] << "}}";
-            }
-            else IF_VISITED_TYPE_IS(mx::Matrix44)
-            {
-                ss << "Matrix44{"
-                    << "{" << v[0][0] << ", " << v[0][1] << ", " << v[0][2] << ", " << v[0][3] << "}, "
-                    << "{" << v[1][0] << ", " << v[1][1] << ", " << v[1][2] << ", " << v[1][3] << "}, "
-                    << "{" << v[2][0] << ", " << v[2][1] << ", " << v[2][2] << ", " << v[2][3] << "}, "
-                    << "{" << v[3][0] << ", " << v[3][1] << ", " << v[3][2] << ", " << v[3][3] << "}}";
-            }
+                return "null";
+            else IF_VISITED_TYPE_IS(bool)
+                return v ? "true" : "false";
+            else IF_VISITED_TYPE_IS(int)
+                return std::to_string(v);
+            else IF_VISITED_TYPE_IS(float)
+                return string_utils::format_float(v);
             else IF_VISITED_TYPE_IS(string)
-            {
-                ss << "\"" << v << "\"";
-            }
-            else
-            {
-                ss << std::boolalpha << v;
-            }
-
-            return ss.str();
+                return "\"" + v + "\"";
+            else IF_VISITED_TYPE_IS(fs::path)
+                return "\"" + v.string() + "\"";
+            else IF_VISITED_TYPE_IS(mx::Vector2)
+                return "vec2{" + vector_components(v) + "}";
+            else IF_VISITED_TYPE_IS(mx::Vector3)
+                return "vec3{" + vector_components(v) + "}";
+            else IF_VISITED_TYPE_IS(mx::Vector4)
+                return "vec4{" + vector_components(v) + "}";
+            else IF_VISITED_TYPE_IS(mx::Color3)
+                return "color3{" + vector_components(v) + "}";
+            else IF_VISITED_TYPE_IS(mx::Color4)
+                return "color4{" + vector_components(v) + "}";
+            else IF_VISITED_TYPE_IS(mx::Matrix33)
+                return "creatematrix(" + matrix_rows(v) + ")";
+            else IF_VISITED_TYPE_IS(mx::Matrix44)
+                return "creatematrix(" + matrix_rows(v) + ")";
+            throw CompileError{"Unknown primitive type: " + type_utils::name_of<VISITED_TYPE>()};
         });
     }
 }

@@ -5,15 +5,13 @@
     <output name="nonlocal_out__a" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <add name="var__0" type="float">
+    <add name="var__a__1" type="float">
       <input name="in1" type="float" interfacename="b" />
       <input name="in2" type="float" value="1" />
     </add>
-    <output name="nonlocal_out__a" type="float" nodename="var__0" />
+    <output name="nonlocal_out__a" type="float" nodename="var__a__1" />
   </nodegraph>
-  <foo name="var__0" type="float">
-    <input name="b" type="float" value="1" />
-  </foo>
+  <foo name="var__0" type="float" />
   <foo name="var__1" type="float">
     <input name="b" type="float" nodename="var__0" />
   </foo>

@@ -1,0 +1,2 @@
+vec2 uv = texcoord() * 2.0 - 1.0;
+color3 c = color3{magnitude(uv), atan2(uv.y, uv.x), 0.0};

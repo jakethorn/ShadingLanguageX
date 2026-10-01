@@ -1,0 +1,14 @@
+vec3 p = position();
+float x = p.x;
+float y = p.y;
+bool above = x > y;
+bool not_below = x >= 0.5;
+bool on_edge = x == 0.0;
+bool off_edge = y != 1.0;
+bool both = above & not_below;
+bool either = above | on_edge;
+bool one = above ^ off_edge;
+bool neither = !either;
+float mask = if (above) { 1.0 } else { 0.0 };
+float band = if (x > 0.75) { 1.0 } else if (x > 0.25) { 0.5 } else { 0.0 };
+color3 tint = if (both | !off_edge) { color3{1.0, 0.0, 0.0} } else { color3{0.0, 0.0, 1.0} };

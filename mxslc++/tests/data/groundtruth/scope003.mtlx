@@ -11,16 +11,16 @@
     <output name="nonlocal_out__f" type="float" />
   </nodedef>
   <nodegraph name="NG_foo" nodedef="ND_foo">
-    <divide name="var__0" type="float">
+    <divide name="var__f__1" type="float">
       <input name="in1" type="float" value="8" />
       <input name="in2" type="float" value="9" />
     </divide>
-    <output name="nonlocal_out__f" type="float" nodename="var__0" />
-    <divide name="var__1" type="float">
+    <output name="nonlocal_out__f" type="float" nodename="var__f__1" />
+    <divide name="var__0" type="float">
       <input name="in1" type="float" interfacename="x" />
       <input name="in2" type="float" interfacename="y" />
     </divide>
-    <output name="out" type="float" nodename="var__1" />
+    <output name="out" type="float" nodename="var__0" />
   </nodegraph>
   <foo name="var__0" type="multioutput">
     <input name="x" type="float" value="1" />

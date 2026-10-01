@@ -13,17 +13,17 @@
     <input name="in1" type="float" nodename="x" />
     <input name="in2" type="float" nodename="y" />
   </add>
-  <normal name="var__0" type="vector3" />
+  <normal name="var__a__1" type="vector3" />
   <add name="w" type="float">
     <input name="in1" type="float" nodename="x" />
     <input name="in2" type="float" nodename="y" />
   </add>
   <extract name="i" type="float">
-    <input name="in" type="vector3" nodename="var__0" />
+    <input name="in" type="vector3" nodename="var__a__1" />
     <input name="index" type="integer" value="1" />
   </extract>
   <extract name="j" type="float">
-    <input name="in" type="vector3" nodename="var__0" />
+    <input name="in" type="vector3" nodename="var__a__1" />
     <input name="index" type="integer" value="1" />
   </extract>
   <add name="k" type="float">
@@ -31,6 +31,6 @@
     <input name="in2" type="float" nodename="j" />
   </add>
   <magnitude name="m" type="float">
-    <input name="in" type="vector3" nodename="var__0" />
+    <input name="in" type="vector3" nodename="var__a__1" />
   </magnitude>
 </materialx>

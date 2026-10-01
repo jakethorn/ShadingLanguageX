@@ -1,0 +1,7 @@
+float t = time();
+
+[[nodegraph]]
+float wave(float speed = t, float amplitude = 0.5)
+{
+    return sin(speed * 2.0) * amplitude;
+}

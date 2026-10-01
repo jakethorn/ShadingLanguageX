@@ -10,15 +10,15 @@
     </dot>
     <output name="out" type="float" nodename="node1" />
   </nodegraph>
-  <power name="var__0" type="float">
+  <power name="var__i__1" type="float">
     <input name="in1" type="float" value="5" />
     <input name="in2" type="float" value="2" />
   </power>
   <foo name="j" type="float">
-    <input name="i" type="float" nodename="var__0" />
+    <input name="i" type="float" nodename="var__i__1" />
   </foo>
   <multiply name="k" type="float">
-    <input name="in1" type="float" nodename="var__0" />
+    <input name="in1" type="float" nodename="var__i__1" />
     <input name="in2" type="float" nodename="j" />
   </multiply>
 </materialx>

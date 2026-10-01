@@ -37,6 +37,7 @@ namespace mxslc::runtime
 
         bool has_default_value() const { return expr_ != nullptr; }
         VarPtr evaluate() const;
+        VarPtr initial_value() const { return initial_value_; }
 
         string to_string() const override;
 
@@ -47,6 +48,8 @@ namespace mxslc::runtime
         string name_;
         ExprPtr expr_;
         size_t index_;
+
+        mutable VarPtr initial_value_;
     };
 }
 

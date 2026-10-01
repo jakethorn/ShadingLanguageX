@@ -1,0 +1,14 @@
+vec2 uv = position().xy;
+mutable float scale = 2.0;
+mutable float height = 0.0;
+
+for (int i from 0 to 3)
+{
+    float scale2 = scale * scale;
+    height += noise2d(texcoord = uv / scale2) * scale2;
+    scale *= 2.0;
+}
+
+surfaceshader s = standard_surface(base_color = color3{0.82, 0.796, 0.761}, metalness = 0.0, specular_roughness = 1.0);
+displacementshader d = displacement(height);
+material m = surfacematerial(s, displacementshader = d);

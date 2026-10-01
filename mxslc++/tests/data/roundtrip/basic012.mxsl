@@ -1,0 +1,9 @@
+{float, float} x = {3.0, 4.0};
+vec2 y;
+
+float foo()
+{
+    return x[0] + y[1];
+}
+
+constant(foo());

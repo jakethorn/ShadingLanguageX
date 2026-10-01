@@ -1,0 +1,22 @@
+@@colorspace "lin_rec709"
+
+[[nodegraph]]
+color3 marble1(@uiname "Color 1" @uifolder "Marble Color" color3 base_color_1 = color3{0.8}, @uiname "Color 2" @uifolder "Marble Color" color3 base_color_2 = color3{0.1, 0.1, 0.3}, @uisoftmin "1.0" @uisoftmax "10.0" @uiname "Scale 1" @uifolder "Marble Noise" float noise_scale_1 = 6.0, @uisoftmin "1.0" @uisoftmax "10.0" @uiname "Scale 2" @uifolder "Marble Noise" float noise_scale_2 = 4.0, @uisoftmin "1.0" @uisoftmax "10.0" @uiname "Power" @uifolder "Marble Noise" float noise_power = 3.0, @uisoftmin "1" @uisoftmax "8" @uiname "Octaves" @uifolder "Marble Noise" int noise_octaves = 3)
+{
+    vec3 obj_pos = position();
+    float add_xyz = dotproduct(obj_pos, vec3{1.0});
+    float scale_xyz = add_xyz * noise_scale_1;
+    vec3 scale_pos = obj_pos * noise_scale_2;
+    float noise = fractal3d(octaves = noise_octaves, position = scale_pos);
+    float scale_noise = noise * 3.0;
+    float sum = scale_xyz + scale_noise;
+    float sin = sin(sum);
+    float scale = sin * 0.5;
+    float bias = scale + 0.5;
+    float power = bias ^ noise_power;
+    color3 color_mix = mix(base_color_2, base_color_1, power);
+    return color_mix;
+}
+
+surfaceshader SR_marble1 = standard_surface(1.0, marble1(), specular_roughness = 0.1, subsurface = 0.4, subsurface_color = marble1());
+material Marble_3D = surfacematerial(SR_marble1);

@@ -1,0 +1,21 @@
+inline float sq(float v)
+{
+    return v * v;
+}
+
+inline vec3 remap(vec3 v, float lo, float hi)
+{
+    vec3 t = (v - lo) / (hi - lo);
+    return clamp(t, 0.0, 1.0);
+}
+
+inline float length2(vec3 v)
+{
+    return sq(v.x) + sq(v.y) + sq(v.z);
+}
+
+vec3 p = position();
+float a = sq(p.x);
+float b = sq(a + 1.0) + sq(0.5);
+vec3 r = remap(p, p.y, p.z);
+float l = length2(r);

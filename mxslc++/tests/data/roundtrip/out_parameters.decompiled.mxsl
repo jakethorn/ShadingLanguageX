@@ -1,0 +1,10 @@
+[[nodedef]]
+void sincos(float r, out float s, out float c)
+{
+    s = sin(r);
+    c = cos(r);
+}
+
+float theta = time();
+sincos(theta, float s, float c);
+vec2 dir = vec2{c, s};

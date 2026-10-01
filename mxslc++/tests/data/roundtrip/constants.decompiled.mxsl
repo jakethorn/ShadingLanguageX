@@ -1,0 +1,4 @@
+vec2 uv = texcoord();
+color3 c = if (uv.x > 0.5) { color3{1.0, 0.0, 0.0} } else { color3{uv, 0.5} };
+float theta = uv.y * 3.14159 * 2.0;
+vec2 dir = vec2{cos(theta), sin(theta)};

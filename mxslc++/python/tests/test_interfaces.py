@@ -80,9 +80,9 @@ def test_decompile_renames_reserved_keyword():
     """'out' is an MXSL keyword, should be renamed to 'out1' in decompiled output."""
     result = mxslc.decompile_string_to_string(MTLX_WITH_RESERVED_NAME)
 
-    # The type declaration should use 'out1' not 'out' for the first output
-    assert '{color3 out1, color3 my_out2, color3 my_out3}' in result, \
-        "Reserved name 'out' should be renamed to 'out1' in type declaration"
+    # The type declaration should use 'out_' not 'out' for the first output
+    assert '{color3 out_, color3 my_out2, color3 my_out3}' in result, \
+        "Reserved name 'out' should be renamed to 'out_' in type declaration"
 
 
 def test_decompile_reference_matches_renamed_output():
@@ -90,9 +90,9 @@ def test_decompile_reference_matches_renamed_output():
     result = mxslc.decompile_string_to_string(MTLX_WITH_RESERVED_NAME)
 
     # The reference should match the renamed output name
-    assert 'diffuseColor = root_graph.out1' in result, \
-        "Reference to renamed output 'out' should use 'root_graph.out1'"
-    assert 'root_graph.out' not in result.split('diffuseColor')[0], \
+    assert 'surfaceshader SR = UsdPreviewSurface(root_graph.out_);' in result, \
+        "Reference to renamed output 'out' should use 'root_graph.out_'"
+    assert 'root_graph.out' not in result.split('UsdPreviewSurface')[0], \
         "Reference should not use raw 'out' when it's a reserved keyword"
 
 
@@ -169,9 +169,6 @@ def test_decompile_interface_parameters():
     # Should emit a function with parameters
     assert 'marble1(float noise_scale' in result, \
         "Function should have parameters from interface inputs"
-    # Should emit a variable calling the function with default values
-    assert 'marble1_out = marble1(' in result, \
-        "A variable calling the function with defaults should be emitted"
     # interfacename references should resolve to parameter names
     assert 'interfacename' not in result, \
         "interfacename references should not remain in decompiled output"

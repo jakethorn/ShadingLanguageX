@@ -1,0 +1,11 @@
+vec3 p = position();
+float offset = p.y * 0.5;
+
+[[nodedef]]
+float shifted(float x)
+{
+    return x + offset;
+}
+
+float a = shifted(p.x);
+float b = shifted(p.z);

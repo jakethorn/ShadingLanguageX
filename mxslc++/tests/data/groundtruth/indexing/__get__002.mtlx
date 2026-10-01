@@ -5,9 +5,9 @@
     <input name="in" type="vector3" nodename="a" />
     <input name="index" type="integer" value="0" />
   </extract>
-  <normal name="var__0" type="vector3" />
+  <normal name="var__a__1" type="vector3" />
   <extract name="y" type="float">
-    <input name="in" type="vector3" nodename="var__0" />
+    <input name="in" type="vector3" nodename="var__a__1" />
     <input name="index" type="integer" value="0" />
   </extract>
   <add name="z" type="float">

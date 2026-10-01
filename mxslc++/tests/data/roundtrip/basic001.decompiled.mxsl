@@ -1,0 +1,2 @@
+{float outx, float outy} var_0 = separate2(vec2{});
+constant(var_0.outx);

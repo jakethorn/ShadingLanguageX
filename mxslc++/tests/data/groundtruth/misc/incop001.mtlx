@@ -17,22 +17,22 @@
     </add>
     <output name="out" type="integer" nodename="var__1" />
   </nodegraph>
-  <add name="var__0" type="integer">
+  <add name="var__i__1" type="integer">
     <input name="in1" type="integer" value="0" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="var__1" type="integer">
-    <input name="in1" type="integer" nodename="var__0" />
+  <add name="var__i__2" type="integer">
+    <input name="in1" type="integer" nodename="var__i__1" />
     <input name="in2" type="integer" value="1" />
   </add>
-  <add name="var__2" type="integer">
-    <input name="in1" type="integer" nodename="var__1" />
+  <add name="var__i__3" type="integer">
+    <input name="in1" type="integer" nodename="var__i__2" />
     <input name="in2" type="integer" value="1" />
   </add>
   <foo name="x" type="integer">
-    <input name="x" type="integer" nodename="var__0" />
-    <input name="y" type="integer" nodename="var__1" />
-    <input name="z" type="integer" nodename="var__2" />
+    <input name="x" type="integer" nodename="var__i__1" />
+    <input name="y" type="integer" nodename="var__i__2" />
+    <input name="z" type="integer" nodename="var__i__3" />
   </foo>
   <add name="end" type="integer">
     <input name="in1" type="integer" nodename="x" />

@@ -1,0 +1,17 @@
+void offset(ref float v, out float w)
+{
+    float before = v * 2.0;
+    v += 1.0;
+    w = v + before;
+}
+
+float doubled(mutable float a)
+{
+    float old = a;
+    a = a * 2.0;
+    return old + a;
+}
+
+mutable float t = time();
+offset(t, float w);
+float d = doubled(w) + t;

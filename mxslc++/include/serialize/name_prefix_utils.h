@@ -2,8 +2,8 @@
 // Created by jaket on 31/07/2026.
 //
 
-#ifndef MXSLC_SERIALIZE_NAME_UTILS_H
-#define MXSLC_SERIALIZE_NAME_UTILS_H
+#ifndef MXSLC_NAME_PREFIX_UTILS_H
+#define MXSLC_NAME_PREFIX_UTILS_H
 
 #include <MaterialXCore/Node.h>
 
@@ -25,8 +25,12 @@ namespace mxslc::serialize
     string with_prefix(const string& prefix, const TypePtr& type, size_t i);
 
     bool has_prefix(const string& str, const string& prefix);
+    bool has_prefix(const mx::ElementPtr& elem, const string& prefix);
 
     string remove_prefix(const string& str);
+    string remove_prefix(const string& str, const string& prefix);
+    string without_prefix(const mx::ElementPtr& elem);
+    string without_prefix(const mx::ElementPtr& elem, const string& prefix);
 
     string get_valid_node_name(const mx::GraphElementPtr& graph);
 
@@ -37,4 +41,4 @@ namespace mxslc::serialize
     }
 }
 
-#endif //MXSLC_SERIALIZE_NAME_UTILS_H
+#endif //MXSLC_NAME_PREFIX_UTILS_H

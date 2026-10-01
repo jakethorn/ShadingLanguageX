@@ -1,0 +1,15 @@
+float facing_ratio =>
+{
+    vec3 n = normal();
+    vec3 v = viewdirection();
+    return dotproduct(n, v);
+}
+
+[[nodegraph]]
+color3 tinted(color3 base = color3{1.0, 0.5, 0.25}, float amount = 0.5)
+{
+    return base * amount;
+}
+
+float f = facing_ratio * 2.0;
+color3 c = tinted() * f;

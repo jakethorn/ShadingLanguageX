@@ -96,7 +96,7 @@ namespace mxslc
 
     StmtPtr Parser::bare_statement()
     {
-        if (peek() == "@@"s)
+        if (peek() == "@@")
         {
             return document_attribute();
         }

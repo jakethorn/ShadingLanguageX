@@ -19,9 +19,7 @@
     </add>
     <output name="out" type="float" nodename="var__2" />
   </nodegraph>
-  <foo name="f1" type="float">
-    <input name="v" type="vector2" value="1, 0" />
-  </foo>
+  <foo name="f1" type="float" />
   <foo name="f2" type="float">
     <input name="v" type="vector2" value="0, 1" />
   </foo>

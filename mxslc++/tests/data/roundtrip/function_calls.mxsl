@@ -1,0 +1,16 @@
+vec3 n = normal("world");
+vec3 v = viewdirection("object");
+vec2 uv = texcoord();
+float facing = dotproduct(n, v);
+color3 albedo = image("textures/albedo.png", texcoord = uv);
+float height = image("textures/height.png", texcoord = uv * 2.0);
+float grain = noise2d(0.5, 0.25, uv * 4.0);
+float r = randomfloat(facing, 0.2, 0.8, 3);
+float s = randomfloat(facing, seed = 7);
+color3 rc = randomcolor(s);
+float m = mix(0.25, 1.0, facing);
+float edge = smoothstep(facing, 0.2, 0.25);
+vec3 h = normalize(n + v);
+float len = magnitude(v - n);
+float cl = clamp(facing, 0.1, 0.9);
+color3 lit = albedo * max(dotproduct(n, h), 0.05);

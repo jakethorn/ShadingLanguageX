@@ -1,0 +1,12 @@
+vec3 p = position();
+vec2 uv = texcoord();
+float t = time();
+vec2 a = vec2{t, p.z};
+vec3 b = vec3{uv, t};
+vec3 c = vec3{t, uv};
+vec4 d = vec4{p, 1.0};
+vec4 e = vec4{uv, uv};
+color3 f = color3{p};
+color3 g = color3{t};
+color4 h = color4{f, t};
+float i = dotproduct(p, vec3{0.0, 1.0, 0.0});

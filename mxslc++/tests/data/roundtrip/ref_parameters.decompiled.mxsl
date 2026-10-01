@@ -1,0 +1,10 @@
+[[nodedef]]
+void scale(ref vec3 v, float s)
+{
+    v *= s;
+}
+
+vec3 p = position();
+mutable vec3 v = p;
+scale(v, 2.0);
+vec3 q = v + 1.0;

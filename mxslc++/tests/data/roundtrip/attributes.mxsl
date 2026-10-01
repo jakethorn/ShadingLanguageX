@@ -1,0 +1,13 @@
+@@madewith "ShadingLanguageX"
+
+@doc "adds one to in"
+@nodegroup "math"
+float add_one(@doc "the value to increment" float in)
+{
+    return in + 1.0;
+}
+
+@doc "the surface normal"
+vec3 n = normal();
+color3 albedo = image(@colorspace "srgb_texture" "textures/albedo.png");
+float a = add_one(n.y);

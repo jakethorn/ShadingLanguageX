@@ -44,6 +44,15 @@ inline string read_file(const fs::path& src_path)
     return buffer.str();
 }
 
+// source files may be checked out with either line ending, generated source code always uses \n
+inline string normalise_line_endings(string text)
+{
+    size_t i = 0;
+    while ((i = text.find("\r\n", i)) != string::npos)
+        text.erase(i, 1);
+    return text;
+}
+
 inline void write_file(const fs::path& filepath, const string& text)
 {
     std::ofstream file{filepath};

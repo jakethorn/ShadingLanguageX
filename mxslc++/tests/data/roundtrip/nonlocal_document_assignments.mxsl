@@ -1,0 +1,11 @@
+mutable float total = 0.0;
+
+float read_total()
+{
+    return total * 2.0;
+}
+
+total += time();
+float a = read_total();
+total += 1.0;
+float b = read_total();

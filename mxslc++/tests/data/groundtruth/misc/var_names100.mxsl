@@ -1,0 +1,3 @@
+string truely = "surely";
+string falsely = "not surely";
+string nully = "0";

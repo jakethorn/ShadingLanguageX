@@ -1,0 +1,14 @@
+int foo<bool, float>(T v)
+{
+    return int{v};
+}
+
+int bar(bool v)
+{
+    return int{v};
+}
+
+int a = foo(1.0);
+int b = foo(false);
+int c = foo(2.0);
+int d = bar(true);

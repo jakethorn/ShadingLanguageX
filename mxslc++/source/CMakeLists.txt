@@ -10,8 +10,11 @@ add_library(mxslc_lib
         CompileOptions.cpp
         errors/CompileError.cpp
         errors/AmbiguousFunctionError.cpp
+        decompile/SourceCode.cpp
         decompile/decompile.cpp
         decompile/Decompiler.cpp
+        decompile/GraphDecompiler.cpp
+        decompile/decompile_utils.cpp
         runtime/Runtime.cpp
         runtime/Scope.cpp
         runtime/Argument.cpp
@@ -108,7 +111,8 @@ add_library(mxslc_lib
         serialize/serialize_constexpr.cpp
         serialize/serialize_constexpr_wrapper.cpp
         serialize/serializer_utils.cpp
-        serialize/serialize_name_utils.cpp
+        serialize/name_prefix_utils.cpp
+        serialize/node_name_utils.cpp
         serialize/values/Value.cpp
         serialize/values/NodeValue.cpp
         serialize/values/InterfaceValue.cpp

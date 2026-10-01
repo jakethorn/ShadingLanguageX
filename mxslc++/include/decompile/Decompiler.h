@@ -8,15 +8,24 @@
 #include <MaterialXCore/Document.h>
 
 #include "common.h"
+#include "decompile/GraphDecompiler.h"
+#include "decompile/SourceCode.h"
 
 namespace mxslc::decompile
 {
+    // Decompiles a MaterialX document into ShadingLanguageX code. Function definitions (from node defs and node graphs)
+    // and variable definitions (from nodes) are written in document order, but always after the code they depend on.
     class Decompiler
     {
     public:
         explicit Decompiler(const fs::path& src_path);
         explicit Decompiler(const string& source);
-        explicit Decompiler(mx::DocumentPtr document);
+        // the document is copied, so that the MaterialX libraries of its version can be added to it
+        explicit Decompiler(const mx::DocumentPtr& document);
+
+        // the graph decompiler of the document refers to this decompiler
+        Decompiler(const Decompiler&) = delete;
+        Decompiler& operator=(const Decompiler&) = delete;
 
         string decompile_document();
         string decompile_node(const string& node_name, bool with_dependencies = false);
@@ -26,44 +35,46 @@ namespace mxslc::decompile
         string decompile_node_graph(const string& node_graph_name, bool with_dependencies = false);
         string decompile_node_graph(const mx::NodeGraphPtr& node_graph, bool with_dependencies = false);
 
+        const mx::DocumentPtr& document() const { return document_; }
+
+        // true if the node def is defined by the document, i.e., it is not part of a library
+        bool is_document_node_def(const mx::NodeDefPtr& node_def) const;
+        string get_function_name(const mx::ElementPtr& function) const;
+        // true if an argument must be passed for this input, i.e., the parameter was declared without a default
+        bool is_required_input(const mx::NodeDefPtr& node_def, const string& input_name) const;
+        // true if the variable is assigned to by a function, i.e., it is a nonlocal variable of the function
+        bool is_assigned_by_function(const string& variable) const;
+        // void functions without outputs are given a placeholder integer output, see Serializer
+        bool is_void_function(const mx::NodeDefPtr& node_def) const;
+
     private:
-        string node_to_variable_definition(const string& node_name);
-        string node_to_variable_definition(const mx::NodePtr& node);
-        string node_def_to_function_definition(const string& node_def_name);
-        string node_def_to_function_definition(const mx::NodeDefPtr& node_def);
-        string node_graph_to_function_definition(const string& node_graph_name);
-        string node_graph_to_function_definition(const mx::NodeGraphPtr& node_graph);
+        // the function of a node def or a node graph
+        string decompile_function(const mx::ElementPtr& function, bool with_dependencies);
 
-        string node_to_expression(const mx::NodePtr& node);
-        string node_to_attributes(const mx::NodePtr& node);
-        string node_def_to_attributes(const mx::NodeDefPtr& node_def);
-        string outputs_to_data_type(const vector<mx::OutputPtr>& outputs);
-        string port_to_expression(const mx::PortElementPtr& port);
-        string outputs_to_expression(const vector<mx::OutputPtr>& outputs);
-        string value_to_constructor(const mx::ValuePtr& value);
-        string interface_name_to_identifier(const string& interface_name);
-        string node_and_output_to_dot_op(const mx::NodePtr& node, const string& output);
-        string node_graph_name_and_output_to_dot_op(const string& node_graph_name, const string& output);
-        string node_to_identifier(const mx::NodePtr& node);
-        string node_graph_name_to_identifier(const string& node_graph_name);
-        string input_to_argument(const mx::InputPtr& input);
-        string inputs_to_arguments(const vector<mx::InputPtr>& inputs);
-        string input_to_parameter(const mx::InputPtr& input);
-        string inputs_to_parameters(const vector<mx::InputPtr>& inputs);
+        void emit_document_attributes();
+        void emit_node(const mx::NodePtr& node);
+        void emit_function(const mx::ElementPtr& function);
+        void emit_dependencies(const vector<mx::ElementPtr>& functions);
+        // nonlocal variables without a node, e.g., those with a constant value, must still be declared, the node def is
+        // the function that uses it, or null if it is declared for a value that is assigned to it
+        void emit_nonlocal_variable(const mx::NodeDefPtr& node_def, const string& name, const string& type_name);
+        // each call to a decompile function writes its own code
+        void clear_emitted_code();
 
-        string get_node_data_type(const mx::NodePtr& node);
-        string get_node_def_data_type(const mx::NodeDefPtr& node_def);
-        string get_node_graph_signature(const mx::NodeGraphPtr& node_graph);
-        string get_node_graph_identifier(const mx::NodeGraphPtr& node_graph);
-        string get_node_graph_return_expression(const mx::NodeGraphPtr& node_graph);
+        SourceCode create_function_definition(const mx::NodeDefPtr& node_def, GraphDecompiler& body);
+        SourceCode create_function_definition(const mx::NodeGraphPtr& node_graph, GraphDecompiler& body);
+        // the statements of the body of a function, and the value of an output, e.g., its return value
+        static vector<SourceCode> create_body_statements(GraphDecompiler& body);
+        static SourceCode create_output_value(GraphDecompiler& body, const mx::OutputPtr& output);
 
         mx::DocumentPtr document_;
-        string global_code_;
-        string function_code_;
-        bool in_function_{false};
-        unordered_set<mx::NodePtr> decompiled_nodes_;
-        unordered_map<std::string, std::string> node_graph_var_names_;
-        unordered_set<string> decompiled_node_graphs_;
+        SourceCodeWriter writer_;
+        unordered_set<string> function_assigned_variables_;
+        unordered_set<mx::NodePtr> emitted_nodes_;
+        unordered_set<mx::ElementPtr> emitted_functions_;
+        unordered_set<string> emitted_nonlocal_variables_;
+
+        GraphDecompiler graph_decompiler_;
     };
 }
 

@@ -1,0 +1,9 @@
+{float lo, float hi} bounds(float x)
+{
+    return {x - 1.0, x + 1.0};
+}
+
+float t = time();
+float upper = bounds(t).hi;
+{float lo, float hi} both = bounds(t * 2.0);
+float width = both.hi - both.lo;

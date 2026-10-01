@@ -1,0 +1,5 @@
+using Ray = {vec3 origin, vec3 dir};
+Ray ray = {position(), viewdirection()};
+vec3 hit = ray.origin + ray.dir * 2.0;
+{vec2 uv, float t} data = {texcoord(), time()};
+color3 c = color3{data.uv, data.t};

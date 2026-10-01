@@ -4,7 +4,7 @@
     <input name="file" type="filename" value="" />
   </gltf_colorimage>
   <gltf_pbr name="gltf_pbr_surfaceshader" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="gltf_colorimage" />
+    <input name="base_color" type="color3" output="outcolor" nodename="gltf_colorimage" />
   </gltf_pbr>
   <surfacematerial name="surfacematerial" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="gltf_pbr_surfaceshader" />

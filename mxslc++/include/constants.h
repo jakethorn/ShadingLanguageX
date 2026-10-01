@@ -10,6 +10,7 @@
 namespace mxslc
 {
     inline const string DEFAULT_MTLX_VERSION{"1.39.5"};
+    inline const string DECOMPILE_HINTS_MACRO{"__DC_HINTS__"};
 }
 
 #endif //MXSLC_CONSTANTS_H

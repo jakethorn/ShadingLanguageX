@@ -48,6 +48,16 @@ namespace mxslc::runtime
         return graph_func_ == parent_->graph_func_;
     }
 
+    bool Scope::is_inside_inline_function() const
+    {
+        for (const Scope* scope = this; scope; scope = scope->parent())
+        {
+            if (const FuncPtr func = scope->function())
+                return func->is_inline();
+        }
+        return false;
+    }
+
     void Scope::add_variable(string name, VarPtr var)
     {
         if (contains(variables_, name))

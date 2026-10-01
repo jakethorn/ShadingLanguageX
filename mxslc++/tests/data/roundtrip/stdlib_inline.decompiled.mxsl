@@ -1,0 +1,5 @@
+vec3 p = position();
+float lo = min(min(p.x, p.y), p.z);
+float hi = max(max(max(p.x, p.y), p.z), 1.0);
+vec3 m = min(p, 0.5);
+vec2 xy = vec2{p.x, p.y};

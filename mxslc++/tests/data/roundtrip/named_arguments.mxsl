@@ -1,0 +1,5 @@
+vec2 uv = texcoord();
+float n = noise2d(amplitude = 0.5, pivot = 0.0, texcoord = uv);
+float m = mix(fg = 1.0, bg = 0.0, mix = n);
+float c = clamp(n, low = 0.2, high = 0.8);
+color3 albedo = image(file = "textures/albedo.png", texcoord = uv);

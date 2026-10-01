@@ -59,13 +59,13 @@
     <input name="in2" type="vector3" nodename="row1" />
     <input name="in3" type="vector3" nodename="var__5" />
   </creatematrix>
-  <switch name="var__9" type="matrix33">
+  <switch name="var__m__1" type="matrix33">
     <input name="in1" type="matrix33" nodename="var__6" />
     <input name="in2" type="matrix33" nodename="var__7" />
     <input name="in3" type="matrix33" nodename="var__8" />
     <input name="which" type="integer" value="1" />
   </switch>
   <invertmatrix name="o" type="matrix33">
-    <input name="in" type="matrix33" nodename="var__9" />
+    <input name="in" type="matrix33" nodename="var__m__1" />
   </invertmatrix>
 </materialx>

@@ -9,7 +9,7 @@
 #include "runtime/Function.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
-#include "serialize/serialize_name_utils.h"
+#include "serialize/name_prefix_utils.h"
 #include "serialize/values/interface.h"
 #include "serialize/values/InterfaceValue.h"
 #include "serialize/values/NodeGraphOutputValue.h"

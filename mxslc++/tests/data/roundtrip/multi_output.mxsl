@@ -1,0 +1,5 @@
+vec2 uv = texcoord();
+float u, v = separate2(uv);
+float x, y, z = separate3(position());
+{float, float} pair = {u * 2.0, v * 2.0};
+float a = pair[0] + pair[1] + x * y * z;

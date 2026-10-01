@@ -1,0 +1,12 @@
+mutable float total;
+
+[[nodedef]]
+float read_total()
+{
+    return total * 2.0;
+}
+
+total = 0.0 + time();
+float a = read_total();
+total++;
+float b = read_total();

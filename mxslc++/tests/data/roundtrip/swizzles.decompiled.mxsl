@@ -1,0 +1,13 @@
+vec3 p = position();
+color4 c = image("textures/albedo.png");
+vec2 uv = texcoord();
+vec2 a = p.xy;
+vec2 b = p.zx;
+vec3 d = p.zyx;
+vec4 e = p.xxyy;
+float f = p.z;
+color3 g = c.rgb;
+float h = c.a;
+vec3 i = vec3{uv.yx, f};
+vec2 j = position().yz;
+color3 k = c.bgr * h;

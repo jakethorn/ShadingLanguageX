@@ -1,0 +1,12 @@
+vec3 p = position();
+float var_0 = p.x;
+float a = var_0 * var_0;
+float var_1 = a + 1.0;
+float b = var_1 * var_1 + 0.5 * 0.5;
+float var_4 = p.y;
+vec3 t = (p - var_4) / (p.z - var_4);
+vec3 r = clamp(t, 0.0, 1.0);
+float var_8 = r.x;
+float var_10 = r.y;
+float var_13 = r.z;
+float l = var_8 * var_8 + var_10 * var_10 + var_13 * var_13;
