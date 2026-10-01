@@ -31,8 +31,8 @@ namespace mxslc::runtime
     Runtime& Runtime::create(CompileOptions opts)
     {
         instance_ = std::make_unique<Runtime>(std::move(opts));
-        instance_->add_libraries();
         instance_->add_materialx_library();
+        instance_->add_libraries();
         return *instance_;
     }
 

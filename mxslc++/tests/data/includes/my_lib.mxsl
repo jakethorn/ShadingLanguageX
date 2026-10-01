@@ -1,0 +1,4 @@
+color3 my_node(color3 c)
+{
+    return c ^ 2.2;
+}

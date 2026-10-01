@@ -1,0 +1,2 @@
+#library "../../includes/my_lib.mtlx"
+color3 c = my_node(color3{0.5, 0.5, 0.5});
