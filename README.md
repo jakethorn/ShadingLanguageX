@@ -3,8 +3,15 @@
 <h1 align="center">ShadingLanguageX</h1>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/jakethorn/ShadingLanguageX/blob/main/LICENSE)
-![version](https://img.shields.io/badge/version-0.3.1_beta-blue)
+[![GitHub release](https://img.shields.io/github/v/release/jakethorn/ShadingLanguageX)](https://github.com/jakethorn/ShadingLanguageX/releases)
+[![GitHub stars](https://img.shields.io/github/stars/jakethorn/ShadingLanguageX)](https://github.com/jakethorn/ShadingLanguageX/stargazers)
+[![PyPI version](https://img.shields.io/pypi/v/mxslcxx)](https://pypi.org/project/mxslcxx/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/mxslcxx)](https://pypi.org/project/mxslcxx/)
 [![Tests](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/run-tests.yml)
+[![Wheel build and tests](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/build-wheels.yml/badge.svg?branch=main)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/build-wheels.yml)
+[![JavaScript/WASM build](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/build-js.yml/badge.svg?branch=main)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/build-js.yml)
+[![PyPI publish](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/publish-wheels.yml/badge.svg)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/publish-wheels.yml)
+[![JavaScript release](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/release-js.yml/badge.svg)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/release-js.yml)
 
 __ShadingLanguageX (SLX)__ is a high level programming language for [MaterialX](https://materialx.org/) that makes it easier to express complex shading algorithms.  
 
