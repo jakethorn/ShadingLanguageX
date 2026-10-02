@@ -4,6 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/jakethorn/ShadingLanguageX/blob/main/LICENSE)
 ![version](https://img.shields.io/badge/version-0.3.1_beta-blue)
+[![Tests](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/jakethorn/ShadingLanguageX/actions/workflows/run-tests.yml)
 
 __ShadingLanguageX (SLX)__ is a high level programming language for [MaterialX](https://materialx.org/) that makes it easier to express complex shading algorithms.  
 
