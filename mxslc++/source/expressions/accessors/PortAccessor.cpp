@@ -29,7 +29,7 @@ namespace mxslc::expressions
             throw CompileError{"Variable of type '" + node_var_->type()->to_string() + "' does not have a port or valid swizzle with the name: " + input_name_};
 
         const mx::NodePtr node = node_value->node();
-        const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node, runtime().materialx_library());
+        const mx::NodeDefPtr node_def = mtlx_utils::get_node_def(node);
 
         const mx::InputPtr input = node_def->getActiveInput(input_name_);
         if (input == nullptr)

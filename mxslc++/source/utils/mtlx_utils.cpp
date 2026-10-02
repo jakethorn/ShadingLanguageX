@@ -52,34 +52,13 @@ namespace mxslc::mtlx_utils
         return output;
     }
 
-    mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const mx::DocumentPtr& mtlx_lib)
+    mx::NodeDefPtr get_node_def(const mx::NodePtr& node)
     {
         mx::NodeDefPtr node_def = node->getNodeDef();
         if (node_def)
             return node_def;
 
-        // resolve the node def from a copy of the node in a scratch document, as the MaterialX library is shared
-        // between compiles and must not be modified
-        const mx::DocumentPtr scratch = mx::createDocument();
-        scratch->setDataLibrary(mtlx_lib);
-        const mx::NodePtr copy = scratch->addNode(node->getCategory());
-        copy->copyContentFrom(node);
-
-        node_def = copy->getNodeDef();
-        if (node_def)
-            return node_def;
-
         throw CompileError{"Cannot find NodeDef for " + node->getCategory()};
-    }
-
-    mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const string& mtlx_version, const vector<fs::path>& include_dirs)
-    {
-        const mx::DocumentPtr mtlx_lib = load_materialx_library(
-            mtlx_version,
-            include_dirs.empty() ? io_utils::get_default_search_directories() : include_dirs
-        );
-
-        return get_node_def(node, mtlx_lib);
     }
 
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib)
@@ -93,16 +72,6 @@ namespace mxslc::mtlx_utils
             return node_def;
 
         throw CompileError{"Cannot find NodeDef for " + node_graph->getName()};
-    }
-
-    mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const string& mtlx_version, const vector<fs::path>& include_dirs)
-    {
-        const mx::DocumentPtr mtlx_lib = load_materialx_library(
-            mtlx_version,
-            include_dirs.empty() ? io_utils::get_default_search_directories() : include_dirs
-        );
-
-        return get_node_def(node_graph, mtlx_lib);
     }
 
     mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def)

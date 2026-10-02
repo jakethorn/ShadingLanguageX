@@ -20,10 +20,8 @@ namespace mxslc::mtlx_utils
 
     mx::OutputPtr add_or_get_output(const mx::NodeGraphPtr& node_graph, const TypePtr& type, const string& name);
 
-    mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const mx::DocumentPtr& mtlx_lib);
-    mx::NodeDefPtr get_node_def(const mx::NodePtr& node, const string& mtlx_version = DEFAULT_MTLX_VERSION, const vector<fs::path>& include_dirs = {});
+    mx::NodeDefPtr get_node_def(const mx::NodePtr& node);
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib);
-    mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const string& mtlx_version = DEFAULT_MTLX_VERSION, const vector<fs::path>& include_dirs = {});
 
     mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def);
 

@@ -193,23 +193,18 @@ namespace mxslc
 
     mx::DocumentPtr load_materialx_library(const string& version, const vector<fs::path>& include_dirs)
     {
-        // Reading and parsing the MaterialX libraries is the most expensive part of compiling or decompiling
-        // a small program, so each loaded library is cached and shared between calls. The returned document
-        // must therefore be treated as read-only.
-        static std::mutex cache_mutex;
-        static std::map<std::pair<string, vector<fs::path>>, mx::DocumentPtr> cache;
+        // cache matx lib between calls to increase performance
+        static unordered_map<string, mx::DocumentPtr> cache;
 
-        std::pair<string, vector<fs::path>> key{get_latest_version(version), include_dirs};
+        if (not contains(cache, version))
+        {
+            mx::DocumentPtr doc = mx::createDocument();
+            load_materialx_library(version, include_dirs, doc);
 
-        const std::lock_guard lock{cache_mutex};
+            cache.emplace(version, doc);
+        }
 
-        if (const auto it = cache.find(key); it != cache.end())
-            return it->second;
-
-        const mx::DocumentPtr doc = mx::createDocument();
-        load_materialx_library(version, include_dirs, doc);
-        cache.emplace(std::move(key), doc);
-        return doc;
+        return cache.at(version);
     }
 
     void load_materialx_library(const string& version, const vector<fs::path>& include_dirs, const mx::DocumentPtr& doc)
