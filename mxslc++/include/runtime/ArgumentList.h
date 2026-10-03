@@ -62,6 +62,8 @@ namespace mxslc::runtime
         string to_string() const override;
 
     private:
+        void validate_arguments() const;
+
         vector<Argument> args_;
     };
 }

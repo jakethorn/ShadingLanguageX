@@ -35,6 +35,8 @@ namespace mxslc::runtime
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
         size_t index() const { return index_; }
+        bool is_named() const { return has_name(); }
+        bool is_positional() const { return not has_name(); }
 
         Argument monomorphize(const TypePtr& template_type) const override;
 
