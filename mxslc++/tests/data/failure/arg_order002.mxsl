@@ -1,0 +1,6 @@
+float foo(float x, float y, float z)
+{
+    return x + y + z;
+}
+
+foo(1, y=2, 3);

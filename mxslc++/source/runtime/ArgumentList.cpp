@@ -14,25 +14,31 @@ namespace mxslc::runtime
 {
     ArgumentList::ArgumentList(vector<Argument> args) : args_{std::move(args)}
     {
-
+        validate_arguments();
     }
 
     ArgumentList::ArgumentList(const vector<ExprPtr>& exprs)
     {
         for (size_t i = 0; i < exprs.size(); ++i)
             args_.emplace_back(exprs[i], i);
+
+        validate_arguments();
     }
 
     ArgumentList::ArgumentList(const vector<VarPtr>& values)
     {
         for (size_t i = 0; i < values.size(); ++i)
             args_.emplace_back(values[i], i);
+
+        validate_arguments();
     }
 
     ArgumentList::ArgumentList(const vector<Primitive>& values)
     {
         for (size_t i = 0; i < values.size(); ++i)
             args_.emplace_back(values[i], i);
+
+        validate_arguments();
     }
 
     ArgumentList::ArgumentList(const ExprPtr& expr)
@@ -101,6 +107,19 @@ namespace mxslc::runtime
             }
         }
         return nullptr;
+    }
+
+    void ArgumentList::validate_arguments() const
+    {
+        // ensure all positional arguments come before all named arguments
+        bool last_was_named = false;
+        for (const Argument& arg : args_)
+        {
+            if (last_was_named and arg.is_positional())
+                throw CompileError{"Positional argument appears after a named argument"};
+
+            last_was_named = arg.is_named();
+        }
     }
 
     string ArgumentList::to_string() const
