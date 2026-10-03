@@ -18,19 +18,11 @@
 
 namespace mxslc::statements
 {
-    VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr)
-        : VariableDefinition{std::move(mods), std::move(type), std::move(name), std::move(expr), Token{}}
-    {
-
-    }
-
     VariableDefinition::VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token)
         : Statement{std::move(token)}, mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}, expr_{std::move(expr)}
     {
 
     }
-
-    VariableDefinition::~VariableDefinition() = default;
 
     const ModifierList &VariableDefinition::modifiers() const
     {

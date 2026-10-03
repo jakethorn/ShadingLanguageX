@@ -23,15 +23,20 @@ namespace mxslc::type_utils
         }
     };
 
-    TypePtr type_of(const vector<VarPtr>& children)
+    TypePtr resolve(const string& type_name)
     {
-        vector<TypePtr> fields;
-        fields.reserve(children.size());
-        for (const VarPtr& child : children)
-            fields.push_back(child->type());
+        return Runtime::get().scope().get_type(type_name);
+    }
 
+    TypePtr resolve(const TypePtr& type)
+    {
+        return Runtime::get().scope().resolve_type(type);
+    }
+
+    TypePtr resolve(const vector<TypePtr>& fields)
+    {
         return Runtime::get().scope().resolve_type(
-            create_type(std::move(fields))
+            create_type(fields)
         );
     }
 

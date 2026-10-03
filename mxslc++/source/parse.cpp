@@ -155,7 +155,7 @@ namespace mxslc
 
         ExprPtr expr = expression(mods);
 
-        if (peek() == '=')
+        if (peek() == '=' or peek() == ',')
         {
             return variable_assignment(std::move(expr));
         }
@@ -232,15 +232,34 @@ namespace mxslc
 
     StmtPtr Parser::variable_assignment(ExprPtr lhs)
     {
+        vector<ExprPtr> lhs_exprs{lhs};
+        while (consume(','))
+            lhs_exprs.push_back(expression());
+
         Token token = match('=');
+
         ExprPtr rhs;
         if (peek() == TokenType::If)
-            rhs = if_expression(lhs);
+        {
+            rhs = if_expression(lhs_exprs.size() == 1 ? lhs : create_expression<UnnamedConstructor>(lhs_exprs));
+        }
         else
+        {
             rhs = expression();
+
+            if (peek() == ',')
+            {
+                vector<ExprPtr> rhs_exprs{rhs};
+                while (consume(','))
+                    rhs_exprs.push_back(expression());
+
+                rhs = create_expression<UnnamedConstructor>(std::move(rhs_exprs));
+            }
+        }
+
         match(';');
 
-        return create_statement<VariableAssignment>(std::move(token), std::move(lhs), std::move(rhs));
+        return create_statement<VariableAssignment>(std::move(lhs_exprs), std::move(rhs), std::move(token));
     }
 
     StmtPtr Parser::function_definition(ModifierList mods, TypePtr type)

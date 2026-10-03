@@ -10,7 +10,20 @@
 
 namespace mxslc::type_utils
 {
-    TypePtr type_of(const vector<VarPtr>& children);
+    TypePtr resolve(const string& type_name);
+    TypePtr resolve(const TypePtr& type);
+    TypePtr resolve(const vector<TypePtr>& fields);
+
+    template<typename T>
+    TypePtr type_of(const vector<T>& children)
+    {
+        vector<TypePtr> fields;
+        fields.reserve(children.size());
+        for (const T& child : children)
+            fields.push_back(child->type());
+
+        return resolve(fields);
+    }
 
     bool contains_auto(const TypePtr& type);
     TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type);

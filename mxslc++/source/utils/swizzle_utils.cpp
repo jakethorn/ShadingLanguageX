@@ -14,7 +14,7 @@ namespace mxslc::swizzle_utils
 
     namespace
     {
-        template <typename T>
+        template<typename T>
         VarPtr evaluate_swizzle_impl(const T& value, const string& swizzle)
         {
             if (swizzle.size() == 1)

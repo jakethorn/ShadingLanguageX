@@ -27,7 +27,7 @@ namespace mxslc::runtime
         ArgumentList(const VarPtr& value);
         ArgumentList(const ValuePtr& value);
 
-        template <typename... Exprs>
+        template<typename... Exprs>
         explicit ArgumentList(Exprs&&... exprs)
         {
             args_.reserve(sizeof...(exprs));

@@ -79,7 +79,7 @@ namespace mxslc::runtime_utils
         return dst;
     }
 
-    template <typename... Args>
+    template<typename... Args>
     auto monomorphize_all(const TypePtr& template_type, const Args&... args)
     {
         return std::make_tuple(monomorphize(args, template_type)...);

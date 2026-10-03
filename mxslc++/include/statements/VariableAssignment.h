@@ -12,8 +12,8 @@ namespace mxslc::statements
     class VariableAssignment final : public Statement
     {
     public:
-        VariableAssignment(Token token, ExprPtr lhs_expr, ExprPtr rhs_expr);
-        ~VariableAssignment() override;
+        VariableAssignment(ExprPtr lhs_expr, ExprPtr rhs_expr, Token token = {});
+        VariableAssignment(vector<ExprPtr> lhs_exprs, ExprPtr rhs_expr, Token token = {});
 
         void set_attributes(AttributeList attrs) override;
 
@@ -25,7 +25,7 @@ namespace mxslc::statements
         void execute_impl() const override;
 
     private:
-        ExprPtr lhs_expr_;
+        vector<ExprPtr> lhs_exprs_;
         ExprPtr rhs_expr_;
     };
 }
