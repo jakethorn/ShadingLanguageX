@@ -6,24 +6,24 @@
     <output name="nonlocal_out__a__1" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
+    <output name="nonlocal_out__a__0" type="float" nodename="node3" />
     <constant name="node1" type="float">
       <input name="value" type="float" value="3" />
     </constant>
-    <output name="nonlocal_out__a__0" type="float" nodename="node3" />
+    <output name="nonlocal_out__a__1" type="float" nodename="node4" />
     <constant name="node2" type="float">
       <input name="value" type="float" value="4" />
     </constant>
-    <output name="nonlocal_out__a__1" type="float" nodename="node4" />
     <constant name="node3" type="float">
       <input name="value" type="float" value="7" />
     </constant>
     <constant name="node4" type="float">
       <input name="value" type="float" value="8" />
     </constant>
+    <output name="out" type="float" nodename="node5" />
     <constant name="node5" type="float">
       <input name="value" type="float" value="3" />
     </constant>
-    <output name="out" type="float" nodename="node5" />
   </nodegraph>
   <multiply name="c" type="float">
     <input name="in1" type="float" value="1" />

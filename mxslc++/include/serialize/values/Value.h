@@ -24,11 +24,15 @@ namespace mxslc::serialize::values
         virtual bool equals(const ValuePtr& other) const = 0;
 
         virtual void set_as_node_input(const mx::InputPtr& input) const { }
-        virtual void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const { }
-        virtual void set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const { }
-        virtual void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const;
+        virtual void set_as_node_graph_input(const mx::InputPtr& input) const { }
+        virtual void set_as_node_graph_output(const mx::OutputPtr& output) const { }
+        virtual void set_as_node_def_input(const mx::InputPtr& input) const { }
 
         void set_as_node_input(const mx::NodePtr& node, const string& input_name) const;
+        void set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const;
+        void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const;
+        void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const;
+
 
         string to_string() const override = 0;
 

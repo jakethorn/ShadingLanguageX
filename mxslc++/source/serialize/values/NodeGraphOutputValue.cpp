@@ -34,34 +34,22 @@ namespace mxslc::serialize::values
 
     void NodeGraphOutputValue::set_as_node_input(const mx::InputPtr& input) const
     {
-        input->setOutputString(output_name_);
-        input->setNodeGraphString(node_graph_name_);
+        mtlx_utils::set_node_graph_output_string(input, node_graph_name_, output_name_);
     }
 
-    void NodeGraphOutputValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
+    void NodeGraphOutputValue::set_as_node_graph_input(const mx::InputPtr& input) const
+    {
+        mtlx_utils::set_node_graph_output_string(input, node_graph_name_, output_name_);
+    }
+
+    void NodeGraphOutputValue::set_as_node_graph_output(const mx::OutputPtr& output) const
     {
         // node graph outputs cannot be given directly to outputs, so create a dot node as a passthrough
-        const mx::NodePtr passthrough_node = create_passthrough_node(node_graph);
+        const mx::NodeGraphPtr node_graph = output->getParent()->asA<mx::NodeGraph>();
+        const auto& [node, input] = mtlx_utils::create_dot(node_graph, type_);
+        mtlx_utils::set_node_graph_output_string(input, node_graph_name_, output_name_);
 
-        const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
-        output->setConnectedNode(passthrough_node);
-    }
-
-    void NodeGraphOutputValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
-    {
-        const mx::InputPtr input = mtlx_utils::add_or_get_input(node_graph, type_, input_name);
-        input->setOutputString(output_name_);
-        input->setNodeGraphString(node_graph_name_);
-    }
-
-    mx::NodePtr NodeGraphOutputValue::create_passthrough_node(const mx::NodeGraphPtr& node_graph) const
-    {
-        const mx::NodePtr dot_node = node_graph->addNode("dot", mx::EMPTY_STRING, type_->name());
-        const mx::InputPtr dot_node_input = dot_node->addInput("in", type_->name());
-        dot_node_input->setOutputString(output_name_);
-        dot_node_input->setNodeGraphString(node_graph_name_);
-
-        return dot_node;
+        mtlx_utils::set_connected_node(output, node);
     }
 
     string NodeGraphOutputValue::to_string() const

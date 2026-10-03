@@ -18,7 +18,7 @@ namespace mxslc::serialize::values
 
     }
 
-    NodeGraphValue::NodeGraphValue(TypePtr type, string node_graph_name) : Value{std::move(type)}, name_{std::move(node_graph_name)}
+    NodeGraphValue::NodeGraphValue(TypePtr type, string node_graph_name) : Value{std::move(type)}, node_graph_name_{std::move(node_graph_name)}
     {
 
     }
@@ -26,42 +26,33 @@ namespace mxslc::serialize::values
     bool NodeGraphValue::equals(const ValuePtr& other) const
     {
         if (const NodeGraphValuePtr other_node_graph = cast_value<NodeGraphValue>(other))
-            return name_ == other_node_graph->name_;
+            return node_graph_name_ == other_node_graph->node_graph_name_;
         return false;
     }
 
     void NodeGraphValue::set_as_node_input(const mx::InputPtr& input) const
     {
-        input->setNodeGraphString(name_);
+        mtlx_utils::set_node_graph_string(input, node_graph_name_);
     }
 
-    void NodeGraphValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
+    void NodeGraphValue::set_as_node_graph_input(const mx::InputPtr& input) const
+    {
+        mtlx_utils::set_node_graph_string(input, node_graph_name_);
+    }
+
+    void NodeGraphValue::set_as_node_graph_output(const mx::OutputPtr& output) const
     {
         // node graph strings cannot be given directly to outputs, so create a dot node as a passthrough
-        const mx::NodePtr passthrough_node = create_passthrough_node(node_graph);
+        const mx::NodeGraphPtr node_graph = output->getParent()->asA<mx::NodeGraph>();
+        const auto& [node, input] = mtlx_utils::create_dot(node_graph, type_);
+        mtlx_utils::set_node_graph_string(input, node_graph_name_);
 
-        const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
-        output->setConnectedNode(passthrough_node);
-    }
-
-    void NodeGraphValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
-    {
-        const mx::InputPtr input = mtlx_utils::add_or_get_input(node_graph, type_, input_name);
-        input->setNodeGraphString(name_);
-    }
-
-    mx::NodePtr NodeGraphValue::create_passthrough_node(const mx::NodeGraphPtr& node_graph) const
-    {
-        const mx::NodePtr dot_node = node_graph->addNode("dot", mx::EMPTY_STRING, type_->name());
-        const mx::InputPtr dot_node_input = dot_node->addInput("in", type_->name());
-        dot_node_input->setNodeGraphString(name_);
-
-        return dot_node;
+        mtlx_utils::set_connected_node(output, node);
     }
 
     string NodeGraphValue::to_string() const
     {
-        string node_graph_name = name_;
+        string node_graph_name = node_graph_name_;
         if (not starts_with(node_graph_name, "NG_"))
             node_graph_name = "NG_" + node_graph_name;
 

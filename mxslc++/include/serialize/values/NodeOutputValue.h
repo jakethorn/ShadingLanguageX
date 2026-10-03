@@ -22,8 +22,8 @@ namespace mxslc::serialize::values
         bool equals(const ValuePtr& other) const override;
 
         void set_as_node_input(const mx::InputPtr& input) const override;
-        void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
-        void set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const override;
+        void set_as_node_graph_input(const mx::InputPtr& input) const override;
+        void set_as_node_graph_output(const mx::OutputPtr& output) const override;
 
         string to_string() const override;
 

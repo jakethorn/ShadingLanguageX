@@ -22,15 +22,13 @@ namespace mxslc::serialize::values
         bool equals(const ValuePtr& other) const override;
 
         void set_as_node_input(const mx::InputPtr& input) const override;
-        void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override;
-        void set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const override;
-        void set_as_node_def_input(const mx::NodeDefPtr& node_def, const string& input_name) const override;
+        void set_as_node_graph_input(const mx::InputPtr& input) const override;
+        void set_as_node_graph_output(const mx::OutputPtr& output) const override;
+        void set_as_node_def_input(const mx::InputPtr& input) const override;
 
         string to_string() const override;
 
     private:
-        string type_name() const;
-
         Primitive value_;
     };
 }

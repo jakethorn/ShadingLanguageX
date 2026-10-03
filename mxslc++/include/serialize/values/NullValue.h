@@ -25,9 +25,9 @@ namespace mxslc::serialize::values
             mtlx_utils::remove_port(input);
         }
 
-        void set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const override
+        void set_as_node_graph_output(const mx::OutputPtr& output) const override
         {
-            node_graph->removeChild(output_name);
+            mtlx_utils::remove_port(output);
         }
 
         string to_string() const override { return "null"; }

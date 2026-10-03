@@ -68,23 +68,22 @@ namespace mxslc::serialize::values
 
     void NodeValue::set_as_node_input(const mx::InputPtr& input) const
     {
-        input->removeAttribute("value");
-        input->setConnectedNode(node_);
+        mtlx_utils::set_connected_node(input, node_);
     }
 
-    void NodeValue::set_as_node_graph_output(const mx::NodeGraphPtr& node_graph, const string& output_name) const
+    void NodeValue::set_as_node_graph_input(const mx::InputPtr& input) const
     {
-        const mx::OutputPtr output = mtlx_utils::add_or_get_output(node_graph, type_, output_name);
-        output->setConnectedNode(node_);
-    }
+        const mx::NodeGraphPtr node_graph = input->getParent()->asA<mx::NodeGraph>();
 
-    void NodeValue::set_as_node_graph_input(const mx::NodeGraphPtr& node_graph, const string& input_name) const
-    {
         if (node_graph->getParent() != node_->getParent())
             throw CompileError{"Invalid node graph input. You cannot reference variables from an enclosing function in a nodegraph function."};
 
-        const mx::InputPtr input = mtlx_utils::add_or_get_input(node_graph, type_, input_name);
-        input->setConnectedNode(node_);
+        mtlx_utils::set_connected_node(input, node_);
+    }
+
+    void NodeValue::set_as_node_graph_output(const mx::OutputPtr& output) const
+    {
+        mtlx_utils::set_connected_node(output, node_);
     }
 
     string NodeValue::to_string() const

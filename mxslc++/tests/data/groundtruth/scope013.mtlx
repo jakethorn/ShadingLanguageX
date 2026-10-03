@@ -7,21 +7,21 @@
     <output name="nonlocal_out__b__1" type="float" />
   </nodedef>
   <nodegraph name="NG_some_func" nodedef="ND_some_func">
+    <output name="nonlocal_out__b__0" type="float" nodename="node2" />
     <constant name="node1" type="float">
       <input name="value" type="float" value="3" />
     </constant>
-    <output name="nonlocal_out__b__0" type="float" nodename="node2" />
     <dot name="node2" type="float">
       <input name="in" type="float" interfacename="nonlocal_in__b__1" />
     </dot>
+    <output name="nonlocal_out__b__1" type="float" nodename="node3" />
     <constant name="node3" type="float">
       <input name="value" type="float" value="7" />
     </constant>
-    <output name="nonlocal_out__b__1" type="float" nodename="node3" />
+    <output name="out" type="float" nodename="node4" />
     <constant name="node4" type="float">
       <input name="value" type="float" value="0" />
     </constant>
-    <output name="out" type="float" nodename="node4" />
   </nodegraph>
   <multiply name="c" type="float">
     <input name="in1" type="float" value="5" />
