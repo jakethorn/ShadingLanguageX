@@ -36,6 +36,8 @@ namespace mxslc::statements
 
     void VariableAssignment::execute_impl() const
     {
+        // this covers both single and multi-variable assignment
+
         // initialise lhs
         for (const ExprPtr& lhs_expr : lhs_exprs_)
             lhs_expr->init();

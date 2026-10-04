@@ -1,0 +1,7 @@
+float a, b = randomfloat(), normal().y;
+constant(a);
+constant(b);
+
+float c, d = {randomfloat(), normal().y};
+constant(c);
+constant(d);

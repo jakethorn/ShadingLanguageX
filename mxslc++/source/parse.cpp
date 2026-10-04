@@ -48,6 +48,14 @@
 
 namespace mxslc
 {
+    namespace
+    {
+        ExprPtr as_tuple(vector<ExprPtr> exprs)
+        {
+            return create_expression<UnnamedConstructor>(std::move(exprs));
+        }
+    }
+
     vector<StmtPtr> parse(vector<Token> tokens)
     {
         return Parser{std::move(tokens)}.parse();
@@ -230,7 +238,7 @@ namespace mxslc
                 vector rhs_exprs{rhs};
                 while (consume(','))
                     rhs_exprs.push_back(expression());
-                rhs = create_expression<UnnamedConstructor>(std::move(rhs_exprs));
+                rhs = as_tuple(std::move(rhs_exprs));
             }
         }
 
@@ -245,16 +253,20 @@ namespace mxslc
 
     StmtPtr Parser::variable_assignment(ExprPtr lhs)
     {
-        vector<ExprPtr> lhs_exprs{lhs};
+        vector lhs_exprs{lhs};
+
+        // handle multi-var assignment (e.g., a, b = 1, 2)
         while (consume(','))
             lhs_exprs.push_back(expression());
 
         Token token = match('=');
 
+        // parse rhs
         ExprPtr rhs;
         if (peek() == TokenType::If)
         {
-            rhs = if_expression(lhs_exprs.size() == 1 ? lhs : create_expression<UnnamedConstructor>(lhs_exprs));
+            // special handling for if-expressions
+            rhs = if_expression(lhs_exprs.size() == 1 ? lhs : as_tuple(lhs_exprs));
         }
         else
         {
@@ -262,11 +274,12 @@ namespace mxslc
 
             if (peek() == ',')
             {
-                vector<ExprPtr> rhs_exprs{rhs};
+                // combine comma separated expressions into a tuple
+                vector rhs_exprs{rhs};
                 while (consume(','))
                     rhs_exprs.push_back(expression());
 
-                rhs = create_expression<UnnamedConstructor>(std::move(rhs_exprs));
+                rhs = as_tuple(std::move(rhs_exprs));
             }
         }
 
