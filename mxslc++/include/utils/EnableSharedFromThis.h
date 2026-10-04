@@ -9,19 +9,19 @@
 
 namespace mxslc
 {
-    template <typename T>
+    template<typename T>
     class EnableSharedFromThis : public std::enable_shared_from_this<T>
     {
     public:
         virtual ~EnableSharedFromThis() = default;
 
-        template <typename S>
+        template<typename S>
         shared_ptr<S> shared_from_child()
         {
             return std::static_pointer_cast<S>(this->shared_from_this());
         }
 
-        template <typename S>
+        template<typename S>
         shared_ptr<const S> shared_from_child() const
         {
             return std::static_pointer_cast<const S>(this->shared_from_this());

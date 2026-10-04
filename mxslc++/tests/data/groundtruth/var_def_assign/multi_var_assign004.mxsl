@@ -1,0 +1,8 @@
+mutable float a, b = 1, 2;
+mutable float c = randomfloat();
+
+a, b, c = position() + c;
+
+constant(a);
+constant(b);
+constant(c);

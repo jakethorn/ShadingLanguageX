@@ -8,7 +8,7 @@ namespace mxslc::primitive_utils
 {
     namespace
     {
-        template <typename T>
+        template<typename T>
         T fract_vec(const Primitive& in)
         {
             float int_;

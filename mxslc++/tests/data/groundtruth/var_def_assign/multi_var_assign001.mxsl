@@ -1,0 +1,8 @@
+mutable float a = 1;
+mutable float b = 2;
+constant(a);
+constant(b);
+a, b = 3, 4;
+constant(a);
+constant(b);
+

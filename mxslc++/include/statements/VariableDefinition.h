@@ -13,9 +13,7 @@ namespace mxslc::statements
     class VariableDefinition final : public Statement
     {
     public:
-        VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr);
-        VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token);
-        ~VariableDefinition() override;
+        VariableDefinition(ModifierList mods, TypePtr type, string name, ExprPtr expr, Token token = {});
 
         const ModifierList& modifiers() const;
         TypePtr type() const;

@@ -27,7 +27,7 @@ namespace mxslc::serialize_utils
         return create_variable(func(values[Is]..., type));
     }
 
-    template <typename... Ts>
+    template<typename... Ts>
     constexpr bool requires_type()
     {
         if constexpr (sizeof...(Ts) == 0)

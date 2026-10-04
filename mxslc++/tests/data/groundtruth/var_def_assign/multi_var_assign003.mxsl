@@ -1,0 +1,6 @@
+mutable float a, b = 1, 2;
+constant(a);
+constant(b);
+a, b = {3, 4};
+constant(a);
+constant(b);

@@ -48,6 +48,14 @@
 
 namespace mxslc
 {
+    namespace
+    {
+        ExprPtr as_tuple(vector<ExprPtr> exprs)
+        {
+            return create_expression<UnnamedConstructor>(std::move(exprs));
+        }
+    }
+
     vector<StmtPtr> parse(vector<Token> tokens)
     {
         return Parser{std::move(tokens)}.parse();
@@ -155,7 +163,7 @@ namespace mxslc
 
         ExprPtr expr = expression(mods);
 
-        if (peek() == '=')
+        if (peek() == '=' or peek() == ',')
         {
             return variable_assignment(std::move(expr));
         }
@@ -220,27 +228,64 @@ namespace mxslc
             }
         }
 
-        ExprPtr expr = consume('=') ? expression() : nullptr;
+        ExprPtr rhs = nullptr;
+        if (consume('='))
+        {
+            rhs = expression();
+
+            if (peek() == ',')
+            {
+                vector rhs_exprs{rhs};
+                while (consume(','))
+                    rhs_exprs.push_back(expression());
+                rhs = as_tuple(std::move(rhs_exprs));
+            }
+        }
+
         match(';');
 
         return create_statement<MultiVariableDefinition>(
             create_type(std::move(fields)),
-            std::move(expr),
+            std::move(rhs),
             std::move(token)
         );
     }
 
     StmtPtr Parser::variable_assignment(ExprPtr lhs)
     {
+        vector lhs_exprs{lhs};
+
+        // handle multi-var assignment (e.g., a, b = 1, 2)
+        while (consume(','))
+            lhs_exprs.push_back(expression());
+
         Token token = match('=');
+
+        // parse rhs
         ExprPtr rhs;
         if (peek() == TokenType::If)
-            rhs = if_expression(lhs);
+        {
+            // special handling for if-expressions
+            rhs = if_expression(lhs_exprs.size() == 1 ? lhs : as_tuple(lhs_exprs));
+        }
         else
+        {
             rhs = expression();
+
+            if (peek() == ',')
+            {
+                // combine comma separated expressions into a tuple
+                vector rhs_exprs{rhs};
+                while (consume(','))
+                    rhs_exprs.push_back(expression());
+
+                rhs = as_tuple(std::move(rhs_exprs));
+            }
+        }
+
         match(';');
 
-        return create_statement<VariableAssignment>(std::move(token), std::move(lhs), std::move(rhs));
+        return create_statement<VariableAssignment>(std::move(lhs_exprs), std::move(rhs), std::move(token));
     }
 
     StmtPtr Parser::function_definition(ModifierList mods, TypePtr type)
