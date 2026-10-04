@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="c" type="float" />
+  <position name="var__0" type="vector3" />
+  <add name="var__1" type="vector3">
+    <input name="in1" type="vector3" nodename="var__0" />
+    <input name="in2" type="float" nodename="c" />
+  </add>
+  <separate3 name="var__2" type="multioutput">
+    <input name="in" type="vector3" nodename="var__1" />
+  </separate3>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" output="outx" nodename="var__2" />
+  </constant>
+  <constant name="var__4" type="float">
+    <input name="value" type="float" output="outy" nodename="var__2" />
+  </constant>
+  <constant name="var__5" type="float">
+    <input name="value" type="float" output="outz" nodename="var__2" />
+  </constant>
+</materialx>
