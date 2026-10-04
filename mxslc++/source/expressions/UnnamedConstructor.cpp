@@ -38,12 +38,7 @@ namespace mxslc::expressions
 
     TypePtr UnnamedConstructor::type_impl() const
     {
-        vector<TypePtr> types;
-        types.reserve(exprs_.size());
-        for (const ExprPtr& expr : exprs_)
-            types.push_back(expr->type());
-        const TypePtr type = create_type(std::move(types));
-        return scope().resolve_type(type);
+        return type_utils::type_of(exprs_);
     }
 
     VarPtr UnnamedConstructor::evaluate_impl() const
