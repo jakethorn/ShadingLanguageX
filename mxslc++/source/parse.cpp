@@ -220,12 +220,25 @@ namespace mxslc
             }
         }
 
-        ExprPtr expr = consume('=') ? expression() : nullptr;
+        ExprPtr rhs = nullptr;
+        if (consume('='))
+        {
+            rhs = expression();
+
+            if (peek() == ',')
+            {
+                vector rhs_exprs{rhs};
+                while (consume(','))
+                    rhs_exprs.push_back(expression());
+                rhs = create_expression<UnnamedConstructor>(std::move(rhs_exprs));
+            }
+        }
+
         match(';');
 
         return create_statement<MultiVariableDefinition>(
             create_type(std::move(fields)),
-            std::move(expr),
+            std::move(rhs),
             std::move(token)
         );
     }
