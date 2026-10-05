@@ -110,7 +110,11 @@ namespace test_utils
             }
             for (const mx::InputPtr& input : graph->getInputs())
             {
-                const string source = input->getNodeName().empty() ? get_value_string(input) : "node(" + input->getNodeName() + ")";
+                string source = get_value_string(input);
+                if (not input->getNodeName().empty())
+                    source = "node(" + input->getNodeName() + ")";
+                else if (not input->getNodeGraphString().empty())
+                    source = "nodegraph(" + input->getNodeGraphString() + ")." + get_output_string(input);
                 parts.push_back("input " + input->getName() + ":" + input->getType() + "=" + source);
             }
             std::sort(parts.begin(), parts.end());
@@ -121,12 +125,29 @@ namespace test_utils
             return result;
         }
 
+        // the parameters of a function, whose order matters, as opposed to the nonlocal variables that it reads, which are
+        // added in the order that the function uses them
+        inline bool is_parameter(const mx::InputPtr& input)
+        {
+            return input->getName().rfind("nonlocal_in__", 0) != 0;
+        }
+
         inline string describe_node_def(const mx::NodeDefPtr& node_def)
         {
-            // the order of inputs is the order of the parameters, but the position of outputs does not matter
+            // the order of parameters matters, but the position of nonlocal variables and outputs does not
             string result = get_attribute_string(node_def, {"name"}) + "\n";
+            vector<string> nonlocal_inputs;
             for (const mx::InputPtr& input : node_def->getInputs())
-                result += "input " + input->getName() + ":" + input->getType() + "=" + get_value_string(input) + "[" + get_attribute_string(input, {"name", "type", "value"}) + "]\n";
+            {
+                const string desc = "input " + input->getName() + ":" + input->getType() + "=" + get_value_string(input) + "[" + get_attribute_string(input, {"name", "type", "value"}) + "]\n";
+                if (is_parameter(input))
+                    result += desc;
+                else
+                    nonlocal_inputs.push_back(desc);
+            }
+            std::sort(nonlocal_inputs.begin(), nonlocal_inputs.end());
+            for (const string& input : nonlocal_inputs)
+                result += input;
 
             vector<string> outputs;
             for (const mx::OutputPtr& output : node_def->getOutputs())
@@ -138,6 +159,28 @@ namespace test_utils
             return result;
         }
 
+        // node defs are identified by their function and signature rather than their names, because overloads are named
+        // in the order that they are defined, e.g., ND_foo and ND_foo2
+        inline string get_signature(const mx::NodeDefPtr& node_def)
+        {
+            string result = node_def->getNodeString() + "(";
+            for (const mx::InputPtr& input : node_def->getInputs())
+            {
+                if (is_parameter(input))
+                    result += input->getType() + ",";
+            }
+
+            vector<string> outputs;
+            for (const mx::OutputPtr& output : node_def->getOutputs())
+                outputs.push_back(output->getName() + ":" + output->getType());
+            std::sort(outputs.begin(), outputs.end());
+
+            result += ")->(";
+            for (const string& output : outputs)
+                result += output + ",";
+            return result + ")";
+        }
+
         inline std::map<string, string> describe(const mx::DocumentPtr& doc)
         {
             std::map<string, string> result;
@@ -146,9 +189,15 @@ namespace test_utils
             for (const mx::ElementPtr& element : doc->getChildren())
             {
                 if (const mx::NodeDefPtr node_def = element->asA<mx::NodeDef>())
-                    result["nodedef " + node_def->getName()] = describe_node_def(node_def);
+                {
+                    result["nodedef " + get_signature(node_def)] = describe_node_def(node_def);
+                }
                 else if (const mx::NodeGraphPtr node_graph = element->asA<mx::NodeGraph>())
-                    result["nodegraph " + node_graph->getName()] = get_attribute_string(node_graph, {"name"}) + "\n" + describe_graph(node_graph);
+                {
+                    const mx::NodeDefPtr implemented = node_graph->getNodeDef();
+                    const string key = implemented ? "nodegraph of " + get_signature(implemented) : "nodegraph " + node_graph->getName();
+                    result[key] = get_attribute_string(node_graph, {"name", "nodedef"}) + "\n" + describe_graph(node_graph);
+                }
             }
             return result;
         }

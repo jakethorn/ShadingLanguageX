@@ -76,6 +76,12 @@ namespace mxslc::decompile_utils
     // to its out parameters and nonlocal variables
     bool is_return_output(const mx::OutputPtr& output);
 
+    // Sorts the elements of the document, and the nodes of its node graphs, into the order of the code that they could be
+    // compiled from, where each element comes after the elements that it depends on, e.g., a node after the node def of
+    // the function that it calls, and the values of a variable, e.g., x, var__x__1 and var__x__2, are in the order that
+    // they were assigned. Elements keep their order where possible, so the documents of the compiler are not changed.
+    void sort_by_dependencies(const mx::DocumentPtr& document);
+
 }
 
 #endif //MXSLC_DECOMPILE_UTILS_H

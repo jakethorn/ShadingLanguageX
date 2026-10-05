@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- a node that uses the outputs of a node graph, before the node graph -->
+<materialx version="1.39">
+  <subtract name="width" type="float">
+    <input name="in1" type="float" output="out__hi" nodegraph="NG_range" />
+    <input name="in2" type="float" output="out__lo" nodegraph="NG_range" />
+  </subtract>
+  <nodegraph name="NG_range">
+    <add name="hi" type="float">
+      <input name="in1" type="float" nodename="lo" />
+      <input name="in2" type="float" value="0.8" />
+    </add>
+    <constant name="lo" type="float">
+      <input name="value" type="float" value="0.1" />
+    </constant>
+    <output name="out__lo" type="float" nodename="lo" />
+    <output name="out__hi" type="float" nodename="hi" />
+  </nodegraph>
+</materialx>

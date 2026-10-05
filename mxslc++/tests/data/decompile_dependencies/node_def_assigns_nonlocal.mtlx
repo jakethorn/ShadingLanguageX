@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- calls of a node def that assigns to a nonlocal variable, before the code that uses the previous value of the variable -->
+<materialx version="1.39">
+  <add name="z" type="float">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" value="20" />
+  </add>
+  <bar name="var__1" type="float">
+    <input name="nonlocal_in__x" type="float" nodename="var__0" />
+  </bar>
+  <add name="y" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="10" />
+  </add>
+  <bar name="var__0" type="float">
+    <input name="nonlocal_in__x" type="float" value="7" />
+  </bar>
+  <nodegraph name="NG_bar" nodedef="ND_bar">
+    <add name="var__x__1" type="float">
+      <input name="in1" type="float" interfacename="nonlocal_in__x" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="nonlocal_out__x" type="float" nodename="var__x__1" />
+  </nodegraph>
+  <nodedef name="ND_bar" node="bar">
+    <input name="nonlocal_in__x" type="float" />
+    <output name="nonlocal_out__x" type="float" />
+  </nodedef>
+</materialx>

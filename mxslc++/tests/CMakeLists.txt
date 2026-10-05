@@ -29,6 +29,7 @@ add_executable(mxslc_tests
         roundtrip_tests.cpp
         groundtruth_roundtrip_diff.cpp
         groundtruth_decompile_tests.cpp
+        decompile_dependencies_tests.cpp
         value_override_tests.cpp
 )
 

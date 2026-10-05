@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- a node def that calls another node def, and a node that calls it, before the node defs -->
+<materialx version="1.39">
+  <scale_twice name="y" type="float">
+    <input name="x" type="float" value="1" />
+  </scale_twice>
+  <nodegraph name="NG_scale_twice" nodedef="ND_scale_twice">
+    <scale name="var__1" type="float">
+      <input name="x" type="float" nodename="var__0" />
+    </scale>
+    <scale name="var__0" type="float">
+      <input name="x" type="float" interfacename="x" />
+    </scale>
+    <output name="out" type="float" nodename="var__1" />
+  </nodegraph>
+  <nodedef name="ND_scale_twice" node="scale_twice">
+    <output name="out" type="float" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_scale" nodedef="ND_scale">
+    <multiply name="var__0" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" value="2" />
+    </multiply>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <nodedef name="ND_scale" node="scale">
+    <output name="out" type="float" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+</materialx>

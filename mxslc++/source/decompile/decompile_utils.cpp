@@ -4,6 +4,8 @@
 
 #include "decompile/decompile_utils.h"
 
+#include <functional>
+
 #include "Primitive.h"
 #include "TokenType.h"
 #include "serialize/name_prefix_utils.h"
@@ -336,5 +338,251 @@ namespace mxslc::decompile_utils
     bool is_return_output(const mx::OutputPtr& output)
     {
         return not has_prefix(output, OUT_PARAMETER_PREFIX) and not has_prefix(output, NONLOCAL_OUT_PREFIX);
+    }
+
+    namespace
+    {
+        // the number of a value that is assigned to a variable, e.g., 2 of var__x__2
+        size_t get_assignment_number(const string& node_name)
+        {
+            return std::stoul(node_name.substr(node_name.rfind("__") + 2));
+        }
+
+        // the elements of the graph that the element is connected to or calls, e.g., the node def of the function that a
+        // node calls, or the nodes that a node graph uses as default values and that a node def reads as nonlocal variables
+        vector<mx::ElementPtr> get_dependencies(const mx::GraphElementPtr& graph, const mx::ElementPtr& element)
+        {
+            const mx::DocumentPtr document = graph->asA<mx::Document>();
+
+            vector<mx::ElementPtr> dependencies;
+            const auto add_connections = [&](const mx::PortElementPtr& port) {
+                dependencies.push_back(graph->getNode(port->getNodeName()));
+                if (document)
+                    dependencies.push_back(document->getNodeGraph(port->getNodeGraphString()));
+            };
+            const auto add_calls = [&](const mx::NodeGraphPtr& body) {
+                for (const mx::NodePtr& node : body->getNodes())
+                    dependencies.push_back(node->getNodeDef());
+            };
+            const auto add_nonlocal_variable = [&](const mx::PortElementPtr& port) {
+                if (has_prefix(port, NONLOCAL_IN_PREFIX) or has_prefix(port, NONLOCAL_OUT_PREFIX))
+                    dependencies.push_back(graph->getNode(without_prefix(port)));
+            };
+
+            if (const mx::NodePtr node = element->asA<mx::Node>())
+            {
+                for (const mx::InputPtr& input : node->getInputs())
+                    add_connections(input);
+                if (document)
+                    dependencies.push_back(node->getNodeDef());
+            }
+            else if (const mx::NodeDefPtr node_def = element->asA<mx::NodeDef>())
+            {
+                if (const mx::NodeGraphPtr body = mtlx_utils::get_node_graph(node_def))
+                    add_calls(body);
+                for (const mx::InputPtr& input : node_def->getActiveInputs())
+                    add_nonlocal_variable(input);
+                for (const mx::OutputPtr& output : node_def->getActiveOutputs())
+                    add_nonlocal_variable(output);
+            }
+            else if (const mx::NodeGraphPtr node_graph = element->asA<mx::NodeGraph>())
+            {
+                // the node graphs of node defs are their bodies
+                if (const mx::NodeDefPtr implemented = node_graph->getNodeDef())
+                {
+                    dependencies.push_back(implemented);
+                }
+                else
+                {
+                    add_calls(node_graph);
+                    for (const mx::InputPtr& input : node_graph->getInputs())
+                        add_connections(input);
+                }
+            }
+            else if (const mx::OutputPtr output = element->asA<mx::Output>())
+            {
+                add_connections(output);
+            }
+
+            // only the elements of the graph are sorted, e.g., not the node defs of the MaterialX libraries
+            const auto is_outside = [&](const mx::ElementPtr& dependency) { return dependency == nullptr or dependency == element or dependency->getParent() != graph; };
+            dependencies.erase(std::remove_if(dependencies.begin(), dependencies.end(), is_outside), dependencies.end());
+            return dependencies;
+        }
+
+        // true if the node is a temporary value, var__<n>, which is written as part of the expression that uses it
+        bool is_temporary_node(const mx::NodePtr& node)
+        {
+            return is_generated_node_name(node->getName()) and not get_assigned_variable_name(node->getName());
+        }
+
+        // true if the call assigns a new value to the variable of the argument, e.g., the argument of a ref parameter, or a
+        // nonlocal variable that the function assigns to
+        bool is_overwritten_argument(const mx::NodeDefPtr& node_def, const mx::InputPtr& input)
+        {
+            const string& name = input->getName();
+            if (has_prefix(name, NONLOCAL_IN_PREFIX))
+                return node_def->getActiveOutput(with_prefix(NONLOCAL_OUT_PREFIX, remove_prefix(name))) != nullptr;
+            return node_def->getActiveOutput(with_prefix(OUT_PARAMETER_PREFIX, name)) != nullptr;
+        }
+
+        // the node and the nodes that use it, directly or through other nodes
+        unordered_set<mx::NodePtr> find_dependents(const mx::NodePtr& node, const unordered_map<mx::NodePtr, vector<mx::NodePtr>>& uses)
+        {
+            unordered_set<mx::NodePtr> dependents{node};
+            vector<mx::NodePtr> stack{node};
+            while (not stack.empty())
+            {
+                const mx::NodePtr current = stack.back();
+                stack.pop_back();
+                if (not contains(uses, current))
+                    continue;
+                for (const mx::NodePtr& use : uses.at(current))
+                {
+                    if (dependents.insert(use).second)
+                        stack.push_back(use);
+                }
+            }
+            return dependents;
+        }
+
+        // The values that are assigned to variables, which overwrite the previous values of the variables, come after the
+        // previous values and the code that uses them, in the code that the graph is compiled from. The previous value of
+        // a value named var__x__2 is var__x__1, and of a call that assigns to an argument it is the argument. The code that
+        // uses a previous value includes the expressions that use it through temporary values, e.g., `y` of
+        // `float y = x * 2.0 + 1.0;`, because temporary values are written as part of the expressions that use them.
+        unordered_map<mx::ElementPtr, vector<mx::ElementPtr>> find_assignment_dependencies(const mx::GraphElementPtr& graph)
+        {
+            unordered_map<mx::NodePtr, vector<mx::NodePtr>> uses;
+            vector<std::pair<mx::NodePtr, mx::NodePtr>> overwritten_values;
+            unordered_map<string, vector<mx::NodePtr>> variable_values;
+            for (const mx::NodePtr& node : graph->getNodes())
+            {
+                const mx::NodeDefPtr node_def = node->getNodeDef();
+                for (const mx::InputPtr& input : node->getInputs())
+                {
+                    const mx::NodePtr used = graph->getNode(input->getNodeName());
+                    if (used == nullptr)
+                        continue;
+                    uses[used].push_back(node);
+                    if (node_def and is_overwritten_argument(node_def, input))
+                        overwritten_values.emplace_back(used, node);
+                }
+
+                if (const optional<string> variable = get_assigned_variable_name(node->getName()))
+                    variable_values[*variable].push_back(node);
+            }
+
+            for (auto& [variable, nodes] : variable_values)
+            {
+                std::sort(nodes.begin(), nodes.end(), [](const mx::NodePtr& a, const mx::NodePtr& b) {
+                    return get_assignment_number(a->getName()) < get_assignment_number(b->getName());
+                });
+
+                mx::NodePtr previous = graph->getNode(variable);
+                for (const mx::NodePtr& node : nodes)
+                {
+                    if (previous)
+                        overwritten_values.emplace_back(previous, node);
+                    previous = node;
+                }
+            }
+
+            unordered_map<mx::ElementPtr, vector<mx::ElementPtr>> dependencies;
+            for (const auto& [previous, node] : overwritten_values)
+            {
+                vector<mx::ElementPtr>& node_dependencies = dependencies[node];
+                node_dependencies.push_back(previous);
+
+                // the code that uses the new value cannot come before it
+                const unordered_set<mx::NodePtr> dependents = find_dependents(node, uses);
+                unordered_set<mx::NodePtr> visited;
+                vector<mx::NodePtr> stack = uses[previous];
+                while (not stack.empty())
+                {
+                    const mx::NodePtr use = stack.back();
+                    stack.pop_back();
+                    if (contains(dependents, use) or not visited.insert(use).second)
+                        continue;
+
+                    node_dependencies.push_back(use);
+                    if (is_temporary_node(use) and contains(uses, use))
+                        stack.insert(stack.end(), uses.at(use).begin(), uses.at(use).end());
+                }
+            }
+            return dependencies;
+        }
+
+        // the elements after the elements that they depend on, in their order where possible, or nothing if their
+        // dependencies are cyclic
+        optional<vector<mx::ElementPtr>> sort_elements(const mx::GraphElementPtr& graph, const vector<mx::ElementPtr>& elements, const unordered_map<mx::ElementPtr, vector<mx::ElementPtr>>& assignment_dependencies)
+        {
+            vector<mx::ElementPtr> result;
+            unordered_set<mx::ElementPtr> visited;
+            unordered_set<mx::ElementPtr> visiting;
+            bool is_cyclic = false;
+
+            const std::function<void(const mx::ElementPtr&)> visit = [&](const mx::ElementPtr& element) {
+                if (contains(visiting, element))
+                    is_cyclic = true;
+                if (contains(visited, element))
+                    return;
+                visited.insert(element);
+                visiting.insert(element);
+
+                if (contains(assignment_dependencies, element))
+                {
+                    for (const mx::ElementPtr& dependency : assignment_dependencies.at(element))
+                        visit(dependency);
+                }
+                for (const mx::ElementPtr& dependency : get_dependencies(graph, element))
+                    visit(dependency);
+
+                visiting.erase(element);
+                result.push_back(element);
+            };
+
+            for (const mx::ElementPtr& element : elements)
+                visit(element);
+
+            if (is_cyclic)
+                return std::nullopt;
+            return result;
+        }
+
+        // the order of the values of variables is only known from their names, which the graph does not have to follow,
+        // so it is ignored if it conflicts with the connections of the graph
+        vector<mx::ElementPtr> sort_elements(const mx::GraphElementPtr& graph, const vector<mx::ElementPtr>& elements)
+        {
+            if (optional<vector<mx::ElementPtr>> result = sort_elements(graph, elements, find_assignment_dependencies(graph)))
+                return *result;
+            if (optional<vector<mx::ElementPtr>> result = sort_elements(graph, elements, {}))
+                return *result;
+            return elements;
+        }
+
+        void set_child_order(const mx::ElementPtr& parent, const vector<mx::ElementPtr>& children)
+        {
+            for (size_t i = 0; i < children.size(); ++i)
+                parent->setChildIndex(children[i]->getName(), static_cast<int>(i));
+        }
+    }
+
+    void sort_by_dependencies(const mx::DocumentPtr& document)
+    {
+        set_child_order(document, sort_elements(document, document->getChildren()));
+
+        // the nodes of node graphs are sorted in the places of the nodes, e.g., between its inputs and outputs
+        for (const mx::NodeGraphPtr& node_graph : document->getNodeGraphs())
+        {
+            const vector<mx::NodePtr> nodes = node_graph->getNodes();
+            const vector<mx::ElementPtr> sorted_nodes = sort_elements(node_graph, {nodes.begin(), nodes.end()});
+
+            vector<mx::ElementPtr> children;
+            size_t next_node = 0;
+            for (const mx::ElementPtr& child : node_graph->getChildren())
+                children.push_back(child->isA<mx::Node>() ? sorted_nodes.at(next_node++) : child);
+            set_child_order(node_graph, children);
+        }
     }
 }

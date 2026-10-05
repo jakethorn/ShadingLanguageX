@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- a call that assigns to a ref argument, before the code that uses the previous value of the argument -->
+<materialx version="1.39">
+  <multiply name="z" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="3" />
+  </multiply>
+  <increment name="var__0" type="float">
+    <input name="v" type="float" nodename="x" />
+  </increment>
+  <multiply name="y" type="float">
+    <input name="in1" type="float" nodename="x" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <constant name="x" type="float">
+    <input name="value" type="float" value="1" />
+  </constant>
+  <nodegraph name="NG_increment" nodedef="ND_increment">
+    <add name="var__v__1" type="float">
+      <input name="in1" type="float" interfacename="v" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="outparam__v" type="float" nodename="var__v__1" />
+  </nodegraph>
+  <nodedef name="ND_increment" node="increment">
+    <input name="v" type="float" value="0" />
+    <output name="outparam__v" type="float" />
+  </nodedef>
+</materialx>
