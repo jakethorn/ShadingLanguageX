@@ -1,3 +1,11 @@
+# (mxslc++) Version 0.3.2
+
+* Added library caching between runs (contributed by [@Mejval5](https://github.com/Mejval5))
+* Added multi-variable assignment (TODO: link)
+* Updated README.md with links to friends
+* Bug fixes
+
+
 # (mxslc++) Version 0.3.1
 
 * Added [BasicExample.md](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/BasicExamples.md) document
