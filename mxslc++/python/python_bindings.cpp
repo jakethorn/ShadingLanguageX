@@ -9,10 +9,12 @@
 #include "decompile_bindings.h"
 #include "Decompiler_bindings.h"
 #include "Macro_bindings.h"
+#include "constants.h"
 
 PYBIND11_MODULE(_mxslc, m)
 {
     m.doc() = "Python bindings for mxslc";
+    m.attr("DEFAULT_MTLX_VERSION") = DEFAULT_MTLX_VERSION;
 #ifdef MXSLCXX_PY_VERSION
     m.attr("__version__") = MXSLCXX_PY_VERSION;
 #endif
