@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- a node graph function whose parameter defaults to a call of another node graph function, before that function -->
+<materialx version="1.39">
+  <nodegraph name="NG_foo">
+    <input name="b" type="float" nodegraph="NG_bar" />
+    <output name="out" type="float" nodename="node1" />
+    <dot name="node1" type="float">
+      <input name="in" type="float" interfacename="b" />
+    </dot>
+  </nodegraph>
+  <nodegraph name="NG_bar">
+    <input name="f" type="float" value="1" />
+    <output name="out" type="float" nodename="node1" />
+    <dot name="node1" type="float">
+      <input name="in" type="float" interfacename="f" />
+    </dot>
+  </nodegraph>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodegraph="NG_foo" />
+  </constant>
+</materialx>

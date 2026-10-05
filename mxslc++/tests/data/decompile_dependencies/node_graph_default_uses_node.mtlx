@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- a node graph function whose parameter defaults to a node, before the node -->
+<materialx version="1.39">
+  <nodegraph name="NG_shift">
+    <input name="x" type="float" nodename="offset" />
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <constant name="offset" type="float">
+    <input name="value" type="float" value="0.5" />
+  </constant>
+</materialx>

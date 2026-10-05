@@ -218,55 +218,8 @@ namespace test_utils
                 result.push_back(key);
         return result;
     }
-
-    namespace reverse_element_order_detail
-    {
-        inline void set_child_order(const mx::ElementPtr& parent, const vector<mx::ElementPtr>& order)
-        {
-            for (size_t i = 0; i < order.size(); ++i)
-                parent->setChildIndex(order[i]->getName(), static_cast<int>(i));
-        }
-
-        // the nodes of a node graph are reversed, but not its inputs and outputs, because their order is the order of the
-        // parameters and return values of its function
-        inline void reverse_node_order(const mx::NodeGraphPtr& node_graph)
-        {
-            vector<mx::ElementPtr> order;
-            vector<mx::ElementPtr> nodes;
-            for (const mx::ElementPtr& child : node_graph->getChildren())
-            {
-                if (child->isA<mx::Node>())
-                    nodes.push_back(child);
-                else
-                    order.push_back(child);
-            }
-            order.insert(order.end(), nodes.rbegin(), nodes.rend());
-            set_child_order(node_graph, order);
-        }
-    }
-
-    // A copy of the document whose elements, and the nodes of its node graphs, are in reverse order, so that elements
-    // come before the elements that they depend on, e.g., a node before the node def that it calls. The order of the
-    // elements of a MaterialX document does not change what it computes.
-    inline mx::DocumentPtr reverse_element_order(const mx::DocumentPtr& doc)
-    {
-        using namespace reverse_element_order_detail;
-
-        const mx::DocumentPtr result = mx::createDocument();
-        result->copyContentFrom(doc);
-
-        vector<mx::ElementPtr> children = result->getChildren();
-        std::reverse(children.begin(), children.end());
-        set_child_order(result, children);
-
-        for (const mx::NodeGraphPtr& node_graph : result->getNodeGraphs())
-            reverse_node_order(node_graph);
-
-        return result;
-    }
 }
 
 using test_utils::GraphComparator;
-using test_utils::reverse_element_order;
 
 #endif //MXSLC_GRAPH_UTILS_H

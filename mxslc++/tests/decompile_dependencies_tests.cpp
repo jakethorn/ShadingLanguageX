@@ -2,15 +2,20 @@
 // Created by jaket on 05/10/2026.
 //
 
-// A function or node that is decompiled with its dependencies must compile on its own, so the decompiled code must
-// include the functions that it calls, the nodes that it uses and the nonlocal variables that it reads, before it.
+// Each file in data/decompile_dependencies is a document whose elements come before the elements that they depend on,
+// e.g., a node before the node def of the function that it calls, which never happens in documents that are compiled from
+// code. The decompiled code must still define everything before it is used, so the document must decompile to code that
+// compiles to the same graph, and each of its functions and nodes must decompile with its dependencies to code that
+// compiles on its own.
 
 #include "gtest/gtest.h"
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <MaterialXFormat/XmlIo.h>
 #include "compile.h"
 #include "CompileOptions.h"
+#include "decompile/decompile.h"
 #include "decompile/Decompiler.h"
 #include "utils/data_utils.h"
 #include "utils/graph_utils.h"
@@ -23,11 +28,18 @@ using decompile_dependencies_tests = testing::TestWithParam<fs::path>;
 
 namespace
 {
-    mxslc::CompileOptions get_compile_options()
+    mx::DocumentPtr read_document(const fs::path& path)
+    {
+        const mx::DocumentPtr document = mx::createDocument();
+        mx::readFromXmlFile(document, path.string());
+        return document;
+    }
+
+    mx::DocumentPtr compile(const string& code)
     {
         mxslc::CompileOptions opts;
         opts.reduce_graph = false;
-        return opts;
+        return mxslc::compile_to_document(code, opts);
     }
 
     // the error of the code, or nothing if it compiles
@@ -35,7 +47,7 @@ namespace
     {
         try
         {
-            mxslc::compile_to_document(code, get_compile_options());
+            compile(code);
             return "";
         }
         catch (const std::exception& e)
@@ -43,66 +55,63 @@ namespace
             return e.what();
         }
     }
-
-    // the elements come before the elements that depend on them, so that the decompiler cannot rely on their order
-    mx::DocumentPtr compile_reordered(const fs::path& path)
-    {
-        return reverse_element_order(mxslc::compile_to_document(read_file(path), get_compile_options()));
-    }
 }
 
-TEST_P(decompile_dependencies_tests, functions_are_decompiled_with_their_dependencies)
+TEST_P(decompile_dependencies_tests, decompiled_code_compiles_to_the_same_graph)
 {
-    const mx::DocumentPtr document = compile_reordered(GetParam());
+    const mx::DocumentPtr document = read_document(GetParam());
+    const string decompiled = mxslc::decompile_to_string(document);
+
+    mx::DocumentPtr recompiled;
+    try
+    {
+        recompiled = compile(decompiled);
+    }
+    catch (const std::exception& e)
+    {
+        FAIL() << e.what() << "\n" << decompiled;
+    }
+
+    const vector<string> differences = GraphComparator::find_differences(document, recompiled);
+    EXPECT_TRUE(differences.empty()) << "different elements: " << testing::PrintToString(differences) << "\n" << decompiled;
+}
+
+TEST_P(decompile_dependencies_tests, functions_and_nodes_are_decompiled_with_their_dependencies)
+{
+    const mx::DocumentPtr document = read_document(GetParam());
     mxslc::decompile::Decompiler decompiler{document};
 
-    for (const mx::NodeDefPtr& node_def : document->getNodeDefs())
-    {
-        const string code = decompiler.decompile_node_def(node_def, /*with_dependencies*/true);
+    const auto expect_compiles = [](const string& name, const string& code) {
         const string error = get_compile_error(code);
-        EXPECT_TRUE(error.empty()) << node_def->getName() << ": " << error << "\n" << code;
-    }
+        EXPECT_TRUE(error.empty()) << name << ": " << error << "\n" << code;
+    };
+
+    for (const mx::NodeDefPtr& node_def : document->getNodeDefs())
+        expect_compiles(node_def->getName(), decompiler.decompile_node_def(node_def, /*with_dependencies*/true));
 
     for (const mx::NodeGraphPtr& node_graph : document->getNodeGraphs())
     {
-        if (node_graph->getNodeDef())
-            continue;
-
-        const string code = decompiler.decompile_node_graph(node_graph, /*with_dependencies*/true);
-        const string error = get_compile_error(code);
-        EXPECT_TRUE(error.empty()) << node_graph->getName() << ": " << error << "\n" << code;
+        if (node_graph->getNodeDef() == nullptr)
+            expect_compiles(node_graph->getName(), decompiler.decompile_node_graph(node_graph, /*with_dependencies*/true));
     }
-}
-
-TEST_P(decompile_dependencies_tests, nodes_are_decompiled_with_their_dependencies)
-{
-    const mx::DocumentPtr document = compile_reordered(GetParam());
-    mxslc::decompile::Decompiler decompiler{document};
 
     for (const mx::NodePtr& node : document->getNodes())
-    {
-        const string code = decompiler.decompile_node(node, /*with_dependencies*/true);
-        const string error = get_compile_error(code);
-        EXPECT_TRUE(error.empty()) << node->getName() << ": " << error << "\n" << code;
-    }
+        expect_compiles(node->getName(), decompiler.decompile_node(node, /*with_dependencies*/true));
 }
 
 namespace
 {
-    vector<fs::path> get_roundtrip_files()
+    vector<fs::path> get_dependency_files()
     {
-        const fs::path test_dir = get_test_data("roundtrip");
+        const fs::path test_dir = get_test_data("decompile_dependencies");
 
         if (not fs::exists(test_dir))
             return {};
 
         vector<fs::path> files;
         for (const auto& p : fs::directory_iterator(test_dir))
-        {
-            const string name = p.path().filename().string();
-            if (p.path().extension() == ".mxsl" and name.find(".decompiled.") == string::npos)
+            if (p.path().extension() == ".mtlx")
                 files.push_back(p.path());
-        }
         std::sort(files.begin(), files.end());
 
         return files;
@@ -112,7 +121,7 @@ namespace
 INSTANTIATE_TEST_SUITE_P(
     decompiler,
     decompile_dependencies_tests,
-    testing::ValuesIn(get_roundtrip_files()),
+    testing::ValuesIn(get_dependency_files()),
     [](const testing::TestParamInfo<fs::path>& info) {
         return info.param.stem().string();
     }
