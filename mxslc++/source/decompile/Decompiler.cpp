@@ -38,11 +38,14 @@ namespace mxslc::decompile
         }
 
         // the node defs of the MaterialX libraries are needed to know the order and default values of node inputs
-        mx::DocumentPtr copy_with_data_library(const mx::DocumentPtr& document)
+        // a copy of the document with the MaterialX libraries of its version, whose elements are sorted into the order of
+        // code, see sort_by_dependencies
+        mx::DocumentPtr copy_document(const mx::DocumentPtr& document)
         {
             const mx::DocumentPtr copy = mx::createDocument();
             copy->copyContentFrom(document);
             copy->setDataLibrary(load_materialx_library(copy->getVersionString(), io_utils::get_default_search_directories()));
+            sort_by_dependencies(copy);
             return copy;
         }
 
@@ -189,7 +192,7 @@ namespace mxslc::decompile
     }
 
     Decompiler::Decompiler(const mx::DocumentPtr& document)
-        : document_{copy_with_data_library(document)},
+        : document_{copy_document(document)},
         function_assigned_variables_{find_nonlocal_outputs(document_)},
         graph_decompiler_{*this, document_, find_nonlocal_declarations(document_)}
     {
@@ -401,11 +404,14 @@ namespace mxslc::decompile
                 emit_nonlocal_variable(node_def, without_prefix(port), port->getType());
         }
 
-        // node graph functions can use nodes in the document as default values
+        // node graph functions can use nodes and the outputs of node graphs in the document as default values, e.g.,
+        // `float foo(float b = bar())`
         for (const mx::InputPtr& input : node_graph->getInputs())
         {
             if (const mx::NodePtr node = document_->getNode(input->getNodeName()))
                 emit_node(node);
+            if (const mx::NodeGraphPtr default_graph = document_->getNodeGraph(input->getNodeGraphString()))
+                emit_function(default_graph);
         }
 
         if (node_def)

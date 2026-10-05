@@ -1,0 +1,53 @@
+// the dependencies between the elements of a document, which the decompiler must keep in order when the elements of the
+// document are not, see reordered_document_compiles_to_the_same_graph
+
+// a node graph function whose parameter defaults to a call of another node graph function
+[[nodegraph]]
+float bar(float f = 1.0)
+{
+    return dot(f);
+}
+
+[[nodegraph]]
+float foo(float b = bar())
+{
+    return dot(b);
+}
+
+// node def functions that call other node def functions
+float scale(float x)
+{
+    return x * 2.0;
+}
+
+float scale_twice(float x)
+{
+    return scale(scale(x));
+}
+
+// a node graph function whose parameter defaults to a node
+float offset = constant(0.5);
+
+[[nodegraph]]
+float shift(float x = offset)
+{
+    return x + 1.0;
+}
+
+// a node graph whose outputs are used by a node, and which calls a node def function
+{float lo, float hi} range =>
+{
+    float lo = constant(0.1);
+    return {lo, scale(lo)};
+}
+
+// a node def function that reads a nonlocal variable
+float amount = constant(0.25);
+
+float add_amount(float x)
+{
+    return x + amount;
+}
+
+float width = range.hi - range.lo;
+float result = foo() + scale_twice(width) + shift() + add_amount(width);

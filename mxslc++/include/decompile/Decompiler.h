@@ -20,7 +20,8 @@ namespace mxslc::decompile
     public:
         explicit Decompiler(const fs::path& src_path);
         explicit Decompiler(const string& source);
-        // the document is copied, so that the MaterialX libraries of its version can be added to it
+        // the document is copied, so that the MaterialX libraries of its version can be added to it and its elements can
+        // be sorted into the order of code
         explicit Decompiler(const mx::DocumentPtr& document);
 
         // the graph decompiler of the document refers to this decompiler

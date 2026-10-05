@@ -93,6 +93,29 @@ TEST_P(roundtrip_tests, decompiling_decompiled_code_gives_the_same_code)
         print_debug_info(get_decompiled_path(original_path), redecompiled, decompiled);
 }
 
+TEST_P(roundtrip_tests, reordered_document_compiles_to_the_same_graph)
+{
+    // compiled code always comes after the code it depends on, the decompiler must put the elements of documents that
+    // are not in that order back in dependency order, see reverse_element_order
+    const fs::path& original_path = GetParam();
+
+    const mx::DocumentPtr original = mxslc::compile_to_document(read_file(original_path), get_roundtrip_options());
+    const string decompiled = mxslc::decompile_to_string(reverse_element_order(original));
+
+    mx::DocumentPtr recompiled;
+    try
+    {
+        recompiled = mxslc::compile_to_document(decompiled, get_roundtrip_options());
+    }
+    catch (const std::exception& e)
+    {
+        FAIL() << e.what() << "\n" << decompiled;
+    }
+
+    const vector<string> differences = GraphComparator::find_differences(original, recompiled);
+    EXPECT_TRUE(differences.empty()) << "different elements: " << testing::PrintToString(differences) << "\n" << decompiled;
+}
+
 vector<fs::path> get_roundtrip_files()
 {
     const fs::path test_dir = get_test_data("roundtrip");
