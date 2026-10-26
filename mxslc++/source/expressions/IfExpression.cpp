@@ -4,8 +4,6 @@
 
 #include "expressions/IfExpression.h"
 
-#include <cassert>
-
 #include "expressions/interface.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"

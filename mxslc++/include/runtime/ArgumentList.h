@@ -42,6 +42,12 @@ namespace mxslc::runtime
             args_.emplace_back(arg, size());
         }
 
+        template<typename T>
+        void add(string name, T arg)
+        {
+            args_.emplace_back(std::move(name), arg, size());
+        }
+
         ArgumentList monomorphize(const TypePtr& template_type) const override;
 
         VarPtr evaluate(const Parameter& param) const;

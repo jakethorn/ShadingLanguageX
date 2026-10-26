@@ -64,6 +64,7 @@ add_library(mxslc_lib
         expressions/RangeExpression.cpp
         expressions/IfExpression.cpp
         expressions/DefaultExpression.cpp
+        expressions/SwitchExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
