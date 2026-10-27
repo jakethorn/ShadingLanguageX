@@ -18,6 +18,7 @@
 #include "expressions/MethodCall.h"
 #include "expressions/NamedConstructor.h"
 #include "expressions/RangeExpression.h"
+#include "expressions/SwitchExpression.h"
 #include "expressions/ThisExpression.h"
 #include "expressions/TypeOfOperator.h"
 #include "expressions/VariableDefinitionExpression.h"
@@ -794,6 +795,11 @@ namespace mxslc
             return if_expression();
         }
 
+        if (peek() == TokenType::Switch)
+        {
+            return is_switch_expression() ? switch_expression() : function_call();
+        }
+
         if (peek() == TokenType::Default)
         {
             return default_expression();
@@ -836,6 +842,42 @@ namespace mxslc
         return create_expression<IfExpression>(std::move(cond_expr), std::move(then_expr), std::move(else_expr), std::move(token));
     }
 
+    ExprPtr Parser::switch_expression()
+    {
+        Token token = match(TokenType::Switch);
+        match('(');
+        ExprPtr which_expr = expression();
+        match(')');
+
+        vector<SwitchCase> cases = list<SwitchCase>('{', '}', [this](const size_t){ return switch_case(); });
+        if (cases.empty())
+            throw CompileError{token, "Switch expression has no cases"};
+
+        return create_expression<SwitchExpression>(std::move(which_expr), std::move(cases), std::move(token));
+    }
+
+    SwitchCase Parser::switch_case()
+    {
+        if (peek() == TokenType::Default and peek(1) == ':')
+        {
+            match(TokenType::Default);
+            match(':');
+            return SwitchCase{/*is_default*/true, expression()};
+        }
+
+        if (consume(TokenType::Case))
+        {
+            vector<Token> predicate = consume_until(TokenType::Colon);
+            if (predicate.empty())
+                throw CompileError{peek(), "Missing switch case predicate"};
+
+            match(':');
+            return SwitchCase{std::move(predicate), expression()};
+        }
+
+        return SwitchCase{expression()};
+    }
+
     ExprPtr Parser::default_expression()
     {
         Token token = match(TokenType::Default);
@@ -851,7 +893,8 @@ namespace mxslc
 
     ExprPtr Parser::function_call()
     {
-        Token name = match(TokenType::Identifier);
+        // allows switch std lib function to be called even though switch is a keyword
+        Token name = match(TokenType::Identifier, TokenType::Switch);
         TypePtr template_type = nullptr;
         if (consume('<'))
         {
@@ -982,6 +1025,26 @@ namespace mxslc
             peek(3) == '>';
 
         return is_func_call or is_templated_paramless_func_call or is_templated_func_call;
+    }
+
+    bool Parser::is_switch_expression() const
+    {
+        // switch expressions are followed by their cases, e.g., switch(i) { a, b }, unlike calls to the switch node
+        if (peek(0) != TokenType::Switch or peek(1) != '(')
+            return false;
+
+        size_t i = 2;
+        size_t count = 1;
+        while (count > 0)
+        {
+            if (peek(i) == '(')
+                count++;
+            else if (peek(i) == ')')
+                count--;
+            i++;
+        }
+
+        return peek(i) == '{';
     }
 
     bool Parser::is_constructor_definition() const

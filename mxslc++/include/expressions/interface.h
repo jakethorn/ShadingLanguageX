@@ -40,6 +40,7 @@ using Const##T##Ptr = shared_ptr<const T>;
     TYPE_DEF(NullExpression)
     TYPE_DEF(RangeExpression)
     TYPE_DEF(RuntimeExpression)
+    TYPE_DEF(SwitchExpression)
     TYPE_DEF(ThisExpression)
     TYPE_DEF(TypeOfOperator)
     TYPE_DEF(UnnamedConstructor)

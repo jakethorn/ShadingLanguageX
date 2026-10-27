@@ -26,6 +26,8 @@ namespace mxslc::serialize
 
     namespace
     {
+        using OneWType = Primitive (*)(const Primitive&, const TypePtr&);
+
         const unordered_map<string, constexpr_func> CONSTEXPR_FUNCS {
             {"add", wrap(primitive_utils::add)},
             {"subtract", wrap(primitive_utils::subtract)},
@@ -50,6 +52,9 @@ namespace mxslc::serialize
             {"switch", wrap_switch()},
             {"fract", wrap(primitive_utils::fract)},
             {"dotproduct", wrap(primitive_utils::dotproduct)},
+            {"floor", wrap(static_cast<OneWType>(primitive_utils::floor))},
+            {"ceil", wrap(static_cast<OneWType>(primitive_utils::ceil))},
+            {"round", wrap(static_cast<OneWType>(primitive_utils::round))},
         };
 
         bool is_constexpr(const FuncPtr& func, const ParameterValues& input_values, vector<Primitive>& comptime_values)

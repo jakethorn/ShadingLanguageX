@@ -9,33 +9,38 @@
 
 namespace mxslc::expressions
 {
-    class SwitchCase : Stringable
+    template<typename T>
+    using Indexed = unordered_map<size_t, T>;
+
+    class SwitchCase final : public Monomorphizable<SwitchCase>, public Stringable
     {
     public:
-        explicit SwitchCase(ExprPtr value_expr) : SwitchCase{"", std::move(value_expr)} { }
-        SwitchCase(string predicate, ExprPtr value_expr) : predicate_{std::move(predicate)}, value_expr_{std::move(value_expr)} { }
+        explicit SwitchCase(ExprPtr value_expr) : SwitchCase{{}, false, std::move(value_expr)} { }
+        SwitchCase(const bool is_default, ExprPtr value_expr) : SwitchCase{{}, is_default, std::move(value_expr)} { }
+        SwitchCase(vector<Token> predicate, ExprPtr value_expr) : SwitchCase{std::move(predicate), false, std::move(value_expr)} { }
 
         bool has_predicate() const { return not predicate_.empty(); }
-        const string& predicate() const { return predicate_; }
+        const vector<Token>& predicate() const { return predicate_; }
+        bool is_default() const { return is_default_; }
         const ExprPtr& value_expr() const { return value_expr_; }
 
-        string to_string() const override
-        {
-            if (has_predicate())
-                return "case " + predicate_ + ": " + value_expr_->to_string();
-            else
-                return value_expr_->to_string();
-        }
+        SwitchCase monomorphize(const TypePtr& template_type) const override;
+
+        string to_string() const override;
 
     private:
-        string predicate_;
+        SwitchCase(vector<Token> predicate, const bool is_default, ExprPtr value_expr)
+            : predicate_{std::move(predicate)}, is_default_{is_default}, value_expr_{std::move(value_expr)} { }
+
+        vector<Token> predicate_;
+        bool is_default_;
         ExprPtr value_expr_;
     };
 
     class SwitchExpression final : public Expression
     {
     public:
-        explicit SwitchExpression(ExprPtr value_expr, vector<SwitchCase> cases, Token token = {});
+        SwitchExpression(ExprPtr which_expr, vector<SwitchCase> cases, Token token = {});
 
         ExprPtr monomorphize(const TypePtr& template_type) const override;
 
@@ -48,8 +53,13 @@ namespace mxslc::expressions
         VarPtr evaluate_impl() const override;
 
     private:
-        ExprPtr value_expr_;
+        void index_case_expressions();
+        VarPtr runtime_evaluate(const VarPtr& which) const;
+
+        ExprPtr which_expr_;
         vector<SwitchCase> cases_;
+
+        Indexed<ExprPtr> indexed_case_exprs_;
     };
 }
 

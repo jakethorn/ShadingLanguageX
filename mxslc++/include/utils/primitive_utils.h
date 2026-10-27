@@ -6,6 +6,7 @@
 #define MXSLC_PRIMITIVE_UTILS_H
 
 #include "Primitive.h"
+#include "runtime/Type.h"
 
 namespace mxslc::primitive_utils
 {
@@ -61,7 +62,27 @@ namespace mxslc::primitive_utils
     std::array<Primitive, 4> separate4(const Primitive& in);
     vector<Primitive> separate(const Primitive& in);
 
+    Primitive floor(const Primitive& in, const TypePtr& type = nullptr);
+    Primitive ceil(const Primitive& in, const TypePtr& type = nullptr);
     Primitive round(const Primitive& in, const TypePtr& type = nullptr);
+
+    template<typename T>
+    T floor(const Primitive& in)
+    {
+        return floor(in, Type::of<T>()).template as<T>();
+    }
+
+    template<typename T>
+    T ceil(const Primitive& in)
+    {
+        return ceil(in, Type::of<T>()).template as<T>();
+    }
+
+    template<typename T>
+    T round(const Primitive& in)
+    {
+        return round(in, Type::of<T>()).template as<T>();
+    }
 
     // TODO: Add tests to primitive_utils_tests.cpp for creatematrix and invertmatrix
     Primitive creatematrix(const Primitive& in1, const Primitive& in2, const Primitive& in3, const TypePtr& type = nullptr);

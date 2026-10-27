@@ -173,7 +173,7 @@ namespace mxslc::serialize_utils
             return create_variable(std::move(type), fields_values);
         }
 
-        return create_variable(Primitive(type));
+        return create_variable(Primitive{type});
     }
 
     ValuePtr copy_value_from_port(const mx::PortElementPtr& port)
