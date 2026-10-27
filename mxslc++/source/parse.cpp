@@ -856,28 +856,6 @@ namespace mxslc
         return create_expression<SwitchExpression>(std::move(which_expr), std::move(cases), std::move(token));
     }
 
-    SwitchCase Parser::switch_case()
-    {
-        if (peek() == TokenType::Default and peek(1) == ':')
-        {
-            match(TokenType::Default);
-            match(':');
-            return SwitchCase{/*is_default*/true, expression()};
-        }
-
-        if (consume(TokenType::Case))
-        {
-            vector<Token> predicate = consume_until(TokenType::Colon);
-            if (predicate.empty())
-                throw CompileError{peek(), "Missing switch case predicate"};
-
-            match(':');
-            return SwitchCase{std::move(predicate), expression()};
-        }
-
-        return SwitchCase{expression()};
-    }
-
     ExprPtr Parser::default_expression()
     {
         Token token = match(TokenType::Default);
@@ -975,6 +953,28 @@ namespace mxslc
         }
 
         return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
+    }
+
+    SwitchCase Parser::switch_case()
+    {
+        if (peek() == TokenType::Default and peek(1) == ':')
+        {
+            match(TokenType::Default);
+            match(':');
+            return SwitchCase{/*is_default*/true, expression()};
+        }
+
+        if (consume(TokenType::Case))
+        {
+            vector<Token> predicate = consume_until(TokenType::Colon);
+            if (predicate.empty())
+                throw CompileError{peek(), "Missing switch case predicate"};
+
+            match(':');
+            return SwitchCase{std::move(predicate), expression()};
+        }
+
+        return SwitchCase{expression()};
     }
 
     bool Parser::is_typed_definition() const

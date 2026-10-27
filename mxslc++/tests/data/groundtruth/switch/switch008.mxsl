@@ -1,0 +1,8 @@
+float a = switch(2) { case <2: randomfloat(), case 2: 5.0, default: geompropvalue("q") };
+float b = switch(2.7) { 1.0, 2.0, 3.0, 4.0 };
+float c = switch(7) { 1.0, default: 9.0 };
+
+constant(a);
+constant(b);
+constant(c);
+

@@ -295,7 +295,7 @@ namespace mxslc::expressions
 
     string SwitchExpression::to_string() const
     {
-        string result = "switch (" + which_expr_->to_string() + ")\n{";
+        string result = "switch(" + which_expr_->to_string() + ")\n{";
 
         for (size_t i = 0; i < cases_.size(); ++i)
             result += (i == 0 ? "\n    " : ",\n    ") + cases_[i].to_string();

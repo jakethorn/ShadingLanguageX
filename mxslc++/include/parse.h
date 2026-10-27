@@ -68,7 +68,6 @@ namespace mxslc
         ExprPtr primary();
         ExprPtr if_expression(ExprPtr else_expr = nullptr);
         ExprPtr switch_expression();
-        SwitchCase switch_case();
         ExprPtr default_expression();
         ExprPtr function_call();
         ExprPtr method_call(ExprPtr instance);
@@ -78,6 +77,7 @@ namespace mxslc
         ExprPtr typeof_operator();
 
         Argument argument(size_t i);
+        SwitchCase switch_case();
 
         template<typename T>
         vector<T> list(const TokenType opener, const TokenType closer, std::function<T(size_t)> func)
