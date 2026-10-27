@@ -115,6 +115,89 @@ namespace mxslc::decompile
                 return SourceCode::concat({"(", expr.code, ");"});
             return SourceCode::concat({expr.code, ";"});
         }
+
+        // the number of inputs of a switch node, see SwitchExpression.cpp
+        constexpr size_t SWITCH_INPUT_COUNT = 10;
+
+        // the index that selects an input of a switch node, e.g., 0 for in1
+        optional<size_t> get_switch_index(const string& input_name)
+        {
+            for (size_t i = 0; i < SWITCH_INPUT_COUNT; ++i)
+            {
+                if (input_name == "in" + std::to_string(i + 1))
+                    return i;
+            }
+            return std::nullopt;
+        }
+
+        // the `i / 10` or `i % 10` of a nested switch, see GraphDecompiler::NestedSwitch
+        bool is_nested_index_operation(const mx::NodePtr& node, const string& category)
+        {
+            if (node == nullptr or node->getCategory() != category or node->getType() != "float")
+                return false;
+            return is_connected(node->getInput("in1")) and has_float_value(node->getInput("in2"), static_cast<float>(SWITCH_INPUT_COUNT));
+        }
+
+        // true if the inputs have the same value, e.g., they are connected to the same output of the same node
+        bool has_same_value(const mx::InputPtr& a, const mx::InputPtr& b)
+        {
+            const bool has_same_connection = a->getNodeName() == b->getNodeName() and a->getOutputString() == b->getOutputString() and
+                a->getNodeGraphString() == b->getNodeGraphString() and a->getInterfaceName() == b->getInterfaceName();
+            return has_same_connection and (is_connected(a) or a->getValueString() == b->getValueString());
+        }
+
+        // a case of a switch expression and the input whose value it selects, e.g., `case >=5: a`
+        struct SwitchCase
+        {
+            // empty if the case selects the index of its position, e.g., the b of `switch(i) { a, b }`
+            string predicate;
+            mx::InputPtr input;
+        };
+
+        // Each case selects the index of its position, unless an index is skipped, e.g., the c of
+        // `switch(i) { a, b, case 5: c }`. Consecutive indices with the same value are selected by a single case if they
+        // start at the first index, e.g., `case <3: a`, or if later cases, which take precedence, select every index after
+        // them, e.g., `case >=7: b`.
+        vector<SwitchCase> get_switch_cases(const vector<mx::InputPtr>& inputs)
+        {
+            // the ranges of consecutive indices with the same value
+            vector<std::pair<size_t, size_t>> ranges;
+            for (size_t index = 0; index < inputs.size(); ++index)
+            {
+                if (inputs[index] == nullptr)
+                    continue;
+                if (ranges.empty() or ranges.back().second + 1 != index or not has_same_value(inputs[ranges.back().first], inputs[index]))
+                    ranges.emplace_back(index, index);
+                else
+                    ranges.back().second = index;
+            }
+
+            // the indices after the last input of a single switch node also select the last input, so a case that selects
+            // every index from its start onwards must be followed by a last case that does the same
+            const bool is_last_range_selected_onwards = inputs.size() > SWITCH_INPUT_COUNT or (not ranges.empty() and ranges.back().first < ranges.back().second);
+
+            vector<SwitchCase> cases;
+            for (const auto& [start, end] : ranges)
+            {
+                const bool is_selected_after = std::all_of(inputs.begin() + end + 1, inputs.end(), [](const mx::InputPtr& input) { return input != nullptr; });
+
+                if (start == 0 and end > 0)
+                {
+                    cases.push_back({"<" + std::to_string(end + 1), inputs[start]});
+                }
+                else if (end > start and is_selected_after and is_last_range_selected_onwards)
+                {
+                    cases.push_back({">=" + std::to_string(start), inputs[start]});
+                }
+                else
+                {
+                    for (size_t index = start; index <= end; ++index)
+                        cases.push_back({index == cases.size() ? "" : std::to_string(index), inputs[index]});
+                }
+            }
+
+            return cases;
+        }
     }
 
     GraphDecompiler::GraphDecompiler(Decompiler& decompiler, mx::GraphElementPtr graph, unordered_set<string> outside_variables)
@@ -502,6 +585,22 @@ namespace mxslc::decompile
         return get_user_attributes(helper).empty();
     }
 
+    bool GraphDecompiler::is_absorbable_by(const mx::NodePtr& helper, const unordered_set<mx::NodePtr>& consumers) const
+    {
+        if (helper == nullptr or not contains(uses_, helper) or get_assignments(helper))
+            return false;
+
+        unordered_set<mx::NodePtr> users;
+        for (const NodeUse& use : uses_.at(helper))
+        {
+            const mx::NodePtr consumer = use.consumer->asA<mx::Node>();
+            if (not contains(consumers, consumer) or not users.insert(consumer).second)
+                return false;
+        }
+
+        return users.size() == consumers.size() and get_user_attributes(helper).empty();
+    }
+
     mx::NodePtr GraphDecompiler::get_connected_node(const mx::InputPtr& input) const
     {
         if (input == nullptr or input->getNodeName().empty())
@@ -704,6 +803,113 @@ namespace mxslc::decompile
         return node->getInput("in1") != nullptr or node->getInput("in2") != nullptr;
     }
 
+    // `switch(i) { a, b }` is compiled to `switch(a, b, which=i)`, unless i is known at compile time
+    bool GraphDecompiler::is_switch_expression(const mx::NodePtr& node) const
+    {
+        if (node->getCategory() != "switch" or not is_connected(node->getInput("which")))
+            return false;
+
+        bool has_case = false;
+        for (const mx::InputPtr& input : node->getInputs())
+        {
+            // the cases and index of a switch expression cannot have attributes
+            if (not get_user_attributes(input).empty())
+                return false;
+            if (input->getName() == "which")
+                continue;
+            if (not get_switch_index(input->getName()))
+                return false;
+            has_case = has_case or is_connected(input) or input->hasValue();
+        }
+
+        return has_case;
+    }
+
+    // `switch(i) { ... }` with more than 10 indices is compiled to `switch(..., which=i / 10)`, whose inputs can be inner
+    // switch nodes `switch(..., which=i % 10)`, where i is converted to a float if it is an integer
+    optional<GraphDecompiler::NestedSwitch> GraphDecompiler::find_nested_switch(const mx::NodePtr& node) const
+    {
+        if (not is_switch_expression(node))
+            return std::nullopt;
+
+        NestedSwitch nested;
+        nested.divide = get_connected_node(node->getInput("which"));
+        if (not is_nested_index_operation(nested.divide, "divide") or not is_absorbable_by(nested.divide, node, 1))
+            return std::nullopt;
+
+        const mx::InputPtr index = nested.divide->getInput("in1");
+        for (const mx::InputPtr& input : node->getInputs())
+        {
+            const mx::NodePtr inner = get_connected_node(input);
+            if (inner == nullptr or input->getName() == "which" or not is_switch_expression(inner) or not is_absorbable_by(inner, node, 1))
+                continue;
+
+            const mx::NodePtr modulo = get_connected_node(inner->getInput("which"));
+            if (not is_nested_index_operation(modulo, "modulo") or not has_same_value(modulo->getInput("in1"), index))
+                continue;
+            if (nested.modulo and modulo != nested.modulo)
+                return std::nullopt;
+
+            nested.modulo = modulo;
+            nested.inner_switches.insert(inner);
+        }
+
+        if (nested.modulo and not is_absorbable_by(nested.modulo, nested.inner_switches))
+            return std::nullopt;
+
+        // an integer index is converted to a float, because there is no integer modulo node
+        const mx::NodePtr convert = get_connected_node(index);
+        unordered_set<mx::NodePtr> convert_consumers{nested.divide};
+        if (nested.modulo)
+            convert_consumers.insert(nested.modulo);
+        const bool is_integer_index = convert and convert->getCategory() == "convert" and is_connected(convert->getInput("in")) and convert->getInput("in")->getType() == "integer";
+        if (is_integer_index and is_absorbable_by(convert, convert_consumers))
+            nested.convert = convert;
+
+        // a group without an inner switch node selects its 10 indices with a single input, whose value would be created
+        // again if more than one case selected it
+        unordered_set<mx::InputPtr> selected_inputs;
+        for (const SwitchCase& case_ : get_switch_cases(get_switch_inputs(node, &nested)))
+        {
+            if (is_connected(case_.input) and not selected_inputs.insert(case_.input).second)
+                return std::nullopt;
+        }
+
+        return nested;
+    }
+
+    vector<mx::InputPtr> GraphDecompiler::get_switch_inputs(const mx::NodePtr& node, const NestedSwitch* nested) const
+    {
+        vector<mx::InputPtr> inputs(nested ? SWITCH_INPUT_COUNT * SWITCH_INPUT_COUNT : SWITCH_INPUT_COUNT);
+        for (const mx::InputPtr& input : node->getInputs())
+        {
+            const optional<size_t> index = get_switch_index(input->getName());
+            if (not index or not (is_connected(input) or input->hasValue()))
+                continue;
+
+            if (nested == nullptr)
+            {
+                inputs[*index] = input;
+                continue;
+            }
+
+            // the indices of a group are selected by its inner switch node, or all by the same input
+            const auto group = inputs.begin() + *index * SWITCH_INPUT_COUNT;
+            const mx::NodePtr inner = get_connected_node(input);
+            if (inner and contains(nested->inner_switches, inner))
+            {
+                const vector<mx::InputPtr> inner_inputs = get_switch_inputs(inner, nullptr);
+                std::copy(inner_inputs.begin(), inner_inputs.end(), group);
+            }
+            else
+            {
+                std::fill_n(group, SWITCH_INPUT_COUNT, input);
+            }
+        }
+
+        return inputs;
+    }
+
     // `geomprop float x;` is compiled to `geompropvalue("x")` named x
     bool GraphDecompiler::is_geomprop_definition(const mx::NodePtr& node) const
     {
@@ -742,6 +948,7 @@ namespace mxslc::decompile
     {
         absorbed_.clear();
         swizzle_assignments_.clear();
+        nested_switches_.clear();
 
         for (const mx::NodePtr& node : nodes_)
         {
@@ -765,6 +972,17 @@ namespace mxslc::decompile
             {
                 for (const SeparatedArgument& argument : get_separated_arguments(node))
                     absorbed_.insert(argument.separate);
+            }
+
+            if (const optional<NestedSwitch> nested = find_nested_switch(node))
+            {
+                for (const mx::NodePtr& helper : {nested->divide, nested->modulo, nested->convert})
+                {
+                    if (helper)
+                        absorbed_.insert(helper);
+                }
+                absorbed_.insert(nested->inner_switches.begin(), nested->inner_switches.end());
+                nested_switches_[node] = *nested;
             }
         }
     }
@@ -1233,6 +1451,12 @@ namespace mxslc::decompile
                 return expr;
         }
 
+        if (is_switch_expression(node))
+        {
+            if (optional<ExpressionCode> expr = create_switch_expression(node))
+                return expr;
+        }
+
         if (category == "extract")
         {
             if (optional<ExpressionCode> expr = create_extract_expression(node))
@@ -1311,6 +1535,35 @@ namespace mxslc::decompile
         if (not else_code)
             return std::nullopt;
         return format_if_expression(*condition, *then_code, *else_code);
+    }
+
+    optional<ExpressionCode> GraphDecompiler::create_switch_expression(const mx::NodePtr& node)
+    {
+        const NestedSwitch* nested = contains(nested_switches_, node) ? &nested_switches_.at(node) : nullptr;
+
+        // the index of a nested switch is written before it is divided into groups, see NestedSwitch
+        optional<ExpressionCode> which;
+        if (nested and nested->convert)
+            which = create_untyped_expression(nested->convert, "in");
+        else if (nested)
+            which = create_untyped_expression(nested->divide, "in1");
+        else
+            which = create_untyped_expression(node, "which");
+        if (not which)
+            return std::nullopt;
+
+        vector<SourceCode> cases;
+        for (const SwitchCase& case_ : get_switch_cases(get_switch_inputs(node, nested)))
+        {
+            // the cases have the type of the switch expression
+            TypedContext context{is_typed_context_, is_typed_context_ and case_.input->getType() == node->getType()};
+            const optional<ExpressionCode> value = create_port_expression(case_.input);
+            if (not value)
+                return std::nullopt;
+            cases.push_back(format_switch_case(case_.predicate, *value));
+        }
+
+        return format_switch_expression(*which, cases);
     }
 
     optional<ExpressionCode> GraphDecompiler::create_extract_expression(const mx::NodePtr& node)

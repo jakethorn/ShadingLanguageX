@@ -1,0 +1,14 @@
+float i = randomfloat();
+int n = geompropvalue("n");
+float a = switch(i) { 0.0, 1.0, geompropvalue("a") };
+float b = switch(n) { 1.0, 2.0, case 5: 3.0, case >=7: geompropvalue("b") };
+color3 c = switch(i) { case <3: color3{1.0, 0.0, 0.0}, case 3: color3{0.0, 1.0, 0.0}, case >=4: color3{0.0, 0.0, 1.0} };
+float d = 1.0 + switch(i) { a, b };
+float e = switch(i)
+{
+    case <=4: 1.0 + 1.0,
+    case 5: randomfloat(),
+    case 6: geompropvalue("first"),
+    geompropvalue("second"),
+    default: geompropvalue("third")
+};

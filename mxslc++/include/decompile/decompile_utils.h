@@ -58,6 +58,8 @@ namespace mxslc::decompile_utils
     bool is_connected(const mx::InputPtr& input);
     // true if the input has a boolean value, rather than a connection, that is the expected value
     bool has_bool_value(const mx::InputPtr& input, bool expected);
+    // true if the input has a float value, rather than a connection, that is the expected value
+    bool has_float_value(const mx::InputPtr& input, float expected);
     // the value of the input if it is an integer, rather than a connection
     optional<int> get_int_value(const mx::InputPtr& input);
     // the components of a numeric value, e.g., {1, 2, 3} for "1, 2, 3", empty if the value is not numeric

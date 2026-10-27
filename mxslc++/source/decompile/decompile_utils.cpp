@@ -269,6 +269,14 @@ namespace mxslc::decompile_utils
         return value and value->isA<bool>() and value->asA<bool>() == expected;
     }
 
+    bool has_float_value(const mx::InputPtr& input, const float expected)
+    {
+        if (input == nullptr or is_connected(input) or not input->hasValue())
+            return false;
+        const mx::ValuePtr value = input->getValue();
+        return value and value->isA<float>() and value->asA<float>() == expected;
+    }
+
     optional<int> get_int_value(const mx::InputPtr& input)
     {
         if (input == nullptr or is_connected(input) or not input->hasValue())
