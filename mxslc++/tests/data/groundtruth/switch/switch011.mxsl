@@ -1,0 +1,4 @@
+float i = randomfloat();
+float a = switch(1.0, 2.0, which=i);
+float b = switch(i) { default: geompropvalue("d") };
+float c = 1.0 + switch(i * 2.0) { 1.0, switch(i) { 2.0, 3.0 } };

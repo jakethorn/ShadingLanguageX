@@ -4,8 +4,6 @@
 
 #include "expressions/IfExpression.h"
 
-#include <cassert>
-
 #include "expressions/interface.h"
 #include "runtime/interface.h"
 #include "runtime/Type.h"
@@ -74,7 +72,7 @@ namespace mxslc::expressions
     {
         const VarPtr cond = cond_expr_->evaluate();
 
-        if (cond->is_compile_time<bool>())
+        if (cond->is_compile_time())
             return cond->compile_time_value<bool>() ? then_expr_->evaluate() : else_expr_->evaluate();
 
         const VarPtr then = then_expr_->evaluate();

@@ -1,0 +1,1 @@
+switch102.mxsl, line 2: Switch cases do not evaluate to the same type

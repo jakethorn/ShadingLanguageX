@@ -89,6 +89,18 @@ namespace mxslc::decompile
             mx::NodePtr separate;
         };
 
+        // `switch(i) { ... }` with more than 10 indices is compiled to an outer switch node that selects a group of 10
+        // indices with `i / 10`, and inner switch nodes that select an index in a group with `i % 10`
+        struct NestedSwitch
+        {
+            mx::NodePtr divide;
+            // null if every group has a single value, i.e., there are no inner switch nodes
+            mx::NodePtr modulo;
+            // the conversion of an integer index to a float, or null if the index is a float
+            mx::NodePtr convert;
+            unordered_set<mx::NodePtr> inner_switches;
+        };
+
         void add_use(const mx::PortElementPtr& port, const mx::ElementPtr& consumer);
         void find_assignments();
         void find_absorbed_nodes();
@@ -117,12 +129,18 @@ namespace mxslc::decompile
         void collect_interface_dependencies(const mx::PortElementPtr& port, unordered_set<string>& names, unordered_set<mx::NodePtr>& visited) const;
 
         bool is_absorbable_by(const mx::NodePtr& helper, const mx::NodePtr& consumer, size_t expected_uses) const;
+        // true if the helper is used once by each of the consumers and by nothing else
+        bool is_absorbable_by(const mx::NodePtr& helper, const unordered_set<mx::NodePtr>& consumers) const;
         mx::NodePtr get_connected_node(const mx::InputPtr& input) const;
         mx::NodePtr get_float_operand_convert(const mx::NodePtr& node) const;
         mx::NodePtr get_swizzle_separate(const mx::NodePtr& node) const;
         vector<SeparatedArgument> get_separated_arguments(const mx::NodePtr& node) const;
         bool is_comparison(const mx::NodePtr& node) const;
         bool is_if_expression(const mx::NodePtr& node) const;
+        bool is_switch_expression(const mx::NodePtr& node) const;
+        optional<NestedSwitch> find_nested_switch(const mx::NodePtr& node) const;
+        // the input selected by each index of the switch node, or null if the index selects no input
+        vector<mx::InputPtr> get_switch_inputs(const mx::NodePtr& node, const NestedSwitch* nested) const;
         bool is_geomprop_definition(const mx::NodePtr& node) const;
         // compile-time values that are returned by a function are written to its outputs as constant nodes
         bool is_output_constant(const mx::NodePtr& node) const;
@@ -136,6 +154,7 @@ namespace mxslc::decompile
         optional<ExpressionCode> create_binary_expression(const mx::NodePtr& node, const string& op);
         optional<ExpressionCode> create_comparison_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_if_expression(const mx::NodePtr& node);
+        optional<ExpressionCode> create_switch_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_extract_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_combine_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_function_call(const mx::NodePtr& node, bool with_out_arguments);
@@ -170,6 +189,7 @@ namespace mxslc::decompile
         vector<VariableAssignments> assignments_;
         unordered_map<mx::NodePtr, size_t> assignment_indices_;
         unordered_map<mx::NodePtr, SwizzleAssignment> swizzle_assignments_;
+        unordered_map<mx::NodePtr, NestedSwitch> nested_switches_;
         unordered_set<mx::NodePtr> absorbed_;
         unordered_set<mx::NodePtr> statements_;
         unordered_set<string> used_identifiers_;

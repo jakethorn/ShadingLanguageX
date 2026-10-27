@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="i" type="float" />
+  <switch name="a" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+  <geompropvalue name="b" type="float">
+    <input name="geomprop" type="string" value="d" />
+  </geompropvalue>
+  <multiply name="var__0" type="float">
+    <input name="in1" type="float" nodename="i" />
+    <input name="in2" type="float" value="2" />
+  </multiply>
+  <switch name="var__1" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+  <switch name="var__2" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="var__1" />
+    <input name="which" type="float" nodename="var__0" />
+  </switch>
+  <add name="c" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="var__2" />
+  </add>
+</materialx>

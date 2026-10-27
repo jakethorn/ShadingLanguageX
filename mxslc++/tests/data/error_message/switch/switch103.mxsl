@@ -1,0 +1,6 @@
+float i = randomfloat();
+float a = switch(i)
+{
+    case 2.5: 1.0,
+    2.0
+};

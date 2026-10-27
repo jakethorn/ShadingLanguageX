@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "TokenReader.h"
+#include "expressions/SwitchExpression.h"
 #include "runtime/Attribute.h"
 #include "runtime/AttributeList.h"
 #include "runtime/ModifierList.h"
@@ -66,6 +67,7 @@ namespace mxslc
         ExprPtr property();
         ExprPtr primary();
         ExprPtr if_expression(ExprPtr else_expr = nullptr);
+        ExprPtr switch_expression();
         ExprPtr default_expression();
         ExprPtr function_call();
         ExprPtr method_call(ExprPtr instance);
@@ -75,6 +77,7 @@ namespace mxslc
         ExprPtr typeof_operator();
 
         Argument argument(size_t i);
+        SwitchCase switch_case();
 
         template<typename T>
         vector<T> list(const TokenType opener, const TokenType closer, std::function<T(size_t)> func)
@@ -105,6 +108,7 @@ namespace mxslc
 
         bool is_typed_definition() const;
         bool is_function_call() const;
+        bool is_switch_expression() const;
         bool is_constructor_definition() const;
 
         bool in_abs_{false};

@@ -84,14 +84,7 @@ namespace mxslc::decompile
                     break;
                 }
                 write_text(node.text);
-                for (size_t i = 0; i < parts.size(); ++i)
-                {
-                    const bool is_last = i + 1 == parts.size();
-                    new_line(indent + INDENT_WIDTH);
-                    write(parts[i], indent + INDENT_WIDTH, is_last ? 0 : 1);
-                    if (not is_last)
-                        write_text(",");
-                }
+                write_items(parts, indent);
                 new_line(indent);
                 write_text(node.close);
                 break;
@@ -109,6 +102,18 @@ namespace mxslc::decompile
                     write(parts[i], indent, is_last ? node.close.size() + trailing : 1);
                     write_text(is_last ? node.close : ",");
                 }
+                break;
+            case SourceCode::Kind::BracedList:
+                if (fits(code, trailing))
+                {
+                    write_flat(code);
+                    break;
+                }
+                new_line(indent);
+                write_text("{");
+                write_items(parts, indent);
+                new_line(indent);
+                write_text("}");
                 break;
             case SourceCode::Kind::Chain:
                 if (fits(code, trailing))
@@ -162,6 +167,19 @@ namespace mxslc::decompile
         const string& str() const { return out_; }
 
     private:
+        // writes the items of a list on their own indented lines, separated by commas
+        void write_items(const vector<SourceCode>& items, const size_t indent)
+        {
+            for (size_t i = 0; i < items.size(); ++i)
+            {
+                const bool is_last = i + 1 == items.size();
+                new_line(indent + INDENT_WIDTH);
+                write(items[i], indent + INDENT_WIDTH, is_last ? 0 : 1);
+                if (not is_last)
+                    write_text(",");
+            }
+        }
+
         void write_flat(const SourceCode& code)
         {
             const SourceCode::Node& node = *code.node_;
@@ -173,6 +191,7 @@ namespace mxslc::decompile
                 break;
             case SourceCode::Kind::List:
             case SourceCode::Kind::ParameterList:
+            case SourceCode::Kind::BracedList:
                 write_text(node.text);
                 for (size_t i = 0; i < parts.size(); ++i)
                 {
@@ -251,7 +270,7 @@ namespace mxslc::decompile
         size_t width = text.size() + close.size();
         for (const SourceCode& part : parts)
             width += part.width();
-        if ((kind == Kind::List or kind == Kind::ParameterList) and not parts.empty())
+        if ((kind == Kind::List or kind == Kind::ParameterList or kind == Kind::BracedList) and not parts.empty())
             width += 2 * (parts.size() - 1);
         if (kind == Kind::Chain and not parts.empty())
             width += parts.size() - 1;
@@ -274,6 +293,11 @@ namespace mxslc::decompile
     SourceCode SourceCode::parameter_list(vector<SourceCode> params)
     {
         return SourceCode{Kind::ParameterList, "(", std::move(params), ")"};
+    }
+
+    SourceCode SourceCode::braced_list(vector<SourceCode> items)
+    {
+        return SourceCode{Kind::BracedList, " { ", std::move(items), " }"};
     }
 
     SourceCode SourceCode::chain(vector<SourceCode> links)
@@ -334,6 +358,9 @@ namespace mxslc::decompile
         case Kind::List:
         case Kind::ParameterList:
             return node_->parts.empty() ? width() : node_->text.size();
+        // the line is broken before the opening brace
+        case Kind::BracedList:
+            return 0;
         case Kind::Branch:
             return 1;
         case Kind::Chain:
@@ -357,6 +384,7 @@ namespace mxslc::decompile
             return node_->parts.size() > 1 or (node_->parts.size() == 1 and node_->parts.front().is_breakable());
         case Kind::List:
         case Kind::ParameterList:
+        case Kind::BracedList:
             return not node_->parts.empty();
         default:
             return true;
@@ -444,6 +472,11 @@ namespace mxslc::decompile
         return ExpressionCode{SourceCode::chain(std::move(links)), Precedence::Lowest};
     }
 
+    ExpressionCode format_switch_expression(const ExpressionCode& which, const vector<SourceCode>& cases)
+    {
+        return ExpressionCode{SourceCode::concat({"switch(", which.code, ")", SourceCode::braced_list(cases)}), Precedence::Primary};
+    }
+
     SourceCode format_argument(const vector<string>& attributes, const string& name, const ExpressionCode& value)
     {
         string prefix = join(attributes, " ");
@@ -452,6 +485,13 @@ namespace mxslc::decompile
         if (not name.empty())
             prefix += name + " = ";
         return prefix.empty() ? value.code : SourceCode::concat({prefix, value.code});
+    }
+
+    SourceCode format_switch_case(const string& predicate, const ExpressionCode& value)
+    {
+        if (predicate.empty())
+            return value.code;
+        return SourceCode::concat({"case " + predicate + ": ", value.code});
     }
 
     SourceCode add_attributes(const vector<string>& attributes, const SourceCode& statement)

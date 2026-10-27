@@ -1,0 +1,2 @@
+float i = randomfloat();
+float a = switch(i) { };

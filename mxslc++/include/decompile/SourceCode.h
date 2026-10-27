@@ -54,6 +54,9 @@ namespace mxslc::decompile
         // the parameters of a function, which are written on their own lines without indentation if they do not fit,
         // and the list is closed after the last parameter
         static SourceCode parameter_list(vector<SourceCode> params);
+        // items separated by commas between braces, e.g., the cases of `switch(i) { a, b }`, which are written on their
+        // own indented lines if they do not fit, with the braces on their own lines before and after them
+        static SourceCode braced_list(vector<SourceCode> items);
         // links that are written on their own indented lines after the first if they do not fit, e.g., `a` `+ b` `+ c`
         // or `if (x) { a }` `else { b }`
         static SourceCode chain(vector<SourceCode> links);
@@ -71,7 +74,7 @@ namespace mxslc::decompile
         string str() const;
 
     private:
-        enum class Kind { Text, Concat, List, ParameterList, Chain, Branch, Lines, Block };
+        enum class Kind { Text, Concat, List, ParameterList, BracedList, Chain, Branch, Lines, Block };
         struct Node;
         friend class SourceCodeRenderer;
 
@@ -119,9 +122,13 @@ namespace mxslc::decompile
     // `if (c) { a } else { b }`, whose else branch can be implied by the variable it is assigned to, e.g.,
     // `x = if (c) { a };`
     ExpressionCode format_if_expression(const ExpressionCode& condition, const ExpressionCode& then_code, const optional<ExpressionCode>& else_code);
+    // `switch(i) { a, case >=2: b }`, whose cases are complete, see format_switch_case
+    ExpressionCode format_switch_expression(const ExpressionCode& which, const vector<SourceCode>& cases);
 
     // an argument of a call, e.g., `@uiname "Color" base_color = c`
     SourceCode format_argument(const vector<string>& attributes, const string& name, const ExpressionCode& value);
+    // a case of a switch expression, e.g., `case >=2: b`, or `b` if it has no predicate
+    SourceCode format_switch_case(const string& predicate, const ExpressionCode& value);
     // writes the attributes of a statement on the lines before it
     SourceCode add_attributes(const vector<string>& attributes, const SourceCode& statement);
 

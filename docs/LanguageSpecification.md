@@ -425,7 +425,7 @@ float pi2 = 3.14 * 2.0;
 
 The following identifiers have a special meaning in ShadingLanguageX and cannot be used for user-defined variables or functions.
 
-`if` `else` `switch` `for` `from` `to` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
+`if` `else` `switch` `case` `for` `from` `to` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
 `global` `default` `using` `class` `this` `print` `typeof` `break` `comptime` `nodegraph` `nodedef`
 
 
@@ -1018,19 +1018,33 @@ float a, int b, string c;
 Use the following syntax to also initialise them:
 
 ```
-float a, int b, string c = {1.0, 2, "hello"};
+float a, int b, string c = 1.0, 2, "hello";
 ```
 
 If all variables share the same modifiers and type, the syntax can be simplified to:
 
 ```
-const float a, b, c = {1.0, 2.0, 3.0};
+const float a, b, c = 1.0, 2.0, 3.0;
+```
+
+Variables can also be initialised using a tuple:
+
+```
+float a, int b, string c = {1.0, 2, "hello"};
+const float d, e, f = {1.0, 2.0, 3.0};
 ```
 
 Functions that return multiple variables can also be used for initialisation:
 
 ```
 float u, v = separate2(texcoord());
+```
+
+Finally, vectors can be used to initialise floats with matching dimensions:
+
+```
+float x, y = vec2{0, 0};
+float u, v = texcoord(); // this is identical to `separate2(texcoord());`
 ```
 
 ```
@@ -1054,7 +1068,11 @@ float x, y = randompoint();
 name = value;
 name[i] = value;
 name.property = value;
+
+name1, name2, ... = value
+name1, name2, ... = value1, value2, ...
 ```  
+
 `name` must be the name of a previously declared variable.  
 `value` can be any valid expression that evaluates to the type of `name`.  
 
@@ -1106,6 +1124,30 @@ surfaceshader s = standard_surface(base_color=randomcolor(), specular_roughness=
 // Or
 surfaceshader s = standard_surface(base_color=randomcolor());
 s.specular_roughness = randomfloat();
+```
+
+## Multi-Variable Assignment
+
+Multiple variables can be assigned at once.
+
+```
+// definition
+mutable float x, y = 1, 2;
+
+// assignment
+x, y = 3, 4;
+```
+
+```
+{vec3, bool} intersection(vec3 origin, vec3 dir)
+{
+    mutable vec3 pos;
+    mutable bool hit;
+    // raycasting calculations...
+    return {pos, hit};
+}
+
+p, h = intersection(origin, dir);
 ```
 
 ## Increment/Decrement Operator
@@ -1311,33 +1353,56 @@ if (a > 0.5) // Error: runtime condition
 }
 ```
 
-> [!WARNING]
-> ### Not yet supported in mxslc++
-> # Switch Expression
-> 
-> ShadingLanguageX does not support switch statements, but instead uses switch expressions, for the same reasons as if
-> expressions above. They are similar to switch expressions found in the C# programming language.
-> 
-> ```
-> switch (which) { in1, in2, in3 }
-> ```
-> 
-> `which` can be any expression that evaluates to either an `int` or `float` type.  
-> The switch expression will evaluate to either `in1`, `in2`, `in3`, or a default value depending on the value of `which`.
-> See the `switch` node in the MaterialX Standard Node document for more information.
-> 
-> ### Example
-> 
-> ```
-> color3 albedo = switch (wall_id)
-> {
->     image("left_wall.png", texcoord=uv),
->     image("right_wall.png", texcoord=uv),
->     image("back_wall.png", texcoord=uv),
->     image("ceiling.png", texcoord=uv),
->     image("floor.png", texcoord=uv)
-> }
-> ```
+# Switch Expression
+
+```
+float i = randomfloat(max=2.0);
+
+color3 c = switch(i)
+{
+    color3{1, 0, 0},
+    color3{0, 1, 0},
+    color3{0, 0, 1}
+};
+```
+
+`switch` expressions allow users to select a value from a list of cases based on an index, starting from zero, they support the same types
+as the MaterialX `switch` node, as well as user-defined types, and can have up to 100 cases.
+
+## Types of Cases
+
+| Case         | Selects                                                                                            |
+|--------------|----------------------------------------------------------------------------------------------------|
+| `x`          | the index of its position in the list of cases, starting at 0                                      |
+| `case n: x`  | the index `n`, can also be written as `case ==n: x`                                                |
+| `case <n: x` | every index that satisfies the comparison, the operators `<=`, `>`, `>=` and `!=` can also be used |
+| `default: x` | every index that is not selected by another case                                                   |
+
+If more than one case selects the same index, the later case takes precedence. The `default` case is the exception, it
+only selects the indices that no other case selects, wherever it is written. A switch expression can have at most one
+`default` case.
+
+### Example
+
+```
+float a = switch(i)
+{
+    1.0,                   // index 0
+    geompropvalue("b"),    // index 1
+    normal().z,            // index 2
+    default=randomfloat()  // index 3 to 99
+};
+```
+
+```
+float b = switch(i)
+{
+    case <=7: 1.0,  // index 0, 1, 2, 3, 4 and 7
+    case 5: 2.0,    // index 5
+    case 6: 3.0,    // index 6
+    default: 4.0    // index 8 to 99
+};
+```
 
 # Compile Time Evaluation
 

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="i" type="float" />
+  <randomfloat name="var__0" type="float" />
+  <convert name="var__1" type="vector3">
+    <input name="in" type="float" nodename="var__0" />
+  </convert>
+  <randomfloat name="var__2" type="float" />
+  <switch name="f__x" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" nodename="var__2" />
+    <input name="in3" type="float" value="3" />
+    <input name="in4" type="float" value="3" />
+    <input name="in5" type="float" value="3" />
+    <input name="in6" type="float" value="3" />
+    <input name="in7" type="float" value="3" />
+    <input name="in8" type="float" value="3" />
+    <input name="in9" type="float" value="3" />
+    <input name="in10" type="float" value="3" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+  <switch name="f__y" type="vector3">
+    <input name="in1" type="vector3" nodename="var__1" />
+    <input name="in2" type="vector3" value="2, 2, 2" />
+    <input name="in3" type="vector3" value="3, 3, 3" />
+    <input name="in4" type="vector3" value="3, 3, 3" />
+    <input name="in5" type="vector3" value="3, 3, 3" />
+    <input name="in6" type="vector3" value="3, 3, 3" />
+    <input name="in7" type="vector3" value="3, 3, 3" />
+    <input name="in8" type="vector3" value="3, 3, 3" />
+    <input name="in9" type="vector3" value="3, 3, 3" />
+    <input name="in10" type="vector3" value="3, 3, 3" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" nodename="f__x" />
+  </constant>
+  <constant name="var__4" type="vector3">
+    <input name="value" type="vector3" nodename="f__y" />
+  </constant>
+</materialx>

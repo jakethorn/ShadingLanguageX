@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="i" type="float" />
+  <geompropvalue name="var__0" type="float">
+    <input name="geomprop" type="string" value="big" />
+  </geompropvalue>
+  <switch name="a" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+    <input name="in6" type="float" nodename="var__0" />
+    <input name="in7" type="float" nodename="var__0" />
+    <input name="in8" type="float" nodename="var__0" />
+    <input name="in9" type="float" nodename="var__0" />
+    <input name="in10" type="float" nodename="var__0" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+  <geompropvalue name="var__1" type="float">
+    <input name="geomprop" type="string" value="nine" />
+  </geompropvalue>
+  <switch name="b" type="float">
+    <input name="in1" type="float" value="0" />
+    <input name="in2" type="float" value="1" />
+    <input name="in3" type="float" value="2" />
+    <input name="in4" type="float" value="3" />
+    <input name="in5" type="float" value="4" />
+    <input name="in6" type="float" value="5" />
+    <input name="in7" type="float" value="6" />
+    <input name="in8" type="float" value="7" />
+    <input name="in9" type="float" value="8" />
+    <input name="in10" type="float" nodename="var__1" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+</materialx>

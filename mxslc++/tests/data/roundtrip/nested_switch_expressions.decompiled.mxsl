@@ -1,0 +1,26 @@
+geomprop int i;
+float var_0 = geompropvalue("big");
+float a = switch(i)
+{
+    0.0,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    case >=50: var_0
+};
+float f = randomfloat(max = 30.0);
+float var_8 = geompropvalue("high");
+float b = switch(f)
+{
+    case <10: geompropvalue("low"),
+    case >=10: geompropvalue("mid"),
+    case >=20: var_8
+};

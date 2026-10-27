@@ -64,6 +64,7 @@ add_library(mxslc_lib
         expressions/RangeExpression.cpp
         expressions/IfExpression.cpp
         expressions/DefaultExpression.cpp
+        expressions/SwitchExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp
@@ -104,6 +105,8 @@ add_library(mxslc_lib
         utils/primitive_utils/conditional_nodes.cpp
         utils/primitive_utils/path_functions.cpp
         utils/primitive_utils/constant.cpp
+        utils/primitive_utils/floor.cpp
+        utils/primitive_utils/ceil.cpp
         utils/primitive_utils/round.cpp
         utils/primitive_utils/fract.cpp
         utils/primitive_utils/dotproduct.cpp

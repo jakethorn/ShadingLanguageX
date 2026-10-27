@@ -1,0 +1,1 @@
+switch105.mxsl, line 2: Switch case index -1 is out of range, indices must be between 0 and 99

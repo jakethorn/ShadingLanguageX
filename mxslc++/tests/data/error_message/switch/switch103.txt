@@ -1,0 +1,1 @@
+switch103.mxsl, line 4: Switch case index must be an integer
