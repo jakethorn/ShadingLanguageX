@@ -1,0 +1,2 @@
+vec2 i = vec2{1.0, 2.0};
+float a = switch(i) { 1.0, 2.0 };

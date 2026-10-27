@@ -1,0 +1,2 @@
+float i = randomfloat();
+float a = switch(i) { case <50: geompropvalue("lo"), 7.0, case >=50: geompropvalue("hi") };

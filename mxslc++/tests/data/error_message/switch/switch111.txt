@@ -1,0 +1,1 @@
+switch111.mxsl, line 2: Cannot assign an expression of type vector2 to a variable or parameter of type (integer, float)

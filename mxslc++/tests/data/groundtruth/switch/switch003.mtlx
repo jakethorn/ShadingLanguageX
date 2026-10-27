@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="i" type="float">
+    <input name="max" type="float" value="20" />
+  </randomfloat>
+  <geompropvalue name="var__0" type="float">
+    <input name="geomprop" type="string" value="ne" />
+  </geompropvalue>
+  <geompropvalue name="var__1" type="float">
+    <input name="geomprop" type="string" value="le" />
+  </geompropvalue>
+  <geompropvalue name="var__2" type="float">
+    <input name="geomprop" type="string" value="lt" />
+  </geompropvalue>
+  <geompropvalue name="var__3" type="float">
+    <input name="geomprop" type="string" value="ge" />
+  </geompropvalue>
+  <geompropvalue name="var__4" type="float">
+    <input name="geomprop" type="string" value="gt" />
+  </geompropvalue>
+  <geompropvalue name="var__5" type="float">
+    <input name="geomprop" type="string" value="eq" />
+  </geompropvalue>
+  <switch name="a" type="float">
+    <input name="in1" type="float" nodename="var__2" />
+    <input name="in2" type="float" nodename="var__2" />
+    <input name="in3" type="float" nodename="var__1" />
+    <input name="in4" type="float" nodename="var__1" />
+    <input name="in6" type="float" nodename="var__0" />
+    <input name="in7" type="float" nodename="var__5" />
+    <input name="in8" type="float" nodename="var__3" />
+    <input name="in9" type="float" nodename="var__3" />
+    <input name="in10" type="float" nodename="var__4" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+</materialx>

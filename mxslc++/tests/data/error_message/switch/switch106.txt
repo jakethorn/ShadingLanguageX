@@ -1,0 +1,1 @@
+switch106.mxsl, line 2: Switch expression has multiple default cases

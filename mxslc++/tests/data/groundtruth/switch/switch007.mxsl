@@ -1,0 +1,2 @@
+float i = randomfloat(max=30.0);
+float a = switch(i) { case <20: geompropvalue("b"), case <10: geompropvalue("a"), default: geompropvalue("c") };

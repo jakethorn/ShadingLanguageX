@@ -1,0 +1,7 @@
+float i = randomfloat();
+float a = switch(i)
+{
+    case 1+1: 4.5,
+    case 2+2: 5.5,
+    case >3+3: 6.5,
+};

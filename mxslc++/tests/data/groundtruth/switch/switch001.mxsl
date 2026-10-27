@@ -1,0 +1,9 @@
+float i = randomfloat();
+float a = switch(i)
+{
+    case <=4: 1.0 + 1.0,
+    case 5: randomfloat(),
+    case 6: geompropvalue("b"),
+    geompropvalue("c"),
+    default: geompropvalue("d")
+};

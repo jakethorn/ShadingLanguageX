@@ -88,6 +88,10 @@ namespace mxslc::expressions
         if (which->is_compile_time())
         {
             const int index = floor<int>(which->compile_time_value());
+
+            if (index < 0 or index >= static_cast<int>(SwitchIndexCount))
+                throw CompileError{"Switch which index " + std::to_string(index) + " is out of range, indices must be between 0 and " + std::to_string(SwitchIndexCount - 1)};
+
             if (contains(indexed_case_exprs_, index))
                 return indexed_case_exprs_.at(index)->evaluate();
             return create_variable(type());

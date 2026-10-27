@@ -1,0 +1,1 @@
+switch101.mxsl, line 2: Switch expression has no cases

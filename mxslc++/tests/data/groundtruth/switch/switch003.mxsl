@@ -1,0 +1,10 @@
+float i = randomfloat(max=20.0);
+float a = switch(i)
+{
+    case !=4: geompropvalue("ne"),
+    case <=3: geompropvalue("le"),
+    case <2: geompropvalue("lt"),
+    case >=7: geompropvalue("ge"),
+    case >8: geompropvalue("gt"),
+    case ==6: geompropvalue("eq")
+};

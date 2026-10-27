@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <randomfloat name="i" type="float" />
+  <switch name="a" type="float">
+    <input name="in3" type="float" value="4.5" />
+    <input name="in5" type="float" value="5.5" />
+    <input name="in8" type="float" value="6.5" />
+    <input name="in9" type="float" value="6.5" />
+    <input name="in10" type="float" value="6.5" />
+    <input name="which" type="float" nodename="i" />
+  </switch>
+</materialx>

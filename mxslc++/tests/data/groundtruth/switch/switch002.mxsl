@@ -1,0 +1,2 @@
+int i = geompropvalue("i");
+vec3 a = switch(i) { vec3{1.0}, vec3{randomfloat()}, geompropvalue("a") };
