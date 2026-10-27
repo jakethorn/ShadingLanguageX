@@ -1,7 +1,13 @@
+# (mxslc++) Version 0.3.3
+
+* Added switch expressions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#switch-expression))
+* Added more compile-time node optimisations
+
+
 # (mxslc++) Version 0.3.2
 
 * Added library caching between runs (contributed by [@Mejval5](https://github.com/Mejval5))
-* Added multi-variable assignment (TODO: link)
+* Added multi-variable assignment ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#variable-assignment))
 * Updated README.md with links to friends
 * Bug fixes
 

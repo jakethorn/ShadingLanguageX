@@ -1,0 +1,1 @@
+switch107.mxsl, line 2: Switch expression has no cases that select an index between 0 and 99

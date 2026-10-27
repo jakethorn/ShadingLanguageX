@@ -189,6 +189,9 @@ namespace mxslc::expressions
             for (size_t index = 0; index < SwitchIndexCount; ++index)
                 indexed_case_exprs_.try_emplace(index, default_expr);
         }
+
+        if (indexed_case_exprs_.empty())
+            throw CompileError{"Switch expression has no cases that select an index between 0 and " + std::to_string(SwitchIndexCount - 1)};
     }
 
     namespace
