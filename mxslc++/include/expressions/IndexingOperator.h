@@ -25,6 +25,7 @@ namespace mxslc::expressions
         void init_impl(const vector<TypePtr>& types) override;
         TypePtr type_impl() const override;
         VarPtr evaluate_impl() const override;
+        void assign_impl(const VarPtr& value) const override;
 
     private:
         ExprPtr value_expr_;

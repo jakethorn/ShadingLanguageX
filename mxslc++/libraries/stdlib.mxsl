@@ -430,36 +430,36 @@ inline void __set__(ref vector2 vector, int index, float value)
 {
     float x, y = separate2(vector);
 
-    vector = switch(
+    vector = switch(index)
+    {
         combine2(value, y),
         combine2(x, value),
-        which=index
-    );
+    };
 }
 
 inline void __set__<vector3, color3>(ref T vector, int index, float value)
 {
     float x, y, z = separate3(vector);
 
-    vector = switch(
+    vector = switch(index)
+    {
         combine3(value, y, z),
         combine3(x, value, z),
         combine3(x, y, value),
-        which=index
-    );
+    };
 }
 
 inline void __set__<vector4, color4>(ref T vector, int index, float value)
 {
     float x, y, z, w = separate4(vector);
 
-    vector = switch(
+    vector = switch(index)
+    {
         combine4(value, y, z, w),
         combine4(x, value, z, w),
         combine4(x, y, value, w),
         combine4(x, y, z, value),
-        which=index
-    );
+    };
 }
 
 inline void __set__(ref matrix33 matrix, int index, vector3 value)
@@ -468,12 +468,12 @@ inline void __set__(ref matrix33 matrix, int index, vector3 value)
     vector3 row1 = extract(matrix, 1);
     vector3 row2 = extract(matrix, 2);
 
-    matrix = switch(
+    matrix = switch(index)
+    {
         creatematrix(value, row1, row2),
         creatematrix(row0, value, row2),
         creatematrix(row0, row1, value),
-        which=index
-    );
+    };
 }
 
 inline void __set__(ref matrix44 matrix, int index, vector4 value)
@@ -483,13 +483,13 @@ inline void __set__(ref matrix44 matrix, int index, vector4 value)
     vector4 row2 = extract(matrix, 2);
     vector4 row3 = extract(matrix, 3);
 
-    matrix = switch(
+    matrix = switch(index)
+    {
         creatematrix(value, row1, row2, row3),
         creatematrix(row0, value, row2, row3),
         creatematrix(row0, row1, value, row3),
         creatematrix(row0, row1, row2, value),
-        which=index
-    );
+    };
 }
 
 //

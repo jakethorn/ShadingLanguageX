@@ -22,8 +22,15 @@ using T##Ptr = unique_ptr<T>;
     TYPE_DEF(ChannelAccessor)
     TYPE_DEF(FieldAccessor)
     TYPE_DEF(PortAccessor)
+    TYPE_DEF(RuntimeFieldAccessor)
 
 #undef TYPE_DEF
+
+    template<typename T>
+    bool is_a(const unique_ptr<Accessor>& accessor)
+    {
+        return dynamic_cast<const T*>(accessor.get()) != nullptr;
+    }
 }
 
 #endif //MXSLC_ACCESSORS_INTERFACE_H

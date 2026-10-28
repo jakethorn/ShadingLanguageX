@@ -1,1 +1,1 @@
-errmsg004.mxsl, line 8: Variable is not available at compile-time
+errmsg004.mxsl, line 8: Cannot assign to a field using an index that is not known at compile-time

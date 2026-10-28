@@ -60,6 +60,7 @@ namespace mxslc::expressions
         virtual void init_impl(const vector<TypePtr>& types) { }
         virtual TypePtr type_impl() const = 0;
         virtual VarPtr evaluate_impl() const = 0;
+        virtual void assign_impl(const VarPtr& value) const;
 
         Token token_;
 

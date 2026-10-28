@@ -140,11 +140,16 @@ namespace mxslc::expressions
     {
         TRY_START
 
+        assign_impl(value);
+
+        TRY_END
+    }
+
+    void Expression::assign_impl(const VarPtr& value) const
+    {
         const VarPtr var = evaluate();
         name_assigned_nodes(var, value);
         var->copy(value);
-
-        TRY_END
     }
 
     bool Expression::update_target_type(const TypePtr& type, const vector<TypePtr>& target_types)

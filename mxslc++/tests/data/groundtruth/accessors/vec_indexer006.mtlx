@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <separate3 name="room_pos" type="multioutput">
+    <input name="in" type="vector3" value="0, 0, 0" />
+  </separate3>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" output="outx" nodename="room_pos" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" output="outy" nodename="room_pos" />
+  </constant>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" value="1" />
+  </constant>
+</materialx>
