@@ -85,13 +85,11 @@ __ShadingLanguageX__ source files are compiled to MaterialX (.mtlx) files using 
 into a tree of statements and expressions which in turn map to one or more MaterialX nodes. These nodes are then written to the MaterialX document 
 as shown in the diagram above.  
 For example, the `+` operator (e.g., `float x = 1.0 + 1.0;`) intuitively compiles to the `add` node, and the same for all other mathematical operators. 
-`if` expressions compile to an `ifequal` node that selects between the two branches, with the condition itself
-compiling to `ifgreater`, `ifgreatereq` or `ifequal` nodes. `switch` expressions compile to 
+`if` expressions compile to either of the `ifgreater`, `ifgreatereq` or `ifequal` nodes depending on the condition. `switch` expressions compile to 
 the `switch` node. The swizzle operator (e.g., `some_vector.xy`) compiles to `extract` and `combine` nodes. Most MaterialX nodes are represented by a 
 standard library function that is built into the language, such as `color3 c = image("albedo.png");`, which compiles to the `image` node, 
 or `vec3 p = position()`, which compiles to the `position` node. Additionally, 
-values known at compile time (e.g., `vec3 up = vec3{0.0, 1.0, 0.0};`) are written directly into the `value` of the inputs that use them,
-while constructors with runtime inputs (e.g., `vec3{u, v, 0.0}`) compile to `combine` nodes.  
+declaring a variable (e.g., `vec3 up = vec3{0.0, 1.0, 0.0};`) compiles to a `constant` node (or a `combine` node depending on the inputs to the expression).  
 
 
 # Why Use ShadingLanguageX?
