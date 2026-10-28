@@ -77,12 +77,12 @@ inline {float outx, float outy} separate(vector2 in)
     return separate2(in);
 }
 
-inline {float outx, float outz, float outz} separate(vector3 in)
+inline {float outx, float outy, float outz} separate(vector3 in)
 {
     return separate3(in);
 }
 
-inline {float outx, float outz, float outz, float outw} separate(vector4 in)
+inline {float outx, float outy, float outz, float outw} separate(vector4 in)
 {
     return separate4(in);
 }
@@ -186,7 +186,7 @@ inline matrix33 __sub__(float in1, matrix33 in2)
     return subtract(m33_in1, in2);
 }
 
-inline matrix33 __sub__(float in1, matrix44 in2)
+inline matrix44 __sub__(float in1, matrix44 in2)
 {
     vector4 v4_in1 = convert(in1);
     matrix44 m44_in1 = creatematrix(v4_in1, v4_in1, v4_in1, v4_in1);
