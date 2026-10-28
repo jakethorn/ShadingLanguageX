@@ -184,6 +184,10 @@ user wants custom NodeDefs. The documentation's own examples write entry functio
   the same relative name in the process's working directory takes priority over one next to the
   including file.
 - The compositing node `out(...)` can't be called because `out` is a keyword.
+- A non-inline function that returns `default(T)` for a shader type (for example `volumeshader`) emits an
+  invalid `constant` node and fails validation. Make it `inline`.
+- In Python, `mxslc.Decompiler("...")` always treats a `str` as a file path. For XML text use
+  `decompile_string_to_string`.
 
 ## References (load as needed)
 

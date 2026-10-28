@@ -460,6 +460,10 @@ Define free functions, never class members:
 Compound assignments use the binary overload (`p += q` calls `__add__`). Declare overloads `inline`
 unless you want NodeDefs named `__add__`.
 
+Watch out for unnamed structs and `using` aliases with 2 to 4 float fields: they convert implicitly to
+vectors, so without an overload `p + q` still compiles and adds them as `vec2`. Your overloads always
+win over that conversion. Class types don't convert, so they need the overload.
+
 ```slx
 using V2 = {float x, float y};
 inline V2 __add__(V2 a, V2 b) { return {a.x + b.x, a.y + b.y}; }

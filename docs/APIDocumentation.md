@@ -111,11 +111,11 @@ fs::path compile_to_file(const fs::path& src_path, const fs::path& dst_path);
 ### C++ Example
 
 ```c++
-#include "mxslc/compile.h"
-#include "mxslc/CompileOptions.h"
+#include "compile.h"
+#include "CompileOptions.h"
 
-// 1
-MaterialX::DocumentPtr doc = mxslc::compile_to_document("float f = 1 + randomfloat();");
+// 1 (wrap string literals in std::string{} for source code or fs::path{} for files, a bare literal is ambiguous)
+MaterialX::DocumentPtr doc = mxslc::compile_to_document(std::string{"float f = 1 + randomfloat();"});
 
 // 2
 mxslc::CompileOptions opts;
@@ -141,19 +141,22 @@ fs::path mtlx_path = mxslc::compile_to_file(fs::path{"mxsl/example.mxsl"}, fs::p
 CompileOptions.__init__(
     output_file: str | pathlib.Path | None = None,
     version: str = "1.39.5",
-    macros: list[str | tuple[str, str] | Macro] | None = None,
-    search_directories: list[str | pathlib.Path] | None = None,
-    includes: list[str | pathlib.Path] | None = None,
-    libraries: list[str | pathlib.Path] | None = None,
-    globals: dict[str, Any] | None = None,
+    macros: list[str | tuple[str, str] | Macro] = [],
+    search_directories: list[str | pathlib.Path] = [],
+    includes: list[str | pathlib.Path] = [],
+    libraries: list[str | pathlib.Path] = [],
+    globals: dict[str, Any] = {},
     error_on_missing_globals: bool = True,
     error_on_unused_globals: bool = True,
     func_name: str | None = None,
-    func_args: list[Any] | None = None,
+    func_args: list[Any] = [],
     reduce_graph: bool = True,
-    validate_graph: bool = True
+    validate_graph: bool = True,
+    sources: dict[str, str] = {}
 )
 ```
+
+Only `output_file` and `func_name` accept `None`; pass empty lists/dicts for the other options.
 
 ### Fields
 
@@ -171,7 +174,21 @@ CompileOptions.func_name: str | None
 CompileOptions.func_args: list[Any]
 CompileOptions.reduce_graph: bool
 CompileOptions.validate_graph: bool
+CompileOptions.sources: dict[str, str]
 ```
+
+### Methods
+
+```python
+CompileOptions.add_source(name: str, contents: str) -> None
+CompileOptions.remove_source(name: str) -> None
+CompileOptions.clear_sources() -> None
+CompileOptions.has_source(name: str) -> bool
+CompileOptions.get_source(name: str) -> str
+```
+
+`sources` holds in-memory files keyed by the path as written in an `#include` or `#library` directive. They are checked
+before the file system, so a multi-file project can be compiled without writing it to disk.
 
 ### Python Example
 
@@ -182,17 +199,18 @@ import MaterialX as mx
 opts = mxslc.CompileOptions(
     output_file = "mtlx/example.mtlx",
     version = "1.39.4",
-    macros = None,
+    macros = [],
     search_directories = ["..", "../mxsl_utils/"],
     includes = ["glsl_macros.mxsl"],
-    libraries = None,
+    libraries = [],
     globals = {"bg_color": mx.Color3(0.5, 0.2, 0.8)},
     error_on_missing_globals = False,
     error_on_unused_globals = True,
     func_name = "main",
-    func_args = None,
+    func_args = [],
     reduce_graph = True,
-    validate_graph = True
+    validate_graph = True,
+    sources = {}
 )
 
 mtlx = mxslc.compile_file_to_string("mxsl/example.mxsl", opts)
@@ -211,6 +229,8 @@ struct CompileOptions
 
     string version{"1.39.5"};
     bool reduce_graph{true};
+    bool validate_graph{true};
+    bool decompile_hints{false};
 
     vector<fs::path> includes;
     vector<fs::path> libraries;
@@ -227,10 +247,19 @@ struct CompileOptions
     void clear_search_directories();
     vector<fs::path> search_directories() const;
 
+    // in-memory source methods (checked before the file system by #include and #library)
+    void add_source(string name, const string& contents);
+    void set_sources(unordered_map<string, string> sources);
+    void remove_source(const string& name);
+    void clear_sources();
+    const string& get_source(const string& name) const;
+    bool has_source(const string& name) const;
+    const unordered_map<string, string>& sources() const;
+
     // macro methods
     void add_macro(Macro macro);
     void add_macro(string macro);
-    void add_macro(string name, string body);
+    void add_macro(string name, const string& body);
     void remove_macro(const string& name);
     void clear_macros();
     const Macro& get_macro(const string& name) const;
@@ -255,6 +284,10 @@ struct CompileOptions
     void clear_entry_function_arguments();
     const vector<VarPtr>& entry_function_arguments() const;
 
+    // debug mode (interactive debugger, -d/--debug on the command line)
+    void set_debug_mode(bool debug_mode);
+    bool debug_mode() const;
+
     // utility methods
     bool has_output_file() const;
     bool has_entry_function() const;
@@ -274,7 +307,7 @@ opts.set_globals({{"roughness", 0.2f}, {"thin_film", true}});
 opts.error_on_missing_globals = false;
 opts.reduce_graph = false;
 
-mxslc::compile_to_file("example.mxsl", opts);
+mxslc::compile_to_file(fs::path{"example.mxsl"}, opts);
 ```
 
 ---
@@ -340,8 +373,8 @@ public:
 ### C++ Example
 
 ```c++
-#include "mxslc/preprocess/Macro.h"
-#include "mxslc/CompileOptions.h"
+#include "preprocess/Macro.h"
+#include "CompileOptions.h"
 
 mxslc::Macro use_disp_macro{"USE_DISPLACEMENT"};
 mxslc::Macro disp_scale_macro{"DISPLACEMENT_SCALE", "0.2"};
@@ -431,7 +464,7 @@ VarPtr create_variable(TypePtr type);
 
 # Decompile Functions
 
-### mxslc::decompile_to_*
+### mxslc::decompile::decompile_to_*
 
 ```c++
 string decompile_to_string(const fs::path& src_path);
@@ -448,7 +481,7 @@ fs::path decompile_to_file(const MaterialX::DocumentPtr& document, const fs::pat
 
 ```c++
 
-namespace mxslc
+namespace mxslc::decompile
 {
     class Decompiler
     {
@@ -481,18 +514,22 @@ the given element or an element preceding it in the graph.
 CompileOptions.__init__(
     output_file: str | pathlib.Path | None = None,
     version: str = "1.39.5",
-    macros: list[str | tuple[str, str] | Macro] | None = None,
-    search_directories: list[str | pathlib.Path] | None = None,
-    includes: list[str | pathlib.Path] | None = None,
-    libraries: list[str | pathlib.Path] | None = None,
-    globals: dict[str, Variable | bool | int | float | str] | None = None,
+    macros: list[str | tuple[str, str] | Macro] = [],
+    search_directories: list[str | pathlib.Path] = [],
+    includes: list[str | pathlib.Path] = [],
+    libraries: list[str | pathlib.Path] = [],
+    globals: dict[str, Variable | bool | int | float | str] = {},
     error_on_missing_globals: bool = True,
     error_on_unused_globals: bool = True,
     func_name: str | None = None,
-    func_args: list[Variable | bool | int | float | str] | None = None,
-    reduce_graph: bool = True
+    func_args: list[Variable | bool | int | float | str] = [],
+    reduce_graph: bool = True,
+    validate_graph: bool = True,
+    sources: dict[str, str] = {}
 )
 ```
+
+Only `output_file` and `func_name` accept `None`; pass empty lists/dicts for the other options.
 
 #### Properties
 
@@ -509,6 +546,8 @@ options.error_on_unused_globals: bool
 options.func_name: str | None
 options.func_args: list[Variable | bool | int | float | str]
 options.reduce_graph: bool
+options.validate_graph: bool
+options.sources: dict[str, str]
 ```
 
 #### Example
