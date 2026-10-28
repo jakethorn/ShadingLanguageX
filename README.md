@@ -77,6 +77,12 @@ and [Examples](https://github.com/jakethorn/ShadingLanguageX/tree/main/examples)
 
 The [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md) provides even more information about how to install and use the SLX compiler (mxslc).
 
+## Agent Skill
+
+The [`.claude`](https://github.com/jakethorn/ShadingLanguageX/tree/main/.claude) folder contains a [skill](https://code.claude.com/docs/en/skills) that teaches AI coding agents
+how to write SLX and use the compiler. Claude Code loads it automatically in this repository, and you can copy the
+`.claude/skills/shadinglanguagex` folder into your own project's `.claude/skills` folder to use it elsewhere.
+
 # How It Works
 
 ![](examples/screenshots/howitworks.jpg)  

@@ -86,6 +86,7 @@ compiles to:
   </dotproduct>
   <invert name="theta" type="float">
     <input name="in" type="float" nodename="var__0" />
+    <input name="amount" type="float" value="0" />
   </invert>
   <smoothstep name="outline" type="float">
     <input name="in" type="float" nodename="theta" />
@@ -120,7 +121,7 @@ inline void main()
 {
     surfacematerial(
         standard_surface(
-            base_color = color3(1.0, 0.72, 0.315),
+            base_color = color3{1.0, 0.72, 0.315},
             specular_roughness = 0.02,
             metalness = 1.0
         )
@@ -320,7 +321,7 @@ class Sphere
     float radius;
 }
 
-print typeof(Sphere).str; // "Sphere{vec3 center, float radius}"
+print typeof(Sphere).str; // "Sphere{vector3 center, float radius}"
 
 string foo<mat3, mat4>()
 {
@@ -426,8 +427,8 @@ float pi2 = 3.14 * 2.0;
 The following identifiers have a special meaning in ShadingLanguageX and cannot be used for user-defined variables or functions.
 
 `if` `else` `switch` `case` `for` `from` `to` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
-`global` `default` `using` `class` `this` `print` `typeof` `break` `comptime` `nodegraph` `nodedef`
-
+`global` `default` `using` `class` `this` `print` `typeof` `break` `comptime` `nodegraph` `nodedef` `geomprop`
+`uniform` `varying` `namespace` `consteval`
 
 # Modifiers
 
@@ -489,30 +490,30 @@ comment
 
 ## Binary Operators
 
-| Operation | MaterialX Node(s)   |
-|-----------|---------------------|
-| `a + b`   | `add`               |
-| `a - b`   | `subtract`          |
-| `a * b`   | `multiply`          |
-| `a / b`   | `divide`            |
-| `a % b`   | `modulo`            |
-| `a ^ b`   | `power` or `xor`    |
-| `a > b`   | `ifgreater`         |
-| `a >= b`  | `ifgreatereq`       |
-| `a < b`   | `ifgreatereq`       |
-| `a <= b`  | `ifgreater`         |
-| `a == b`  | `ifequal`           |
-| `a != b`  | `ifequal`+`not`     |
-| `a & b`   | `and`               |
-| `a \| b`  | `or`                |
+| Operation | MaterialX Node(s) |
+|-----------|-------------------|
+| `a + b`   | `add`             |
+| `a - b`   | `subtract`        |
+| `a * b`   | `multiply`        |
+| `a / b`   | `divide`          |
+| `a % b`   | `modulo`          |
+| `a ^ b`   | `power` or `xor`  |
+| `a > b`   | `ifgreater`       |
+| `a >= b`  | `ifgreatereq`     |
+| `a < b`   | `ifgreatereq`     |
+| `a <= b`  | `ifgreater`       |
+| `a == b`  | `ifequal`         |
+| `a != b`  | `ifequal`+`not`   |
+| `a & b`   | `and`             |
+| `a \| b`  | `or`              |
 
 ## Unary Operators
 
-| Operation | MaterialX Node(s)   |
-|-----------|---------------------|
-| `!a`      | `not`               |
-| `-a`      | `subtract`          |
-| `+a`      |                     |
+| Operation | MaterialX Node(s) |
+|-----------|-------------------|
+| `!a`      | `not`             |
+| `-a`      | `invert`          |
+| `+a`      |                   |
 
 ### Notes
 
@@ -584,7 +585,7 @@ Finally, vector swizzles will always return a vector or `float` type variable, t
 `a.xy` return a `vec2`, while `a.zyzy` returns a `vec4`. Appropriately, color swizzles only return color or `float` type variables.
 
 ```
-float alpha = image("alpha_mask.png").a;  
+float alpha = image<color4>("alpha_mask.png").a;  
 vec2 left_wall_uv = position().yz;
 color4 all_red = randomcolor().rrrr;
 ```
@@ -619,12 +620,12 @@ float theta = dotproduct( up[0], normal( up[1] ) );
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <normal name="node1" type="vector3">
+  <normal name="var__0" type="vector3">
     <input name="space" type="string" value="world" />
   </normal>
-  <dotproduct name="node2" type="float">
+  <dotproduct name="theta" type="float">
     <input name="in1" type="vector3" value="0, 1, 0" />
-    <input name="in2" type="vector3" nodename="node1" />
+    <input name="in2" type="vector3" nodename="var__0" />
   </dotproduct>
 </materialx>
 ```
@@ -732,7 +733,7 @@ uv[i] = 181.0;
     <input name="in1" type="float" output="outx" nodename="var__0" />
     <input name="in2" type="float" value="181" />
   </combine2>
-  <switch name="var__3" type="vector2">
+  <switch name="var__uv__1" type="vector2">
     <input name="in1" type="vector2" nodename="var__1" />
     <input name="in2" type="vector2" nodename="var__2" />
     <input name="which" type="integer" nodename="i" />
@@ -773,9 +774,9 @@ for (int i from 1 to 100)
 
 ## Compile Time Expressions
 
-`comptime` is a modifier that can be placed before an expression. It tells the compiler to perform as much as of that expression
+`comptime` is a modifier that can be placed before an expression. It tells the compiler to perform as much of that expression
 at compile time as possible. It operates exactly the same as the `reduce_graph` compiler option (see User Guide), but for a single expression.
-For example: 
+For example:
 
 ```
 float a = 1 + 1;
@@ -822,7 +823,7 @@ The order of precedence of compound assignment operator (`a += b`, `a -= b`, etc
 the expression. The right hand side of the expression will always be evaluated first. For example:
 
 ```
-int i = 0;
+mutable int i = 0;
 print 1 + 1 + i += 1 + 1;
 // is equivalent to
 print (1 + 1 + (i += (1 + 1)));
@@ -849,11 +850,11 @@ bool half_chance = randomfloat() > 0.5;
 int uv_channel = 3;
 vec2 uv = 1.0 - texcoord(uv_channel);
 string space = "world";
-surfaceshader surface = standard_surface(
+surfaceshader surface = standard_surface();
 
 mutable int i = 0;
 const float PI = 3.14;
-global int iter_count = 50
+global int iter_count = 50;
 ```
 
 ## Modifiers
@@ -908,7 +909,7 @@ geomprop float y = 0.5;
 This is equivalent to:
 ```
 float x = geompropvalue("x");
-float x = geompropvalue("y", 0.5);
+float y = geompropvalue("y", 0.5);
 ```
 Both compile to:
 ```xml
@@ -942,7 +943,7 @@ ShadingLanguageX either from the command line or the C++/Python APIs (see the
 ```
 global filename albedo_path;
 global color3 tint;
-color3 c = image(albedo_path) * tint;
+color3 c = image<color3>(albedo_path) * tint;
 ```
 ```python
 from pathlib import Path
@@ -959,11 +960,11 @@ mxslc.compile_file_to_file("example_1.mxsl", opts)
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <image name="node1" type="color3">
-    <input name="file" type="filename" value="..\brick.png" />
+  <image name="var__0" type="color3">
+    <input name="file" type="filename" value="../brick.png" />
   </image>
-  <multiply name="node2" type="color3">
-    <input name="in1" type="color3" nodename="node1" />
+  <multiply name="c" type="color3">
+    <input name="in1" type="color3" nodename="var__0" />
     <input name="in2" type="color3" value="1, 0, 0" />
   </multiply>
 </materialx>
@@ -998,25 +999,25 @@ mxslc.compile_file_to_file("example_2.mxsl", opts)
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <position name="node1" type="vector3">
+  <position name="var__0" type="vector3">
     <input name="space" type="string" value="world" />
   </position>
-  <subtract name="node2" type="vector3">
+  <subtract name="var__1" type="vector3">
     <input name="in1" type="vector3" value="0, 10, 0" />
-    <input name="in2" type="vector3" nodename="node1" />
+    <input name="in2" type="vector3" nodename="var__0" />
   </subtract>
-  <normalize name="node3" type="vector3">
-    <input name="in" type="vector3" nodename="node2" />
+  <normalize name="to_light" type="vector3">
+    <input name="in" type="vector3" nodename="var__1" />
   </normalize>
-  <normalize name="node4" type="vector3">
+  <normalize name="var__2" type="vector3">
     <input name="in" type="vector3" value="0, -1, 0" />
   </normalize>
-  <dotproduct name="node5" type="float">
-    <input name="in1" type="vector3" nodename="node3" />
-    <input name="in2" type="vector3" nodename="node4" />
+  <dotproduct name="intensity" type="float">
+    <input name="in1" type="vector3" nodename="to_light" />
+    <input name="in2" type="vector3" nodename="var__2" />
   </dotproduct>
-  <convert name="node6" type="color3">
-    <input name="in" type="float" nodename="node5" />
+  <convert name="c" type="color3">
+    <input name="in" type="float" nodename="intensity" />
   </convert>
 </materialx>
 ```
@@ -1176,10 +1177,10 @@ p, h = intersection(origin, dir);
 ### Example
 
 ```
-int i = 0;
+mutable int i = 0;
 print i++; // prints 0, then increases i by 1
 
-int j = 0;
+mutable int j = 0;
 print ++j; // increases j by 1, then prints 1
 ```
 
@@ -1203,7 +1204,7 @@ an expression, such as an argument to a function. Compound Assignment Operators 
 i.e., they increase the value of the variable first, and then return the value.
 
 ```
-int i = 0;
+mutable int i = 0;
 float a = randomfloat(seed = i+=10); // seed = 10
 float b = randomfloat(seed = i+=10); // seed = 20
 ```
@@ -1231,9 +1232,9 @@ In the case that no arguments are passed to the constructor, a default value wil
 | `float`   | `0.0`                        |
 | `vec2`    | `vec2{0.0, 0.0}`             |
 | `vec3`    | `vec3{0.0, 0.0, 0.0}`        |
-| `vec4`    | `vec4{0.0, 0.0, 0.0, 1.0}`   |
+| `vec4`    | `vec4{0.0, 0.0, 0.0, 0.0}`   |
 | `color3`  | `color3{0.0, 0.0, 0.0}`      |
-| `color4`  | `color4{0.0, 0.0, 0.0, 1.0}` |
+| `color4`  | `color4{0.0, 0.0, 0.0, 0.0}` |
 
 ## One Argument
 
@@ -1252,14 +1253,16 @@ color3 v_debug = color3{viewdirection()};
 ## Two Or More Arguments
 
 For two or more arguments, the constructor builds the target type using the arguments in the order they are provided. 
-If not enough arguments are provided, the remaining components will be zero.
+The arguments must provide exactly as many components as the target type, either as individual floats or as smaller
+vectors/colors, e.g., `vec3{v2, z}`, `vec4{x, v2, w}` or `vec4{v2, v2}`. Missing components are not filled in, so
+`vec3{1.0, 2.0}` is an error.
 
 ### Example
 
 `vec2 a = vec2{1.0, 2.0};`  
 `vec3 b = vec3{a, 3.0}; // will be vec3{1.0, 2.0, 3.0}`  
-`vec4 c = vec4{4.0, a}; // will be vec4{4.0, 1.0, 2.0, 0.0}`  
-`color3 d = color3{g=1.0}; // will be color3{0.0, 1.0, 0.0}`
+`vec4 c = vec4{4.0, a, 5.0}; // will be vec4{4.0, 1.0, 2.0, 5.0}`  
+`color4 d = color4{color3{0.0, 1.0, 0.0}, 0.5}; // will be color4{0.0, 1.0, 0.0, 0.5}`
 
 # If Expression
 
@@ -1404,7 +1407,7 @@ float a = switch(i)
     1.0,                   // index 0
     geompropvalue("b"),    // index 1
     normal().z,            // index 2
-    default=randomfloat()  // index 3 to 99
+    default: randomfloat()  // index 3 to 99
 };
 ```
 
@@ -1437,6 +1440,10 @@ are currently optimised to evaluate at compile-time, if possible.
 | `multiply`     |
 | `divide`       |
 | `invert`       |
+| `not`          |
+| `ifequal`      |
+| `ifgreater`    |
+| `ifgreatereq`  |
 | `constant`     |
 | `combine2`     |
 | `combine3`     |
@@ -1449,6 +1456,11 @@ are currently optimised to evaluate at compile-time, if possible.
 | `creatematrix` |
 | `invertmatrix` |
 | `switch`       |
+| `fract`        |
+| `dotproduct`   |
+| `floor`        |
+| `ceil`         |
+| `round`        |
 
 This also means that expressions or statements that require compile time values such as if statements, for loops and 
 some indexing operators can also use these expressions and not just literals. For example:
@@ -1558,10 +1570,10 @@ material main(color3 c, float intensity, vec3 n)
 }
 
 vec3 n = image("normals.png");
-material m = main(color3(3.0, 7.0, 5.0), 0.8, n);
+material m = main(color3{3.0, 7.0, 5.0}, 0.8, n);
 ```
 ```
-float i = 0.0;
+mutable float i = 0.0;
 void incr_i()
 {
     i += 1.0;
@@ -1576,11 +1588,11 @@ As well as the variables within them, functions can also access and modify varia
 as you saw in the previous example.
 
 ```
-float a = 0.0;
+mutable float a = 0.0;
 void do_something()
 {
     float b = 1.0;
-    for (int i = 0:9)
+    for (int i from 0 to 9)
     {
         float c = 2.0;
         a += b / c;
@@ -1605,7 +1617,7 @@ color3 do_something(color3 c)
     return c * 2.0;
 }
 
-color3 c = randomcolor();
+mutable color3 c = randomcolor();
 c = do_something(c);
 ```
 In this case, the call to `do_something()` will invoke the second function because it's being passed an argument of type `color3`.
@@ -1697,7 +1709,7 @@ T one_minus<float, vec2, vec3, vec4, color3, color4>(T v)
 vec2 uv = texcoord();
 
 vec2 inv_uv = one_minus(uv); // <vec2> is inferred from return and parameter types
-vec2 inv_uv = one_minus<vec2>(uv); // <vec2> can still be included for clarity
+vec2 inv_uv2 = one_minus<vec2>(uv); // <vec2> can still be included for clarity
 ```
 
 ## Parameter Modifiers
@@ -1784,22 +1796,19 @@ float y = add_one(5.0);
 Compiles to the following:
 ```xml
 <nodedef name="ND_add_one" node="add_one">
-  <output name="out" type="float" default="0.0" />
+  <output name="out" type="float" />
   <input name="in" type="float" value="0" />
 </nodedef>
-
 <nodegraph name="NG_add_one" nodedef="ND_add_one">
-  <add name="node3" type="float">
+  <add name="var__0" type="float">
     <input name="in1" type="float" interfacename="in" />
     <input name="in2" type="float" value="1" />
   </add>
-  <output name="out" type="float" nodename="node3" />
+  <output name="out" type="float" nodename="var__0" />
 </nodegraph>
-
 <add_one name="x" type="float">
   <input name="in" type="float" value="2" />
 </add_one>
-
 <add_one name="y" type="float">
   <input name="in" type="float" value="5" />
 </add_one>
@@ -1822,7 +1831,6 @@ Instead, directly compiles to:
   <input name="in1" type="float" value="2" />
   <input name="in2" type="float" value="1" />
 </add>
-
 <add name="y" type="float">
   <input name="in1" type="float" value="5" />
   <input name="in2" type="float" value="1" />
@@ -1845,10 +1853,14 @@ float f = foo(1, 2) + randomfloat();
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="var__0" type="float" />
-  <add name="f" type="float">
+  <power name="var__0" type="float">
     <input name="in1" type="float" value="0.666667" />
-    <input name="in2" type="float" nodename="var__0" />
+    <input name="in2" type="float" value="4" />
+  </power>
+  <randomfloat name="var__1" type="float" />
+  <add name="f" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" nodename="var__1" />
   </add>
 </materialx>
 ```
@@ -1940,21 +1952,21 @@ standard_surface(base_color = randomcolor() * viewing_angle);
 ```
 ```xml
 <nodegraph name="NG_viewing_angle">
-  <normal name="node1" type="vector3" />
-  <viewdirection name="node2" type="vector3" />
-  <dotproduct name="node3" type="float">
-    <input name="in1" type="vector3" nodename="node1" />
-    <input name="in2" type="vector3" nodename="node2" />
+  <normal name="n" type="vector3" />
+  <viewdirection name="i" type="vector3" />
+  <dotproduct name="var__0" type="float">
+    <input name="in1" type="vector3" nodename="n" />
+    <input name="in2" type="vector3" nodename="i" />
   </dotproduct>
-  <output name="out" type="float" nodename="node3" />
+  <output name="out" type="float" nodename="var__0" />
 </nodegraph>
-<randomcolor name="node1" type="color3" />
-<multiply name="node2" type="color3">
-  <input name="in1" type="color3" nodename="node1" />
+<randomcolor name="var__0" type="color3" />
+<multiply name="var__1" type="color3">
+  <input name="in1" type="color3" nodename="var__0" />
   <input name="in2" type="float" nodegraph="NG_viewing_angle" />
 </multiply>
-<standard_surface name="node3" type="surfaceshader">
-  <input name="base_color" type="color3" nodename="node2" />
+<standard_surface name="var__2" type="surfaceshader">
+  <input name="base_color" type="color3" nodename="var__1" />
 </standard_surface>
 ```
 
@@ -2065,8 +2077,8 @@ Field modifiers work the same way as for variables:
 ```
 {const float x, mutable float y} a = {1.0, 2.0};
 a.x = 3.0; // Error: a.x is const
-a.y = 4.0; // OK: x.y is mutable
-a = {5.0, 6.0}; // Error: a is const (by default)
+a.y = 4.0; // OK: a.y is mutable
+a = {5.0, 6.0}; // Error: a is immutable (by default)
 ```
 
 This is where `const` can be useful. If you have a field that you always want to be immutable, regardless of the status
@@ -2199,6 +2211,8 @@ vec3 p = ray.end_of_ray(10);
 Class methods can access the class instance using the `this` keyword. They can also access the class instances fields directly. For example:
 
 ```
+const float PI = 3.14159;
+
 class Sphere
 {
     vec2 center;
@@ -2214,7 +2228,7 @@ class Sphere
     Sphere grow(float amount)
     {
         // copy instance
-        Sphere result = this;
+        mutable Sphere result = this;
         
         result.radius += amount;
         return result;
@@ -2285,7 +2299,7 @@ Point __add__(Point a, Point b)
     return {a.x + b.x, a.y + b.y};
 }
 
-Point r = p + q; // OK
+mutable Point r = p + q; // OK
 
 
 Point __add__(Point a, float b)
@@ -2339,15 +2353,15 @@ float add_one(float in)
 ```
 ```xml
 <nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
-  <output name="out" type="float" default="0.0" />
+  <output name="out" type="float" />
   <input name="in" type="float" value="0" />
 </nodedef>
 <nodegraph name="NG_add_one" nodedef="ND_add_one">
-  <add name="node3" type="float">
+  <add name="var__0" type="float">
     <input name="in1" type="float" interfacename="in" />
     <input name="in2" type="float" value="1" />
   </add>
-  <output name="out" type="float" nodename="node3" />
+  <output name="out" type="float" nodename="var__0" />
 </nodegraph>
 ```
 Attributes can also be added to the input/output elements of a NodeDef by specifying the name of the port before the attribute
@@ -2364,15 +2378,15 @@ float add_one(float in)
 ```
 ```xml
 <nodedef name="ND_add_one" node="add_one" nodegroup="math" doc="adds one to in">
-  <output name="out" type="float" default="0.0" doc="the incremented value" />
+  <output name="out" type="float" doc="the incremented value" />
   <input name="in" type="float" value="0" doc="the value to be incremented" />
 </nodedef>
 <nodegraph name="NG_add_one" nodedef="ND_add_one">
-  <add name="node3" type="float">
+  <add name="var__0" type="float">
     <input name="in1" type="float" interfacename="in" />
     <input name="in2" type="float" value="1" />
   </add>
-  <output name="out" type="float" nodename="node3" />
+  <output name="out" type="float" nodename="var__0" />
 </nodegraph>
 ```
 An alternative syntax is to place the attributes directly above parameters. This can be useful for functions with a large
@@ -2406,7 +2420,7 @@ color3 c = image(
 ```
 ```xml
 <image name="c" type="color3" doc="an image of a butterfly">
-  <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
+  <input name="file" type="filename" value="butterfly1.png" colorspace="srgb_texture" />
 </image>
 ```
 
@@ -2423,9 +2437,9 @@ standard_surface(base_color = randomcolor());
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39" madewith="shadinglanguagex">
-  <randomcolor name="node1" type="color3" />
-  <standard_surface name="node2" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node1" />
+  <randomcolor name="var__0" type="color3" />
+  <standard_surface name="var__1" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__0" />
   </standard_surface>
 </materialx>
 ```
@@ -2533,9 +2547,9 @@ void do_something(float inner_x)
     outer_a = outer_b + inner_x;
 }
 
-// inner_a == 0
+// outer_a == 0
 do_something(3);
-// inner_a == 4 (1 + 3)
+// outer_a == 4 (1 + 3)
 ```
 
 In the example above, `do_something` was allowed to access its own variables (`inner_x`) as well as the global variables
@@ -2549,11 +2563,11 @@ outputs to the created NodeDef:
     <output name="nonlocal_out__outer_a" type="float" />
   </nodedef>
   <nodegraph name="NG_do_something" nodedef="ND_do_something">
-    <add name="var__0" type="float">
+    <add name="var__outer_a__1" type="float">
       <input name="in1" type="float" interfacename="nonlocal_in__outer_b" />
       <input name="in2" type="float" interfacename="inner_x" />
     </add>
-    <output name="nonlocal_out__outer_a" type="float" nodename="var__0" />
+    <output name="nonlocal_out__outer_a" type="float" nodename="var__outer_a__1" />
   </nodegraph>
 ```
 
@@ -2563,7 +2577,7 @@ Local variables and functions with the same name as nonlocal ones will hide the 
 float a = 1.0;
 float b = 2.0;
 float c = 3.0;
-float foo(float a = 10.0)
+void foo(float a = 10.0)
 {
     float b = 20.0;
     print a, b, c;
@@ -2616,9 +2630,12 @@ the code into the spot where the `#include` directive was written.
 
 When including a file, paths may be absolute or relative. If the path is relative, ShadingLanguageX will look for the file in
 the following directories in order:
-1. Any additional directories passed to the compiler (see the [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md))
-2. The directory of the `.mxsl` file currently being compiled.
-3. The directory of the mxslc executable or Python module.
+1. The directory of the `.mxsl` file containing the `#include` directive.
+2. Any additional directories passed to the compiler (see the [User Guide](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md)).
+3. The current working directory.
+4. The directory of the mxslc Python module or executable.
+
+Source files passed in memory using the API (`CompileOptions.sources`) are checked before the file system.
 
 ### Example
 
@@ -2656,9 +2673,11 @@ The `#library` directive follows the same rules as the `#include` directive when
 Macros are more limited in ShadingLanguageX than in C. Only flag- and object-like macros are supported, e.g.,
 `#define USE_FFT` and `#define PI 3.14159`. Function-like macros as well as macro stringification and token pasting are not supported.
 
-There are currently two macros pre-defined during shader compilation:
+There are currently four macros pre-defined during shader compilation:
 * `__MAIN__` is defined during compilation of the file originally given to the compiler.
 * `__INCLUDE__` is defined during compilation of included files, either using the `#include` directive or passed as a compile option.
+* `__FILE__` expands to the name of the file currently being compiled, as a string.
+* `__LINE__` expands to the current line number.
 
 `> ./mxslc main.mxsl`  
   

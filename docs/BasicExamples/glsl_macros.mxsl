@@ -34,7 +34,7 @@ inline T glsl_smoothstep<vec2, vec3, vec4>(float low, float high, T in)
 
 inline float glsl_step(float edge, float x)
 {
-    return float{x < edge};
+    return float{x >= edge};
 }
 
 #define step glsl_step

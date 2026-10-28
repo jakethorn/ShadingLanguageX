@@ -31,6 +31,7 @@ add_executable(mxslc_tests
         groundtruth_decompile_tests.cpp
         decompile_dependencies_tests.cpp
         value_override_tests.cpp
+        compile_api_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE

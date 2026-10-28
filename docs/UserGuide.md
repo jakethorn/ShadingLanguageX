@@ -10,22 +10,21 @@
 2. [Language Features](#language-features)
 3. [Installation](#installation)
 4. [Getting Started](#getting-started)
-5. [API Documentation](#getting-started)
+5. [API Documentation](#api-documentation)
 6. [Decompiler](#decompiler)
 7. [MaterialX Libraries](#materialx-libraries)
 
 # What is ShadingLanguageX?
 
 ShadingLanguageX is a high-level programming language that can be used to create MaterialX shaders. Statements
-and expressions are compiled down to native MaterialX elements, like Nodes and NodeDefs. For example,
-`int i = 2 + 2;` would compile to:
+and expressions are compiled down to native MaterialX elements, like Nodes and NodeDefs. For example, `int i = 2 + 2;` would compile to:
 
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <add name="node1" type="int">
-    <input name="in1" type="int" value="2" />
-    <input name="in2" type="int" value="2" />
+  <add name="i" type="integer">
+    <input name="in1" type="integer" value="2" />
+    <input name="in2" type="integer" value="2" />
   </add>
 </materialx>
 ```
@@ -48,7 +47,7 @@ passing it as an argument to the compiler. The default version is 1.39.5.
 
 ```
 vec3 n = normal();
-float = swizzle(n, "x");
+float x = swizzle(n, "x");
 ```
 
 ```bash
@@ -60,13 +59,14 @@ float = swizzle(n, "x");
 ShadingLanguageX has built-in support for adding attributes to MaterialX elements using the `@` symbol.
 
 ```
+@doc "an image of a butterfly"
 @file.colorspace "srgb_texture"
 color3 c = image("butterfly1.png");
 ```
 
 ```xml
 <image name="c" type="color3" doc="an image of a butterfly">
-    <input name="file" type="filename" colorspace="srgb_texture" value="butterfly1.png" />
+  <input name="file" type="filename" value="butterfly1.png" colorspace="srgb_texture" />
 </image>
 ```
 
@@ -80,9 +80,9 @@ standard_surface(base_color = randomcolor());
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39" madewith="ShadingLanguageX">
-  <randomcolor name="node1" type="color3" />
-  <standard_surface name="node2" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node1" />
+  <randomcolor name="var__0" type="color3" />
+  <standard_surface name="var__1" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__0" />
   </standard_surface>
 </materialx>
 ```
@@ -94,11 +94,11 @@ ShadingLanguageX allows that MaterialX does not is loops, with the caveat that t
 compile-time.
 
 ```
-// brownian noise
-float f = 0.0;
-for (int i = 0:2)
+// sum three layers of noise
+mutable float f = 0.0;
+for (float i from 1 to 3)
 {
-    f += my_noise_func(seed=i);
+    f += noise2d(texcoord = texcoord() * i);
 }
 f /= 3.0;
 ```
@@ -172,9 +172,9 @@ print(mtlx)
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="node1" type="float" />
-  <add name="node2" type="float">
-    <input name="in1" type="float" nodename="node1" />
+  <randomfloat name="var__0" type="float" />
+  <add name="f" type="float">
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="1" />
   </add>
 </materialx>
@@ -244,9 +244,9 @@ python -c "import mxslc; print(mxslc.compile_string_to_string('float f = randomf
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomfloat name="node1" type="float" />
-  <add name="node2" type="float">
-    <input name="in1" type="float" nodename="node1" />
+  <randomfloat name="var__0" type="float" />
+  <add name="f" type="float">
+    <input name="in1" type="float" nodename="var__0" />
     <input name="in2" type="float" value="1" />
   </add>
 </materialx>
@@ -315,36 +315,36 @@ mxslc.compile_file_to_file("example.mxsl")
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <texcoord name="node1" type="vector2" />
-  <multiply name="node2" type="vector2">
-    <input name="in1" type="vector2" nodename="node1" />
+  <texcoord name="var__0" type="vector2" />
+  <multiply name="var__1" type="vector2">
+    <input name="in1" type="vector2" nodename="var__0" />
     <input name="in2" type="float" value="10" />
   </multiply>
-  <separate2 name="node3" type="multioutput">
-    <input name="in" type="vector2" nodename="node2" />
+  <separate2 name="var__2" type="multioutput">
+    <input name="in" type="vector2" nodename="var__1" />
   </separate2>
-  <floor name="node4" type="float">
-    <input name="in" type="float" output="outx" nodename="node3" />
+  <floor name="var__3" type="float">
+    <input name="in" type="float" output="outx" nodename="var__2" />
   </floor>
-  <floor name="node5" type="float">
-    <input name="in" type="float" output="outy" nodename="node3" />
+  <floor name="var__4" type="float">
+    <input name="in" type="float" output="outy" nodename="var__2" />
   </floor>
-  <multiply name="node6" type="float">
-    <input name="in1" type="float" nodename="node5" />
+  <multiply name="var__5" type="float">
+    <input name="in1" type="float" nodename="var__4" />
     <input name="in2" type="float" value="10" />
   </multiply>
-  <add name="node7" type="float">
-    <input name="in1" type="float" nodename="node4" />
-    <input name="in2" type="float" nodename="node6" />
+  <add name="seed" type="float">
+    <input name="in1" type="float" nodename="var__3" />
+    <input name="in2" type="float" nodename="var__5" />
   </add>
-  <randomcolor name="node8" type="color3">
-    <input name="in" type="float" nodename="node7" />
+  <randomcolor name="c" type="color3">
+    <input name="in" type="float" nodename="seed" />
   </randomcolor>
-  <standard_surface name="node9" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node8" />
+  <standard_surface name="var__6" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="c" />
   </standard_surface>
-  <surfacematerial name="node10" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="node9" />
+  <surfacematerial name="var__7" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="var__6" />
   </surfacematerial>
 </materialx>
 ```
@@ -406,11 +406,11 @@ inline void blue()
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <standard_surface name="node1" type="surfaceshader">
+  <standard_surface name="var__0" type="surfaceshader">
     <input name="base_color" type="color3" value="0, 0, 1" />
   </standard_surface>
-  <surfacematerial name="node2" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="node1" />
+  <surfacematerial name="var__1" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="var__0" />
   </surfacematerial>
 </materialx>
 ```
@@ -433,11 +433,11 @@ inline void main(float r, float g, float b)
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <standard_surface name="node1" type="surfaceshader">
+  <standard_surface name="var__0" type="surfaceshader">
     <input name="base_color" type="color3" value="1, 0, 0" />
   </standard_surface>
-  <surfacematerial name="node2" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="node1" />
+  <surfacematerial name="var__1" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="var__0" />
   </surfacematerial>
 </materialx>
 ```
@@ -468,9 +468,9 @@ standard_surface(
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <randomcolor name="node1" type="color3" />
-  <standard_surface name="node2" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="node1" />
+  <randomcolor name="var__0" type="color3" />
+  <standard_surface name="var__1" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__0" />
     <input name="metalness" type="float" value="1" />
     <input name="specular_roughness" type="float" value="0.2" />
   </standard_surface>
@@ -497,9 +497,9 @@ Compiled without `--no-reduce-graph`:
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-    <standard_surface name="node1" type="surfaceshader">
-        <input name="base_color" type="color3" value="0.5, 0, 0.25" />
-    </standard_surface>
+  <standard_surface name="var__0" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.5, 0, 0.25" />
+  </standard_surface>
 </materialx>
 ```
 
@@ -508,18 +508,13 @@ Compiled with `--no-reduce-graph`:
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-    <combine3 name="node1" type="color3">
-        <input name="in1" type="float" value="1" />
-        <input name="in2" type="float" value="0" />
-        <input name="in3" type="float" value="0.5" />
-    </combine3>
-    <multiply name="node2" type="color3">
-        <input name="in1" type="color3" nodename="node1" />
-        <input name="in2" type="float" value="0.5" />
-    </multiply>
-    <standard_surface name="node3" type="surfaceshader">
-        <input name="base_color" type="color3" nodename="node2" />
-    </standard_surface>
+  <multiply name="var__0" type="color3">
+    <input name="in1" type="color3" value="1, 0, 0.5" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <standard_surface name="var__1" type="surfaceshader">
+    <input name="base_color" type="color3" nodename="var__0" />
+  </standard_surface>
 </materialx>
 ```
 
@@ -541,7 +536,7 @@ _example.mtlx_:
     <input name="in2" type="float" value="1" />
   </combine2>
   <add name="y" type="vector2">
-    <input name="in1" type="vector2" nodename="node1" />
+    <input name="in1" type="vector2" nodename="x" />
     <input name="in2" type="float" value="2" />
   </add>
 </materialx>
@@ -550,8 +545,8 @@ _example.mtlx_:
 _example_decomped.mxsl_:
 
 ```
-vec2 x = combine2(in1 = 0, in2 = 1);
-vec2 y = x + 2;
+vec2 x = combine2(0.0, 1.0);
+vec2 y = x + 2.0;
 ```
 
 ## Help
@@ -582,6 +577,7 @@ options:
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
   --no-validate-graph            Do not validate the MaterialX graph
+  --decompile-hints              Add hints for the decompiler as xml attributes
 ```
 
 ## Response File
@@ -607,7 +603,7 @@ The API documentation has been moved [here](./APIDocumentation.md).
 # Decompiler
 
 The decompiler is a tool that can be used to decompile MaterialX files into ShadingLanguageX source files.
-It is available as part of the `mxslc` standalone executable (see [Getting Started](#decompiler)) as well as the C++ and Python
+It is available as part of the `mxslc` standalone executable (see [Decompile](#decompile)) as well as the C++ and Python
 APIs (see the [API Documentation](./APIDocumentation.md)).
 
 ## C++
@@ -616,10 +612,11 @@ APIs (see the [API Documentation](./APIDocumentation.md)).
 
 ```c++
 #include <filesystem>
-#include <decompile.h>
+#include <iostream>
+#include "decompile/decompile.h"
 
 std::filesystem::path src_path{"example1.mtlx"};
-std::string result = mxslc::decompile_to_string(src_path);
+std::string result = mxslc::decompile::decompile_to_string(src_path);
 std::cout << result << std::endl;
 ```
 
@@ -642,17 +639,18 @@ _Output_:
 ```
 vec3 n = normal();
 vec3 i = viewdirection();
-float theta = dotproduct(in1 = n, in2 = i);
+float theta = dotproduct(n, i);
 ```
 
 ### Example 2
 
 ```c++
 #include <filesystem>
-#include <Decompiler.h>
+#include <iostream>
+#include "decompile/Decompiler.h"
 
 std::filesystem::path src_path{"example2.mtlx"};
-mxslc::Decompiler decompiler{src_path};
+mxslc::decompile::Decompiler decompiler{src_path};
 std::string result = decompiler.decompile_node("y", /*with_dependencies*/true);
 std::cout << result << std::endl;
 ```
@@ -696,12 +694,13 @@ _example2.mtlx_:
 _Output_:
 
 ```
-float add_two(float base = 0)
+[[nodedef]]
+float add_two(float base)
 {
-    return base + 2;
+    return base + 2.0;
 }
 
-float y = add_two(base = 12);
+float y = add_two(12.0);
 ```
 
 ## Python
@@ -736,7 +735,7 @@ _Output_:
 ```
 vec3 n = normal();
 vec3 i = viewdirection();
-float theta = dotproduct(in1 = n, in2 = i);
+float theta = dotproduct(n, i);
 ```
 
 ### Example 2
@@ -790,12 +789,13 @@ _example2.mtlx_:
 _Output_:
 
 ```
-float add_two(float base = 0)
+[[nodedef]]
+float add_two(float base)
 {
-    return base + 2;
+    return base + 2.0;
 }
 
-float y = add_two(base = 12);
+float y = add_two(12.0);
 ```
 
 # MaterialX Libraries

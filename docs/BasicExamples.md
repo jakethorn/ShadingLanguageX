@@ -172,8 +172,8 @@ mxslc.compile_file_to_file("circles.mxsl", opts)
 ```c++
 #include "brick_pattern.mxsl"
 
-color3 color1;
-color3 color2;
+global color3 color1;
+global color3 color2;
 
 color3 c = get_brick_pattern(color1, color2); // from brick_pattern.mxsl
 surfaceshader s = standard_surface(base_color=c);
