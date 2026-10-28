@@ -188,9 +188,9 @@ call `absval(...)` instead.
 
 Type rules come from `stdlib.mxsl` overloads:
 - `+ - * / % ^` work on `T op T` and `T op float` / `float op T` for float, vec2-4 and color3/4.
-- Matrices (mat3/mat4) support `m + m`, `m + float`, `float + m`, `m - m`, `m - float`, `m * m` and
-  `m / m`. **`m * float` isn't defined.** `float - mat3` works, but `float - mat4` fails because of a bug
-  in `stdlib.mxsl`. For transforms, use `transformmatrix(v, m)`.
+- Matrices (mat3/mat4) support `m + m`, `m + float`, `float + m`, `m - m`, `m - float`, `float - m`,
+  `m * m` and `m / m`. **`m * float`, `float * m` and `m / float` aren't defined.** For transforms,
+  use `transformmatrix(v, m)`.
 - int supports `+ - * / ^` but **not `%`**. `int * int`, `int / int` (floors) and `int ^ int` are
   computed through float and rounded.
 - `BSDF/EDF/VDF` support `+`, plus `* float` and `* color3`.

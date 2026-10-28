@@ -174,9 +174,7 @@ user wants custom NodeDefs. The documentation's own examples write entry functio
 
 ## Known compiler quirks (v0.3.x) and workarounds
 
-- `separate(v)` on vec3/vec4 names its fields `{outx, outz, outz[, outw]}`. Destructure
-  (`float x, y, z = separate(v);`) or call `separate3`/`separate4`.
-- `m * float` isn't defined for matrices, and `float - mat4` fails.
+- Matrices can't be multiplied or divided by a float (`m * 2.0`, `2.0 * m`, `m / 2.0`).
 - A negative index on a **vector** (`v[-1]`) crashes the compiler. Negative indices only work on
   structs and tuples.
 - Recursion crashes instead of reporting an error. `auto` doesn't work as a return type.

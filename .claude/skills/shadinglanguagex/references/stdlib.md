@@ -43,7 +43,7 @@ Listing notation:
 |---|---|
 | `T min(float in1, T in2)`, `T max(float in1, T in2)` | float-first forms, for T in vec2-4 and color3/4 |
 | `T min(T a, T b, T c[, T d[, T e]])`, `max(...)` | 3 to 5 arguments, for T in float, vec2-4 and color3/4 |
-| `separate(v)` | returns separate2/3/4's struct for any vector or colour. **Bug:** the vec3 and vec4 versions name their fields `{outx, outz, outz}` / `{outx, outz, outz, outw}`, so destructure (`float x, y, z = separate(v);`) or use `separate3` |
+| `separate(v)` | returns the matching separate2/3/4 struct for float, vec2-4 or color3/4: fields `outx outy outz outw` for vectors, `outr outg outb outa` for colours. Use `separate(v).outy`, or destructure with `float x, y, z = separate(v);` |
 | `combine(x, y[, z[, w]])` | builds vec2/vec3/vec4/color3/color4 depending on the destination type |
 | type aliases | `bool int vec2 vec3 vec4 mat3 mat4` |
 | operators | `__add__`, `__sub__`, ... wrap `add`, `subtract`, ... (see language.md §6) |
