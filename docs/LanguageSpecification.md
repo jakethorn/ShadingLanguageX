@@ -648,12 +648,26 @@ print x[-2]; // "3"
 // etc...
 ```
 
-Importantly, the index value must be known at compile time. Because the user-defined type is only known to ShadingLanguageX
-and not MaterialX, you cannot use MaterialX nodes to access fields. 
+If the index value is known at compile time, no nodes are created, otherwise the fields are passed to the inputs of a `switch` node and the index is
+used as its `which` input:
 
 ```
 geomprop int i;
-float f = {1.0, 2.0, 3.0}[i]; // Error: i is not known at compile time
+float f = {1.0, 2.0, 3.0}[i];
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <geompropvalue name="i" type="integer">
+    <input name="geomprop" type="string" value="i" />
+  </geompropvalue>
+  <switch name="f" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="2" />
+    <input name="in3" type="float" value="3" />
+    <input name="which" type="integer" nodename="i" />
+  </switch>
+</materialx>
 ```
 
 ### Component Access

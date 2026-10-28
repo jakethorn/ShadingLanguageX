@@ -4,11 +4,14 @@
 
 #include "expressions/IndexingOperator.h"
 
+#include "errors/CompileError.h"
 #include "expressions/interface.h"
 #include "expressions/accessors/ChannelAccessor.h"
 #include "expressions/accessors/FieldAccessor.h"
+#include "expressions/accessors/RuntimeFieldAccessor.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
+#include "serialize/Serializer.h"
 
 namespace mxslc::expressions
 {
@@ -42,8 +45,14 @@ namespace mxslc::expressions
         }
         else
         {
-            const int index = index_expr_->evaluate()->compile_time_value<int>();
-            accessor_ = create_accessor<FieldAccessor>(value_expr_, index);
+            serializer().begin_comptime();
+            const VarPtr index = index_expr_->evaluate();
+            serializer().end_comptime();
+
+            if (index->is_compile_time())
+                accessor_ = create_accessor<FieldAccessor>(value_expr_, index->compile_time_value<int>());
+            else
+                accessor_ = create_accessor<RuntimeFieldAccessor>(value_expr_, index);
         }
     }
 
@@ -55,6 +64,14 @@ namespace mxslc::expressions
     VarPtr IndexingOperator::evaluate_impl() const
     {
         return accessor_->evaluate();
+    }
+
+    void IndexingOperator::assign_impl(const VarPtr& value) const
+    {
+        if (is_a<RuntimeFieldAccessor>(accessor_))
+            throw CompileError{"Cannot assign to a field using an index that is not known at compile-time"};
+
+        Expression::assign_impl(value);
     }
 
     string IndexingOperator::to_string() const

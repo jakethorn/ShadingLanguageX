@@ -52,6 +52,7 @@ add_library(mxslc_lib
         expressions/VariableDefinitionExpression.cpp
         expressions/accessors/PortAccessor.cpp
         expressions/accessors/FieldAccessor.cpp
+        expressions/accessors/RuntimeFieldAccessor.cpp
         expressions/accessors/ChannelAccessor.cpp
         expressions/accessors/SwizzleAccessor.cpp
         expressions/IncrementOperator.cpp

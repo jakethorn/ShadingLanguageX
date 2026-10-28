@@ -1,0 +1,5 @@
+mutable vec3 p = vec3{};
+p.xz = texcoord();
+mutable color3 c = color3{1.0};
+c.g = randomfloat() * c.r;
+float f = c.r + p.y;

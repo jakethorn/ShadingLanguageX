@@ -204,10 +204,9 @@ namespace mxslc::expressions
         }
 
         // inputs maps each switch node input to its value, absent inputs are left unconnected
-        VarPtr create_switch_node(const Indexed<VarPtr>& inputs, const VarPtr& which)
+        VarPtr create_switch_node(const TypePtr& type, const Indexed<VarPtr>& inputs, const VarPtr& which)
         {
-            const VarPtr& first_input = inputs.begin()->second;
-            if (first_input->type()->is_primitive())
+            if (type->is_primitive())
             {
                 ArgumentList args;
                 for (const auto& [i, input] : inputs)
@@ -219,17 +218,17 @@ namespace mxslc::expressions
             else
             {
                 vector<VarPtr> children;
-                children.reserve(first_input->child_count());
-                for (size_t field = 0; field < first_input->child_count(); ++field)
+                children.reserve(type->field_count());
+                for (size_t field = 0; field < type->field_count(); ++field)
                 {
                     Indexed<VarPtr> field_inputs;
                     for (const auto& [i, input] : inputs)
                         field_inputs.emplace(i, input->child(field));
 
-                    children.push_back(create_switch_node(field_inputs, which));
+                    children.push_back(create_switch_node(type->field_type(field), field_inputs, which));
                 }
 
-                return create_variable(children);
+                return create_variable(type, children);
             }
         }
     }
@@ -260,7 +259,7 @@ namespace mxslc::expressions
             for (const auto& [index, value] : index_values)
                 inputs[std::min(index, SwitchInputCount - 1)] = value;
 
-            return all_equal(inputs) ? inputs.begin()->second : create_switch_node(inputs, which);
+            return all_equal(inputs) ? inputs.begin()->second : create_switch_node(type(), inputs, which);
         }
 
         // otherwise, the outer switch node selects a group of 10 indices using which / 10, and the inner switch
@@ -289,11 +288,11 @@ namespace mxslc::expressions
                 if (not inner_which)
                     inner_which = runtime_utils::invoke_function("modulo", ArgumentList{float_which, static_cast<float>(SwitchInputCount)});
 
-                outer_inputs.emplace(group, create_switch_node(inner_inputs, inner_which));
+                outer_inputs.emplace(group, create_switch_node(type(), inner_inputs, inner_which));
             }
         }
 
-        return create_switch_node(outer_inputs, outer_which);
+        return create_switch_node(type(), outer_inputs, outer_which);
     }
 
     string SwitchExpression::to_string() const

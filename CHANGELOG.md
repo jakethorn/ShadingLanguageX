@@ -1,6 +1,7 @@
 # (mxslc++) Version 0.3.3
 
 * Added switch expressions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#switch-expression))
+* Updated indexing operator; now the index value isn't required to be known at compile time ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#indexing-operator))
 * Added more compile-time node optimisations
 
 

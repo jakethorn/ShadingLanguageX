@@ -1,0 +1,1 @@
+tuple_indexer001.mxsl, line 3: Fields of type '{float, vector2}' must all be the same type to be accessed using an index that is not known at compile-time

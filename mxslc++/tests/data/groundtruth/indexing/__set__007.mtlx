@@ -13,27 +13,11 @@
   <separate3 name="var__1" type="multioutput">
     <input name="in" type="vector3" value="1, 1, 1" />
   </separate3>
-  <combine3 name="var__2" type="vector3">
-    <input name="in1" type="float" nodename="var__0" />
-    <input name="in2" type="float" output="outy" nodename="var__1" />
-    <input name="in3" type="float" output="outz" nodename="var__1" />
-  </combine3>
-  <combine3 name="var__3" type="vector3">
-    <input name="in1" type="float" output="outx" nodename="var__1" />
-    <input name="in2" type="float" nodename="var__0" />
-    <input name="in3" type="float" output="outz" nodename="var__1" />
-  </combine3>
-  <combine3 name="var__4" type="vector3">
+  <combine3 name="var__v__1" type="vector3">
     <input name="in1" type="float" output="outx" nodename="var__1" />
     <input name="in2" type="float" output="outy" nodename="var__1" />
     <input name="in3" type="float" nodename="var__0" />
   </combine3>
-  <switch name="var__v__1" type="vector3">
-    <input name="in1" type="vector3" nodename="var__2" />
-    <input name="in2" type="vector3" nodename="var__3" />
-    <input name="in3" type="vector3" nodename="var__4" />
-    <input name="which" type="integer" value="2" />
-  </switch>
   <add name="v2" type="vector3">
     <input name="in1" type="vector3" nodename="var__v__1" />
     <input name="in2" type="float" value="1" />
