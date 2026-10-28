@@ -17,8 +17,7 @@
 # What is ShadingLanguageX?
 
 ShadingLanguageX is a high-level programming language that can be used to create MaterialX shaders. Statements
-and expressions are compiled down to native MaterialX elements, like Nodes and NodeDefs. For example, when compiled with
-the `--no-reduce-graph` option, `int i = 2 + 2;` would compile to:
+and expressions are compiled down to native MaterialX elements, like Nodes and NodeDefs. For example, `int i = 2 + 2;` would compile to:
 
 ```xml
 <?xml version="1.0"?>
@@ -97,9 +96,9 @@ compile-time.
 ```
 // sum three layers of noise
 mutable float f = 0.0;
-for (int i from 0 to 2)
+for (float i from 1 to 3)
 {
-    f += noise2d(texcoord = texcoord() * float{i + 1});
+    f += noise2d(texcoord = texcoord() * i);
 }
 f /= 3.0;
 ```
@@ -129,9 +128,9 @@ class Sphere
 
 ## Compile-Time Operations
 
-Another benefit of using `mxslc` is that it will compute certain operations at compile-time when possible. For example,
-instead of compiling `int i = 2 + 2;` into an `add` node, the compiler computes the value at compile-time by default
-(unless the `--no-reduce-graph` option is used), reducing the number of nodes in the shader. This isn't always possible however, for example, `int i = geompropvalue<int>("i") + 2;`
+Another benefit of using `mxslc` is that it will compute certain operations at compile-time when possible. For example, while
+`int i = 2 + 2;` would typically compile into an `add` node, the compiler can be instructed to compute the value at
+compile-time, reducing the number of nodes in the shader. This isn't always possible however, for example, `int i = geompropvalue<int>("i") + 2;`
 is not possible to compute at compile-time because the value of `geompropvalue` is not known until render-time.
 
 # Installation

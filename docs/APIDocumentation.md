@@ -114,8 +114,8 @@ fs::path compile_to_file(const fs::path& src_path, const fs::path& dst_path);
 #include "compile.h"
 #include "CompileOptions.h"
 
-// 1 (wrap string literals in std::string{} for source code or fs::path{} for files, a bare literal is ambiguous)
-MaterialX::DocumentPtr doc = mxslc::compile_to_document(std::string{"float f = 1 + randomfloat();"});
+// 1
+MaterialX::DocumentPtr doc = mxslc::compile_to_document("float f = 1 + randomfloat();");
 
 // 2
 mxslc::CompileOptions opts;
@@ -155,8 +155,6 @@ CompileOptions.__init__(
     sources: dict[str, str] = {}
 )
 ```
-
-Only `output_file` and `func_name` accept `None`; pass empty lists/dicts for the other options.
 
 ### Fields
 
@@ -528,8 +526,6 @@ CompileOptions.__init__(
     sources: dict[str, str] = {}
 )
 ```
-
-Only `output_file` and `func_name` accept `None`; pass empty lists/dicts for the other options.
 
 #### Properties
 

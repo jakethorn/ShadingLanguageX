@@ -430,9 +430,6 @@ The following identifiers have a special meaning in ShadingLanguageX and cannot 
 `global` `default` `using` `class` `this` `print` `typeof` `break` `comptime` `nodegraph` `nodedef` `geomprop`
 `uniform` `varying` `namespace` `consteval`
 
-`uniform`, `varying`, `namespace` and `consteval` are reserved for future use.
-
-
 # Modifiers
 
 Variables, functions and expressions can be prefixed with modifiers. For example:
@@ -493,30 +490,30 @@ comment
 
 ## Binary Operators
 
-| Operation | MaterialX Node(s)   |
-|-----------|---------------------|
-| `a + b`   | `add`               |
-| `a - b`   | `subtract`          |
-| `a * b`   | `multiply`          |
-| `a / b`   | `divide`            |
-| `a % b`   | `modulo`            |
-| `a ^ b`   | `power` or `xor`    |
-| `a > b`   | `ifgreater`         |
-| `a >= b`  | `ifgreatereq`       |
-| `a < b`   | `ifgreater` (operands swapped, i.e., `b > a`) |
-| `a <= b`  | `ifgreatereq` (operands swapped, i.e., `b >= a`) |
-| `a == b`  | `ifequal`           |
-| `a != b`  | `ifequal`+`not`     |
-| `a & b`   | `and`               |
-| `a \| b`  | `or`                |
+| Operation | MaterialX Node(s) |
+|-----------|-------------------|
+| `a + b`   | `add`             |
+| `a - b`   | `subtract`        |
+| `a * b`   | `multiply`        |
+| `a / b`   | `divide`          |
+| `a % b`   | `modulo`          |
+| `a ^ b`   | `power` or `xor`  |
+| `a > b`   | `ifgreater`       |
+| `a >= b`  | `ifgreatereq`     |
+| `a < b`   | `ifgreatereq`     |
+| `a <= b`  | `ifgreater`       |
+| `a == b`  | `ifequal`         |
+| `a != b`  | `ifequal`+`not`   |
+| `a & b`   | `and`             |
+| `a \| b`  | `or`              |
 
 ## Unary Operators
 
-| Operation | MaterialX Node(s)   |
-|-----------|---------------------|
-| `!a`      | `not`               |
-| `-a`      | `invert` (`subtract` for integers) |
-| `+a`      |                     |
+| Operation | MaterialX Node(s) |
+|-----------|-------------------|
+| `!a`      | `not`             |
+| `-a`      | `invert`          |
+| `+a`      |                   |
 
 ### Notes
 
@@ -779,7 +776,7 @@ for (int i from 1 to 100)
 
 `comptime` is a modifier that can be placed before an expression. It tells the compiler to perform as much of that expression
 at compile time as possible. It operates exactly the same as the `reduce_graph` compiler option (see User Guide), but for a single expression.
-For example, when compiled with the `--no-reduce-graph` option (otherwise `a` would also be evaluated at compile time):
+For example:
 
 ```
 float a = 1 + 1;
@@ -1165,11 +1162,6 @@ x, y = 3, 4;
     return {pos, hit};
 }
 
-vec3 origin = position();
-vec3 dir = viewdirection();
-mutable vec3 p;
-mutable bool h;
-
 p, h = intersection(origin, dir);
 ```
 
@@ -1247,8 +1239,8 @@ In the case that no arguments are passed to the constructor, a default value wil
 ## One Argument
 
 With a single argument, the constructor will convert the argument to the target type.
-Currently, this compiles to the `convert` node, except for float to `bool` (`ifequal` + `not`) and float to `int`
-(`round`). For information regarding supported conversions, see the MaterialX Standard Node document.
+Currently, this simply compiles to the `convert` node. For information regarding supported conversions,
+see the MaterialX Standard Node document.
 
 ### Example
 
@@ -1469,8 +1461,6 @@ are currently optimised to evaluate at compile-time, if possible.
 | `floor`        |
 | `ceil`         |
 | `round`        |
-
-All other nodes, such as `power`, `modulo`, `absval`, `and`, `or` and `xor`, are never evaluated at compile time.
 
 This also means that expressions or statements that require compile time values such as if statements, for loops and 
 some indexing operators can also use these expressions and not just literals. For example:
@@ -1835,8 +1825,7 @@ inline float add_one(float in)
 float x = add_one(2.0);
 float y = add_one(5.0);
 ```
-Instead, directly compiles to the following (with the `--no-reduce-graph` option, otherwise the additions are
-evaluated at compile time):
+Instead, directly compiles to:
 ```xml
 <add name="x" type="float">
   <input name="in1" type="float" value="2" />
@@ -1875,9 +1864,6 @@ float f = foo(1, 2) + randomfloat();
   </add>
 </materialx>
 ```
-
-Note that `power` (the `^` operator) is not one of the nodes that are evaluated at compile time (see
-[Compile-Time Evaluation](#compile-time-evaluation)), so its base is folded to `0.666667` but the `power` node remains.
 
 ## NodeGraph Functions
 
@@ -2300,11 +2286,7 @@ Operator overload functions are defined outside of class definitions.
 | `\|a\|`   | `__abs__`     |
 
 ```
-class Point
-{
-    float x;
-    float y;
-}
+using Point = {float x, float y};
 
 
 Point p = {1.0, 2.0};
@@ -2327,11 +2309,6 @@ Point __add__(Point a, float b)
 
 r += 10.0; // OK
 ``` 
-
-Note that unnamed structs (and `using` aliases of them) with 2 to 4 float fields implicitly convert to vectors (see
-[Type Conversions](#type-conversions)). For example, if `Point` was declared as `using Point = {float x, float y};`, then
-`p + q` would compile without an `__add__` overload by converting both operands to `vec2`. Overloads are always preferred
-over these conversions.
 
 # Print Statement
 
