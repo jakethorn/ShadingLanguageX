@@ -355,6 +355,14 @@ namespace mxslc::decompile
         return (is_nonlocal ? remove_prefix(interface_name) : interface_name) == assignments->variable;
     }
 
+    bool GraphDecompiler::is_initial_value(const mx::NodePtr& node, const mx::InputPtr& input) const
+    {
+        const VariableAssignments* assignments = get_assignments(node);
+        if (assignments == nullptr or assignments->is_declared_outside or get_previous_value(node) or node->getName() == assignments->variable)
+            return false;
+        return input and not is_connected(input) and input->hasValue() and input->getType() == node->getType();
+    }
+
     void GraphDecompiler::remove_assignment(const mx::NodePtr& node)
     {
         VariableAssignments& assignments = assignments_.at(assignment_indices_.at(node));
@@ -709,10 +717,14 @@ namespace mxslc::decompile
 
     optional<GraphDecompiler::SwizzleAssignment> GraphDecompiler::find_swizzle_assignment(const mx::NodePtr& node) const
     {
-        const mx::NodePtr previous = get_previous_value(node);
         const string channels = get_swizzle_channels(node->getType());
-        if (previous == nullptr or not is_combine(node) or channels.size() != get_channel_count(node))
+        if (get_assignments(node) == nullptr or not is_combine(node) or channels.size() != get_channel_count(node))
             return std::nullopt;
+
+        // the first value of a variable keeps the channels of its initial value, if it has one
+        const auto is_kept_value = [&](const mx::InputPtr& input) {
+            return is_previous_value(node, input) or is_initial_value(node, input);
+        };
 
         // the channels that keep the previous value of the variable, which come from a single separate node
         mx::NodePtr previous_separate;
@@ -722,7 +734,7 @@ namespace mxslc::decompile
         {
             const mx::InputPtr input = node->getInput("in" + std::to_string(i + 1));
             const mx::NodePtr separate = get_connected_node(input);
-            const bool is_kept = separate and is_separate(separate) and get_connected_node(separate->getInput("in")) == previous and
+            const bool is_kept = separate and is_separate(separate) and is_kept_value(separate->getInput("in")) and
                 get_separate_channel(input->getOutputString()) == channels[i] and (previous_separate == nullptr or separate == previous_separate);
 
             if (is_kept)
@@ -739,10 +751,13 @@ namespace mxslc::decompile
         if (assigned_channels.empty() or not is_absorbable_by(previous_separate, node, kept_count))
             return std::nullopt;
 
+        const mx::InputPtr previous_input = previous_separate->getInput("in");
+        const mx::InputPtr initial_value = is_initial_value(node, previous_input) ? previous_input : nullptr;
+
         if (assigned_channels.size() == 1)
         {
             const size_t channel = assigned_channels.front();
-            return SwizzleAssignment{previous_separate, nullptr, "in" + std::to_string(channel + 1), string{channels[channel]}};
+            return SwizzleAssignment{previous_separate, nullptr, "in" + std::to_string(channel + 1), string{channels[channel]}, initial_value};
         }
 
         // `q.xz = v;` is compiled to `combine3(separate2(v).outx, separate3(q).outy, separate2(v).outy)`
@@ -768,7 +783,7 @@ namespace mxslc::decompile
             swizzle[index] = channels[i];
         }
 
-        return SwizzleAssignment{previous_separate, value_separate, "", swizzle};
+        return SwizzleAssignment{previous_separate, value_separate, "", swizzle, initial_value};
     }
 
     optional<string> GraphDecompiler::get_compound_operator(const mx::NodePtr& node) const
@@ -1154,6 +1169,10 @@ namespace mxslc::decompile
         }
         else if (get_assignments(node))
         {
+            // e.g., `mutable vec3 q = vec3{};` before `q.y = a;`, see SwizzleAssignment::initial_value
+            if (contains(swizzle_assignments_, node) and swizzle_assignments_.at(node).initial_value)
+                result.push_back(format_variable_definition("mutable", get_variable_type(node), get_identifier(node), format_value(swizzle_assignments_.at(node).initial_value)));
+
             stmt = create_assignment(node);
         }
         else if (not get_out_parameter_outputs(node).empty())
@@ -1218,23 +1237,24 @@ namespace mxslc::decompile
         const string& variable = assignments.identifier;
         const mx::NodePtr previous = get_previous_value(node);
 
+        // `q.y = a;`, which can be the first value of a variable that is declared before it, see create_statements
+        if (contains(swizzle_assignments_, node))
+        {
+            const SwizzleAssignment& swizzle = swizzle_assignments_.at(node);
+            const ScopedValue<InitialValue> initial_value{initial_value_, {variable, swizzle.initial_value}};
+            const optional<ExpressionCode> value = swizzle.value_separate
+                ? create_input_expression(swizzle.value_separate, "in")
+                : create_input_expression(node, swizzle.value_input);
+            if (value)
+                return SourceCode::concat({variable + "." + swizzle.channels + " = ", value->code, ";"});
+        }
+
         // the first value of a variable declares it, e.g., `mutable float x = a;`
         if (previous == nullptr and not assignments.is_declared_outside)
         {
             const bool is_assigned_by_function = graph_->isA<mx::Document>() and decompiler_.is_assigned_by_function(variable);
             const bool is_mutable = assignments.nodes.size() > 1 or is_assigned_by_function;
             return format_variable_definition(is_mutable ? "mutable" : "", get_variable_type(node), variable, create_node_expression(node));
-        }
-
-        // `q.y = a;`
-        if (contains(swizzle_assignments_, node))
-        {
-            const SwizzleAssignment& swizzle = swizzle_assignments_.at(node);
-            const optional<ExpressionCode> value = swizzle.value_separate
-                ? create_input_expression(swizzle.value_separate, "in")
-                : create_input_expression(node, swizzle.value_input);
-            if (value)
-                return SourceCode::concat({variable + "." + swizzle.channels + " = ", value->code, ";"});
         }
 
         // `x += a;`, or `x++;` if a is one
@@ -1275,7 +1295,12 @@ namespace mxslc::decompile
         }
 
         if (port->hasValue())
+        {
+            const mx::InputPtr& initial_value = initial_value_.value;
+            if (initial_value and port->getType() == initial_value->getType() and port->getValueString() == initial_value->getValueString())
+                return format_identifier(initial_value_.variable);
             return format_value(port);
+        }
 
         return std::nullopt;
     }

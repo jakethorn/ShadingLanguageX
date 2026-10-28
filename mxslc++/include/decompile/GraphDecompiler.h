@@ -71,6 +71,17 @@ namespace mxslc::decompile
             // the input of the value of a swizzle with a single channel, e.g., the in2 that a is connected to
             string value_input;
             string channels;
+            // the constant value of the variable before its first value is assigned to a swizzle, e.g., the vec3{} of
+            // `mutable vec3 q = vec3{};`, whose definition has no node, which is declared before `q.y = a;`
+            mx::InputPtr initial_value;
+        };
+
+        // the initial value of the variable that is being assigned to, which is written as the variable, e.g.,
+        // `q.y = q.y * 2.0;` instead of `q.y = vec3{}.y * 2.0;`, see SwizzleAssignment::initial_value
+        struct InitialValue
+        {
+            string variable;
+            mx::InputPtr value;
         };
 
         struct NodeUse
@@ -121,6 +132,9 @@ namespace mxslc::decompile
         mx::NodePtr get_previous_value(const mx::NodePtr& node) const;
         // true if the input has the value of the variable before the node was assigned to it, e.g., the x of `x + 1.0`
         bool is_previous_value(const mx::NodePtr& node, const mx::InputPtr& input) const;
+        // true if the input is the constant value of the variable before the node, its first value, was assigned to it,
+        // e.g., the vec3{} of `mutable vec3 x = vec3{};`, whose definition has no node
+        bool is_initial_value(const mx::NodePtr& node, const mx::InputPtr& input) const;
         optional<SwizzleAssignment> find_swizzle_assignment(const mx::NodePtr& node) const;
         // e.g., "+" for `x + a` that is assigned to x, which is written `x += a;`
         optional<string> get_compound_operator(const mx::NodePtr& node) const;
@@ -199,6 +213,7 @@ namespace mxslc::decompile
         bool is_typed_context_{true};
         // the value of the variable that the else branch of an if-expression can omit, e.g., `x = if (c) { a };`
         mx::NodePtr implied_else_;
+        InitialValue initial_value_;
     };
 }
 
