@@ -79,6 +79,7 @@ namespace mxslc::runtime
 
     private:
         void resolve_fields(const TypePtr& type) const;
+        void resolve_template_type(const TypePtr& type) const;
 
         string name_;
         ScopePtr parent_;

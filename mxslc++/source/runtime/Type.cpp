@@ -199,6 +199,9 @@ namespace mxslc::runtime
         if (other->is_vector() and is_vector_compatible(*other, *this))
             return true;
 
+        if (is_tuple() and is_tuple_compatible(*this, *other))
+            return true;
+
         if (other->is_tuple() and is_tuple_compatible(*other, *this))
             return true;
 

@@ -469,6 +469,7 @@ namespace mxslc
     ModifierList Parser::argument_modifiers()
     {
         // the same as modifiers(), but without default so it doesn't clash with default expressions
+        // and without comptime because it can be used in front of expressions
         consume("[[");
         const vector<Token> mod_tokens = consume_while(
             TokenType::Const,
@@ -478,7 +479,6 @@ namespace mxslc
             TokenType::Nodegraph,
             TokenType::Nodedef,
             TokenType::Inline,
-            TokenType::Comptime,
             TokenType::Ref,
             TokenType::Out
         );
@@ -489,8 +489,20 @@ namespace mxslc
 
     TypePtr Parser::type()
     {
-        if (const optional<Token> type = consume(TokenType::Identifier))
-            return create_type(type->lexeme());
+        if (const optional<Token> type_token = consume(TokenType::Identifier))
+        {
+            const string& type_name = type_token->lexeme();
+            if (consume('<'))
+            {
+                const TypePtr template_type = type();
+                match('>');
+                return create_type(type_name, template_type);
+            }
+            else
+            {
+                return create_type(type_name);
+            }
+        }
 
         vector<Field> fields = list<Field>('{', '}', [this](const size_t){ return field(); });
         return create_type(std::move(fields));
@@ -939,6 +951,15 @@ namespace mxslc
         // consume modifiers before calling this function
 
         if (peek(0) == TokenType::Identifier and peek(1) == TokenType::Identifier)
+        {
+            return true;
+        }
+
+        if (peek(0) == TokenType::Identifier and
+            peek(1) == '<' and
+            peek(2) == TokenType::Identifier and
+            peek(3) == '>' and
+            peek(4) == TokenType::Identifier)
         {
             return true;
         }

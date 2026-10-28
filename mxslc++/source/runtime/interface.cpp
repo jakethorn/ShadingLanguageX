@@ -7,6 +7,8 @@
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/type_utils.h"
 #include "serialize/values/interface.h"
+
+#include "runtime/Type.h"
 #include "serialize/serializer_utils.h"
 #include "serialize/values/Value.h"
 #include "serialize/values/CompileTimeValue.h"
@@ -33,6 +35,9 @@ namespace mxslc::runtime
     {
         if (contains_auto(type))
             type = replace_auto(type, type_of(children));
+
+        if (type->is_tuple())
+            type = type_of(children);
 
         VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
         VariableAPI::copy_children(var, children);
@@ -63,6 +68,9 @@ namespace mxslc::runtime
     {
         if (contains_auto(type))
             type = replace_auto(type, value->type());
+
+        if (type->is_tuple())
+            type = value->type();
 
         VarPtr var = std::make_shared<Variable>(std::move(mods), std::move(type));
         var->copy(value);

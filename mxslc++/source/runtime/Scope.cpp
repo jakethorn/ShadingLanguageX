@@ -204,6 +204,13 @@ namespace mxslc::runtime
         if (type->is_auto())
             return Type::Auto;
 
+        if (type->is_tuple())
+        {
+            resolve_template_type(type);
+            type->set_resolved();
+            return type;
+        }
+
         if (type->has_name())
         {
             return get_type(type->name());
@@ -229,5 +236,11 @@ namespace mxslc::runtime
     {
         for (Field& field : type->fields_)
             field.type_ = resolve_type(field.type_);
+    }
+
+    void Scope::resolve_template_type(const TypePtr& type) const
+    {
+        if (type->has_template_type())
+            type->template_type_ = resolve_type(type->template_type_);
     }
 }

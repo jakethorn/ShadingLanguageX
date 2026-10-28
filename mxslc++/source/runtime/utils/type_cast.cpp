@@ -29,9 +29,13 @@ namespace mxslc::runtime_utils
         {
             cast_value = invoke_constructor(type, value->children());
         }
-        else
+        else if (value->type()->is_vector())
         {
             cast_value = invoke_function(type, "separate" + std::to_string(type->field_count()), value);
+        }
+        else if (type->is_tuple())
+        {
+            return value;
         }
 
         assert(cast_value->type()->equals(type));
