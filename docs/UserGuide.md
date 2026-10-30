@@ -183,6 +183,32 @@ print(mtlx)
 Note that the package name is mxslcxx, but the module is called mxslc to be consistent with the old compiler. See below
 for the API documentation for the Python bindings.
 
+### MCP Server
+
+Install the optional MCP dependency (Python 3.10 or newer) and start the stdio server:
+
+```bash
+pip install "mxslcxx[mcp]"
+mxslcxx-mcp
+```
+
+Configure an MCP client to launch the server:
+
+```json
+{
+  "mcpServers": {
+    "shadinglanguagex": {
+      "command": "mxslcxx-mcp"
+    }
+  }
+}
+```
+
+The server provides `compile_mxsl` and `decompile_mtlx` tools. The compile tool accepts a
+MaterialX `version`, an optional entry-function `func_name`, and `sources`, a mapping of
+virtual include paths to source contents. The SDK's stdio transport redirects native
+compiler output away from the JSON-RPC stream.
+
 ## Build from Source
 
 To build from source, you need:
