@@ -16,6 +16,8 @@ namespace mxslc::runtime
         AttributeList() = default;
         explicit AttributeList(vector<Attribute> attrs) : attrs_{std::move(attrs)} { }
 
+        void add(Attribute attr) { attrs_.push_back(std::move(attr)); }
+
         void add_to(const mx::ElementPtr& element) const;
         void add_to(const mx::ElementPtr& element, const string& child_name) const;
 

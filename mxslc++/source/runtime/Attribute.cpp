@@ -8,6 +8,8 @@
 
 namespace mxslc::runtime
 {
+    Attribute Attribute::Uniform = Attribute{"uniform", "true"};
+
     void Attribute::add_to(const mx::ElementPtr& element) const
     {
         if (has_child())
@@ -22,9 +24,15 @@ namespace mxslc::runtime
         }
     }
 
+    void Attribute::add_to(const mx::ElementPtr& element, const string& child_name) const
+    {
+        if (const mx::ElementPtr child = element->getChild(child_name))
+            add_to(child);
+    }
+
     string Attribute::to_string() const
     {
-        string name_string = name_ + (has_child() ? "." + child_ : "");
+        const string name_string = name_ + (has_child() ? "." + child_ : "");
         return "@" + name_string + " \"" + value_ + "\"";
     }
 }
