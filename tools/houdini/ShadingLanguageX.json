@@ -1,0 +1,9 @@
+{
+    "env": [
+        {
+            "SLX_HOUDINI": "${SLX_HOUDINI-C:/path/to/ShadingLanguageX/tools/houdini/slx}"
+        }
+    ],
+    "hpath": "$SLX_HOUDINI",
+    "load_package_once": true
+}

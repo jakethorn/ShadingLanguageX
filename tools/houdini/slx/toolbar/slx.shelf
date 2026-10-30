@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <toolshelf name="slx" label="SLX">
+    <memberTool name="slx_material"/>
+    <memberTool name="slx_recompile_all"/>
+    <memberTool name="slx_convert_selected"/>
+    <memberTool name="slx_import_materialx"/>
+    <memberTool name="slx_documentation"/>
+  </toolshelf>
+
+  <tool name="slx_material" label="SLX Material" icon="LOP_materiallibrary">
+    <helpText><![CDATA[Creates an SLX Material node in the current LOP network.]]></helpText>
+    <toolMenuContext name="viewer">
+      <contextNetType>LOP</contextNetType>
+    </toolMenuContext>
+    <toolMenuContext name="network">
+      <contextNetType>LOP</contextNetType>
+    </toolMenuContext>
+    <toolSubmenu>Materials</toolSubmenu>
+    <script scriptType="python"><![CDATA[import loptoolutils
+import slx_houdini.node_type
+
+slx_houdini.node_type.ensure_node_type()
+loptoolutils.genericTool(kwargs, "slx_material::1.0")]]></script>
+  </tool>
+
+  <tool name="slx_recompile_all" label="Recompile All" icon="BUTTONS_reload">
+    <helpText><![CDATA[Recompiles every SLX Material node in the scene.]]></helpText>
+    <script scriptType="python"><![CDATA[import slx_houdini.lop
+
+slx_houdini.lop.recompile_all()]]></script>
+  </tool>
+
+  <tool name="slx_convert_selected" label="Convert to SLX" icon="SOP_attribwrangle">
+    <helpText><![CDATA[Creates SLX Material nodes from the selected MaterialX VOP networks, or from LOPs that load .mtlx files.]]></helpText>
+    <script scriptType="python"><![CDATA[import slx_houdini.convert
+
+slx_houdini.convert.convert_selected_to_slx()]]></script>
+  </tool>
+
+  <tool name="slx_import_materialx" label="Import MaterialX" icon="LOP_reference">
+    <helpText><![CDATA[Decompiles a .mtlx file into a new SLX Material node.]]></helpText>
+    <script scriptType="python"><![CDATA[import slx_houdini.convert
+
+slx_houdini.convert.import_materialx_file()]]></script>
+  </tool>
+
+  <tool name="slx_documentation" label="SLX Docs" icon="BUTTONS_help">
+    <helpText><![CDATA[Opens the ShadingLanguageX documentation.]]></helpText>
+    <script scriptType="python"><![CDATA[import webbrowser
+
+webbrowser.open("https://github.com/jakethorn/ShadingLanguageX")]]></script>
+  </tool>
+</shelfDocument>
