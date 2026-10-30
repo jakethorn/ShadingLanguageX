@@ -4,6 +4,8 @@
 
 #include "runtime/Function.h"
 
+#include "utils/Logger.h"
+
 #include <cassert>
 
 #include "expressions/Expression.h"
@@ -54,7 +56,8 @@ namespace mxslc::runtime
             TokenType::Nodegraph,
             TokenType::Nodedef,
             TokenType::Default,
-            TokenType::Comptime
+            TokenType::Comptime,
+            TokenType::Uniform
         );
 
         if (is_comptime() and is_nodegraph())
@@ -83,6 +86,9 @@ namespace mxslc::runtime
                     throw CompileError{"Nodegraph function parameter '" + param.name() + "' must have a default value"};
             }
         }
+
+        if (is_uniform() and not is_nodedef())
+            Logger::warning("Uniform modifier only applies to nodedef functions. Ignoring for function '" + name_ + "'.");
     }
 
     Function::~Function() = default;

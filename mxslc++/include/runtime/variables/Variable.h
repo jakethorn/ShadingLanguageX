@@ -26,6 +26,7 @@ namespace mxslc::runtime
         bool is_comptime() const;
         bool is_const() const;
         bool is_mutable() const;
+        bool is_uniform() const;
         const ModifierList& modifiers() const;
         void set_modifiers(ModifierList mods);
 

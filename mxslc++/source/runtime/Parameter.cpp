@@ -21,7 +21,14 @@ namespace mxslc::runtime
         expr_{std::move(expr)},
         index_{index}
     {
-        mods_.validate(TokenType::Const, TokenType::Comptime, TokenType::Mutable, TokenType::Ref, TokenType::Out);
+        mods_.validate(
+            TokenType::Const,
+            TokenType::Comptime,
+            TokenType::Mutable,
+            TokenType::Ref,
+            TokenType::Out,
+            TokenType::Uniform
+        );
 
         if (mods_.contains(TokenType::Ref) or mods_.contains(TokenType::Out))
             mods_.add(TokenType::Mutable);
@@ -32,6 +39,8 @@ namespace mxslc::runtime
         if (mods_.contains(TokenType::Ref) and mods_.contains(TokenType::Out))
             throw CompileError{"Parameters cannot be both ref and out"};
 
+        if (is_uniform())
+            attrs_.add(Attribute::Uniform);
     }
 
     Parameter Parameter::monomorphize(const TypePtr& template_type) const

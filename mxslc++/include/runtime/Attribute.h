@@ -19,8 +19,11 @@ namespace mxslc::runtime
         Attribute(string child, string name, string value) : child_{std::move(child)}, name_{std::move(name)}, value_{std::move(value)} { }
 
         void add_to(const mx::ElementPtr& element) const;
+        void add_to(const mx::ElementPtr& element, const string& child_name) const;
 
         string to_string() const override;
+
+        static Attribute Uniform;
 
     private:
         bool has_child() const { return not child_.empty(); }
