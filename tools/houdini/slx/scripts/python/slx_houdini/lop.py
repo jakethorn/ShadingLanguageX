@@ -10,6 +10,7 @@ from pxr import Sdf, UsdGeom, UsdShade
 from slx_houdini import NODE_TYPE_NAME, compiler, editor, examples, file_watcher, global_parameters
 
 MATERIALX_MATERIALS_PATH = "/MaterialX/Materials"
+LOADED_EXAMPLE_KEY = "slx_loaded_example"  # node user data: the example whose code the node holds
 ERROR_LINE_PATTERN = re.compile(r"\bline (\d+)")
 
 _compile_results = {}  # node session id -> CompileResult
@@ -43,8 +44,8 @@ def cook(script_node):
     # Reading the parameter makes Houdini recook this node when recompile() changes it.
     node.evalParm("recompile")
     _compile_results.pop(node.sessionId(), None)
-    if is_file_source(node) and not node.evalParm("file").strip():
-        # Like the Reference LOP, a node without a file passes its input through.
+    if not has_source(node):
+        # Like the Reference LOP, a node without a file or example passes its input through.
         file_watcher.unwatch_files(node)
         return
     try:
@@ -71,11 +72,32 @@ def is_file_source(node):
     return node.parm("source").evalAsString() == "file"
 
 
+def is_example_source(node):
+    return node.parm("source").evalAsString() == "example"
+
+
+def has_source(node):
+    if is_file_source(node):
+        return bool(node.evalParm("file").strip())
+    if is_example_source(node):
+        return bool(node.evalParm("example"))
+    return True
+
+
 def get_source_directory(node):
     """Returns the folder that relative paths in the node's SLX source are relative to."""
     if is_file_source(node):
         return os.path.dirname(os.path.abspath(node.evalParm("file").strip()))
+    if is_example_source(node):
+        return get_examples_directory()
     return hou.text.expandString("$HIP")
+
+
+def get_examples_directory():
+    directory = examples.find_examples_directory()
+    if directory is None:
+        raise SourceError("The SLX examples weren't found. They belong in the plugin's slx/examples folder.")
+    return directory
 
 
 def compile_node(node):
@@ -90,17 +112,18 @@ def compile_node(node):
         source_files = compiler.find_source_files(path)
         watch_source_files(node, source_files)
         if not os.path.isfile(path):
-            raise SourceError("SLX file not found: {}. Press Create File to start from a template.".format(path))
+            raise SourceError("SLX file not found: {}. Press Create to start from a template.".format(path))
         source, is_file, compile_function = path, True, mxslc.compile_file_to_string
         # A file's globals change when it, or a file it includes, is saved.
         source_key = tuple((p, file_watcher.get_modified_time(p)) for p in source_files)
         settings = get_compile_settings(node, mxslc, search_directories=[])
     else:
         file_watcher.unwatch_files(node)
-        source = node.parm("code").unexpandedString()
+        source = node.parm("examplecode" if is_example_source(node) else "code").unexpandedString()
         source_key, is_file, compile_function = source, False, mxslc.compile_string_to_string
-        # Inline code has no file of its own, so #include and #library paths are resolved from $HIP.
-        settings = get_compile_settings(node, mxslc, search_directories=[hou.text.expandString("$HIP")])
+        # Code in the node has no file of its own, so #include and #library paths are resolved from $HIP, or for
+        # an example, from the examples folder.
+        settings = get_compile_settings(node, mxslc, search_directories=[get_source_directory(node)])
 
     parameters = get_declared_globals(node, mxslc, source, is_file, settings, source_key)
     options = create_compile_options(mxslc, settings, global_parameters.get_global_values(node, parameters))
@@ -382,33 +405,79 @@ def on_open_editor_pressed(kwargs):
     node = kwargs["node"]
     path = node.evalParm("file").strip()
     if not path:
-        hou.ui.displayMessage("Choose an SLX file first, or press Create File.", title="SLX Material")
+        hou.ui.displayMessage("Choose an SLX file first, or press Create.", title="SLX Material")
         return
     if not os.path.isfile(path):
-        hou.ui.displayMessage("{} doesn't exist yet. Press Create File to start from a template.".format(path),
+        hou.ui.displayMessage("{} doesn't exist yet. Press Create to start from a template.".format(path),
                               title="SLX Material")
         return
     result = _compile_results.get(node.sessionId())
     editor.open_in_editor(path, result.error_line() if result else None)
 
 
-def on_load_example_pressed(kwargs):
+def on_created(kwargs):
+    # Houdini shows parameters that differ from their default in bold. The example code always does, so the inline
+    # code starts from the template here rather than having it as its default, which makes it bold too.
+    kwargs["node"].parm("code").set(compiler.read_template())
+
+
+def on_source_changed(kwargs):
     node = kwargs["node"]
-    directory = examples.find_examples_directory()
-    paths = examples.get_examples(directory) if directory else []
-    if not paths:
-        hou.ui.displayMessage("The SLX examples weren't found. They come with the plugin's release download, and "
-                              "with the ShadingLanguageX repository.", title="Load Example")
+    if not is_example_source(node) or node.parm("examplecode").unexpandedString():
         return
-    names = [os.path.splitext(os.path.basename(p))[0] for p in paths]
-    chosen = hou.ui.selectFromList(names, exclusive=True, title="Load Example", column_header="Example",
-                                   message="The example is copied to $HIP/slx_examples, where you can edit it.")
-    if not chosen:
-        return
-    copied_path = examples.copy_example(paths[chosen[0]], hou.text.expandString("$HIP/slx_examples"))
-    node.parm("source").set("file")
-    node.parm("file").set("$HIP/slx_examples/" + os.path.basename(copied_path))
+    # Nothing is loaded yet, so load the chosen example, or the first one.
+    names = get_example_names()
+    name = node.evalParm("example") or (names[0] if names else "")
+    if name:
+        load_example(node, name)
+        recompile_and_report(node)
+
+
+def on_example_chosen(kwargs):
+    node = kwargs["node"]
+    if hou.isUIAvailable() and is_example_edited(node):
+        loaded_name = node.userData(LOADED_EXAMPLE_KEY) or ""
+        choice = hou.ui.displayMessage("Discard your changes to the {} example?".format(loaded_name),
+                                       buttons=("Discard", "Cancel"), default_choice=0, close_choice=1,
+                                       title="Choose Example")
+        if choice != 0:
+            node.parm("example").set(loaded_name)
+            return
+    load_example(node, node.evalParm("example"))
     recompile_and_report(node)
+
+
+def load_example(node, name):
+    """Chooses the named example on node and puts its code in the node, which compiles that code.
+
+    The code is kept in the node rather than read from the examples folder, so edits to it stay with the node.
+    An empty name clears the choice, and the node then passes its input through.
+    """
+    node.parm("example").set(name)
+    node.parm("examplecode").set(get_example_code(name))
+    node.setUserData(LOADED_EXAMPLE_KEY, name)
+
+
+def is_example_edited(node):
+    """Returns whether node's example code differs from the example it was loaded from."""
+    loaded_name = node.userData(LOADED_EXAMPLE_KEY) or ""
+    return node.parm("examplecode").unexpandedString() != get_example_code(loaded_name)
+
+
+def get_example_code(name):
+    return examples.read_text(os.path.join(get_examples_directory(), name + ".mxsl")) if name else ""
+
+
+def get_example_names():
+    directory = examples.find_examples_directory()
+    return [os.path.splitext(os.path.basename(p))[0] for p in examples.get_examples(directory)] if directory else []
+
+
+def get_example_menu_items():
+    names = get_example_names()
+    if not names:
+        return ["", "No Examples Found"]
+    return [item for name in names for item in (name, name)]
 
 
 def on_create_file_pressed(kwargs):

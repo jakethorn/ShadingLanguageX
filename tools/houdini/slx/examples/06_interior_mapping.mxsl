@@ -1,0 +1,80 @@
+global float rooms_across = 4.0;
+global float floors = 4.0;
+global float room_depth = 1.0;
+global float lights_on = 0.7;
+global float frame_width = 0.05;
+global color3 frame_color = color3{0.1, 0.1, 0.11};
+
+class Ray
+{
+    vec3 origin;
+    vec3 direction;
+
+    Ray(vec3 origin, vec3 direction)
+    {
+        this.origin = origin;
+        this.direction = direction;
+    }
+
+    vec3 at(float distance)
+    {
+        return origin + direction * distance;
+    }
+}
+
+float distance_to_wall(Ray ray)
+{
+    vec3 box_min = vec3{0.0, 0.0, 0.0};
+    vec3 box_max = vec3{1.0, 1.0, room_depth};
+
+    vec3 to_sides = max((box_min - ray.origin) / ray.direction, (box_max - ray.origin) / ray.direction);
+
+    return min(to_sides.x, to_sides.y, to_sides.z);
+}
+
+vec2 rooms = texcoord() * vec2{rooms_across, floors};
+vec2 room = floor(rooms);
+vec2 window = fract(rooms);
+
+vec3 view = viewdirection("world");
+float across = dotproduct(view, tangent("world"));
+float up = dotproduct(view, bitangent("world"));
+float into = |dotproduct(view, normal("world"))|;
+
+vec3 ray_direction = vec3{across, up * floors / rooms_across, into};
+
+Ray ray = Ray{vec3{window, 0.0}, ray_direction};
+vec3 hit = ray.at(distance_to_wall(ray));
+
+float room_number = room.x + room.y * 37.0;
+color3 paint = randomcolor(room_number, saturationlow = 0.15, saturationhigh = 0.4, brightnesslow = 0.55,
+                           brightnesshigh = 0.85);
+bool light_is_on = randomfloat(room_number, seed = 1) < lights_on;
+
+color3 side_wall = if (fract(hit.z * 6.0) > 0.5) { paint } else { paint * 0.85 };
+color3 back_wall = paint * 0.9;
+float plank = floor(hit.x * 5.0);
+color3 floor_color = color3{0.36, 0.2, 0.1} * randomfloat(plank + room_number * 7.0, min = 0.6, max = 1.1);
+float lamp = 1.0 - smoothstep(distance(vec2{hit.x, hit.z}, vec2{0.5, room_depth * 0.5}), 0.1, 0.13);
+color3 ceiling = mix(color3{4.0, 3.6, 3.0}, color3{0.85}, lamp);
+
+float margin = 0.001;
+color3 room_color = if (hit.z > room_depth - margin) { back_wall }
+                    else if (hit.y < margin) { floor_color }
+                    else if (hit.y > 1.0 - margin) { ceiling }
+                    else { side_wall };
+
+float depth_shade = 1.0 - 0.5 * hit.z / room_depth;
+float brightness = if (light_is_on) { 1.0 } else { 0.06 };
+color3 room_light = room_color * depth_shade * brightness;
+
+bool on_frame = window.x < frame_width | window.x > 1.0 - frame_width | window.y < frame_width
+              | window.y > 1.0 - frame_width;
+
+surfaceshader surface = standard_surface();
+surface.base_color = if (on_frame) { frame_color } else { color3{0.0} };
+surface.specular_roughness = if (on_frame) { 0.4 } else { 0.02 };
+surface.emission = 1.0;
+surface.emission_color = if (on_frame) { color3{0.0} } else { room_light };
+
+material example_material = surfacematerial(surface);

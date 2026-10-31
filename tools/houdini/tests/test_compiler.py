@@ -80,42 +80,16 @@ class FindSourceFilesTests(unittest.TestCase):
 
 
 class ExampleTests(unittest.TestCase):
-    def setUp(self):
-        self.directory = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.directory)
-
-    def write_file(self, name, text=""):
-        path = os.path.join(self.directory, name)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as f:
-            f.write(text)
-        return path
-
-    def test_examples_are_files_that_create_a_material(self):
-        self.write_file("wood.mxsl", "material wood = surfacematerial(standard_surface());")
-        self.write_file("gold.mxsl", "auto gold = surfacematerial(standard_surface());")
-        self.write_file("utils.mxsl", "float f(float x) { return x; }")
-        self.write_file("notes.txt", "material x = y;")
-        names = [os.path.basename(p) for p in examples.get_examples(self.directory)]
-        self.assertEqual(names, ["gold.mxsl", "wood.mxsl"])
-
-    def test_copy_example_brings_includes_and_images(self):
-        path = self.write_file("rain.mxsl", '#include "utils.mxsl"\nfilename sky = "textures\\sky.png";\n')
-        self.write_file("utils.mxsl")
-        self.write_file("textures/sky.png")
-        self.write_file("textures/unused.png")
-        destination = os.path.join(self.directory, "copy")
-        self.write_file("copy/utils.mxsl", "edited")
-
-        copied = examples.copy_example(path, destination)
-
-        self.assertEqual(copied, os.path.join(destination, "rain.mxsl"))
-        self.assertTrue(os.path.isfile(os.path.join(destination, "textures", "sky.png")))
-        self.assertFalse(os.path.exists(os.path.join(destination, "textures", "unused.png")))
-        with open(os.path.join(destination, "utils.mxsl")) as f:
-            self.assertEqual(f.read(), "edited")
+    def test_examples_make_example_material_without_textures_or_displacement(self):
+        paths = examples.get_examples(examples.find_examples_directory())
+        self.assertTrue(paths)
+        for path in paths:
+            text = examples.read_text(path)
+            self.assertIn("material example_material = surfacematerial(", text, path)
+            self.assertNotRegex(text, r"\bimage\s*\(|\.(png|jpe?g|exr|hdr|tiff?|tx)\b", path)
+            # Karma CPU in Houdini 22.0 crashes when its viewport switches from a displaced material to one without
+            # displacement, as it does when switching examples.
+            self.assertNotIn("displacement", text, path)
 
 
 if __name__ == "__main__":

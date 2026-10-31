@@ -4,7 +4,7 @@ A Houdini plugin for writing Solaris materials in [ShadingLanguageX](https://git
 
 - **SLX Material LOP**: compiles an `.mxsl` file, or SLX code typed into the node, into MaterialX materials on the
   USD stage. Each `global` variable in the source becomes a parameter on the node. It recompiles when you save the
-  file, can bind its materials to geometry, loads the ShadingLanguageX examples, and exposes every compile option.
+  file, can bind its materials to geometry, comes with six examples, and exposes every compile option.
 - **Node library**: turns the functions in a folder of SLX files into MaterialX nodes, which Karma and MaterialX
   Material Builders list in their Tab menu.
 - **Convert to SLX**: turns a Material Library, a Karma or MaterialX Material Builder, or a `.mtlx` file into an
@@ -47,7 +47,7 @@ material red = surfacematerial(surface);    // -> /materials/red
 
 | Tab | What it does |
 |---|---|
-| Source | Choose **File** or **Inline Code**. **Compile** rereads the source. With **Recompile When Files Change** on, saving the file, or any file it `#include`s, recompiles it. **Open in Editor** uses `$SLX_EDITOR`, `$VISUAL` or `$EDITOR`, then VS Code, then your OS default. If the last compile failed, VS Code opens at the error line. **Load Example...** copies an example into `$HIP/slx_examples` and compiles it. |
+| Source | Choose **File**, **Inline Code** or **Examples**. **Compile** rereads the source. With **Recompile When Files Change** on, saving the file, or any file it `#include`s, recompiles it. **Open in Editor** uses `$SLX_EDITOR`, `$VISUAL` or `$EDITOR`, then VS Code, then your OS default. If the last compile failed, VS Code opens at the error line. **Examples** lists the plugin's six examples, from bricks to interior mapping, and loads the first one when you switch to it. They're short programs for newcomers to ShadingLanguageX, each showing off different language features. Choosing one shows its code and compiles it. You can edit the code there. Your edits are kept in that node and saved with the scene, and choosing another example asks before discarding them. Every example's material is called `example_material`. |
 | Globals | A parameter for each `global` variable in the source, set to its initializer. See below. |
 | Materials | **Assignments** bind compiled materials to geometry from the node's input. |
 | Compile Options | MaterialX version (by default it matches Houdini's), entry function and arguments, macros, graph reduction, and **Inline SLX Functions**. |
@@ -161,4 +161,4 @@ release. To build it yourself:
 python tools/houdini/package_plugin.py --wheel dist/*.whl    # or --version 0.3.3 for wheels on PyPI
 ```
 
-The zip only includes the examples that compile with those wheels.
+Packaging stops with an error if one of the examples in `slx/examples` doesn't compile with those wheels.

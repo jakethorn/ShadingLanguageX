@@ -26,6 +26,7 @@ from slx_houdini import NODE_TYPE_NAME, compiler, global_parameters
 LABEL = "SLX Material"
 ICON = "LOP_materiallibrary"
 COOK_SCRIPT = "import slx_houdini.lop\nslx_houdini.lop.cook(hou.pwd())\n"
+ON_CREATED_SCRIPT = "import slx_houdini.lop\nslx_houdini.lop.on_created(kwargs)\n"
 CALLBACK = "import slx_houdini.lop; slx_houdini.lop.{}(kwargs)"
 # With change_oplibraries_file=False, installing into this library list changes no file and no scene.
 SESSION_ONLY_LIBRARIES = "Scanned Asset Library Directories"
@@ -44,7 +45,7 @@ loptoolutils.genericTool(kwargs, '$HDA_NAME')]]></script>
 
 HELP_TEXT = """= SLX Material =
 
-\"\"\"Compiles a ShadingLanguageX (SLX) file or inline code into MaterialX materials.\"\"\"
+\"\"\"Compiles a ShadingLanguageX (SLX) file, inline code or example into MaterialX materials.\"\"\"
 
 Each `material` variable in the SLX source becomes a material primitive under the Material Path Prefix.
 The compiled MaterialX is written to the Cache Directory and referenced from there, so keep that directory
@@ -124,7 +125,7 @@ def get_definition_path(licence_name):
     The name changes with anything the asset is built from, so a changed plugin or Houdini builds a new one.
     """
     fingerprint = hashlib.sha1()
-    for path in (__file__, slx_houdini.__file__, global_parameters.__file__, compiler.TEMPLATE_PATH):
+    for path in (__file__, slx_houdini.__file__, global_parameters.__file__):
         with open(os.path.abspath(path), "rb") as f:
             fingerprint.update(f.read())
     fingerprint.update("|".join([hou.applicationVersionString()] + get_materialx_versions()).encode("utf-8"))
@@ -171,6 +172,8 @@ def build_definition(path):
                 definition.setIcon(ICON)
                 definition.addSection("Tools.shelf", TOOL_XML)
                 definition.addSection("Help", HELP_TEXT)
+                definition.addSection("OnCreated", ON_CREATED_SCRIPT)
+                definition.setExtraFileOption("OnCreated/IsPython", True)
                 definition.setVersion(slx_houdini.__version__)
                 definition.save(build_path)
             finally:
@@ -219,24 +222,39 @@ def create_button(name, label, callback, join_with_next=False, conditionals=None
 def create_source_folder():
     hide_unless_file = {hou.parmCondType.HideWhen: "{ source != file }"}
     hide_unless_inline = {hou.parmCondType.HideWhen: "{ source != inline }"}
+    hide_unless_example = {hou.parmCondType.HideWhen: "{ source != example }"}
+    example_menu_script = "import slx_houdini.lop\nreturn slx_houdini.lop.get_example_menu_items()"
     return hou.FolderParmTemplate("source_folder", "Source", folder_type=hou.folderType.Tabs, parm_templates=[
-        hou.MenuParmTemplate("source", "Source", menu_items=("file", "inline"), menu_labels=("File", "Inline Code"),
-                             help="Compile an SLX file, or SLX code typed into this node."),
+        hou.MenuParmTemplate("source", "Source", menu_items=("file", "inline", "example"),
+                             menu_labels=("File", "Inline Code", "Examples"),
+                             script_callback=CALLBACK.format("on_source_changed"),
+                             script_callback_language=hou.scriptLanguage.Python,
+                             help="Compile an SLX file, SLX code typed into this node, or one of the SLX examples."),
+        hou.StringParmTemplate("example", "Example", 1, menu_type=hou.menuType.Normal,
+                               item_generator_script=example_menu_script,
+                               item_generator_script_language=hou.scriptLanguage.Python,
+                               script_callback=CALLBACK.format("on_example_chosen"),
+                               script_callback_language=hou.scriptLanguage.Python, conditionals=hide_unless_example,
+                               help="The example to compile. Choosing one shows its code below and compiles it."),
         hou.StringParmTemplate("file", "SLX File", 1, string_type=hou.stringParmType.FileReference,
                                file_type=hou.fileType.Any, conditionals=hide_unless_file,
                                tags={"filechooser_pattern": "*.mxsl", "filechooser_mode": "read"},
                                help="The .mxsl file to compile. Its #include and #library paths, and other "
                                     "relative paths, are resolved from its folder."),
-        hou.StringParmTemplate("code", "Code", 1, default_value=(compiler.read_template(),),
-                               conditionals=hide_unless_inline,
-                               tags={"editor": "1", "editorlines": "20-60"},
+        # The template code is set when the node is created rather than being the default (see
+        # slx_houdini.lop.on_created).
+        hou.StringParmTemplate("code", "Code", 1, conditionals=hide_unless_inline,
+                               tags={"editor": "1", "editorlines": "20-40"},
                                help="SLX code to compile. Its #include and #library paths are resolved from $HIP."),
-        create_button("compile", "Compile", "on_compile_pressed", join_with_next=True),
+        hou.StringParmTemplate("examplecode", "Code", 1, conditionals=hide_unless_example,
+                               tags={"editor": "1", "editorlines": "20-40"},
+                               help="The chosen example's code. Edits are kept in this node only. Its #include "
+                                    "paths and images are resolved from the examples folder."),
+        create_button("compile", "Compile", "on_compile_pressed", join_with_next=True,
+                      conditionals={hou.parmCondType.HideWhen: "{ source == example }"}),
         create_button("openeditor", "Open in Editor", "on_open_editor_pressed", join_with_next=True,
                       conditionals=hide_unless_file),
-        create_button("createfile", "Create File", "on_create_file_pressed", join_with_next=True,
-                      conditionals=hide_unless_file),
-        create_button("loadexample", "Load Example...", "on_load_example_pressed"),
+        create_button("createfile", "Create", "on_create_file_pressed", conditionals=hide_unless_file),
         hou.ToggleParmTemplate("autorecompile", "Recompile When Files Change", default_value=True,
                                conditionals=hide_unless_file,
                                help="Recompile whenever the SLX file, or a file it includes, is saved."),

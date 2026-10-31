@@ -29,7 +29,6 @@ MAIN_SOURCE = """
 surfaceshader surface = standard_surface(base = add_one(0.2));
 material {} = surfacematerial(surface);
 """
-EXAMPLES_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "examples")
 UTILS_SOURCE = "float add_one(float x) { return x + 1.0; }\n"
 GLOBALS_SOURCE = """
 global float roughness = {roughness};
@@ -83,6 +82,7 @@ class SlxMaterialTests(unittest.TestCase):
         self.assertTrue(definition.libraryFilePath().startswith(hou.homeHoudiniDirectory().replace("\\", "/")))
 
     def test_inline_template_creates_material(self):
+        self.assertFalse(self.node.parm("code").isAtDefault())
         material = self.get_material("/materials/slx_material")
         surface = material.ComputeSurfaceSource("mtlx")[0]
         self.assertEqual(surface.GetIdAttr().Get(), "ND_standard_surface_surfaceshader")
@@ -122,12 +122,37 @@ class SlxMaterialTests(unittest.TestCase):
         expected_path = os.path.normcase(os.path.normpath(os.path.join(os.path.dirname(path), "wood.png")))
         self.assertEqual([os.path.normcase(f.resolvedPath) for f in files], [expected_path])
 
-    def test_example_compiles_after_copying(self):
-        example = os.path.join(EXAMPLES_DIRECTORY, "redbrick.mxsl")
-        copied = slx_houdini.examples.copy_example(example, self.directory + "/slx_examples")
-        self.node.parm("source").set("file")
-        self.node.parm("file").set(copied)
-        self.assertTrue(self.get_material("/materials/brick_material"))
+    def test_chosen_example_is_compiled(self):
+        self.node.parm("source").set("example")
+        slx_houdini.lop.on_source_changed({"node": self.node})
+        self.assertEqual(self.node.evalParm("example"), slx_houdini.lop.get_example_names()[0])
+        self.assertTrue(self.get_material("/materials/example_material"))
+
+        self.assertIn("03_hex_tiles", slx_houdini.lop.get_example_menu_items())
+        self.node.parm("example").set("03_hex_tiles")
+        slx_houdini.lop.on_example_chosen({"node": self.node})
+        code = self.node.evalParm("examplecode")
+        example_path = os.path.join(slx_houdini.examples.find_examples_directory(), "03_hex_tiles.mxsl")
+        self.assertEqual(code, slx_houdini.examples.read_text(example_path))
+        self.assertTrue(self.get_material("/materials/example_material"))
+
+        self.assertFalse(slx_houdini.lop.is_example_edited(self.node))
+        self.node.parm("examplecode").set(code.replace("example_material", "edited_material"))
+        self.assertTrue(self.get_material("/materials/edited_material"))
+        self.assertTrue(slx_houdini.lop.is_example_edited(self.node))
+
+        slx_houdini.lop.load_example(self.node, "")
+        self.assertEqual(self.node.evalParm("examplecode"), "")
+        self.assertFalse(self.node.stage().GetPrimAtPath("/materials"))
+
+    def test_every_example_compiles(self):
+        self.node.parm("source").set("example")
+        for inline_functions in (True, False):
+            self.node.parm("inlinefunctions").set(inline_functions)
+            for name in slx_houdini.lop.get_example_names():
+                slx_houdini.lop.load_example(self.node, name)
+                self.assertEqual(self.get_errors(), "", name)
+                self.assertEqual(slx_houdini.lop.get_last_result(self.node).material_names, ["example_material"])
 
     def test_compile_error_is_shown_on_node(self):
         self.node.parm("code").set("float x = 1.0\nfloat y = 2.0;")

@@ -1,0 +1,48 @@
+global float repeats = 2.0;
+global float threads = 160.0;
+global color3 green = color3{0.02, 0.2, 0.08};
+global color3 navy = color3{0.02, 0.04, 0.18};
+global color3 red = color3{0.6, 0.03, 0.03};
+global color3 yellow = color3{0.8, 0.62, 0.1};
+global color3 black = color3{0.01};
+
+color3 sett_color(float position)
+{
+    float band = floor(fract(position) * 16.0);
+
+    return switch (band)
+    {
+        green, green, green, green,     // bands 0-3: a wide green stripe
+        black,                          // band 4
+        navy, navy, navy, navy,         // bands 5-8
+        red,                            // band 9: a thin red line
+        navy, navy,                     // bands 10-11
+        black,                          // band 12
+        yellow,                         // band 13: a thin yellow line
+        default: green                  // bands 14-15
+    };
+}
+
+float u, v = texcoord();
+
+color3 warp = sett_color(u * repeats);
+color3 weft = sett_color(v * repeats);
+
+float column = floor(u * threads);
+float row = floor(v * threads);
+bool warp_on_top = modulo(column + row, 4.0) < 2.0;
+color3 cloth = if (warp_on_top) { warp } else { weft };
+
+float along = if (warp_on_top) { fract(u * threads) } else { fract(v * threads) };
+float roundness = sin(along * 3.14159);
+color3 base_color = cloth * (0.55 + 0.45 * roundness);
+
+surfaceshader surface = standard_surface();
+surface.base_color = base_color;
+surface.specular_roughness = 0.7;
+surface.specular = 0.3;
+surface.sheen = 1.0;
+surface.sheen_color = base_color + 0.2;
+surface.sheen_roughness = 0.4;
+
+material example_material = surfacematerial(surface);

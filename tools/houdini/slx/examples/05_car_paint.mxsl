@@ -1,0 +1,26 @@
+global color3 face_color = color3{0.7, 0.05, 0.02};
+global color3 flop_color = color3{0.12, 0.0, 0.1};
+global float flake_density = 250.0;
+global float flake_sparkle = 0.3;
+global float coat_roughness = 0.02;
+
+vec3 n = normal("world");
+vec3 view = viewdirection("world");
+float facing = |dotproduct(n, view)|;
+color3 paint = mix(face_color, flop_color, facing);
+
+vec3 p = position("object") * flake_density;
+vec3 random = vec3{cellnoise3d(p), cellnoise3d(p + 100.0), cellnoise3d(p + 200.0)};
+vec3 tilt = random - 0.5;
+
+vec3 flake_normal = normalize(n + tilt * flake_sparkle);
+
+surfaceshader surface = standard_surface();
+surface.base_color = paint;
+surface.metalness = 0.8;
+surface.specular_roughness = 0.25;
+surface.normal = flake_normal;
+surface.coat = 1.0;
+surface.coat_roughness = coat_roughness;
+
+material example_material = surfacematerial(surface);

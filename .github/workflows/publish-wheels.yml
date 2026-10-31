@@ -250,7 +250,7 @@ jobs:
           path: dist
           merge-multiple: true
 
-      # The plugin carries every wheel, and only the examples that compile with them.
+      # The plugin carries every wheel, and packaging checks that its examples compile with them.
       - name: Package the plugin
         run: python tools/houdini/package_plugin.py --wheel dist/*.whl --output ShadingLanguageX-Houdini.zip
 
