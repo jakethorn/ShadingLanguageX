@@ -18,6 +18,32 @@ namespace mxslc::statements
 {
     using container_utils::contains;
 
+    namespace
+    {
+        TokenType::Enum to_modifier(const FunctionBehaviour behaviour)
+        {
+            switch (behaviour)
+            {
+                case FunctionBehaviour::NodeDef: return TokenType::Nodedef;
+                case FunctionBehaviour::NodeGraph: return TokenType::Nodegraph;
+                case FunctionBehaviour::Inline: return TokenType::Inline;
+                case FunctionBehaviour::Comptime: return TokenType::Comptime;
+            }
+            throw CompileError{"Unknown function behaviour"};
+        }
+    }
+
+    void add_default_function_behaviour(ModifierList& mods)
+    {
+        const FunctionBehaviour behaviour = Runtime::get().options().default_function_behaviour;
+        // A function without a modifier already compiles to a NodeDef, and leaving nodedef out keeps the function
+        // as written in error messages.
+        if (behaviour == FunctionBehaviour::NodeDef)
+            return;
+        if (mods.only(TokenType::Nodedef, TokenType::Nodegraph, TokenType::Inline, TokenType::Comptime).empty())
+            mods.add(to_modifier(behaviour));
+    }
+
     FunctionDefinition::FunctionDefinition(
         ModifierList mods,
         TypePtr type,
@@ -62,6 +88,8 @@ namespace mxslc::statements
     {
         if (not funcs_.empty())
             return;
+
+        add_default_function_behaviour(mods_);
 
         if (is_templated())
         {

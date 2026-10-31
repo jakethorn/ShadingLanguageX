@@ -96,10 +96,10 @@ class SlxMaterialTests(unittest.TestCase):
         self.assertTrue(self.get_material("/materials/mat"))
         self.assertIn(os.path.normpath(self.directory + "/utils.mxsl"), slx_houdini.compiler.find_source_files(path))
 
-    def test_function_nodes_are_expanded_for_karma(self):
+    def test_functions_are_inlined_for_karma(self):
         self.use_file_source()
         self.assertEqual(self.get_custom_nodes(), [])
-        self.node.parm("expandfunctions").set(False)
+        self.node.parm("inlinefunctions").set(False)
         custom_nodes = self.get_custom_nodes()
         self.assertEqual(len(custom_nodes), 1)
         self.assertTrue(os.path.isfile(custom_nodes[0].GetAttribute("info:mtlx:sourceAsset").Get().resolvedPath))

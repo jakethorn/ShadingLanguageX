@@ -11,6 +11,12 @@
 
 void bind_compile_options(py::module_& m)
 {
+    py::enum_<FunctionBehaviour>(m, "FunctionBehaviour")
+        .value("NodeDef", FunctionBehaviour::NodeDef)
+        .value("NodeGraph", FunctionBehaviour::NodeGraph)
+        .value("Inline", FunctionBehaviour::Inline)
+        .value("Comptime", FunctionBehaviour::Comptime);
+
     py::class_<CompileOptions>(m, "CompileOptions")
         .def(
             py::init([](
@@ -27,7 +33,8 @@ void bind_compile_options(py::module_& m)
                 const py::list& func_args,
                 const bool reduce_graph,
                 const bool validate_graph,
-                const unordered_map<string, string>& sources)
+                const unordered_map<string, string>& sources,
+                const FunctionBehaviour default_function_behaviour)
             {
                 auto opts = std::make_unique<CompileOptions>();
                 opts->output_file = output_file;
@@ -56,6 +63,7 @@ void bind_compile_options(py::module_& m)
 
                 opts->reduce_graph = reduce_graph;
                 opts->validate_graph = validate_graph;
+                opts->default_function_behaviour = default_function_behaviour;
 
                 return opts;
             }),
@@ -72,7 +80,8 @@ void bind_compile_options(py::module_& m)
             py::arg("func_args") = py::list(),
             py::arg("reduce_graph") = CompileOptions{}.reduce_graph,
             py::arg("validate_graph") = CompileOptions{}.validate_graph,
-            py::arg("sources") = py::dict()
+            py::arg("sources") = py::dict(),
+            py::arg("default_function_behaviour") = CompileOptions{}.default_function_behaviour
         )
         .def_readwrite("output_file", &CompileOptions::output_file)
         .def_readwrite("version", &CompileOptions::version)
@@ -135,5 +144,6 @@ void bind_compile_options(py::module_& m)
             }
         )
         .def_readwrite("reduce_graph", &CompileOptions::reduce_graph)
-        .def_readwrite("validate_graph", &CompileOptions::validate_graph);
+        .def_readwrite("validate_graph", &CompileOptions::validate_graph)
+        .def_readwrite("default_function_behaviour", &CompileOptions::default_function_behaviour);
 }

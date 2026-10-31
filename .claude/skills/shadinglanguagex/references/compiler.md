@@ -29,6 +29,7 @@ mxslc @options.rsp
 | `--unused-globals-ok` | Allow globals that are provided but never declared or used |
 | `--no-reduce-graph` | Turn off compile-time folding (named constructors and `comptime` still fold) |
 | `--no-validate-graph` | Skip `MaterialX::Document::validate()` |
+| `--default-function-behaviour B` | `nodedef` (default), `nodegraph`, `inline` or `comptime`: how functions without one of those modifiers compile. Functions with one keep it |
 | `-d, --debug` | Interactive step debugger (see below) |
 | `--decompile-hints` | Developer option: adds decompiler hint attributes to the output and defines the macro `__DC_HINTS__` |
 | `-h, --help` | Print help. It also prints a harmless "Invalid input file path: -h" |
@@ -103,6 +104,7 @@ d.decompile_node_def("ND_foo"); d.decompile_node_graph("NG_foo", with_dependenci
 | `func_args` | `[]` | entry-function arguments |
 | `reduce_graph` | `True` | |
 | `validate_graph` | `True` | |
+| `default_function_behaviour` | `FunctionBehaviour.NodeDef` | `mxslc.FunctionBehaviour.NodeDef`, `NodeGraph`, `Inline` or `Comptime`: how functions without a `nodedef`, `[[nodegraph]]`, `inline` or `comptime` modifier compile |
 | `sources` | `{}` | in-memory files `{"path/as/written.mxsl": "code"}`, checked before the file system. Methods: `add_source`, `remove_source`, `clear_sources`, `has_source`, `get_source` |
 
 **Value conversion** for `globals` and `func_args`:
@@ -175,6 +177,7 @@ const mx = await Mxslc();
 const opts = new mx.CompileOptions();
 opts.version = '1.39.5';
 opts.reduceGraph = true;               // also errorOnMissingGlobals, errorOnUnusedGlobals
+opts.defaultFunctionBehaviour = mx.FunctionBehaviour.Inline;    // or NodeDef (default), NodeGraph, Comptime
 opts.addSource('utils.mxsl', code);    // also clearSources, addSearchDirectory, clearSearchDirectories, searchDirectories()
 const mtlx = mx.compileSlxToMtlx(src, opts);     // throws Error with name 'CompileError'
 const slx = mx.decompileMtlxToSlx(mtlx);

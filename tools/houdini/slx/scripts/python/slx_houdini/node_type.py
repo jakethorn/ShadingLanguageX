@@ -293,9 +293,9 @@ def create_compile_options_folder():
         ]),
         hou.ToggleParmTemplate("reducegraph", "Reduce Graph", default_value=True,
                                help="Fold compile-time values into constants."),
-        hou.ToggleParmTemplate("expandfunctions", "Expand Function Nodes", default_value=True,
-                               help="Replace nodes made from non-inline SLX functions with the nodes inside them. "
-                                    "Karma and the viewport only render MaterialX's standard nodes."),
+        hou.ToggleParmTemplate("inlinefunctions", "Inline SLX Functions", default_value=True,
+                               help="Mark all SLX functions as inline, bypassing MaterialX NodeDef/NodeGraph "
+                                    "elements."),
     ])
 
 

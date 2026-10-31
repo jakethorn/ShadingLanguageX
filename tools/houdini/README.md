@@ -50,7 +50,7 @@ material red = surfacematerial(surface);    // -> /materials/red
 | Source | Choose **File** or **Inline Code**. **Compile** rereads the source. With **Recompile When Files Change** on, saving the file, or any file it `#include`s, recompiles it. **Open in Editor** uses `$SLX_EDITOR`, `$VISUAL` or `$EDITOR`, then VS Code, then your OS default. If the last compile failed, VS Code opens at the error line. **Load Example...** copies an example into `$HIP/slx_examples` and compiles it. |
 | Globals | A parameter for each `global` variable in the source, set to its initializer. See below. |
 | Materials | **Assignments** bind compiled materials to geometry from the node's input. |
-| Compile Options | MaterialX version (by default it matches Houdini's), entry function and arguments, macros, graph reduction, and **Expand Function Nodes**. |
+| Compile Options | MaterialX version (by default it matches Houdini's), entry function and arguments, macros, graph reduction, and **Inline SLX Functions**. |
 | Output | **Cache Directory** for the compiled `.mtlx` files, and buttons to view or export the compiled MaterialX. |
 
 ### Globals
@@ -76,9 +76,9 @@ Listing globals needs mxslcxx 0.3.3 or later.
   including render farm jobs, must be able to read that directory. Each change writes a new file, named after its
   contents, so USD never shows a stale material. Old files aren't deleted, because USD files you exported earlier
   may still use them.
-- Karma and the viewport only render MaterialX's standard nodes. **Expand Function Nodes** (on by default) replaces
-  each node made from a non-inline SLX function with the nodes inside it. **View** and **Export MaterialX** show the
-  document before expansion, with your functions as NodeDefs.
+- Karma and the viewport only render MaterialX's standard nodes, not the NodeDefs that SLX functions compile to.
+  **Inline SLX Functions** (on by default) compiles every function without a `nodedef`, `[[nodegraph]]`, `inline` or
+  `comptime` modifier as `inline`. Turn it off, or mark a function `nodedef`, to get NodeDefs for other renderers.
 - Compile errors appear on the node. Houdini wraps them in "Invalid source ...", because the compile runs inside
   the asset.
 

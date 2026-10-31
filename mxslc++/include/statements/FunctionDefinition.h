@@ -11,6 +11,10 @@
 
 namespace mxslc::statements
 {
+    // Adds CompileOptions::default_function_behaviour to the modifiers of a function definition that has none of the
+    // nodedef, [[nodegraph]], inline or comptime modifiers.
+    void add_default_function_behaviour(ModifierList& mods);
+
     class FunctionDefinition final : public Statement
     {
     public:

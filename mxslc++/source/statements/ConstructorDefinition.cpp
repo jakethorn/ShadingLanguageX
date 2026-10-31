@@ -12,6 +12,7 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/utils/monomorphize.h"
+#include "statements/FunctionDefinition.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -75,6 +76,7 @@ namespace mxslc::statements
         inner_ctor_->set_class_type(class_type);
 
         StmtPtr body = get_outer_ctor_body(class_type, params_);
+        add_default_function_behaviour(mods_);
         outer_ctor_ = create_function(
             mods_,
             class_type,

@@ -55,6 +55,9 @@ options:
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
   --no-validate-graph            Do not validate the MaterialX graph
+  --default-function-behaviour BEHAVIOUR
+                                 How functions without a nodedef, [[nodegraph]], inline or comptime
+                                 modifier compile: nodedef (default), nodegraph, inline or comptime
   --decompile-hints              Add hints for the decompiler as xml attributes
 )";
 
@@ -274,6 +277,41 @@ options:
             clargs.options.reduce_graph = false;
         }
 
+        optional<FunctionBehaviour> to_function_behaviour(const string& str)
+        {
+            if (str == "nodedef")
+                return FunctionBehaviour::NodeDef;
+            if (str == "nodegraph")
+                return FunctionBehaviour::NodeGraph;
+            if (str == "inline")
+                return FunctionBehaviour::Inline;
+            if (str == "comptime")
+                return FunctionBehaviour::Comptime;
+            return std::nullopt;
+        }
+
+        void parse_default_function_behaviour(Span<string>& argv, CommandLineArgs& clargs)
+        {
+            if (argv.empty())
+            {
+                clargs.is_valid = false;
+                print_error("Empty --default-function-behaviour option");
+                return;
+            }
+
+            const string& value = argv.pop_front();
+            const optional<FunctionBehaviour> behaviour = to_function_behaviour(value);
+            if (not behaviour)
+            {
+                clargs.is_valid = false;
+                print_error("Invalid value in --default-function-behaviour option: " + value
+                            + " (expected nodedef, nodegraph, inline or comptime)");
+                return;
+            }
+
+            clargs.options.default_function_behaviour = *behaviour;
+        }
+
         void parse_no_validate_graph(Span<string>&, CommandLineArgs& clargs)
         {
             clargs.options.validate_graph = false;
@@ -323,6 +361,7 @@ options:
                 {"--unused-globals-ok", parse_unused_globals_ok},
                 {"--no-reduce-graph", parse_no_reduce_graph},
                 {"--no-validate-graph", parse_no_validate_graph},
+                {"--default-function-behaviour", parse_default_function_behaviour},
                 {"--decompile-hints", parse_decompile_hints}
             };
 

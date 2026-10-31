@@ -155,6 +155,9 @@ print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
 | `[[nodegraph]] float f(float a = 1)` | standalone `NG_f` NodeGraph; every param needs a default; call with no args (`f()`, `f(o = out float x)`) | a NodeGraph without NodeDef |
 | `float f => {...}` (parameterless) | `NG_f` NodeGraph wired by `nodegraph="NG_f"`; can't touch nonlocals; not void | constant sub-graphs |
 
+Functions without one of these modifiers use the `default_function_behaviour` compile option, which is
+`NodeDef` unless set to `NodeGraph`, `Inline` or `Comptime` (`--default-function-behaviour inline` on the CLI).
+
 A non-inline function that reads or writes outer variables gets hidden ports (`nonlocal_in__x` and
 `nonlocal_out__x`), and out parameters become `outparam__name` outputs. Prefer `inline` unless the
 user wants custom NodeDefs. The documentation's own examples write entry functions as

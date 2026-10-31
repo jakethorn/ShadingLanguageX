@@ -27,6 +27,8 @@ namespace mxslc::runtime
         static Runtime& create(CompileOptions opts);
         static Runtime& get();
 
+        const CompileOptions& options() const { return opts_; }
+
         VarPtr global(const string& name) const;
         void declare_global(string name, TypePtr type, VarPtr value);
         const vector<GlobalVariable>& declared_globals() const { return declared_globals_; }

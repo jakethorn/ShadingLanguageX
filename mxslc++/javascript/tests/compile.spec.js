@@ -33,6 +33,19 @@ test.describe('Compile (SLX -> MTLX)', () =>
         opts.delete();
     });
 
+    test('compiles functions with the default function behaviour', () =>
+    {
+        const source = 'float twice(float x) { return x * 2.0; }\nfloat y = twice(texcoord<vec2>().x);';
+        const opts = new mx.CompileOptions();
+        expect(opts.defaultFunctionBehaviour).toBe(mx.FunctionBehaviour.NodeDef);
+        expect(mx.compileSlxToMtlx(source, opts)).toContain('<nodedef');
+
+        opts.defaultFunctionBehaviour = mx.FunctionBehaviour.Inline;
+        expect(mx.compileSlxToMtlx(source, opts)).not.toContain('<nodedef');
+
+        opts.delete();
+    });
+
     test('compiles a surface material to nodes with default options', () =>
     {
         const slx = [

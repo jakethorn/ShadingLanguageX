@@ -27,7 +27,7 @@ class CompileResult(object):
     """What a node's last cook produced, kept for its parameter callbacks."""
 
     def __init__(self, xml=None, material_names=(), global_parameters=None, error=None):
-        self.xml = xml  # as compiled, before function nodes are expanded for USD
+        self.xml = xml  # as compiled, before file paths are made absolute for USD
         self.material_names = list(material_names)
         self.global_parameters = global_parameters
         self.error = error
@@ -49,7 +49,7 @@ def cook(script_node):
         return
     try:
         xml, parameters = compile_node(node)
-        usd_xml = prepare_materialx_for_usd(xml, get_source_directory(node), node.evalParm("expandfunctions"))
+        usd_xml = make_file_paths_absolute(xml, get_source_directory(node))
         materialx_path = write_materialx_cache(node, usd_xml)
         stage = script_node.editableStage()
         layer = Sdf.Layer.FindOrOpen(materialx_path)
@@ -155,6 +155,12 @@ def get_compile_settings(node, mxslc, search_directories):
     version = get_materialx_version(node, mxslc)
     if version:
         settings["version"] = version
+    if node.evalParm("inlinefunctions"):
+        # Karma and Houdini's viewport only render MaterialX's standard nodes. They ignore the NodeDefs that
+        # non-inline SLX functions compile to, even though USD records which file defines them.
+        if not hasattr(mxslc, "FunctionBehaviour"):
+            raise SourceError("Inline SLX Functions needs mxslcxx 0.3.3 or later.")
+        settings["default_function_behaviour"] = mxslc.FunctionBehaviour.Inline
     return settings
 
 
@@ -194,22 +200,14 @@ def run_compiler(compile_function, source, options):
         raise SourceError("SLX compile error: {}".format(e))
 
 
-def prepare_materialx_for_usd(xml, source_directory, expand_functions):
-    """Returns the compiled MaterialX changed to work from the cache directory, in USD and Houdini's renderers.
+def make_file_paths_absolute(xml, source_directory):
+    """Returns the compiled MaterialX with relative file paths made absolute, from source_directory.
 
-    - Relative file paths become absolute, from source_directory. USD would resolve them from the cache directory.
-    - With expand_functions, each node made from a non-inline SLX function is replaced with the nodes inside it.
-      Karma and Houdini's viewport only render MaterialX's standard nodes. They ignore the custom NodeDefs that
-      SLX functions compile to, even though USD records which file defines them.
+    The MaterialX is referenced from the cache directory, which USD would otherwise resolve relative paths from.
     """
     import MaterialX as mx
     document = mx.createDocument()
     mx.readFromXmlString(document, xml)
-    if expand_functions and document.getNodeDefs():
-        document.flattenSubgraphs()
-        for graph in document.getNodeGraphs():
-            if not graph.getNodeDefString():
-                graph.flattenSubgraphs()
     for element in document.traverseTree():
         if element.isA(mx.Input) and element.getType() == "filename" and element.hasValueString():
             element.setValueString(make_absolute_path(element.getResolvedValueString(), source_directory))

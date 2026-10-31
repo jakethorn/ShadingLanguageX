@@ -184,7 +184,8 @@ CompileOptions.__init__(
     func_args: list[Any] = [],
     reduce_graph: bool = True,
     validate_graph: bool = True,
-    sources: dict[str, str] = {}
+    sources: dict[str, str] = {},
+    default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef
 )
 ```
 
@@ -205,7 +206,12 @@ CompileOptions.func_args: list[Any]
 CompileOptions.reduce_graph: bool
 CompileOptions.validate_graph: bool
 CompileOptions.sources: dict[str, str]
+CompileOptions.default_function_behaviour: FunctionBehaviour
 ```
+
+`default_function_behaviour` is how functions compile when they're defined without a `nodedef`, `[[nodegraph]]`,
+`inline` or `comptime` modifier: `mxslc.FunctionBehaviour.NodeDef` (the default), `NodeGraph`, `Inline` or `Comptime`.
+A function with one of those modifiers keeps it.
 
 ### Methods
 
@@ -240,7 +246,8 @@ opts = mxslc.CompileOptions(
     func_args = [],
     reduce_graph = True,
     validate_graph = True,
-    sources = {}
+    sources = {},
+    default_function_behaviour = mxslc.FunctionBehaviour.Inline
 )
 
 mtlx = mxslc.compile_file_to_string("mxsl/example.mxsl", opts)
@@ -249,6 +256,15 @@ mtlx = mxslc.compile_file_to_string("mxsl/example.mxsl", opts)
 ## C++
 
 ```c++
+// How a function compiles: the nodedef, [[nodegraph]], inline and comptime function modifiers.
+enum class FunctionBehaviour
+{
+    NodeDef,
+    NodeGraph,
+    Inline,
+    Comptime
+};
+
 struct CompileOptions
 {
     // ctor
@@ -261,6 +277,9 @@ struct CompileOptions
     bool reduce_graph{true};
     bool validate_graph{true};
     bool decompile_hints{false};
+
+    // used by functions defined without a nodedef, [[nodegraph]], inline or comptime modifier
+    FunctionBehaviour default_function_behaviour{FunctionBehaviour::NodeDef};
 
     vector<fs::path> includes;
     vector<fs::path> libraries;
@@ -555,7 +574,8 @@ CompileOptions.__init__(
     func_args: list[Variable | bool | int | float | str] = [],
     reduce_graph: bool = True,
     validate_graph: bool = True,
-    sources: dict[str, str] = {}
+    sources: dict[str, str] = {},
+    default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef
 )
 ```
 
@@ -576,6 +596,7 @@ options.func_args: list[Variable | bool | int | float | str]
 options.reduce_graph: bool
 options.validate_graph: bool
 options.sources: dict[str, str]
+options.default_function_behaviour: FunctionBehaviour
 ```
 
 #### Example

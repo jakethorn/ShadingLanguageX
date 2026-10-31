@@ -13,6 +13,15 @@
 
 namespace mxslc
 {
+    // How a function compiles: the nodedef, [[nodegraph]], inline and comptime function modifiers.
+    enum class FunctionBehaviour
+    {
+        NodeDef,
+        NodeGraph,
+        Inline,
+        Comptime
+    };
+
     struct CompileOptions
     {
         optional<fs::path> output_file;
@@ -21,6 +30,9 @@ namespace mxslc
         bool reduce_graph{true};
         bool validate_graph{true};
         bool decompile_hints{false};
+
+        // Used by functions defined without a nodedef, [[nodegraph]], inline or comptime modifier.
+        FunctionBehaviour default_function_behaviour{FunctionBehaviour::NodeDef};
 
         vector<fs::path> includes;
         vector<fs::path> libraries;

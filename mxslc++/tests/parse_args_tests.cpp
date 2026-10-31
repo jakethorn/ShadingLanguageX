@@ -337,3 +337,24 @@ TEST(parse_args_tests, test_bad_global_options_2)
 
     ASSERT_FALSE(args.is_valid);
 }
+
+TEST(parse_args_tests, test_default_function_behaviour_options)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "--default-function-behaviour", "inline" };
+    const mxslc::CommandLineArgs args = mxslc::parse_cli_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+    ASSERT_EQ(args.options.default_function_behaviour, mxslc::FunctionBehaviour::Inline);
+}
+
+TEST(parse_args_tests, test_bad_default_function_behaviour_options)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "--default-function-behaviour", "macro" };
+    const mxslc::CommandLineArgs args = mxslc::parse_cli_args(argv);
+
+    ASSERT_FALSE(args.is_valid);
+}

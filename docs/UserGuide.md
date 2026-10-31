@@ -518,6 +518,40 @@ Compiled with `--no-reduce-graph`:
 </materialx>
 ```
 
+### Default Function Behaviour
+
+A function defined without a `nodedef`, `[[nodegraph]]`, `inline` or `comptime` modifier compiles to a MaterialX
+NodeDef and NodeGraph. The `--default-function-behaviour` option changes that to `nodegraph`, `inline` or `comptime`
+for every such function. Functions that have one of those modifiers keep it. For example:
+
+```
+float half(float x) { return x * 0.5; }
+standard_surface(base = half(texcoord<vec2>().x));
+```
+
+Compiled with `--default-function-behaviour inline`, the function's body replaces the call:
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="var__0" type="vector2" />
+  <extract name="var__1" type="float">
+    <input name="in" type="vector2" nodename="var__0" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <multiply name="var__2" type="float">
+    <input name="in1" type="float" nodename="var__1" />
+    <input name="in2" type="float" value="0.5" />
+  </multiply>
+  <standard_surface name="var__3" type="surfaceshader">
+    <input name="base" type="float" nodename="var__2" />
+  </standard_surface>
+</materialx>
+```
+
+Without it, the output also contains an `ND_half` NodeDef and an `NG_half` NodeGraph, and the call is a `<half>` node.
+See [Functions](LanguageSpecification.md#functions) for what each behaviour means.
+
 ## Decompile
 
 `mxslc` can also decompile MaterialX files into ShadingLanguageX source files (see [below](#decompiler) for more information).
@@ -577,6 +611,9 @@ options:
   --unused-globals-ok            Allow `global` variables to be unused
   --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
   --no-validate-graph            Do not validate the MaterialX graph
+  --default-function-behaviour BEHAVIOUR
+                                 How functions without a nodedef, [[nodegraph]], inline or comptime
+                                 modifier compile: nodedef (default), nodegraph, inline or comptime
   --decompile-hints              Add hints for the decompiler as xml attributes
 ```
 
