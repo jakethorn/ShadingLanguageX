@@ -9,11 +9,14 @@ matching the running Houdini (see slx_houdini.compiler.get_vendor_directory).
 """
 
 import argparse
+import glob
+import hashlib
 import io
 import json
 import os
 import re
 import shutil
+import tempfile
 import urllib.request
 import zipfile
 
@@ -22,7 +25,7 @@ WHEEL_PATTERN = re.compile(r"^mxslcxx-[^-]+-cp(\d+)-cp\d+-(.+)\.whl$")
 
 
 def get_vendor_name(wheel_name):
-    """Returns the vendor folder for a wheel, e.g. "windows-cp311", or None for wheels Houdini can't use."""
+    """Returns the vendor folder prefix for a wheel, e.g. "windows-cp311", or None for wheels Houdini can't use."""
     match = WHEEL_PATTERN.match(wheel_name)
     if not match:
         return None
@@ -55,14 +58,46 @@ def read_local_wheels(paths):
             yield os.path.basename(path), f.read()
 
 
-def extract_wheel(wheel_name, data):
-    target = os.path.join(VENDOR_DIRECTORY, get_vendor_name(wheel_name))
-    shutil.rmtree(target, ignore_errors=True)
-    with zipfile.ZipFile(io.BytesIO(data)) as wheel:
-        for member in wheel.namelist():
-            if ".dist-info/" not in member:
-                wheel.extract(member, target)
+def vendor_wheels(wheels, vendor_directory=VENDOR_DIRECTORY):
+    """Extracts (wheel name, wheel bytes) pairs into vendor_directory."""
+    for wheel_name, data in wheels:
+        if get_vendor_name(wheel_name):
+            extract_wheel(wheel_name, data, vendor_directory)
+        else:
+            print("  skipped {}: not a platform Houdini runs on".format(wheel_name))
+
+
+def extract_wheel(wheel_name, data, vendor_directory):
+    """Extracts a wheel into <vendor>/<os>-cp<XY>-<hash>, replacing any earlier build for that OS and Python.
+
+    The hash of the compiled module is part of the folder name because Windows can keep loading a replaced DLL
+    from a WSL or network share as long as its path stays the same.
+    """
+    vendor_name = get_vendor_name(wheel_name)
+    os.makedirs(vendor_directory, exist_ok=True)
+    extract_directory = tempfile.mkdtemp(dir=vendor_directory)
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as wheel:
+            for member in wheel.namelist():
+                if ".dist-info/" not in member:
+                    wheel.extract(member, extract_directory)
+        old_directories = glob.glob(os.path.join(vendor_directory, vendor_name + "-*"))
+        old_directories += glob.glob(os.path.join(vendor_directory, vendor_name))
+        for old_directory in old_directories:
+            shutil.rmtree(old_directory)
+        target = os.path.join(vendor_directory, "{}-{}".format(vendor_name, hash_compiled_module(extract_directory)))
+        os.rename(extract_directory, target)
+    finally:
+        shutil.rmtree(extract_directory, ignore_errors=True)
     print("  {} -> {}".format(wheel_name, os.path.relpath(target)))
+
+
+def hash_compiled_module(directory):
+    digest = hashlib.sha1()
+    for path in sorted(glob.glob(os.path.join(directory, "mxslc", "_mxslc*"))):
+        with open(path, "rb") as f:
+            digest.update(f.read())
+    return digest.hexdigest()[:8]
 
 
 def main():
@@ -70,13 +105,7 @@ def main():
     parser.add_argument("--version", help="the mxslcxx release to download (default: latest)")
     parser.add_argument("--wheel", nargs="+", help="local wheel files to use instead of downloading")
     args = parser.parse_args()
-
-    wheels = read_local_wheels(args.wheel) if args.wheel else download_release_wheels(args.version)
-    for wheel_name, data in wheels:
-        if get_vendor_name(wheel_name):
-            extract_wheel(wheel_name, data)
-        else:
-            print("  skipped {}: not a platform Houdini runs on".format(wheel_name))
+    vendor_wheels(read_local_wheels(args.wheel) if args.wheel else download_release_wheels(args.version))
 
 
 if __name__ == "__main__":

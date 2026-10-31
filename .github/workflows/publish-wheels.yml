@@ -226,3 +226,42 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+
+  houdini_plugin:
+    name: Package the Houdini plugin
+    needs: build_wheels
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out mxslc
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      # The plugin carries every wheel, and only the examples that compile with them.
+      - name: Package the plugin
+        run: python tools/houdini/package_plugin.py --wheel dist/*.whl --output ShadingLanguageX-Houdini.zip
+
+      - name: Upload the plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: houdini-plugin
+          path: ShadingLanguageX-Houdini.zip
+
+      - name: Attach the plugin to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" ShadingLanguageX-Houdini.zip --clobber --repo "$GITHUB_REPOSITORY"

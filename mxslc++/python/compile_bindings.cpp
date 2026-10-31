@@ -68,4 +68,30 @@ void bind_compile_functions(py::module_& m)
         py::arg("source"),
         py::arg("dst_path")
     );
+
+    m.def(
+        "get_globals_from_file",
+        py::overload_cast<const fs::path&>(&get_globals),
+        py::arg("src_path")
+    );
+
+    m.def(
+        "get_globals_from_file",
+        py::overload_cast<const fs::path&, const CompileOptions&>(&get_globals),
+        py::arg("src_path"),
+        py::arg("opts")
+    );
+
+    m.def(
+        "get_globals_from_string",
+        py::overload_cast<const string&>(&get_globals),
+        py::arg("source")
+    );
+
+    m.def(
+        "get_globals_from_string",
+        py::overload_cast<const string&, const CompileOptions&>(&get_globals),
+        py::arg("source"),
+        py::arg("opts")
+    );
 }

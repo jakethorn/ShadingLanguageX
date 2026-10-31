@@ -9,6 +9,7 @@
 
 #include "common.h"
 #include "CompileOptions.h"
+#include "GlobalVariable.h"
 #include "serialize/Serializer.h"
 
 namespace mxslc
@@ -27,6 +28,8 @@ namespace mxslc::runtime
         static Runtime& get();
 
         VarPtr global(const string& name) const;
+        void declare_global(string name, TypePtr type, VarPtr value);
+        const vector<GlobalVariable>& declared_globals() const { return declared_globals_; }
 
         mx::DocumentPtr materialx_library() { return mtlx_lib_; }
 
@@ -50,6 +53,7 @@ namespace mxslc::runtime
         Serializer serializer_;
 
         mutable vector<string> used_globals;
+        vector<GlobalVariable> declared_globals_;
 
         static unique_ptr<Runtime> instance_;
     };

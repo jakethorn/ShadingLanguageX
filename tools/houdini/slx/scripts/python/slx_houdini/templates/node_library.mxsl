@@ -1,0 +1,19 @@
+// An SLX node library. Every non-inline function in this folder's .mxsl files becomes a MaterialX node, which
+// Karma and MaterialX Material Builders list in their Tab menu after SLX > Rebuild Node Library.
+//
+// - Parameter defaults become the node's defaults, and @doc attributes become its help.
+// - @nodegroup sets the Tab submenu, e.g. @nodegroup "procedural2d". Otherwise it's MaterialX > Shading Language X.
+// - A templated function, such as `T f<float, vec3>(T x)`, becomes one node with a signature per type.
+// - Inline functions aren't nodes, so use them for helpers.
+
+@doc "Repeating ramps from 0 to 1, count times between 0 and 1."
+float stripes(@doc "The coordinate to stripe, e.g. a texture coordinate." float x, float count = 8.0)
+{
+    return fract(x * count);
+}
+
+@doc "Picks colour a where t is over 0.5, and colour b elsewhere."
+color3 two_tone(color3 a = color3{1.0, 0.45, 0.1}, color3 b = color3{0.1, 0.1, 0.3}, float t = 0.0)
+{
+    return mix(b, a, float{t > 0.5});
+}

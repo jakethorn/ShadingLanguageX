@@ -9,7 +9,7 @@ inline vec2 wave_dx(vec2 pos, vec2 dir, float freq, float time)
     return vec2{wave, -dx};
 }
 
-inline float get_waves(vec2 pos)
+inline float get_waves(mutable vec2 pos)
 {
     float wave_phase_shift = magnitude(pos) * 0.1;
     mutable float iter = 0.0;

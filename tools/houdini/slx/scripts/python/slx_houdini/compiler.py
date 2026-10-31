@@ -4,11 +4,13 @@ Nothing in this module imports hou, so it can be tested with a plain Python inte
 """
 
 import ast
+import glob
 import os
 import re
 import sys
 
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+VENDOR_ROOT = os.path.join(PLUGIN_ROOT, "vendor")
 TEMPLATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "material.mxsl")
 
 INCLUDE_PATTERN = re.compile(r'^[ \t]*#[ \t]*(include|library)[ \t]+"([^"]+)"', re.MULTILINE)
@@ -16,31 +18,34 @@ VERSION_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 def get_vendor_directory():
-    """Returns the folder holding the mxslc build for this OS and Python version."""
+    """Returns the folder holding the mxslc build for this OS and Python version, or None if there isn't one.
+
+    vendor_mxslc.py names the folder <os>-cp<XY>-<hash of the build>, e.g. windows-cp313-1a2b3c4d.
+    """
     os_name = {"win32": "windows", "darwin": "macos"}.get(sys.platform, "linux")
-    return os.path.join(PLUGIN_ROOT, "vendor", "{}-cp{}{}".format(os_name, *sys.version_info[:2]))
+    candidates = glob.glob(os.path.join(VENDOR_ROOT, "{}-cp{}{}-*".format(os_name, *sys.version_info[:2])))
+    return max(candidates, key=os.path.getmtime) if candidates else None
 
 
 def import_mxslc():
     """Imports mxslc, preferring the copy vendored with the plugin over any installed one."""
     vendor_directory = get_vendor_directory()
-    if os.path.isdir(vendor_directory) and vendor_directory not in sys.path:
+    if vendor_directory is not None and vendor_directory not in sys.path:
         sys.path.insert(0, vendor_directory)
     try:
         import mxslc
     except ImportError as e:
         raise ImportError(
             "Could not import mxslc ({}). Run tools/houdini/vendor_mxslc.py to download it into {}, "
-            "or pip install mxslcxx into Houdini's Python.".format(e, vendor_directory)
+            "or pip install mxslcxx into Houdini's Python.".format(e, VENDOR_ROOT)
         ) from e
     return mxslc
 
 
 def get_available_materialx_versions(mxslc):
     """Returns the MaterialX library versions mxslc can compile for, oldest first."""
-    libraries = os.path.join(os.path.dirname(mxslc.__file__), "libraries")
     try:
-        names = os.listdir(libraries)
+        names = os.listdir(os.path.join(os.path.dirname(mxslc.__file__), "libraries"))
     except OSError:
         return []
     return sorted((n for n in names if VERSION_PATTERN.match(n)), key=parse_version)

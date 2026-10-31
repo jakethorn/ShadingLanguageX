@@ -50,7 +50,7 @@ float CHANNEL_MIDDLE = CHANNEL + HALF_CHANNEL;
 float CHANNEL_LEFT = -HALF_CHANNEL + DROP_SIZE;
 float CHANNEL_RGHT = HALF_CHANNEL - DROP_SIZE;
 
-float progress = CHANNEL;
+mutable float progress = CHANNEL;
 progress += randomfloat(CHANNEL) * DROP_FREQ;
 progress += time() / 5.0;
 progress %= DROP_FREQ;
@@ -58,7 +58,7 @@ progress %= DROP_FREQ;
 mutable float sway = 0.0;
 mutable float tail = 0.0;
 mutable vec2 tail_pos = vec2{0};
-for (float f = 0.0 : 10.0)
+for (float f from 0.0:10.0)
 {
     float fn = f / 100.0;
 
@@ -93,7 +93,7 @@ drop_norm = if (to_drop < DROP_SIZE) { drop_norm } else { vec2{0} };
 
 vec2 inv_uv = 1.0 - UV;
 
-mutable vec2 tail_uv = vec2(inv_uv.x + (UV.x - tail_pos.x) * TAIL_REFLECT_AREA, inv_uv.y);
+mutable vec2 tail_uv = vec2{inv_uv.x + (UV.x - tail_pos.x) * TAIL_REFLECT_AREA, inv_uv.y};
 tail_uv.x += randomfloat(UV.y, -0.01, 0.01, 2);
 tail_uv = if (in_tail > 0.5) { tail_uv } else { inv_uv };
 

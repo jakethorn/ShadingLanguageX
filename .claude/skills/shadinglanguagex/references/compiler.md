@@ -72,6 +72,8 @@ mtlx: str = mxslc.compile_string_to_string(src)                 # optional opts
 mtlx: str = mxslc.compile_file_to_string("a.mxsl", opts)
 path = mxslc.compile_file_to_file("a.mxsl")                     # -> a.mtlx; or (src, dst) or (src, opts)
 path = mxslc.compile_string_to_file(src, "out.mtlx")            # or (src, opts) with opts.output_file set
+gs = mxslc.get_globals_from_file("a.mxsl", opts)                # also _from_string; each has .name, .type ("color3"),
+                                                                # .value (initializer or type default; None if runtime)
 
 slx: str = mxslc.decompile_file_to_string("a.mtlx")
 slx: str = mxslc.decompile_string_to_string(xml)

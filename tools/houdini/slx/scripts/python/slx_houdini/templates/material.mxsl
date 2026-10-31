@@ -1,10 +1,16 @@
 // A starting point for an SLX material. Edit it and press Compile, or save the file if the node
 // recompiles when files change. Language reference: https://github.com/jakethorn/ShadingLanguageX
+//
+// Each `global` variable becomes a parameter on the node's Globals tab.
 
-float scale = 8.0;
+global float scale = 8.0;
+global color3 color_a = color3{0.9, 0.45, 0.1};
+global color3 color_b = color3{0.08, 0.08, 0.1};
+global float roughness = 0.35;
+
 float u, v = texcoord() * scale;
 float checker = modulo(floor(u) + floor(v), 2.0);
-color3 base = mix(color3{0.9, 0.45, 0.1}, color3{0.08, 0.08, 0.1}, checker);
+color3 base = mix(color_a, color_b, checker);
 
-surfaceshader surface = standard_surface(base_color = base, specular_roughness = 0.35);
+surfaceshader surface = standard_surface(base_color = base, specular_roughness = roughness);
 material slx_material = surfacematerial(surface);

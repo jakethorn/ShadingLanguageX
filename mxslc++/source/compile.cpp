@@ -53,7 +53,7 @@ namespace mxslc
                 stmt->execute();
         }
 
-        mx::DocumentPtr compile_to_document(string source, CompileOptions opts, const optional<fs::path>& src_path)
+        Runtime& execute(string source, CompileOptions opts, const optional<fs::path>& src_path)
         {
             opts.add_default_search_directories();
 
@@ -84,6 +84,12 @@ namespace mxslc
                 runtime.exit_scope();
             }
 
+            return runtime;
+        }
+
+        mx::DocumentPtr compile_to_document(string source, const CompileOptions& opts, const optional<fs::path>& src_path)
+        {
+            Runtime& runtime = execute(std::move(source), opts, src_path);
             runtime.finalise();
 
             const mx::DocumentPtr doc = runtime.serializer().document();
@@ -92,6 +98,15 @@ namespace mxslc
                 mtlx_utils::validate(doc);
 
             return doc;
+        }
+
+        vector<GlobalVariable> get_globals(string source, CompileOptions opts, const optional<fs::path>& src_path)
+        {
+            // Without global values, each global takes its initializer's value or its type's default value.
+            opts.clear_globals();
+            opts.error_on_missing_globals = false;
+            opts.set_debug_mode(false);
+            return execute(std::move(source), std::move(opts), src_path).declared_globals();
         }
 
         fs::path get_destination_path(const fs::path& src_path, const CompileOptions& opts)
@@ -182,5 +197,25 @@ namespace mxslc
         opts.output_file = dst_path;
 
         return compile_to_file(source, opts);
+    }
+
+    vector<GlobalVariable> get_globals(const fs::path& src_path)
+    {
+        return get_globals(src_path, CompileOptions{});
+    }
+
+    vector<GlobalVariable> get_globals(const fs::path& src_path, const CompileOptions& opts)
+    {
+        return get_globals(io_utils::read_file(src_path), opts, src_path);
+    }
+
+    vector<GlobalVariable> get_globals(const string& source)
+    {
+        return get_globals(source, CompileOptions{});
+    }
+
+    vector<GlobalVariable> get_globals(const string& source, const CompileOptions& opts)
+    {
+        return get_globals(source, opts, std::nullopt);
     }
 }

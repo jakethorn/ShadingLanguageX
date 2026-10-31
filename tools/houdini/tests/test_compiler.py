@@ -11,7 +11,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "slx", "scripts", "python"))
 
-from slx_houdini import compiler  # noqa: E402
+from slx_houdini import compiler, examples  # noqa: E402
 
 AVAILABLE = ["1.38.10", "1.39.4", "1.39.5"]
 
@@ -77,6 +77,45 @@ class FindSourceFilesTests(unittest.TestCase):
         main = self.write_file("main.mxsl", '#include "lib/a.mxsl"\n')
         self.write_file("lib/a.mxsl", '#library "defs.mtlx"\n')
         self.assertIn(os.path.join(self.directory, "defs.mtlx"), compiler.find_source_files(main))
+
+
+class ExampleTests(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.directory)
+
+    def write_file(self, name, text=""):
+        path = os.path.join(self.directory, name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(text)
+        return path
+
+    def test_examples_are_files_that_create_a_material(self):
+        self.write_file("wood.mxsl", "material wood = surfacematerial(standard_surface());")
+        self.write_file("gold.mxsl", "auto gold = surfacematerial(standard_surface());")
+        self.write_file("utils.mxsl", "float f(float x) { return x; }")
+        self.write_file("notes.txt", "material x = y;")
+        names = [os.path.basename(p) for p in examples.get_examples(self.directory)]
+        self.assertEqual(names, ["gold.mxsl", "wood.mxsl"])
+
+    def test_copy_example_brings_includes_and_images(self):
+        path = self.write_file("rain.mxsl", '#include "utils.mxsl"\nfilename sky = "textures\\sky.png";\n')
+        self.write_file("utils.mxsl")
+        self.write_file("textures/sky.png")
+        self.write_file("textures/unused.png")
+        destination = os.path.join(self.directory, "copy")
+        self.write_file("copy/utils.mxsl", "edited")
+
+        copied = examples.copy_example(path, destination)
+
+        self.assertEqual(copied, os.path.join(destination, "rain.mxsl"))
+        self.assertTrue(os.path.isfile(os.path.join(destination, "textures", "sky.png")))
+        self.assertFalse(os.path.exists(os.path.join(destination, "textures", "unused.png")))
+        with open(os.path.join(destination, "utils.mxsl")) as f:
+            self.assertEqual(f.read(), "edited")
 
 
 if __name__ == "__main__":

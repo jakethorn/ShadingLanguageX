@@ -7,12 +7,14 @@ import re
 import hou
 from pxr import Sdf, UsdGeom, UsdShade
 
-from slx_houdini import NODE_TYPE_NAME, compiler, editor, file_watcher
+from slx_houdini import NODE_TYPE_NAME, compiler, editor, examples, file_watcher, global_parameters
 
 MATERIALX_MATERIALS_PATH = "/MaterialX/Materials"
 ERROR_LINE_PATTERN = re.compile(r"\bline (\d+)")
 
 _compile_results = {}  # node session id -> CompileResult
+_declared_globals = {}  # node session id -> (source and settings key, [GlobalParameter])
+_scheduled_global_updates = set()  # session ids of nodes whose global parameters change once their cook ends
 _automatic_materialx_version = None
 _is_runtime_created = False
 
@@ -24,9 +26,10 @@ class SourceError(Exception):
 class CompileResult(object):
     """What a node's last cook produced, kept for its parameter callbacks."""
 
-    def __init__(self, xml=None, material_names=(), error=None):
+    def __init__(self, xml=None, material_names=(), global_parameters=None, error=None):
         self.xml = xml  # as compiled, before function nodes are expanded for USD
         self.material_names = list(material_names)
+        self.global_parameters = global_parameters
         self.error = error
 
     def error_line(self):
@@ -45,11 +48,12 @@ def cook(script_node):
         file_watcher.unwatch_files(node)
         return
     try:
-        xml = compile_node(node)
-        usd_xml = expand_function_nodes(xml) if node.evalParm("expandfunctions") else xml
+        xml, parameters = compile_node(node)
+        usd_xml = prepare_materialx_for_usd(xml, get_source_directory(node), node.evalParm("expandfunctions"))
         materialx_path = write_materialx_cache(node, usd_xml)
         stage = script_node.editableStage()
-        material_paths = reference_materials(stage, Sdf.Layer.FindOrOpen(materialx_path), get_material_path_prefix(node))
+        layer = Sdf.Layer.FindOrOpen(materialx_path)
+        material_paths = reference_materials(stage, layer, get_material_path_prefix(node))
         if not material_paths:
             # Raised as an error because warnings from inside an asset don't show on the asset's node.
             raise SourceError("The SLX source doesn't define any materials. "
@@ -58,14 +62,24 @@ def cook(script_node):
     except SourceError as e:
         _compile_results[node.sessionId()] = CompileResult(error=str(e))
         raise hou.NodeError(str(e))
-    _compile_results[node.sessionId()] = CompileResult(xml, material_paths)
+    _compile_results[node.sessionId()] = CompileResult(xml, material_paths, parameters)
+    if not global_parameters.has_matching_parameters(node, parameters):
+        schedule_global_parameter_update(node)
 
 
 def is_file_source(node):
     return node.parm("source").evalAsString() == "file"
 
 
+def get_source_directory(node):
+    """Returns the folder that relative paths in the node's SLX source are relative to."""
+    if is_file_source(node):
+        return os.path.dirname(os.path.abspath(node.evalParm("file").strip()))
+    return hou.text.expandString("$HIP")
+
+
 def compile_node(node):
+    """Compiles the node's SLX source. Returns the MaterialX XML and the globals the source declares."""
     try:
         mxslc = compiler.import_mxslc()
     except ImportError as e:
@@ -73,32 +87,53 @@ def compile_node(node):
 
     if is_file_source(node):
         path = os.path.normpath(node.evalParm("file").strip())
-        watch_source_files(node, path)
+        source_files = compiler.find_source_files(path)
+        watch_source_files(node, source_files)
         if not os.path.isfile(path):
             raise SourceError("SLX file not found: {}. Press Create File to start from a template.".format(path))
-        options = create_compile_options(node, mxslc, search_directories=[])
-        return run_compiler(mxslc.compile_file_to_string, path, options)
+        source, is_file, compile_function = path, True, mxslc.compile_file_to_string
+        # A file's globals change when it, or a file it includes, is saved.
+        source_key = tuple((p, file_watcher.get_modified_time(p)) for p in source_files)
+        settings = get_compile_settings(node, mxslc, search_directories=[])
+    else:
+        file_watcher.unwatch_files(node)
+        source = node.parm("code").unexpandedString()
+        source_key, is_file, compile_function = source, False, mxslc.compile_string_to_string
+        # Inline code has no file of its own, so #include and #library paths are resolved from $HIP.
+        settings = get_compile_settings(node, mxslc, search_directories=[hou.text.expandString("$HIP")])
 
-    file_watcher.unwatch_files(node)
-    # Inline code has no file of its own, so #include and #library paths are resolved from $HIP.
-    options = create_compile_options(node, mxslc, search_directories=[hou.text.expandString("$HIP")])
-    return run_compiler(mxslc.compile_string_to_string, node.parm("code").unexpandedString(), options)
+    parameters = get_declared_globals(node, mxslc, source, is_file, settings, source_key)
+    options = create_compile_options(mxslc, settings, global_parameters.get_global_values(node, parameters))
+    return run_compiler(compile_function, source, options), parameters
 
 
-def watch_source_files(node, path):
+def watch_source_files(node, source_files):
     if node.evalParm("autorecompile"):
-        file_watcher.watch_files(node, compiler.find_source_files(path), recompile_and_report)
+        file_watcher.watch_files(node, source_files, recompile_and_report)
     else:
         file_watcher.unwatch_files(node)
 
 
-def create_compile_options(node, mxslc, search_directories):
-    global_values = {}
-    for i in range(1, node.evalParm("globals") + 1):
-        name = node.evalParm("globalname{}".format(i)).strip()
-        if name:
-            global_values[name] = compiler.parse_value(node.evalParm("globalvalue{}".format(i)))
+def get_declared_globals(node, mxslc, source, is_file, settings, source_key):
+    """Returns the globals the source declares, running the source again only when it or the settings changed.
 
+    That keeps changes to a global's parameter, such as dragging a slider, down to one compile.
+    """
+    key = (source_key, repr(sorted(settings.items())))
+    cached = _declared_globals.get(node.sessionId())
+    if cached is not None and cached[0] == key:
+        return cached[1]
+    options = create_compile_options(mxslc, settings, {})
+    try:
+        parameters = global_parameters.get_global_parameters(mxslc, source, options, is_file)
+    except RuntimeError as e:
+        raise SourceError("SLX compile error: {}".format(e))
+    _declared_globals[node.sessionId()] = (key, parameters)
+    return parameters
+
+
+def get_compile_settings(node, mxslc, search_directories):
+    """Returns the node's compile options, apart from global values, as CompileOptions keyword arguments."""
     macros = []
     for i in range(1, node.evalParm("macros") + 1):
         name = node.evalParm("macroname{}".format(i)).strip()
@@ -107,24 +142,27 @@ def create_compile_options(node, mxslc, search_directories):
             macros.append((name, value) if value else name)
 
     entry_function = node.evalParm("entryfunction").strip() or None
-    entry_arguments = compiler.parse_value_list(node.evalParm("entryarguments")) if entry_function else []
-    if compiler.has_sequence_value(list(global_values.values()) + entry_arguments):
-        create_runtime(mxslc)
-
-    options = {
+    settings = {
         "macros": macros,
         "search_directories": search_directories,
-        "globals": global_values,
-        "error_on_missing_globals": not node.evalParm("allowmissingglobals"),
+        # Globals without a parameter, such as structs, use their initializers.
+        "error_on_missing_globals": False,
+        "error_on_unused_globals": False,
         "func_name": entry_function,
-        "func_args": entry_arguments,
+        "func_args": compiler.parse_value_list(node.evalParm("entryarguments")) if entry_function else [],
         "reduce_graph": bool(node.evalParm("reducegraph")),
     }
     version = get_materialx_version(node, mxslc)
     if version:
-        options["version"] = version
+        settings["version"] = version
+    return settings
+
+
+def create_compile_options(mxslc, settings, global_values):
+    if compiler.has_sequence_value(list(global_values.values()) + settings["func_args"]):
+        create_runtime(mxslc)
     try:
-        return mxslc.CompileOptions(**options)
+        return mxslc.CompileOptions(globals=global_values, **settings)
     except (TypeError, ValueError, RuntimeError) as e:
         raise SourceError("Invalid compile options: {}".format(e))
 
@@ -156,22 +194,33 @@ def run_compiler(compile_function, source, options):
         raise SourceError("SLX compile error: {}".format(e))
 
 
-def expand_function_nodes(xml):
-    """Replaces each node made from a non-inline SLX function with the nodes inside it.
+def prepare_materialx_for_usd(xml, source_directory, expand_functions):
+    """Returns the compiled MaterialX changed to work from the cache directory, in USD and Houdini's renderers.
 
-    Karma and Houdini's viewport only render MaterialX's standard nodes. They ignore the custom NodeDefs that
-    SLX functions compile to, even though USD records which file defines them.
+    - Relative file paths become absolute, from source_directory. USD would resolve them from the cache directory.
+    - With expand_functions, each node made from a non-inline SLX function is replaced with the nodes inside it.
+      Karma and Houdini's viewport only render MaterialX's standard nodes. They ignore the custom NodeDefs that
+      SLX functions compile to, even though USD records which file defines them.
     """
     import MaterialX as mx
     document = mx.createDocument()
     mx.readFromXmlString(document, xml)
-    if not document.getNodeDefs():
-        return xml
-    document.flattenSubgraphs()
-    for graph in document.getNodeGraphs():
-        if not graph.getNodeDefString():
-            graph.flattenSubgraphs()
+    if expand_functions and document.getNodeDefs():
+        document.flattenSubgraphs()
+        for graph in document.getNodeGraphs():
+            if not graph.getNodeDefString():
+                graph.flattenSubgraphs()
+    for element in document.traverseTree():
+        if element.isA(mx.Input) and element.getType() == "filename" and element.hasValueString():
+            element.setValueString(make_absolute_path(element.getResolvedValueString(), source_directory))
     return mx.writeToXmlString(document)
+
+
+def make_absolute_path(path, directory):
+    path = path.replace("\\", "/")
+    if not path or os.path.isabs(path) or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", path):
+        return path  # absolute, empty, or with a drive letter or URL scheme
+    return os.path.join(directory, path).replace("\\", "/")
 
 
 def write_materialx_cache(node, xml):
@@ -272,7 +321,7 @@ def recompile(node):
 def recompile_and_report(node):
     """Recompiles node now, rather than when something next needs it, and shows the result in the status bar."""
     recompile(node)
-    node.stage()
+    update_global_parameters(node)
     result = _compile_results.get(node.sessionId())
     if not hou.isUIAvailable() or result is None:
         return
@@ -286,6 +335,40 @@ def recompile_and_report(node):
 def recompile_all():
     for node in get_slx_nodes():
         recompile_and_report(node)
+
+
+def update_global_parameters(node):
+    """Cooks node and gives it a parameter for each global its SLX source declares.
+
+    Cooks do this themselves when Houdini's UI is running. Scripts in hython can call this instead.
+    """
+    result = get_last_result(node)
+    if result is None or result.global_parameters is None:
+        return
+    if not global_parameters.has_matching_parameters(node, result.global_parameters):
+        global_parameters.update_parameters(node, result.global_parameters)
+        # The last cook couldn't read parameters that didn't exist, so Houdini wouldn't recook when they change.
+        recompile(node)
+
+
+def schedule_global_parameter_update(node):
+    """Updates node's global parameters once its cook ends, because Houdini forbids changing them during it.
+
+    This needs Houdini's UI, which runs the update from its event loop.
+    """
+    if not hou.isUIAvailable() or node.sessionId() in _scheduled_global_updates:
+        return
+    import hdefereval
+    session_id = node.sessionId()
+    _scheduled_global_updates.add(session_id)
+
+    def update():
+        _scheduled_global_updates.discard(session_id)
+        scheduled_node = hou.nodeBySessionId(session_id)
+        if scheduled_node is not None:
+            update_global_parameters(scheduled_node)
+
+    hdefereval.executeDeferred(update)
 
 
 def get_last_result(node):
@@ -309,6 +392,25 @@ def on_open_editor_pressed(kwargs):
         return
     result = _compile_results.get(node.sessionId())
     editor.open_in_editor(path, result.error_line() if result else None)
+
+
+def on_load_example_pressed(kwargs):
+    node = kwargs["node"]
+    directory = examples.find_examples_directory()
+    paths = examples.get_examples(directory) if directory else []
+    if not paths:
+        hou.ui.displayMessage("The SLX examples weren't found. They come with the plugin's release download, and "
+                              "with the ShadingLanguageX repository.", title="Load Example")
+        return
+    names = [os.path.splitext(os.path.basename(p))[0] for p in paths]
+    chosen = hou.ui.selectFromList(names, exclusive=True, title="Load Example", column_header="Example",
+                                   message="The example is copied to $HIP/slx_examples, where you can edit it.")
+    if not chosen:
+        return
+    copied_path = examples.copy_example(paths[chosen[0]], hou.text.expandString("$HIP/slx_examples"))
+    node.parm("source").set("file")
+    node.parm("file").set("$HIP/slx_examples/" + os.path.basename(copied_path))
+    recompile_and_report(node)
 
 
 def on_create_file_pressed(kwargs):

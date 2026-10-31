@@ -5,6 +5,8 @@
     <memberTool name="slx_recompile_all"/>
     <memberTool name="slx_convert_selected"/>
     <memberTool name="slx_import_materialx"/>
+    <memberTool name="slx_edit_node_library"/>
+    <memberTool name="slx_rebuild_node_library"/>
     <memberTool name="slx_documentation"/>
   </toolshelf>
 
@@ -43,6 +45,20 @@ slx_houdini.convert.convert_selected_to_slx()]]></script>
     <script scriptType="python"><![CDATA[import slx_houdini.convert
 
 slx_houdini.convert.import_materialx_file()]]></script>
+  </tool>
+
+  <tool name="slx_edit_node_library" label="Edit Node Library" icon="BUTTONS_edit">
+    <helpText><![CDATA[Opens the SLX node library, whose functions become MaterialX nodes. Starts it from a template if it's empty.]]></helpText>
+    <script scriptType="python"><![CDATA[import slx_houdini.node_library
+
+slx_houdini.node_library.edit_library()]]></script>
+  </tool>
+
+  <tool name="slx_rebuild_node_library" label="Rebuild Node Library" icon="BUTTONS_reload">
+    <helpText><![CDATA[Compiles the SLX node library and updates its MaterialX nodes.]]></helpText>
+    <script scriptType="python"><![CDATA[import slx_houdini.node_library
+
+slx_houdini.node_library.rebuild_with_message()]]></script>
   </tool>
 
   <tool name="slx_documentation" label="SLX Docs" icon="BUTTONS_help">

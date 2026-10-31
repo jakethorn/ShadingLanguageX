@@ -21,7 +21,7 @@ import tempfile
 import hou
 
 import slx_houdini
-from slx_houdini import NODE_TYPE_NAME, compiler
+from slx_houdini import NODE_TYPE_NAME, compiler, global_parameters
 
 LABEL = "SLX Material"
 ICON = "LOP_materiallibrary"
@@ -124,7 +124,7 @@ def get_definition_path(licence_name):
     The name changes with anything the asset is built from, so a changed plugin or Houdini builds a new one.
     """
     fingerprint = hashlib.sha1()
-    for path in (__file__, slx_houdini.__file__, compiler.TEMPLATE_PATH):
+    for path in (__file__, slx_houdini.__file__, global_parameters.__file__, compiler.TEMPLATE_PATH):
         with open(os.path.abspath(path), "rb") as f:
             fingerprint.update(f.read())
     fingerprint.update("|".join([hou.applicationVersionString()] + get_materialx_versions()).encode("utf-8"))
@@ -133,7 +133,8 @@ def get_definition_path(licence_name):
 
 
 def get_cache_directory():
-    for directory in (os.path.join(hou.homeHoudiniDirectory(), "slx"), os.path.join(hou.getenv("HOUDINI_TEMP_DIR"), "slx")):
+    preferences_directory = os.path.join(hou.homeHoudiniDirectory(), "slx")
+    for directory in (preferences_directory, os.path.join(hou.getenv("HOUDINI_TEMP_DIR"), "slx")):
         try:
             os.makedirs(directory, exist_ok=True)
         except OSError:
@@ -203,6 +204,7 @@ def remove_old_definitions(current_path):
 def create_parm_template_group():
     group = hou.ParmTemplateGroup()
     group.append(create_source_folder())
+    group.append(create_globals_folder())
     group.append(create_materials_folder())
     group.append(create_compile_options_folder())
     group.append(create_output_folder())
@@ -223,18 +225,31 @@ def create_source_folder():
         hou.StringParmTemplate("file", "SLX File", 1, string_type=hou.stringParmType.FileReference,
                                file_type=hou.fileType.Any, conditionals=hide_unless_file,
                                tags={"filechooser_pattern": "*.mxsl", "filechooser_mode": "read"},
-                               help="The .mxsl file to compile. Its #include and #library paths are resolved from its folder."),
-        hou.StringParmTemplate("code", "Code", 1, default_value=(compiler.read_template(),), conditionals=hide_unless_inline,
+                               help="The .mxsl file to compile. Its #include and #library paths, and other "
+                                    "relative paths, are resolved from its folder."),
+        hou.StringParmTemplate("code", "Code", 1, default_value=(compiler.read_template(),),
+                               conditionals=hide_unless_inline,
                                tags={"editor": "1", "editorlines": "20-60"},
                                help="SLX code to compile. Its #include and #library paths are resolved from $HIP."),
         create_button("compile", "Compile", "on_compile_pressed", join_with_next=True),
         create_button("openeditor", "Open in Editor", "on_open_editor_pressed", join_with_next=True,
                       conditionals=hide_unless_file),
-        create_button("createfile", "Create File", "on_create_file_pressed", conditionals=hide_unless_file),
+        create_button("createfile", "Create File", "on_create_file_pressed", join_with_next=True,
+                      conditionals=hide_unless_file),
+        create_button("loadexample", "Load Example...", "on_load_example_pressed"),
         hou.ToggleParmTemplate("autorecompile", "Recompile When Files Change", default_value=True,
                                conditionals=hide_unless_file,
                                help="Recompile whenever the SLX file, or a file it includes, is saved."),
         hou.IntParmTemplate("recompile", "Recompile", 1, is_hidden=True),
+    ])
+
+
+def create_globals_folder():
+    # Cooks fill this tab with a spare parameter for each global variable (see slx_houdini.global_parameters).
+    return hou.FolderParmTemplate(global_parameters.FOLDER_NAME, global_parameters.FOLDER_LABEL,
+                                  folder_type=hou.folderType.Tabs, parm_templates=[
+        hou.LabelParmTemplate(global_parameters.NO_GLOBALS_LABEL_NAME, "",
+                              column_labels=("The SLX source doesn't declare any global variables.",)),
     ])
 
 
@@ -270,14 +285,8 @@ def create_compile_options_folder():
                                help="A function to call after the file has run, like mxslc --func."),
         hou.StringParmTemplate("entryarguments", "Entry Arguments", 1,
                                conditionals={hou.parmCondType.DisableWhen: '{ entryfunction == "" }'},
-                               help='Comma separated arguments for the entry function, e.g. 0.5, "brick.png", (1, 0, 0).'),
-        hou.FolderParmTemplate("globals", "Globals", folder_type=hou.folderType.MultiparmBlock, parm_templates=[
-            hou.StringParmTemplate("globalname#", "Name", 1, join_with_next=True),
-            hou.StringParmTemplate("globalvalue#", "Value", 1,
-                                   help='A value such as 0.5, 2, true, "a.png" or (1, 0, 0).'),
-        ]),
-        hou.ToggleParmTemplate("allowmissingglobals", "Use Initializers for Missing Globals", default_value=True,
-                               help="Globals without a value here use their initializer, or their type's default."),
+                               help='Comma separated arguments for the entry function, '
+                                    'e.g. 0.5, "brick.png", (1, 0, 0).'),
         hou.FolderParmTemplate("macros", "Macros", folder_type=hou.folderType.MultiparmBlock, parm_templates=[
             hou.StringParmTemplate("macroname#", "Name", 1, join_with_next=True),
             hou.StringParmTemplate("macrovalue#", "Value", 1, help="Leave empty to define a flag macro."),

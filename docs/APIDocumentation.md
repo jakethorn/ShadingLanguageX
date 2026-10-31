@@ -58,6 +58,21 @@ mxslc.compile_file_to_file(src_path: str | pathlib.Path, opts: mxslc.CompileOpti
 mxslc.compile_file_to_file(src_path: str | pathlib.Path, dst_path: str | pathlib.Path) -> pathlib.Path
 ```
 
+### get_globals_from_string / get_globals_from_file
+
+Run the ShadingLanguageX source code without any global values and return the `global` variables it declares, in
+declaration order. Each `mxslc.GlobalVariable` has a `name`, a `type` (e.g., `"float"`, `"color3"`) and a `value`: the
+initializer's value, or the type's default if there's no initializer. `value` is `None` if the initializer isn't known
+at compile time. Global values in the optional [CompileOptions](#compile-options) are ignored, but its other fields, such
+as macros, apply.
+
+```python
+mxslc.get_globals_from_string(source: str) -> list[mxslc.GlobalVariable]
+mxslc.get_globals_from_string(source: str, opts: mxslc.CompileOptions) -> list[mxslc.GlobalVariable]
+mxslc.get_globals_from_file(src_path: str | pathlib.Path) -> list[mxslc.GlobalVariable]
+mxslc.get_globals_from_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> list[mxslc.GlobalVariable]
+```
+
 ### Python Example
 
 ```python
@@ -67,6 +82,9 @@ mtlx = mxslc.compile_string_to_string('float f = 1 + randomfloat();')
 mtlx = mxslc.compile_file_to_string('example.mxsl', mxslc.CompileOptions(func_name="main"))
 mtlx_path = mxslc.compile_string_to_file('float f = 1 + randomfloat();', 'example.mtlx')
 mtlx_path = mxslc.compile_file_to_file('example.mxsl')
+
+for g in mxslc.get_globals_from_string('global float roughness = 0.25; global color3 tint;'):
+    print(g.name, g.type, g.value)  # "roughness float 0.25", then "tint color3 0, 0, 0" (a MaterialX.Color3)
 ```
 
 ## C++
@@ -106,6 +124,20 @@ fs::path compile_to_file(const string& source, const fs::path& dst_path);
 fs::path compile_to_file(const fs::path& src_path);
 fs::path compile_to_file(const fs::path& src_path, const CompileOptions& opts);
 fs::path compile_to_file(const fs::path& src_path, const fs::path& dst_path);
+```
+
+### get_globals
+
+Run the source code given by `source` or `src_path` without any global values and return the `global` variables it
+declares, in declaration order. Each `GlobalVariable` has a `name`, a `type` and a `value`: the initializer's value,
+or the type's default if there's no initializer. Global values in the optional [CompileOptions](#compile-options) are
+ignored.
+
+```c++
+vector<GlobalVariable> get_globals(const string& source);
+vector<GlobalVariable> get_globals(const string& source, const CompileOptions& opts);
+vector<GlobalVariable> get_globals(const fs::path& src_path);
+vector<GlobalVariable> get_globals(const fs::path& src_path, const CompileOptions& opts);
 ```
 
 ### C++ Example

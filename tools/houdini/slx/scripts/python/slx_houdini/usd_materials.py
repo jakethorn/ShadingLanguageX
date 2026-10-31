@@ -41,7 +41,8 @@ def find_terminals(material):
 
 
 def find_materialx_materials(stage):
-    return [UsdShade.Material(p) for p in stage.Traverse() if p.IsA(UsdShade.Material) and find_terminals(UsdShade.Material(p))]
+    materials = [UsdShade.Material(p) for p in stage.Traverse() if p.IsA(UsdShade.Material)]
+    return [m for m in materials if find_terminals(m)]
 
 
 def create_materialx_xml(material):
@@ -67,13 +68,15 @@ def add_shader_node(document, material, prim, nodes):
     if prim.GetPath() in nodes:
         return nodes[prim.GetPath()]
     if not prim.IsA(UsdShade.Shader):
-        raise hou.OperationFailed("{} is a {}, which can't be converted yet.".format(prim.GetPath(), prim.GetTypeName()))
+        message = "{} is a {}, which can't be converted yet.".format(prim.GetPath(), prim.GetTypeName())
+        raise hou.OperationFailed(message)
 
     shader = UsdShade.Shader(prim)
     node_def_name = shader.GetIdAttr().Get()
     node_def = get_materialx_library().getNodeDef(node_def_name)
     if node_def is None:
-        raise hou.OperationFailed("{} uses {}, which isn't a standard MaterialX node.".format(prim.GetPath(), node_def_name))
+        message = "{} uses {}, which isn't a standard MaterialX node.".format(prim.GetPath(), node_def_name)
+        raise hou.OperationFailed(message)
 
     node = document.addNode(node_def.getNodeString(), mx.createValidName(prim.GetName()), node_def.getType())
     nodes[prim.GetPath()] = node
