@@ -136,5 +136,11 @@ def create_parm_template(parameter):
     else:
         template = hou.FloatParmTemplate(name, label, VECTOR_SIZES[type_name], default_value=default,
                                          naming_scheme=hou.parmNamingScheme.XYZW)
+    if parameter.is_editable():
+        template.setHelp("Sets the global variable {} in the SLX source. Its default is the variable's "
+                         "initializer.".format(parameter.name))
+    else:
+        template.setHelp("The global variable {} keeps its initializer from the SLX source, because a parameter "
+                         "can't hold it.".format(parameter.name))
     template.setTags({TYPE_TAG: type_name, DEFAULT_TAG: repr(default)})
     return template

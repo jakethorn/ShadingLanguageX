@@ -23,7 +23,8 @@
 import slx_houdini.node_type
 
 slx_houdini.node_type.ensure_node_type()
-loptoolutils.genericTool(kwargs, "slx_material::1.0")]]></script>
+# The node has nothing to position, so it's created without waiting for a click in the viewport.
+loptoolutils.genericTool(kwargs, "slx_material::1.0", clicktoplace=False)]]></script>
   </tool>
 
   <tool name="slx_recompile_all" label="Recompile All" icon="BUTTONS_reload">
@@ -47,7 +48,7 @@ slx_houdini.convert.convert_selected_to_slx()]]></script>
 slx_houdini.convert.import_materialx_file()]]></script>
   </tool>
 
-  <tool name="slx_edit_node_library" label="Edit Node Library" icon="BUTTONS_edit">
+  <tool name="slx_edit_node_library" label="Open Node Library" icon="BUTTONS_edit">
     <helpText><![CDATA[Opens the SLX node library, whose functions become MaterialX nodes. Starts it from a template if it's empty.]]></helpText>
     <script scriptType="python"><![CDATA[import slx_houdini.node_library
 

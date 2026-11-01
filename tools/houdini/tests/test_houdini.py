@@ -14,6 +14,7 @@ import tempfile
 import unittest
 
 import hou
+import houdinihelp.api
 import voptoolutils
 from pxr import UsdShade
 
@@ -242,7 +243,19 @@ class SlxMaterialTests(unittest.TestCase):
         self.set_code_and_update_globals(GLOBALS_SOURCE.format(roughness=0.25))
         self.set_code_and_update_globals("material mat = surfacematerial(standard_surface());")
         self.assertIsNone(self.node.parmTuple("global_roughness"))
-        self.assertFalse(self.node.parmTemplateGroup().find("noglobals").isHidden())
+        no_globals_label = self.node.parmTemplateGroup().find("noglobals")
+        self.assertFalse(no_globals_label.isHidden())
+        # Houdini shows an empty label as the parameter's name.
+        self.assertTrue(no_globals_label.isLabelHidden())
+
+    def test_every_parameter_has_help(self):
+        # Houdini's tooltip for a parameter without help says it "Could not find help for SLX Material".
+        self.set_code_and_update_globals(GLOBALS_SOURCE.format(roughness=0.25))
+        help_page = houdinihelp.api.load_json("/nodes/lop/" + NODE_TYPE_NAME)
+        missing = [t.name() for t in get_parm_templates(self.node.parmTemplateGroup().entries())
+                   if not t.isHidden() and not t.help() and not houdinihelp.api.find_parm(help_page, t.name(), t.label())
+                   and not (t.type() == hou.parmTemplateType.Folder and t.folderType() == hou.folderType.Tabs)]
+        self.assertEqual(missing, [])
 
     def test_convert_karma_material_builder_to_slx(self):
         library = self.network.createNode("materiallibrary")
@@ -351,6 +364,13 @@ class NodeLibraryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("Unhandled node type", result.stdout + result.stderr)
         self.assertTrue(os.path.isfile(os.path.join(self.directory, "render.png")))
+
+
+def get_parm_templates(templates):
+    for template in templates:
+        yield template
+        if template.type() == hou.parmTemplateType.Folder:
+            yield from get_parm_templates(template.parmTemplates())
 
 
 def get_input_value(shader, name):

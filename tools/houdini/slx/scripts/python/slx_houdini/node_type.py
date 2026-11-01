@@ -38,11 +38,12 @@ TOOL_XML = """<?xml version="1.0" encoding="UTF-8"?>
   <tool name="$HDA_DEFAULT_TOOL" label="$HDA_LABEL" icon="$HDA_ICON">
     <script scriptType="python"><![CDATA[import loptoolutils
 
-loptoolutils.genericTool(kwargs, '$HDA_NAME')]]></script>
+loptoolutils.genericTool(kwargs, '$HDA_NAME', clicktoplace=False)]]></script>
   </tool>
 </shelfDocument>
 """
 
+# Parameter tooltips come from their help strings. Multiparm folders can't have one, so theirs come from @parameters.
 HELP_TEXT = """= SLX Material =
 
 \"\"\"Compiles a ShadingLanguageX (SLX) file, inline code or example into MaterialX materials.\"\"\"
@@ -52,6 +53,16 @@ The compiled MaterialX is written to the Cache Directory and referenced from the
 somewhere your renders can read.
 
 Language reference: [https://github.com/jakethorn/ShadingLanguageX]
+
+@parameters
+
+Assignments:
+    #id: assignments
+    Bind materials from the SLX source to geometry.
+
+Macros:
+    #id: macros
+    Define macros before the SLX source is compiled, like #define.
 """
 
 
@@ -119,15 +130,26 @@ def is_same_path(a, b):
     return os.path.normcase(os.path.normpath(a)) == os.path.normcase(os.path.normpath(b))
 
 
+def hash_source_files():
+    source_hash = hashlib.sha1()
+    for path in (__file__, slx_houdini.__file__, global_parameters.__file__):
+        with open(os.path.abspath(path), "rb") as f:
+            source_hash.update(f.read())
+    return source_hash.digest()
+
+
+# Hashed as the plugin loads, so the asset's name matches the code that builds it. A session that outlives an edit to
+# these files would otherwise build the asset from its old code under the new name, and every later session would
+# install that stale asset.
+SOURCE_HASH = hash_source_files()
+
+
 def get_definition_path(licence_name):
     """Returns where the asset for this Houdini and licence is cached.
 
     The name changes with anything the asset is built from, so a changed plugin or Houdini builds a new one.
     """
-    fingerprint = hashlib.sha1()
-    for path in (__file__, slx_houdini.__file__, global_parameters.__file__):
-        with open(os.path.abspath(path), "rb") as f:
-            fingerprint.update(f.read())
+    fingerprint = hashlib.sha1(SOURCE_HASH)
     fingerprint.update("|".join([hou.applicationVersionString()] + get_materialx_versions()).encode("utf-8"))
     file_name = "slx_material_{}_{}.hda".format(fingerprint.hexdigest()[:12], licence_name.lower())
     return os.path.join(get_cache_directory(), file_name).replace("\\", "/")
@@ -214,9 +236,10 @@ def create_parm_template_group():
     return group
 
 
-def create_button(name, label, callback, join_with_next=False, conditionals=None):
+def create_button(name, label, callback, help_text, join_with_next=False, conditionals=None):
     return hou.ButtonParmTemplate(name, label, join_with_next=join_with_next, script_callback=CALLBACK.format(callback),
-                                  script_callback_language=hou.scriptLanguage.Python, conditionals=conditionals or {})
+                                  script_callback_language=hou.scriptLanguage.Python, conditionals=conditionals or {},
+                                  help=help_text)
 
 
 def create_source_folder():
@@ -250,12 +273,15 @@ def create_source_folder():
                                tags={"editor": "1", "editorlines": "20-40"},
                                help="The chosen example's code. Edits are kept in this node only. Its #include "
                                     "paths and images are resolved from the examples folder."),
-        create_button("compile", "Compile", "on_compile_pressed", join_with_next=True,
-                      conditionals={hou.parmCondType.HideWhen: "{ source == example }"}),
-        create_button("openeditor", "Open in Editor", "on_open_editor_pressed", join_with_next=True,
+        create_button("compile", "Compile", "on_compile_pressed",
+                      "Compile the SLX source file",
+                      join_with_next=True, conditionals={hou.parmCondType.HideWhen: "{ source == example }"}),
+        create_button("openeditor", "Open in Editor", "on_open_editor_pressed",
+                      "Open the SLX source file in an external editor", join_with_next=True,
                       conditionals=hide_unless_file),
-        create_button("createfile", "Create", "on_create_file_pressed", conditionals=hide_unless_file),
-        hou.ToggleParmTemplate("autorecompile", "Recompile When Files Change", default_value=True,
+        create_button("createfile", "Create", "on_create_file_pressed",
+                      "Create a SLX source file at the given path", conditionals=hide_unless_file),
+        hou.ToggleParmTemplate("autorecompile", "Recompile on Change", default_value=True,
                                conditionals=hide_unless_file,
                                help="Recompile whenever the SLX file, or a file it includes, is saved."),
         hou.IntParmTemplate("recompile", "Recompile", 1, is_hidden=True),
@@ -266,7 +292,7 @@ def create_globals_folder():
     # Cooks fill this tab with a spare parameter for each global variable (see slx_houdini.global_parameters).
     return hou.FolderParmTemplate(global_parameters.FOLDER_NAME, global_parameters.FOLDER_LABEL,
                                   folder_type=hou.folderType.Tabs, parm_templates=[
-        hou.LabelParmTemplate(global_parameters.NO_GLOBALS_LABEL_NAME, "",
+        hou.LabelParmTemplate(global_parameters.NO_GLOBALS_LABEL_NAME, "", is_label_hidden=True,
                               column_labels=("The SLX source doesn't declare any global variables.",)),
     ])
 
@@ -306,11 +332,13 @@ def create_compile_options_folder():
                                help='Comma separated arguments for the entry function, '
                                     'e.g. 0.5, "brick.png", (1, 0, 0).'),
         hou.FolderParmTemplate("macros", "Macros", folder_type=hou.folderType.MultiparmBlock, parm_templates=[
-            hou.StringParmTemplate("macroname#", "Name", 1, join_with_next=True),
+            hou.StringParmTemplate("macroname#", "Name", 1, join_with_next=True,
+                                   help="The macro's name, as used by #ifdef, #if and the code."),
             hou.StringParmTemplate("macrovalue#", "Value", 1, help="Leave empty to define a flag macro."),
         ]),
         hou.ToggleParmTemplate("reducegraph", "Reduce Graph", default_value=True,
-                               help="Fold compile-time values into constants."),
+                               help="Allow the SLX compiler to optimize the resulting MaterialX graph, reducing the "
+                                    "node count"),
         hou.ToggleParmTemplate("inlinefunctions", "Inline SLX Functions", default_value=True,
                                help="Mark all SLX functions as inline, bypassing MaterialX NodeDef/NodeGraph "
                                     "elements."),
@@ -322,6 +350,8 @@ def create_output_folder():
         hou.StringParmTemplate("cachedir", "Cache Directory", 1, default_value=("$HIP/slx_cache",),
                                string_type=hou.stringParmType.FileReference, file_type=hou.fileType.Directory,
                                help="Where compiled .mtlx files are written. Renders read them from here."),
-        create_button("viewmaterialx", "View MaterialX", "on_view_materialx_pressed", join_with_next=True),
-        create_button("exportmaterialx", "Export MaterialX...", "on_export_materialx_pressed"),
+        create_button("viewmaterialx", "View MaterialX", "on_view_materialx_pressed",
+                      "Show the compiled MaterialX document", join_with_next=True),
+        create_button("exportmaterialx", "Export MaterialX...", "on_export_materialx_pressed",
+                      "Save the compiled MaterialX document to a .mtlx file"),
     ])

@@ -511,8 +511,8 @@ def on_view_materialx_pressed(kwargs):
         hou.ui.displayMessage("There's no compiled MaterialX to show.", title="SLX Material",
                               details=result.error if result else None, severity=hou.severityType.Warning)
         return
-    hou.ui.displayMessage("MaterialX compiled from {}:".format(node.path()), title="SLX Material",
-                          details=result.xml, details_label="MaterialX", details_expanded=True)
+    from slx_houdini import text_window  # imports Qt, which cooks without a UI don't need
+    text_window.show_xml("SLX Material", "MaterialX compiled from {}:".format(node.path()), result.xml)
 
 
 def on_export_materialx_pressed(kwargs):

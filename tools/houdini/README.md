@@ -47,7 +47,7 @@ material red = surfacematerial(surface);    // -> /materials/red
 
 | Tab | What it does |
 |---|---|
-| Source | Choose **File**, **Inline Code** or **Examples**. **Compile** rereads the source. With **Recompile When Files Change** on, saving the file, or any file it `#include`s, recompiles it. **Open in Editor** uses `$SLX_EDITOR`, `$VISUAL` or `$EDITOR`, then VS Code, then your OS default. If the last compile failed, VS Code opens at the error line. **Examples** lists the plugin's six examples, from bricks to interior mapping, and loads the first one when you switch to it. They're short programs for newcomers to ShadingLanguageX, each showing off different language features. Choosing one shows its code and compiles it. You can edit the code there. Your edits are kept in that node and saved with the scene, and choosing another example asks before discarding them. Every example's material is called `example_material`. |
+| Source | Choose **File**, **Inline Code** or **Examples**. **Compile** rereads the source. With **Recompile on Change** on, saving the file, or any file it `#include`s, recompiles it. **Open in Editor** uses `$SLX_EDITOR`, `$VISUAL` or `$EDITOR`, then VS Code, then your OS default. If the last compile failed, VS Code opens at the error line. **Examples** lists the plugin's six examples, from bricks to interior mapping, and loads the first one when you switch to it. They're short programs for newcomers to ShadingLanguageX, each showing off different language features. Choosing one shows its code and compiles it. You can edit the code there. Your edits are kept in that node and saved with the scene, and choosing another example asks before discarding them. Every example's material is called `example_material`. |
 | Globals | A parameter for each `global` variable in the source, set to its initializer. See below. |
 | Materials | **Assignments** bind compiled materials to geometry from the node's input. |
 | Compile Options | MaterialX version (by default it matches Houdini's), entry function and arguments, macros, graph reduction, and **Inline SLX Functions**. |
@@ -95,7 +95,7 @@ float stripes(float x, float count = 8.0)     // the "SLX Stripes" node, with in
 }
 ```
 
-**Edit Node Library** on the SLX shelf opens the folder, starting it with an example file. **Rebuild Node Library**
+**Open Node Library** on the SLX shelf opens the folder, starting it with an example file. **Rebuild Node Library**
 compiles it and makes the nodes, which appear in the Tab menu under **MaterialX > Shading Language X** straight
 away.
 
