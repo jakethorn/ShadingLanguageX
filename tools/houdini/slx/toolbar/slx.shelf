@@ -4,7 +4,6 @@
     <memberTool name="slx_material"/>
     <memberTool name="slx_recompile_all"/>
     <memberTool name="slx_convert_selected"/>
-    <memberTool name="slx_import_materialx"/>
     <memberTool name="slx_edit_node_library"/>
     <memberTool name="slx_rebuild_node_library"/>
     <memberTool name="slx_documentation"/>
@@ -39,13 +38,6 @@ slx_houdini.lop.recompile_all()]]></script>
     <script scriptType="python"><![CDATA[import slx_houdini.convert
 
 slx_houdini.convert.convert_selected_to_slx()]]></script>
-  </tool>
-
-  <tool name="slx_import_materialx" label="Import MaterialX" icon="LOP_reference">
-    <helpText><![CDATA[Decompiles a .mtlx file into a new SLX Material node.]]></helpText>
-    <script scriptType="python"><![CDATA[import slx_houdini.convert
-
-slx_houdini.convert.import_materialx_file()]]></script>
   </tool>
 
   <tool name="slx_edit_node_library" label="Open Node Library" icon="BUTTONS_edit">

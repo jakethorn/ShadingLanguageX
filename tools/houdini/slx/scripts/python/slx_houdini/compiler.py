@@ -3,7 +3,6 @@
 Nothing in this module imports hou, so it can be tested with a plain Python interpreter.
 """
 
-import ast
 import glob
 import os
 import re
@@ -93,9 +92,10 @@ def choose_materialx_version(houdini_version, available_versions):
     return older[-1] if older else available[0]
 
 
-def find_source_files(path):
+def find_source_files(path, search_directories=()):
     """Returns the SLX file and every file it includes, following #include and #library recursively.
 
+    Like mxslc, a file that isn't found relative to the file naming it is looked for in each search directory.
     The result can contain files that don't exist yet, so a watcher notices when they appear.
     """
     main_directory = os.path.dirname(os.path.abspath(path))
@@ -116,51 +116,14 @@ def find_source_files(path):
         for directive, name in INCLUDE_PATTERN.findall(text):
             # mxslc resolves #library paths relative to the main file, even inside included files
             base = main_directory if directive == "library" else os.path.dirname(current)
-            pending.append(os.path.join(base, name))
+            pending.append(find_included_file(name, [base] + list(search_directories)))
     return found
 
 
-def parse_value(text):
-    """Converts parameter text to a value mxslc accepts: 0.5, 2, true, "a.png" or (1, 0, 0).
-
-    Text that isn't a literal is passed through as a string, so file names don't need quotes.
-    """
-    stripped = text.strip()
-    if stripped.lower() in ("true", "false"):
-        return stripped.lower() == "true"
-    try:
-        value = ast.literal_eval(stripped)
-    except (ValueError, SyntaxError):
-        return stripped
-    if isinstance(value, tuple):
-        return list(value)
-    return value
-
-
-def parse_value_list(text):
-    """Converts comma separated parameter text, e.g. `0.5, "a.png", (1, 0, 0)`, to a list of values."""
-    parts = []
-    depth = 0
-    quote = None
-    current = ""
-    for char in text:
-        if quote:
-            if char == quote:
-                quote = None
-        elif char in "\"'":
-            quote = char
-        elif char in "([{":
-            depth += 1
-        elif char in ")]}":
-            depth -= 1
-        elif char == "," and depth == 0:
-            parts.append(current)
-            current = ""
-            continue
-        current += char
-    if current.strip():
-        parts.append(current)
-    return [parse_value(part) for part in parts]
+def find_included_file(name, directories):
+    """Returns the path of name in the first directory that has it, or in the first directory if none do."""
+    candidates = [os.path.join(directory, name) for directory in directories]
+    return next((c for c in candidates if os.path.isfile(c)), candidates[0])
 
 
 def has_sequence_value(values):

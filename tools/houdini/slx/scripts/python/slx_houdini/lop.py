@@ -7,7 +7,7 @@ import re
 import hou
 from pxr import Sdf, UsdGeom, UsdShade
 
-from slx_houdini import NODE_TYPE_NAME, compiler, editor, examples, file_watcher, global_parameters
+from slx_houdini import NODE_TYPE_NAME, compiler, editor, examples, file_watcher, global_parameters, node_type
 
 MATERIALX_MATERIALS_PATH = "/MaterialX/Materials"
 LOADED_EXAMPLE_KEY = "slx_loaded_example"  # node user data: the example whose code the node holds
@@ -109,25 +109,37 @@ def compile_node(node):
 
     if is_file_source(node):
         path = os.path.normpath(node.evalParm("file").strip())
-        source_files = compiler.find_source_files(path)
+        search_directories = get_search_directories(node)
+        source_files = compiler.find_source_files(path, search_directories)
         watch_source_files(node, source_files)
         if not os.path.isfile(path):
             raise SourceError("SLX file not found: {}. Press Create to start from a template.".format(path))
         source, is_file, compile_function = path, True, mxslc.compile_file_to_string
         # A file's globals change when it, or a file it includes, is saved.
         source_key = tuple((p, file_watcher.get_modified_time(p)) for p in source_files)
-        settings = get_compile_settings(node, mxslc, search_directories=[])
+        settings = get_compile_settings(node, mxslc, search_directories)
     else:
         file_watcher.unwatch_files(node)
         source = node.parm("examplecode" if is_example_source(node) else "code").unexpandedString()
         source_key, is_file, compile_function = source, False, mxslc.compile_string_to_string
         # Code in the node has no file of its own, so #include and #library paths are resolved from $HIP, or for
         # an example, from the examples folder.
-        settings = get_compile_settings(node, mxslc, search_directories=[get_source_directory(node)])
+        settings = get_compile_settings(node, mxslc, [get_source_directory(node)] + get_search_directories(node))
 
     parameters = get_declared_globals(node, mxslc, source, is_file, settings, source_key)
     options = create_compile_options(mxslc, settings, global_parameters.get_global_values(node, parameters))
     return run_compiler(compile_function, source, options), parameters
+
+
+def get_search_directories(node):
+    """Returns the node's Search Directories. Relative ones are relative to the source's folder."""
+    source_directory = get_source_directory(node)
+    directories = []
+    for i in range(1, node.evalParm("searchdirs") + 1):
+        directory = node.evalParm("searchdir{}".format(i)).strip()
+        if directory:
+            directories.append(os.path.normpath(os.path.join(source_directory, directory)))
+    return directories
 
 
 def watch_source_files(node, source_files):
@@ -172,7 +184,7 @@ def get_compile_settings(node, mxslc, search_directories):
         "error_on_missing_globals": False,
         "error_on_unused_globals": False,
         "func_name": entry_function,
-        "func_args": compiler.parse_value_list(node.evalParm("entryarguments")) if entry_function else [],
+        "func_args": get_entry_arguments(node) if entry_function else [],
         "reduce_graph": bool(node.evalParm("reducegraph")),
     }
     version = get_materialx_version(node, mxslc)
@@ -185,6 +197,15 @@ def get_compile_settings(node, mxslc, search_directories):
             raise SourceError("Inline SLX Functions needs mxslcxx 0.3.3 or later.")
         settings["default_function_behaviour"] = mxslc.FunctionBehaviour.Inline
     return settings
+
+
+def get_entry_arguments(node):
+    arguments = []
+    for i in range(1, node.evalParm("entryargs") + 1):
+        type_name = node.parm("argtype{}".format(i)).evalAsString()
+        parm_tuple = node.parmTuple(node_type.get_argument_value_parm_name(type_name, i))
+        arguments.append(global_parameters.get_parm_tuple_value(parm_tuple, type_name))
+    return arguments
 
 
 def create_compile_options(mxslc, settings, global_values):

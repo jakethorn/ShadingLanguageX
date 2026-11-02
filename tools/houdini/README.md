@@ -9,8 +9,8 @@ A Houdini plugin for writing Solaris materials in [ShadingLanguageX](https://git
   Material Builders list in their Tab menu.
 - **Convert to SLX**: turns a Material Library, a Karma or MaterialX Material Builder, or a `.mtlx` file into an
   SLX Material node holding the equivalent SLX code.
-- **SLX shelf**: new SLX Material, Recompile All, Convert to SLX, Import MaterialX, Edit and Rebuild Node Library,
-  and a link to the docs.
+- **SLX shelf**: new SLX Material, Recompile All, Convert to SLX, Open and Rebuild Node Library, and a link to the
+  docs.
 
 It needs Houdini 19.5 or later on Windows, Linux or Apple Silicon macOS. So far it has only been tested with
 Houdini 22.0 on Windows.
@@ -50,7 +50,7 @@ material red = surfacematerial(surface);    // -> /materials/red
 | Source | Choose **File**, **Inline Code** or **Examples**. **Compile** rereads the source. With **Recompile on Change** on, saving the file, or any file it `#include`s, recompiles it. **Open in Editor** uses `$SLX_EDITOR`, `$VISUAL` or `$EDITOR`, then VS Code, then your OS default. If the last compile failed, VS Code opens at the error line. **Examples** lists the plugin's six examples, from bricks to interior mapping, and loads the first one when you switch to it. They're short programs for newcomers to ShadingLanguageX, each showing off different language features. Choosing one shows its code and compiles it. You can edit the code there. Your edits are kept in that node and saved with the scene, and choosing another example asks before discarding them. Every example's material is called `example_material`. |
 | Globals | A parameter for each `global` variable in the source, set to its initializer. See below. |
 | Materials | **Assignments** bind compiled materials to geometry from the node's input. |
-| Compile Options | MaterialX version (by default it matches Houdini's), entry function and arguments, macros, graph reduction, and **Inline SLX Functions**. |
+| Compile Options | MaterialX version (by default it matches Houdini's), entry function and arguments, macros, search directories for `#include` and `#library` files, graph reduction, and **Inline SLX Functions**. |
 | Output | **Cache Directory** for the compiled `.mtlx` files, and buttons to view or export the compiled MaterialX. |
 
 ### Globals
@@ -72,6 +72,9 @@ Listing globals needs mxslcxx 0.3.3 or later.
 
 - Relative file paths in the source, such as `image("textures/wood.png")`, are relative to the SLX file, or to
   `$HIP` for inline code.
+- `#include` and `#library` files that aren't found relative to the file naming them are looked for in each of the
+  **Search Directories**, in order. A relative search directory is relative to the SLX file, or to `$HIP` for
+  inline code.
 - The materials reference compiled `.mtlx` files in the **Cache Directory** (`$HIP/slx_cache` by default). Renders,
   including render farm jobs, must be able to read that directory. Each change writes a new file, named after its
   contents, so USD never shows a stale material. Old files aren't deleted, because USD files you exported earlier
@@ -121,7 +124,7 @@ Things to know:
 
 Right-click a Material Library LOP, a material inside one, or a LOP that loads a `.mtlx` file (such as a Reference
 LOP), and choose **Convert to SLX Material**. The **Convert to SLX** shelf tool does the same for the selected nodes.
-**Import MaterialX** decompiles a `.mtlx` file you choose.
+To convert a `.mtlx` file that isn't in the scene yet, load it with a Reference LOP and convert that.
 
 Materials are converted from the USD stage, so this works for Karma Material Builders, which Houdini's own MaterialX
 exporter can't save. Shaders inside UsdShade NodeGraph prims, and nodes that aren't standard MaterialX nodes, can't

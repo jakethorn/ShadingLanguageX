@@ -43,6 +43,11 @@ loptoolutils.genericTool(kwargs, '$HDA_NAME', clicktoplace=False)]]></script>
 </shelfDocument>
 """
 
+# Entry argument types, as (MaterialX type, menu label). Each type has its own value parameter.
+ARGUMENT_TYPES = [("boolean", "bool"), ("integer", "int"), ("float", "float"), ("vector2", "vector2"),
+                  ("vector3", "vector3"), ("vector4", "vector4"), ("color3", "color3"), ("color4", "color4"),
+                  ("string", "string"), ("filename", "filename")]
+
 # Parameter tooltips come from their help strings. Multiparm folders can't have one, so theirs come from @parameters.
 HELP_TEXT = """= SLX Material =
 
@@ -60,9 +65,18 @@ Assignments:
     #id: assignments
     Bind materials from the SLX source to geometry.
 
+Entry Arguments:
+    #id: entryargs
+    Arguments for the entry function, passed to it in this order.
+
 Macros:
     #id: macros
     Define macros before the SLX source is compiled, like #define.
+
+Search Directories:
+    #id: searchdirs
+    Folders to look for #include and #library files in, in this order, when they aren't found relative to the
+    file naming them.
 """
 
 
@@ -327,14 +341,20 @@ def create_compile_options_folder():
                                help="The MaterialX library version to compile against."),
         hou.StringParmTemplate("entryfunction", "Entry Function", 1,
                                help="A function to call after the file has run, like mxslc --func."),
-        hou.StringParmTemplate("entryarguments", "Entry Arguments", 1,
+        hou.FolderParmTemplate("entryargs", "Entry Arguments", folder_type=hou.folderType.MultiparmBlock,
                                conditionals={hou.parmCondType.DisableWhen: '{ entryfunction == "" }'},
-                               help='Comma separated arguments for the entry function, '
-                                    'e.g. 0.5, "brick.png", (1, 0, 0).'),
+                               parm_templates=create_entry_argument_templates()),
         hou.FolderParmTemplate("macros", "Macros", folder_type=hou.folderType.MultiparmBlock, parm_templates=[
             hou.StringParmTemplate("macroname#", "Name", 1, join_with_next=True,
                                    help="The macro's name, as used by #ifdef, #if and the code."),
             hou.StringParmTemplate("macrovalue#", "Value", 1, help="Leave empty to define a flag macro."),
+        ]),
+        hou.FolderParmTemplate("searchdirs", "Search Directories", folder_type=hou.folderType.MultiparmBlock,
+                               parm_templates=[
+            hou.StringParmTemplate("searchdir#", "Directory", 1, string_type=hou.stringParmType.FileReference,
+                                   file_type=hou.fileType.Directory,
+                                   help="A folder to look for #include and #library files in. A relative path is "
+                                        "relative to the SLX file, or $HIP for inline code."),
         ]),
         hou.ToggleParmTemplate("reducegraph", "Reduce Graph", default_value=True,
                                help="Allow the SLX compiler to optimize the resulting MaterialX graph, reducing the "
@@ -343,6 +363,51 @@ def create_compile_options_folder():
                                help="Mark all SLX functions as inline, bypassing MaterialX NodeDef/NodeGraph "
                                     "elements."),
     ])
+
+
+def create_entry_argument_templates():
+    """Returns an entry argument's parameters: a type menu, and a value parameter for each type.
+
+    Only the chosen type's value parameter is shown, beside the menu. Like the macros' Name and Value, each has a
+    label, which also lines the value fields up from one argument to the next.
+    """
+    type_menu = hou.MenuParmTemplate("argtype#", "Type", menu_items=[t for t, _ in ARGUMENT_TYPES],
+                                     menu_labels=[label for _, label in ARGUMENT_TYPES], default_value=2,
+                                     join_with_next=True,
+                                     help="The argument's type. Arguments are passed to the entry function in order.")
+    values = [create_argument_value_template(type_name) for type_name, _ in ARGUMENT_TYPES]
+    for template in values[:-1]:
+        # Joined rows skip hidden parameters, so whichever value is shown sits beside the menu.
+        template.setJoinWithNext(True)
+    return [type_menu] + values
+
+
+def create_argument_value_template(type_name):
+    name = get_argument_value_parm_name(type_name)
+    settings = {"help": "The argument's value.",
+                "conditionals": {hou.parmCondType.HideWhen: "{{ argtype# != {} }}".format(type_name)}}
+    if type_name == "boolean":
+        return hou.ToggleParmTemplate(name, "Value", **settings)
+    if type_name == "integer":
+        return hou.IntParmTemplate(name, "Value", 1, min=0, max=10, min_is_strict=False, max_is_strict=False,
+                                   **settings)
+    if type_name == "float":
+        return hou.FloatParmTemplate(name, "Value", 1, min=0.0, max=1.0, min_is_strict=False, max_is_strict=False,
+                                     **settings)
+    if type_name == "string":
+        return hou.StringParmTemplate(name, "Value", 1, **settings)
+    if type_name == "filename":
+        return hou.StringParmTemplate(name, "Value", 1, string_type=hou.stringParmType.FileReference, **settings)
+    size = global_parameters.VECTOR_SIZES[type_name]
+    if type_name.startswith("color"):
+        return hou.FloatParmTemplate(name, "Value", size, look=hou.parmLook.ColorSquare,
+                                     naming_scheme=hou.parmNamingScheme.RGBA, **settings)
+    return hou.FloatParmTemplate(name, "Value", size, naming_scheme=hou.parmNamingScheme.XYZW, **settings)
+
+
+def get_argument_value_parm_name(type_name, index="#"):
+    """Returns the name of the parameter holding an entry argument's value when its type is type_name."""
+    return "arg{}value{}".format(type_name, index)
 
 
 def create_output_folder():

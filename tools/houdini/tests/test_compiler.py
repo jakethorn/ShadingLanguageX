@@ -35,22 +35,6 @@ class ChooseMaterialXVersionTests(unittest.TestCase):
         self.assertEqual(compiler.choose_materialx_version(None, AVAILABLE), "1.39.5")
 
 
-class ParseValueTests(unittest.TestCase):
-    def test_literals(self):
-        self.assertEqual(compiler.parse_value("0.5"), 0.5)
-        self.assertEqual(compiler.parse_value("2"), 2)
-        self.assertIs(compiler.parse_value("true"), True)
-        self.assertEqual(compiler.parse_value('"a.png"'), "a.png")
-        self.assertEqual(compiler.parse_value("(1, 0.5, 0)"), [1, 0.5, 0])
-
-    def test_text_that_isnt_a_literal_is_a_string(self):
-        self.assertEqual(compiler.parse_value("textures/brick.png"), "textures/brick.png")
-
-    def test_value_list_splits_on_top_level_commas(self):
-        self.assertEqual(compiler.parse_value_list('0.5, "a, b.png", (1, 0, 0)'), [0.5, "a, b.png", [1, 0, 0]])
-        self.assertEqual(compiler.parse_value_list(""), [])
-
-
 class FindSourceFilesTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.mkdtemp()
@@ -77,6 +61,12 @@ class FindSourceFilesTests(unittest.TestCase):
         main = self.write_file("main.mxsl", '#include "lib/a.mxsl"\n')
         self.write_file("lib/a.mxsl", '#library "defs.mtlx"\n')
         self.assertIn(os.path.join(self.directory, "defs.mtlx"), compiler.find_source_files(main))
+
+    def test_includes_not_next_to_the_file_are_found_in_search_directories(self):
+        main = self.write_file("main.mxsl", '#include "a.mxsl"\n#include "missing.mxsl"\n')
+        shared = os.path.dirname(self.write_file("shared/a.mxsl", ""))
+        expected = [main, os.path.join(shared, "a.mxsl"), os.path.join(self.directory, "missing.mxsl")]
+        self.assertEqual(compiler.find_source_files(main, [shared]), expected)
 
 
 class ExampleTests(unittest.TestCase):

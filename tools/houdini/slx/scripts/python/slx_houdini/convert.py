@@ -78,15 +78,12 @@ def decompile_xml(xml):
         raise hou.OperationFailed("Could not decompile the material: {}".format(e))
 
 
-def create_slx_node(network, code, name, anchor=None, offset=0):
+def create_slx_node(network, code, name, anchor, offset=0):
     node_type.ensure_node_type()
     node = network.createNode(NODE_TYPE_NAME, hou.text.variableName("slx_{}".format(name)))
     node.parm("source").set("inline")
     node.parm("code").set(code)
-    if anchor is not None:
-        node.setPosition(anchor.position() + hou.Vector2(3, -offset))
-    else:
-        node.moveToGoodPosition()
+    node.setPosition(anchor.position() + hou.Vector2(3, -offset))
     node.setSelected(True, clear_all_selected=offset == 0)
     return node
 
@@ -113,24 +110,3 @@ def convert_node_with_message(node):
         hou.ui.displayMessage("Could not convert {} to SLX.".format(node.path()), details=e.instanceMessage(),
                               title="Convert to SLX", severity=hou.severityType.Error)
 
-
-def import_materialx_file():
-    chosen = hou.ui.selectFile(start_directory="$HIP/", title="Import MaterialX as SLX", pattern="*.mtlx",
-                               chooser_mode=hou.fileChooserMode.Read)
-    if not chosen:
-        return
-    path = hou.text.expandString(chosen)
-    try:
-        code = decompile_file(path)
-    except hou.Error as e:
-        hou.ui.displayMessage("Could not import {}.".format(path), details=e.instanceMessage(),
-                              title="Import MaterialX as SLX", severity=hou.severityType.Error)
-        return
-    create_slx_node(get_current_lop_network(), code, os.path.splitext(os.path.basename(path))[0])
-
-
-def get_current_lop_network():
-    editor = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
-    if editor is not None and editor.pwd().childTypeCategory() == hou.lopNodeTypeCategory():
-        return editor.pwd()
-    return hou.node("/stage")

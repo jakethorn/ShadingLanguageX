@@ -105,6 +105,19 @@ class SlxMaterialTests(unittest.TestCase):
         self.assertEqual(len(custom_nodes), 1)
         self.assertTrue(os.path.isfile(custom_nodes[0].GetAttribute("info:mtlx:sourceAsset").Get().resolvedPath))
 
+    def test_includes_are_found_in_search_directories(self):
+        os.makedirs(self.directory + "/shared")
+        self.write_file("shared/tint.mxsl", "color3 tint = color3{0, 0, 1};\n")
+        path = self.write_file("main.mxsl", '#include "tint.mxsl"\n'
+                                            "material mat = surfacematerial(standard_surface(base_color = tint));\n")
+        self.node.parm("source").set("file")
+        self.node.parm("file").set(path)
+        self.assertIn("could not be found", self.get_errors())
+        self.node.parm("searchdirs").set(1)
+        self.node.parm("searchdir1").set("shared")  # relative to the SLX file
+        surface = self.get_material("/materials/mat").ComputeSurfaceSource("mtlx")[0]
+        self.assertEqual(tuple(get_input_value(surface, "base_color")), (0, 0, 1))
+
     def get_errors(self):
         try:
             self.node.cook(force=True)
@@ -202,6 +215,23 @@ class SlxMaterialTests(unittest.TestCase):
         self.node.parm("macroname1").set("ROUGH")
         surface = self.get_material("/materials/mat").ComputeSurfaceSource("mtlx")[0]
         self.assertAlmostEqual(get_input_value(surface, "specular_roughness"), 0.9, places=5)
+
+    def test_entry_arguments(self):
+        self.node.parm("code").set(
+            "inline void main(bool shiny, color3 tint) {\n"
+            "    float roughness = if (shiny) { 0.1 } else { 0.9 };\n"
+            "    material mat = surfacematerial(standard_surface(base_color = tint, specular_roughness = roughness));\n"
+            "}\n"
+        )
+        self.node.parm("entryfunction").set("main")
+        self.node.parm("entryargs").set(2)
+        self.node.parm("argtype1").set("boolean")
+        self.node.parm("argbooleanvalue1").set(True)
+        self.node.parm("argtype2").set("color3")
+        self.node.parmTuple("argcolor3value2").set((0, 0, 1))
+        surface = self.get_material("/materials/mat").ComputeSurfaceSource("mtlx")[0]
+        self.assertAlmostEqual(get_input_value(surface, "specular_roughness"), 0.1, places=5)
+        self.assertEqual(tuple(get_input_value(surface, "base_color")), (0, 0, 1))
 
     def set_code_and_update_globals(self, code):
         self.node.parm("code").set(code)
