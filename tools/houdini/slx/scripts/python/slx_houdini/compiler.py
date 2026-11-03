@@ -3,26 +3,28 @@
 Nothing in this module imports hou, so it can be tested with a plain Python interpreter.
 """
 
+import functools
 import glob
 import os
 import re
 import sys
 
-PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+MODULE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+PLUGIN_ROOT = os.path.normpath(os.path.join(MODULE_DIRECTORY, "..", "..", ".."))  # slx, above scripts/python/slx_houdini
 VENDOR_ROOT = os.path.join(PLUGIN_ROOT, "vendor")
-TEMPLATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "material.mxsl")
+TEMPLATE_PATH = os.path.join(MODULE_DIRECTORY, "templates", "material.mxsl")
 
 INCLUDE_PATTERN = re.compile(r'^[ \t]*#[ \t]*(include|library)[ \t]+"([^"]+)"', re.MULTILINE)
 VERSION_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
 
 
-def get_vendor_directory():
+def get_vendor_directory(vendor_root=VENDOR_ROOT):
     """Returns the folder holding the mxslc build for this OS and Python version, or None if there isn't one.
 
     vendor_mxslc.py names the folder <os>-cp<XY>-<hash of the build>, e.g. windows-cp313-1a2b3c4d.
     """
     os_name = {"win32": "windows", "darwin": "macos"}.get(sys.platform, "linux")
-    candidates = glob.glob(os.path.join(VENDOR_ROOT, "{}-cp{}{}-*".format(os_name, *sys.version_info[:2])))
+    candidates = glob.glob(os.path.join(vendor_root, "{}-cp{}{}-*".format(os_name, *sys.version_info[:2])))
     return max(candidates, key=os.path.getmtime) if candidates else None
 
 
@@ -65,6 +67,12 @@ def get_houdini_materialx_version():
         return None
     match = re.search(r'<materialx\s+version="([\d.]+)"', header)
     return match.group(1) if match else None
+
+
+@functools.lru_cache(maxsize=None)
+def choose_materialx_version_for_houdini(mxslc):
+    """Returns the library version mxslc compiles for by default in Houdini, or None if it has none."""
+    return choose_materialx_version(get_houdini_materialx_version(), get_available_materialx_versions(mxslc))
 
 
 def parse_version(version):

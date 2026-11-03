@@ -16,7 +16,6 @@ ERROR_LINE_PATTERN = re.compile(r"\bline (\d+)")
 _compile_results = {}  # node session id -> CompileResult
 _declared_globals = {}  # node session id -> (source and settings key, [GlobalParameter])
 _scheduled_global_updates = set()  # session ids of nodes whose global parameters change once their cook ends
-_automatic_materialx_version = None
 _is_runtime_created = False
 
 
@@ -24,7 +23,7 @@ class SourceError(Exception):
     """A problem with the node's SLX source or settings, reported as an error on the node."""
 
 
-class CompileResult(object):
+class CompileResult:
     """What a node's last cook produced, kept for its parameter callbacks."""
 
     def __init__(self, xml=None, material_names=(), global_parameters=None, error=None):
@@ -76,9 +75,13 @@ def is_example_source(node):
     return node.parm("source").evalAsString() == "example"
 
 
+def get_source_file(node):
+    return node.evalParm("file").strip()
+
+
 def has_source(node):
     if is_file_source(node):
-        return bool(node.evalParm("file").strip())
+        return bool(get_source_file(node))
     if is_example_source(node):
         return bool(node.evalParm("example"))
     return True
@@ -87,7 +90,7 @@ def has_source(node):
 def get_source_directory(node):
     """Returns the folder that relative paths in the node's SLX source are relative to."""
     if is_file_source(node):
-        return os.path.dirname(os.path.abspath(node.evalParm("file").strip()))
+        return os.path.dirname(os.path.abspath(get_source_file(node)))
     if is_example_source(node):
         return get_examples_directory()
     return hou.text.expandString("$HIP")
@@ -108,7 +111,7 @@ def compile_node(node):
         raise SourceError(str(e))
 
     if is_file_source(node):
-        path = os.path.normpath(node.evalParm("file").strip())
+        path = os.path.normpath(get_source_file(node))
         search_directories = get_search_directories(node)
         source_files = compiler.find_source_files(path, search_directories)
         watch_source_files(node, source_files)
@@ -226,15 +229,8 @@ def create_runtime(mxslc):
 
 
 def get_materialx_version(node, mxslc):
-    global _automatic_materialx_version
     choice = node.parm("materialxversion").evalAsString()
-    if choice != "auto":
-        return choice
-    if _automatic_materialx_version is None:
-        _automatic_materialx_version = compiler.choose_materialx_version(
-            compiler.get_houdini_materialx_version(), compiler.get_available_materialx_versions(mxslc)
-        )
-    return _automatic_materialx_version
+    return compiler.choose_materialx_version_for_houdini(mxslc) if choice == "auto" else choice
 
 
 def run_compiler(compile_function, source, options):
@@ -424,7 +420,7 @@ def on_compile_pressed(kwargs):
 
 def on_open_editor_pressed(kwargs):
     node = kwargs["node"]
-    path = node.evalParm("file").strip()
+    path = get_source_file(node)
     if not path:
         hou.ui.displayMessage("Choose an SLX file first, or press Create.", title="SLX Material")
         return
@@ -496,14 +492,12 @@ def get_example_names():
 
 def get_example_menu_items():
     names = get_example_names()
-    if not names:
-        return ["", "No Examples Found"]
-    return [item for name in names for item in (name, name)]
+    return create_menu_items(names) if names else ["", "No Examples Found"]
 
 
 def on_create_file_pressed(kwargs):
     node = kwargs["node"]
-    path = node.evalParm("file").strip()
+    path = get_source_file(node)
     if not path:
         chosen = hou.ui.selectFile(start_directory="$HIP/", title="Create SLX File", pattern="*.mxsl",
                                    chooser_mode=hou.fileChooserMode.Write)
@@ -512,7 +506,7 @@ def on_create_file_pressed(kwargs):
         if not chosen.endswith(".mxsl"):
             chosen += ".mxsl"
         node.parm("file").set(chosen)
-        path = node.evalParm("file")
+        path = get_source_file(node)
     if os.path.exists(path):
         hou.ui.displayMessage("{} already exists.".format(path), title="SLX Material")
         return
@@ -527,31 +521,38 @@ def on_create_file_pressed(kwargs):
 
 def on_view_materialx_pressed(kwargs):
     node = kwargs["node"]
-    result = get_last_result(node)
-    if result is None or result.xml is None:
-        hou.ui.displayMessage("There's no compiled MaterialX to show.", title="SLX Material",
-                              details=result.error if result else None, severity=hou.severityType.Warning)
-        return
-    from slx_houdini import text_window  # imports Qt, which cooks without a UI don't need
-    text_window.show_xml("SLX Material", "MaterialX compiled from {}:".format(node.path()), result.xml)
+    xml = get_compiled_xml(node, "show")
+    if xml is not None:
+        from slx_houdini import text_window  # imports Qt, which cooks without a UI don't need
+        text_window.show_xml("SLX Material", "MaterialX compiled from {}:".format(node.path()), xml)
 
 
 def on_export_materialx_pressed(kwargs):
-    node = kwargs["node"]
-    result = get_last_result(node)
-    if result is None or result.xml is None:
-        hou.ui.displayMessage("There's no compiled MaterialX to export.", title="SLX Material",
-                              details=result.error if result else None, severity=hou.severityType.Warning)
+    xml = get_compiled_xml(kwargs["node"], "export")
+    if xml is None:
         return
     chosen = hou.ui.selectFile(start_directory="$HIP/", title="Export MaterialX", pattern="*.mtlx",
                                chooser_mode=hou.fileChooserMode.Write)
     if chosen:
         with open(hou.text.expandString(chosen), "w", encoding="utf-8") as f:
-            f.write(result.xml)
+            f.write(xml)
+
+
+def get_compiled_xml(node, action):
+    """Returns the node's compiled MaterialX, or None after telling the user there's none to show or export."""
+    result = get_last_result(node)
+    if result is None or result.xml is None:
+        hou.ui.displayMessage("There's no compiled MaterialX to {}.".format(action), title="SLX Material",
+                              details=result.error if result else None, severity=hou.severityType.Warning)
+        return None
+    return result.xml
 
 
 def get_material_menu_items(node):
-    """Returns the compiled material names for a menu, as Houdini's flat [token, label, ...] list."""
     result = _compile_results.get(node.sessionId())
-    names = result.material_names if result else []
+    return create_menu_items(result.material_names if result else [])
+
+
+def create_menu_items(names):
+    """Returns names as a menu, in Houdini's flat [token, label, ...] form."""
     return [item for name in names for item in (name, name)]

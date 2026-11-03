@@ -44,7 +44,7 @@ slx_houdini.convert.convert_selected_to_slx()]]></script>
     <helpText><![CDATA[Opens the SLX node library, whose functions become MaterialX nodes. Starts it from a template if it's empty.]]></helpText>
     <script scriptType="python"><![CDATA[import slx_houdini.node_library
 
-slx_houdini.node_library.edit_library()]]></script>
+slx_houdini.node_library.open_library()]]></script>
   </tool>
 
   <tool name="slx_rebuild_node_library" label="Rebuild Node Library" icon="BUTTONS_reload">

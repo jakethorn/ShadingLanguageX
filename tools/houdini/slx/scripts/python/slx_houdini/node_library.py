@@ -17,7 +17,7 @@ import tempfile
 
 import hou
 
-from slx_houdini import compiler, editor, usd_materials
+from slx_houdini import compiler, editor, hda_files, usd_materials
 
 DEFAULT_LIBRARY_DIRECTORY = "$HOUDINI_USER_PREF_DIR/slx_nodes"
 DEFINITIONS_DIRECTORY = os.path.join("materialx", "libraries", "slx")
@@ -29,10 +29,9 @@ DEFAULT_NODE_GROUP = "shading language x"
 TEMPLATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "node_library.mxsl")
 MATERIALX_TYPE_NAMES = {"float", "integer", "boolean", "string", "filename", "vector2", "vector3", "vector4",
                         "color3", "color4", "matrix33", "matrix44"}
-SESSION_ONLY_LIBRARIES = "Scanned Asset Library Directories"
 
 
-class LibraryBuild(object):
+class LibraryBuild:
     """What building a node library produced."""
 
     def __init__(self, directory):
@@ -90,8 +89,7 @@ def build_node_library(directory=None):
 def compile_definitions(mxslc, source_path):
     """Returns a MaterialX document with just the NodeDefs, and their NodeGraphs, that an SLX file compiles to."""
     import MaterialX as mx
-    version = compiler.choose_materialx_version(compiler.get_houdini_materialx_version(),
-                                                compiler.get_available_materialx_versions(mxslc))
+    version = compiler.choose_materialx_version_for_houdini(mxslc)
     options = mxslc.CompileOptions(error_on_missing_globals=False, **({"version": version} if version else {}))
     compiled = mx.createDocument()
     mx.readFromXmlString(compiled, mxslc.compile_file_to_string(source_path, options))
@@ -103,7 +101,7 @@ def compile_definitions(mxslc, source_path):
         if not copy.hasNodeGroup():
             copy.setNodeGroup(DEFAULT_NODE_GROUP)
     for graph in compiled.getNodeGraphs():
-        # A graph without a NodeDef comes from a [[nodegraph]] function, which isn't a node.
+        # A graph without a NodeDef comes from a nodegraph function, which isn't a node.
         if graph.getNodeDefString():
             document.addNodeGraph(graph.getName()).copyContentFrom(graph)
     merge_template_signatures(document)
@@ -183,10 +181,10 @@ def get_node_label(node):
 
 def install_vop_nodes(build_path, path):
     """Replaces the library's HDA with the one at build_path (None for no nodes) and updates this session."""
-    installed = any(is_same_path(p, path) for p in hou.hda.loadedFiles())
+    installed = hda_files.is_installed(path)
     if build_path is None:
         if installed:
-            hou.hda.uninstallFile(path, SESSION_ONLY_LIBRARIES, change_oplibraries_file=False)
+            hda_files.uninstall_for_session(path)
         if os.path.exists(path):
             os.remove(path)
         return
@@ -195,15 +193,11 @@ def install_vop_nodes(build_path, path):
     if installed:
         hou.hda.reloadFile(path)
     else:
-        hou.hda.installFile(path, SESSION_ONLY_LIBRARIES, change_oplibraries_file=False)
-
-
-def is_same_path(a, b):
-    return os.path.normcase(os.path.normpath(a)) == os.path.normcase(os.path.normpath(b))
+        hda_files.install_for_session(path)
 
 
 def is_on_houdini_path(directory):
-    return any(is_same_path(p, directory) for p in hou.houdiniPath())
+    return any(hda_files.is_same_path(p, directory) for p in hou.houdiniPath())
 
 
 def rebuild_with_message():
@@ -233,7 +227,7 @@ def rebuild_with_message():
                           severity=hou.severityType.Warning if build.errors else hou.severityType.Message)
 
 
-def edit_library():
+def open_library():
     """Shelf tool: opens the node library, starting it from a template if it has no SLX files yet."""
     directory = get_library_directory()
     sources = find_library_sources(directory)

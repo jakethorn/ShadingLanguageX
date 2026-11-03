@@ -16,7 +16,7 @@ VECTOR_SIZES = {"vector2": 2, "vector3": 3, "vector4": 4, "color3": 3, "color4":
 EDITABLE_TYPES = {"float", "integer", "boolean", "string", "filename"} | set(VECTOR_SIZES)
 
 
-class GlobalParameter(object):
+class GlobalParameter:
     """A global variable's name, SLX type and default value, as plain Python values."""
 
     def __init__(self, name, type_name, default):
@@ -113,34 +113,47 @@ def update_parameters(node, parameters):
 
 def create_parm_template(parameter):
     name, label, type_name, default = parameter.parm_name(), parameter.name, parameter.type_name, parameter.default
-    if not parameter.is_editable():
-        template = hou.LabelParmTemplate(name, label, column_labels=("{}, set by its initializer".format(type_name),))
-    elif type_name == "float":
-        limit = max(1.0, abs(default) * 2)
-        template = hou.FloatParmTemplate(name, label, 1, default_value=(default,), min=-limit if default < 0 else 0.0,
-                                         max=limit, min_is_strict=False, max_is_strict=False)
-    elif type_name == "integer":
-        limit = max(10, abs(default) * 2)
-        template = hou.IntParmTemplate(name, label, 1, default_value=(default,), min=-limit if default < 0 else 0,
-                                       max=limit, min_is_strict=False, max_is_strict=False)
-    elif type_name == "boolean":
-        template = hou.ToggleParmTemplate(name, label, default_value=bool(default))
-    elif type_name == "filename":
-        template = hou.StringParmTemplate(name, label, 1, default_value=(default,),
-                                          string_type=hou.stringParmType.FileReference)
-    elif type_name == "string":
-        template = hou.StringParmTemplate(name, label, 1, default_value=(default,))
-    elif type_name.startswith("color"):
-        template = hou.FloatParmTemplate(name, label, VECTOR_SIZES[type_name], default_value=default,
-                                         look=hou.parmLook.ColorSquare, naming_scheme=hou.parmNamingScheme.RGBA)
-    else:
-        template = hou.FloatParmTemplate(name, label, VECTOR_SIZES[type_name], default_value=default,
-                                         naming_scheme=hou.parmNamingScheme.XYZW)
     if parameter.is_editable():
+        template = create_value_parm_template(name, label, type_name, default)
         template.setHelp("Sets the global variable {} in the SLX source. Its default is the variable's "
                          "initializer.".format(parameter.name))
     else:
+        template = hou.LabelParmTemplate(name, label, column_labels=("{}, set by its initializer".format(type_name),))
         template.setHelp("The global variable {} keeps its initializer from the SLX source, because a parameter "
                          "can't hold it.".format(parameter.name))
     template.setTags({TYPE_TAG: type_name, DEFAULT_TAG: repr(default)})
     return template
+
+
+def create_value_parm_template(name, label, type_name, default):
+    """Returns a parameter template for a value of an editable type, such as a global's or an entry argument's.
+
+    Sliders range from 0 to twice the default, or from -2x to 2x for a negative default.
+    """
+    if type_name == "float":
+        limit = max(1.0, abs(default) * 2)
+        return hou.FloatParmTemplate(name, label, 1, default_value=(default,), min=-limit if default < 0 else 0.0,
+                                     max=limit, min_is_strict=False, max_is_strict=False)
+    if type_name == "integer":
+        limit = max(10, abs(default) * 2)
+        return hou.IntParmTemplate(name, label, 1, default_value=(default,), min=-limit if default < 0 else 0,
+                                   max=limit, min_is_strict=False, max_is_strict=False)
+    if type_name == "boolean":
+        return hou.ToggleParmTemplate(name, label, default_value=bool(default))
+    if type_name == "filename":
+        return hou.StringParmTemplate(name, label, 1, default_value=(default,),
+                                      string_type=hou.stringParmType.FileReference)
+    if type_name == "string":
+        return hou.StringParmTemplate(name, label, 1, default_value=(default,))
+    if type_name.startswith("color"):
+        return hou.FloatParmTemplate(name, label, VECTOR_SIZES[type_name], default_value=default,
+                                     look=hou.parmLook.ColorSquare, naming_scheme=hou.parmNamingScheme.RGBA)
+    return hou.FloatParmTemplate(name, label, VECTOR_SIZES[type_name], default_value=default,
+                                 naming_scheme=hou.parmNamingScheme.XYZW)
+
+
+def get_zero_value(type_name):
+    """Returns an editable type's zero value, e.g. 0.0 for float, (0.0, 0.0) for vector2 and "" for string."""
+    if type_name in VECTOR_SIZES:
+        return (0.0,) * VECTOR_SIZES[type_name]
+    return {"float": 0.0, "integer": 0, "boolean": False}.get(type_name, "")

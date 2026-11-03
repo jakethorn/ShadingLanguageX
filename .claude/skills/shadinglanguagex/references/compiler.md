@@ -104,7 +104,7 @@ d.decompile_node_def("ND_foo"); d.decompile_node_graph("NG_foo", with_dependenci
 | `func_args` | `[]` | entry-function arguments |
 | `reduce_graph` | `True` | |
 | `validate_graph` | `True` | |
-| `default_function_behaviour` | `FunctionBehaviour.NodeDef` | `mxslc.FunctionBehaviour.NodeDef`, `NodeGraph`, `Inline` or `Comptime`: how functions without a `nodedef`, `[[nodegraph]]`, `inline` or `comptime` modifier compile |
+| `default_function_behaviour` | `FunctionBehaviour.NodeDef` | `mxslc.FunctionBehaviour.NodeDef`, `NodeGraph`, `Inline` or `Comptime`: how functions without a `nodedef`, `nodegraph`, `inline` or `comptime` modifier compile |
 | `sources` | `{}` | in-memory files `{"path/as/written.mxsl": "code"}`, checked before the file system. Methods: `add_source`, `remove_source`, `clear_sources`, `has_source`, `get_source` |
 
 **Value conversion** for `globals` and `func_args`:
@@ -245,7 +245,7 @@ element depends on.
 | `Invalid swizzle: rg` | 2-channel colour swizzle | `vec2{c.r, c.g}`, or use a color3 swizzle |
 | `Temporary variable being passed to ref or out parameter` | expression passed to out/ref | pass a mutable variable |
 | `Cannot access nonlocal variables in parameterless function` | `=>` function touching outer vars | pass values as parameters (normal function) |
-| `Arguments cannot be passed to nodegraph functions` | `f(1)` on `[[nodegraph]]` | set defaults, or use a normal function |
+| `Arguments cannot be passed to nodegraph functions` | `f(1)` on a `nodegraph` function | set defaults, or use a normal function |
 | `Missing global variable: x` / `Unused global variable: x` | globals mismatch | pass `-g`, or use `--missing-globals-ok` / `--unused-globals-ok` |
 | `Non-void function 'f' did not return a value` | missing return on some path | return on every compile-time path |
 | `No function could be found with the name 'g'` for a function defined later | used before definition | move the definition up |

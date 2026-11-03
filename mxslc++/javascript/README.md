@@ -61,8 +61,8 @@ const slx = mx.decompileMtlxToSlx(mtlx);
 - `reduceGraph` (boolean)
 - `errorOnMissingGlobals` (boolean)
 - `errorOnUnusedGlobals` (boolean)
-- `defaultFunctionBehaviour` (`mx.FunctionBehaviour.NodeDef`, `NodeGraph`, `Inline` or `Comptime`) - how
-  functions without a `nodedef`, `[[nodegraph]]`, `inline` or `comptime` modifier compile. Defaults to `NodeDef`.
+- `defaultFunctionBehaviour` (`NodeDef`, `NodeGraph`, `Inline` or `Comptime`) - how
+  functions without one of these modifiers compile. Defaults to `NodeDef`.
 
 ## Testing
 

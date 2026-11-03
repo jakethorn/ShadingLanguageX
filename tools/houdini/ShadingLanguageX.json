@@ -1,10 +1,10 @@
 {
     "env": [
         {
-            "SLX_HOUDINI": "${SLX_HOUDINI-C:/path/to/ShadingLanguageX/tools/houdini/slx}"
+            "SLX_HOUDINI": "C:/path/to/ShadingLanguageX/tools/houdini/slx"
         },
         {
-            "SLX_NODE_LIBRARY": "${SLX_NODE_LIBRARY-$HOUDINI_USER_PREF_DIR/slx_nodes}"
+            "SLX_NODE_LIBRARY": "$HOUDINI_USER_PREF_DIR/slx_nodes"
         }
     ],
     "hpath": [

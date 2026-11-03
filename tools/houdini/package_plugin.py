@@ -8,7 +8,6 @@ the package file and the README.
 """
 
 import argparse
-import glob
 import os
 import shutil
 import sys
@@ -20,7 +19,7 @@ HOUDINI_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 PLUGIN_NAME = "ShadingLanguageX-Houdini"
 
 sys.path.insert(0, os.path.join(HOUDINI_DIRECTORY, "slx", "scripts", "python"))
-from slx_houdini import examples  # noqa: E402
+from slx_houdini import compiler, examples  # noqa: E402
 
 
 def package_plugin(wheels, output_path):
@@ -61,12 +60,11 @@ def check_examples(vendor_directory, examples_directory):
 
 def import_vendored_mxslc(vendor_directory):
     """Imports the vendored mxslc for the Python running this script, or returns None if there isn't one."""
-    os_name = {"win32": "windows", "darwin": "macos"}.get(sys.platform, "linux")
-    candidates = glob.glob(os.path.join(vendor_directory, "{}-cp{}{}-*".format(os_name, *sys.version_info[:2])))
-    if not candidates:
+    directory = compiler.get_vendor_directory(vendor_directory)
+    if directory is None:
         print("  no compiler for this Python, so the examples aren't checked")
         return None
-    sys.path.insert(0, candidates[0])
+    sys.path.insert(0, directory)
     import mxslc
     return mxslc
 

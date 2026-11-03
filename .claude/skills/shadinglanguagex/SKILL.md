@@ -77,7 +77,7 @@ switch (i) { a, b, case 5: c, case <=3: d, default: e }    // expression, indice
 if (COMPILE_TIME) { ... } else { ... }         // statement (compile-time condition only)
 for (int i from 0 to 9) { }   for (float f from 0.0:0.5:2.0) { }   for (auto x from {1, "a"}) { }
 float f(float x, float k = 2.0) { return x * k; }      f(1.0, k = 3.0);    // named args after positional
-inline / comptime / [[nodegraph]] / nodedef / default   T f<float, vec3>(T x) { }   f<vec3>(v);
+inline / comptime / nodegraph / nodedef / default   T f<float, vec3>(T x) { }   f<vec3>(v);
 void g(out float o, ref vec3 r) { }   g(float o, my_mutable_vec);    // declare out-variables in the call
 float viewing => { return dotproduct(normal(), viewdirection()); }   // parameterless fn, use as `viewing`
 using Ray = {vec3 orig, vec3 dir};   class Sphere { vec3 c; float r; Sphere(vec3 c) { this.c = c; this.r = 1.0; } float area() { return 12.566 * r * r; } }
@@ -152,7 +152,7 @@ print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
 | `float f(float x) {...}` (or `nodedef`) | `ND_f` NodeDef + `NG_f` NodeGraph, `<f>` node per call; emitted even if never called; templated → one per type (`ND_f_vector3`) | reusable custom node; params are runtime |
 | `inline float f(...)` | body expanded at each call site | helpers, GLSL ports, anything whose params drive loops/ifs, the entry function, anything building a `material` |
 | `comptime float f(...)` | inline, with everything folded as far as possible (runtime args are fine, they just stay nodes) | constant math you want folded even under `--no-reduce-graph` |
-| `[[nodegraph]] float f(float a = 1)` | standalone `NG_f` NodeGraph; every param needs a default; call with no args (`f()`, `f(o = out float x)`) | a NodeGraph without NodeDef |
+| `nodegraph float f(float a = 1)` | standalone `NG_f` NodeGraph; every param needs a default; call with no args (`f()`, `f(o = out float x)`) | a NodeGraph without NodeDef |
 | `float f => {...}` (parameterless) | `NG_f` NodeGraph wired by `nodegraph="NG_f"`; can't touch nonlocals; not void | constant sub-graphs |
 
 Functions without one of these modifiers use the `default_function_behaviour` compile option, which is

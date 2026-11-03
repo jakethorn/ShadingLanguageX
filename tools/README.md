@@ -1,5 +1,5 @@
 ## `houdini/`
-A Houdini plugin with an SLX Material LOP for Solaris, and tools to convert MaterialX materials to SLX. See [houdini/README.md](houdini/README.md).
+A Houdini plugin with an SLX Material LOP for Solaris and tools to create a MaterialX node library using SLX. See [houdini/README.md](houdini/README.md).
 
 ## `mtlx_to_slx.py`
 Decompiles a .mtlx file into an SLX source file. For example:

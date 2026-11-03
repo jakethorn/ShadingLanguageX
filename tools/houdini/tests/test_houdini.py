@@ -20,6 +20,7 @@ from pxr import UsdShade
 
 import slx_houdini.convert
 import slx_houdini.examples
+import slx_houdini.hda_files
 import slx_houdini.lop
 import slx_houdini.node_library
 import slx_houdini.node_type
@@ -328,9 +329,8 @@ class NodeLibraryTests(unittest.TestCase):
         for node in hou.node("/stage").children():
             node.destroy()
         hda_path = os.path.join(self.directory, slx_houdini.node_library.HDA_PATH)
-        if any(slx_houdini.node_library.is_same_path(p, hda_path) for p in hou.hda.loadedFiles()):
-            hou.hda.uninstallFile(hda_path, slx_houdini.node_library.SESSION_ONLY_LIBRARIES,
-                                  change_oplibraries_file=False)
+        if slx_houdini.hda_files.is_installed(hda_path):
+            slx_houdini.hda_files.uninstall_for_session(hda_path)
         shutil.rmtree(self.directory, ignore_errors=True)
 
     def write_source(self, name, text):

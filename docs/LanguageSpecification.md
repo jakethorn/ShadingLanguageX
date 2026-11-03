@@ -1903,10 +1903,9 @@ float foo(float a = 1, float b = r)
 As this is the default, you don't need to add any modifiers to enable this behaviour, but you can add the `nodedef` modifer
 to make it more explicit.
 
-The default can be changed with the `default_function_behaviour` compile option (`--default-function-behaviour` on the
-command line). It applies to every function defined without a `nodedef`, `[[nodegraph]]`, `inline` or `comptime`
-modifier, so `inline` makes them all inline functions. A function with one of those modifiers keeps it, so add
-`nodedef` to keep a function a NodeDef whatever the option is.
+The default can be changed with the `default_function_behaviour` compile option. It applies to every function defined 
+without a `nodedef`, `nodegraph`, `inline` or `comptime`
+modifier. For example, passing the option `inline` would make all functions inline by default.
 
 ```
 [[nodedef]]

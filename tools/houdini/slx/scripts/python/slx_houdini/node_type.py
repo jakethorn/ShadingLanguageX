@@ -21,15 +21,13 @@ import tempfile
 import hou
 
 import slx_houdini
-from slx_houdini import NODE_TYPE_NAME, compiler, global_parameters
+from slx_houdini import NODE_TYPE_NAME, compiler, global_parameters, hda_files
 
 LABEL = "SLX Material"
 ICON = "LOP_materiallibrary"
 COOK_SCRIPT = "import slx_houdini.lop\nslx_houdini.lop.cook(hou.pwd())\n"
 ON_CREATED_SCRIPT = "import slx_houdini.lop\nslx_houdini.lop.on_created(kwargs)\n"
 CALLBACK = "import slx_houdini.lop; slx_houdini.lop.{}(kwargs)"
-# With change_oplibraries_file=False, installing into this library list changes no file and no scene.
-SESSION_ONLY_LIBRARIES = "Scanned Asset Library Directories"
 
 # The asset's own tool has no menu contexts, which keeps it out of the Tab menu. The plugin's slx_material
 # shelf tool is in the Tab menu instead, because it exists before the asset has been built.
@@ -47,6 +45,9 @@ loptoolutils.genericTool(kwargs, '$HDA_NAME', clicktoplace=False)]]></script>
 ARGUMENT_TYPES = [("boolean", "bool"), ("integer", "int"), ("float", "float"), ("vector2", "vector2"),
                   ("vector3", "vector3"), ("vector4", "vector4"), ("color3", "color3"), ("color4", "color4"),
                   ("string", "string"), ("filename", "filename")]
+DEFAULT_ARGUMENT_TYPE = "float"
+
+SEARCH_DIRECTORIES_HELP = "Additional directories to search when resolving #include and #library directives"
 
 # Parameter tooltips come from their help strings. Multiparm folders can't have one, so theirs come from @parameters.
 HELP_TEXT = """= SLX Material =
@@ -75,9 +76,8 @@ Macros:
 
 Search Directories:
     #id: searchdirs
-    Folders to look for #include and #library files in, in this order, when they aren't found relative to the
-    file naming them.
-"""
+    {}
+""".format(SEARCH_DIRECTORIES_HELP)
 
 
 def install_node_type_at_startup():
@@ -88,7 +88,7 @@ def install_node_type_at_startup():
     """
     built = glob.glob(get_definition_path("*"))
     if len(built) == 1:
-        install_definition_file(built[0])
+        hda_files.install_for_session(built[0])
     hou.hipFile.addEventCallback(on_hip_file_event)
 
 
@@ -106,14 +106,14 @@ def ensure_node_type():
     path = get_definition_path(hou.licenseCategory().name())
     node_type = hou.nodeType(hou.lopNodeTypeCategory(), NODE_TYPE_NAME)
     installed_path = node_type.definition().libraryFilePath() if node_type else None
-    if installed_path is not None and is_same_path(installed_path, path):
+    if installed_path is not None and hda_files.is_same_path(installed_path, path):
         return
     with pause_help_indexing():
         if not os.path.isfile(path):
             build_definition(path)
         if installed_path is not None:
-            hou.hda.uninstallFile(installed_path, SESSION_ONLY_LIBRARIES, change_oplibraries_file=False)
-    install_definition_file(path)
+            hda_files.uninstall_for_session(installed_path)
+    hda_files.install_for_session(path)
     remove_old_definitions(path)
 
 
@@ -133,15 +133,6 @@ def pause_help_indexing():
     finally:
         for event_types, callback in callbacks:
             hou.hda.addEventCallback(event_types, callback)
-
-
-def install_definition_file(path):
-    # Installing for the "current HIP file" would record the cached asset's path in every scene saved afterwards.
-    hou.hda.installFile(path, SESSION_ONLY_LIBRARIES, change_oplibraries_file=False)
-
-
-def is_same_path(a, b):
-    return os.path.normcase(os.path.normpath(a)) == os.path.normcase(os.path.normpath(b))
 
 
 def hash_source_files():
@@ -233,7 +224,7 @@ def move_into_place(source, path):
 
 def remove_old_definitions(current_path):
     for path in glob.glob(os.path.join(os.path.dirname(current_path), "slx_material_*.hda")):
-        if not is_same_path(path, current_path):
+        if not hda_files.is_same_path(path, current_path):
             try:
                 os.remove(path)
             except OSError:
@@ -339,6 +330,11 @@ def create_compile_options_folder():
                                menu_labels=["Match Houdini ({})".format(houdini_version)] + versions,
                                menu_type=hou.menuType.Normal,
                                help="The MaterialX library version to compile against."),
+        hou.FolderParmTemplate("searchdirs", "Search Directories", folder_type=hou.folderType.MultiparmBlock,
+                               parm_templates=[
+            hou.StringParmTemplate("searchdir#", "Directory", 1, string_type=hou.stringParmType.FileReference,
+                                   file_type=hou.fileType.Directory, help=SEARCH_DIRECTORIES_HELP),
+        ]),
         hou.StringParmTemplate("entryfunction", "Entry Function", 1,
                                help="A function to call after the file has run, like mxslc --func."),
         hou.FolderParmTemplate("entryargs", "Entry Arguments", folder_type=hou.folderType.MultiparmBlock,
@@ -348,13 +344,6 @@ def create_compile_options_folder():
             hou.StringParmTemplate("macroname#", "Name", 1, join_with_next=True,
                                    help="The macro's name, as used by #ifdef, #if and the code."),
             hou.StringParmTemplate("macrovalue#", "Value", 1, help="Leave empty to define a flag macro."),
-        ]),
-        hou.FolderParmTemplate("searchdirs", "Search Directories", folder_type=hou.folderType.MultiparmBlock,
-                               parm_templates=[
-            hou.StringParmTemplate("searchdir#", "Directory", 1, string_type=hou.stringParmType.FileReference,
-                                   file_type=hou.fileType.Directory,
-                                   help="A folder to look for #include and #library files in. A relative path is "
-                                        "relative to the SLX file, or $HIP for inline code."),
         ]),
         hou.ToggleParmTemplate("reducegraph", "Reduce Graph", default_value=True,
                                help="Allow the SLX compiler to optimize the resulting MaterialX graph, reducing the "
@@ -371,11 +360,12 @@ def create_entry_argument_templates():
     Only the chosen type's value parameter is shown, beside the menu. Like the macros' Name and Value, each has a
     label, which also lines the value fields up from one argument to the next.
     """
-    type_menu = hou.MenuParmTemplate("argtype#", "Type", menu_items=[t for t, _ in ARGUMENT_TYPES],
-                                     menu_labels=[label for _, label in ARGUMENT_TYPES], default_value=2,
-                                     join_with_next=True,
+    type_names = [type_name for type_name, _ in ARGUMENT_TYPES]
+    type_menu = hou.MenuParmTemplate("argtype#", "Type", menu_items=type_names,
+                                     menu_labels=[label for _, label in ARGUMENT_TYPES],
+                                     default_value=type_names.index(DEFAULT_ARGUMENT_TYPE), join_with_next=True,
                                      help="The argument's type. Arguments are passed to the entry function in order.")
-    values = [create_argument_value_template(type_name) for type_name, _ in ARGUMENT_TYPES]
+    values = [create_argument_value_template(type_name) for type_name in type_names]
     for template in values[:-1]:
         # Joined rows skip hidden parameters, so whichever value is shown sits beside the menu.
         template.setJoinWithNext(True)
@@ -383,26 +373,11 @@ def create_entry_argument_templates():
 
 
 def create_argument_value_template(type_name):
-    name = get_argument_value_parm_name(type_name)
-    settings = {"help": "The argument's value.",
-                "conditionals": {hou.parmCondType.HideWhen: "{{ argtype# != {} }}".format(type_name)}}
-    if type_name == "boolean":
-        return hou.ToggleParmTemplate(name, "Value", **settings)
-    if type_name == "integer":
-        return hou.IntParmTemplate(name, "Value", 1, min=0, max=10, min_is_strict=False, max_is_strict=False,
-                                   **settings)
-    if type_name == "float":
-        return hou.FloatParmTemplate(name, "Value", 1, min=0.0, max=1.0, min_is_strict=False, max_is_strict=False,
-                                     **settings)
-    if type_name == "string":
-        return hou.StringParmTemplate(name, "Value", 1, **settings)
-    if type_name == "filename":
-        return hou.StringParmTemplate(name, "Value", 1, string_type=hou.stringParmType.FileReference, **settings)
-    size = global_parameters.VECTOR_SIZES[type_name]
-    if type_name.startswith("color"):
-        return hou.FloatParmTemplate(name, "Value", size, look=hou.parmLook.ColorSquare,
-                                     naming_scheme=hou.parmNamingScheme.RGBA, **settings)
-    return hou.FloatParmTemplate(name, "Value", size, naming_scheme=hou.parmNamingScheme.XYZW, **settings)
+    template = global_parameters.create_value_parm_template(get_argument_value_parm_name(type_name), "Value",
+                                                            type_name, global_parameters.get_zero_value(type_name))
+    template.setHelp("The argument's value.")
+    template.setConditional(hou.parmCondType.HideWhen, "{{ argtype# != {} }}".format(type_name))
+    return template
 
 
 def get_argument_value_parm_name(type_name, index="#"):
