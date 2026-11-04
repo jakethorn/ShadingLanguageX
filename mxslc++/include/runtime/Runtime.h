@@ -55,8 +55,6 @@ namespace mxslc::runtime
         Serializer serializer_;
         Reflection reflection_;
 
-        mutable vector<string> used_globals;
-
         static unique_ptr<Runtime> instance_;
     };
 }

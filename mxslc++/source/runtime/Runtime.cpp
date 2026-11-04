@@ -8,7 +8,6 @@
 #include "runtime/Scope.h"
 #include "runtime/variables/Variable.h"
 #include "utils/load_mtlx.h"
-#include "utils/io_utils.h"
 #include "errors/CompileError.h"
 #include "runtime/Function.h"
 #include "runtime/interface.h"
@@ -46,10 +45,7 @@ namespace mxslc::runtime
     VarPtr Runtime::global(const string& name) const
     {
         if (opts_.has_global(name))
-        {
-            used_globals.push_back(name);
             return opts_.get_global(name)->copy();
-        }
         if (opts_.error_on_missing_globals)
             throw CompileError{"Missing global variable: " + name};
         return nullptr;
@@ -118,10 +114,21 @@ namespace mxslc::runtime
         if (not opts_.error_on_unused_globals)
             return;
 
+        vector<string> unused_globals;
         for (const auto& [name, value] : opts_.globals())
         {
-            if (not contains(used_globals, name))
-                throw CompileError{"Unused global variable: " + name};
+            bool used = false;
+            for (const reflection::GlobalInfo& global_info : reflection_.globals())
+            {
+                if (global_info.name == name)
+                    used = true;
+            }
+
+            if (not used)
+                unused_globals.push_back(name);
         }
+
+        if (not unused_globals.empty())
+            throw CompileError{"Unused global variables: " + Stringable::join(unused_globals, ", ")};
     }
 }
