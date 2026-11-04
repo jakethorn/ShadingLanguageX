@@ -36,11 +36,15 @@ class GlobalParameter:
 
 
 def get_global_parameters(mxslc, source, options, is_file):
-    """Returns the globals that source declares, or [] if this mxslc can't list them (before mxslcxx 0.3.3)."""
-    get_globals = getattr(mxslc, "get_globals_from_file" if is_file else "get_globals_from_string", None)
-    if get_globals is None:
+    """Returns the globals that source declares, or [] if this mxslc can't reflect them (before mxslcxx 0.3.3).
+
+    options shouldn't give the globals values, because a global's default is the value options gives it.
+    """
+    reflect = getattr(mxslc, "reflect_from_file" if is_file else "reflect_from_string", None)
+    if reflect is None:
         return []
-    return [GlobalParameter(g.name, g.type, to_python_value(g.value)) for g in get_globals(source, options)]
+    reflection = reflect(source, options)
+    return [GlobalParameter(g.name, g.type, to_python_value(g.default_value)) for g in reflection.globals]
 
 
 def to_python_value(value):

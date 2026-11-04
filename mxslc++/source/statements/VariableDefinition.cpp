@@ -79,11 +79,11 @@ namespace mxslc::statements
         if (not value)
             value = create_variable(type_);
 
-        if (is_global)
-            runtime().declare_global(name_, type_, value);
-
         const VarPtr var = create_variable(mods_.without(TokenType::Global, TokenType::Geomprop), type_, value);
         var->add_to_scope(name_);
+
+        if (is_global)
+            reflection().add_global(name_, type_, value);
     }
 
     VarPtr VariableDefinition::evaluate_global() const

@@ -55,15 +55,6 @@ namespace mxslc::runtime
         return nullptr;
     }
 
-    void Runtime::declare_global(string name, TypePtr type, VarPtr value)
-    {
-        // The same declaration can run more than once, e.g. inside a loop, but it still declares one global.
-        for (const GlobalVariable& global : declared_globals_)
-            if (global.name == name)
-                return;
-        declared_globals_.push_back({std::move(name), std::move(type), std::move(value)});
-    }
-
     Scope& Runtime::scope()
     {
         return *scope_;
@@ -88,6 +79,11 @@ namespace mxslc::runtime
     Serializer& Runtime::serializer()
     {
         return serializer_;
+    }
+
+    Reflection& Runtime::reflection()
+    {
+        return reflection_;
     }
 
     void Runtime::finalise() const

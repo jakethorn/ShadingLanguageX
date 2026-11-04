@@ -4,8 +4,10 @@ pybind11_add_module(_mxslc
         python_bindings.cpp
         CompileOptions_bindings.cpp
         Variable_bindings.cpp
-        GlobalVariable_bindings.cpp
+        GlobalInfo_bindings.cpp
+        Reflection_bindings.cpp
         compile_bindings.cpp
+        reflect_bindings.cpp
         decompile_bindings.cpp
         Decompiler_bindings.cpp
         Macro_bindings.cpp

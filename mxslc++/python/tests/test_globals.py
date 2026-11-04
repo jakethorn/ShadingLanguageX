@@ -39,20 +39,22 @@ def test_globals_5():
 
 def test_get_globals_from_string():
     source = "global float roughness = 0.25;\nglobal int count;\nglobal float u = texcoord<vec2>().x;\n"
-    globals = mxslc.get_globals_from_string(source)
+    reflection = mxslc.reflect_from_string(source)
+    globals = reflection.globals
 
     assert [(g.name, g.type) for g in globals] == [("roughness", "float"), ("count", "integer"), ("u", "float")]
-    assert globals[0].value == pytest.approx(0.25)
-    assert globals[1].value == 0
-    assert globals[2].value is None
+    assert globals[0].default_value == pytest.approx(0.25)
+    assert globals[1].default_value == 0
+    assert globals[2].default_value is None
 
 
 def test_get_globals_from_file():
     opts = mxslc.CompileOptions(globals = {"tint": 0.3})
-    globals = mxslc.get_globals_from_file(get_data_path("globals005.mxsl"), opts)
+    reflection = mxslc.reflect_from_file(get_data_path("globals005.mxsl"), opts)
+    globals = reflection.globals
 
     assert [(g.name, g.type) for g in globals] == [("albedo_path", "filename"), ("tint", "float")]
-    assert globals[1].value == 0.0
+    assert globals[1].default_value == pytest.approx(0.3)
 
 
 try:

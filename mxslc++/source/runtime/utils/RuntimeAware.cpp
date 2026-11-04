@@ -7,6 +7,11 @@
 
 namespace mxslc::runtime_utils
 {
+    const CompileOptions& RuntimeAware::compile_options()
+    {
+        return Runtime::get().compile_options();
+    }
+
     Runtime& RuntimeAware::runtime()
     {
         return Runtime::get();
@@ -20,5 +25,10 @@ namespace mxslc::runtime_utils
     Serializer& RuntimeAware::serializer()
     {
         return Runtime::get().serializer();
+    }
+
+    Reflection& RuntimeAware::reflection()
+    {
+        return Runtime::get().reflection();
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="var__0" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <constant name="x" type="float">
+    <input name="value" type="float" nodename="var__0" />
+  </constant>
+  <nodedef name="ND_add_two" node="add_two">
+    <output name="out" type="float" />
+    <input name="x" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_add_two" nodedef="ND_add_two">
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="x" />
+      <input name="in2" type="float" value="2" />
+    </add>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <add_two name="var__1" type="float">
+    <input name="x" type="float" value="2" />
+  </add_two>
+  <constant name="y" type="float">
+    <input name="value" type="float" nodename="var__1" />
+  </constant>
+  <add name="var__2" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="3" />
+  </add>
+  <constant name="z" type="float">
+    <input name="value" type="float" nodename="var__2" />
+  </constant>
+  <constant name="w" type="float">
+    <input name="value" type="float" value="6" />
+  </constant>
+</materialx>

@@ -8,6 +8,7 @@
 
 #include "expressions/Expression.h"
 #include "statements/Statement.h"
+#include "runtime/Runtime.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
@@ -18,6 +19,21 @@
 
 namespace mxslc::runtime
 {
+    namespace
+    {
+        TokenType::Enum behaviour_to_modifier(const FunctionBehaviour behaviour)
+        {
+            switch (behaviour)
+            {
+                case FunctionBehaviour::NodeDef: return TokenType::Nodedef;
+                case FunctionBehaviour::NodeGraph: return TokenType::Nodegraph;
+                case FunctionBehaviour::Inline: return TokenType::Inline;
+                case FunctionBehaviour::Comptime: return TokenType::Comptime;
+            }
+            throw CompileError{"Unknown function behaviour"};
+        }
+    }
+
     Function::Function(
         ModifierList mods,
         TypePtr return_type,
@@ -49,6 +65,12 @@ namespace mxslc::runtime
         body_{std::move(body)},
         is_parameterless_{not params.has_value()}
     {
+        // set default function behaviour if none are specified in functions modifier list
+        const ModifierList behaviour_mods = mods_.only(TokenType::Nodedef, TokenType::Nodegraph, TokenType::Inline, TokenType::Comptime);
+        const FunctionBehaviour behaviour{compile_options().default_function_behaviour};
+        if (behaviour_mods.empty() and behaviour != FunctionBehaviour::NodeDef)
+            mods_.add(behaviour_to_modifier(behaviour));
+
         mods_.validate(
             TokenType::Inline,
             TokenType::Nodegraph,

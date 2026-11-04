@@ -7,7 +7,7 @@
 3. [Macro](#macro)
 4. [Variable](#variable)
 5. [Decompile Functions](#decompile-functions)
-6. [Get Globals](#get-globals)
+6. [Reflection](#reflection)
 
 ---
 
@@ -633,47 +633,57 @@ string material_code = decompiler.decompile_node("m", true);
 
 ---
 
-# Get Globals
+# Reflection
 
-The `get_globals` functions run ShadingLanguageX source code and return the `global`
-variables it declares, in declaration order. They let a tool find out which globals a program has, e.g., to show a
-parameter for each one like in the [Houdini SLX plugin](https://github.com/jakethorn/ShadingLanguageX/blob/main/tools/houdini/README.md#globals)
+The `reflect` functions run ShadingLanguageX source code and return a `Reflection` of the program, which lists the
+`global` variables it declares, in declaration order. They let a tool find out which globals a program has, e.g., to
+show a parameter for each one like in the [Houdini SLX plugin](https://github.com/jakethorn/ShadingLanguageX/blob/main/tools/houdini/README.md#globals)
+
+The source is run as it is when compiling, with two differences: missing and unused globals aren't errors, and debug
+mode is off.
 
 ## Python
 
-### get_globals_from_string
+### reflect_from_string
 
-Run a string containing the ShadingLanguageX source code and return its global variables. An optional
-[CompileOptions](#compile-options) object can be passed in. Its global values are ignored, but its other fields, such
-as macros, apply.
-
-```python
-mxslc.get_globals_from_string(source: str) -> list[mxslc.GlobalVariable]
-mxslc.get_globals_from_string(source: str, opts: mxslc.CompileOptions) -> list[mxslc.GlobalVariable]
-```
-
-### get_globals_from_file
-
-Run a ShadingLanguageX source file provided by `src_path` and return its global variables. An optional
-[CompileOptions](#compile-options) object can be passed in. Its global values are ignored, but its other fields, such
-as macros, apply.
+Run a string containing the ShadingLanguageX source code and return its `Reflection`. An optional
+[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
 
 ```python
-mxslc.get_globals_from_file(src_path: str | pathlib.Path) -> list[mxslc.GlobalVariable]
-mxslc.get_globals_from_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> list[mxslc.GlobalVariable]
+mxslc.reflect_from_string(source: str) -> mxslc.Reflection
+mxslc.reflect_from_string(source: str, opts: mxslc.CompileOptions) -> mxslc.Reflection
 ```
 
-### GlobalVariable
+### reflect_from_file
+
+Run a ShadingLanguageX source file provided by `src_path` and return its `Reflection`. An optional
+[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
 
 ```python
-GlobalVariable.name: str
-GlobalVariable.type: str
-GlobalVariable.value: Any
+mxslc.reflect_from_file(src_path: str | pathlib.Path) -> mxslc.Reflection
+mxslc.reflect_from_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> mxslc.Reflection
 ```
 
-The fields are read-only. `type` is the variable's type name, e.g., `"float"` or `"color3"`. `value` is the
-initializer's value, or the type's default if there's no initializer. It is
-`None` if the initializer isn't known at compile time, e.g., `geompropvalue<float>("x")`.
+### Reflection
+
+```python
+Reflection.globals: list[mxslc.GlobalInfo]
+```
+
+`globals` is read-only. A `Reflection` is only returned by the `reflect` functions; it has no constructor.
+
+### GlobalInfo
+
+```python
+GlobalInfo.name: str
+GlobalInfo.type: str
+GlobalInfo.default_value: Any
+```
+
+The fields are read-only. `type` is the variable's type name, e.g., `"float"` or `"color3"`. `default_value` is the
+variable's value in [CompileOptions](#compile-options) `globals`, if it has one. Otherwise, it is the initializer's
+value, or the type's default if there's no initializer. It is `None` if the initializer isn't known at compile time,
+e.g., `geompropvalue<float>("x")`.
 
 ### Python Example
 
@@ -686,63 +696,81 @@ global color3 tint;
 global float u = texcoord<vec2>().x;
 """
 
-for g in mxslc.get_globals_from_string(code):
-    print(g.name, g.type, g.value)
+reflection = mxslc.reflect_from_string(code)
+for g in reflection.globals:
+    print(g.name, g.type, g.default_value)
 
 # roughness float 0.25
 # tint color3 0, 0, 0
 # u float None
 
+opts = mxslc.CompileOptions(globals={"roughness": 0.5})
+print(mxslc.reflect_from_string(code, opts).globals[0].default_value)
+
+# 0.5
+
 opts = mxslc.CompileOptions(macros=["OPEN_PBR"])
-declared = mxslc.get_globals_from_file("example.mxsl", opts)
+reflection = mxslc.reflect_from_file("example.mxsl", opts)
 ```
 
 ## C++
 
-### get_globals
+The `reflect` functions, `Reflection` and `GlobalInfo` are in the `mxslc::reflection` namespace.
 
-Run the source code given by `source` or `src_path` and return its global variables. An optional
-[CompileOptions](#compile-options) object can be passed in. Its global values are ignored, but its other fields, such
-as macros, apply.
+### reflect
+
+Run the source code given by `source` or `src_path` and return its `Reflection`. An optional
+[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
 
 ```c++
-vector<GlobalVariable> get_globals(const string& source);
-vector<GlobalVariable> get_globals(const string& source, const CompileOptions& opts);
-vector<GlobalVariable> get_globals(const fs::path& src_path);
-vector<GlobalVariable> get_globals(const fs::path& src_path, const CompileOptions& opts);
+Reflection reflect(const string& source);
+Reflection reflect(const string& source, const CompileOptions& opts);
+Reflection reflect(const fs::path& src_path);
+Reflection reflect(const fs::path& src_path, const CompileOptions& opts);
 ```
 
-### GlobalVariable
+### Reflection
 
 ```c++
-struct GlobalVariable
+class Reflection
 {
-    string name;
-    TypePtr type;
-    // the initializer's value, or the type's default value if the declaration has no initializer
-    VarPtr value;
+public:
+    const vector<GlobalInfo>& globals() const;
 };
 ```
 
-`value->is_compile_time()` is false if the initializer isn't known at compile time.
+### GlobalInfo
+
+```c++
+struct GlobalInfo
+{
+    string name;
+    TypePtr type;
+    VarPtr default_value;
+};
+```
+
+`default_value` is set as it is in [Python](#globalinfo). `default_value->is_compile_time()` is false if the
+initializer isn't known at compile time.
 
 ### C++ Example
 
 ```c++
 #include <iostream>
 
-#include "compile.h"
 #include "CompileOptions.h"
+#include "reflection/reflect.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
 
 mxslc::CompileOptions opts;
 opts.add_macro("OPEN_PBR");
 
-for (const mxslc::GlobalVariable& global : mxslc::get_globals(fs::path{"example.mxsl"}, opts))
+mxslc::reflection::Reflection reflection = mxslc::reflection::reflect(fs::path{"example.mxsl"}, opts);
+for (const mxslc::reflection::GlobalInfo& global : reflection.globals())
 {
     std::cout << global.name << " " << global.type->to_string();
-    if (not global.value->is_compile_time())
+    if (not global.default_value->is_compile_time())
         std::cout << " (initializer not known at compile time)";
     std::cout << "\n";
 }

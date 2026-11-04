@@ -10,10 +10,12 @@
 #include "common.h"
 #include "CompileOptions.h"
 #include "compile.h"
+#include "reflection/reflect.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
 
 using namespace mxslc;
+using namespace mxslc::reflection;
 
 TEST(global_tests, test_string_to_path)
 {
@@ -107,34 +109,26 @@ global {vec3 pos, float size} light;
 float unrelated = 1.0;
 )";
 
-    const vector<GlobalVariable> globals = get_globals(source);
+    const Reflection& reflection = reflect(source);
+    const vector<GlobalInfo>& globals = reflection.globals();
 
     ASSERT_EQ(globals.size(), 3);
     EXPECT_EQ(globals[0].name, "roughness");
     EXPECT_EQ(globals[0].type->to_string(), "float");
-    EXPECT_FLOAT_EQ(globals[0].value->compile_time_value<float>(), 0.25f);
+    EXPECT_FLOAT_EQ(globals[0].default_value->compile_time_value<float>(), 0.25f);
     EXPECT_EQ(globals[1].name, "tint");
     EXPECT_EQ(globals[1].type->to_string(), "color3");
-    EXPECT_EQ(globals[1].value->compile_time_value<mx::Color3>(), mx::Color3(0.0f));
+    EXPECT_EQ(globals[1].default_value->compile_time_value<mx::Color3>(), mx::Color3(0.0f));
     EXPECT_EQ(globals[2].name, "light");
-    EXPECT_EQ(globals[2].value->child_count(), 2);
-}
-
-TEST(global_tests, test_get_globals_ignores_global_values)
-{
-    CompileOptions opts;
-    opts.add_global("roughness", 0.9f);
-
-    const vector<GlobalVariable> globals = get_globals("global float roughness = 0.25;"s, opts);
-
-    ASSERT_EQ(globals.size(), 1);
-    EXPECT_FLOAT_EQ(globals[0].value->compile_time_value<float>(), 0.25f);
+    EXPECT_EQ(globals[2].default_value->child_count(), 2);
 }
 
 TEST(global_tests, test_get_globals_with_runtime_initializer)
 {
-    const vector<GlobalVariable> globals = get_globals("global float u = texcoord<vec2>().x;"s);
+    const Reflection& reflection = reflect("global float u = texcoord<vec2>().x;"s);
+    const vector<GlobalInfo>& globals = reflection.globals();
+
 
     ASSERT_EQ(globals.size(), 1);
-    EXPECT_FALSE(globals[0].value->is_compile_time());
+    EXPECT_FALSE(globals[0].default_value->is_compile_time());
 }

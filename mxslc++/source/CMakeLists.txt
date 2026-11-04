@@ -130,6 +130,8 @@ add_library(mxslc_lib
         preprocess/preprocess.cpp
         preprocess/Macro.cpp
         preprocess/parse_primitive.cpp
+        reflection/reflect.cpp
+        reflection/Reflection.cpp
         debug/Debugger.cpp
 )
 

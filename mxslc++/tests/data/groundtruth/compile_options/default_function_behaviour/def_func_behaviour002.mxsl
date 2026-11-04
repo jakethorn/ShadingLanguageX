@@ -1,0 +1,2 @@
+float add_one(float x) { return x + 1.0; }
+float x = constant( add_one( 2 ) );

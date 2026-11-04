@@ -85,7 +85,7 @@ namespace mxslc::statements
         string result = join(type_->fields(), ", ");
         if (expr_)
             result += " = " + expr_->to_string();
-        result += ";";
+        result += ';';
         return result;
     }
 }
