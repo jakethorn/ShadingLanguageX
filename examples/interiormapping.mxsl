@@ -25,13 +25,13 @@ vec3 origin = vec3{uv * 2.0 - 1.0, -1.0};
 // perform raycast
 float room_dist = raycast(origin, view_dir);
 
-vec3 room_pos = origin + view_dir * room_dist;
+mutable vec3 room_pos = origin + view_dir * room_dist;
 room_pos.z *= -1.0;
 
 vec3 wall_uvs = 1.0 - (room_pos + 1.0) / 2.0;
 
 // paint walls
-color4 words = color4{};
+mutable color4 words = color4{};
 words = if (room_pos.x >  0.99) { image(wall1, texcoord=wall_uvs.zy) };
 words = if (room_pos.y < -0.99) { image(ceilg, texcoord=vec2{wall_uvs.x, -wall_uvs.z}) };
 words = if (room_pos.x < -0.99) { image(wall2, texcoord=vec2{-wall_uvs.z, wall_uvs.y}) };

@@ -373,7 +373,8 @@ standard_surface(base = s + c, normal = pos);
 ### Function kinds (modifiers)
 | Modifier | Effect |
 |---|---|
-| *(default)* / `nodedef` | NodeDef + NodeGraph. Parameters are runtime interface inputs, so they can't be used as loop bounds or `if`-statement conditions |
+| *(none)* | whatever the `default_function_behaviour` compile option says: `nodedef` unless set to `nodegraph`, `inline` or `comptime` |
+| `nodedef` | NodeDef + NodeGraph. Parameters are runtime interface inputs, so they can't be used as loop bounds or `if`-statement conditions |
 | `inline` | expanded at each call site. Parameters keep their compile-time-ness |
 | `comptime` | inline, and everything inside is folded where possible (`power` and similar still emit nodes, see the lowering reference) |
 | `nodegraph` | a NodeGraph with no NodeDef. Every in-parameter needs a default, and you can't pass arguments except out-params by name |

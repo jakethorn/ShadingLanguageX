@@ -10,6 +10,7 @@
 #include "common.h"
 #include "CompileOptions.h"
 #include "serialize/Serializer.h"
+#include "reflection/Reflection.h"
 
 namespace mxslc
 {
@@ -18,6 +19,8 @@ namespace mxslc
 
 namespace mxslc::runtime
 {
+    using reflection::Reflection;
+
     class Runtime
     {
     public:
@@ -26,9 +29,10 @@ namespace mxslc::runtime
         static Runtime& create(CompileOptions opts);
         static Runtime& get();
 
-        VarPtr global(const string& name) const;
-
+        const CompileOptions& compile_options() const { return opts_; }
         mx::DocumentPtr materialx_library() { return mtlx_lib_; }
+
+        VarPtr global(const string& name) const;
 
         Scope& scope();
         void enter_scope(string name = "");
@@ -36,6 +40,7 @@ namespace mxslc::runtime
         void exit_scope();
 
         Serializer& serializer();
+        Reflection& reflection();
 
         void finalise() const;
 
@@ -48,8 +53,7 @@ namespace mxslc::runtime
         mx::DocumentPtr mtlx_lib_;
         ScopePtr scope_;
         Serializer serializer_;
-
-        mutable vector<string> used_globals;
+        Reflection reflection_;
 
         static unique_ptr<Runtime> instance_;
     };

@@ -13,6 +13,14 @@
 
 namespace mxslc
 {
+    enum class FunctionBehaviour
+    {
+        NodeDef,
+        NodeGraph,
+        Inline,
+        Comptime
+    };
+
     struct CompileOptions
     {
         optional<fs::path> output_file;
@@ -21,6 +29,8 @@ namespace mxslc
         bool reduce_graph{true};
         bool validate_graph{true};
         bool decompile_hints{false};
+
+        FunctionBehaviour default_function_behaviour{FunctionBehaviour::NodeDef};
 
         vector<fs::path> includes;
         vector<fs::path> libraries;

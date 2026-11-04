@@ -1,0 +1,29 @@
+global float scale = 1.0;
+global float turbulence = 3.0;
+global int detail = 6;
+global float vein_thinness = 30.0;
+global color3 stone_color = color3{0.9, 0.89, 0.86};
+global color3 vein_color = color3{0.2, 0.22, 0.26};
+
+vec3 p = position("object") * scale;
+
+float swirl = fractal3d(octaves = detail, position = p);
+
+float wave = sin((p.x + p.y * 0.5) * 4.0 + swirl * turbulence);
+
+float ridge = 1.0 - |wave|;
+float haze = ridge ^ 3.0;
+float vein = ridge ^ vein_thinness;
+
+color3 haze_color = mix(vein_color, stone_color, 0.35);
+color3 stone_and_haze = mix(haze_color, stone_color, haze * 0.8);
+color3 base_color = mix(vein_color, stone_and_haze, vein);
+
+surfaceshader surface = standard_surface(
+    base_color = base_color,
+    specular_roughness = 0.3,
+    coat = 1.0,
+    coat_roughness = 0.05
+);
+
+material example_material = surfacematerial(surface);

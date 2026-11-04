@@ -21,6 +21,16 @@ def test_compile_options_reduce_graph_is_true():
     assert result == REDUCED_OUTPUT
 
 
+def test_compile_options_default_function_behaviour():
+    source = "float twice(float x) { return x * 2.0; }\nfloat y = twice(texcoord<vec2>().x);"
+
+    assert "<nodedef" in mxslc.compile_string_to_string(source, mxslc.CompileOptions())
+    options = mxslc.CompileOptions(default_function_behaviour=mxslc.FunctionBehaviour.Inline)
+    assert "<nodedef" not in mxslc.compile_string_to_string(source, options)
+    options.default_function_behaviour = mxslc.FunctionBehaviour.NodeDef
+    assert "<nodedef" in mxslc.compile_string_to_string(source, options)
+
+
 def test_compile_options_with_non_default_version():
     options = mxslc.CompileOptions(version="1.39.4")
 

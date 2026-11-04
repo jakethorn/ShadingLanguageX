@@ -21,14 +21,14 @@ __ShadingLanguageX (SLX)__ is a high level programming language for [MaterialX](
 
 # Getting Started
 
-## Code Editors
+## Editors and Plugins
 
-There are several web-based editors that support ShadingLanguageX.
+There are several editors and plugins that support ShadingLanguageX.
 
 [MaterialX Playground](https://joaovbs96.github.io/MaterialXPlayground/) (by João Vítor Silva) is a comprehensive MaterialX graph editor and viewer, allowing users to view and compare multiple 
 MaterialX or USD scenes at once. SLX source files can be loaded and edited alongside their compiled MaterialX
 shader graph, and decompilation allows roundtripping between both views. It also provides syntax highlighting, code completion, 
-and documentation links for standard library functions for SLX.
+and documentation links for standard library functions.
 
 [ShadingLanguageX Playground](https://raccoon.website/shadinglanguagex/) (by Mejval5) allows users to write SLX
 shaders and save them as projects between sessions. Projects can also be shared publicly via the [gallery](https://raccoon.website/shadinglanguagex/gallery/) 
@@ -36,6 +36,10 @@ shaders and save them as projects between sessions. Projects can also be shared 
 
 [SLX to MTLX Converter](https://jakethorn.github.io/ShadingLanguageX/) (by Bernard Kwok) is the official tool for compiling 
 SLX source code to MaterialX.
+
+[Houdini SLX Plugin](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/houdini) is the official SLX plugin for Houdini. 
+It provides an SLX Material node, decompilation tools and allows users to create a library of nodes using SLX which can
+be re-used in other MaterialX material builders. Follow the link to see the full documentation.
 
 ## Installation
 

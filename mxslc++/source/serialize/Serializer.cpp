@@ -322,7 +322,8 @@ namespace mxslc::serialize
 
     void Serializer::finalise() const
     {
-
+        if (compile_options().validate_graph)
+            mtlx_utils::validate(doc_);
     }
 
     void Serializer::save(const fs::path& dst_path) const

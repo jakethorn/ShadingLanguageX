@@ -518,6 +518,13 @@ Compiled with `--no-reduce-graph`:
 </materialx>
 ```
 
+### Default Function Behaviour
+
+By default, functions compile to a MaterialX
+NodeDef/NodeGraph pair. The `--default-function-behaviour` option lets you override this behaviour to one of either
+`nodedef`, `nodegraph`, `inline` or `comptime` for every function without one of those modifiers.
+See the [Language Specification](./LanguageSpecification.md) for more information about function modifiers.
+
 ## Decompile
 
 `mxslc` can also decompile MaterialX files into ShadingLanguageX source files (see [below](#decompiler) for more information).
@@ -566,18 +573,20 @@ positional arguments:
   input-file                     Input path to .mxsl file
 
 options:
-  -h, --help                     Show this help message and exit
-  -o, --output-file OUTPUT_FILE  Output path of .mtlx file
-  -d, --debug                    Enable debug mode
-  -v, --version VERSION          Target MaterialX version (default: 1.39.5)
-  -f, --func FUNC                Name of entry function into the program
-  -a, --args ARGS*               Arguments to be passed to the entry function
-  -g, --globals NAME VALUE*      Values to be assigned to `global` variables
-  --missing-globals-ok           Allow `global` variables to be missing
-  --unused-globals-ok            Allow `global` variables to be unused
-  --no-reduce-graph              Always create graph nodes instead of evaluating logic at compile-time
-  --no-validate-graph            Do not validate the MaterialX graph
-  --decompile-hints              Add hints for the decompiler as xml attributes
+  -h, --help                                Show this help message and exit
+  -o, --output-file OUTPUT_FILE             Output path of .mtlx file
+  -d, --debug                               Enable debug mode
+  -v, --version VERSION                     Target MaterialX version (default: 1.39.5)
+  -f, --func FUNC                           Name of entry function into the program
+  -a, --args ARGS*                          Arguments to be passed to the entry function
+  -g, --globals NAME VALUE*                 Values to be assigned to `global` variables
+  --missing-globals-ok                      Allow `global` variables to be missing
+  --unused-globals-ok                       Allow `global` variables to be unused
+  --no-reduce-graph                         Always create graph nodes instead of evaluating logic at compile-time
+  --no-validate-graph                       Do not validate the MaterialX graph
+  --default-function-behaviour BEHAVIOUR    How functions without one of the following modifers compile: nodedef
+                                            (default), nodegraph, inline or comptime
+  --decompile-hints                         Add hints for the decompiler as xml attributes
 ```
 
 ## Response File

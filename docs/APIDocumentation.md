@@ -7,6 +7,7 @@
 3. [Macro](#macro)
 4. [Variable](#variable)
 5. [Decompile Functions](#decompile-functions)
+6. [Reflection](#reflection)
 
 ---
 
@@ -152,7 +153,8 @@ CompileOptions.__init__(
     func_args: list[Any] = [],
     reduce_graph: bool = True,
     validate_graph: bool = True,
-    sources: dict[str, str] = {}
+    sources: dict[str, str] = {},
+    default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef
 )
 ```
 
@@ -173,7 +175,15 @@ CompileOptions.func_args: list[Any]
 CompileOptions.reduce_graph: bool
 CompileOptions.validate_graph: bool
 CompileOptions.sources: dict[str, str]
+CompileOptions.default_function_behaviour: FunctionBehaviour
 ```
+
+`globals` maps global variable names to their values, and `func_args` holds the entry function's arguments in order.
+Each value can be a `bool`, `int`, `float`, `str`, `pathlib.Path`, MaterialX vector, colour or matrix (e.g.,
+`mx.Color3`), [Variable](#variable), or a list of these, e.g., for a struct.
+
+`default_function_behaviour` is how functions compile when they're defined without a `nodedef`, `nodegraph`,
+`inline` or `comptime` modifier: `mxslc.FunctionBehaviour.NodeDef` (the default), `NodeGraph`, `Inline` or `Comptime`.
 
 ### Methods
 
@@ -208,7 +218,8 @@ opts = mxslc.CompileOptions(
     func_args = [],
     reduce_graph = True,
     validate_graph = True,
-    sources = {}
+    sources = {},
+    default_function_behaviour = mxslc.FunctionBehaviour.Inline
 )
 
 mtlx = mxslc.compile_file_to_string("mxsl/example.mxsl", opts)
@@ -217,6 +228,15 @@ mtlx = mxslc.compile_file_to_string("mxsl/example.mxsl", opts)
 ## C++
 
 ```c++
+// How a function compiles: the nodedef, nodegraph, inline and comptime function modifiers.
+enum class FunctionBehaviour
+{
+    NodeDef,
+    NodeGraph,
+    Inline,
+    Comptime
+};
+
 struct CompileOptions
 {
     // ctor
@@ -229,6 +249,9 @@ struct CompileOptions
     bool reduce_graph{true};
     bool validate_graph{true};
     bool decompile_hints{false};
+
+    // used by functions defined without a nodedef, nodegraph, inline or comptime modifier
+    FunctionBehaviour default_function_behaviour{FunctionBehaviour::NodeDef};
 
     vector<fs::path> includes;
     vector<fs::path> libraries;
@@ -317,10 +340,8 @@ mxslc::compile_to_file(fs::path{"example.mxsl"}, opts);
 ### Constructor
 
 ```python
-Macro.__init__(
-    name: str,
-body: str | None = None
-)
+Macro.__init__(name: str)
+Macro.__init__(name: str, body: str)
 ```
 
 ### Python Example
@@ -462,163 +483,295 @@ VarPtr create_variable(TypePtr type);
 
 # Decompile Functions
 
-### mxslc::decompile::decompile_to_*
-
-```c++
-string decompile_to_string(const fs::path& src_path);
-string decompile_to_string(const string& source);
-string decompile_to_string(const MaterialX::DocumentPtr& document);
-
-fs::path decompile_to_file(const fs::path& src_path, const optional<fs::path>& dst_path = std::nullopt);
-fs::path decompile_to_file(const fs::path& src_path, const fs::path& dst_path);
-fs::path decompile_to_file(const string& source, const fs::path& dst_path);
-fs::path decompile_to_file(const MaterialX::DocumentPtr& document, const fs::path& dst_path);
-```
-
-### mxslc::Decompiler
-
-```c++
-
-namespace mxslc::decompile
-{
-    class Decompiler
-    {
-    public:
-        Decompiler(const fs::path& src_path);
-        Decompiler(const string& source);
-        Decompiler(MaterialX::DocumentPtr document);
-
-        string decompile_document();
-        string decompile_node(const string& node_name, bool with_dependencies = false);
-        string decompile_node(const MaterialX::NodePtr& node, bool with_dependencies = false);
-        string decompile_node_def(const string& node_def_name, bool with_dependencies = false);
-        string decompile_node_def(const MaterialX::NodeDefPtr& node_def, bool with_dependencies = false);
-        string decompile_node_graph(const string& node_graph_name, bool with_dependencies = false);
-        string decompile_node_graph(const MaterialX::NodeGraphPtr& node_graph, bool with_dependencies = false);
-    };
-}
-```
-
-The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs used by
-the given element or an element preceding it in the graph.
+The `decompile` functions provide users with the functionality to decompile MaterialX (.mtlx) files into
+ShadingLanguageX (.mxsl) source code.
 
 ## Python
 
-### `mxslc.CompileOptions`
+### decompile_string_to_string
 
-#### Constructors
-
-```python
-CompileOptions.__init__(
-    output_file: str | pathlib.Path | None = None,
-    version: str = "1.39.5",
-    macros: list[str | tuple[str, str] | Macro] = [],
-    search_directories: list[str | pathlib.Path] = [],
-    includes: list[str | pathlib.Path] = [],
-    libraries: list[str | pathlib.Path] = [],
-    globals: dict[str, Variable | bool | int | float | str] = {},
-    error_on_missing_globals: bool = True,
-    error_on_unused_globals: bool = True,
-    func_name: str | None = None,
-    func_args: list[Variable | bool | int | float | str] = [],
-    reduce_graph: bool = True,
-    validate_graph: bool = True,
-    sources: dict[str, str] = {}
-)
-```
-
-#### Properties
-
-```python
-options.output_file: str | pathlib.Path | None
-options.version: str
-options.macros: list[str | tuple[str, str] | Macro]
-options.search_directories: list[str | pathlib.Path]
-options.includes: list[str | pathlib.Path]
-options.libraries: list[str | pathlib.Path]
-options.globals: dict[str, Variable | bool | int | float | str]
-options.error_on_missing_globals: bool
-options.error_on_unused_globals: bool
-options.func_name: str | None
-options.func_args: list[Variable | bool | int | float | str]
-options.reduce_graph: bool
-options.validate_graph: bool
-options.sources: dict[str, str]
-```
-
-#### Example
-
-```python
-opts = mxslc.CompileOptions();
-opts.output_file = "example.mtlx"
-opts.version = "1.39.4"
-opts.macros = ["DEBUG", ("PI", "3.14159")]
-opts.search_directories = ["C:/Users/jaket/mtlx_libs"]
-opts.globals = {"roughness": 0.2, "thin_film": True}
-opts.error_on_missing_globals = False
-opts.reduce_graph = False
-
-mxslc.compile_file_to_file("example.mxsl", opts);
-```
-
-### `mxslc.compile_*_to_*`
-
-```python
-mxslc.compile_string_to_string(source: str) -> str
-mxslc.compile_string_to_string(source: str, opts: mxslc.CompileOptions) -> str
-
-mxslc.compile_file_to_string(src_path: str | pathlib.Path) -> str
-mxslc.compile_file_to_string(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> str
-
-mxslc.compile_string_to_file(source: str, opts: mxslc.CompileOptions) -> pathlib.Path
-mxslc.compile_string_to_file(source: str, dst_path: str | pathlib.Path) -> pathlib.Path
-
-mxslc.compile_file_to_file(src_path: str | pathlib.Path) -> pathlib.Path
-mxslc.compile_file_to_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> pathlib.Path
-mxslc.compile_file_to_file(src_path: str | pathlib.Path, dst_path: str | pathlib.Path) -> pathlib.Path
-```
-
-```python
-# Example
-opts = mxslc.CompileOptions()
-opts.reduce_graph = False
-
-mtlx = mxslc.compile_string_to_string("float f = 1.0 + 1.0;", opts)
-
-src_path = pathlib.Path("example.mxsl")
-dst_path = mxslc.compile_file_to_file(src_path)
-```
-
-### `mxslc.decompile_*_to_*`
+Decompile a string containing the MaterialX source and return the ShadingLanguageX source code as a string.
 
 ```python
 mxslc.decompile_string_to_string(source: str) -> str
+```
 
+### decompile_file_to_string
+
+Decompile a MaterialX file provided by `src_path` and return the ShadingLanguageX source code as a string.
+
+```python
 mxslc.decompile_file_to_string(src_path: str | pathlib.Path) -> str
+```
 
+### decompile_string_to_file
+
+Decompile a string containing the MaterialX source and save the ShadingLanguageX source code to the file given by
+`dst_path`.
+
+```python
 mxslc.decompile_string_to_file(source: str, dst_path: str | pathlib.Path) -> pathlib.Path
+```
 
+### decompile_file_to_file
+
+Decompile a MaterialX file provided by `src_path` and save the ShadingLanguageX source code as a file. The output file
+path will be the same as the `src_path` with the extension changed to .mxsl, or can be given by the `dst_path`
+parameter.
+
+```python
 mxslc.decompile_file_to_file(src_path: str | pathlib.Path) -> pathlib.Path
 mxslc.decompile_file_to_file(src_path: str | pathlib.Path, dst_path: str | pathlib.Path) -> pathlib.Path
 ```
 
-### `mxslc.Decompiler`
+### Decompiler
 
-#### Constructors
+Decompile a whole MaterialX document, or individual Nodes, NodeDefs and NodeGraphs from it.
 
 ```python
-Decompiler.__init__(
-    source: str | pathlib.Path
-)
+Decompiler.__init__(src_path: str | pathlib.Path)
+Decompiler.__init__(source: str)
 ```
 
-Use `str` for inline MaterialX source text, and use `pathlib.Path` for filesystem input files.
-
-#### Methods
+A positional argument is always read as a file path, so pass MaterialX source by keyword:
+`mxslc.Decompiler(source=mtlx)`.
 
 ```python
 Decompiler.decompile_document() -> str
 Decompiler.decompile_node(node_name: str, with_dependencies: bool = False) -> str
 Decompiler.decompile_node_def(node_def_name: str, with_dependencies: bool = False) -> str
 Decompiler.decompile_node_graph(node_graph_name: str, with_dependencies: bool = False) -> str
+```
+
+The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs used by
+the given element or an element preceding it in the graph.
+
+### Python Example
+
+```python
+import mxslc
+
+slx = mxslc.decompile_file_to_string("example.mtlx")
+slx_path = mxslc.decompile_file_to_file("example.mtlx")  # writes example.mxsl
+
+mtlx = mxslc.compile_string_to_string("material m = surfacematerial(standard_surface(specular_roughness = 0.25));")
+slx = mxslc.decompile_string_to_string(mtlx)
+
+decompiler = mxslc.Decompiler(source=mtlx)
+print(decompiler.decompile_node("m", with_dependencies=True))
+# material m = surfacematerial(standard_surface(specular_roughness = 0.25));
+```
+
+## C++
+
+The decompile functions and the `Decompiler` class are in the `mxslc::decompile` namespace.
+
+### decompile_to_string
+
+Decompile the MaterialX given by `src_path`, `source` or `document`. The result is returned as a string.
+
+```c++
+string decompile_to_string(const fs::path& src_path);
+string decompile_to_string(const string& source);
+string decompile_to_string(const MaterialX::DocumentPtr& document);
+```
+
+### decompile_to_file
+
+Decompile the MaterialX given by `src_path`, `source` or `document`. The result is saved to the file given by
+`dst_path`. When decompiling `src_path` without a `dst_path`, the output file path will be the same as the `src_path`
+with the extension changed to .mxsl.
+
+```c++
+fs::path decompile_to_file(const fs::path& src_path, const optional<fs::path>& dst_path = std::nullopt);
+fs::path decompile_to_file(const fs::path& src_path, const fs::path& dst_path);
+fs::path decompile_to_file(const string& source, const fs::path& dst_path);
+fs::path decompile_to_file(const MaterialX::DocumentPtr& document, const fs::path& dst_path);
+```
+
+### Decompiler
+
+Decompile a whole MaterialX document, or individual Nodes, NodeDefs and NodeGraphs from it.
+
+```c++
+class Decompiler
+{
+public:
+    explicit Decompiler(const fs::path& src_path);
+    explicit Decompiler(const string& source);
+    explicit Decompiler(const MaterialX::DocumentPtr& document);
+
+    string decompile_document();
+    string decompile_node(const string& node_name, bool with_dependencies = false);
+    string decompile_node(const MaterialX::NodePtr& node, bool with_dependencies = false);
+    string decompile_node_def(const string& node_def_name, bool with_dependencies = false);
+    string decompile_node_def(const MaterialX::NodeDefPtr& node_def, bool with_dependencies = false);
+    string decompile_node_graph(const string& node_graph_name, bool with_dependencies = false);
+    string decompile_node_graph(const MaterialX::NodeGraphPtr& node_graph, bool with_dependencies = false);
+};
+```
+
+The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs used by
+the given element or an element preceding it in the graph.
+
+### C++ Example
+
+```c++
+#include "decompile/decompile.h"
+#include "decompile/Decompiler.h"
+
+// 1
+string code = mxslc::decompile::decompile_to_string(fs::path{"example.mtlx"});
+
+// 2
+fs::path mxsl_path = mxslc::decompile::decompile_to_file(fs::path{"mtlx/example.mtlx"}, fs::path{"mxsl/example.mxsl"});
+
+// 3
+mxslc::decompile::Decompiler decompiler{fs::path{"example.mtlx"}};
+string material_code = decompiler.decompile_node("m", true);
+```
+
+---
+
+# Reflection
+
+The `reflect` functions run ShadingLanguageX source code and return a `Reflection` of the program, which lists the
+`global` variables it declares, in declaration order. They let a tool find out which globals a program has, e.g., to
+show a parameter for each one like in the [Houdini SLX plugin](https://github.com/jakethorn/ShadingLanguageX/blob/main/tools/houdini/README.md#globals)
+
+The source is run as it is when compiling, with two differences: missing and unused globals aren't errors, and debug
+mode is off.
+
+## Python
+
+### reflect_from_string
+
+Run a string containing the ShadingLanguageX source code and return its `Reflection`. An optional
+[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
+
+```python
+mxslc.reflect_from_string(source: str) -> mxslc.Reflection
+mxslc.reflect_from_string(source: str, opts: mxslc.CompileOptions) -> mxslc.Reflection
+```
+
+### reflect_from_file
+
+Run a ShadingLanguageX source file provided by `src_path` and return its `Reflection`. An optional
+[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
+
+```python
+mxslc.reflect_from_file(src_path: str | pathlib.Path) -> mxslc.Reflection
+mxslc.reflect_from_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions) -> mxslc.Reflection
+```
+
+### Reflection
+
+```python
+Reflection.globals: list[mxslc.GlobalInfo]
+```
+
+`globals` is read-only. A `Reflection` is only returned by the `reflect` functions; it has no constructor.
+
+### GlobalInfo
+
+```python
+GlobalInfo.name: str
+GlobalInfo.type: str
+GlobalInfo.default_value: Any
+```
+
+The fields are read-only. `type` is the variable's type name, e.g., `"float"` or `"color3"`. `default_value` is the
+variable's value in [CompileOptions](#compile-options) `globals`, if it has one. Otherwise, it is the initializer's
+value, or the type's default if there's no initializer. It is `None` if the initializer isn't known at compile time,
+e.g., `geompropvalue<float>("x")`.
+
+### Python Example
+
+```python
+import mxslc
+
+code = """
+global float roughness = 0.25;
+global color3 tint;
+global float u = texcoord<vec2>().x;
+"""
+
+reflection = mxslc.reflect_from_string(code)
+for g in reflection.globals:
+    print(g.name, g.type, g.default_value)
+
+# roughness float 0.25
+# tint color3 0, 0, 0
+# u float None
+
+opts = mxslc.CompileOptions(globals={"roughness": 0.5})
+print(mxslc.reflect_from_string(code, opts).globals[0].default_value)
+
+# 0.5
+
+opts = mxslc.CompileOptions(macros=["OPEN_PBR"])
+reflection = mxslc.reflect_from_file("example.mxsl", opts)
+```
+
+## C++
+
+The `reflect` functions, `Reflection` and `GlobalInfo` are in the `mxslc::reflection` namespace.
+
+### reflect
+
+Run the source code given by `source` or `src_path` and return its `Reflection`. An optional
+[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
+
+```c++
+Reflection reflect(const string& source);
+Reflection reflect(const string& source, const CompileOptions& opts);
+Reflection reflect(const fs::path& src_path);
+Reflection reflect(const fs::path& src_path, const CompileOptions& opts);
+```
+
+### Reflection
+
+```c++
+class Reflection
+{
+public:
+    const vector<GlobalInfo>& globals() const;
+};
+```
+
+### GlobalInfo
+
+```c++
+struct GlobalInfo
+{
+    string name;
+    TypePtr type;
+    VarPtr default_value;
+};
+```
+
+`default_value` is set as it is in [Python](#globalinfo). `default_value->is_compile_time()` is false if the
+initializer isn't known at compile time.
+
+### C++ Example
+
+```c++
+#include <iostream>
+
+#include "CompileOptions.h"
+#include "reflection/reflect.h"
+#include "runtime/Type.h"
+#include "runtime/variables/Variable.h"
+
+mxslc::CompileOptions opts;
+opts.add_macro("OPEN_PBR");
+
+mxslc::reflection::Reflection reflection = mxslc::reflection::reflect(fs::path{"example.mxsl"}, opts);
+for (const mxslc::reflection::GlobalInfo& global : reflection.globals())
+{
+    std::cout << global.name << " " << global.type->to_string();
+    if (not global.default_value->is_compile_time())
+        std::cout << " (initializer not known at compile time)";
+    std::cout << "\n";
+}
 ```

@@ -1,0 +1,19 @@
+// https://github.com/jakethorn/ShadingLanguageX
+
+// global variables can be set by Houdini in the "Globals" tab
+global float scale = 8.0;
+global int n = 1;
+
+color3 wavy_pattern()
+{
+    mutable vec2 uv = texcoord() * scale;
+    for (int i from 1 to n)
+    {
+        uv += sin(uv.yx * scale) / scale;
+    }
+    float seed = floor(uv.x) + floor(uv.y) * scale;
+    return randomcolor(seed);
+}
+
+surfaceshader surface = standard_surface(base_color = wavy_pattern());
+material slx_material = surfacematerial(surface);

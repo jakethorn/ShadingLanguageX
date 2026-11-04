@@ -55,6 +55,7 @@ const engine = {
         opts.reduceGraph = options.reduce_graph;
         opts.errorOnMissingGlobals = options.error_on_missing_globals;
         opts.errorOnUnusedGlobals = options.error_on_unused_globals;
+        opts.defaultFunctionBehaviour = mx.FunctionBehaviour[options.default_function_behaviour ?? 'NodeDef'];
         const result = mx.compileSlxToMtlx(source, opts);
         opts.delete();
         return result;

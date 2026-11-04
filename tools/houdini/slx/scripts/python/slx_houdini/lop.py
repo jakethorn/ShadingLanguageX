@@ -1,0 +1,558 @@
+"""Cook logic and parameter callbacks for the SLX Material LOP."""
+
+import hashlib
+import os
+import re
+
+import hou
+from pxr import Sdf, UsdGeom, UsdShade
+
+from slx_houdini import NODE_TYPE_NAME, compiler, editor, examples, file_watcher, global_parameters, node_type
+
+MATERIALX_MATERIALS_PATH = "/MaterialX/Materials"
+LOADED_EXAMPLE_KEY = "slx_loaded_example"  # node user data: the example whose code the node holds
+ERROR_LINE_PATTERN = re.compile(r"\bline (\d+)")
+
+_compile_results = {}  # node session id -> CompileResult
+_declared_globals = {}  # node session id -> (source and settings key, [GlobalParameter])
+_scheduled_global_updates = set()  # session ids of nodes whose global parameters change once their cook ends
+_is_runtime_created = False
+
+
+class SourceError(Exception):
+    """A problem with the node's SLX source or settings, reported as an error on the node."""
+
+
+class CompileResult:
+    """What a node's last cook produced, kept for its parameter callbacks."""
+
+    def __init__(self, xml=None, material_names=(), global_parameters=None, error=None):
+        self.xml = xml  # as compiled, before file paths are made absolute for USD
+        self.material_names = list(material_names)
+        self.global_parameters = global_parameters
+        self.error = error
+
+    def error_line(self):
+        match = ERROR_LINE_PATTERN.search(self.error or "")
+        return int(match.group(1)) if match else None
+
+
+def cook(script_node):
+    """Cooks the SLX Material node containing script_node, the Python Script LOP inside the asset."""
+    node = script_node.parent()
+    # Reading the parameter makes Houdini recook this node when recompile() changes it.
+    node.evalParm("recompile")
+    _compile_results.pop(node.sessionId(), None)
+    if not has_source(node):
+        # Like the Reference LOP, a node without a file or example passes its input through.
+        file_watcher.unwatch_files(node)
+        return
+    try:
+        xml, parameters = compile_node(node)
+        usd_xml = make_file_paths_absolute(xml, get_source_directory(node))
+        materialx_path = write_materialx_cache(node, usd_xml)
+        stage = script_node.editableStage()
+        layer = Sdf.Layer.FindOrOpen(materialx_path)
+        material_paths = reference_materials(stage, layer, get_material_path_prefix(node))
+        if not material_paths:
+            # Raised as an error because warnings from inside an asset don't show on the asset's node.
+            raise SourceError("The SLX source doesn't define any materials. "
+                              "Store a surfacematerial(...) in a material variable to create one.")
+        assign_materials(node, stage, material_paths)
+    except SourceError as e:
+        _compile_results[node.sessionId()] = CompileResult(error=str(e))
+        raise hou.NodeError(str(e))
+    _compile_results[node.sessionId()] = CompileResult(xml, material_paths, parameters)
+    if not global_parameters.has_matching_parameters(node, parameters):
+        schedule_global_parameter_update(node)
+
+
+def is_file_source(node):
+    return node.parm("source").evalAsString() == "file"
+
+
+def is_example_source(node):
+    return node.parm("source").evalAsString() == "example"
+
+
+def get_source_file(node):
+    return node.evalParm("file").strip()
+
+
+def has_source(node):
+    if is_file_source(node):
+        return bool(get_source_file(node))
+    if is_example_source(node):
+        return bool(node.evalParm("example"))
+    return True
+
+
+def get_source_directory(node):
+    """Returns the folder that relative paths in the node's SLX source are relative to."""
+    if is_file_source(node):
+        return os.path.dirname(os.path.abspath(get_source_file(node)))
+    if is_example_source(node):
+        return get_examples_directory()
+    return hou.text.expandString("$HIP")
+
+
+def get_examples_directory():
+    directory = examples.find_examples_directory()
+    if directory is None:
+        raise SourceError("The SLX examples weren't found. They belong in the plugin's slx/examples folder.")
+    return directory
+
+
+def compile_node(node):
+    """Compiles the node's SLX source. Returns the MaterialX XML and the globals the source declares."""
+    try:
+        mxslc = compiler.import_mxslc()
+    except ImportError as e:
+        raise SourceError(str(e))
+
+    if is_file_source(node):
+        path = os.path.normpath(get_source_file(node))
+        search_directories = get_search_directories(node)
+        source_files = compiler.find_source_files(path, search_directories)
+        watch_source_files(node, source_files)
+        if not os.path.isfile(path):
+            raise SourceError("SLX file not found: {}. Press Create to start from a template.".format(path))
+        source, is_file, compile_function = path, True, mxslc.compile_file_to_string
+        # A file's globals change when it, or a file it includes, is saved.
+        source_key = tuple((p, file_watcher.get_modified_time(p)) for p in source_files)
+        settings = get_compile_settings(node, mxslc, search_directories)
+    else:
+        file_watcher.unwatch_files(node)
+        source = node.parm("examplecode" if is_example_source(node) else "code").unexpandedString()
+        source_key, is_file, compile_function = source, False, mxslc.compile_string_to_string
+        # Code in the node has no file of its own, so #include and #library paths are resolved from $HIP, or for
+        # an example, from the examples folder.
+        settings = get_compile_settings(node, mxslc, [get_source_directory(node)] + get_search_directories(node))
+
+    parameters = get_declared_globals(node, mxslc, source, is_file, settings, source_key)
+    options = create_compile_options(mxslc, settings, global_parameters.get_global_values(node, parameters))
+    return run_compiler(compile_function, source, options), parameters
+
+
+def get_search_directories(node):
+    """Returns the node's Search Directories. Relative ones are relative to the source's folder."""
+    source_directory = get_source_directory(node)
+    directories = []
+    for i in range(1, node.evalParm("searchdirs") + 1):
+        directory = node.evalParm("searchdir{}".format(i)).strip()
+        if directory:
+            directories.append(os.path.normpath(os.path.join(source_directory, directory)))
+    return directories
+
+
+def watch_source_files(node, source_files):
+    if node.evalParm("autorecompile"):
+        file_watcher.watch_files(node, source_files, recompile_and_report)
+    else:
+        file_watcher.unwatch_files(node)
+
+
+def get_declared_globals(node, mxslc, source, is_file, settings, source_key):
+    """Returns the globals the source declares, running the source again only when it or the settings changed.
+
+    That keeps changes to a global's parameter, such as dragging a slider, down to one compile.
+    """
+    key = (source_key, repr(sorted(settings.items())))
+    cached = _declared_globals.get(node.sessionId())
+    if cached is not None and cached[0] == key:
+        return cached[1]
+    options = create_compile_options(mxslc, settings, {})
+    try:
+        parameters = global_parameters.get_global_parameters(mxslc, source, options, is_file)
+    except RuntimeError as e:
+        raise SourceError("SLX compile error: {}".format(e))
+    _declared_globals[node.sessionId()] = (key, parameters)
+    return parameters
+
+
+def get_compile_settings(node, mxslc, search_directories):
+    """Returns the node's compile options, apart from global values, as CompileOptions keyword arguments."""
+    macros = []
+    for i in range(1, node.evalParm("macros") + 1):
+        name = node.evalParm("macroname{}".format(i)).strip()
+        value = node.evalParm("macrovalue{}".format(i))
+        if name:
+            macros.append((name, value) if value else name)
+
+    entry_function = node.evalParm("entryfunction").strip() or None
+    settings = {
+        "macros": macros,
+        "search_directories": search_directories,
+        # Globals without a parameter, such as structs, use their initializers.
+        "error_on_missing_globals": False,
+        "error_on_unused_globals": False,
+        "func_name": entry_function,
+        "func_args": get_entry_arguments(node) if entry_function else [],
+        "reduce_graph": bool(node.evalParm("reducegraph")),
+    }
+    version = get_materialx_version(node, mxslc)
+    if version:
+        settings["version"] = version
+    if node.evalParm("inlinefunctions"):
+        # Karma and Houdini's viewport only render MaterialX's standard nodes. They ignore the NodeDefs that
+        # non-inline SLX functions compile to, even though USD records which file defines them.
+        if not hasattr(mxslc, "FunctionBehaviour"):
+            raise SourceError("Inline SLX Functions needs mxslcxx 0.3.3 or later.")
+        settings["default_function_behaviour"] = mxslc.FunctionBehaviour.Inline
+    return settings
+
+
+def get_entry_arguments(node):
+    arguments = []
+    for i in range(1, node.evalParm("entryargs") + 1):
+        type_name = node.parm("argtype{}".format(i)).evalAsString()
+        parm_tuple = node.parmTuple(node_type.get_argument_value_parm_name(type_name, i))
+        arguments.append(global_parameters.get_parm_tuple_value(parm_tuple, type_name))
+    return arguments
+
+
+def create_compile_options(mxslc, settings, global_values):
+    if compiler.has_sequence_value(list(global_values.values()) + settings["func_args"]):
+        create_runtime(mxslc)
+    try:
+        return mxslc.CompileOptions(globals=global_values, **settings)
+    except (TypeError, ValueError, RuntimeError) as e:
+        raise SourceError("Invalid compile options: {}".format(e))
+
+
+def create_runtime(mxslc):
+    """Works around mxslc raising "Runtime not created" for list values before anything has compiled."""
+    global _is_runtime_created
+    if not _is_runtime_created:
+        mxslc.compile_string_to_string("")
+        _is_runtime_created = True
+
+
+def get_materialx_version(node, mxslc):
+    choice = node.parm("materialxversion").evalAsString()
+    return compiler.choose_materialx_version_for_houdini(mxslc) if choice == "auto" else choice
+
+
+def run_compiler(compile_function, source, options):
+    try:
+        return compile_function(source, options)
+    except RuntimeError as e:
+        raise SourceError("SLX compile error: {}".format(e))
+
+
+def make_file_paths_absolute(xml, source_directory):
+    """Returns the compiled MaterialX with relative file paths made absolute, from source_directory.
+
+    The MaterialX is referenced from the cache directory, which USD would otherwise resolve relative paths from.
+    """
+    import MaterialX as mx
+    document = mx.createDocument()
+    mx.readFromXmlString(document, xml)
+    for element in document.traverseTree():
+        if element.isA(mx.Input) and element.getType() == "filename" and element.hasValueString():
+            element.setValueString(make_absolute_path(element.getResolvedValueString(), source_directory))
+    return mx.writeToXmlString(document)
+
+
+def make_absolute_path(path, directory):
+    path = path.replace("\\", "/")
+    if not path or os.path.isabs(path) or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", path):
+        return path  # absolute, empty, or with a drive letter or URL scheme
+    return os.path.join(directory, path).replace("\\", "/")
+
+
+def write_materialx_cache(node, xml):
+    """Writes xml to the cache directory under a name that changes with its contents and returns the path.
+
+    A new name for new contents means USD never serves a stale copy of a layer it already loaded.
+    """
+    directory = node.evalParm("cachedir").strip()
+    if not directory:
+        raise SourceError("Set a Cache Directory for the compiled MaterialX files.")
+    digest = hashlib.sha1(xml.encode("utf-8")).hexdigest()[:12]
+    file_name = "{}_{}.mtlx".format(node.path().strip("/").replace("/", "_"), digest)
+    path = os.path.join(directory, file_name).replace("\\", "/")
+    if os.path.isfile(path):
+        return path
+    try:
+        os.makedirs(directory, exist_ok=True)
+        temp_path = "{}.{}.tmp".format(path, os.getpid())
+        with open(temp_path, "w", encoding="utf-8") as f:
+            f.write(xml)
+        os.replace(temp_path, path)
+    except OSError as e:
+        raise SourceError("Could not write the compiled MaterialX to {}: {}".format(directory, e))
+    return path
+
+
+def get_material_path_prefix(node):
+    text = node.evalParm("matpathprefix").strip().rstrip("/")
+    if not text:
+        return Sdf.Path.absoluteRootPath
+    if not text.startswith("/") or not Sdf.Path.IsValidPathString(text):
+        raise SourceError("Material Path Prefix must be an absolute primitive path, such as /materials/.")
+    return Sdf.Path(text)
+
+
+def reference_materials(stage, layer, prefix):
+    """References every material in the compiled MaterialX layer to a prim under prefix.
+
+    Returns {material name: prim path}. Each material in a MaterialX layer reaches its shaders and node graphs
+    through internal references, so referencing the material prim alone brings in its whole network.
+    """
+    material_paths = {}
+    materials = layer.GetPrimAtPath(MATERIALX_MATERIALS_PATH)
+    if not materials:
+        return material_paths
+    define_scopes(stage, prefix)
+    for spec in materials.nameChildren:
+        path = prefix.AppendChild(spec.name)
+        stage.DefinePrim(path).GetReferences().AddReference(layer.identifier, spec.path)
+        material_paths[spec.name] = path
+    return material_paths
+
+
+def define_scopes(stage, path):
+    for prefix in path.GetPrefixes():
+        if not stage.GetPrimAtPath(prefix):
+            UsdGeom.Scope.Define(stage, prefix)
+
+
+def assign_materials(node, stage, material_paths):
+    for i in range(1, node.evalParm("assignments") + 1):
+        name = node.evalParm("material{}".format(i)).strip()
+        pattern = node.evalParm("geometry{}".format(i)).strip()
+        if not name or not pattern:
+            continue
+        if name not in material_paths:
+            raise SourceError("Assignment {}: the SLX source has no material named '{}'.".format(i, name))
+        material = UsdShade.Material(stage.GetPrimAtPath(material_paths[name]))
+        rule = hou.LopSelectionRule()
+        rule.setPathPattern(pattern)
+        for path in rule.expandedPaths(stage=stage):
+            bind_material(stage.GetPrimAtPath(path), material)
+
+
+def bind_material(prim, material):
+    binding_api = UsdShade.MaterialBindingAPI
+    # MaterialBindingAPI became an applied schema in newer USD versions, which then expect Apply().
+    binding = binding_api.Apply(prim) if hasattr(binding_api, "Apply") else binding_api(prim)
+    binding.Bind(material)
+
+
+def get_slx_nodes():
+    node_type = hou.nodeType(hou.lopNodeTypeCategory(), NODE_TYPE_NAME)
+    return node_type.instances() if node_type else ()
+
+
+def recompile(node):
+    """Makes node read its SLX source again the next time it cooks."""
+    parm = node.parm("recompile")
+    try:
+        with hou.undos.disabler():
+            parm.set(parm.eval() + 1)
+    except hou.PermissionError:
+        # Nodes inside a locked asset can't have parameters set; a forced cook still rereads the source.
+        node.cook(force=True)
+
+
+def recompile_and_report(node):
+    """Recompiles node now, rather than when something next needs it, and shows the result in the status bar."""
+    recompile(node)
+    update_global_parameters(node)
+    result = _compile_results.get(node.sessionId())
+    if not hou.isUIAvailable() or result is None:
+        return
+    if result.error:
+        hou.ui.setStatusMessage("{}: {}".format(node.path(), result.error), severity=hou.severityType.Error)
+    else:
+        message = "{}: compiled {} material(s)".format(node.path(), len(result.material_names))
+        hou.ui.setStatusMessage(message, severity=hou.severityType.Message)
+
+
+def recompile_all():
+    for node in get_slx_nodes():
+        recompile_and_report(node)
+
+
+def update_global_parameters(node):
+    """Cooks node and gives it a parameter for each global its SLX source declares.
+
+    Cooks do this themselves when Houdini's UI is running. Scripts in hython can call this instead.
+    """
+    result = get_last_result(node)
+    if result is None or result.global_parameters is None:
+        return
+    if not global_parameters.has_matching_parameters(node, result.global_parameters):
+        global_parameters.update_parameters(node, result.global_parameters)
+        # The last cook couldn't read parameters that didn't exist, so Houdini wouldn't recook when they change.
+        recompile(node)
+
+
+def schedule_global_parameter_update(node):
+    """Updates node's global parameters once its cook ends, because Houdini forbids changing them during it.
+
+    This needs Houdini's UI, which runs the update from its event loop.
+    """
+    if not hou.isUIAvailable() or node.sessionId() in _scheduled_global_updates:
+        return
+    import hdefereval
+    session_id = node.sessionId()
+    _scheduled_global_updates.add(session_id)
+
+    def update():
+        _scheduled_global_updates.discard(session_id)
+        scheduled_node = hou.nodeBySessionId(session_id)
+        if scheduled_node is not None:
+            update_global_parameters(scheduled_node)
+
+    hdefereval.executeDeferred(update)
+
+
+def get_last_result(node):
+    node.stage()
+    return _compile_results.get(node.sessionId())
+
+
+def on_compile_pressed(kwargs):
+    recompile_and_report(kwargs["node"])
+
+
+def on_open_editor_pressed(kwargs):
+    node = kwargs["node"]
+    path = get_source_file(node)
+    if not path:
+        hou.ui.displayMessage("Choose an SLX file first, or press Create.", title="SLX Material")
+        return
+    if not os.path.isfile(path):
+        hou.ui.displayMessage("{} doesn't exist yet. Press Create to start from a template.".format(path),
+                              title="SLX Material")
+        return
+    result = _compile_results.get(node.sessionId())
+    editor.open_in_editor(path, result.error_line() if result else None)
+
+
+def on_created(kwargs):
+    # Houdini shows parameters that differ from their default in bold. The example code always does, so the inline
+    # code starts from the template here rather than having it as its default, which makes it bold too.
+    kwargs["node"].parm("code").set(compiler.read_template())
+
+
+def on_source_changed(kwargs):
+    node = kwargs["node"]
+    if not is_example_source(node) or node.parm("examplecode").unexpandedString():
+        return
+    # Nothing is loaded yet, so load the chosen example, or the first one.
+    names = get_example_names()
+    name = node.evalParm("example") or (names[0] if names else "")
+    if name:
+        load_example(node, name)
+        recompile_and_report(node)
+
+
+def on_example_chosen(kwargs):
+    node = kwargs["node"]
+    if hou.isUIAvailable() and is_example_edited(node):
+        loaded_name = node.userData(LOADED_EXAMPLE_KEY) or ""
+        choice = hou.ui.displayMessage("Discard your changes to the {} example?".format(loaded_name),
+                                       buttons=("Discard", "Cancel"), default_choice=0, close_choice=1,
+                                       title="Choose Example")
+        if choice != 0:
+            node.parm("example").set(loaded_name)
+            return
+    load_example(node, node.evalParm("example"))
+    recompile_and_report(node)
+
+
+def load_example(node, name):
+    """Chooses the named example on node and puts its code in the node, which compiles that code.
+
+    The code is kept in the node rather than read from the examples folder, so edits to it stay with the node.
+    An empty name clears the choice, and the node then passes its input through.
+    """
+    node.parm("example").set(name)
+    node.parm("examplecode").set(get_example_code(name))
+    node.setUserData(LOADED_EXAMPLE_KEY, name)
+
+
+def is_example_edited(node):
+    """Returns whether node's example code differs from the example it was loaded from."""
+    loaded_name = node.userData(LOADED_EXAMPLE_KEY) or ""
+    return node.parm("examplecode").unexpandedString() != get_example_code(loaded_name)
+
+
+def get_example_code(name):
+    return examples.read_text(os.path.join(get_examples_directory(), name + ".mxsl")) if name else ""
+
+
+def get_example_names():
+    directory = examples.find_examples_directory()
+    return [os.path.splitext(os.path.basename(p))[0] for p in examples.get_examples(directory)] if directory else []
+
+
+def get_example_menu_items():
+    names = get_example_names()
+    return create_menu_items(names) if names else ["", "No Examples Found"]
+
+
+def on_create_file_pressed(kwargs):
+    node = kwargs["node"]
+    path = get_source_file(node)
+    if not path:
+        chosen = hou.ui.selectFile(start_directory="$HIP/", title="Create SLX File", pattern="*.mxsl",
+                                   chooser_mode=hou.fileChooserMode.Write)
+        if not chosen:
+            return
+        if not chosen.endswith(".mxsl"):
+            chosen += ".mxsl"
+        node.parm("file").set(chosen)
+        path = get_source_file(node)
+    if os.path.exists(path):
+        hou.ui.displayMessage("{} already exists.".format(path), title="SLX Material")
+        return
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(compiler.read_template())
+    editor.open_in_editor(path)
+    recompile_and_report(node)
+
+
+def on_view_materialx_pressed(kwargs):
+    node = kwargs["node"]
+    xml = get_compiled_xml(node, "show")
+    if xml is not None:
+        from slx_houdini import text_window  # imports Qt, which cooks without a UI don't need
+        text_window.show_xml("SLX Material", "MaterialX compiled from {}:".format(node.path()), xml)
+
+
+def on_export_materialx_pressed(kwargs):
+    xml = get_compiled_xml(kwargs["node"], "export")
+    if xml is None:
+        return
+    chosen = hou.ui.selectFile(start_directory="$HIP/", title="Export MaterialX", pattern="*.mtlx",
+                               chooser_mode=hou.fileChooserMode.Write)
+    if chosen:
+        with open(hou.text.expandString(chosen), "w", encoding="utf-8") as f:
+            f.write(xml)
+
+
+def get_compiled_xml(node, action):
+    """Returns the node's compiled MaterialX, or None after telling the user there's none to show or export."""
+    result = get_last_result(node)
+    if result is None or result.xml is None:
+        hou.ui.displayMessage("There's no compiled MaterialX to {}.".format(action), title="SLX Material",
+                              details=result.error if result else None, severity=hou.severityType.Warning)
+        return None
+    return result.xml
+
+
+def get_material_menu_items(node):
+    result = _compile_results.get(node.sessionId())
+    return create_menu_items(result.material_names if result else [])
+
+
+def create_menu_items(names):
+    """Returns names as a menu, in Houdini's flat [token, label, ...] form."""
+    return [item for name in names for item in (name, name)]

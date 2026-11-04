@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Adds SLX items to the right-click menu of nodes in the network editor. -->
+<menuDocument>
+  <menu>
+    <scriptItem id="slx.convert_to_slx">
+      <label>Convert to SLX Material</label>
+      <context>
+        <expression>__import__("slx_houdini.convert").convert.can_convert(kwargs["node"])</expression>
+      </context>
+      <scriptCode><![CDATA[
+import slx_houdini.convert
+slx_houdini.convert.convert_node_with_message(kwargs["node"])
+]]></scriptCode>
+    </scriptItem>
+  </menu>
+</menuDocument>

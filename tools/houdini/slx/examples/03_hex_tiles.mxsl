@@ -1,0 +1,47 @@
+global float tiles = 5.0;
+global float seam_width = 0.04;
+global color3 tile_color = color3{0.16, 0.17, 0.19};
+global color3 glow_color = color3{0.1, 0.7, 1.0};
+global float glow_strength = 3.0;
+global float lit_tiles = 0.12;
+
+float hexagon_distance(vec2 offset)
+{
+    vec2 folded = |offset|;
+    return max(dotproduct(folded, vec2{0.5, 0.8660254}), folded.x);
+}
+
+void find_hexagon(vec2 p, out vec2 center, out vec2 offset)
+{
+    vec2 cell = vec2{1.0, 1.7320508};
+    vec2 from_a = modulo(p, cell) - cell * 0.5;
+    vec2 from_b = modulo(p - cell * 0.5, cell) - cell * 0.5;
+    offset = if (dotproduct(from_a, from_a) < dotproduct(from_b, from_b)) { from_a } else { from_b };
+    center = p - offset;
+}
+
+vec2 p = texcoord() * tiles;
+
+find_hexagon(p, vec2 center, vec2 offset);
+
+float to_edge = 0.5 - hexagon_distance(offset);
+float seam = 1.0 - smoothstep(to_edge, 0.0, seam_width);
+
+vec2 tile_id = round(center / vec2{0.5, 0.8660254});
+float tile_number = tile_id.x + tile_id.y * 37.0;
+float tile_random = randomfloat(tile_number);
+float light_random = randomfloat(tile_number, seed = 1);
+
+bool is_lit = light_random < lit_tiles;
+float tile_glow = if (is_lit) { 0.4 } else { 0.0 };
+float glow = max(seam * 0.8, tile_glow);
+
+surfaceshader surface = standard_surface();
+surface.base_color = tile_color * (0.7 + 0.6 * tile_random);
+surface.metalness = 0.9;
+surface.specular_roughness = 0.25 + 0.25 * tile_random;
+surface.normal = bump(clamp(to_edge * 10.0, 0.0, 1.0), 0.01);
+surface.emission = glow_strength;
+surface.emission_color = glow_color * glow;
+
+material example_material = surfacematerial(surface);

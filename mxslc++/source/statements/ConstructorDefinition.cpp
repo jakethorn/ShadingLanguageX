@@ -12,6 +12,7 @@
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
 #include "runtime/utils/monomorphize.h"
+#include "statements/FunctionDefinition.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -19,7 +20,7 @@ namespace mxslc::statements
     ConstructorDefinition::ConstructorDefinition(ModifierList mods, string class_name, ParameterList params, StmtPtr body, Token token)
         : Statement{std::move(token)}, mods_{std::move(mods)}, class_name_{std::move(class_name)}, params_{std::move(params)}, body_{std::move(body)}
     {
-        mods_.validate(TokenType::Inline);
+        mods_.validate(TokenType::Inline, TokenType::Nodedef);
     }
 
     StmtPtr ConstructorDefinition::monomorphize(const TypePtr& template_type) const
@@ -101,8 +102,8 @@ namespace mxslc::statements
     {
         string mods_string = mods_.to_string();
         if (not mods_string.empty())
-            mods_string += " ";
+            mods_string += ' ';
 
-        return mods_string + class_name_ + "(" + params_.to_string() + ")\n" + body_->to_string();
+        return mods_string + class_name_ + '(' + params_.to_string() + ")\n" + body_->to_string();
     }
 }

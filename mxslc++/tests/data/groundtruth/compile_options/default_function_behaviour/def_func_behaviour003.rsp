@@ -1,0 +1,4 @@
+compile
+def_func_behaviour001.mxsl
+--no-reduce-graph
+--default-function-behaviour nodedef

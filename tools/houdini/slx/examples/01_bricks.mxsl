@@ -1,0 +1,44 @@
+global float bricks_across = 4.0;
+global float rows = 12.0;
+global float mortar_width = 0.12;
+global color3 brick_color = color3{0.45, 0.13, 0.08};
+global color3 mortar_color = color3{0.62, 0.6, 0.56};
+global float color_variation = 0.3;
+
+using Brick = {vec2 id, vec2 inside};
+
+Brick find_brick(vec2 uv)
+{
+    vec2 position = uv * vec2{bricks_across, rows};
+    float row = floor(position.y);
+
+    float shift = if (row % 2.0 == 1.0) { 0.5 } else { 0.0 };
+    vec2 shifted = vec2{position.x + shift, position.y};
+
+    return {floor(shifted), fract(shifted)};
+}
+
+vec2 uv = texcoord();
+Brick brick = find_brick(uv);
+
+float brick_width = rows / bricks_across;
+float to_side = min(brick.inside.x, 1.0 - brick.inside.x) * brick_width;
+float to_top_or_bottom = min(brick.inside.y, 1.0 - brick.inside.y);
+float to_edge = min(to_side, to_top_or_bottom);
+
+float half_mortar = mortar_width * 0.5;
+float is_brick = smoothstep(to_edge, half_mortar, half_mortar + 0.05);
+
+float seed = brick.id.x + brick.id.y * 50.0;
+float shade = randomfloat(seed, min = 1.0 - color_variation, max = 1.0 + color_variation);
+
+float grain = noise2d(amplitude = 0.12, pivot = 1.0, texcoord = uv * 150.0);
+
+color3 base_color = mix(brick_color * shade, mortar_color, is_brick) * grain;
+
+surfaceshader surface = standard_surface();
+surface.base_color = base_color;
+surface.specular_roughness = mix(0.6, 0.95, is_brick);
+surface.normal = bump(is_brick, 0.02);
+
+material example_material = surfacematerial(surface);

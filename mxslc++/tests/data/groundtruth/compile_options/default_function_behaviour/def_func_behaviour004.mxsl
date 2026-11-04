@@ -1,0 +1,14 @@
+float add_one(float x) { return x + 1.0; }
+float x = constant( add_one( 2 ) );
+
+[[nodedef]]
+float add_two(float x) { return x + 2.0; }
+float y = constant( add_two( 2 ) );
+
+[[inline]]
+float add_three(float x) { return x + 3.0; }
+float z = constant( add_three( 2 ) );
+
+[[comptime]]
+float add_four(float x) { return x + 4.0; }
+float w = constant( add_four( 2 ) );

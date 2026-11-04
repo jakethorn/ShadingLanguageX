@@ -4,6 +4,8 @@
 
 #include <MaterialXFormat/XmlIo.h>
 
+#include <utility>
+
 #include "compile.h"
 
 #include "common.h"
@@ -18,7 +20,6 @@
 #include "errors/CompileError.h"
 #include "preprocess/preprocess.h"
 #include "runtime/utils/invoke.h"
-#include "utils/mtlx_utils.h"
 
 namespace mxslc
 {
@@ -26,6 +27,15 @@ namespace mxslc
 
     namespace
     {
+        fs::path get_destination_path(const fs::path& src_path, const CompileOptions& opts = {})
+        {
+            if (opts.output_file)
+                return *opts.output_file;
+            fs::path dst_path = src_path;
+            dst_path.replace_extension(".mtlx");
+            return dst_path;
+        }
+
         fs::path get_stdlib_path(const CompileOptions& opts)
         {
             string searched_dirs;
@@ -53,7 +63,7 @@ namespace mxslc
                 stmt->execute();
         }
 
-        mx::DocumentPtr compile_to_document(string source, CompileOptions opts, const optional<fs::path>& src_path)
+        Runtime& compile(string source, CompileOptions opts, const optional<fs::path>& src_path)
         {
             opts.add_default_search_directories();
 
@@ -85,49 +95,76 @@ namespace mxslc
             }
 
             runtime.finalise();
-
-            const mx::DocumentPtr doc = runtime.serializer().document();
-
-            if (opts.validate_graph)
-                mtlx_utils::validate(doc);
-
-            return doc;
+            return runtime;
         }
+    }
 
-        fs::path get_destination_path(const fs::path& src_path, const CompileOptions& opts)
-        {
-            if (opts.output_file)
-                return *opts.output_file;
-            fs::path dst_path = src_path;
-            dst_path.replace_extension(".mtlx");
-            return dst_path;
-        }
+    Runtime& compile(const fs::path& src_path)
+    {
+        return compile(io_utils::read_file(src_path), {}, src_path);
+    }
+
+    Runtime& compile(const fs::path& src_path, const CompileOptions& opts)
+    {
+        return compile(io_utils::read_file(src_path), opts, src_path);
+    }
+
+    Runtime& compile(const string& source)
+    {
+        return compile(source, {}, std::nullopt);
+    }
+
+    Runtime& compile(const string& source, const CompileOptions& opts)
+    {
+        return compile(source, opts, std::nullopt);
     }
 
     mx::DocumentPtr compile_to_document(const fs::path& src_path)
     {
-        return compile_to_document(src_path, CompileOptions{});
+        return compile(src_path).serializer().document();
     }
 
     mx::DocumentPtr compile_to_document(const fs::path& src_path, const CompileOptions& opts)
     {
-        return compile_to_document(io_utils::read_file(src_path), opts, src_path);
+        return compile(src_path, opts).serializer().document();
+    }
+
+    mx::DocumentPtr compile_to_document(const string& source)
+    {
+        return compile(source).serializer().document();
+    }
+
+    mx::DocumentPtr compile_to_document(const string& source, const CompileOptions& opts)
+    {
+        return compile(source, opts).serializer().document();
     }
 
     std::string compile_to_string(const fs::path& src_path)
     {
-        return compile_to_string(src_path, CompileOptions{});
+        return compile(src_path).serializer().xml();
     }
 
     std::string compile_to_string(const fs::path& src_path, const CompileOptions& opts)
     {
-        const mx::DocumentPtr doc = compile_to_document(src_path, opts);
-        return mx::writeToXmlString(doc);
+        return compile(src_path, opts).serializer().xml();
+    }
+
+    std::string compile_to_string(const string& source)
+    {
+        return compile(source).serializer().xml();
+    }
+
+    std::string compile_to_string(const string& source, const CompileOptions& opts)
+    {
+        return compile(source, opts).serializer().xml();
     }
 
     fs::path compile_to_file(const fs::path& src_path)
     {
-        return compile_to_file(src_path, CompileOptions{});
+        fs::path dst_path = get_destination_path(src_path);
+        const string mtlx = compile_to_string(src_path);
+        io_utils::save_file(dst_path, mtlx);
+        return dst_path;
     }
 
     fs::path compile_to_file(const fs::path& src_path, const CompileOptions& opts)
@@ -140,37 +177,15 @@ namespace mxslc
 
     fs::path compile_to_file(const fs::path& src_path, const fs::path& dst_path)
     {
-        CompileOptions opts;
-        opts.output_file = dst_path;
-
-        return compile_to_file(src_path, opts);
-    }
-
-    mx::DocumentPtr compile_to_document(const string& source)
-    {
-        return compile_to_document(source, CompileOptions{});
-    }
-
-    mx::DocumentPtr compile_to_document(const string& source, const CompileOptions& opts)
-    {
-        return compile_to_document(source, opts, std::nullopt);
-    }
-
-    std::string compile_to_string(const string& source)
-    {
-        return compile_to_string(source, CompileOptions{});
-    }
-
-    std::string compile_to_string(const string& source, const CompileOptions& opts)
-    {
-        const mx::DocumentPtr doc = compile_to_document(source, opts);
-        return mx::writeToXmlString(doc);
+        const string mtlx = compile_to_string(src_path);
+        io_utils::save_file(dst_path, mtlx);
+        return dst_path;
     }
 
     fs::path compile_to_file(const string& source, const CompileOptions& opts)
     {
         if (not opts.output_file)
-            throw CompileError{"Output file not specified"s};
+            throw CompileError{"Please specify output file using CompileOptions.output_file."};
         const string mtlx = compile_to_string(source, opts);
         io_utils::save_file(*opts.output_file, mtlx);
         return *opts.output_file;
@@ -178,9 +193,8 @@ namespace mxslc
 
     fs::path compile_to_file(const string& source, const fs::path& dst_path)
     {
-        CompileOptions opts;
-        opts.output_file = dst_path;
-
-        return compile_to_file(source, opts);
+        const string mtlx = compile_to_string(source);
+        io_utils::save_file(dst_path, mtlx);
+        return dst_path;
     }
 }

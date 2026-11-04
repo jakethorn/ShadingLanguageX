@@ -132,12 +132,19 @@ namespace
 
 EMSCRIPTEN_BINDINGS(mxslc)
 {
+    ems::enum_<mxslc::FunctionBehaviour>("FunctionBehaviour")
+        .value("NodeDef", mxslc::FunctionBehaviour::NodeDef)
+        .value("NodeGraph", mxslc::FunctionBehaviour::NodeGraph)
+        .value("Inline", mxslc::FunctionBehaviour::Inline)
+        .value("Comptime", mxslc::FunctionBehaviour::Comptime);
+
     ems::class_<mxslc::CompileOptions>("CompileOptions")
         .constructor<>()
         .property("version", &mxslc::CompileOptions::version)
         .property("reduceGraph", &mxslc::CompileOptions::reduce_graph)
         .property("errorOnMissingGlobals", &mxslc::CompileOptions::error_on_missing_globals)
         .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals)
+        .property("defaultFunctionBehaviour", &mxslc::CompileOptions::default_function_behaviour)
         // In-memory sources resolved by #include / #library, plus the
         // file-system search directories used for everything else.
         .function("addSource", &mxslc::CompileOptions::add_source)
