@@ -212,20 +212,20 @@ namespace mxslc
         vector<Field> fields;
         Token name = match(TokenType::Identifier);
         Token token{name};
-        fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*is_multi_var_def*/true);
+        fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), Field::Usage::MultiVarDef);
         while (consume(','))
         {
             if (peek() == TokenType::Identifier and (peek(1) == ',' or peek(1) == '=' or peek(1) == ';'))
             {
                 name = match(TokenType::Identifier);
-                fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), /*is_multi_var_def*/true);
+                fields.emplace_back(fields.back().modifiers(), fields.back().type(), name.lexeme(), Field::Usage::MultiVarDef);
             }
             else
             {
                 mods = modifiers();
                 type_ = type();
                 name = match(TokenType::Identifier);
-                fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), /*is_multi_var_def*/true);
+                fields.emplace_back(std::move(mods), std::move(type_), name.lexeme(), Field::Usage::MultiVarDef);
             }
         }
 
@@ -448,44 +448,78 @@ namespace mxslc
 
     ModifierList Parser::modifiers()
     {
-        consume("[[");
-        const vector<Token> mod_tokens = consume_while(
-            TokenType::Const,
-            TokenType::Mutable,
-            TokenType::Global,
-            TokenType::Geomprop,
-            TokenType::Nodegraph,
-            TokenType::Nodedef,
-            TokenType::Inline,
-            TokenType::Default,
-            TokenType::Comptime,
-            TokenType::Ref,
-            TokenType::Out
-        );
-        consume("]]");
+        auto modifiers_ = [this]() -> ModifierList {
+            const bool expect_closer = consume("[[") != std::nullopt;
 
-        return ModifierList{mod_tokens};
+            const vector<Token> mod_tokens = consume_while(
+                TokenType::Const,
+                TokenType::Mutable,
+                TokenType::Global,
+                TokenType::Geomprop,
+                TokenType::Nodegraph,
+                TokenType::Nodedef,
+                TokenType::Inline,
+                TokenType::Default,
+                TokenType::Comptime,
+                TokenType::Ref,
+                TokenType::Out,
+                TokenType::Uniform
+            );
+
+            if (expect_closer)
+                match("]]");
+
+            return ModifierList{mod_tokens};
+        };
+
+        ModifierList mods;
+        while (true)
+        {
+            ModifierList next_mods = modifiers_();
+            if (next_mods.empty())
+                break;
+            mods.extend(next_mods);
+        }
+
+        return mods;
     }
 
+    // the same as modifiers(), but without default so it doesn't clash with default expressions
     ModifierList Parser::argument_modifiers()
     {
-        // the same as modifiers(), but without default so it doesn't clash with default expressions
-        consume("[[");
-        const vector<Token> mod_tokens = consume_while(
-            TokenType::Const,
-            TokenType::Mutable,
-            TokenType::Global,
-            TokenType::Geomprop,
-            TokenType::Nodegraph,
-            TokenType::Nodedef,
-            TokenType::Inline,
-            TokenType::Comptime,
-            TokenType::Ref,
-            TokenType::Out
-        );
-        consume("]]");
+        auto modifiers_ = [this]() -> ModifierList {
+            const bool expect_closer = consume("[[") != std::nullopt;
 
-        return ModifierList{mod_tokens};
+            const vector<Token> mod_tokens = consume_while(
+                TokenType::Const,
+                TokenType::Mutable,
+                TokenType::Global,
+                TokenType::Geomprop,
+                TokenType::Nodegraph,
+                TokenType::Nodedef,
+                TokenType::Inline,
+                TokenType::Comptime,
+                TokenType::Ref,
+                TokenType::Out,
+                TokenType::Uniform
+            );
+
+            if (expect_closer)
+                match("]]");
+
+            return ModifierList{mod_tokens};
+        };
+
+        ModifierList mods;
+        while (true)
+        {
+            ModifierList next_mods = modifiers_();
+            if (next_mods.empty())
+                break;
+            mods.extend(next_mods);
+        }
+
+        return mods;
     }
 
     TypePtr Parser::type()
@@ -948,11 +982,11 @@ namespace mxslc
         }
         else
         {
-            mods.validate(TokenType::Ref, TokenType::Out);
+            mods.validate(TokenType::Ref, TokenType::Out, TokenType::Uniform);
             expr = expression();
         }
 
-        return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
+        return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out, TokenType::Uniform), std::move(name), std::move(expr), i};
     }
 
     SwitchCase Parser::switch_case()

@@ -43,6 +43,11 @@ namespace mxslc::runtime
         return mods_.contains(TokenType::Mutable);
     }
 
+    bool Variable::is_uniform() const
+    {
+        return mods_.contains(TokenType::Uniform);
+    }
+
     const ModifierList& Variable::modifiers() const
     {
         return mods_;
@@ -51,7 +56,7 @@ namespace mxslc::runtime
     void Variable::set_modifiers(ModifierList mods)
     {
         mods_ = std::move(mods);
-        mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Comptime);
+        mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Comptime, TokenType::Uniform);
         if (is_const() and is_mutable())
             throw CompileError{"Variables cannot be both const and mutable"};
         if (mods_.contains(TokenType::Comptime) and mods_.contains(TokenType::Geomprop))

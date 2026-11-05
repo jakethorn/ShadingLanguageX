@@ -1,0 +1,7 @@
+uniform float foo({uniform bool, bool} b)
+{
+    return if (b[0] & b[1]) { 1.0 } else { 0.0 };
+}
+
+float x = foo({true, false});
+constant(x);

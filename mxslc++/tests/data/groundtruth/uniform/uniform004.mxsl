@@ -1,0 +1,9 @@
+void foo(float y, uniform out float x, out float z)
+{
+    x = 7.0;
+    z = y + 2.0;
+}
+
+foo(4.0, float x, float z);
+constant(x);
+constant(z);

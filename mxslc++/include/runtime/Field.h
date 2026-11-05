@@ -19,19 +19,25 @@ namespace mxslc::runtime
         friend class Scope;
 
     public:
+        enum class Usage
+        {
+            Default,
+            MultiVarDef,
+        };
+
         Field(TypePtr type, string name)
             : type_{std::move(type)}, name_{std::move(name)}
         {
 
         }
 
-        Field(ModifierList mods, TypePtr type, string name, const bool is_multi_var_def = false)
+        Field(ModifierList mods, TypePtr type, string name, const Usage usage = Usage::Default)
             : mods_{std::move(mods)}, type_{std::move(type)}, name_{std::move(name)}
         {
-            if (is_multi_var_def)
-                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Global, TokenType::Geomprop, TokenType::Comptime);
+            if (usage == Usage::MultiVarDef)
+                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Uniform, TokenType::Global, TokenType::Geomprop, TokenType::Comptime);
             else
-                mods_.validate(TokenType::Const, TokenType::Mutable);
+                mods_.validate(TokenType::Const, TokenType::Mutable, TokenType::Uniform);
         }
 
         explicit Field(TypePtr type) : Field{ModifierList{}, std::move(type), ""} { }
@@ -41,6 +47,7 @@ namespace mxslc::runtime
         bool is_mutable() const { return mods_.contains(TokenType::Mutable); }
         bool is_global() const { return mods_.contains(TokenType::Global); }
         bool is_geomprop() const { return mods_.contains(TokenType::Geomprop); }
+        bool is_uniform() const { return mods_.contains(TokenType::Uniform); }
         const TypePtr& type() const { return type_; }
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }

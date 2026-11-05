@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" uniform="true" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="float" nodename="node1" />
+    <constant name="node1" type="float">
+      <input name="value" type="float" value="1" />
+    </constant>
+  </nodegraph>
+  <foo name="var__0" type="float" />
+  <constant name="var__1" type="float">
+    <input name="value" type="float" nodename="var__0" />
+  </constant>
+</materialx>

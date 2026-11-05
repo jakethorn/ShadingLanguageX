@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="float" uniform="true" />
+    <input name="b__0" type="boolean" value="false" uniform="true" />
+    <input name="b__1" type="boolean" value="false" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <and name="var__0" type="boolean">
+      <input name="in1" type="boolean" interfacename="b__0" />
+      <input name="in2" type="boolean" interfacename="b__1" />
+    </and>
+    <ifequal name="var__1" type="float">
+      <input name="value1" type="boolean" nodename="var__0" />
+      <input name="value2" type="boolean" value="true" />
+      <input name="in1" type="float" value="1" />
+      <input name="in2" type="float" value="0" />
+    </ifequal>
+    <output name="out" type="float" nodename="var__1" />
+  </nodegraph>
+  <foo name="x" type="float">
+    <input name="b__0" type="boolean" value="true" />
+    <input name="b__1" type="boolean" value="false" />
+  </foo>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodename="x" />
+  </constant>
+</materialx>

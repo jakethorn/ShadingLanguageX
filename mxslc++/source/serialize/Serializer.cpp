@@ -41,7 +41,7 @@ namespace mxslc::serialize
             throw CompileError{"Unable to serialize function type"};
         }
 
-        void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const string& name, const TypePtr& type)
+        void add_outputs_to_node_def(const mx::NodeDefPtr& node_def, const string& name, const TypePtr& type, bool is_uniform)
         {
             if (type->is_void())
                 return;
@@ -50,12 +50,15 @@ namespace mxslc::serialize
             {
                 for (size_t i = 0; i < type->field_count(); ++i)
                 {
-                    add_outputs_to_node_def(node_def, with_prefix(name, type, i), type->field_type(i));
+                    is_uniform |= type->field(i).is_uniform();
+                    add_outputs_to_node_def(node_def, with_prefix(name, type, i), type->field_type(i), is_uniform);
                 }
             }
             else
             {
-                node_def->addOutput(name, type->name());
+                const mx::OutputPtr output = node_def->addOutput(name, type->name());
+                if (is_uniform)
+                    Attribute::Uniform.add_to(output);
             }
         }
 
@@ -335,7 +338,7 @@ namespace mxslc::serialize
     {
         mx::NodeDefPtr node_def = doc_->addNodeDef(node_def_name(func), TypeName::Int, node_category(func));
         node_def->removeOutput("out");
-        add_outputs_to_node_def(node_def, RETURN_VALUE_PREFIX, func->return_type());
+        add_outputs_to_node_def(node_def, RETURN_VALUE_PREFIX, func->return_type(), func->is_uniform());
 
         for (const Parameter& param : func->parameters())
         {
@@ -362,6 +365,7 @@ namespace mxslc::serialize
         return node_def;
     }
 
+    // this function is for writing node graphs that do not have an associated node def
     mx::NodeGraphPtr Serializer::write_node_graph(const FuncPtr& func) const
     {
         // create node graph
@@ -514,7 +518,11 @@ namespace mxslc::serialize
         {
             var->value()->set_as_node_graph_output(node_graph, output_name);
             if (const mx::NodeDefPtr node_def = node_graph->getNodeDef())
+            {
                 attrs.add_to(node_def, output_name);
+                if (var->is_uniform())
+                    Attribute::Uniform.add_to(node_def, output_name);
+            }
         }
         else
         {
@@ -573,6 +581,8 @@ namespace mxslc::serialize
         {
             var->value()->set_as_node_def_input(node_def, input_name);
             attrs.add_to(node_def, input_name);
+            if (var->is_uniform())
+                Attribute::Uniform.add_to(node_def, input_name);
         }
         else
         {
