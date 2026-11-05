@@ -1,0 +1,9 @@
+uniform void foo(out {float x, float y} z)
+{
+    z.x = 100.0;
+    z.y = 200.0;
+}
+
+foo({float a, float b} c);
+constant(c.a);
+constant(c.b);

@@ -1,0 +1,7 @@
+float foo(uniform bool b)
+{
+    return if (b) { 1.0 } else { 0.0 };
+}
+
+float x = foo(true);
+constant(x);

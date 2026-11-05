@@ -1,0 +1,6 @@
+{float, uniform string} foo()
+{
+    return {1.0, "hello"};
+}
+
+auto f = foo();

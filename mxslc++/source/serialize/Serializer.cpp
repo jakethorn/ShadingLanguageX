@@ -365,6 +365,7 @@ namespace mxslc::serialize
         return node_def;
     }
 
+    // this function is for writing node graphs that do not have an associated node def
     mx::NodeGraphPtr Serializer::write_node_graph(const FuncPtr& func) const
     {
         // create node graph
@@ -517,7 +518,11 @@ namespace mxslc::serialize
         {
             var->value()->set_as_node_graph_output(node_graph, output_name);
             if (const mx::NodeDefPtr node_def = node_graph->getNodeDef())
+            {
                 attrs.add_to(node_def, output_name);
+                if (var->is_uniform())
+                    Attribute::Uniform.add_to(node_def, output_name);
+            }
         }
         else
         {

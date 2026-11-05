@@ -54,6 +54,9 @@ namespace mxslc::statements
     void VariableDefinition::init()
     {
         type_ = scope().resolve_type(type_);
+
+        if (mods_.contains(TokenType::Uniform))
+            throw CompileError{"Uniform modifier can only be applied to parameter and argument variables"};
     }
 
     void VariableDefinition::execute_impl() const

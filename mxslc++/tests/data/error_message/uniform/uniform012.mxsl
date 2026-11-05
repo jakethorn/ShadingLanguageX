@@ -1,0 +1,2 @@
+float a = uniform constant();
+constant(a);

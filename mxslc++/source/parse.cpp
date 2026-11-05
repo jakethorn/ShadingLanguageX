@@ -956,11 +956,11 @@ namespace mxslc
         }
         else
         {
-            mods.validate(TokenType::Ref, TokenType::Out);
+            mods.validate(TokenType::Ref, TokenType::Out, TokenType::Uniform);
             expr = expression();
         }
 
-        return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out), std::move(name), std::move(expr), i};
+        return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out, TokenType::Uniform), std::move(name), std::move(expr), i};
     }
 
     SwitchCase Parser::switch_case()
