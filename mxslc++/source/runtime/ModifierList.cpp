@@ -26,6 +26,12 @@ namespace mxslc::runtime
         }
     }
 
+    void ModifierList::extend(const ModifierList& mods)
+    {
+        for (const TokenType mod : mods.mods_)
+            add(mod);
+    }
+
     string ModifierList::to_string() const
     {
         return join(mods_, " ");

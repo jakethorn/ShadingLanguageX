@@ -448,52 +448,78 @@ namespace mxslc
 
     ModifierList Parser::modifiers()
     {
-        const bool expect_closer = consume("[[") != std::nullopt;
+        auto modifiers_ = [this]() -> ModifierList {
+            const bool expect_closer = consume("[[") != std::nullopt;
 
-        const vector<Token> mod_tokens = consume_while(
-            TokenType::Const,
-            TokenType::Mutable,
-            TokenType::Global,
-            TokenType::Geomprop,
-            TokenType::Nodegraph,
-            TokenType::Nodedef,
-            TokenType::Inline,
-            TokenType::Default,
-            TokenType::Comptime,
-            TokenType::Ref,
-            TokenType::Out,
-            TokenType::Uniform
-        );
+            const vector<Token> mod_tokens = consume_while(
+                TokenType::Const,
+                TokenType::Mutable,
+                TokenType::Global,
+                TokenType::Geomprop,
+                TokenType::Nodegraph,
+                TokenType::Nodedef,
+                TokenType::Inline,
+                TokenType::Default,
+                TokenType::Comptime,
+                TokenType::Ref,
+                TokenType::Out,
+                TokenType::Uniform
+            );
 
-        if (expect_closer)
-            match("]]");
+            if (expect_closer)
+                match("]]");
 
-        return ModifierList{mod_tokens};
+            return ModifierList{mod_tokens};
+        };
+
+        ModifierList mods;
+        while (true)
+        {
+            ModifierList next_mods = modifiers_();
+            if (next_mods.empty())
+                break;
+            mods.extend(next_mods);
+        }
+
+        return mods;
     }
 
+    // the same as modifiers(), but without default so it doesn't clash with default expressions
     ModifierList Parser::argument_modifiers()
     {
-        const bool expect_closer = consume("[[") != std::nullopt;
+        auto modifiers_ = [this]() -> ModifierList {
+            const bool expect_closer = consume("[[") != std::nullopt;
 
-        // the same as modifiers(), but without default so it doesn't clash with default expressions
-        const vector<Token> mod_tokens = consume_while(
-            TokenType::Const,
-            TokenType::Mutable,
-            TokenType::Global,
-            TokenType::Geomprop,
-            TokenType::Nodegraph,
-            TokenType::Nodedef,
-            TokenType::Inline,
-            TokenType::Comptime,
-            TokenType::Ref,
-            TokenType::Out,
-            TokenType::Uniform
-        );
+            const vector<Token> mod_tokens = consume_while(
+                TokenType::Const,
+                TokenType::Mutable,
+                TokenType::Global,
+                TokenType::Geomprop,
+                TokenType::Nodegraph,
+                TokenType::Nodedef,
+                TokenType::Inline,
+                TokenType::Comptime,
+                TokenType::Ref,
+                TokenType::Out,
+                TokenType::Uniform
+            );
 
-        if (expect_closer)
-            match("]]");
+            if (expect_closer)
+                match("]]");
 
-        return ModifierList{mod_tokens};
+            return ModifierList{mod_tokens};
+        };
+
+        ModifierList mods;
+        while (true)
+        {
+            ModifierList next_mods = modifiers_();
+            if (next_mods.empty())
+                break;
+            mods.extend(next_mods);
+        }
+
+        return mods;
     }
 
     TypePtr Parser::type()

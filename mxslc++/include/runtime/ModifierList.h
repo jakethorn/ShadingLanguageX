@@ -46,6 +46,7 @@ namespace mxslc::runtime
         }
 
         void add(const TokenType mod) { mods_.insert(mod); }
+        void extend(const ModifierList& mods);
         void remove(const TokenType mod) { mods_.erase(mod); }
         bool contains(const TokenType mod) const { return container_utils::contains(mods_, mod); }
         size_t size() const { return mods_.size(); }
