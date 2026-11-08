@@ -8,6 +8,8 @@
 * Added uniform modifier (TODO link)
 * Added `--default-function-behaviour` compile option
 * Updated indexing operator; now the index value isn't required to be known at compile time ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#indexing-operator))
+* Bug Fixes:
+  * Fixed an issue with the `comptime` modifier during function calls.
 
 # (mxslc++) Version 0.3.2
 

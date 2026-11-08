@@ -484,7 +484,7 @@ namespace mxslc
         return mods;
     }
 
-    // the same as modifiers(), but without default so it doesn't clash with default expressions
+    // the same as modifiers(), but without default and comptime so it doesn't clash with default and comptime expressions
     ModifierList Parser::argument_modifiers()
     {
         auto modifiers_ = [this]() -> ModifierList {
@@ -498,7 +498,6 @@ namespace mxslc
                 TokenType::Nodegraph,
                 TokenType::Nodedef,
                 TokenType::Inline,
-                TokenType::Comptime,
                 TokenType::Ref,
                 TokenType::Out,
                 TokenType::Uniform

@@ -1427,8 +1427,6 @@ Some expressions can be evaluated at compile time, given that:
 1. All of its arguments are known at compile time.
 2. Either the shader was compiled with the `reduce_graph` option, or the expression is marked as `comptime` or is inside a `comptime` function.
 
-
-
 For example, instead of `1 + 1` evaluating to an `add` node, it will simply evaluate to `2`. On the other hand, evaluating `geompropvalue<float>("x") + 1.0`
 is not possible at compile-time because the user value is not known until render time. The following list shows the MaterialX Nodes that
 are currently optimised to evaluate at compile-time, if possible.
@@ -2036,6 +2034,43 @@ vec3 v = foo(); // OK: the default function is called
 ```
 // Signature: {float outx, float outy} separate2(const vec2 in)
 float u, v = separate2(texcoord());
+```
+
+## Uniform Modifier
+
+The `uniform` modifier can be applied to types that are part of a function definition or expressions being passed as arguments during a function call.
+It adds the `"uniform"="true"` attribute to any input/output elements created from the type or expression.
+See the [MaterialX Specification](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.Specification.md) for more information on uniform elements.
+
+### Example
+
+```
+uniform float add_one(uniform float f)
+{
+    return f + 1.0;
+}
+
+float two = add_one(uniform 1.0);
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_add_one" node="add_one">
+    <output name="out" type="float" uniform="true" />
+    <input name="f" type="float" value="0" uniform="true" />
+  </nodedef>
+  <nodegraph name="NG_add_one" nodedef="ND_add_one">
+    <add name="var__0" type="float">
+      <input name="in1" type="float" interfacename="f" />
+      <input name="in2" type="float" value="1" />
+    </add>
+    <output name="out" type="float" nodename="var__0" />
+  </nodegraph>
+  <add_one name="two" type="float">
+    <input name="f" type="float" value="1" uniform="true" />
+  </add_one>
+</materialx>
 ```
 
 # User-Defined Types

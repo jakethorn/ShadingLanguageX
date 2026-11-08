@@ -1,0 +1,4 @@
+float a = normal()[comptime 1 + 1];
+float b = {1.0, 2.0, 3.0}[comptime 1 + 1];
+constant(a);
+constant(b);
