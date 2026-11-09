@@ -5,7 +5,7 @@
 * Added SKILL.md for AI agents ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/.claude/skills/shadinglanguagex))
 * Added Houdini SLX Plugin ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/houdini))
 * Added reflection API ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/APIDocumentation.md#reflection))
-* Added uniform modifier (TODO link)
+* Added uniform modifier ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#uniform-modifier))
 * Added `--default-function-behaviour` compile option
 * Updated indexing operator; now the index value isn't required to be known at compile time ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#indexing-operator))
 * Bug Fixes:
