@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import hou
 import houdinihelp.api
@@ -19,6 +20,7 @@ import voptoolutils
 from pxr import UsdShade
 
 import slx_houdini.convert
+import slx_houdini.documentation
 import slx_houdini.examples
 import slx_houdini.hda_files
 import slx_houdini.lop
@@ -394,6 +396,26 @@ class NodeLibraryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("Unhandled node type", result.stdout + result.stderr)
         self.assertTrue(os.path.isfile(os.path.join(self.directory, "render.png")))
+
+
+class DocumentationTests(unittest.TestCase):
+    # hython has no hou.ui, so the dialog is replaced by one that returns the button choice.
+    def open_documentation(self, choice):
+        with mock.patch.object(hou, "ui", create=True) as ui, mock.patch("webbrowser.open") as open_url:
+            ui.displayMessage.return_value = choice
+            slx_houdini.documentation.open_documentation()
+        return ui.displayMessage, open_url
+
+    def test_each_button_opens_its_documentation(self):
+        for choice, (label, url) in enumerate(slx_houdini.documentation.DOCUMENTS):
+            dialog, open_url = self.open_documentation(choice)
+            self.assertEqual(dialog.call_args.kwargs["buttons"],
+                             ["SLX Github", "SLX Language Specification", "SLX Plugin Docs", "Cancel"])
+            open_url.assert_called_once_with(url)
+
+    def test_cancel_opens_nothing(self):
+        _, open_url = self.open_documentation(len(slx_houdini.documentation.DOCUMENTS))
+        open_url.assert_not_called()
 
 
 def get_parm_templates(templates):

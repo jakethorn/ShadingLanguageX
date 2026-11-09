@@ -32,7 +32,8 @@ def get_vendor_name(wheel_name):
     python_tag, platform_tag = match.groups()
     if platform_tag.startswith("win_amd64"):
         os_name = "windows"
-    elif "manylinux" in platform_tag and platform_tag.endswith("x86_64"):
+    # Release wheels are manylinux, and local builds, e.g. from build_python.sh, are plain linux.
+    elif platform_tag == "linux_x86_64" or ("manylinux" in platform_tag and platform_tag.endswith("x86_64")):
         os_name = "linux"
     elif platform_tag.startswith("macosx"):
         os_name = "macos"

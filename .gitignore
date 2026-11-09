@@ -12,6 +12,7 @@ mxslc++/rsp_decomp.py
 mxslc++/todo.txt
 mxslc++/notes.txt
 mxslc++/build_python.sh
+mxslc++/build_python.ps1
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

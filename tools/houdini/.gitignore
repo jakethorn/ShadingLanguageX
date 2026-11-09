@@ -1,2 +1,4 @@
 slx/vendor/
+build_plugin.sh
+build_plugin.ps1
 __pycache__/

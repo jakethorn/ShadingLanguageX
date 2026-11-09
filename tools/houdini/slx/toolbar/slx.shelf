@@ -55,9 +55,9 @@ slx_houdini.node_library.rebuild_with_message()]]></script>
   </tool>
 
   <tool name="slx_documentation" label="SLX Docs" icon="BUTTONS_help">
-    <helpText><![CDATA[Opens the ShadingLanguageX documentation.]]></helpText>
-    <script scriptType="python"><![CDATA[import webbrowser
+    <helpText><![CDATA[Opens the ShadingLanguageX GitHub page, language specification or plugin docs.]]></helpText>
+    <script scriptType="python"><![CDATA[import slx_houdini.documentation
 
-webbrowser.open("https://github.com/jakethorn/ShadingLanguageX")]]></script>
+slx_houdini.documentation.open_documentation()]]></script>
   </tool>
 </shelfDocument>

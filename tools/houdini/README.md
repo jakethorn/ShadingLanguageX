@@ -11,7 +11,7 @@ A Houdini plugin for writing Solaris materials in [ShadingLanguageX](https://git
   Material Builders list in their Tab menu.
 - **Convert to SLX**: turns a Material Library, a Material Builder, or a referenced `.mtlx` file into an
   SLX Material node holding the equivalent SLX code.
-- **SLX shelf**: new SLX Material, Recompile All, Convert to SLX, Open and Rebuild Node Library, and a link to the
+- **SLX shelf**: new SLX Material, Recompile All, Convert to SLX, Open and Rebuild Node Library, and links to the
   docs.
 
 ![](./images/ShelfTool.png)
