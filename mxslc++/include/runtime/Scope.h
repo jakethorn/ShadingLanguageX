@@ -77,6 +77,14 @@ namespace mxslc::runtime
         TypePtr resolve_type(const TypePtr& type) const;
         TypePtr get_type(const string& name) const;
 
+        /*
+         * namespace
+         */
+
+        void enter_namespace(string name);
+        void exit_namespace();
+        NamespacePtr get_namespace() const;
+
     private:
         void resolve_fields(const TypePtr& type) const;
 
@@ -87,6 +95,7 @@ namespace mxslc::runtime
         unordered_map<string, VarPtr> variables_;
         unordered_map<string, vector<FuncPtr>> functions_;
         unordered_map<string, TypePtr> types_;
+        NamespacePtr namespace_;
 
         mx::GraphElementPtr graph_;
         FuncPtr graph_func_;

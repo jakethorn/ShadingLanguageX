@@ -41,6 +41,7 @@
 #include "statements/IfStatement.h"
 #include "statements/interface.h"
 #include "statements/MultiVariableDefinition.h"
+#include "statements/NamespaceDefinition.h"
 #include "statements/PrintStatement.h"
 #include "statements/ReturnStatement.h"
 #include "statements/VariableDefinition.h"
@@ -138,6 +139,11 @@ namespace mxslc
         if (peek() == TokenType::Return)
         {
             return return_statement();
+        }
+
+        if (peek() == TokenType::Namespace)
+        {
+            return namespace_definition();
         }
 
         ModifierList mods = modifiers();
@@ -414,6 +420,14 @@ namespace mxslc
         return create_statement<IfStatement>(std::move(token), std::move(cond_expr), std::move(then_block), std::move(else_block));
     }
 
+    StmtPtr Parser::namespace_definition()
+    {
+        Token token = match(TokenType::Namespace);
+        string name = match(TokenType::Identifier).lexeme();
+        StmtPtr body = block_statement();
+        return create_statement<NamespaceDefinition>(std::move(name), std::move(body), std::move(token));
+    }
+
     StmtPtr Parser::document_attribute()
     {
         Token token = match("@@"s);
@@ -594,7 +608,7 @@ namespace mxslc
     {
         ExprPtr expr = equality();
 
-        const vector<TokenType> ops = in_abs_ ? vector<TokenType>{'&'} : vector<TokenType>{'&', '|'};
+        const vector<TokenType> ops = in_abs_ ? vector<TokenType>{'&', TokenType::And} : vector<TokenType>{'&', '|', TokenType::And, TokenType::Or};
         while (optional<Token> op = consume(ops))
         {
             ExprPtr right = equality();
@@ -706,7 +720,7 @@ namespace mxslc
 
     ExprPtr Parser::unary()
     {
-        if (optional<Token> op = consume('!', '+', '-'))
+        if (optional<Token> op = consume('!', '+', '-', TokenType::Not))
             return ExpressionFactory::unary(std::move(*op), compound());
         return compound();
     }

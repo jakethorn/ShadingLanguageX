@@ -25,7 +25,9 @@ namespace mxslc::expressions
             {">="s, "__ge__"},
             {"<="s, "__le__"},
             {'&', "__and__"},
+            {TokenType::And, "__and__"},
             {'|', "__or__"},
+            {TokenType::Or, "__or__"},
         };
 
         string dunder_name = OP_NAMES.at(op.type());
@@ -55,6 +57,7 @@ namespace mxslc::expressions
             {'+', "__pos__"},
             {'-', "__neg__"},
             {'!', "__not__"},
+            {TokenType::Not, "__not__"},
         };
 
         string dunder_name = OP_NAMES.at(op.type());

@@ -14,6 +14,7 @@
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
+#include "runtime/Namespace.h"
 
 namespace mxslc::runtime
 {
@@ -223,6 +224,29 @@ namespace mxslc::runtime
         if (parent_)
             return parent_->get_type(name);
         throw CompileError{"Type '" + name + "' not defined"};
+    }
+
+    void Scope::enter_namespace(string name)
+    {
+        if (namespace_)
+        {
+            namespace_ = create_namespace(std::move(name), namespace_);
+        }
+        else
+        {
+            namespace_ = create_namespace(std::move(name));
+        }
+    }
+
+    void Scope::exit_namespace()
+    {
+        assert(namespace_ != nullptr);
+        namespace_ = namespace_->parent();
+    }
+
+    NamespacePtr Scope::get_namespace() const
+    {
+        return namespace_;
     }
 
     void Scope::resolve_fields(const TypePtr& type) const

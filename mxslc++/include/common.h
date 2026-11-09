@@ -75,6 +75,9 @@ namespace mxslc
 
         class Parameter;
         using ParameterValues = vector<std::pair<const Parameter&, VarPtr>>;
+
+        class Namespace;
+        using NamespacePtr = shared_ptr<Namespace>;
     }
 
     namespace serialize::values

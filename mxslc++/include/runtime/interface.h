@@ -45,6 +45,12 @@ namespace mxslc::runtime
         return std::make_unique<Scope>(std::forward<Args>(args)...);
     }
 
+    template<typename... Args>
+    NamespacePtr create_namespace(Args&&... args)
+    {
+        return std::make_shared<Namespace>(std::forward<Args>(args)...);
+    }
+
     VarPtr create_variable(ModifierList mods, TypePtr type, const vector<VarPtr>& children);
     VarPtr create_variable(ModifierList mods, TypePtr type, const vector<Primitive>& children);
     VarPtr create_variable(ModifierList mods, TypePtr type, ValuePtr value);

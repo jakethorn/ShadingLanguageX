@@ -81,6 +81,7 @@ add_library(mxslc_lib
         statements/ClassDefinition.cpp
         statements/ConstructorDefinition.cpp
         statements/ReturnStatement.cpp
+        statements/NamespaceDefinition.cpp
         utils/io_utils.cpp
         utils/string_utils.cpp
         utils/parse_cli_args.cpp

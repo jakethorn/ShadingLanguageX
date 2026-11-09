@@ -40,6 +40,7 @@ namespace mxslc
         StmtPtr expression_statement(ExprPtr expr);
         StmtPtr block_statement();
         StmtPtr if_statement();
+        StmtPtr namespace_definition();
         StmtPtr document_attribute();
 
         Attribute attribute();

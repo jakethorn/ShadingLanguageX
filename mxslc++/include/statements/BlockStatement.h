@@ -12,7 +12,7 @@ namespace mxslc::statements
     class BlockStatement final : public Statement
     {
     public:
-        BlockStatement(vector<StmtPtr> body, Token token = {});
+        explicit BlockStatement(vector<StmtPtr> body, Token token = {});
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
 
