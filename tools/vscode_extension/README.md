@@ -37,6 +37,7 @@ The source in `slx-vscode/src/`:
 | `extension.ts` | The entry point: creates everything below |
 | `engine.ts`, `engineWorker.ts`, `engineProtocol.ts` | Run the WebAssembly compiler on a worker thread |
 | `includes.ts`, `documents.ts` | Find the files a document includes and pass them to the compiler |
+| `libraryNodes.ts` | Read the node definitions in `#library` files |
 | `diagnostics.ts`, `compileErrors.ts`, `compilerOutput.ts` | Errors as you type, and the compiler's printed output |
 | `skill.ts`, `skillFiles.ts` | SLX: Install AI Skill |
 | `commands.ts`, `compiledFiles.ts`, `saveDialog.ts`, `preview.ts`, `statusBar.ts` | Commands, the file each SLX file compiles to, the default file of the save dialog, the live preview and the status bar item |

@@ -108,19 +108,5 @@
     "body": [
       "global ${1:float} ${2:name} = ${3:0.0};"
     ]
-  },
-  "Include": {
-    "prefix": "#include",
-    "description": "Include another SLX file",
-    "body": [
-      "#include \"${1:file.mxsl}\""
-    ]
-  },
-  "Library": {
-    "prefix": "#library",
-    "description": "Make the NodeDefs in a MaterialX file callable as functions",
-    "body": [
-      "#library \"${1:nodes.mtlx}\""
-    ]
   }
 }

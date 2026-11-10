@@ -169,6 +169,12 @@ jobs:
         continue-on-error: true
         run: python tools/vscode_extension/gen_extension.py --generate --converter
 
+      - name: Check the generated grammar and package.json are up to date
+        continue-on-error: true
+        run: |
+          git diff --exit-code -- tools/vscode_extension/slx-vscode/syntaxes tools/vscode_extension/slx-vscode/package.json tools/vscode_extension/slx-vscode/LICENSE ||
+            { echo "::error::Run 'python tools/vscode_extension/gen_extension.py --generate' and commit the changes."; exit 1; }
+
       - name: Test the VS Code extension
         continue-on-error: true
         working-directory: tools/vscode_extension/slx-vscode

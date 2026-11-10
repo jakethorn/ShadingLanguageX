@@ -13,18 +13,22 @@ compiles to MaterialX node graphs.
   starting with a `.mtlx` file of the same name next to the source. After that it updates the same file without
   asking, including in any editor it's open in. *SLX: Compile to MaterialX As...* saves to a different file.
   *SLX: Decompile to SLX* opens the SLX of a `.mtlx` file beside it.
-- **Completion** of variables, your own functions and classes, MaterialX nodes, standard library functions, types
-  and keywords. Inside a call, the names of the function's parameters or the node's inputs are offered as
-  `name = `, leaving out those already passed.
+- **Completion** of variables, your own functions and classes, MaterialX nodes, nodes from `#library` files,
+  standard library functions, types and keywords. Inside a call, the names of the function's parameters or the
+  node's inputs are offered as `name = `, leaving out those already passed. Typing `#` at the start of a line offers
+  the directives, the path in an `#include` or `#library` directive completes from the files and folders it can
+  find, and `@` offers common MaterialX attributes such as `doc`, `uiname` and `colorspace`.
 - **Hovers** show the declaration and docs of variables and functions, including those in included files. For
   MaterialX nodes they show the signatures, inputs, defaults and allowed values, and link to the node's section of
   the [MaterialX specification](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/documents/Specification).
-  Hover over an argument name, like `base_color` in `standard_surface(base_color = c)`, to see that input.
+  Hover over an argument name, like `base_color` in `standard_surface(base_color = c)`, to see that input. Nodes
+  from `#library` files are described the same way, with the file they come from.
 - **Parameter hints** show the signatures of the function or node being called, with the current argument
   highlighted.
 - **Go to Definition** (Ctrl+Click, or F12) on a variable, function, class or type alias jumps to where it is
-  declared, in the same file or an included one. On a standard library function such as `combine`, it opens the
-  function in the extension's copy of `stdlib.mxsl`.
+  declared, in the same file or an included one. On a node from a `#library` file, it opens its definition in that
+  file. On a standard library function such as `combine`, it opens the function in the extension's copy of
+  `stdlib.mxsl`.
 - **Links.** Ctrl+Click on an `#include` or `#library` path opens the file. With `slx.links.nodes` on, Ctrl+Click
   on a MaterialX node in a call, such as `mix` in `mix(a, b, t)`, opens the node's section of the MaterialX
   specification in your browser. It's off by default because VS Code underlines every link.
@@ -34,8 +38,8 @@ compiles to MaterialX node graphs.
   beside the source, and updates it as you type.
 - **Status bar.** The MaterialX version the file compiles against, and whether it compiles. Click it to choose the
   version.
-- **Snippets** for materials, entry functions, functions, classes, loops, `if` and `switch` expressions, globals,
-  `#include` and `#library`.
+- **Snippets** for materials, entry functions, functions, classes, loops, `if` and `switch` expressions and
+  globals.
 - **Includes and libraries.** `#include` and `#library` find files next to the file containing the directive, then
   in the folders in `slx.includePaths`. Unsaved changes in open editors are used.
 

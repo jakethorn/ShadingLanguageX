@@ -14,6 +14,7 @@
 // "b.mxsl", the second file is registered as "sub/b.mxsl".
 //
 // Keys use POSIX path rules because the WebAssembly runtime does.
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export type DirectiveKind = 'include' | 'library';
@@ -200,4 +201,40 @@ export function collectSources(
 
     visit(ROOT_KEY, rootFilePath, rootText, 0);
     return { sources, missing };
+}
+
+export interface FolderEntry {
+    name: string;
+    isFolder: boolean;
+}
+
+/**
+ * Lists what a directive's path can continue with: the subfolders, and the files with the extension, in each of
+ * the folders. Hidden entries are left out, and a name is listed once even if several folders have it.
+ */
+export function listDirectiveEntries(folders: readonly string[], extension: string, exclude?: string): FolderEntry[] {
+    const entries = new Map<string, FolderEntry>();
+    for (const folder of folders) {
+        let dirents: fs.Dirent[];
+        try {
+            dirents = fs.readdirSync(folder, { withFileTypes: true });
+        } catch {
+            continue;
+        }
+        for (const dirent of dirents) {
+            if (dirent.name.startsWith('.') || entries.has(dirent.name)) continue;
+            const fullPath = path.join(folder, dirent.name);
+            let isFolder = dirent.isDirectory();
+            if (dirent.isSymbolicLink()) {
+                try {
+                    isFolder = fs.statSync(fullPath).isDirectory();
+                } catch {
+                    continue;
+                }
+            }
+            const matches = isFolder || path.extname(dirent.name).toLowerCase() === extension;
+            if (matches && path.resolve(fullPath) !== exclude) entries.set(dirent.name, { name: dirent.name, isFolder });
+        }
+    }
+    return [...entries.values()];
 }

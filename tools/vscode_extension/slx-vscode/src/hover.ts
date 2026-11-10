@@ -1,7 +1,15 @@
 // Hovers: the declaration and docs of variables, functions, MaterialX nodes and their inputs.
 import * as vscode from 'vscode';
 import { formatDeclarationHover, formatInputHover, formatNodeHover } from './signatures';
-import { findDeclarations, findIncludedVariables, type DocumentIndex, type LocatedSymbol, type SymbolIndex } from './symbolIndex';
+import {
+    findDeclarations,
+    findIncludedVariables,
+    findLibraryNodes,
+    findNodeSignatures,
+    type DocumentIndex,
+    type LocatedSymbol,
+    type SymbolIndex,
+} from './symbolIndex';
 import { findVisibleVariables } from './symbols';
 import { findWordContext, type WordContext } from './wordContext';
 
@@ -40,15 +48,19 @@ export class SlxHoverProvider implements vscode.HoverProvider {
         const declarations = findDeclarations(indexed, (s) => (s.kind === 'function' || s.kind === 'class' || s.kind === 'alias') && s.name === word);
         if (declarations.length > 0) return formatDeclarationHover(declarations.map((d) => d.symbol), describeOrigin(declarations));
 
+        // MaterialX nodes, nodes from #library files and standard library functions, which can share a name.
         const language = this.index.language;
-        if (!language) return undefined;
-        const signatures = language.nodeSignatures(word, indexed.version);
-        const stdlib = language.stdlibOverloads(word);
-        if (signatures.length > 0) {
-            const hover = formatNodeHover(word, signatures, indexed.version, language.specLink(word));
-            return stdlib.length > 0 ? `${hover}\n\n---\n\n${formatDeclarationHover(stdlib, 'Also defined in the SLX standard library')}` : hover;
+        const parts: string[] = [];
+        const signatures = language?.nodeSignatures(word, indexed.version) ?? [];
+        if (signatures.length > 0) parts.push(formatNodeHover(word, signatures, indexed.version, language!.specLink(word)));
+        const library = findLibraryNodes(indexed, word);
+        for (const file of new Set(library.map((l) => l.file))) {
+            const fileSignatures = library.filter((l) => l.file === file).map((l) => l.node.signature);
+            parts.push(formatNodeHover(word, fileSignatures, indexed.version, undefined, file.key));
         }
-        return stdlib.length > 0 ? formatDeclarationHover(stdlib, 'SLX standard library') : undefined;
+        const stdlib = language?.stdlibOverloads(word) ?? [];
+        if (stdlib.length > 0) parts.push(formatDeclarationHover(stdlib, parts.length > 0 ? 'Also defined in the SLX standard library' : 'SLX standard library'));
+        return parts.length > 0 ? parts.join('\n\n---\n\n') : undefined;
     }
 
     /** The parameter or node input passed by name, as in `base_color` in `standard_surface(base_color = c)`. */
@@ -58,7 +70,7 @@ export class SlxHoverProvider implements vscode.HoverProvider {
             const parameter = symbol.parameters?.find((p) => p.name === name);
             if (parameter) return ['```slx', parameter.label, '```', parameter.doc ?? ''].join('\n').trim();
         }
-        for (const signature of this.index.language?.nodeSignatures(functionName, indexed.version) ?? []) {
+        for (const signature of findNodeSignatures(indexed, this.index.language, functionName)) {
             const input = signature.inputs.find((i) => i.name === name);
             if (input) return formatInputHover(functionName, input);
         }

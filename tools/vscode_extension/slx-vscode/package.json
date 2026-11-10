@@ -811,7 +811,7 @@
     "build": "node esbuild.mjs",
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && node esbuild.mjs && node esbuild.mjs --tests && node --test out/test/compileErrors.test.js out/test/includes.test.js out/test/symbols.test.js out/test/languageFeatures.test.js out/test/macros.test.js out/test/skillFiles.test.js out/test/saveDialog.test.js out/test/engine.test.js out/test/snippets.test.js && npm run test:grammar",
+    "test": "npm run typecheck && node esbuild.mjs && node esbuild.mjs --tests && node --test out/test/compileErrors.test.js out/test/includes.test.js out/test/symbols.test.js out/test/languageFeatures.test.js out/test/macros.test.js out/test/skillFiles.test.js out/test/libraryNodes.test.js out/test/saveDialog.test.js out/test/engine.test.js out/test/snippets.test.js && npm run test:grammar",
     "test:grammar": "vscode-tmgrammar-test --grammar syntaxes/slx.tmLanguage.json \"test/grammar/*.test.mxsl\"",
     "package": "vsce package --no-dependencies --out ..",
     "vscode:prepublish": "node esbuild.mjs --production"

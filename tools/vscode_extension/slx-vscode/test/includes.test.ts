@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import { test } from 'node:test';
-import { blankComments, collectSources, findDirectives, joinKey, type ReadSource } from '../src/includes';
+import { blankComments, collectSources, findDirectives, joinKey, listDirectiveEntries, type ReadSource } from '../src/includes';
 
 /** A fake file system, keyed by absolute path. */
 function readFrom(files: Record<string, string>): ReadSource {
@@ -116,4 +118,24 @@ test('collectSources also registers libraries under the path as written', () => 
         sources.map((s) => s.key),
         ['sub/a.mxsl', 'sub/nodes.mtlx', 'nodes.mtlx'],
     );
+});
+
+test('listDirectiveEntries lists folders and files with the extension, once each, without hidden ones or the excluded file', () => {
+    const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'slx-entries-'));
+    try {
+        const first = path.join(temp, 'first');
+        const second = path.join(temp, 'second');
+        for (const file of ['first/a.mxsl', 'first/main.mxsl', 'first/b.mtlx', 'first/.hidden.mxsl', 'second/a.mxsl', 'second/c.MXSL']) {
+            fs.mkdirSync(path.dirname(path.join(temp, file)), { recursive: true });
+            fs.writeFileSync(path.join(temp, file), '');
+        }
+        fs.mkdirSync(path.join(first, 'sub'));
+        const entries = listDirectiveEntries([first, second, path.join(temp, 'missing')], '.mxsl', path.join(first, 'main.mxsl'));
+        assert.deepEqual(
+            entries.map((e) => `${e.name}${e.isFolder ? '/' : ''}`).sort(),
+            ['a.mxsl', 'c.MXSL', 'sub/'],
+        );
+    } finally {
+        fs.rmSync(temp, { recursive: true, force: true });
+    }
 });

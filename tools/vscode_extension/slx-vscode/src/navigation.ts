@@ -6,7 +6,15 @@ import * as vscode from 'vscode';
 import { isCallName } from './callContext';
 import { findCandidatePaths, findDirectives } from './includes';
 import { readSettings } from './settings';
-import { findDeclarations, findIncludedVariables, positionAt, rangeOf, type LocatedSymbol, type SymbolIndex } from './symbolIndex';
+import {
+    findDeclarations,
+    findIncludedVariables,
+    findLibraryNodes,
+    positionAt,
+    rangeOf,
+    type LocatedSymbol,
+    type SymbolIndex,
+} from './symbolIndex';
 import { findVisibleVariables } from './symbols';
 import { findWordContext } from './wordContext';
 
@@ -55,7 +63,13 @@ export class SlxDefinitionProvider implements vscode.DefinitionProvider {
             }
         }
         if (found.length > 0) return found.map(toLocation);
-        return context.afterDot || context.argumentOf ? undefined : this.findStandardLibraryDefinitions(word, indexed.version);
+        if (context.afterDot || context.argumentOf) return undefined;
+        // Nodes from #library files: their <nodedef> elements.
+        const libraryNodes = findLibraryNodes(indexed, word);
+        if (libraryNodes.length > 0) {
+            return libraryNodes.map(({ node, file }) => new vscode.Location(file.uri, positionAt(file.text, node.offset)));
+        }
+        return this.findStandardLibraryDefinitions(word, indexed.version);
     }
 
     /**

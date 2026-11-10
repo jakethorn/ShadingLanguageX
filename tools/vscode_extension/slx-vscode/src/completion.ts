@@ -1,10 +1,14 @@
-// Code completion: argument names, variables, functions, MaterialX nodes, types and keywords.
+// Code completion: argument names, variables, functions, MaterialX nodes, types and keywords, and directives, the
+// paths in #include and #library directives, and attribute names.
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { findCallContext, type CallContext } from './callContext';
+import { listDirectiveEntries, type DirectiveKind } from './includes';
 import type { NodeInput } from './languageData';
 import { isInCommentOrString } from './lexer';
 import { describeInput, formatDeclarationHover, formatNodeHover } from './signatures';
-import { findDeclarations, findIncludedVariables, type DocumentIndex, type SymbolIndex } from './symbolIndex';
+import { readSettings } from './settings';
+import { findDeclarations, findIncludedVariables, findNodeSignatures, type DocumentIndex, type SymbolIndex } from './symbolIndex';
 import { findVisibleVariables, type SlxSymbol } from './symbols';
 
 // Groups shown in this order when items match equally well.
@@ -13,6 +17,41 @@ const SORT_VARIABLE = '1';
 const SORT_DECLARATION = '2';
 const SORT_BUILTIN = '3';
 const SORT_LANGUAGE = '4';
+
+/** Characters that open completion as they are typed: directives, their paths, and attribute names. */
+export const COMPLETION_TRIGGER_CHARACTERS = ['#', '"', '/', '@'];
+
+const DIRECTIVES = ['include', 'library', 'version', 'define', 'undef', 'ifdef', 'ifndef', 'if', 'elif', 'elifdef', 'elifndef', 'else', 'endif'];
+
+/** Common MaterialX attributes, completed after @. Any name can be written. */
+const ATTRIBUTES: Record<string, string> = {
+    doc: 'Documentation.',
+    uiname: 'The name shown in user interfaces.',
+    uifolder: 'The folder an input is shown in, such as "Base/Color".',
+    uimin: 'The smallest value user interfaces allow.',
+    uimax: 'The largest value user interfaces allow.',
+    uisoftmin: 'The smallest value of user interface sliders.',
+    uisoftmax: 'The largest value of user interface sliders.',
+    uistep: 'The step of user interface sliders.',
+    uiadvanced: '"true" to show an input only in advanced views.',
+    uivisible: '"false" to hide an input in user interfaces.',
+    colorspace: 'The colour space of a value or file, such as "srgb_texture".',
+    unit: 'The unit of a value, such as "meter".',
+    unittype: 'The kind of unit, such as "distance".',
+    enum: 'The values an input accepts, separated by commas.',
+    enumvalues: 'The values that the enum names stand for, separated by commas.',
+    defaultgeomprop: 'The geometric property an input defaults to, such as "Nworld".',
+    nodegroup: 'The group of a node definition, such as "math".',
+};
+
+/** Attributes of the MaterialX document, completed after @@. */
+const DOCUMENT_ATTRIBUTES: Record<string, string> = {
+    colorspace: 'The colour space of the values and files in the document.',
+    namespace: 'The namespace of the elements in the document.',
+    doc: 'Documentation.',
+};
+
+const TRIGGER_SUGGEST: vscode.Command = { command: 'editor.action.triggerSuggest', title: 'Suggest' };
 
 /** A MaterialX node or standard library function, whose documentation is filled in when it is selected. */
 class BuiltinCompletionItem extends vscode.CompletionItem {
@@ -47,19 +86,60 @@ function declarationItem(symbols: SlxSymbol[], sortGroup: string): vscode.Comple
     return item;
 }
 
+/** The directive names, after a # at the start of a line. #include and #library go on to complete a path. */
+function completeDirectives(range: vscode.Range): vscode.CompletionItem[] {
+    return DIRECTIVES.map((name) => {
+        const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Keyword);
+        item.range = range;
+        if (name === 'include' || name === 'library') {
+            item.insertText = new vscode.SnippetString(`${name} "$1"`);
+            item.command = TRIGGER_SUGGEST;
+        }
+        return item;
+    });
+}
+
+function completeAttributes(attributes: Record<string, string>, range: vscode.Range): vscode.CompletionItem[] {
+    return Object.entries(attributes).map(([name, documentation]) => {
+        const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
+        item.range = range;
+        item.insertText = new vscode.SnippetString(`${name} "$1"`);
+        item.documentation = documentation;
+        return item;
+    });
+}
+
 export class SlxCompletionProvider implements vscode.CompletionItemProvider<vscode.CompletionItem> {
     constructor(private readonly index: SymbolIndex) {}
 
-    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] | undefined {
+    provideCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        _token?: vscode.CancellationToken,
+        context?: vscode.CompletionContext,
+    ): vscode.CompletionItem[] | undefined {
+        const trigger = context?.triggerKind === vscode.CompletionTriggerKind.TriggerCharacter ? context.triggerCharacter : undefined;
+        const linePrefix = document.lineAt(position.line).text.slice(0, position.character);
+        /** Replaces what has been typed of the name or path being completed. */
+        const typedRange = (length: number) => new vscode.Range(position.line, position.character - length, position.line, position.character);
+
+        const pathDirective = /^\s*#\s*(include|library)\s+"([^"]*)$/.exec(linePrefix);
+        if (pathDirective) return this.completePath(document, pathDirective[1] as DirectiveKind, pathDirective[2], typedRange);
+        const directive = /^\s*#\s*(\w*)$/.exec(linePrefix);
+        if (directive) return completeDirectives(typedRange(directive[1].length));
+        if (/^\s*#/.test(linePrefix) || (trigger !== undefined && trigger !== '@')) return undefined;
+
         const indexed = this.index.index(document);
         const offset = document.offsetAt(position);
         const lexed = indexed.file.scanned.lexed;
         if (isInCommentOrString(lexed, offset)) return undefined;
 
-        const linePrefix = document.lineAt(position.line).text.slice(0, position.character);
-        if (/^\s*#/.test(linePrefix)) return undefined;
-        // Attribute names, and fields, ports and swizzles after a "." need types to complete.
-        if (/[@.]\s*\w*$/.test(linePrefix)) return undefined;
+        // @name, @port.name or @@name.
+        const attribute = /(@@?)(?:[A-Za-z_][\w-]*\.)?([\w-]*)$/.exec(linePrefix);
+        if (attribute) return completeAttributes(attribute[1] === '@@' ? DOCUMENT_ATTRIBUTES : ATTRIBUTES, typedRange(attribute[2].length));
+        if (trigger === '@') return undefined;
+        // Fields, ports and swizzles after a "." need types to complete.
+        if (/\.\s*\w*$/.test(linePrefix)) return undefined;
 
         const items: vscode.CompletionItem[] = [];
         const names = new Set<string>();
@@ -91,10 +171,35 @@ export class SlxCompletionProvider implements vscode.CompletionItemProvider<vsco
         return item;
     }
 
+    /** The folders, and the .mxsl or .mtlx files, that the path in an #include or #library directive can continue with. */
+    private completePath(
+        document: vscode.TextDocument,
+        kind: DirectiveKind,
+        typed: string,
+        typedRange: (length: number) => vscode.Range,
+    ): vscode.CompletionItem[] {
+        const folderPart = typed.slice(0, typed.lastIndexOf('/') + 1);
+        const range = typedRange(typed.length - folderPart.length);
+        const filePath = document.uri.scheme === 'file' ? document.uri.fsPath : undefined;
+        const searched = [...(filePath ? [path.dirname(filePath)] : []), ...readSettings(document.uri).includePaths];
+        const folders = path.isAbsolute(folderPart) ? [folderPart] : searched.map((folder) => path.join(folder, folderPart));
+        return listDirectiveEntries(folders, kind === 'include' ? '.mxsl' : '.mtlx', filePath && path.resolve(filePath)).map((entry) => {
+            const item = new vscode.CompletionItem(
+                entry.isFolder ? `${entry.name}/` : entry.name,
+                entry.isFolder ? vscode.CompletionItemKind.Folder : vscode.CompletionItemKind.File,
+            );
+            item.range = range;
+            // Files first, then folders, which open the suggestions again for what is in them.
+            item.sortText = (entry.isFolder ? '1' : '0') + entry.name;
+            if (entry.isFolder) item.command = TRIGGER_SUGGEST;
+            return item;
+        });
+    }
+
     /** `name = ` for each parameter of the function being called that isn't passed yet. */
     private addArgumentNames(indexed: DocumentIndex, call: CallContext, items: vscode.CompletionItem[]): void {
         const inputs = new Map<string, NodeInput>();
-        for (const signature of this.index.language?.nodeSignatures(call.name, indexed.version) ?? []) {
+        for (const signature of findNodeSignatures(indexed, this.index.language, call.name)) {
             for (const input of signature.inputs) if (!inputs.has(input.name)) inputs.set(input.name, input);
         }
         const parameters = new Map<string, string>();
@@ -128,6 +233,16 @@ export class SlxCompletionProvider implements vscode.CompletionItemProvider<vsco
     }
 
     private addBuiltins(indexed: DocumentIndex, add: (item: vscode.CompletionItem) => void): void {
+        for (const file of indexed.libraries) {
+            for (const name of new Set(file.nodes.map((node) => node.name))) {
+                const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function);
+                item.detail = `Node from ${file.key}`;
+                const signatures = file.nodes.filter((node) => node.name === name).map((node) => node.signature);
+                item.documentation = new vscode.MarkdownString(formatNodeHover(name, signatures, indexed.version, undefined, file.key));
+                item.sortText = SORT_BUILTIN + name;
+                add(item);
+            }
+        }
         const language = this.index.language;
         if (!language) return;
         for (const name of language.nodeNames(indexed.version)) {

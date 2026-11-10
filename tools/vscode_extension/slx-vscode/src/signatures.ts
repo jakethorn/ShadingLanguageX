@@ -106,8 +106,11 @@ export function functionSignatureHint(symbol: SlxSymbol): SignatureHint {
 /** How many signatures a hover lists before summarising the rest. */
 const HOVER_SIGNATURE_LIMIT = 8;
 
-/** Returns the hover text, as Markdown, for a MaterialX node, linking to its section of the specification if it has one. */
-export function formatNodeHover(name: string, signatures: NodeSignature[], version: string, specLink?: string): string {
+/**
+ * Returns the hover text, as Markdown, for a MaterialX node, linking to its section of the specification if it has
+ * one. For a node from a #library file, library is the file's name.
+ */
+export function formatNodeHover(name: string, signatures: NodeSignature[], version: string, specLink?: string, library?: string): string {
     const lines: string[] = [];
     if (signatures.length === 1) {
         // One signature: one input per line, with defaults, as most such nodes have many inputs.
@@ -128,7 +131,8 @@ export function formatNodeHover(name: string, signatures: NodeSignature[], versi
         if (signatures.length > HOVER_SIGNATURE_LIMIT) lines.push(`*…and ${signatures.length - HOVER_SIGNATURE_LIMIT} more signatures*`, '');
     }
     const group = signatures.find((s) => s.group)?.group;
-    lines.push(`MaterialX ${version} node${group ? ` · ${group}` : ''}${specLink ? ` · ${formatSpecLink(specLink)}` : ''}`);
+    const origin = library ? `Defined in \`${library}\`` : `MaterialX ${version} node`;
+    lines.push(`${origin}${group ? ` · ${group}` : ''}${specLink ? ` · ${formatSpecLink(specLink)}` : ''}`);
     return lines.join('\n');
 }
 

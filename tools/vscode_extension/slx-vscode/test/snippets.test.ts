@@ -42,20 +42,7 @@ function expandSnippet(body: string[]): string {
 const contexts: Record<string, (snippet: string) => string> = {
     'If expression': (s) => `float a = 1.0;\nbool condition = a > 0.5;\nfloat value_if_true = 1.0;\nfloat value_if_false = 0.0;\nfloat x = ${s};\n`,
     'Switch expression': (s) => `int index = 1;\nfloat value_0 = 0.0;\nfloat value_1 = 1.0;\nfloat value_2 = 2.0;\nfloat x = ${s};\n`,
-    Include: (s) => `${s}\nfloat y = INCLUDED;\n`,
-    Library: (s) => `${s}\nfloat y = my_node(in=1.0);\n`,
 };
-
-const includedSources = [
-    { key: 'file.mxsl', text: 'const float INCLUDED = 1.0;\n' },
-    {
-        key: 'nodes.mtlx',
-        text:
-            '<?xml version="1.0"?>\n<materialx version="1.39">\n' +
-            '  <nodedef name="ND_my_node" node="my_node"><input name="in" type="float" value="0"/><output name="out" type="float"/></nodedef>\n' +
-            '</materialx>\n',
-    },
-];
 
 test('expandSnippet uses the default values', () => {
     assert.equal(expandSnippet(['${1:a} ${2:{b\\}} $1 ${0:$2}']), 'a {b} a {b}');
@@ -65,6 +52,6 @@ for (const [name, snippet] of Object.entries(snippets)) {
     test(`the "${name}" snippet compiles`, { skip }, async () => {
         const expanded = expandSnippet(snippet.body);
         const source = contexts[name] ? contexts[name](expanded) : expanded;
-        await engine.compile(source, includedSources, settings);
+        await engine.compile(source, [], settings);
     });
 }

@@ -3,7 +3,10 @@
 ## 0.4.0
 
 - Completion of variables, functions, classes, MaterialX nodes, standard library functions, types and keywords,
-  and of argument names inside calls.
+  and of argument names inside calls. Also of directive names after `#`, the paths in `#include` and `#library`
+  directives, and common MaterialX attributes after `@`. These replace the `#include` and `#library` snippets.
+- Nodes from `#library` files are completed, described in hovers and parameter hints, and Go to Definition opens
+  their definitions.
 - Hovers for variables, functions and MaterialX nodes, including node inputs passed by name. Node hovers link to
   the node's section of the MaterialX specification.
 - Parameter hints for functions and MaterialX nodes.

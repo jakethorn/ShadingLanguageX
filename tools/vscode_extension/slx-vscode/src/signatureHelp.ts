@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { findCallContext } from './callContext';
 import { isInCommentOrString } from './lexer';
 import { functionSignatureHint, nodeSignatureHints, type SignatureHint } from './signatures';
-import { findDeclarations, type SymbolIndex } from './symbolIndex';
+import { findDeclarations, findLibraryNodes, type SymbolIndex } from './symbolIndex';
 
 function toSignatureInformation(hint: SignatureHint): vscode.SignatureInformation {
     const information = new vscode.SignatureInformation(hint.label, hint.documentation ? new vscode.MarkdownString(hint.documentation) : undefined);
@@ -33,16 +33,19 @@ export class SlxSignatureHelpProvider implements vscode.SignatureHelpProvider {
         const declared = findDeclarations(indexed, (s) => (s.kind === 'function' || s.kind === 'constructor') && s.name === call.name);
         let hints = declared.map((d) => functionSignatureHint(d.symbol));
         const language = this.index.language;
-        if (hints.length === 0 && language) {
-            let signatures = language.nodeSignatures(call.name, indexed.version);
-            if (call.templateArguments.length === 1) {
+        if (hints.length === 0) {
+            let signatures = [
+                ...(language?.nodeSignatures(call.name, indexed.version) ?? []),
+                ...findLibraryNodes(indexed, call.name).map((l) => l.node.signature),
+            ];
+            if (call.templateArguments.length === 1 && language) {
                 const type = language.canonicalType(call.templateArguments[0]);
                 const matching = signatures.filter((s) => s.outputs.length === 1 && s.outputs[0].type === type);
                 if (matching.length > 0) signatures = matching;
             }
             hints = [
-                ...nodeSignatureHints(call.name, signatures, language.specLink(call.name)),
-                ...language.stdlibOverloads(call.name).map(functionSignatureHint),
+                ...nodeSignatureHints(call.name, signatures, language?.specLink(call.name)),
+                ...(language?.stdlibOverloads(call.name) ?? []).map(functionSignatureHint),
             ];
         }
         if (hints.length === 0) return undefined;

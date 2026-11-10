@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import { registerBracketColorization } from './bracketColorization';
 import { registerCommands } from './commands';
-import { SlxCompletionProvider } from './completion';
+import { COMPLETION_TRIGGER_CHARACTERS, SlxCompletionProvider } from './completion';
 import { SlxDiagnostics } from './diagnostics';
 import { SlxEngine } from './engine';
 import { SlxHoverProvider } from './hover';
@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext): void {
         { dispose: () => engine.dispose() },
         ...registerCommands(diagnostics, context.workspaceState, log),
         index,
-        vscode.languages.registerCompletionItemProvider(SLX, new SlxCompletionProvider(index)),
+        vscode.languages.registerCompletionItemProvider(SLX, new SlxCompletionProvider(index), ...COMPLETION_TRIGGER_CHARACTERS),
         vscode.languages.registerHoverProvider(SLX, new SlxHoverProvider(index)),
         vscode.languages.registerSignatureHelpProvider(SLX, new SlxSignatureHelpProvider(index), '(', ','),
         vscode.languages.registerDocumentSymbolProvider(SLX, new SlxDocumentSymbolProvider(index)),

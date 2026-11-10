@@ -2,7 +2,8 @@
 // includes, scanned once per version of each file's text.
 import * as vscode from 'vscode';
 import { collectDocumentSources } from './documents';
-import { findVersionDirective, type SlxLanguage } from './languageData';
+import { findVersionDirective, type NodeSignature, type SlxLanguage } from './languageData';
+import { parseNodeDefs, type LibraryNode } from './libraryNodes';
 import { readSettings } from './settings';
 import { scanSymbols, type ScannedSource, type SlxSymbol } from './symbols';
 
@@ -14,10 +15,21 @@ export interface IndexedFile {
     scanned: ScannedSource;
 }
 
+/** A MaterialX file the document loads with #library. */
+export interface LibraryFile {
+    uri: vscode.Uri;
+    /** The file's name in the include tree, e.g. "nodes.mtlx". */
+    key: string;
+    text: string;
+    nodes: LibraryNode[];
+}
+
 export interface DocumentIndex {
     file: IndexedFile;
     /** The SLX files the document includes, directly or through other includes. */
     includes: IndexedFile[];
+    /** The MaterialX files the document and its includes load with #library. */
+    libraries: LibraryFile[];
     /** The MaterialX version the document compiles against. */
     version: string;
 }
@@ -45,10 +57,14 @@ export function rangeOf(file: IndexedFile, start: number, end: number): vscode.R
 
 export class SymbolIndex implements vscode.Disposable {
     private readonly scans = new Map<string, { text: string; scanned: ScannedSource }>();
+    private readonly libraryNodes = new Map<string, { text: string; nodes: LibraryNode[] }>();
     private readonly closeListener: vscode.Disposable;
 
     constructor(readonly language: SlxLanguage | undefined) {
-        this.closeListener = vscode.workspace.onDidCloseTextDocument((document) => this.scans.delete(document.uri.toString()));
+        this.closeListener = vscode.workspace.onDidCloseTextDocument((document) => {
+            this.scans.delete(document.uri.toString());
+            this.libraryNodes.delete(document.uri.toString());
+        });
     }
 
     dispose(): void {
@@ -64,6 +80,15 @@ export class SymbolIndex implements vscode.Disposable {
         return scanned;
     }
 
+    private parseLibrary(uri: vscode.Uri, text: string): LibraryNode[] {
+        const key = uri.toString();
+        const cached = this.libraryNodes.get(key);
+        if (cached && cached.text === text) return cached.nodes;
+        const nodes = parseNodeDefs(text);
+        this.libraryNodes.set(key, { text, nodes });
+        return nodes;
+    }
+
     index(document: vscode.TextDocument): DocumentIndex {
         const text = document.getText();
         const settings = readSettings(document.uri);
@@ -71,17 +96,38 @@ export class SymbolIndex implements vscode.Disposable {
 
         const seen = new Set<string>();
         const includes: IndexedFile[] = [];
+        const libraries: LibraryFile[] = [];
         for (const source of collectDocumentSources(document, text, settings.includePaths).sources) {
-            if (source.origin.directive.kind !== 'include' || seen.has(source.filePath)) continue;
+            if (seen.has(source.filePath)) continue;
             seen.add(source.filePath);
             const uri = vscode.Uri.file(source.filePath);
-            includes.push({ uri, key: source.key, text: source.text, scanned: this.scan(uri, source.text) });
+            if (source.origin.directive.kind === 'library') {
+                libraries.push({ uri, key: source.key, text: source.text, nodes: this.parseLibrary(uri, source.text) });
+            } else {
+                includes.push({ uri, key: source.key, text: source.text, scanned: this.scan(uri, source.text) });
+            }
         }
 
         const requested = findVersionDirective(text) ?? settings.compile.materialxVersion;
         const version = this.language ? this.language.resolveVersion(requested) : requested;
-        return { file, includes, version };
+        return { file, includes, libraries, version };
     }
+}
+
+/** A node from a #library file, with the file. */
+export interface LocatedNode {
+    node: LibraryNode;
+    file: LibraryFile;
+}
+
+/** The nodes with this name in the document's #library files. */
+export function findLibraryNodes(index: DocumentIndex, name: string): LocatedNode[] {
+    return index.libraries.flatMap((file) => file.nodes.filter((node) => node.name === name).map((node) => ({ node, file })));
+}
+
+/** The signatures of the nodes with this name: the MaterialX standard ones, then those from #library files. */
+export function findNodeSignatures(index: DocumentIndex, language: SlxLanguage | undefined, name: string): NodeSignature[] {
+    return [...(language?.nodeSignatures(name, index.version) ?? []), ...findLibraryNodes(index, name).map((l) => l.node.signature)];
 }
 
 /** Every declaration in the document and its includes that matches. */
