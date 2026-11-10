@@ -18,7 +18,7 @@ jobs:
         include:
           - os: ubuntu-latest
           - os: windows-latest
-          - os: macos-14
+          - os: macos-latest
             generator: Ninja
             cc: clang
             cxx: clang++
