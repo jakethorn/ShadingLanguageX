@@ -17,7 +17,9 @@
     "shadinglanguagex",
     "mxsl",
     "materialx",
-    "shading language"
+    "shading language",
+    "ai",
+    "skill"
   ],
   "engines": {
     "vscode": "^1.85.0"
@@ -74,24 +76,28 @@
         "path": "./snippets/slx.code-snippets"
       }
     ],
+    "chatSkills": [
+      {
+        "path": "./skills/shadinglanguagex/SKILL.md"
+      }
+    ],
     "commands": [
       {
         "command": "slx.compile",
         "category": "SLX",
         "title": "Compile to MaterialX",
-        "icon": "$(arrow-swap)"
+        "icon": "$(play)"
+      },
+      {
+        "command": "slx.compileAs",
+        "category": "SLX",
+        "title": "Compile to MaterialX As..."
       },
       {
         "command": "slx.decompile",
         "category": "SLX",
         "title": "Decompile to SLX",
-        "icon": "$(arrow-swap)"
-      },
-      {
-        "command": "slx.validate",
-        "category": "SLX",
-        "title": "Validate",
-        "icon": "$(check-all)"
+        "icon": "$(play)"
       },
       {
         "command": "slx.showPreview",
@@ -103,6 +109,11 @@
         "command": "slx.selectMaterialXVersion",
         "category": "SLX",
         "title": "Select MaterialX Version"
+      },
+      {
+        "command": "slx.installSkill",
+        "category": "SLX",
+        "title": "Install AI Skill"
       }
     ],
     "menus": {
@@ -121,11 +132,6 @@
           "command": "slx.decompile",
           "when": "resourceExtname =~ /^\\.mtlx$/i",
           "group": "navigation"
-        },
-        {
-          "command": "slx.validate",
-          "when": "editorLangId == slx || resourceExtname =~ /^\\.mtlx$/i",
-          "group": "navigation"
         }
       ],
       "editor/context": [
@@ -140,13 +146,13 @@
           "group": "1_slx"
         },
         {
-          "command": "slx.decompile",
-          "when": "resourceExtname =~ /^\\.mtlx$/i",
+          "command": "slx.compileAs",
+          "when": "editorLangId == slx",
           "group": "1_slx"
         },
         {
-          "command": "slx.validate",
-          "when": "editorLangId == slx || resourceExtname =~ /^\\.mtlx$/i",
+          "command": "slx.decompile",
+          "when": "resourceExtname =~ /^\\.mtlx$/i",
           "group": "1_slx"
         }
       ],
@@ -156,12 +162,12 @@
           "when": "editorLangId == slx"
         },
         {
-          "command": "slx.decompile",
-          "when": "resourceExtname =~ /^\\.mtlx$/i"
+          "command": "slx.compileAs",
+          "when": "editorLangId == slx"
         },
         {
-          "command": "slx.validate",
-          "when": "editorLangId == slx || resourceExtname =~ /^\\.mtlx$/i"
+          "command": "slx.decompile",
+          "when": "resourceExtname =~ /^\\.mtlx$/i"
         },
         {
           "command": "slx.showPreview",
@@ -234,12 +240,6 @@
           "scope": "resource",
           "markdownDescription": "Extra folders to search for `#include` and `#library` files, after the folder of the file containing the directive. Relative paths are resolved against the workspace folder."
         },
-        "slx.compileOnSave": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "markdownDescription": "When an SLX file is saved, write the compiled MaterialX to a `.mtlx` file with the same name next to it. Nothing is written if the file has errors."
-        },
         "slx.links.nodes": {
           "type": "boolean",
           "default": false,
@@ -262,7 +262,7 @@
           "enumDescriptions": [
             "Check files as you type, after a short pause.",
             "Check files when they are opened or saved.",
-            "Only check files when the SLX: Validate command is run."
+            "Only check files when they are compiled or decompiled with an SLX command."
           ],
           "default": "onType",
           "scope": "resource",
@@ -811,7 +811,7 @@
     "build": "node esbuild.mjs",
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && node esbuild.mjs && node esbuild.mjs --tests && node --test out/test/compileErrors.test.js out/test/includes.test.js out/test/symbols.test.js out/test/languageFeatures.test.js out/test/macros.test.js out/test/engine.test.js out/test/snippets.test.js && npm run test:grammar",
+    "test": "npm run typecheck && node esbuild.mjs && node esbuild.mjs --tests && node --test out/test/compileErrors.test.js out/test/includes.test.js out/test/symbols.test.js out/test/languageFeatures.test.js out/test/macros.test.js out/test/skillFiles.test.js out/test/saveDialog.test.js out/test/engine.test.js out/test/snippets.test.js && npm run test:grammar",
     "test:grammar": "vscode-tmgrammar-test --grammar syntaxes/slx.tmLanguage.json \"test/grammar/*.test.mxsl\"",
     "package": "vsce package --no-dependencies --out ..",
     "vscode:prepublish": "node esbuild.mjs --production"

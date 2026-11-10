@@ -9,8 +9,10 @@ compiles to MaterialX node graphs.
   modifiers and preprocessor directives.
 - **Errors as you type.** Open SLX files are compiled after each pause in typing, and errors appear in the Problems
   panel. An error in an included file is shown in that file and on the `#include` line that pulls it in.
-- **Compile and decompile.** *SLX: Compile to MaterialX* opens the compiled MaterialX beside the source, and
-  *SLX: Decompile to SLX* does the reverse for `.mtlx` files. *SLX: Validate* checks a file without opening anything.
+- **Compile and decompile.** *SLX: Compile to MaterialX* saves the compiled MaterialX to a file you choose,
+  starting with a `.mtlx` file of the same name next to the source. After that it updates the same file without
+  asking, including in any editor it's open in. *SLX: Compile to MaterialX As...* saves to a different file.
+  *SLX: Decompile to SLX* opens the SLX of a `.mtlx` file beside it.
 - **Completion** of variables, your own functions and classes, MaterialX nodes, standard library functions, types
   and keywords. Inside a call, the names of the function's parameters or the node's inputs are offered as
   `name = `, leaving out those already passed.
@@ -30,8 +32,6 @@ compiles to MaterialX node graphs.
   material and shader variables.
 - **Live MaterialX preview.** *SLX: Open MaterialX Preview to the Side* (Ctrl+K V) shows the compiled MaterialX
   beside the source, and updates it as you type.
-- **Compile on save.** With `slx.compileOnSave` on, saving an SLX file writes the compiled MaterialX to a `.mtlx`
-  file next to it.
 - **Status bar.** The MaterialX version the file compiles against, and whether it compiles. Click it to choose the
   version.
 - **Snippets** for materials, entry functions, functions, classes, loops, `if` and `switch` expressions, globals,
@@ -41,6 +41,20 @@ compiles to MaterialX node graphs.
 
 Completion, hovers, parameter hints and the MaterialX version follow the file's `#version` directive, or the
 `slx.materialxVersion` setting.
+
+## AI agents
+
+The extension includes a skill that teaches AI agents SLX: the language, the standard library, the compiler and
+how SLX becomes MaterialX nodes.
+
+- **GitHub Copilot in VS Code** uses it automatically, in recent versions of VS Code.
+- **Claude Code and other agents** read skills from folders. Run *SLX: Install AI Skill* to copy it into your
+  personal skills folder (`~/.claude/skills`), for all your projects, or into a workspace's `.claude/skills`, to
+  share it through the repository.
+
+A copied skill doesn't update with the extension, and VS Code's chat uses it in place of the one in the extension.
+After updating the extension, run *SLX: Install AI Skill* again: it shows which copies are out of date and
+replaces them.
 
 ## Colours
 
@@ -73,10 +87,11 @@ The buttons in the editor title bar and the commands in the editor's right-click
 | Command | Files | What it does |
 | --- | --- | --- |
 | SLX: Open MaterialX Preview to the Side (Ctrl+K V) | `.mxsl` | Opens the compiled MaterialX beside the file, and keeps it up to date |
-| SLX: Compile to MaterialX | `.mxsl` | Compiles the file and opens the MaterialX beside it |
+| SLX: Compile to MaterialX | `.mxsl` | Compiles the file and saves the MaterialX. The first time, it asks where, starting with a `.mtlx` file of the same name next to the source. After that it updates the same file. |
+| SLX: Compile to MaterialX As... | `.mxsl` | Compiles the file and asks where to save the MaterialX. Later compiles update the file you chose. |
 | SLX: Decompile to SLX | `.mtlx` | Decompiles the file and opens the SLX beside it |
-| SLX: Validate | `.mxsl`, `.mtlx` | Compiles or decompiles the file and reports whether it has errors |
 | SLX: Select MaterialX Version | `.mxsl` | Sets `slx.materialxVersion`. Also runs when you click the status bar item. |
+| SLX: Install AI Skill | any | Copies the SLX skill for AI agents into your personal or a workspace's skills folder |
 
 Text printed by `print` statements and compiler warnings appear in the **SLX** output panel when you run a
 command.
@@ -92,8 +107,7 @@ command.
 | `slx.includePaths` | `[]` | Extra folders to search for `#include` and `#library` files. Relative paths are resolved against the workspace folder. |
 | `slx.links.nodes` | `false` | Make MaterialX node names in calls links to the node's section of the MaterialX specification, opened with Ctrl+Click. |
 | `slx.bracketPairColorization` | `false` | Colour-code matching brackets by their nesting level. Turning it on or off sets `editor.language.colorizedBracketPairs` for SLX in the same settings file. |
-| `slx.compileOnSave` | `false` | When an SLX file is saved, write the compiled MaterialX to a `.mtlx` file with the same name next to it. Nothing is written if the file has errors. |
-| `slx.diagnostics.trigger` | `onType` | When to check open files: `onType`, `onSave`, or `off` (only when *SLX: Validate* is run). |
+| `slx.diagnostics.trigger` | `onType` | When to check open files: `onType`, `onSave`, or `off` (only when the file is compiled or decompiled with a command). |
 
 ## Limitations
 

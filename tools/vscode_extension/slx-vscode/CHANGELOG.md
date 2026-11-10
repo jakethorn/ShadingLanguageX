@@ -13,15 +13,23 @@
   MaterialX specification, opened with Ctrl+Click. It's off by default.
 - Outline and breadcrumbs.
 - *SLX: Open MaterialX Preview to the Side* (Ctrl+K V): a live view of the compiled MaterialX.
-- The `slx.compileOnSave` setting writes the compiled MaterialX next to the source when it is saved.
+- *SLX: Compile to MaterialX* saves the MaterialX to a file instead of opening it in an unsaved tab. The first
+  time, it asks where, starting with a `.mtlx` file of the same name next to the source. After that it updates the
+  same file without asking, including in any editor it's open in. *SLX: Compile to MaterialX As...* saves to a
+  different file.
 - In VS Code's default themes, SLX uses the colours of the MaterialX Playground's code editor, plus a soft red for
   argument names, like `base_color` in `standard_surface(base_color = c)`, a muted yellow for calls of standard
   library functions, and lavender for macros.
 - Macros are highlighted wherever they're used, including those defined in included files.
 - Brackets are no longer colour-coded by nesting level, as in the Playground. The new `slx.bracketPairColorization`
   setting turns it back on.
+- The SLX skill for AI agents is included. GitHub Copilot in VS Code uses it automatically, and the new
+  *SLX: Install AI Skill* command copies it into a skills folder for Claude Code and other agents.
 - A status bar item shows the MaterialX version and whether the file compiles. Clicking it runs the new
   *SLX: Select MaterialX Version* command.
+- Removed *SLX: Validate*. SLX files are already checked as you type, compiling validates the MaterialX it produces,
+  and *SLX: Decompile to SLX* reports errors in `.mtlx` files.
+- The compile and decompile buttons have a play icon instead of two arrows.
 
 ## 0.3.0
 

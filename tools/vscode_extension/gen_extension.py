@@ -43,6 +43,10 @@ PACKAGE_JSON = EXTENSION_DIR / "package.json"
 LIB_DIR = EXTENSION_DIR / "media" / "lib"
 DATA_DIR = EXTENSION_DIR / "data"
 LANGUAGE_DATA_OUT = DATA_DIR / "language-data.json"
+# The skill for AI agents, bundled so VS Code's chat can use it (the chatSkills contribution in
+# package.json) and SLX: Install AI Skill can copy it for other agents.
+SKILL_SOURCE = REPO_ROOT / ".claude" / "skills" / "shadinglanguagex"
+SKILL_OUT = EXTENSION_DIR / "skills" / SKILL_SOURCE.name
 
 JS_BUILD_BIN = REPO_ROOT / "mxslc++" / "javascript" / "build" / "mxslc" / "javascript" / "bin"
 JS_BUILD_SCRIPT = REPO_ROOT / "mxslc++" / "javascript" / "build_javascript.sh"
@@ -419,6 +423,19 @@ def copy_license() -> None:
     shutil.copy2(REPO_ROOT / "LICENSE", EXTENSION_DIR / "LICENSE")
 
 
+def copy_skill() -> None:
+    """Copy the skill for AI agents into the extension. VS Code requires its folder
+    to be named after the skill's name."""
+    skill_md = (SKILL_SOURCE / "SKILL.md").read_text(encoding="utf-8")
+    name = re.search(r"^name:\s*(\S+)\s*$", skill_md, re.M)
+    if not name or name.group(1) != SKILL_SOURCE.name:
+        sys.exit(f"error: the name in {SKILL_SOURCE / 'SKILL.md'} must be {SKILL_SOURCE.name}, the name of its folder")
+    if SKILL_OUT.exists():
+        shutil.rmtree(SKILL_OUT)
+    shutil.copytree(SKILL_SOURCE, SKILL_OUT, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    print(f"  -> {SKILL_OUT}")
+
+
 # ---------------------------------------------------------------------------
 # WebAssembly compiler
 # ---------------------------------------------------------------------------
@@ -515,7 +532,7 @@ def publish_extension() -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate, package and install the SLX extension for VS Code.")
     parser.add_argument("-g", "--generate", action="store_true",
-                        help="Regenerate syntaxes/slx.tmLanguage.json, data/ and the MaterialX version list in package.json.")
+                        help="Regenerate syntaxes/slx.tmLanguage.json, data/, skills/ and the MaterialX version list in package.json.")
     parser.add_argument("-c", "--converter", action="store_true",
                         help="Copy the WebAssembly compiler (JsMxslc.{js,wasm,data}) into media/lib, "
                              "building it first if it is missing.")
@@ -553,6 +570,7 @@ def main() -> None:
         write_language_data(language)
         update_package_json(versions, generate_theme_colors(grammar))
         copy_license()
+        copy_skill()
 
     if args.converter:
         print("\nBundling the WebAssembly compiler...")

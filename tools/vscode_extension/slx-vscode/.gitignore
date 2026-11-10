@@ -3,4 +3,5 @@ dist/
 out/
 media/lib/
 data/
+skills/
 *.vsix

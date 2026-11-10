@@ -152,9 +152,7 @@ export class SlxDiagnostics implements vscode.Disposable {
     }
 
     private handleSave(document: vscode.TextDocument): void {
-        // With slx.compileOnSave, the save handler compiles the document itself.
-        const compiledOnSave = document.uri.scheme === 'file' && readSettings(document.uri).compileOnSave;
-        if (isCheckable(document) && !compiledOnSave && this.triggerFor(document) !== 'off') this.schedule(document, 0);
+        if (isCheckable(document) && this.triggerFor(document) !== 'off') this.schedule(document, 0);
         this.scheduleDependents(document, 'save');
     }
 

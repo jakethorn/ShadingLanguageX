@@ -2,7 +2,6 @@
 import * as vscode from 'vscode';
 import { registerBracketColorization } from './bracketColorization';
 import { registerCommands } from './commands';
-import { registerCompileOnSave } from './compileOnSave';
 import { SlxCompletionProvider } from './completion';
 import { SlxDiagnostics } from './diagnostics';
 import { SlxEngine } from './engine';
@@ -13,6 +12,7 @@ import { SlxDocumentSymbolProvider } from './outline';
 import { MaterialXPreview } from './preview';
 import { SEMANTIC_TOKENS_LEGEND, SlxSemanticTokensProvider } from './semanticTokens';
 import { SlxSignatureHelpProvider } from './signatureHelp';
+import { registerSkillCommand } from './skill';
 import { SlxStatusBar } from './statusBar';
 import { SymbolIndex } from './symbolIndex';
 
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext): void {
         log,
         diagnostics,
         { dispose: () => engine.dispose() },
-        ...registerCommands(diagnostics, log),
+        ...registerCommands(diagnostics, context.workspaceState, log),
         index,
         vscode.languages.registerCompletionItemProvider(SLX, new SlxCompletionProvider(index)),
         vscode.languages.registerHoverProvider(SLX, new SlxHoverProvider(index)),
@@ -52,9 +52,9 @@ export function activate(context: vscode.ExtensionContext): void {
         semanticTokens,
         vscode.languages.registerDocumentSemanticTokensProvider(SLX, semanticTokens, SEMANTIC_TOKENS_LEGEND),
         new MaterialXPreview(diagnostics),
-        registerCompileOnSave(diagnostics, log),
         new SlxStatusBar(diagnostics, language, packagedVersions),
         registerBracketColorization(log),
+        registerSkillCommand(context, log),
     );
 }
 

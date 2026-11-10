@@ -1,10 +1,13 @@
-// The SLX: Compile to MaterialX, SLX: Decompile to SLX and SLX: Validate commands.
+// The SLX: Compile to MaterialX, SLX: Compile to MaterialX As... and SLX: Decompile to SLX commands.
+import * as os from 'node:os';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { CompiledFiles, exists, isVisible, writeCompiledFile } from './compiledFiles';
 import { createCommandLogger } from './compilerOutput';
-import type { CheckResult, SlxDiagnostics } from './diagnostics';
+import type { SlxDiagnostics } from './diagnostics';
 import { isMaterialXDocument, isSlxDocument } from './documents';
 import type { EngineError } from './engine';
+import { toSaveDialogDefault } from './saveDialog';
 
 const SHOW_PROBLEMS = 'Show Problems';
 const SHOW_OUTPUT = 'Show Output';
@@ -15,6 +18,22 @@ function describeDocument(document: vscode.TextDocument): string {
 
 function findActiveDocument(): vscode.TextDocument | undefined {
     return vscode.window.activeTextEditor?.document;
+}
+
+/**
+ * Where the save dialog starts for a file that hasn't been compiled before: the source's folder and name, with a .mtlx extension. An
+ * unsaved file has no folder, so it starts in the workspace folder, or the home folder.
+ */
+function findDefaultOutputUri(document: vscode.TextDocument): vscode.Uri {
+    if (document.isUntitled) {
+        const folder = vscode.workspace.workspaceFolders?.[0]?.uri ?? vscode.Uri.file(os.homedir());
+        return vscode.Uri.joinPath(folder, `${path.posix.basename(document.uri.path)}.mtlx`);
+    }
+    return document.uri.with({ path: document.uri.path.replace(/(\.[^./]*)?$/, '.mtlx') });
+}
+
+function isLocalWindows(): boolean {
+    return process.platform === 'win32' && vscode.env.remoteName === undefined;
 }
 
 async function openBeside(content: string, language: string): Promise<void> {
@@ -40,10 +59,12 @@ async function showFailure(log: vscode.LogOutputChannel, action: string, documen
     else if (choice === SHOW_OUTPUT) log.show(true);
 }
 
-export function registerCommands(diagnostics: SlxDiagnostics, log: vscode.LogOutputChannel): vscode.Disposable[] {
+export function registerCommands(diagnostics: SlxDiagnostics, workspaceState: vscode.Memento, log: vscode.LogOutputChannel): vscode.Disposable[] {
     const compilerLog = createCommandLogger(log);
+    const compiledFiles = new CompiledFiles(workspaceState);
 
-    const compile = async () => {
+    /** Compiles the active SLX file. With chooseFile, or if it hasn't been compiled before, asks where to save it. */
+    const compile = async (chooseFile: boolean) => {
         const document = findActiveDocument();
         if (!document || !isSlxDocument(document)) {
             void vscode.window.showWarningMessage('SLX: open an .mxsl file to compile it.');
@@ -54,8 +75,36 @@ export function registerCommands(diagnostics: SlxDiagnostics, log: vscode.LogOut
             await showFailure(log, 'Compiling', document, result.error!);
             return;
         }
-        log.info(`Compiled ${describeDocument(document)} (${result.output.length} characters).`);
-        await openBeside(result.output, 'xml');
+        const previous = compiledFiles.find(document.uri);
+        let target = !chooseFile && previous && (await exists(previous)) ? previous : undefined;
+        target ??= await vscode.window.showSaveDialog({
+            title: `Save the MaterialX Compiled from ${describeDocument(document)}`,
+            // A plain object rather than a vscode.Uri, for UNC paths: see toSaveDialogDefault.
+            defaultUri: toSaveDialogDefault(previous ?? findDefaultOutputUri(document), isLocalWindows()) as vscode.Uri,
+            filters: { MaterialX: ['mtlx'] },
+        });
+        if (!target) return;
+        const name = target.scheme === 'file' ? vscode.workspace.asRelativePath(target) : target.toString();
+        try {
+            if (!(await writeCompiledFile(target, result.output))) return;
+        } catch (error) {
+            log.error(`Couldn't write ${name}: ${error instanceof Error ? error.message : String(error)}`);
+            void vscode.window.showErrorMessage(`SLX: couldn't save ${name}.`, SHOW_OUTPUT).then((choice) => {
+                if (choice === SHOW_OUTPUT) log.show(true);
+            });
+            return;
+        }
+        await compiledFiles.remember(document.uri, target);
+        log.info(`Compiled ${describeDocument(document)} to ${name}.`);
+        // An open editor shows the change, so a message in the status bar is enough.
+        if (isVisible(target)) {
+            vscode.window.setStatusBarMessage(`$(check) SLX: compiled to ${name}`, 5000);
+            return;
+        }
+        const open = 'Open';
+        void vscode.window.showInformationMessage(`SLX: compiled to ${name}.`, open).then((choice) => {
+            if (choice === open) void vscode.window.showTextDocument(target, { viewColumn: vscode.ViewColumn.Beside });
+        });
     };
 
     const decompile = async () => {
@@ -75,30 +124,9 @@ export function registerCommands(diagnostics: SlxDiagnostics, log: vscode.LogOut
         await openBeside(result.output, 'slx');
     };
 
-    const validate = async () => {
-        const document = findActiveDocument();
-        let result: CheckResult;
-        if (document && isSlxDocument(document)) {
-            result = await runWithStatus(`SLX: validating ${describeDocument(document)}`, () => diagnostics.check(document, compilerLog));
-        } else if (document && isMaterialXDocument(document)) {
-            result = await runWithStatus(`SLX: validating ${describeDocument(document)}`, () =>
-                diagnostics.checkMaterialX(document, compilerLog),
-            );
-        } else {
-            void vscode.window.showWarningMessage('SLX: open an .mxsl or .mtlx file to validate it.');
-            return;
-        }
-        if (result.error) {
-            await showFailure(log, 'Validating', document, result.error);
-            return;
-        }
-        log.info(`Validated ${describeDocument(document)}: no errors.`);
-        void vscode.window.showInformationMessage(`SLX: ${describeDocument(document)} has no errors.`);
-    };
-
     return [
-        vscode.commands.registerCommand('slx.compile', compile),
+        vscode.commands.registerCommand('slx.compile', () => compile(false)),
+        vscode.commands.registerCommand('slx.compileAs', () => compile(true)),
         vscode.commands.registerCommand('slx.decompile', decompile),
-        vscode.commands.registerCommand('slx.validate', validate),
     ];
 }

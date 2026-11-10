@@ -26,6 +26,7 @@ installed, uninstall it first.
 | `slx-vscode/syntaxes/slx.tmLanguage.json` | The highlighting grammar. Generated, don't edit it by hand. |
 | `slx-vscode/data/` | The keywords, types, MaterialX node signatures, links to the MaterialX specification and a copy of `stdlib.mxsl`, for completion, hovers and parameter hints. Generated and not committed. |
 | `slx-vscode/media/lib/` | The WebAssembly compiler. Copied in and not committed. |
+| `slx-vscode/skills/` | A copy of the skill for AI agents from [.claude/skills](../../.claude/skills). Copied in and not committed. |
 | `grammar/slx.tmLanguage.template.json` | The template the grammar is generated from |
 | `gen_extension.py` | Generates the grammar, bundles the compiler, packages and installs the extension |
 
@@ -37,7 +38,8 @@ The source in `slx-vscode/src/`:
 | `engine.ts`, `engineWorker.ts`, `engineProtocol.ts` | Run the WebAssembly compiler on a worker thread |
 | `includes.ts`, `documents.ts` | Find the files a document includes and pass them to the compiler |
 | `diagnostics.ts`, `compileErrors.ts`, `compilerOutput.ts` | Errors as you type, and the compiler's printed output |
-| `commands.ts`, `preview.ts`, `compileOnSave.ts`, `statusBar.ts` | Commands, the live preview, compile on save and the status bar item |
+| `skill.ts`, `skillFiles.ts` | SLX: Install AI Skill |
+| `commands.ts`, `compiledFiles.ts`, `saveDialog.ts`, `preview.ts`, `statusBar.ts` | Commands, the file each SLX file compiles to, the default file of the save dialog, the live preview and the status bar item |
 | `macros.ts`, `semanticTokens.ts` | Find macros and highlight their uses, which the grammar can't see |
 | `lexer.ts`, `symbols.ts`, `callContext.ts` | Find the declarations in SLX source, and the call at a position. They match shapes and know nothing about types. |
 | `languageData.ts`, `signatures.ts` | Read `data/` and format node and function signatures |
@@ -81,6 +83,9 @@ gen_extension.py [-h] [-g] [-c] [-v] [-i] [-p] [--js-build-dir JS_BUILD_DIR] [--
 - the [MaterialX specification](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/documents/Specification)
   on MaterialX's `main` branch, which it downloads to find each node's section. Node hovers link there. If it can't be
   downloaded, the generator warns and the hovers have no links.
+
+It also copies the skill for AI agents, `.claude/skills/shadinglanguagex`, into `skills/`. VS Code requires the
+skill's folder to be named after the `name` in its `SKILL.md`, so the script stops with an error if they differ.
 
 It also writes the colours SLX uses in VS Code's default themes into `package.json`, from `PLAYGROUND_COLORS`
 and `SCOPE_COLORS` in the script. These match the MaterialX Playground's code editor, so update them if its colours

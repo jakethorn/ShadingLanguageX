@@ -10,8 +10,6 @@ export interface SlxSettings {
     /** Absolute folders searched for #include and #library files. */
     includePaths: string[];
     diagnosticsTrigger: DiagnosticsTrigger;
-    /** Write the compiled MaterialX next to the source when it is saved. */
-    compileOnSave: boolean;
     /** Make MaterialX node names links to their section of the specification. */
     nodeLinks: boolean;
 }
@@ -35,7 +33,6 @@ export function readSettings(uri: vscode.Uri | undefined): SlxSettings {
         },
         includePaths: config.get<string[]>('includePaths', []).map((p) => resolveIncludePath(p, folder)),
         diagnosticsTrigger: config.get<DiagnosticsTrigger>('diagnostics.trigger', 'onType'),
-        compileOnSave: config.get<boolean>('compileOnSave', false),
         nodeLinks: config.get<boolean>('links.nodes', false),
     };
 }
