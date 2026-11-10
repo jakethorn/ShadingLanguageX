@@ -1,0 +1,267 @@
+{
+  "$comment": "Template for syntaxes/slx.tmLanguage.json. gen_extension.py replaces each {{NAME}} with a list of words joined by |.",
+  "scopeName": "source.slx",
+  "name": "SLX",
+  "fileTypes": ["mxsl"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#preprocessor" },
+    { "include": "#strings" },
+    { "include": "#attributes" },
+    { "include": "#modifier-brackets" },
+    { "include": "#class-definition" },
+    { "include": "#using-alias" },
+    { "include": "#function-definition" },
+    { "include": "#function-call" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
+    { "include": "#numbers" },
+    { "include": "#member-access" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.slx",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "beginCaptures": { "0": { "name": "punctuation.definition.comment.begin.slx" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.comment.end.slx" } }
+        },
+        {
+          "name": "comment.line.double-slash.slx",
+          "begin": "//",
+          "end": "$",
+          "beginCaptures": { "0": { "name": "punctuation.definition.comment.slx" } }
+        }
+      ]
+    },
+    "preprocessor": {
+      "patterns": [
+        {
+          "name": "meta.preprocessor.include.slx",
+          "begin": "^\\s*((#)\\s*(?:include|library))\\b",
+          "end": "(?=$|//|/\\*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.directive.include.slx" },
+            "2": { "name": "punctuation.definition.directive.slx" }
+          },
+          "patterns": [
+            { "name": "string.quoted.double.include.slx", "match": "\"[^\"]*\"" }
+          ]
+        },
+        {
+          "name": "meta.preprocessor.version.slx",
+          "match": "^\\s*((#)\\s*version)\\b\\s*([0-9][0-9.]*)?",
+          "captures": {
+            "1": { "name": "keyword.control.directive.version.slx" },
+            "2": { "name": "punctuation.definition.directive.slx" },
+            "3": { "name": "constant.numeric.version.slx" }
+          }
+        },
+        {
+          "name": "meta.preprocessor.macro.slx",
+          "begin": "^\\s*((#)\\s*(?:define|undef))\\b\\s*([A-Za-z_]\\w*)?",
+          "end": "(?=$|//|/\\*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.directive.define.slx" },
+            "2": { "name": "punctuation.definition.directive.slx" },
+            "3": { "name": "entity.name.function.preprocessor.slx" }
+          },
+          "patterns": [
+            { "include": "#strings" },
+            { "include": "#constants" },
+            { "include": "#numbers" }
+          ]
+        },
+        {
+          "name": "meta.preprocessor.conditional.slx",
+          "begin": "^\\s*((#)\\s*(?:ifdef|ifndef|if|elifdef|elifndef|elif|else|endif))\\b",
+          "end": "(?=$|//|/\\*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.directive.conditional.slx" },
+            "2": { "name": "punctuation.definition.directive.slx" }
+          },
+          "patterns": [
+            { "include": "#constants" },
+            { "include": "#numbers" },
+            { "include": "#operators" },
+            { "name": "entity.name.function.preprocessor.slx", "match": "[A-Za-z_]\\w*" }
+          ]
+        },
+        {
+          "name": "keyword.control.directive.slx",
+          "match": "^\\s*#\\s*\\w+"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.slx",
+      "begin": "\"",
+      "end": "\"",
+      "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.slx" } },
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.slx" } }
+    },
+    "attributes": {
+      "name": "meta.attribute.slx",
+      "match": "(@@?)(?:([A-Za-z_]\\w*)(\\.))?([A-Za-z_]\\w*)",
+      "captures": {
+        "1": { "name": "punctuation.definition.attribute.slx" },
+        "2": { "name": "variable.parameter.slx" },
+        "3": { "name": "punctuation.accessor.slx" },
+        "4": { "name": "entity.other.attribute-name.slx" }
+      }
+    },
+    "modifier-brackets": {
+      "name": "meta.modifier.slx",
+      "begin": "\\[\\[",
+      "end": "\\]\\]",
+      "beginCaptures": { "0": { "name": "punctuation.definition.modifier.begin.slx" } },
+      "endCaptures": { "0": { "name": "punctuation.definition.modifier.end.slx" } },
+      "patterns": [
+        { "name": "storage.modifier.slx", "match": "[A-Za-z_]\\w*" },
+        { "include": "#punctuation" }
+      ]
+    },
+    "class-definition": {
+      "match": "\\b(class)\\s+([A-Za-z_]\\w*)",
+      "captures": {
+        "1": { "name": "storage.type.class.slx" },
+        "2": { "name": "entity.name.type.class.slx" }
+      }
+    },
+    "using-alias": {
+      "match": "\\b(using)\\s+([A-Za-z_]\\w*)\\s*(=)",
+      "captures": {
+        "1": { "name": "keyword.other.using.slx" },
+        "2": { "name": "entity.name.type.alias.slx" },
+        "3": { "name": "keyword.operator.assignment.slx" }
+      }
+    },
+    "template-arguments": {
+      "match": "(<)\\s*([A-Za-z_]\\w*(?:\\s*,\\s*[A-Za-z_]\\w*)*)\\s*(>)",
+      "captures": {
+        "1": { "name": "punctuation.definition.template.begin.slx" },
+        "2": {
+          "patterns": [
+            { "include": "#types" },
+            { "name": "entity.name.type.slx", "match": "[A-Za-z_]\\w*" },
+            { "include": "#punctuation" }
+          ]
+        },
+        "3": { "name": "punctuation.definition.template.end.slx" }
+      }
+    },
+    "function-definition": {
+      "$comment": "A type, then a name, then an optional template argument list, then an opening parenthesis.",
+      "begin": "\\b(?!(?:{{KEYWORDS}})\\b)([A-Za-z_]\\w*)\\s+([A-Za-z_]\\w*)\\s*(?=(?:<\\s*[A-Za-z_]\\w*(?:\\s*,\\s*[A-Za-z_]\\w*)*\\s*>)?\\s*\\()",
+      "end": "(?=\\()",
+      "beginCaptures": {
+        "1": {
+          "patterns": [
+            { "include": "#types" },
+            { "name": "entity.name.type.slx", "match": "[A-Za-z_]\\w*" }
+          ]
+        },
+        "2": { "name": "entity.name.function.slx" }
+      },
+      "patterns": [{ "include": "#template-arguments" }]
+    },
+    "function-call": {
+      "$comment": "A call: the name, any template arguments, then the argument list. Ends after the closing parenthesis.",
+      "patterns": [
+        {
+          "begin": "\\b({{BUILTIN_FUNCTIONS}})\\s*(?=(?:<\\s*[A-Za-z_]\\w*(?:\\s*,\\s*[A-Za-z_]\\w*)*\\s*>)?\\s*\\()",
+          "end": "(?<=\\))",
+          "beginCaptures": { "1": { "name": "support.function.slx" } },
+          "patterns": [{ "include": "#template-arguments" }, { "include": "#call-arguments" }]
+        },
+        {
+          "begin": "\\b(?!(?:{{KEYWORDS}}|{{TYPES}})\\b)([A-Za-z_]\\w*)\\s*(?=(?:<\\s*[A-Za-z_]\\w*(?:\\s*,\\s*[A-Za-z_]\\w*)*\\s*>)?\\s*\\()",
+          "end": "(?<=\\))",
+          "beginCaptures": { "1": { "name": "entity.name.function.call.slx" } },
+          "patterns": [{ "include": "#template-arguments" }, { "include": "#call-arguments" }]
+        }
+      ]
+    },
+    "call-arguments": {
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": { "0": { "name": "punctuation.section.parens.begin.slx" } },
+      "endCaptures": { "0": { "name": "punctuation.section.parens.end.slx" } },
+      "patterns": [{ "include": "#named-argument" }, { "include": "#parens" }, { "include": "$self" }]
+    },
+    "named-argument": {
+      "$comment": "The name in a `name = value` argument: the first word after the opening parenthesis, a comma or the start of a line.",
+      "match": "(?:(?<=[(,])|^)\\s*([A-Za-z_]\\w*)\\s*(?==(?!=))",
+      "captures": { "1": { "name": "variable.parameter.named-argument.slx" } }
+    },
+    "parens": {
+      "$comment": "Parentheses inside an argument list, matched so that their closing parenthesis doesn't end the list.",
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": { "0": { "name": "punctuation.section.parens.begin.slx" } },
+      "endCaptures": { "0": { "name": "punctuation.section.parens.end.slx" } },
+      "patterns": [{ "include": "#parens" }, { "include": "$self" }]
+    },
+    "keywords": {
+      "patterns": [
+        { "name": "keyword.control.slx", "match": "\\b(?:{{CONTROL_KEYWORDS}})\\b" },
+        { "name": "storage.modifier.slx", "match": "\\b(?:{{MODIFIER_KEYWORDS}})\\b" },
+        { "name": "storage.type.class.slx", "match": "\\bclass\\b" },
+        { "name": "variable.language.this.slx", "match": "\\bthis\\b" },
+        { "name": "keyword.other.slx", "match": "\\b(?:{{OTHER_KEYWORDS}})\\b" }
+      ]
+    },
+    "types": {
+      "name": "storage.type.slx",
+      "match": "\\b(?:{{TYPES}})\\b"
+    },
+    "constants": {
+      "patterns": [
+        { "name": "constant.language.slx", "match": "\\b(?:true|false|null)\\b" },
+        { "name": "support.constant.macro.slx", "match": "\\b__(?:MAIN|INCLUDE|FILE|LINE)__\\b" }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.slx",
+      "match": "(?<![\\w.])(?:\\d+\\.\\d*(?:[eE][+-]?\\d+)?|\\.\\d+(?:[eE][+-]?\\d+)?|\\d+[eE][+-]?\\d+|\\d+)[fF]?(?![\\w.])"
+    },
+    "member-access": {
+      "match": "(\\.)\\s*([A-Za-z_]\\w*)\\b(?!\\s*\\()",
+      "captures": {
+        "1": { "name": "punctuation.accessor.slx" },
+        "2": { "name": "variable.other.member.slx" }
+      }
+    },
+    "operators": {
+      "patterns": [
+        { "name": "keyword.operator.increment-decrement.slx", "match": "\\+\\+|--" },
+        { "name": "keyword.operator.comparison.slx", "match": "==|!=|<=|>=" },
+        { "name": "keyword.operator.assignment.compound.slx", "match": "[-+*/%^&|]=" },
+        { "name": "keyword.operator.logical.slx", "match": "&&|\\|\\||[!&|]" },
+        { "name": "keyword.operator.slx", "match": "=>|->|::" },
+        { "name": "keyword.operator.assignment.slx", "match": "=" },
+        { "name": "keyword.operator.comparison.slx", "match": "[<>]" },
+        { "name": "keyword.operator.arithmetic.slx", "match": "[-+*/%^]" },
+        { "name": "keyword.operator.range.slx", "match": ":" }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        { "name": "punctuation.terminator.statement.slx", "match": ";" },
+        { "name": "punctuation.separator.delimiter.slx", "match": "," },
+        { "name": "punctuation.accessor.slx", "match": "\\." },
+        { "name": "punctuation.section.block.begin.slx", "match": "\\{" },
+        { "name": "punctuation.section.block.end.slx", "match": "\\}" },
+        { "name": "punctuation.section.parens.begin.slx", "match": "\\(" },
+        { "name": "punctuation.section.parens.end.slx", "match": "\\)" },
+        { "name": "punctuation.section.brackets.begin.slx", "match": "\\[" },
+        { "name": "punctuation.section.brackets.end.slx", "match": "\\]" }
+      ]
+    }
+  }
+}

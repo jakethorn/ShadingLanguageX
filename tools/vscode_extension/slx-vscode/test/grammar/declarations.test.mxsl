@@ -1,0 +1,33 @@
+// SYNTAX TEST "source.slx" "functions, classes and aliases"
+
+inline float add_one(float in)
+// <------ storage.modifier.slx
+//     ^^^^^ storage.type.slx
+//           ^^^^^^^ entity.name.function.slx
+//                   ^^^^^ storage.type.slx
+T one_minus<float, vec2>(T v)
+// <- storage.type.slx
+//^^^^^^^^^ entity.name.function.slx
+//          ^^^^^ storage.type.slx
+//                 ^^^^ storage.type.slx
+Point move(Point p, out vec3 v)
+// <----- entity.name.type.slx
+//    ^^^^ entity.name.function.slx
+//                  ^^^ storage.modifier.slx
+[[nodegraph]]
+// <-- punctuation.definition.modifier.begin.slx
+//^^^^^^^^^ storage.modifier.slx
+//         ^^ punctuation.definition.modifier.end.slx
+class Ray
+// <----- storage.type.class.slx
+//    ^^^ entity.name.type.class.slx
+    this.orig = orig;
+//  ^^^^ variable.language.this.slx
+//       ^^^^ variable.other.member.slx
+using Ray2 = {vec3 orig, vec3 dir};
+// <----- keyword.other.using.slx
+//    ^^^^ entity.name.type.alias.slx
+//            ^^^^ storage.type.slx
+global filename albedo_path;
+// <------ storage.modifier.slx
+//     ^^^^^^^^ storage.type.slx

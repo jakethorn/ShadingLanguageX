@@ -1,0 +1,30 @@
+// SYNTAX TEST "source.slx" "preprocessor directives and attributes"
+
+#include "colors.mxsl"
+// <-------- keyword.control.directive.include.slx
+//       ^^^^^^^^^^^^^ string.quoted.double.include.slx
+#library "utils.mtlx" // nodes
+// <-------- keyword.control.directive.include.slx
+//                    ^^^^^^^^ comment.line.double-slash.slx
+#version 1.39.5
+// <-------- keyword.control.directive.version.slx
+//       ^^^^^^ constant.numeric.version.slx
+#define PI 3.14
+// <------- keyword.control.directive.define.slx
+//      ^^ entity.name.function.preprocessor.slx
+//         ^^^^ constant.numeric.slx
+#ifdef __MAIN__
+// <------ keyword.control.directive.conditional.slx
+//     ^^^^^^^^ support.constant.macro.slx
+#endif
+// <------ keyword.control.directive.conditional.slx
+    @doc "adds one to in"
+//  ^ punctuation.definition.attribute.slx
+//   ^^^ entity.other.attribute-name.slx
+//       ^^^^^^^^^^^^^^^^ string.quoted.double.slx
+    @in.doc "the value"
+//   ^^ variable.parameter.slx
+//      ^^^ entity.other.attribute-name.slx
+@@madewith "shadinglanguagex"
+// <-- punctuation.definition.attribute.slx
+//^^^^^^^^ entity.other.attribute-name.slx

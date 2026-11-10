@@ -1,0 +1,2 @@
+# Packages are built by CI and attached to releases.
+*.vsix

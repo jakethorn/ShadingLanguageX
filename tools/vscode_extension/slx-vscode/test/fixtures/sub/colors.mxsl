@@ -1,0 +1,4 @@
+#include "palette.mxsl"
+
+const color3 RED = PALETTE_RED;
+const color3 BLUE = color3{0, 0, 1};

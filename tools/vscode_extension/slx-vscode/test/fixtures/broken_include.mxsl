@@ -1,0 +1,3 @@
+#include "sub/broken.mxsl"
+
+float x = B + 1.0;

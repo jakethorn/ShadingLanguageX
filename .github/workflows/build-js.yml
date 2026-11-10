@@ -158,30 +158,33 @@ jobs:
         with:
           path: mxslc++/javascript/browser
 
-      # Attempt to build VScode extension. Allow to
-      # continue if fails.
+      # Build, test and package the VS Code extension with the WebAssembly
+      # compiler built above. Allowed to fail without failing the build.
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-          cache: pip
-          cache-dependency-path: tools/vscode_extension/requirements.txt
 
-      - name: Install VS Code extension generator dependencies
+      - name: Generate the VS Code extension and bundle the compiler
         continue-on-error: true
-        run: pip install -r tools/vscode_extension/requirements.txt
+        run: python tools/vscode_extension/gen_extension.py --generate --converter
 
-      - name: Generate and package VS Code extension (.vsix)
+      - name: Test the VS Code extension
         continue-on-error: true
+        working-directory: tools/vscode_extension/slx-vscode
         run: |
-          python tools/vscode_extension/gen_extension.py \
-            --generate --converter --vsix
+          npm ci
+          npm test
+
+      - name: Package the VS Code extension (.vsix)
+        continue-on-error: true
+        run: python tools/vscode_extension/gen_extension.py --vsix
 
       - name: Upload VSCode extension artifact
         uses: actions/upload-artifact@v7
         with:
           name: mxslc-vscode
-          path: tools/vscode_extension/mxsl-language-*.vsix
+          path: tools/vscode_extension/slx-*.vsix
           if-no-files-found: warn
 
   deploy:
