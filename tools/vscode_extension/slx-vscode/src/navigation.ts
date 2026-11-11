@@ -104,8 +104,8 @@ export class SlxDocumentLinkProvider implements vscode.DocumentLinkProvider {
         for (const directive of findDirectives(document.getText())) {
             const target = findCandidatePaths(directive.target, fromFilePath, includePaths).find(isFile);
             if (!target) continue;
-            // The path inside the quotes.
-            const range = new vscode.Range(directive.line, directive.start + 1, directive.line, directive.end - 1);
+            // The path and its quotes.
+            const range = new vscode.Range(directive.line, directive.start, directive.line, directive.end);
             const link = new vscode.DocumentLink(range, vscode.Uri.file(target));
             link.tooltip = `Open ${directive.target}`;
             links.push(link);

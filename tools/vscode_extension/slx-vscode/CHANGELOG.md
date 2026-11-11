@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0
+## 1.0.0
 
 - Completion of variables, functions, classes, MaterialX nodes, standard library functions, types and keywords,
   and of argument names inside calls. Also of directive names after `#`, the paths in `#include` and `#library`

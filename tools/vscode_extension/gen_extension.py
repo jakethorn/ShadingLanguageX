@@ -408,7 +408,8 @@ def update_package_json(versions: list[str], theme_colors: dict) -> None:
     and set the colours of the default themes."""
     package = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))
     before = json.dumps(package)
-    setting = package["contributes"]["configuration"]["properties"]["slx.materialxVersion"]
+    sections = package["contributes"]["configuration"]
+    setting = next(s["properties"]["slx.materialxVersion"] for s in sections if "slx.materialxVersion" in s["properties"])
     setting["enum"] = versions
     setting["default"] = versions[-1]
     package["contributes"]["configurationDefaults"] = {"editor.tokenColorCustomizations": theme_colors}

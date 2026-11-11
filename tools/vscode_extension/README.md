@@ -4,7 +4,7 @@ A VS Code extension that adds language support and commands for [ShadingLanguage
 
 ## Installation
 
-Download `mxslc_vscode_extension.zip` from the most recent [release](https://github.com/jakethorn/ShadingLanguageX/releases), unzip it and install the `.vsix` using VS Code.
+Download `slx-<version>.vsix` from the most recent [release](https://github.com/jakethorn/ShadingLanguageX/releases) and install it using VS Code.
 
 ## Features
 
@@ -49,6 +49,8 @@ in the `Output` window after compiling the file.
 ### Other
 
 * SLX `print` statements print to the console.
+* The SLX status bar shows the MaterialX version being used by the compiler. It updates automatically based on the `#version` directive
+used in the code.
 
 ## AI agents
 

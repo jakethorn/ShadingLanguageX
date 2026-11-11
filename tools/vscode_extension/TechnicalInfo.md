@@ -5,11 +5,11 @@ How the VS Code extension for ShadingLanguageX is laid out, built, tested and re
 
 ### Installing
 
-Download `mxslc_vscode_extension.zip` from a [release](https://github.com/jakethorn/ShadingLanguageX/releases), or
-the `mxslc-vscode` artifact of a *Build JavaScript (WASM)* workflow run, and unzip it. Then install the `.vsix`:
+Download `slx-<version>.vsix` from a [release](https://github.com/jakethorn/ShadingLanguageX/releases), or the
+`mxslc-vscode` artifact of a *Build JavaScript (WASM)* workflow run and unzip it. Then install the `.vsix`:
 
 ```
-code --install-extension slx-0.4.0.vsix
+code --install-extension slx-1.0.0.vsix
 ```
 
 or use *Extensions: Install from VSIX...* in VS Code. If *MXSL Language Support* (the extension's old name) is
