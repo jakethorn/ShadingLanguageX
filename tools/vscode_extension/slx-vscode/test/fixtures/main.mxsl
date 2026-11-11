@@ -1,0 +1,6 @@
+// Includes a file from a subfolder, which includes its neighbour.
+#include "sub/colors.mxsl"
+
+vec2 uv = texcoord();
+color3 c = mix(RED, BLUE, uv.x);
+standard_surface(base_color = c);

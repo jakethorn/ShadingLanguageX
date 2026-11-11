@@ -1,0 +1,827 @@
+{
+  "name": "slx",
+  "displayName": "ShadingLanguageX (SLX)",
+  "description": "Language support for ShadingLanguageX (SLX): highlighting, errors as you type, completion, hovers, navigation, snippets, a live MaterialX preview and SLX <-> MaterialX conversion",
+  "version": "0.4.0",
+  "publisher": "shadinglanguagex",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jakethorn/ShadingLanguageX"
+  },
+  "bugs": {
+    "url": "https://github.com/jakethorn/ShadingLanguageX/issues"
+  },
+  "keywords": [
+    "slx",
+    "shadinglanguagex",
+    "mxsl",
+    "materialx",
+    "shading language",
+    "ai",
+    "skill"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:slx"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "slx",
+        "aliases": [
+          "SLX",
+          "ShadingLanguageX"
+        ],
+        "extensions": [
+          ".mxsl"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "xml",
+        "extensions": [
+          ".mtlx"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "slx",
+        "scopeName": "source.slx",
+        "path": "./syntaxes/slx.tmLanguage.json"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "slx",
+        "scopes": {
+          "macro": [
+            "entity.name.function.preprocessor.slx"
+          ]
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "slx",
+        "path": "./snippets/slx.code-snippets"
+      }
+    ],
+    "chatSkills": [
+      {
+        "path": "./skills/shadinglanguagex/SKILL.md"
+      }
+    ],
+    "commands": [
+      {
+        "command": "slx.compile",
+        "category": "SLX",
+        "title": "Compile to MaterialX",
+        "icon": "$(play)"
+      },
+      {
+        "command": "slx.compileAs",
+        "category": "SLX",
+        "title": "Compile to MaterialX As..."
+      },
+      {
+        "command": "slx.decompile",
+        "category": "SLX",
+        "title": "Decompile to SLX",
+        "icon": "$(play)"
+      },
+      {
+        "command": "slx.showPreview",
+        "category": "SLX",
+        "title": "Open MaterialX Preview to the Side",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "slx.selectMaterialXVersion",
+        "category": "SLX",
+        "title": "Select MaterialX Version"
+      },
+      {
+        "command": "slx.installSkill",
+        "category": "SLX",
+        "title": "Install AI Skill"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "slx.showPreview",
+          "when": "editorLangId == slx",
+          "group": "navigation"
+        },
+        {
+          "command": "slx.compile",
+          "when": "editorLangId == slx",
+          "group": "navigation"
+        },
+        {
+          "command": "slx.decompile",
+          "when": "resourceExtname =~ /^\\.mtlx$/i",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "slx.showPreview",
+          "when": "editorLangId == slx",
+          "group": "1_slx"
+        },
+        {
+          "command": "slx.compile",
+          "when": "editorLangId == slx",
+          "group": "1_slx"
+        },
+        {
+          "command": "slx.compileAs",
+          "when": "editorLangId == slx",
+          "group": "1_slx"
+        },
+        {
+          "command": "slx.decompile",
+          "when": "resourceExtname =~ /^\\.mtlx$/i",
+          "group": "1_slx"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "slx.compile",
+          "when": "editorLangId == slx"
+        },
+        {
+          "command": "slx.compileAs",
+          "when": "editorLangId == slx"
+        },
+        {
+          "command": "slx.decompile",
+          "when": "resourceExtname =~ /^\\.mtlx$/i"
+        },
+        {
+          "command": "slx.showPreview",
+          "when": "editorLangId == slx"
+        },
+        {
+          "command": "slx.selectMaterialXVersion",
+          "when": "editorLangId == slx"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "slx.showPreview",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "editorLangId == slx"
+      }
+    ],
+    "configuration": {
+      "title": "SLX",
+      "properties": {
+        "slx.materialxVersion": {
+          "type": "string",
+          "enum": [
+            "1.38.10",
+            "1.39.4",
+            "1.39.5"
+          ],
+          "default": "1.39.5",
+          "scope": "resource",
+          "markdownDescription": "MaterialX version to compile against. A `#version` directive in the file takes precedence."
+        },
+        "slx.reduceGraph": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "markdownDescription": "Simplify the compiled node graph, for example by folding constants and removing redundant nodes."
+        },
+        "slx.defaultFunctionBehaviour": {
+          "type": "string",
+          "enum": [
+            "nodedef",
+            "nodegraph",
+            "inline",
+            "comptime"
+          ],
+          "enumDescriptions": [
+            "Functions compile to a NodeDef and its NodeGraph.",
+            "Functions compile to a NodeGraph without a NodeDef.",
+            "Functions are inlined at each call site.",
+            "Functions are evaluated at compile time."
+          ],
+          "default": "nodedef",
+          "scope": "resource",
+          "markdownDescription": "How functions compile when they have no `nodedef`, `nodegraph`, `inline` or `comptime` modifier."
+        },
+        "slx.errorOnMissingGlobals": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "markdownDescription": "Report an error for every `global` variable, because the extension can't pass values for them. When off, globals compile with their initial value, or zero."
+        },
+        "slx.includePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Extra folders to search for `#include` and `#library` files, after the folder of the file containing the directive. Relative paths are resolved against the workspace folder."
+        },
+        "slx.links.nodes": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "markdownDescription": "Make the names of MaterialX nodes in calls links to the node's section of the MaterialX specification, opened with Ctrl+Click. VS Code underlines links, so every node call is underlined while this is on."
+        },
+        "slx.bracketPairColorization": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "Colour-code matching brackets in SLX files by their nesting level, as VS Code does for other languages. Off by default, as in the MaterialX Playground. Turning this on or off sets `editor.language.colorizedBracketPairs` for SLX in the same settings file. Needs `#editor.bracketPairColorization.enabled#`, which is on by default."
+        },
+        "slx.diagnostics.trigger": {
+          "type": "string",
+          "enum": [
+            "onType",
+            "onSave",
+            "off"
+          ],
+          "enumDescriptions": [
+            "Check files as you type, after a short pause.",
+            "Check files when they are opened or saved.",
+            "Only check files when they are compiled or decompiled with an SLX command."
+          ],
+          "default": "onType",
+          "scope": "resource",
+          "markdownDescription": "When to compile open SLX files and show their errors in the Problems panel."
+        }
+      }
+    },
+    "configurationDefaults": {
+      "editor.tokenColorCustomizations": {
+        "[Dark 2026][Dark Modern][Default Dark Modern][Dark+][Default Dark+]": {
+          "textMateRules": [
+            {
+              "name": "SLX argument",
+              "scope": [
+                "variable.parameter.named-argument.slx"
+              ],
+              "settings": {
+                "foreground": "#e49a9a",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX builtin",
+              "scope": [
+                "support.function.slx"
+              ],
+              "settings": {
+                "foreground": "#cabe91",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX comment",
+              "scope": [
+                "comment.block.slx",
+                "comment.line.double-slash.slx",
+                "punctuation.definition.comment.begin.slx",
+                "punctuation.definition.comment.end.slx",
+                "punctuation.definition.comment.slx"
+              ],
+              "settings": {
+                "foreground": "#6a9955",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX directive",
+              "scope": [
+                "keyword.control.directive.conditional.slx",
+                "keyword.control.directive.define.slx",
+                "keyword.control.directive.include.slx",
+                "keyword.control.directive.slx",
+                "keyword.control.directive.version.slx",
+                "punctuation.definition.directive.slx"
+              ],
+              "settings": {
+                "foreground": "#c586c0",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX function",
+              "scope": [
+                "entity.other.attribute-name.slx",
+                "meta.attribute.slx",
+                "punctuation.definition.attribute.slx",
+                "meta.attribute.slx punctuation.accessor.slx",
+                "meta.attribute.slx variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#dcdcaa",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX keyword",
+              "scope": [
+                "keyword.control.slx",
+                "keyword.other.slx",
+                "keyword.other.using.slx",
+                "storage.modifier.slx",
+                "storage.type.class.slx",
+                "variable.language.this.slx"
+              ],
+              "settings": {
+                "foreground": "#569cd6",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX macro",
+              "scope": [
+                "entity.name.function.preprocessor.slx",
+                "support.constant.macro.slx"
+              ],
+              "settings": {
+                "foreground": "#c3a6e0",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX number",
+              "scope": [
+                "constant.language.slx",
+                "constant.numeric.slx",
+                "constant.numeric.version.slx"
+              ],
+              "settings": {
+                "foreground": "#b5cea8",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX string",
+              "scope": [
+                "punctuation.definition.string.begin.slx",
+                "punctuation.definition.string.end.slx",
+                "string.quoted.double.include.slx",
+                "string.quoted.double.slx"
+              ],
+              "settings": {
+                "foreground": "#ce9178",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX type",
+              "scope": [
+                "storage.type.slx"
+              ],
+              "settings": {
+                "foreground": "#4ec9b0",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Dark 2026]": {
+          "textMateRules": [
+            {
+              "name": "SLX plain",
+              "scope": [
+                "entity.name.function.call.slx",
+                "entity.name.function.slx",
+                "entity.name.type.alias.slx",
+                "entity.name.type.class.slx",
+                "entity.name.type.slx",
+                "keyword.operator.arithmetic.slx",
+                "keyword.operator.assignment.compound.slx",
+                "keyword.operator.assignment.slx",
+                "keyword.operator.comparison.slx",
+                "keyword.operator.increment-decrement.slx",
+                "keyword.operator.logical.slx",
+                "keyword.operator.range.slx",
+                "keyword.operator.slx",
+                "meta.modifier.slx",
+                "meta.preprocessor.conditional.slx",
+                "meta.preprocessor.include.slx",
+                "meta.preprocessor.macro.slx",
+                "meta.preprocessor.version.slx",
+                "punctuation.accessor.slx",
+                "punctuation.definition.modifier.begin.slx",
+                "punctuation.definition.modifier.end.slx",
+                "punctuation.definition.template.begin.slx",
+                "punctuation.definition.template.end.slx",
+                "punctuation.section.block.begin.slx",
+                "punctuation.section.block.end.slx",
+                "punctuation.section.brackets.begin.slx",
+                "punctuation.section.brackets.end.slx",
+                "punctuation.section.parens.begin.slx",
+                "punctuation.section.parens.end.slx",
+                "punctuation.separator.delimiter.slx",
+                "punctuation.terminator.statement.slx",
+                "variable.other.member.slx",
+                "variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#bbbebf",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Dark Modern][Default Dark Modern]": {
+          "textMateRules": [
+            {
+              "name": "SLX plain",
+              "scope": [
+                "entity.name.function.call.slx",
+                "entity.name.function.slx",
+                "entity.name.type.alias.slx",
+                "entity.name.type.class.slx",
+                "entity.name.type.slx",
+                "keyword.operator.arithmetic.slx",
+                "keyword.operator.assignment.compound.slx",
+                "keyword.operator.assignment.slx",
+                "keyword.operator.comparison.slx",
+                "keyword.operator.increment-decrement.slx",
+                "keyword.operator.logical.slx",
+                "keyword.operator.range.slx",
+                "keyword.operator.slx",
+                "meta.modifier.slx",
+                "meta.preprocessor.conditional.slx",
+                "meta.preprocessor.include.slx",
+                "meta.preprocessor.macro.slx",
+                "meta.preprocessor.version.slx",
+                "punctuation.accessor.slx",
+                "punctuation.definition.modifier.begin.slx",
+                "punctuation.definition.modifier.end.slx",
+                "punctuation.definition.template.begin.slx",
+                "punctuation.definition.template.end.slx",
+                "punctuation.section.block.begin.slx",
+                "punctuation.section.block.end.slx",
+                "punctuation.section.brackets.begin.slx",
+                "punctuation.section.brackets.end.slx",
+                "punctuation.section.parens.begin.slx",
+                "punctuation.section.parens.end.slx",
+                "punctuation.separator.delimiter.slx",
+                "punctuation.terminator.statement.slx",
+                "variable.other.member.slx",
+                "variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#cccccc",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Dark+][Default Dark+]": {
+          "textMateRules": [
+            {
+              "name": "SLX plain",
+              "scope": [
+                "entity.name.function.call.slx",
+                "entity.name.function.slx",
+                "entity.name.type.alias.slx",
+                "entity.name.type.class.slx",
+                "entity.name.type.slx",
+                "keyword.operator.arithmetic.slx",
+                "keyword.operator.assignment.compound.slx",
+                "keyword.operator.assignment.slx",
+                "keyword.operator.comparison.slx",
+                "keyword.operator.increment-decrement.slx",
+                "keyword.operator.logical.slx",
+                "keyword.operator.range.slx",
+                "keyword.operator.slx",
+                "meta.modifier.slx",
+                "meta.preprocessor.conditional.slx",
+                "meta.preprocessor.include.slx",
+                "meta.preprocessor.macro.slx",
+                "meta.preprocessor.version.slx",
+                "punctuation.accessor.slx",
+                "punctuation.definition.modifier.begin.slx",
+                "punctuation.definition.modifier.end.slx",
+                "punctuation.definition.template.begin.slx",
+                "punctuation.definition.template.end.slx",
+                "punctuation.section.block.begin.slx",
+                "punctuation.section.block.end.slx",
+                "punctuation.section.brackets.begin.slx",
+                "punctuation.section.brackets.end.slx",
+                "punctuation.section.parens.begin.slx",
+                "punctuation.section.parens.end.slx",
+                "punctuation.separator.delimiter.slx",
+                "punctuation.terminator.statement.slx",
+                "variable.other.member.slx",
+                "variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#d4d4d4",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Light 2026][Light Modern][Default Light Modern][Light+][Default Light+]": {
+          "textMateRules": [
+            {
+              "name": "SLX argument",
+              "scope": [
+                "variable.parameter.named-argument.slx"
+              ],
+              "settings": {
+                "foreground": "#ba3b5b",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX builtin",
+              "scope": [
+                "support.function.slx"
+              ],
+              "settings": {
+                "foreground": "#7e6f44",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX comment",
+              "scope": [
+                "comment.block.slx",
+                "comment.line.double-slash.slx",
+                "punctuation.definition.comment.begin.slx",
+                "punctuation.definition.comment.end.slx",
+                "punctuation.definition.comment.slx"
+              ],
+              "settings": {
+                "foreground": "#008000",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX directive",
+              "scope": [
+                "keyword.control.directive.conditional.slx",
+                "keyword.control.directive.define.slx",
+                "keyword.control.directive.include.slx",
+                "keyword.control.directive.slx",
+                "keyword.control.directive.version.slx",
+                "punctuation.definition.directive.slx"
+              ],
+              "settings": {
+                "foreground": "#af00db",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX function",
+              "scope": [
+                "entity.other.attribute-name.slx",
+                "meta.attribute.slx",
+                "punctuation.definition.attribute.slx",
+                "meta.attribute.slx punctuation.accessor.slx",
+                "meta.attribute.slx variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#795e26",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX keyword",
+              "scope": [
+                "keyword.control.slx",
+                "keyword.other.slx",
+                "keyword.other.using.slx",
+                "storage.modifier.slx",
+                "storage.type.class.slx",
+                "variable.language.this.slx"
+              ],
+              "settings": {
+                "foreground": "#0000ff",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX macro",
+              "scope": [
+                "entity.name.function.preprocessor.slx",
+                "support.constant.macro.slx"
+              ],
+              "settings": {
+                "foreground": "#7b3f9e",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX number",
+              "scope": [
+                "constant.language.slx",
+                "constant.numeric.slx",
+                "constant.numeric.version.slx"
+              ],
+              "settings": {
+                "foreground": "#08794f",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX string",
+              "scope": [
+                "punctuation.definition.string.begin.slx",
+                "punctuation.definition.string.end.slx",
+                "string.quoted.double.include.slx",
+                "string.quoted.double.slx"
+              ],
+              "settings": {
+                "foreground": "#a31515",
+                "fontStyle": ""
+              }
+            },
+            {
+              "name": "SLX type",
+              "scope": [
+                "storage.type.slx"
+              ],
+              "settings": {
+                "foreground": "#217a93",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Light 2026]": {
+          "textMateRules": [
+            {
+              "name": "SLX plain",
+              "scope": [
+                "entity.name.function.call.slx",
+                "entity.name.function.slx",
+                "entity.name.type.alias.slx",
+                "entity.name.type.class.slx",
+                "entity.name.type.slx",
+                "keyword.operator.arithmetic.slx",
+                "keyword.operator.assignment.compound.slx",
+                "keyword.operator.assignment.slx",
+                "keyword.operator.comparison.slx",
+                "keyword.operator.increment-decrement.slx",
+                "keyword.operator.logical.slx",
+                "keyword.operator.range.slx",
+                "keyword.operator.slx",
+                "meta.modifier.slx",
+                "meta.preprocessor.conditional.slx",
+                "meta.preprocessor.include.slx",
+                "meta.preprocessor.macro.slx",
+                "meta.preprocessor.version.slx",
+                "punctuation.accessor.slx",
+                "punctuation.definition.modifier.begin.slx",
+                "punctuation.definition.modifier.end.slx",
+                "punctuation.definition.template.begin.slx",
+                "punctuation.definition.template.end.slx",
+                "punctuation.section.block.begin.slx",
+                "punctuation.section.block.end.slx",
+                "punctuation.section.brackets.begin.slx",
+                "punctuation.section.brackets.end.slx",
+                "punctuation.section.parens.begin.slx",
+                "punctuation.section.parens.end.slx",
+                "punctuation.separator.delimiter.slx",
+                "punctuation.terminator.statement.slx",
+                "variable.other.member.slx",
+                "variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#202020",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Light Modern][Default Light Modern]": {
+          "textMateRules": [
+            {
+              "name": "SLX plain",
+              "scope": [
+                "entity.name.function.call.slx",
+                "entity.name.function.slx",
+                "entity.name.type.alias.slx",
+                "entity.name.type.class.slx",
+                "entity.name.type.slx",
+                "keyword.operator.arithmetic.slx",
+                "keyword.operator.assignment.compound.slx",
+                "keyword.operator.assignment.slx",
+                "keyword.operator.comparison.slx",
+                "keyword.operator.increment-decrement.slx",
+                "keyword.operator.logical.slx",
+                "keyword.operator.range.slx",
+                "keyword.operator.slx",
+                "meta.modifier.slx",
+                "meta.preprocessor.conditional.slx",
+                "meta.preprocessor.include.slx",
+                "meta.preprocessor.macro.slx",
+                "meta.preprocessor.version.slx",
+                "punctuation.accessor.slx",
+                "punctuation.definition.modifier.begin.slx",
+                "punctuation.definition.modifier.end.slx",
+                "punctuation.definition.template.begin.slx",
+                "punctuation.definition.template.end.slx",
+                "punctuation.section.block.begin.slx",
+                "punctuation.section.block.end.slx",
+                "punctuation.section.brackets.begin.slx",
+                "punctuation.section.brackets.end.slx",
+                "punctuation.section.parens.begin.slx",
+                "punctuation.section.parens.end.slx",
+                "punctuation.separator.delimiter.slx",
+                "punctuation.terminator.statement.slx",
+                "variable.other.member.slx",
+                "variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#3b3b3b",
+                "fontStyle": ""
+              }
+            }
+          ]
+        },
+        "[Light+][Default Light+]": {
+          "textMateRules": [
+            {
+              "name": "SLX plain",
+              "scope": [
+                "entity.name.function.call.slx",
+                "entity.name.function.slx",
+                "entity.name.type.alias.slx",
+                "entity.name.type.class.slx",
+                "entity.name.type.slx",
+                "keyword.operator.arithmetic.slx",
+                "keyword.operator.assignment.compound.slx",
+                "keyword.operator.assignment.slx",
+                "keyword.operator.comparison.slx",
+                "keyword.operator.increment-decrement.slx",
+                "keyword.operator.logical.slx",
+                "keyword.operator.range.slx",
+                "keyword.operator.slx",
+                "meta.modifier.slx",
+                "meta.preprocessor.conditional.slx",
+                "meta.preprocessor.include.slx",
+                "meta.preprocessor.macro.slx",
+                "meta.preprocessor.version.slx",
+                "punctuation.accessor.slx",
+                "punctuation.definition.modifier.begin.slx",
+                "punctuation.definition.modifier.end.slx",
+                "punctuation.definition.template.begin.slx",
+                "punctuation.definition.template.end.slx",
+                "punctuation.section.block.begin.slx",
+                "punctuation.section.block.end.slx",
+                "punctuation.section.brackets.begin.slx",
+                "punctuation.section.brackets.end.slx",
+                "punctuation.section.parens.begin.slx",
+                "punctuation.section.parens.end.slx",
+                "punctuation.separator.delimiter.slx",
+                "punctuation.terminator.statement.slx",
+                "variable.other.member.slx",
+                "variable.parameter.slx"
+              ],
+              "settings": {
+                "foreground": "#000000",
+                "fontStyle": ""
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && node esbuild.mjs && node esbuild.mjs --tests && node --test out/test/compileErrors.test.js out/test/includes.test.js out/test/symbols.test.js out/test/languageFeatures.test.js out/test/macros.test.js out/test/skillFiles.test.js out/test/libraryNodes.test.js out/test/saveDialog.test.js out/test/engine.test.js out/test/snippets.test.js && npm run test:grammar",
+    "test:grammar": "vscode-tmgrammar-test --grammar syntaxes/slx.tmLanguage.json \"test/grammar/*.test.mxsl\"",
+    "package": "vsce package --no-dependencies --out ..",
+    "vscode:prepublish": "node esbuild.mjs --production"
+  },
+  "devDependencies": {
+    "@types/node": "18.19.130",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "3.9.2",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3",
+    "vscode-tmgrammar-test": "0.1.3"
+  }
+}

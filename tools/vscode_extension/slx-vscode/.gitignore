@@ -1,0 +1,7 @@
+node_modules/
+dist/
+out/
+media/lib/
+data/
+skills/
+*.vsix

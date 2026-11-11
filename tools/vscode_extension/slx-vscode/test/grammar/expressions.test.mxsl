@@ -1,0 +1,63 @@
+// SYNTAX TEST "source.slx" "calls, keywords and literals"
+
+float n = dotproduct(UP, normal());
+//        ^^^^^^^^^^ support.function.slx
+//                       ^^^^^^ support.function.slx
+float m = add_one(n);
+//        ^^^^^^^ entity.name.function.call.slx
+color3 c = image<color3>(albedo_path);
+//         ^^^^^ support.function.slx
+//               ^^^^^^ storage.type.slx
+float area = comptime get_area(10);
+//           ^^^^^^^^ storage.modifier.slx
+//                    ^^^^^^^^ entity.name.function.call.slx
+//                             ^^ constant.numeric.slx
+    return foo(x);
+//  ^^^^^^ keyword.control.slx
+//         ^^^ entity.name.function.call.slx
+float f = ray.end_of_ray(1.0) + uv.x;
+//            ^^^^^^^^^^ entity.name.function.call.slx
+//                                 ^ variable.other.member.slx
+color3 s = switch(i) { case <=7: RED, default: BLUE };
+//         ^^^^^^ keyword.control.slx
+//                     ^^^^ keyword.control.slx
+//                          ^^ keyword.operator.comparison.slx
+//                                    ^^^^^^^ keyword.control.slx
+float a = if (x > y) { 0.5 } else { 0.7 };
+//        ^^ keyword.control.slx
+//                     ^^^ constant.numeric.slx
+//                           ^^^^ keyword.control.slx
+for (int i from 0 to 9)
+// <--- keyword.control.slx
+//   ^^^ storage.type.slx
+//         ^^^^ keyword.control.slx
+//                ^^ keyword.control.slx
+auto nums = 10:5:20;
+// <---- storage.type.slx
+//          ^^ constant.numeric.slx
+//            ^ keyword.operator.range.slx
+auto f = {.5, 2., 2.5e6, .9e-3, 1.5f};
+//        ^^ constant.numeric.slx
+//            ^^ constant.numeric.slx
+//                ^^^^^ constant.numeric.slx
+//                       ^^^^^ constant.numeric.slx
+//                              ^^^^ constant.numeric.slx
+vec3 v3 = vec3{0.0};
+// <---- storage.type.slx
+//        ^^^^ storage.type.slx
+bool b = true & !false;
+//       ^^^^ constant.language.slx
+//            ^ keyword.operator.logical.slx
+//              ^ keyword.operator.logical.slx
+//               ^^^^^ constant.language.slx
+mutable float x = null;
+// <------- storage.modifier.slx
+//                ^^^^ constant.language.slx
+print "// not a comment"; // a comment
+// <----- keyword.other.slx
+//    ^^^^^^^^^^^^^^^^^^ string.quoted.double.slx
+//                        ^^^^^^^^^^^^ comment.line.double-slash.slx
+x += 1; /* block */ y++;
+//^^ keyword.operator.assignment.compound.slx
+//      ^^^^^^^^^^^ comment.block.slx
+//                   ^^ keyword.operator.increment-decrement.slx

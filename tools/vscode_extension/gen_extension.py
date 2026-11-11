@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Generate and/or install a VS Code extension for MXSL syntax highlighting.
+"""Generate, package and install the ShadingLanguageX (SLX) extension for VS Code.
+
+The extension's source lives in slx-vscode/. This script generates the parts
+that come from the rest of the repository, then builds and packages it.
 
 Usage:
-    python gen_extension.py --generate     # generate extension files
-    python gen_extension.py --install      # install to ~/.vscode/extensions/
-    python gen_extension.py --generate --install   # both
-    python gen_extension.py --generate --converter   # also bundle the MXSL<->MTLX
-                                                     # WebAssembly converter
-    python gen_extension.py --generate --converter --build-js  # ... and build WASM
-                                                     # if artifacts are missing
-    python gen_extension.py --publish                # package + publish via vsce
-                                                     # (needs vsce + marketplace PAT)
+    python gen_extension.py --generate             # regenerate the grammar, language data and version list
+    python gen_extension.py --converter            # copy the WebAssembly compiler into the extension
+    python gen_extension.py --vsix                 # build and package slx-<version>.vsix
+    python gen_extension.py --install              # package and install into VS Code
+    python gen_extension.py --publish              # publish to the VS Code Marketplace
+
+Options can be combined, e.g. `--generate --converter --vsix`. Building and
+packaging need Node.js and npm.
 """
 
 import argparse
@@ -20,840 +22,570 @@ import re
 import shutil
 import subprocess
 import sys
-import zipfile
+import urllib.error
+import urllib.request
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-KW_PATH = REPO_ROOT / "mxslc++" / "browser_shared" / "keywords.js"
-STDLIB_PATH = REPO_ROOT / "mxslc++" / "libraries" / "stdlib.mxsl"
-OUT_DIR = REPO_ROOT / "tools" / "vscode_extension" / "mxsl-vscode"
+KEYWORDS_JS = REPO_ROOT / "mxslc++" / "browser_shared" / "keywords.js"
+STDLIB_MXSL = REPO_ROOT / "mxslc++" / "libraries" / "stdlib.mxsl"
+LIBRARIES_DIR = REPO_ROOT / "mxslc++" / "libraries"
 
-# JavaScript (WebAssembly) build artifacts for the MXSL <-> MTLX converter.
+TOOL_DIR = REPO_ROOT / "tools" / "vscode_extension"
+EXTENSION_DIR = TOOL_DIR / "slx-vscode"
+GRAMMAR_TEMPLATE = TOOL_DIR / "grammar" / "slx.tmLanguage.template.json"
+GRAMMAR_OUT = EXTENSION_DIR / "syntaxes" / "slx.tmLanguage.json"
+PACKAGE_JSON = EXTENSION_DIR / "package.json"
+LIB_DIR = EXTENSION_DIR / "media" / "lib"
+DATA_DIR = EXTENSION_DIR / "data"
+LANGUAGE_DATA_OUT = DATA_DIR / "language-data.json"
+# The skill for AI agents, bundled so VS Code's chat can use it (the chatSkills contribution in
+# package.json) and SLX: Install AI Skill can copy it for other agents.
+SKILL_SOURCE = REPO_ROOT / ".claude" / "skills" / "shadinglanguagex"
+SKILL_OUT = EXTENSION_DIR / "skills" / SKILL_SOURCE.name
+
 JS_BUILD_BIN = REPO_ROOT / "mxslc++" / "javascript" / "build" / "mxslc" / "javascript" / "bin"
 JS_BUILD_SCRIPT = REPO_ROOT / "mxslc++" / "javascript" / "build_javascript.sh"
+JS_ARTIFACTS = ["JsMxslc.js", "JsMxslc.wasm", "JsMxslc.data"]
+
+# The MaterialX specification, which node hovers link to. The links go to the
+# main branch, so they follow the latest documentation.
+SPEC_RAW_URL = "https://raw.githubusercontent.com/AcademySoftwareFoundation/MaterialX/main/documents/Specification/"
+SPEC_URL = "https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/"
+SPEC_DOCUMENTS = [
+    "MaterialX.StandardNodes.md",
+    "MaterialX.PBRSpec.md",
+    "MaterialX.NPRSpec.md",
+    "MaterialX.Specification.md",
+]
+# Nodes the specification describes under a heading rather than a node anchor,
+# as (pattern matching the node name, heading text, document).
+SPEC_HEADINGS = [
+    (r"standard_surface", "Autodesk Standard Surface", "MaterialX.PBRSpec.md"),
+    (r"UsdPreviewSurface", "UsdPreviewSurface", "MaterialX.PBRSpec.md"),
+    (r"gltf_pbr", "Khronos glTF PBR", "MaterialX.PBRSpec.md"),
+    (r"open_pbr_surface", "OpenPBR Surface", "MaterialX.PBRSpec.md"),
+    (r"disney_principled", "Disney Principled BSDF", "MaterialX.PBRSpec.md"),
+    (r"Lama\w+", "MaterialX Lama", "MaterialX.PBRSpec.md"),
+    (r"\w+_to_\w+", "Shading Translation Graphs", "MaterialX.PBRSpec.md"),
+]
+
+# ---------------------------------------------------------------------------
+# Keyword classes. Every keyword in keywords.js that is not listed here is
+# highlighted as keyword.other.
+# ---------------------------------------------------------------------------
+CONTROL_KEYWORDS = {"if", "else", "for", "from", "to", "return", "break", "switch", "case", "default"}
+MODIFIER_KEYWORDS = {
+    "const", "mutable", "consteval", "comptime", "global", "geomprop", "nodegraph", "nodedef",
+    "inline", "uniform", "varying", "ref", "out",
+}
+# Keywords with rules of their own in the grammar template.
+SPECIAL_KEYWORDS = {"class", "this", "null"}
+LANGUAGE_CONSTANTS = {"true", "false", "null"}
+EXTRA_TYPES = {"void", "auto", "T"}
 
 
 # ---------------------------------------------------------------------------
-# Keyword extraction
+# Colours in VS Code's default themes, matching the SLX code editor of the
+# MaterialX Playground (MaterialXPlayground js/shared/theme-tokens.js, the
+# code-syntax-* tokens, and js/graph/code-view.jsx). Other themes choose their
+# own colours.
+# ---------------------------------------------------------------------------
+PLAYGROUND_COLORS = {
+    "dark": {"comment": "#6a9955", "string": "#ce9178", "number": "#b5cea8", "keyword": "#569cd6",
+             "type": "#4ec9b0", "directive": "#c586c0", "function": "#dcdcaa",
+             # Not from the Playground, which leaves these plain: argument names, as in
+             # standard_surface(base_color = c), calls of standard library functions,
+             # and macros.
+             "argument": "#e49a9a", "builtin": "#cabe91", "macro": "#c3a6e0"},
+    "light": {"comment": "#008000", "string": "#a31515", "number": "#08794f", "keyword": "#0000ff",
+              "type": "#217a93", "directive": "#af00db", "function": "#795e26",
+              "argument": "#ba3b5b", "builtin": "#7e6f44", "macro": "#7b3f9e"},
+}
+# The default themes, by their ids in current VS Code and in older versions,
+# with each one's text colour: the Playground leaves names, calls, operators
+# and punctuation as plain text, so those get it.
+DEFAULT_THEMES = {
+    "dark": [(["Dark 2026"], "#bbbebf"), (["Dark Modern", "Default Dark Modern"], "#cccccc"), (["Dark+", "Default Dark+"], "#d4d4d4")],
+    "light": [(["Light 2026"], "#202020"), (["Light Modern", "Default Light Modern"], "#3b3b3b"), (["Light+", "Default Light+"], "#000000")],
+}
+# Which colour each scope of the grammar gets, by scope prefix; the first
+# match wins. A scope that matches none stops generation, so new scopes
+# can't go uncoloured.
+SCOPE_COLORS = [
+    ("comment.", "comment"), ("punctuation.definition.comment.", "comment"),
+    ("string.", "string"), ("punctuation.definition.string.", "string"),
+    ("constant.numeric.", "number"), ("constant.language.", "number"),
+    ("keyword.control.directive.", "directive"), ("punctuation.definition.directive.", "directive"),
+    ("keyword.control.", "keyword"), ("storage.modifier.", "keyword"), ("storage.type.class.", "keyword"),
+    ("variable.language.this.", "keyword"), ("keyword.other.", "keyword"),
+    ("storage.type.", "type"),
+    # Attributes, as in @doc, @in.doc and @@colorspace, all in the function colour.
+    ("meta.attribute.", "function"), ("entity.other.attribute-name.", "function"),
+    ("punctuation.definition.attribute.", "function"),
+    ("variable.parameter.named-argument.", "argument"), ("support.function.", "builtin"),
+    # Macro names in #define and #ifdef lines, and the predefined macros. Macros used elsewhere are
+    # found by the extension's semantic highlighting, which package.json maps to the first scope.
+    ("entity.name.function.preprocessor.", "macro"), ("support.constant.macro.", "macro"),
+    ("entity.name.", "plain"), ("support.", "plain"), ("variable.", "plain"), ("keyword.operator.", "plain"),
+    ("punctuation.", "plain"), ("meta.", "plain"),
+]
+
+
+def collect_scopes(node) -> set[str]:
+    """Return every scope name in a grammar."""
+    scopes: set[str] = set()
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key in ("name", "contentName") and isinstance(value, str):
+                scopes.add(value)
+            else:
+                scopes |= collect_scopes(value)
+    elif isinstance(node, list):
+        for item in node:
+            scopes |= collect_scopes(item)
+    return scopes
+
+
+def generate_theme_colors(grammar: dict) -> dict:
+    """Return the editor.tokenColorCustomizations for the default themes.
+
+    Rules name full scopes, like keyword.control.slx, so they are more specific
+    than the themes' own rules and win over them."""
+    by_color: dict[str, list[str]] = {}
+    # The grammar's top-level "name" is its display name, not a scope.
+    for scope in sorted(collect_scopes([grammar["patterns"], grammar["repository"]])):
+        color = next((c for prefix, c in SCOPE_COLORS if scope.startswith(prefix)), None)
+        if color is None:
+            sys.exit(f"error: no colour for the grammar scope {scope}; add it to SCOPE_COLORS in {Path(__file__).name}")
+        by_color.setdefault(color, []).append(scope)
+    # The "." and port name in an attribute, as in @in.doc, have scopes used elsewhere too, so colour them by their parent.
+    attribute_scopes = collect_scopes(grammar["repository"]["attributes"]["captures"])
+    by_color["function"] += [f"meta.attribute.slx {s}" for s in sorted(attribute_scopes) if s in by_color["plain"]]
+
+    def rules(colors: dict[str, str]) -> list[dict]:
+        return [
+            {"name": f"SLX {color}", "scope": by_color[color], "settings": {"foreground": colors[color], "fontStyle": ""}}
+            for color in sorted(colors)
+            if color in by_color
+        ]
+
+    customizations: dict[str, dict] = {}
+    for mode, themes in DEFAULT_THEMES.items():
+        all_ids = [theme_id for ids, _ in themes for theme_id in ids]
+        customizations["".join(f"[{i}]" for i in all_ids)] = {"textMateRules": rules(PLAYGROUND_COLORS[mode])}
+        for ids, text_color in themes:
+            customizations["".join(f"[{i}]" for i in ids)] = {"textMateRules": rules({"plain": text_color})}
+    return customizations
+
+
+# ---------------------------------------------------------------------------
+# Language data
 # ---------------------------------------------------------------------------
 
-def load_keywords() -> dict:
-    """Load MXSL keywords (data types vs control) from the mxslc++ shared
-    browser keyword file (browser_shared/keywords.js). That file is the single
-    source of truth for mxslc++ highlighting and mirrors the mxslc++ TokenType
-    keyword enum (include/TokenType.h), so it includes the [[ ... ]] modifiers
-    such as nodegraph / nodedef."""
-    print(f"......Loading keywords from {KW_PATH}")
-
-    text = KW_PATH.read_text()
+def load_keywords() -> tuple[list[str], list[str]]:
+    """Return the control keywords and data types from browser_shared/keywords.js,
+    which mirrors the mxslc++ TokenType keyword enum (include/TokenType.h)."""
+    text = KEYWORDS_JS.read_text(encoding="utf-8")
 
     def extract_array(name: str) -> list[str]:
-        m = re.search(rf"\b{name}\s*:\s*\[(.*?)\]", text, re.S)
-        if not m:
-            return []
-        return re.findall(r"'([^']*)'", m.group(1))
+        match = re.search(rf"\b{name}\s*:\s*\[(.*?)\]", text, re.S)
+        return re.findall(r"'([^']*)'", match.group(1)) if match else []
 
-    data_types = sorted(extract_array("dataTypes"))
-    control = sorted(extract_array("control"))
-
-    return {"data_types": data_types, "control": control}
+    return extract_array("control"), extract_array("dataTypes")
 
 
-def load_builtins() -> list[str]:
-    """Load built-in function names from stdlib.mxsl."""
-    if not STDLIB_PATH.exists():
-        return []
-    with open(STDLIB_PATH) as f:
-        content = f.read()
-    funcs = set(re.findall(r'\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(', content))
-    funcs = {f for f in funcs if not f.startswith("__")}
-    return sorted(funcs)
+def load_stdlib() -> tuple[dict[str, str], set[str]]:
+    """Return the type aliases (alias -> type) and function names defined in stdlib.mxsl."""
+    text = STDLIB_MXSL.read_text(encoding="utf-8")
+    aliases = dict(re.findall(r"^\s*using\s+(\w+)\s*=\s*(\w+)\s*;", text, re.M))
+    functions = set(re.findall(r"\b([A-Za-z_]\w*)\s*(?:<[^<>()]*>)?\s*\(", text))
+    return aliases, {f for f in functions if not f.startswith("__")}
 
 
-def package_vsix(src: Path) -> Path:
-    """Create a .vsix package from the generated extension files."""
-    pkg = json.loads((src / "package.json").read_text())
-    version = pkg.get("version", "0.0.0")
-    vsix_path = src.parent / f"mxsl-language-{version}.vsix"
-    with zipfile.ZipFile(vsix_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for file in src.rglob("*"):
-            if file.is_file():
-                arcname = "extension/" + str(file.relative_to(src))
-                zf.write(file, arcname)
-    return vsix_path
+def version_key(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split(".") if part.isdigit())
+
+
+def find_materialx_versions() -> list[str]:
+    """Return the MaterialX versions the compiler ships libraries for, oldest first."""
+    versions = [d.name for d in LIBRARIES_DIR.iterdir() if d.is_dir() and re.fullmatch(r"\d+(\.\d+)+", d.name)]
+    return sorted(versions, key=version_key)
+
+
+def load_library_documents(version: str) -> list[ET.Element]:
+    """Return the root elements of the MaterialX library files for a version,
+    the same files the compiler loads."""
+    roots = []
+    for path in sorted((LIBRARIES_DIR / version).rglob("*.mtlx")):
+        # Shader implementation files hold no definitions.
+        if any(part.startswith("gen") for part in path.relative_to(LIBRARIES_DIR / version).parts[:-1]):
+            continue
+        try:
+            roots.append(ET.parse(path).getroot())
+        except ET.ParseError as error:
+            print(f"  Warning: skipping {path}: {error}")
+    return roots
+
+
+# Docs are not taken from the libraries: hovers link to the specification instead.
+INPUT_ATTRIBUTES = ["value", "defaultgeomprop", "enum", "uiname"]
+
+
+def describe_input(element: ET.Element) -> dict:
+    described = {"name": element.get("name"), "type": element.get("type")}
+    for attribute in INPUT_ATTRIBUTES:
+        if element.get(attribute) is not None:
+            described[attribute] = element.get(attribute)
+    if element.get("uniform") == "true":
+        described["uniform"] = True
+    return described
+
+
+def collect_ports(nodedef: ET.Element, nodedefs: dict[str, ET.Element], tag: str, depth: int = 0) -> list[dict]:
+    """Return a nodedef's inputs or outputs, including those it inherits, in MaterialX order."""
+    ports: dict[str, dict] = {}
+    parent = nodedefs.get(nodedef.get("inherit", ""))
+    if parent is not None and depth < 16:
+        ports.update((p["name"], p) for p in collect_ports(parent, nodedefs, tag, depth + 1))
+    for element in nodedef.findall(tag):
+        ports[element.get("name")] = (
+            describe_input(element) if tag == "input" else {"name": element.get("name"), "type": element.get("type")}
+        )
+    return list(ports.values())
+
+
+def load_node_signatures(versions: list[str]) -> dict[str, list[dict]]:
+    """Return the signatures of every MaterialX node, by node name. A signature
+    that is the same in several versions is listed once, with those versions."""
+    signatures: dict[str, dict] = {}
+    for version in versions:
+        nodedefs = {nd.get("name"): nd for root in load_library_documents(version) for nd in root.iter("nodedef")}
+        for name, nodedef in nodedefs.items():
+            # The compiler only loads the default version of a versioned nodedef.
+            if nodedef.get("version") and nodedef.get("isdefaultversion") != "true":
+                continue
+            signature = {
+                "node": nodedef.get("node"),
+                "nodedef": name,
+                "group": nodedef.get("nodegroup"),
+                "inputs": collect_ports(nodedef, nodedefs, "input"),
+                "outputs": collect_ports(nodedef, nodedefs, "output"),
+            }
+            signature = {k: v for k, v in signature.items() if v is not None}
+            key = json.dumps(signature, sort_keys=True)
+            signatures.setdefault(key, {**signature, "versions": []})["versions"].append(version)
+
+    nodes: dict[str, list[dict]] = {}
+    for signature in signatures.values():
+        nodes.setdefault(signature.pop("node"), []).append(signature)
+    return dict(sorted(nodes.items()))
+
+
+def to_github_heading_anchor(heading: str) -> str:
+    """Return the anchor GitHub gives a Markdown heading."""
+    return re.sub(r"[^\w\- ]", "", heading.strip().lower()).replace(" ", "-")
+
+
+def load_spec_links(node_names: list[str]) -> dict[str, str]:
+    """Return the URL of each node's section in the MaterialX specification on
+    GitHub, for the nodes it describes. The specification is downloaded so the
+    links match its current anchors and headings; if it can't be, there are no
+    links."""
+    anchors: dict[str, str] = {}
+    headings: dict[tuple[str, str], str] = {}
+    for document in SPEC_DOCUMENTS:
+        try:
+            with urllib.request.urlopen(SPEC_RAW_URL + document, timeout=30) as response:
+                text = response.read().decode("utf-8")
+        except (urllib.error.URLError, TimeoutError) as error:
+            print(f"  Warning: couldn't download {document} ({error}); node hovers won't link to the specification.")
+            return {}
+        for anchor in re.findall(r'<a id="(node-[^"]+)"', text):
+            anchors.setdefault(anchor, document)
+        for heading in re.findall(r"^#+\s+(.+?)\s*$", text, re.M):
+            headings[(document, heading)] = to_github_heading_anchor(heading)
+
+    links: dict[str, str] = {}
+    for name in node_names:
+        anchor = "node-" + name.lower().replace("_", "-")
+        if anchor in anchors:
+            links[name] = f"{SPEC_URL}{anchors[anchor]}#{anchor}"
+            continue
+        for pattern, heading, document in SPEC_HEADINGS:
+            if re.fullmatch(pattern, name) and (document, heading) in headings:
+                links[name] = f"{SPEC_URL}{document}#{headings[(document, heading)]}"
+                break
+    return links
+
+
+def load_materialx_types(versions: list[str]) -> set[str]:
+    types = {
+        typedef.get("name")
+        for version in versions
+        for root in load_library_documents(version)
+        for typedef in root.iter("typedef")
+    }
+    return {t for t in types if t and t != "none" and not t.endswith("array")}
+
+
+def load_language(versions: list[str]) -> dict:
+    """Return the keywords, types and functions of SLX, for the grammar and the
+    extension's completion, hover and parameter hints."""
+    keywords, data_types = load_keywords()
+    aliases, stdlib_functions = load_stdlib()
+    nodes = load_node_signatures(versions)
+    all_keywords = set(keywords) | LANGUAGE_CONSTANTS
+    types = set(data_types) | set(aliases) | load_materialx_types(versions) | EXTRA_TYPES
+    return {
+        "versions": versions,
+        "keywords": {
+            "control": sorted(CONTROL_KEYWORDS),
+            "modifiers": sorted(MODIFIER_KEYWORDS),
+            "constants": sorted(LANGUAGE_CONSTANTS),
+            "other": sorted(set(keywords) - CONTROL_KEYWORDS - MODIFIER_KEYWORDS - LANGUAGE_CONSTANTS),
+            "all": sorted(all_keywords),
+        },
+        "types": sorted(types),
+        "aliases": dict(sorted(aliases.items())),
+        "builtinFunctions": sorted((set(nodes) | stdlib_functions) - all_keywords - types),
+        "nodes": nodes,
+        "specLinks": load_spec_links(list(nodes)),
+    }
+
+
+def write_language_data(language: dict) -> None:
+    """Write the language data and a copy of stdlib.mxsl into data/."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    LANGUAGE_DATA_OUT.write_text(json.dumps(language, separators=(",", ":")) + "\n", encoding="utf-8")
+    shutil.copy2(STDLIB_MXSL, DATA_DIR / "stdlib.mxsl")
+    signatures = sum(len(s) for s in language["nodes"].values())
+    print(f"  Nodes:             {len(language['nodes'])} ({signatures} signatures)")
+    print(f"  Spec links:        {len(language['specLinks'])}")
+    print(f"  -> {LANGUAGE_DATA_OUT} ({LANGUAGE_DATA_OUT.stat().st_size // 1024} KB)")
+    print(f"  -> {DATA_DIR / 'stdlib.mxsl'}")
+
+
+def join_words(words: set[str]) -> str:
+    """Return a regex alternation of the words, longest first so prefixes don't win."""
+    return "|".join(re.escape(w) for w in sorted(words, key=lambda w: (-len(w), w)))
+
+
+def generate_grammar(language: dict) -> dict:
+    words = {
+        "KEYWORDS": set(language["keywords"]["all"]),
+        "CONTROL_KEYWORDS": CONTROL_KEYWORDS,
+        "MODIFIER_KEYWORDS": MODIFIER_KEYWORDS,
+        "OTHER_KEYWORDS": set(language["keywords"]["other"]) - SPECIAL_KEYWORDS,
+        "TYPES": set(language["types"]),
+        "BUILTIN_FUNCTIONS": set(language["builtinFunctions"]),
+    }
+    print(f"  Keywords:          {len(words['KEYWORDS'])}")
+    print(f"  Types:             {len(words['TYPES'])}")
+    print(f"  Built-in functions: {len(words['BUILTIN_FUNCTIONS'])} (MaterialX {', '.join(language['versions'])})")
+
+    grammar = json.loads(GRAMMAR_TEMPLATE.read_text(encoding="utf-8"))
+    grammar.pop("$comment", None)
+    text = json.dumps(grammar, indent=2)
+    for name, values in words.items():
+        # The words are inserted into JSON strings, so their backslashes need escaping.
+        text = text.replace("{{" + name + "}}", json.dumps(join_words(values))[1:-1])
+    leftover = re.findall(r"\{\{\w+\}\}", text)
+    if leftover:
+        sys.exit(f"error: unknown placeholders in {GRAMMAR_TEMPLATE}: {', '.join(sorted(set(leftover)))}")
+
+    GRAMMAR_OUT.parent.mkdir(parents=True, exist_ok=True)
+    GRAMMAR_OUT.write_text(text + "\n", encoding="utf-8")
+    print(f"  -> {GRAMMAR_OUT}")
+    return json.loads(text)
+
+
+def update_package_json(versions: list[str], theme_colors: dict) -> None:
+    """List the supported MaterialX versions in the slx.materialxVersion setting,
+    and set the colours of the default themes."""
+    package = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))
+    before = json.dumps(package)
+    setting = package["contributes"]["configuration"]["properties"]["slx.materialxVersion"]
+    setting["enum"] = versions
+    setting["default"] = versions[-1]
+    package["contributes"]["configurationDefaults"] = {"editor.tokenColorCustomizations": theme_colors}
+    if json.dumps(package) == before:
+        return
+    PACKAGE_JSON.write_text(json.dumps(package, indent=2) + "\n", encoding="utf-8")
+    print(f"  -> {PACKAGE_JSON} (MaterialX versions {', '.join(versions)}, default theme colours)")
+
+
+def copy_license() -> None:
+    shutil.copy2(REPO_ROOT / "LICENSE", EXTENSION_DIR / "LICENSE")
+
+
+def copy_skill() -> None:
+    """Copy the skill for AI agents into the extension. VS Code requires its folder
+    to be named after the skill's name."""
+    skill_md = (SKILL_SOURCE / "SKILL.md").read_text(encoding="utf-8")
+    name = re.search(r"^name:\s*(\S+)\s*$", skill_md, re.M)
+    if not name or name.group(1) != SKILL_SOURCE.name:
+        sys.exit(f"error: the name in {SKILL_SOURCE / 'SKILL.md'} must be {SKILL_SOURCE.name}, the name of its folder")
+    if SKILL_OUT.exists():
+        shutil.rmtree(SKILL_OUT)
+    shutil.copytree(SKILL_SOURCE, SKILL_OUT, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    print(f"  -> {SKILL_OUT}")
+
+
+# ---------------------------------------------------------------------------
+# WebAssembly compiler
+# ---------------------------------------------------------------------------
+
+def run_js_build(args: argparse.Namespace) -> None:
+    """Build the JsMxslc WebAssembly module with javascript/build_javascript.sh."""
+    emsdk = args.emsdk_location or str(REPO_ROOT.parent / "emsdk")
+    materialx_root = args.materialx_root or os.environ.get("MATERIALX_ROOT", "")
+    command = ["bash", str(JS_BUILD_SCRIPT), emsdk] + ([materialx_root] if materialx_root else [])
+    print("  Building with:", " ".join(command))
+    result = subprocess.run(command, cwd=REPO_ROOT, check=False)
+    if result.returncode != 0:
+        print(f"  Warning: build_javascript.sh exited with code {result.returncode}")
+
+
+def copy_converter(args: argparse.Namespace) -> bool:
+    """Copy the JsMxslc files into media/lib, building them first if they are
+    missing or --build-js is given. Returns False if they could not be found."""
+    bin_dir = Path(args.js_build_dir) if args.js_build_dir else JS_BUILD_BIN
+    if args.build_js or not all((bin_dir / name).exists() for name in JS_ARTIFACTS):
+        run_js_build(args)
+    if not all((bin_dir / name).exists() for name in JS_ARTIFACTS):
+        print(f"  Warning: JsMxslc.{{js,wasm,data}} not found in {bin_dir}.")
+        print("  Re-run with --build-js (and --materialx-root / --emsdk-location as needed).")
+        return False
+
+    LIB_DIR.mkdir(parents=True, exist_ok=True)
+    # The engine worker imports the module as an ES module, which Node only
+    # does for a .mjs file.
+    shutil.copy2(bin_dir / "JsMxslc.js", LIB_DIR / "JsMxslc.mjs")
+    shutil.copy2(bin_dir / "JsMxslc.wasm", LIB_DIR / "JsMxslc.wasm")
+    shutil.copy2(bin_dir / "JsMxslc.data", LIB_DIR / "JsMxslc.data")
+    print(f"  -> {LIB_DIR} (from {bin_dir})")
+    return True
+
+
+# ---------------------------------------------------------------------------
+# Building and packaging
+# ---------------------------------------------------------------------------
+
+def run_npm(*npm_args: str) -> None:
+    npm = shutil.which("npm")
+    if npm is None:
+        sys.exit("error: npm was not found. Install Node.js (which includes npm) and retry.")
+    print(f"  npm {' '.join(npm_args)}")
+    result = subprocess.run([npm, *npm_args], cwd=EXTENSION_DIR, check=False)
+    if result.returncode != 0:
+        sys.exit(f"error: 'npm {' '.join(npm_args)}' failed with exit code {result.returncode}")
+
+
+def install_dependencies() -> None:
+    if not (EXTENSION_DIR / "node_modules").exists():
+        run_npm("ci")
+
+
+def package_vsix() -> Path:
+    """Build the extension and package it with vsce, returning the .vsix path."""
+    install_dependencies()
+    if not (LIB_DIR / "JsMxslc.mjs").exists():
+        print("  Warning: the WebAssembly compiler is not in media/lib; run with --converter to bundle it.")
+        print("           Without it, the extension only provides highlighting and snippets.")
+    run_npm("run", "package")
+    version = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))["version"]
+    vsix = TOOL_DIR / f"slx-{version}.vsix"
+    print(f"\nPackaged to {vsix}")
+    return vsix
+
+
+def install_vsix(vsix: Path) -> None:
+    code = shutil.which("code")
+    if code is None:
+        print(f"'code' was not found on the PATH. Install manually with:\n  code --install-extension {vsix}")
+        return
+    result = subprocess.run([code, "--install-extension", str(vsix)], capture_output=True, text=True)
+    if result.returncode == 0:
+        print("Installed. Reload VS Code (Developer: Reload Window) for the extension to take effect.")
+    else:
+        print(f"Install failed. Try manually:\n  code --install-extension {vsix}")
+        if result.stderr:
+            print(f"  Error: {result.stderr.strip()}")
 
 
 def publish_extension() -> None:
-    """Package with vsce and publish to the VS Code Marketplace."""
-    if shutil.which("vsce") is None:
-        print("error: 'vsce' not found. Install it with: npm install -g @vscode/vsce")
-        return
-    print("\nRunning 'vsce package' ...")
-    r = subprocess.run(["vsce", "package"], cwd=OUT_DIR, check=False)
-    if r.returncode != 0:
-        print("error: 'vsce package' failed; fix the reported issues and retry.")
-        return
-    print("Running 'vsce publish' ...")
-    r = subprocess.run(["vsce", "publish"], cwd=OUT_DIR, check=False)
-    if r.returncode != 0:
-        print("error: 'vsce publish' failed. Ensure VSCE_PAT is set and the")
-        print("       publisher is registered, then retry.")
-        return
-    print("\nPublished successfully.")
-
-
-def load_mtlx_nodedefs(mtlx_stdlib_path: Path | None = None) -> tuple[list[str], str]:
-    """Load MTLX nodedef names from MaterialX stdlib.
-    
-    Args:
-        mtlx_stdlib_path: Optional directory containing MTLX stdlib libraries.
-                          If None, uses the installed MaterialX package's built-in search paths.
-    """
-    import MaterialX as mx
-    stdlib = mx.createDocument()
-
-    if mtlx_stdlib_path:
-        search_path = mx.FileSearchPath(str(mtlx_stdlib_path))
-        lib_folders = list(mx.getDefaultDataLibraryFolders())
-        mx.loadLibraries(lib_folders, search_path, stdlib)
-    else:
-        search_path = mx.getDefaultDataSearchPath()
-        lib_folders = list(mx.getDefaultDataLibraryFolders())
-        mx.loadLibraries(lib_folders, search_path, stdlib)
-
-    unique_names = set(nd.getNodeString() for nd in stdlib.getNodeDefs())
-    return sorted(unique_names), mx.getVersionString()
+    """Publish to the VS Code Marketplace. Needs a VSCE_PAT for the publisher."""
+    install_dependencies()
+    run_npm("exec", "--", "vsce", "publish", "--no-dependencies")
+    print("\nPublished.")
 
 
 # ---------------------------------------------------------------------------
-# JavaScript (WebAssembly) converter bundling
+# Command line
 # ---------------------------------------------------------------------------
-
-def run_js_build(args) -> None:
-    """Invoke javascript/build_javascript.sh to produce the JsMxslc WASM artifacts."""
-    if not JS_BUILD_SCRIPT.exists():
-        print(f"  Warning: build script not found at {JS_BUILD_SCRIPT}")
-        return
-
-    emsdk = args.emsdk_location or str(REPO_ROOT.parent / "emsdk")
-    mtlx_root = args.materialx_root or os.environ.get("MATERIALX_ROOT", "")
-
-    print("  Running javascript/build_javascript.sh ...")
-    cmd = ["bash", str(JS_BUILD_SCRIPT)]
-    if emsdk:
-        cmd.append(emsdk)
-    if mtlx_root:
-        cmd.append(mtlx_root)
-
-    try:
-        print("Building with command:", " ".join(cmd))
-        result = subprocess.run(cmd, cwd=REPO_ROOT, check=False)
-        if result.returncode != 0:
-            print(f"  Warning: build_javascript.sh exited with code {result.returncode}")
-    except Exception as e:
-        print(f"  Warning: could not run build_javascript.sh: {e}")
-
-
-def resolve_js_build(args) -> Path | None:
-    """Resolve the directory holding the JsMxslc WASM artifacts.
-
-    Returns the ``bin`` directory when all three artifacts are present, otherwise
-    attempts to build them (auto-build when missing, or a forced rebuild when
-    ``--build-js`` is passed) and returns ``None`` if they still cannot be found.
-    """
-    bin_dir = Path(args.js_build_dir) if args.js_build_dir else JS_BUILD_BIN
-    artifacts = ["JsMxslc.js", "JsMxslc.wasm", "JsMxslc.data"]
-
-    present = all((bin_dir / a).exists() for a in artifacts)
-    if not present or args.build_js:
-        run_js_build(args)
-        present = all((bin_dir / a).exists() for a in artifacts)
-
-    return bin_dir if present else None
-
-
-def copy_js_artifacts(bin_dir: Path) -> None:
-    """Copy the JsMxslc JS/WASM/data artifacts into the extension's media/lib folder.
-
-    The Emscripten module is an ES module; Node only treats it as ESM when the
-    file carries a ``.mjs`` extension (the extension package is CommonJS), so the
-    JS module is shipped under both names.
-    """
-    lib_dir = OUT_DIR / "media" / "lib"
-    lib_dir.mkdir(parents=True, exist_ok=True)
-    copies = [
-        ("JsMxslc.js", "JsMxslc.js"),
-        ("JsMxslc.js", "JsMxslc.mjs"),
-        ("JsMxslc.wasm", "JsMxslc.wasm"),
-        ("JsMxslc.data", "JsMxslc.data"),
-    ]
-    for src_name, dst_name in copies:
-        src = bin_dir / src_name
-        if not src.exists():
-            print(f"  Warning: missing artifact {src.name}")
-            continue
-        shutil.copy2(src, lib_dir / dst_name)
-        print(f"  -> {lib_dir / dst_name}")
-
-
-# ---------------------------------------------------------------------------
-# Generator
-# ---------------------------------------------------------------------------
-
-def escape_re(s: str) -> str:
-    """Escape a string for use in a TextMate regex character class or alternation."""
-    return re.escape(s)
-
-
-def build_keyword_pattern(words: list[str]) -> str:
-    """Build a case-sensitive word-boundary alternation pattern."""
-    if not words:
-        return r"\b(nonexistent)\b"
-    escaped = [escape_re(w) for w in sorted(words, key=len, reverse=True)]
-    return r"\b(?:" + "|".join(escaped) + r")\b"
-
-
-def generate_package_json(with_converter: bool = False) -> dict:
-    pkg = {
-        "name": "mxsl-language",
-        "displayName": "MXSL Language Support",
-        "description": "Syntax highlighting and MXSL <-> MTLX (MaterialX) conversion for the MXSL Shading Language",
-        "version": "0.2.1",
-        "publisher": "shadinglanguagex",
-        "license": "Apache-2.0",
-        "repository": {
-            "type": "git",
-            "url": "https://github.com/kwokcb/ShadingLanguageX/"
-        },
-        "keywords": [
-            "mxsl",
-            "materialx",
-            "shading language",
-            "slx",
-            "converter",
-            "syntax highlighting"
-        ],
-        "engines": {"vscode": "^1.85.0"},
-        "categories": ["Programming Languages"],
-        "contributes": {
-            "languages": [{
-                "id": "mxsl",
-                "aliases": ["MXSL", "mxsl"],
-                "extensions": [".mxsl"],
-                "configuration": "./language-configuration.json"
-            }],
-            "grammars": [{
-                "language": "mxsl",
-                "scopeName": "source.mxsl",
-                "path": "./syntaxes/mxsl.tmLanguage.json"
-            }],
-            "configurationDefaults": {
-                "editor.tokenColorCustomizations": {
-                    "textMateRules": [
-                        {
-                            "scope": "entity.name.function.mxsl",
-                            "settings": {"foreground": "#78C48B"}
-                        },
-                        {
-                            "scope": "support.function.mxsl",
-                            "settings": {"foreground": "#78C48B"}
-                        }
-                    ]
-                }
-            }
-        }
-    }
-
-    if with_converter:
-        pkg["main"] = "./src/extension.js"
-        pkg["activationEvents"] = ["onCommand:mxsl.convert", "onCommand:mxsl.validate"]
-        pkg["contributes"]["commands"] = [
-            {
-                "command": "mxsl.convert",
-                "title": "MXSL: Convert between MXSL and MTLX",
-                "icon": "$(arrow-swap)"
-            },
-            {
-                "command": "mxsl.validate",
-                "title": "MXSL: Validate current file (MXSL <-> MTLX)",
-                "icon": "$(check-all)"
-            }
-        ]
-        pkg["contributes"]["menus"] = {
-            "editor/context": [
-                {
-                    "command": "mxsl.convert",
-                    "when": "editorLangId == mxsl || editorLangId == xml",
-                    "group": "navigation"
-                },
-                {
-                    "command": "mxsl.validate",
-                    "when": "editorLangId == mxsl || editorLangId == xml",
-                    "group": "navigation"
-                }
-            ],
-            # Icons shown in the editor title bar (top-right), like the built-in
-            # Markdown preview button. Only appear while editing .mxsl/.mtlx files.
-            "editor/title": [
-                {
-                    "command": "mxsl.convert",
-                    "when": "editorLangId == mxsl || editorLangId == xml",
-                    "group": "navigation"
-                },
-                {
-                    "command": "mxsl.validate",
-                    "when": "editorLangId == mxsl || editorLangId == xml",
-                    "group": "navigation"
-                }
-            ]
-        }
-
-    return pkg
-
-
-def generate_readme(with_converter: bool) -> str:
-    """Return the extension README shown on the VS Code Marketplace."""
-    lines = [
-        "# MXSL Language Support",
-        "",
-        "Syntax highlighting for the MXSL (MaterialX Shading Language) files in",
-        "Visual Studio Code.",
-        "",
-    ]
-    if with_converter:
-        lines += [
-            "## Features",
-            "- Syntax highlighting for `.mxsl` files",
-            "- Convert the active `.mxsl` file to MaterialX XML (MTLX)",
-            "- Convert the active `.mtlx` / `.xml` file to MXSL",
-            "- Validate the active file without creating a new one",
-            "",
-            "## Commands",
-            "",
-            "| Command | Description |",
-            "| --- | --- |",
-            "| `MXSL: Convert between MXSL and MTLX` | Convert the open file and show the result in a new editor |",
-            "| `MXSL: Validate current file (MXSL <-> MTLX)` | Run the conversion without creating a new file |",
-            "",
-            "Run these from the Command Palette (`Cmd/Ctrl+Shift+P`) or the editor",
-            "context menu on a `.mxsl` / `.mtlx` file.",
-            "",
-            "## Conversion engine",
-            "The converter uses the `mxslc` compiler/decompiler compiled to",
-            "WebAssembly and bundled with the extension. No network access is required.",
-            "",
-            "## Acknowledgments",
-            "This extension bundles the MaterialX standard library (MaterialX,",
-            "Copyright (c) Contributors to the MaterialX Project), which is",
-            "licensed under the Apache License, Version 2.0. See",
-            "<https://www.materialx.org> for details.",
-            "",
-        ]
-    lines += [
-        "## Requirements",
-        "- Visual Studio Code 1.85 or newer",
-        "",
-        "## License",
-        "Apache-2.0",
-        "",
-    ]
-    return "\n".join(lines)
-
-
-def write_license() -> None:
-    """Copy the repository Apache-2.0 LICENSE into the extension folder."""
-    src = REPO_ROOT / "LICENSE"
-    if not src.exists():
-        print("  Warning: no LICENSE file found at repository root")
-        return
-    shutil.copy2(src, OUT_DIR / "LICENSE")
-    print(f"  -> {OUT_DIR / 'LICENSE'}")
-
-
-def generate_language_configuration() -> dict:
-    return {
-        "comments": {
-            "lineComment": "//",
-            "blockComment": ["/*", "*/"]
-        },
-        "brackets": [
-            ["{", "}"],
-            ["[", "]"],
-            ["(", ")"]
-        ],
-        "autoClosingPairs": [
-            {"open": "{", "close": "}"},
-            {"open": "[", "close": "]"},
-            {"open": "(", "close": ")"},
-            {"open": "\"", "close": "\"", "notIn": ["string"]},
-            {"open": "'", "close": "'", "notIn": ["string"]}
-        ],
-        "surroundingPairs": [
-            {"open": "{", "close": "}"},
-            {"open": "[", "close": "]"},
-            {"open": "(", "close": ")"},
-            {"open": "\"", "close": "\""},
-            {"open": "'", "close": "'"}
-        ]
-    }
-
-
-def generate_tm_grammar(kw: dict, builtins: list[str], functions: list[str]) -> dict:
-    data_type_pat = build_keyword_pattern(kw["data_types"])
-    control_pat = build_keyword_pattern(kw["control"])
-    builtin_pat = build_keyword_pattern(builtins)
-    func_pat = build_keyword_pattern(functions)
-
-    return {
-        "scopeName": "source.mxsl",
-        "name": "MXSL",
-        "fileTypes": ["mxsl"],
-        "patterns": [
-            # Preprocessor directives
-            {"match": r"#\w+", "name": "keyword.control.directive.mxsl"},
-
-            # Multi-line comment
-            {"begin": r"/\*", "end": r"\*/", "name": "comment.block.mxsl"},
-
-            # Single-line comment
-            {"match": r"//.*$", "name": "comment.line.double-slash.mxsl"},
-
-            # String literals
-            {"match": r'"(?:[^"\\]|\\.)*"', "name": "string.quoted.double.mxsl"},
-            {"match": r"'(?:[^'\\]|\\.)*'", "name": "string.quoted.single.mxsl"},
-
-            # Numbers (float with scientific notation)
-            {"match": r"\b\d+\.?\d*(?:[eE][+-]?\d+)?[fF]?\b", "name": "constant.numeric.mxsl"},
-
-            # MTLX nodedef function names (only when followed by `(`)
-            {"match": func_pat + r"(?=\s*\()", "name": "entity.name.function.mxsl"},
-
-            # Built-in function names (only when followed by `(`)
-            {"match": builtin_pat + r"(?=\s*\()", "name": "support.function.mxsl"},
-
-            # Data types
-            {"match": data_type_pat, "name": "storage.type.mxsl"},
-
-            # Control keywords
-            {"match": control_pat, "name": "keyword.control.mxsl"},
-        ],
-        "repository": {
-            "comment": {
-                "patterns": [
-                    {"begin": r"/\*", "end": r"\*/", "name": "comment.block.mxsl"},
-                    {"match": r"//.*$", "name": "comment.line.double-slash.mxsl"}
-                ]
-            },
-            "string": {
-                "patterns": [
-                    {"match": r'"(?:[^"\\]|\\.)*"', "name": "string.quoted.double.mxsl"},
-                    {"match": r"'(?:[^'\\]|\\.)*'", "name": "string.quoted.single.mxsl"}
-                ]
-            },
-            "number": {
-                "match": r"\b\d+\.?\d*(?:[eE][+-]?\d+)?[fF]?\b",
-                "name": "constant.numeric.mxsl"
-            },
-            "function": {
-                "match": func_pat + r"(?=\s*\()",
-                "name": "entity.name.function.mxsl"
-            },
-            "builtin": {
-                "match": builtin_pat + r"(?=\s*\()",
-                "name": "support.function.mxsl"
-            },
-            "type": {
-                "match": data_type_pat,
-                "name": "storage.type.mxsl"
-            },
-            "control": {
-                "match": control_pat,
-                "name": "keyword.control.mxsl"
-            },
-            "operator": {
-                "match": r"[+\-*/%=<>!&|^~]+",
-                "name": "keyword.operator.mxsl"
-            },
-            "variable": {
-                "match": r"[a-zA-Z_$][\w$]*",
-                "name": "variable.other.mxsl"
-            },
-            "paren": {
-                "match": r"[{}()\[\]]",
-                "name": "punctuation.section.mxsl"
-            },
-            "block": {
-                "begin": r"\{",
-                "end": r"\}",
-                "name": "meta.block.mxsl",
-                "patterns": [{"include": "#expression"}]
-            }
-        }
-    }
-
-
-def generate_extension_js() -> str:
-    """Return the VS Code extension entry point that converts/validates the active file."""
-    return r'''// MXSL VS Code extension entry point.
-// Two commands backed by the bundled WebAssembly engine:
-//   mxsl.convert  - convert the open file between MXSL and MTLX, show result in a new editor
-//   mxsl.validate - run the conversion without creating a new file (success/error only)
-const vscode = require('vscode');
-const path = require('path');
-const { pathToFileURL } = require('url');
-
-// Lazily-loaded WebAssembly engine, shared across conversions.
-let enginePromise = null;
-
-// Persistent output channel that logs conversion results and errors.
-let outputChannel = null;
-
-function activate(context) {
-    context.subscriptions.push(
-        vscode.commands.registerCommand('mxsl.convert', () => convertActiveFile(context)),
-        vscode.commands.registerCommand('mxsl.validate', () => validateActiveFile(context))
-    );
-}
-
-function deactivate() {}
-
-function getLibDir(context) {
-    return path.join(context.extensionUri.fsPath, 'media', 'lib');
-}
-
-// Load (once) and return the mxslc WebAssembly engine. The locateFile callback
-// must return an absolute filesystem path so the bundled .wasm / .data files
-// are found regardless of the process working directory (this is what prevents
-// the load from hanging on the data package).
-async function loadEngine(context) {
-    if (!enginePromise) {
-        enginePromise = (async () => {
-            const libDir = getLibDir(context);
-            const mod = await import(pathToFileURL(path.join(libDir, 'JsMxslc.mjs')).href);
-            const factory = mod.default;
-            return factory({ locateFile: (file) => path.join(libDir, file) });
-        })();
-    }
-    return enginePromise;
-}
-
-function errorMessage(err) {
-    return (err && err.message) ? err.message : String(err);
-}
-
-// Lazy Output Channel under View -> Output -> MXSL.
-function getOutputChannel() {
-    if (!outputChannel) {
-        outputChannel = vscode.window.createOutputChannel('MXSL');
-    }
-    return outputChannel;
-}
-
-// Append a timestamped line to the output channel.
-function log(prefix, ...parts) {
-    const line = '[' + new Date().toLocaleTimeString() + '] ' + prefix + ' ' +
-        parts.join(' ').replace(/\s+$/g, '');
-    getOutputChannel().appendLine(line);
-    return line;
-}
-
-// Build a full, multi-line error description (name + message + stack).
-function errorDetail(err) {
-    const name = (err && err.name) ? err.name : 'Error';
-    let detail = name + ': ' + errorMessage(err);
-    if (err && err.stack) {
-        detail += '\n' + err.stack;
-    }
-    return detail;
-}
-
-// Determine the conversion direction for a document, or null if unsupported.
-function getKind(doc) {
-    const ext = path.extname(doc.fileName).toLowerCase();
-    const lang = doc.languageId;
-    const isMxsl = lang === 'mxsl' || ext === '.mxsl';
-    const isMtlx = lang === 'xml' || ext === '.mtlx' || ext === '.xml';
-    if (!isMxsl && !isMtlx) return null;
-    return { isMxsl, isMtlx, label: isMxsl ? 'MXSL → MTLX' : 'MTLX → MXSL' };
-}
-
-// Resolve the active editor and its conversion kind, warning if not usable.
-async function getActiveTarget() {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        vscode.window.showWarningMessage('MXSL: open a .mxsl or .mtlx file first.');
-        return null;
-    }
-    const doc = editor.document;
-    const kind = getKind(doc);
-    if (!kind) {
-        vscode.window.showWarningMessage(
-            'MXSL: unsupported file type "' + path.extname(doc.fileName).toLowerCase() +
-            '". Open a .mxsl or .mtlx file.'
-        );
-        return null;
-    }
-    return { editor, doc, kind };
-}
-
-// Run the conversion and return the resulting string.
-function runConversion(mx, kind, source) {
-    if (kind.isMxsl) {
-        const opts = new mx.CompileOptions();
-        opts.version = '1.39.5';
-        opts.reduceGraph = true;
-        opts.errorOnMissingGlobals = true;
-        opts.errorOnUnusedGlobals = true;
-        try {
-            return mx.compileSlxToMtlx(source, opts);
-        } finally {
-            opts.delete();
-        }
-    }
-    return mx.decompileMtlxToSlx(source);
-}
-
-// Log an error to the output channel and show a toast with a 'Show Output' action.
-async function reportError(prefix, e) {
-    const detail = errorDetail(e);
-    log('ERROR', detail);
-    const action = await vscode.window.showErrorMessage(
-        prefix + ': ' + errorMessage(e),
-        'Show Output'
-    );
-    if (action === 'Show Output') {
-        getOutputChannel().show();
-    }
-}
-
-// Convert the open file and show the result in a new untitled editor.
-async function convertActiveFile(context) {
-    const target = await getActiveTarget();
-    if (!target) return;
-    const { doc, kind } = target;
-    const status = vscode.window.setStatusBarMessage('MXSL: ' + kind.label + ' ...');
-    try {
-        const mx = await loadEngine(context);
-        const result = runConversion(mx, kind, doc.getText());
-        const outDoc = await vscode.workspace.openTextDocument({
-            content: result,
-            language: kind.isMxsl ? 'xml' : 'mxsl'
-        });
-        await vscode.window.showTextDocument(outDoc, {
-            preview: true,
-            viewColumn: vscode.ViewColumn.Beside
-        });
-        log('OK', kind.label, '→', result.length, 'chars');
-        vscode.window.showInformationMessage('MXSL: converted ' + kind.label + '.');
-    } catch (e) {
-        await reportError('MXSL conversion failed', e);
-    } finally {
-        status.dispose();
-    }
-}
-
-// Validate the open file: run the conversion but do NOT create a new file.
-async function validateActiveFile(context) {
-    const target = await getActiveTarget();
-    if (!target) return;
-    const { doc, kind } = target;
-    const status = vscode.window.setStatusBarMessage('MXSL: validating ' + kind.label + ' ...');
-    try {
-        const mx = await loadEngine(context);
-        const result = runConversion(mx, kind, doc.getText());
-        log('VALIDATE OK', kind.label, '→', result.length, 'chars');
-        vscode.window.showInformationMessage(
-            'MXSL: validation passed (' + kind.label + ', ' + result.length + ' chars).'
-        );
-    } catch (e) {
-        await reportError('MXSL validation failed', e);
-    } finally {
-        status.dispose();
-    }
-}
-
-module.exports = { activate, deactivate };
-'''
-
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Generate and/or install a VS Code extension for MXSL syntax highlighting."
-    )
-    parser.add_argument(
-        "-g", "--generate",
-        action="store_true",
-        help="Generate extension files under tools/vscode_extension/mxsl-vscode/"
-    )
-    parser.add_argument(
-        "-i", "--install",
-        action="store_true",
-        help="Package as .vsix and install via code --install-extension"
-    )
-    parser.add_argument(
-        "-v", "--vsix",
-        action="store_true",
-        help="Package the extension as mxsl-language-<version>.vsix"
-    )
-    parser.add_argument(
-        "--mtlx-stdlib",
-        type=str,
-        default=None,
-        help="Path to the MaterialX libraries/ directory (containing stdlib/, bxdf/, etc.). "
-             "Defaults to the installed MaterialX package's built-in libraries."
-    )
-    parser.add_argument(
-        "-c", "--converter",
-        action="store_true",
-        help="Bundle the MXSL<->MTLX WebAssembly converter into the extension: copies "
-             "JsMxslc.{js,wasm,data} into media/lib and adds a converter webview command."
-    )
-    parser.add_argument(
-        "--js-build-dir",
-        type=str,
-        default=None,
-        help="Path to the JS build 'bin' directory containing JsMxslc.{js,wasm,data}. "
-             "Defaults to mxslc++/javascript/build/mxslc/javascript/bin."
-    )
-    parser.add_argument(
-        "--build-js",
-        action="store_true",
-        help="Build the JS/WASM module with build_javascript.sh even if the artifacts "
-             "already exist. Auto-builds whenever artifacts are missing."
-    )
-    parser.add_argument(
-        "--materialx-root",
-        type=str,
-        default=None,
-        help="Path to a MaterialX source tree (used when building the JS module). "
-             "Defaults to the MATERIALX_ROOT environment variable."
-    )
-    parser.add_argument(
-        "--emsdk-location",
-        type=str,
-        default=None,
-        help="Path to the Emscripten SDK (used when building the JS module). "
-             "Defaults to <repo>/../emsdk."
-    )
-    parser.add_argument(
-        "-p", "--publish",
-        action="store_true",
-        help="Package with 'vsce' and publish to the VS Code Marketplace "
-             "(requires vsce and a marketplace Personal Access Token)."
-    )
+    parser = argparse.ArgumentParser(description="Generate, package and install the SLX extension for VS Code.")
+    parser.add_argument("-g", "--generate", action="store_true",
+                        help="Regenerate syntaxes/slx.tmLanguage.json, data/, skills/ and the MaterialX version list in package.json.")
+    parser.add_argument("-c", "--converter", action="store_true",
+                        help="Copy the WebAssembly compiler (JsMxslc.{js,wasm,data}) into media/lib, "
+                             "building it first if it is missing.")
+    parser.add_argument("-v", "--vsix", action="store_true",
+                        help="Build the extension and package it as slx-<version>.vsix.")
+    parser.add_argument("-i", "--install", action="store_true",
+                        help="Package the extension and install it with 'code --install-extension'.")
+    parser.add_argument("-p", "--publish", action="store_true",
+                        help="Publish to the VS Code Marketplace (needs a VSCE_PAT for the publisher).")
+    parser.add_argument("--js-build-dir", default=None,
+                        help="Folder holding JsMxslc.{js,wasm,data}. "
+                             "Defaults to mxslc++/javascript/build/mxslc/javascript/bin.")
+    parser.add_argument("--build-js", action="store_true",
+                        help="Rebuild the WebAssembly compiler even if it already exists.")
+    parser.add_argument("--materialx-root", default=None,
+                        help="MaterialX source tree, for building the WebAssembly compiler. "
+                             "Defaults to the MATERIALX_ROOT environment variable.")
+    parser.add_argument("--emsdk-location", default=None,
+                        help="Emscripten SDK, for building the WebAssembly compiler. Defaults to <repo>/../emsdk.")
     args = parser.parse_args()
-    if not args.generate and not args.install and not args.vsix and not args.publish:
+    if not (args.generate or args.converter or args.vsix or args.install or args.publish):
         parser.print_usage()
-        print("error: at least one of --generate, --install, --vsix, or --publish is required")
-        sys.exit(1)
+        sys.exit("error: give at least one of --generate, --converter, --vsix, --install or --publish")
     return args
 
 
-def main():
+def main() -> None:
     args = parse_args()
 
-    if args.generate or args.converter or not OUT_DIR.exists():
-        print("Loading MXSL keywords...")
-        kw = load_keywords()
-        print(f"  Data types: {len(kw['data_types'])}")
-        print(f"  Control:    {len(kw['control'])}")
+    if args.generate:
+        print("Generating the grammar, language data and version list...")
+        versions = find_materialx_versions()
+        language = load_language(versions)
+        grammar = generate_grammar(language)
+        write_language_data(language)
+        update_package_json(versions, generate_theme_colors(grammar))
+        copy_license()
+        copy_skill()
 
-        print("Loading builtins...")
-        builtins = load_builtins()
-        print(f"  Builtins:   {len(builtins)}")
+    if args.converter:
+        print("\nBundling the WebAssembly compiler...")
+        copy_converter(args)
 
-        print("Loading MTLX nodedef names...")
-        mtlx_stdlib_path = Path(args.mtlx_stdlib) if args.mtlx_stdlib else None
-        try:
-            functions, mtlx_version = load_mtlx_nodedefs(mtlx_stdlib_path)
-            print(f"  Functions for version {mtlx_version}:  {len(functions)}")
-        except Exception as e:
-            print(f"  Warning: Could not load MTLX nodedefs ({e}), using empty list")
-            functions = []
-
-        # Resolve / build the JS/WASM artifacts up front so package.json only
-        # advertises the converter command when it can actually be bundled.
-        with_converter = False
-        if args.converter:
-            print("\nBundling MXSL <-> MTLX converter...")
-            bin_dir = resolve_js_build(args)
-            if bin_dir is None:
-                print("  Warning: JsMxslc.{js,wasm,data} not found; converter disabled.")
-                print("  Re-run with --build-js (and --materialx-root / --emsdk-location as needed),")
-                print("  or build manually: javascript/build_javascript.sh")
-            else:
-                with_converter = True
-                print(f"  Using JS build from {bin_dir}")
-                copy_js_artifacts(bin_dir)
-                src_dir = OUT_DIR / "src"
-                src_dir.mkdir(parents=True, exist_ok=True)
-                (src_dir / "extension.js").write_text(generate_extension_js())
-                print(f"  -> {src_dir / 'extension.js'}")
-
-        # Create output directory
-        syntaxes_dir = OUT_DIR / "syntaxes"
-        syntaxes_dir.mkdir(parents=True, exist_ok=True)
-
-        # Write package.json
-        pkg = generate_package_json(with_converter=with_converter)
-        (OUT_DIR / "package.json").write_text(json.dumps(pkg, indent=2) + "\n")
-        print(f"  -> {OUT_DIR / 'package.json'}")
-
-        # Write README.md (shown on the Marketplace) and LICENSE
-        (OUT_DIR / "README.md").write_text(generate_readme(with_converter))
-        print(f"  -> {OUT_DIR / 'README.md'}")
-        write_license()
-
-        # Write language-configuration.json
-        lang_cfg = generate_language_configuration()
-        (OUT_DIR / "language-configuration.json").write_text(json.dumps(lang_cfg, indent=2) + "\n")
-        print(f"  -> {OUT_DIR / 'language-configuration.json'}")
-
-        # Write tmLanguage.json
-        grammar = generate_tm_grammar(kw, builtins, functions)
-        (syntaxes_dir / "mxsl.tmLanguage.json").write_text(json.dumps(grammar, indent=2) + "\n")
-        print(f"  -> {syntaxes_dir / 'mxsl.tmLanguage.json'}")
-
-        # Remove any leftover files from the previous (webview-based) generator layout.
-        for stale in [OUT_DIR / "media" / "convert.html", OUT_DIR / "media" / "convert.js"]:
-            if stale.exists():
-                stale.unlink()
-                print(f"  Removed stale file {stale}")
-
-        print("\nGeneration complete.")
-
-    if args.install:
-        src = OUT_DIR
-        if not src.exists():
-            print(f"error: no generated extension found at {src}. Run --generate first.")
-            sys.exit(1)
-        vsix_path = package_vsix(src)
-        print(f"\nPackaged to {vsix_path}")
-        result = subprocess.run(["code", "--install-extension", str(vsix_path)],
-                                capture_output=True, text=True)
-        if result.returncode == 0:
-            print("Installed successfully via VS Code.")
-            print("Reload VS Code (Cmd/Ctrl+Shift+P -> Developer: Reload Window) for the extension to take effect.")
-        else:
-            print(f"Install via 'code' command failed. Try manually:")
-            print(f"  code --install-extension {vsix_path}")
-            if result.stderr:
-                print(f"  Error: {result.stderr.strip()}")
-
-    if args.vsix:
-        src = OUT_DIR
-        if not src.exists():
-            print(f"error: no generated extension found at {src}. Run --generate first.")
-            sys.exit(1)
-        vsix_path = package_vsix(src)
-        print(f"\nPackaged to {vsix_path}")
-        print(f"Install with: code --install-extension {vsix_path}")
+    if args.vsix or args.install:
+        print("\nPackaging...")
+        vsix = package_vsix()
+        if args.install:
+            install_vsix(vsix)
 
     if args.publish:
+        print("\nPublishing...")
         publish_extension()
+
 
 if __name__ == "__main__":
     main()

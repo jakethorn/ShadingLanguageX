@@ -1,0 +1,29 @@
+// SYNTAX TEST "source.slx" "argument names in calls"
+
+surfaceshader s = standard_surface(base_color = base, specular_roughness = r);
+//                ^^^^^^^^^^^^^^^^ support.function.slx
+//                                 ^^^^^^^^^^ variable.parameter.named-argument.slx
+//                                              ^^^^ - variable.parameter.named-argument.slx
+//                                                    ^^^^^^^^^^^^^^^^^^ variable.parameter.named-argument.slx
+color3 c = image<color3>(file = "a.png") * fade(RED, (t + 1) * 2, amount = x);
+//         ^^^^^ support.function.slx
+//                       ^^^^ variable.parameter.named-argument.slx
+//                                         ^^^^ entity.name.function.call.slx
+//                                                    ^ - variable.parameter.named-argument.slx
+//                                                                ^^^^^^ variable.parameter.named-argument.slx
+surfaceshader s2 = standard_surface(
+    base_color = mix(a, b, t),
+//  ^^^^^^^^^^ variable.parameter.named-argument.slx
+//               ^^^ support.function.slx
+    specular_roughness = r
+//  ^^^^^^^^^^^^^^^^^^ variable.parameter.named-argument.slx
+);
+x = 1;
+// <- - variable.parameter.named-argument.slx
+bool b = same(x == y);
+//            ^ - variable.parameter.named-argument.slx
+float add_one(float in = 1.0) { return in; }
+//    ^^^^^^^ entity.name.function.slx
+//                  ^^ - variable.parameter.named-argument.slx
+Point p = Point(v = 2.0);
+//              ^ variable.parameter.named-argument.slx
