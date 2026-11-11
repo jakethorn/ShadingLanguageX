@@ -79,6 +79,14 @@ def get_parm_tuple_value(parm_tuple, type_name):
     return parm_tuple[0].eval()
 
 
+def is_in_hidden_parameters_tab(node):
+    """Returns whether a Parameters tab that isn't showing, e.g. one behind another tab, has node's parameters."""
+    if not hou.isUIAvailable():
+        return False
+    return any(tab.type() == hou.paneTabType.Parm and not tab.isCurrentTab() and tab.currentNode() == node
+               for tab in hou.ui.paneTabs())
+
+
 def has_matching_parameters(node, parameters):
     return get_node_signature(node) == [p.signature() for p in parameters]
 
