@@ -36,11 +36,11 @@ namespace mxslc::statements
     void ForEachLoop::init()
     {
         type_ = scope().resolve_type(type_);
-        iter_expr_->init(Type::tuple_of(type_));
     }
 
     void ForEachLoop::execute_impl() const
     {
+        iter_expr_->init(Type::tuple_of(type_));
         const VarPtr iter_value = iter_expr_->evaluate();
         if (iter_value->has_value())
             throw CompileError{"Expression is not iterable"};
