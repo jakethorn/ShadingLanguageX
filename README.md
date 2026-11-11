@@ -17,7 +17,7 @@ __ShadingLanguageX (SLX)__ is a high level programming language for [MaterialX](
 It is free, open-source and available for Windows, Linux, macOS and web applications.
 
 <p align="center">
-  <img src="https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/screenshots/new_readme_example2.png" />
+  <img src="https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/screenshots/Banner2026_2.png" />
 </p>
 
 # Getting Started

@@ -16,6 +16,7 @@ ERROR_LINE_PATTERN = re.compile(r"\bline (\d+)")
 _compile_results = {}  # node session id -> CompileResult
 _declared_globals = {}  # node session id -> (source and settings key, [GlobalParameter])
 _scheduled_global_updates = set()  # session ids of nodes whose global parameters change once their cook ends
+_hidden_global_updates = set()  # session ids of nodes whose global parameters change once no hidden tab shows them
 _is_runtime_created = False
 
 
@@ -383,10 +384,36 @@ def update_global_parameters(node):
     result = get_last_result(node)
     if result is None or result.global_parameters is None:
         return
-    if not global_parameters.has_matching_parameters(node, result.global_parameters):
-        global_parameters.update_parameters(node, result.global_parameters)
-        # The last cook couldn't read parameters that didn't exist, so Houdini wouldn't recook when they change.
-        recompile(node)
+    if global_parameters.has_matching_parameters(node, result.global_parameters):
+        return
+    if global_parameters.is_in_hidden_parameters_tab(node):
+        update_global_parameters_once_shown(node)
+        return
+    global_parameters.update_parameters(node, result.global_parameters)
+    # The last cook couldn't read parameters that didn't exist, so Houdini wouldn't recook when they change.
+    recompile(node)
+
+
+def update_global_parameters_once_shown(node):
+    """Updates node's global parameters once no hidden Parameters tab shows them.
+
+    Houdini crashes when a Parameters tab is shown again after the parameters it shows changed while it was hidden.
+    """
+    session_id = node.sessionId()
+    if session_id in _hidden_global_updates:
+        return
+    _hidden_global_updates.add(session_id)
+
+    def update_when_shown():
+        waiting_node = hou.nodeBySessionId(session_id)
+        if waiting_node is not None and global_parameters.is_in_hidden_parameters_tab(waiting_node):
+            return
+        hou.ui.removeEventLoopCallback(update_when_shown)
+        _hidden_global_updates.discard(session_id)
+        if waiting_node is not None:
+            update_global_parameters(waiting_node)
+
+    hou.ui.addEventLoopCallback(update_when_shown)
 
 
 def schedule_global_parameter_update(node):

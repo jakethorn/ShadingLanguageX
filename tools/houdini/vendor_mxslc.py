@@ -71,8 +71,8 @@ def vendor_wheels(wheels, vendor_directory=VENDOR_DIRECTORY):
 def extract_wheel(wheel_name, data, vendor_directory):
     """Extracts a wheel into <vendor>/<os>-cp<XY>-<hash>, replacing any earlier build for that OS and Python.
 
-    The hash of the compiled module is part of the folder name because Windows can keep loading a replaced DLL
-    from a WSL or network share as long as its path stays the same.
+    The hash of the build is part of the folder name because Windows can keep loading a replaced DLL from a WSL or
+    network share as long as its path stays the same.
     """
     vendor_name = get_vendor_name(wheel_name)
     os.makedirs(vendor_directory, exist_ok=True)
@@ -82,23 +82,43 @@ def extract_wheel(wheel_name, data, vendor_directory):
             for member in wheel.namelist():
                 if ".dist-info/" not in member:
                     wheel.extract(member, extract_directory)
+        target = os.path.join(vendor_directory, "{}-{}".format(vendor_name, hash_build(extract_directory)))
         old_directories = glob.glob(os.path.join(vendor_directory, vendor_name + "-*"))
         old_directories += glob.glob(os.path.join(vendor_directory, vendor_name))
         for old_directory in old_directories:
-            shutil.rmtree(old_directory)
-        target = os.path.join(vendor_directory, "{}-{}".format(vendor_name, hash_compiled_module(extract_directory)))
-        os.rename(extract_directory, target)
+            if old_directory != target:
+                remove_old_build(old_directory)
+        if os.path.isdir(target):
+            os.utime(target)  # the plugin loads the newest build
+        else:
+            os.rename(extract_directory, target)
     finally:
         shutil.rmtree(extract_directory, ignore_errors=True)
     print("  {} -> {}".format(wheel_name, os.path.relpath(target)))
 
 
-def hash_compiled_module(directory):
+def hash_build(directory):
     digest = hashlib.sha1()
-    for path in sorted(glob.glob(os.path.join(directory, "mxslc", "_mxslc*"))):
-        with open(path, "rb") as f:
-            digest.update(f.read())
+    for root, _, names in sorted(os.walk(os.path.join(directory, "mxslc"))):
+        for name in sorted(names):
+            with open(os.path.join(root, name), "rb") as f:
+                digest.update(f.read())
     return digest.hexdigest()[:8]
+
+
+def remove_old_build(directory):
+    """Removes an earlier build, or leaves it whole if it's loaded, e.g. by a running Houdini.
+
+    Windows can't delete a loaded module. The plugin loads the newest build, so a build left here is used only until
+    Houdini restarts, and the next run removes it.
+    """
+    try:
+        for module in glob.glob(os.path.join(directory, "mxslc", "_mxslc*")):
+            os.remove(module)  # before the other files, so a loaded build isn't left half deleted
+    except PermissionError:
+        print("  left {}, which is in use. Restart Houdini to load the new build.".format(os.path.relpath(directory)))
+        return
+    shutil.rmtree(directory)
 
 
 def main():
