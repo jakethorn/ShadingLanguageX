@@ -2,7 +2,7 @@
   "name": "slx",
   "displayName": "ShadingLanguageX (SLX)",
   "description": "Language support for ShadingLanguageX (SLX): highlighting, errors as you type, completion, hovers, navigation, snippets, a live MaterialX preview and SLX <-> MaterialX conversion",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "publisher": "shadinglanguagex",
   "license": "Apache-2.0",
   "repository": {
@@ -187,89 +187,101 @@
         "when": "editorLangId == slx"
       }
     ],
-    "configuration": {
-      "title": "SLX",
-      "properties": {
-        "slx.materialxVersion": {
-          "type": "string",
-          "enum": [
-            "1.38.10",
-            "1.39.4",
-            "1.39.5"
-          ],
-          "default": "1.39.5",
-          "scope": "resource",
-          "markdownDescription": "MaterialX version to compile against. A `#version` directive in the file takes precedence."
-        },
-        "slx.reduceGraph": {
-          "type": "boolean",
-          "default": true,
-          "scope": "resource",
-          "markdownDescription": "Simplify the compiled node graph, for example by folding constants and removing redundant nodes."
-        },
-        "slx.defaultFunctionBehaviour": {
-          "type": "string",
-          "enum": [
-            "nodedef",
-            "nodegraph",
-            "inline",
-            "comptime"
-          ],
-          "enumDescriptions": [
-            "Functions compile to a NodeDef and its NodeGraph.",
-            "Functions compile to a NodeGraph without a NodeDef.",
-            "Functions are inlined at each call site.",
-            "Functions are evaluated at compile time."
-          ],
-          "default": "nodedef",
-          "scope": "resource",
-          "markdownDescription": "How functions compile when they have no `nodedef`, `nodegraph`, `inline` or `comptime` modifier."
-        },
-        "slx.errorOnMissingGlobals": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "markdownDescription": "Report an error for every `global` variable, because the extension can't pass values for them. When off, globals compile with their initial value, or zero."
-        },
-        "slx.includePaths": {
-          "type": "array",
-          "items": {
-            "type": "string"
+    "configuration": [
+      {
+        "title": "ShadingLanguageX (SLX)",
+        "properties": {
+          "slx.diagnostics.trigger": {
+            "type": "string",
+            "enum": [
+              "onType",
+              "onSave",
+              "off"
+            ],
+            "enumDescriptions": [
+              "Check files as you type, after a short pause.",
+              "Check files when they are opened or saved.",
+              "Only check files when they are compiled or decompiled with an SLX command."
+            ],
+            "default": "onType",
+            "scope": "resource",
+            "markdownDescription": "When to check open files for errors: `onType`, `onSave`, or `off`."
+          }
+        }
+      },
+      {
+        "title": "Compile Options",
+        "properties": {
+          "slx.defaultFunctionBehaviour": {
+            "type": "string",
+            "enum": [
+              "nodedef",
+              "nodegraph",
+              "inline",
+              "comptime"
+            ],
+            "enumDescriptions": [
+              "Functions compile to a NodeDef and its NodeGraph.",
+              "Functions compile to a NodeGraph without a NodeDef.",
+              "Functions are inlined at each call site.",
+              "Functions are evaluated at compile time."
+            ],
+            "default": "nodedef",
+            "scope": "resource",
+            "markdownDescription": "How functions without a `nodedef`, `nodegraph`, `inline` or `comptime` modifier compile."
           },
-          "default": [],
-          "scope": "resource",
-          "markdownDescription": "Extra folders to search for `#include` and `#library` files, after the folder of the file containing the directive. Relative paths are resolved against the workspace folder."
-        },
-        "slx.links.nodes": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "markdownDescription": "Make the names of MaterialX nodes in calls links to the node's section of the MaterialX specification, opened with Ctrl+Click. VS Code underlines links, so every node call is underlined while this is on."
-        },
-        "slx.bracketPairColorization": {
-          "type": "boolean",
-          "default": false,
-          "scope": "window",
-          "markdownDescription": "Colour-code matching brackets in SLX files by their nesting level, as VS Code does for other languages. Off by default, as in the MaterialX Playground. Turning this on or off sets `editor.language.colorizedBracketPairs` for SLX in the same settings file. Needs `#editor.bracketPairColorization.enabled#`, which is on by default."
-        },
-        "slx.diagnostics.trigger": {
-          "type": "string",
-          "enum": [
-            "onType",
-            "onSave",
-            "off"
-          ],
-          "enumDescriptions": [
-            "Check files as you type, after a short pause.",
-            "Check files when they are opened or saved.",
-            "Only check files when they are compiled or decompiled with an SLX command."
-          ],
-          "default": "onType",
-          "scope": "resource",
-          "markdownDescription": "When to compile open SLX files and show their errors in the Problems panel."
+          "slx.errorOnMissingGlobals": {
+            "type": "boolean",
+            "default": false,
+            "scope": "resource",
+            "markdownDescription": "Report an error if a `global` variable is not passed a value. (Default `false` for now as VS Code has no way to pass global values to the compiler)."
+          },
+          "slx.includePaths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "scope": "resource",
+            "markdownDescription": "Extra folders to search for `#include` and `#library` files. Relative paths are resolved against the workspace folder."
+          },
+          "slx.materialxVersion": {
+            "type": "string",
+            "enum": [
+              "1.38.10",
+              "1.39.4",
+              "1.39.5"
+            ],
+            "default": "1.39.5",
+            "scope": "resource",
+            "markdownDescription": "MaterialX version to compile against. A `#version` directive in the file takes precedence."
+          },
+          "slx.reduceGraph": {
+            "type": "boolean",
+            "default": true,
+            "scope": "resource",
+            "markdownDescription": "Optimise the compiled node graph."
+          }
+        }
+      },
+      {
+        "title": "Appearance",
+        "properties": {
+          "slx.bracketPairColorization": {
+            "type": "boolean",
+            "default": false,
+            "scope": "window",
+            "markdownDescription": "Color-code matching brackets by their nesting level. Turning it on or off sets `editor.language.colorizedBracketPairs` for SLX in the same settings file."
+          },
+          "slx.links.nodes": {
+            "type": "boolean",
+            "default": false,
+            "scope": "resource",
+            "markdownDescription": "Turn standard library function calls into links to the associated node's section of the MaterialX specification, opened with Ctrl+Click."
+          }
         }
       }
-    },
+    ],
     "configurationDefaults": {
       "editor.tokenColorCustomizations": {
         "[Dark 2026][Dark Modern][Default Dark Modern][Dark+][Default Dark+]": {

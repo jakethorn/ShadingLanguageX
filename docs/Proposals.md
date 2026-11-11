@@ -20,6 +20,12 @@ Let the extension set the entry function and its arguments, values for globals, 
 supports these, but the WebAssembly bindings don't expose them. Today, globals compile with their initial value or
 zero, and there's no way to choose an entry function.
 
+### Highlight macros from the settings
+
+Once macros can be set in the settings, highlight them where they're used, as macros defined with `#define` in the
+file or its includes already are. The extension would take the names from the setting, so this needs nothing from
+the compiler beyond [More compile settings](#more-compile-settings).
+
 ### Better errors
 
 Report errors with their exact column and range, rather than marking the whole line, and report more than one error

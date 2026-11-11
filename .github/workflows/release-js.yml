@@ -19,8 +19,9 @@ name: Release JavaScript (WASM)
 #    release as:
 #      * mxslc_JsMxslc_package.zip  - JsMxslc.js/.wasm/.data + LICENSE
 #      * mxslc_github_pages.zip     - the self-contained browser app
-#      * mxslc_vscode_extension.zip - the .vsix (skipped with a warning if
-#                                     the optional extension build failed)
+#      * slx-<version>.vsix         - the VS Code extension, as built (skipped
+#                                     with a warning if the optional extension
+#                                     build failed)
 #    Existing assets with the same name are replaced.
 # ============================================================================
 
@@ -108,9 +109,9 @@ jobs:
           shopt -s nullglob
           vsix=(artifacts/mxslc-vscode/*.vsix)
           if [ ${#vsix[@]} -gt 0 ]; then
-            zip -j dist/mxslc_vscode_extension.zip "${vsix[@]}"
+            cp "${vsix[@]}" dist/
           else
-            echo "::warning::No VS Code extension (.vsix) was built; mxslc_vscode_extension.zip will not be attached."
+            echo "::warning::No VS Code extension (.vsix) was built, so none will be attached."
           fi
 
           ls -la dist
@@ -119,4 +120,4 @@ jobs:
       - name: Upload assets to release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$TAG" dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
+        run: gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"

@@ -10,7 +10,7 @@ type CompileState = 'ok' | 'errors' | 'unavailable';
 
 const ICONS: Record<CompileState, string> = { ok: '$(check)', errors: '$(error)', unavailable: '$(warning)' };
 const DESCRIPTIONS: Record<CompileState, string> = {
-    ok: 'The file compiles.',
+    ok: 'The file compiled successfully.',
     errors: 'The file has errors. See the Problems panel.',
     unavailable: 'The SLX compiler is unavailable. See the SLX output panel.',
 };

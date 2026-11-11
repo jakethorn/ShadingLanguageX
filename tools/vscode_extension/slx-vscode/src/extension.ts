@@ -36,7 +36,8 @@ export function activate(context: vscode.ExtensionContext): void {
     const diagnostics = new SlxDiagnostics(engine, log);
     const index = new SymbolIndex(language);
     const semanticTokens = new SlxSemanticTokensProvider(index);
-    const packagedVersions: string[] = context.extension.packageJSON.contributes.configuration.properties['slx.materialxVersion'].enum;
+    const settingSections: { properties: Record<string, { enum?: string[] }> }[] = context.extension.packageJSON.contributes.configuration;
+    const packagedVersions = settingSections.find((section) => 'slx.materialxVersion' in section.properties)?.properties['slx.materialxVersion'].enum ?? [];
     context.subscriptions.push(
         log,
         diagnostics,

@@ -1,15 +1,26 @@
 # (mxslc++) Version 0.3.3
 
+### Language Features
+
 * Added switch expressions ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#switch-expression))
-* Added more compile-time node optimisations
-* Added SKILL.md for AI agents ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/.claude/skills/shadinglanguagex))
-* Added Houdini SLX Plugin ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/houdini))
-* Added reflection API ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/APIDocumentation.md#reflection))
 * Added uniform modifier ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#uniform-modifier))
-* Added `--default-function-behaviour` compile option
+
+### Tools
+
+* Added Houdini SLX plugin ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/houdini))
+* Updated VS Code extension ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/vscode_extension))
+* Added SKILL.md for AI agents ([link](https://github.com/jakethorn/ShadingLanguageX/tree/main/.claude/skills/shadinglanguagex))
+
+### Other Improvements 
+
+* Added more compile-time node optimisations ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#compile-time-evaluation))
+* Added reflection API ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/APIDocumentation.md#reflection))
+* Added `--default-function-behaviour` compile option ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md#default-function-behaviour))
 * Updated indexing operator; now the index value isn't required to be known at compile time ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#indexing-operator))
-* Bug Fixes:
-  * Fixed an issue with the `comptime` modifier during function calls.
+
+### Bug Fixes
+
+* Fixed an issue with the `comptime` modifier during function calls.
 
 # (mxslc++) Version 0.3.2
 

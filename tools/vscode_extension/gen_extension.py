@@ -187,16 +187,14 @@ def generate_theme_colors(grammar: dict) -> dict:
 # Language data
 # ---------------------------------------------------------------------------
 
-def load_keywords() -> tuple[list[str], list[str]]:
-    """Return the control keywords and data types from browser_shared/keywords.js,
-    which mirrors the mxslc++ TokenType keyword enum (include/TokenType.h)."""
+def load_keywords() -> list[str]:
+    """Return the keywords from browser_shared/keywords.js, which mirrors the mxslc++
+    TokenType keyword enum (include/TokenType.h). Its data types aren't used: they include
+    types SLX doesn't have, such as float2, so the types come from the MaterialX libraries
+    and stdlib.mxsl instead."""
     text = KEYWORDS_JS.read_text(encoding="utf-8")
-
-    def extract_array(name: str) -> list[str]:
-        match = re.search(rf"\b{name}\s*:\s*\[(.*?)\]", text, re.S)
-        return re.findall(r"'([^']*)'", match.group(1)) if match else []
-
-    return extract_array("control"), extract_array("dataTypes")
+    match = re.search(r"\bcontrol\s*:\s*\[(.*?)\]", text, re.S)
+    return re.findall(r"'([^']*)'", match.group(1)) if match else []
 
 
 def load_stdlib() -> tuple[dict[str, str], set[str]]:
@@ -336,11 +334,12 @@ def load_materialx_types(versions: list[str]) -> set[str]:
 def load_language(versions: list[str]) -> dict:
     """Return the keywords, types and functions of SLX, for the grammar and the
     extension's completion, hover and parameter hints."""
-    keywords, data_types = load_keywords()
+    keywords = load_keywords()
     aliases, stdlib_functions = load_stdlib()
     nodes = load_node_signatures(versions)
     all_keywords = set(keywords) | LANGUAGE_CONSTANTS
-    types = set(data_types) | set(aliases) | load_materialx_types(versions) | EXTRA_TYPES
+    # The MaterialX types, the aliases stdlib.mxsl defines for some of them, and SLX's own.
+    types = set(aliases) | load_materialx_types(versions) | EXTRA_TYPES
     return {
         "versions": versions,
         "keywords": {
@@ -409,7 +408,8 @@ def update_package_json(versions: list[str], theme_colors: dict) -> None:
     and set the colours of the default themes."""
     package = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))
     before = json.dumps(package)
-    setting = package["contributes"]["configuration"]["properties"]["slx.materialxVersion"]
+    sections = package["contributes"]["configuration"]
+    setting = next(s["properties"]["slx.materialxVersion"] for s in sections if "slx.materialxVersion" in s["properties"])
     setting["enum"] = versions
     setting["default"] = versions[-1]
     package["contributes"]["configurationDefaults"] = {"editor.tokenColorCustomizations": theme_colors}
