@@ -4,7 +4,7 @@
 
 #include "expressions/TypeOfOperator.h"
 
-#include "expressions/Identifier.h"
+#include "expressions/IdentifierExpression.h"
 #include "expressions/interface.h"
 #include "runtime/Field.h"
 #include "runtime/interface.h"
@@ -37,7 +37,7 @@ namespace mxslc::expressions
 
     void TypeOfOperator::init_subexpressions(const vector<TypePtr>& types)
     {
-        if (const IdentifierPtr identifier = cast_expression<Identifier>(expr_))
+        if (const IdentifierPtr identifier = cast_expression<IdentifierExpression>(expr_))
         {
             string type_name = identifier->name();
             if (template_type_)

@@ -9,7 +9,7 @@
 #include "expressions/UnnamedConstructor.h"
 #include "expressions/ExpressionFactory.h"
 #include "expressions/FunctionCall.h"
-#include "expressions/Identifier.h"
+#include "expressions/IdentifierExpression.h"
 #include "expressions/IfExpression.h"
 #include "expressions/IncrementOperator.h"
 #include "expressions/IndexingOperator.h"
@@ -84,7 +84,7 @@ namespace mxslc
                 if (consume(TokenType::Break))
                     match(';');
 
-                statements.push_back(statement());
+                statements.push_back(statement(Context::Global));
             }
 
             return statements;
@@ -101,6 +101,14 @@ namespace mxslc
         AttributeList attrs = attributes();
         StmtPtr stmt = bare_statement();
         stmt->set_attributes(std::move(attrs));
+        return stmt;
+    }
+
+    StmtPtr Parser::statement(const Context context)
+    {
+        const Context last_context = std::exchange(context_, context);
+        StmtPtr stmt = statement();
+        context_ = last_context;
         return stmt;
     }
 
@@ -166,6 +174,11 @@ namespace mxslc
             }
         }
 
+        if (is_constructor_definition())
+        {
+            return constructor_definition(std::move(mods));
+        }
+
         mods.validate(TokenType::Comptime);
 
         ExprPtr expr = expression(mods);
@@ -185,6 +198,8 @@ namespace mxslc
 
     StmtPtr Parser::print_statement()
     {
+        invalidate_context(Context::Class);
+
         Token token = match(TokenType::Print);
 
         vector<ExprPtr> exprs;
@@ -260,6 +275,8 @@ namespace mxslc
 
     StmtPtr Parser::variable_assignment(ExprPtr lhs)
     {
+        invalidate_context(Context::Class);
+
         vector lhs_exprs{lhs};
 
         // handle multi-var assignment (e.g., a, b = 1, 2)
@@ -304,7 +321,7 @@ namespace mxslc
         if (not params)
             match(TokenType::FatArrow);
 
-        StmtPtr body = function_body();
+        StmtPtr body = block_statement(context_ == Context::Class ? Context::Method : Context::Function);
 
         return create_statement<FunctionDefinition>(
             std::move(mods),
@@ -319,6 +336,8 @@ namespace mxslc
 
     StmtPtr Parser::class_definition()
     {
+        invalidate_context(Context::Class);
+
         Token token = match(TokenType::Class);
         string name = match(TokenType::Identifier).lexeme();
         vector<TypePtr> template_types = template_list();
@@ -327,23 +346,19 @@ namespace mxslc
         match('{');
         vector<StmtPtr> body;
         while (not consume('}'))
-        {
-            if (is_constructor_definition())
-                body.push_back(constructor_definition());
-            else
-                body.push_back(statement());
-        }
+            body.push_back(statement(Context::Class));
         consume(';');
 
         return create_statement<ClassDefinition>(std::move(name), std::move(template_types), std::move(parent), std::move(body), std::move(token));
     }
 
-    StmtPtr Parser::constructor_definition()
+    StmtPtr Parser::constructor_definition(ModifierList mods)
     {
-        ModifierList mods = modifiers();
+        validate_context(Context::Class);
+
         Token class_name = match(TokenType::Identifier);
         ParameterList params = list<Parameter>('(', ')', [this](const size_t i){ return parameter(i); });
-        StmtPtr body = block_statement();
+        StmtPtr body = block_statement(Context::Constructor);
 
         return create_statement<ConstructorDefinition>(
             std::move(mods),
@@ -356,6 +371,8 @@ namespace mxslc
 
     StmtPtr Parser::using_declaration()
     {
+        invalidate_context(Context::Class);
+
         Token token = match(TokenType::Using);
         string name = match(TokenType::Identifier).lexeme();
         match('=');
@@ -367,6 +384,8 @@ namespace mxslc
 
     StmtPtr Parser::for_loop()
     {
+        invalidate_context(Context::Class);
+
         Token token = match(TokenType::For);
         match('(');
         ModifierList mods = modifiers();
@@ -382,22 +401,26 @@ namespace mxslc
 
     StmtPtr Parser::expression_statement(ExprPtr expr)
     {
+        invalidate_context(Context::Class);
+
         match(';');
         return create_statement<ExpressionStatement>(std::move(expr));
     }
 
-    StmtPtr Parser::block_statement()
+    StmtPtr Parser::block_statement(const Context context)
     {
         Token token = match('{');
         vector<StmtPtr> body;
         while (not consume('}'))
-            body.push_back(statement());
+            body.push_back(statement(context));
 
         return create_statement<BlockStatement>(std::move(body), std::move(token));
     }
 
     StmtPtr Parser::if_statement()
     {
+        invalidate_context(Context::Class);
+
         Token token = match(TokenType::If);
         match('(');
         ExprPtr cond_expr = expression();
@@ -422,15 +445,19 @@ namespace mxslc
 
     StmtPtr Parser::namespace_definition()
     {
+        validate_context(Context::Global, Context::Namespace);
+
         Token token = match(TokenType::Namespace);
         string name = match(TokenType::Identifier).lexeme();
-        StmtPtr body = block_statement();
+        StmtPtr body = block_statement(Context::Namespace);
         return create_statement<NamespaceDefinition>(std::move(name), std::move(body), std::move(token));
     }
 
     StmtPtr Parser::document_attribute()
     {
-        Token token = match("@@"s);
+        invalidate_context(Context::Class);
+
+        Token token = match("@@");
         Attribute attr = attribute();
         return create_statement<DocumentAttribute>(std::move(token), std::move(attr));
     }
@@ -537,8 +564,10 @@ namespace mxslc
 
     TypePtr Parser::type()
     {
-        if (const optional<Token> type = consume(TokenType::Identifier))
-            return create_type(type->lexeme());
+        if (peek() == TokenType::Identifier)
+        {
+            return create_type(identifier());
+        }
 
         vector<Field> fields = list<Field>('{', '}', [this](const size_t){ return field(); });
         return create_type(std::move(fields));
@@ -567,17 +596,6 @@ namespace mxslc
         if (peek() == '<')
             return list<TypePtr>('<', '>', [this](const size_t){ return type(); });
         return {};
-    }
-
-    StmtPtr Parser::function_body()
-    {
-        vector<StmtPtr> body;
-
-        Token token = match('{');
-        while (not consume('}'))
-            body.push_back(statement());
-
-        return create_statement<BlockStatement>(std::move(body), std::move(token));
     }
 
     StmtPtr Parser::return_statement()
@@ -818,18 +836,19 @@ namespace mxslc
 
         if (peek() == TokenType::Identifier)
         {
+            Identifier identifier_ = identifier();
+
             if (is_function_call())
             {
-                return function_call();
+                return function_call(std::move(identifier_));
             }
 
             if (peek(1) == '{')
             {
-                return named_constructor();
+                return named_constructor(std::move(identifier_));
             }
 
-            Token name = match(TokenType::Identifier);
-            return create_expression<Identifier>(std::move(name));
+            return create_expression<IdentifierExpression>(std::move(identifier_));
         }
 
         if (peek() == '{')
@@ -916,10 +935,9 @@ namespace mxslc
         return create_expression<DefaultExpression>(std::move(type_), std::move(token));
     }
 
-    ExprPtr Parser::function_call()
+    ExprPtr Parser::function_call(Identifier identifier)
     {
-        // allows switch std lib function to be called even though switch is a keyword
-        Token name = match(TokenType::Identifier, TokenType::Switch);
+        Token token = peek();
         TypePtr template_type = nullptr;
         if (consume('<'))
         {
@@ -927,7 +945,7 @@ namespace mxslc
             match('>');
         }
         optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
-        return create_expression<FunctionCall>(string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
+        return create_expression<FunctionCall>(std::move(identifier), std::move(template_type), std::move(args), std::move(token));
     }
 
     ExprPtr Parser::method_call(ExprPtr instance)
@@ -943,11 +961,11 @@ namespace mxslc
         return create_expression<MethodCall>(std::move(instance), string{name.lexeme()}, std::move(template_type), std::move(args), std::move(name));
     }
 
-    ExprPtr Parser::named_constructor()
+    ExprPtr Parser::named_constructor(Identifier identifier)
     {
-        Token type_name = match(TokenType::Identifier);
+        Token token = peek();
         vector<Argument> arguments = list<Argument>('{', '}', [this](const size_t i) { return argument(i); });
-        return create_expression<NamedConstructor>(string{type_name.lexeme()}, std::move(arguments), std::move(type_name));
+        return create_expression<NamedConstructor>(std::move(identifier), std::move(arguments), std::move(token));
     }
 
     ExprPtr Parser::unnamed_constructor()
@@ -1000,6 +1018,15 @@ namespace mxslc
         }
 
         return Argument{std::move(attrs), mods.only(TokenType::Ref, TokenType::Out, TokenType::Uniform), std::move(name), std::move(expr), i};
+    }
+
+    Identifier Parser::identifier()
+    {
+        vector<string> names;
+        names.push_back(match(TokenType::Identifier));
+        while (consume(TokenType::DoubleColon))
+            names.push_back(match(TokenType::Identifier));
+        return Identifier{std::move(names)};
     }
 
     SwitchCase Parser::switch_case()
@@ -1096,6 +1123,9 @@ namespace mxslc
 
     bool Parser::is_constructor_definition() const
     {
+        if (context_ != Context::Class)
+            return false;
+
         return (peek(0) == TokenType::Identifier and peek(1) == '(') or
                (peek(0) == TokenType::Inline and peek(1) == TokenType::Identifier and peek(2) == '(');
     }

@@ -5,7 +5,7 @@
 #include "expressions/VariableDefinitionExpression.h"
 
 #include "statements/VariableDefinition.h"
-#include "expressions/Identifier.h"
+#include "expressions/IdentifierExpression.h"
 #include "expressions/interface.h"
 #include "runtime/variables/Variable.h"
 #include "statements/interface.h"
@@ -15,7 +15,7 @@ namespace mxslc::expressions
     VariableDefinitionExpression::VariableDefinitionExpression(ModifierList mods, TypePtr type, Token name)
         : VariableDefinitionExpression{
             create_statement<VariableDefinition>(std::move(mods), std::move(type), name.lexeme(), nullptr),
-            create_expression<Identifier>(name)
+            create_expression<IdentifierExpression>(name)
         }
     {
 

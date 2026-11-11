@@ -14,6 +14,7 @@
 #include "runtime/Field.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
+#include "runtime/Identifier.h"
 
 namespace mxslc
 {
@@ -22,11 +23,23 @@ namespace mxslc
     class Parser final : protected TokenReader
     {
     public:
+        enum class Context
+        {
+            Global,
+            Namespace,
+            Function,
+            Class,
+            Constructor,
+            Method,
+            Block,
+        };
+
         explicit Parser(vector<Token> tokens);
 
         vector<StmtPtr> parse();
 
         StmtPtr statement();
+        StmtPtr statement(Context context);
         StmtPtr bare_statement();
         StmtPtr print_statement();
         StmtPtr variable_definition(ModifierList mods, TypePtr type);
@@ -34,11 +47,11 @@ namespace mxslc
         StmtPtr variable_assignment(ExprPtr lhs);
         StmtPtr function_definition(ModifierList mods, TypePtr type);
         StmtPtr class_definition();
-        StmtPtr constructor_definition();
+        StmtPtr constructor_definition(ModifierList mods);
         StmtPtr using_declaration();
         StmtPtr for_loop();
         StmtPtr expression_statement(ExprPtr expr);
-        StmtPtr block_statement();
+        StmtPtr block_statement(Context context = Context::Block);
         StmtPtr if_statement();
         StmtPtr namespace_definition();
         StmtPtr document_attribute();
@@ -51,7 +64,6 @@ namespace mxslc
         Field field();
         Parameter parameter(size_t index);
         vector<TypePtr> template_list();
-        StmtPtr function_body();
         StmtPtr return_statement();
 
         ExprPtr expression(const ModifierList& mods = {});
@@ -70,14 +82,16 @@ namespace mxslc
         ExprPtr if_expression(ExprPtr else_expr = nullptr);
         ExprPtr switch_expression();
         ExprPtr default_expression();
-        ExprPtr function_call();
+        ExprPtr function_call(Identifier identifier);
         ExprPtr method_call(ExprPtr instance);
-        ExprPtr named_constructor();
+        ExprPtr named_constructor(Identifier identifier);
         ExprPtr unnamed_constructor();
         ExprPtr variable_definition_argument(ModifierList mods);
         ExprPtr typeof_operator();
 
+    private:
         Argument argument(size_t i);
+        Identifier identifier();
         SwitchCase switch_case();
 
         template<typename T>
@@ -112,6 +126,27 @@ namespace mxslc
         bool is_switch_expression() const;
         bool is_constructor_definition() const;
 
+        template<typename... Contexts>
+        void validate_context(const Contexts&... contexts)
+        {
+            if ((... || (context_ == contexts)))
+            {
+                return;
+            }
+
+            throw CompileError{"Invalid statement location"};
+        }
+
+        template<typename... Contexts>
+        void invalidate_context(const Contexts&... contexts)
+        {
+            if ((... || (context_ == contexts)))
+            {
+                throw CompileError{"Invalid statement location"};
+            }
+        }
+
+        Context context_{Context::Global};
         bool in_abs_{false};
     };
 }

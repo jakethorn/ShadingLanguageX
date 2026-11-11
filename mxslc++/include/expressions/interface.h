@@ -30,7 +30,7 @@ using Const##T##Ptr = shared_ptr<const T>;
     TYPE_DEF(DefaultExpression)
     TYPE_DEF(DotOperator)
     TYPE_DEF(FunctionCall)
-    TYPE_DEF(Identifier)
+    TYPE_DEF(IdentifierExpression)
     TYPE_DEF(IfExpression)
     TYPE_DEF(IncrementOperator)
     TYPE_DEF(IndexingOperator)

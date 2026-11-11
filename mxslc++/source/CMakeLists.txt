@@ -42,7 +42,7 @@ add_library(mxslc_lib
         expressions/interface.cpp
         expressions/Expression.cpp
         expressions/FunctionCall.cpp
-        expressions/Identifier.cpp
+        expressions/IdentifierExpression.cpp
         expressions/Literal.cpp
         expressions/ExpressionFactory.cpp
         expressions/NullExpression.cpp

@@ -2,7 +2,7 @@
 // Created by jaket on 28/11/2025.
 //
 
-#include "expressions/Identifier.h"
+#include "expressions/IdentifierExpression.h"
 
 #include "expressions/interface.h"
 #include "runtime/FunctionQuery.h"
@@ -13,12 +13,12 @@
 
 namespace mxslc::expressions
 {
-    ExprPtr Identifier::monomorphize(const TypePtr& template_type) const
+    ExprPtr IdentifierExpression::monomorphize(const TypePtr& template_type) const
     {
-        return create_expression<Identifier>(token_);
+        return create_expression<IdentifierExpression>(token_);
     }
 
-    void Identifier::init_impl(const vector<TypePtr>& types)
+    void IdentifierExpression::init_impl(const vector<TypePtr>& types)
     {
         if (scope().has_variable(name_))
             var_ = scope().get_variable(name_);
@@ -40,17 +40,17 @@ namespace mxslc::expressions
         }
     }
 
-    TypePtr Identifier::type_impl() const
+    TypePtr IdentifierExpression::type_impl() const
     {
         return var_->type();
     }
 
-    VarPtr Identifier::evaluate_impl() const
+    VarPtr IdentifierExpression::evaluate_impl() const
     {
         return var_;
     }
 
-    string Identifier::to_string() const
+    string IdentifierExpression::to_string() const
     {
         return name_;
     }

@@ -9,10 +9,10 @@
 
 namespace mxslc::expressions
 {
-    class Identifier final : public Expression
+    class IdentifierExpression final : public Expression
     {
     public:
-        explicit Identifier(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
+        explicit IdentifierExpression(Token name) : Expression{std::move(name)}, name_{token_.lexeme()} { }
 
         const string& name() const { return name_; }
 
