@@ -30,6 +30,11 @@ There are several editors and plugins that support ShadingLanguageX.
 It provides an SLX Material node, decompilation tools and allows users to create a library of nodes using SLX which can
 be re-used in other MaterialX material builders. Follow the link to see the full documentation.
 
+[VS Code Extension](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/vscode_extension) is the official SLX extension for VS Code.
+It supports syntax highlighting, code completion using `ctrl+space` and code navigation using `ctrl+click`, reports 
+errors as you type and displays information as you hover over code. It also includes the ShadingLanguageX SKILL.md for 
+AI agents which can be queried as you work. Follow the link to see the full documentation.
+
 [MaterialX Playground](https://joaovbs96.github.io/MaterialXPlayground/) (by João Vítor Silva) is a comprehensive MaterialX graph editor and viewer, allowing users to view and compare multiple 
 MaterialX or USD scenes at once. SLX source files can be loaded and edited alongside their compiled MaterialX
 shader graph, and decompilation allows roundtripping between both views. It also provides syntax highlighting, code completion, 
@@ -39,8 +44,7 @@ and documentation links for standard library functions.
 shaders and save them as projects between sessions. Projects can also be shared publicly via the [gallery](https://raccoon.website/shadinglanguagex/gallery/) 
 (think Shadertoy for SLX). The code editor provides syntax highlighting and gives examples to base your own shaders off of.
 
-[SLX to MTLX Converter](https://jakethorn.github.io/ShadingLanguageX/) (by Bernard Kwok) is the official tool for compiling 
-SLX source code to MaterialX.
+[SLX to MTLX Converter](https://jakethorn.github.io/ShadingLanguageX/) (by Bernard Kwok). Hosted on this repo, it provides a basic interface for compiling SLX code.
 
 ## Installation
 

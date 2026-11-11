@@ -335,7 +335,7 @@
           ]
         },
         {
-          "begin": "\\b(?!(?:consteval|namespace|nodegraph|comptime|geomprop|default|mutable|nodedef|uniform|varying|global|inline|return|switch|typeof|break|class|const|false|print|using|case|else|from|null|this|true|for|out|ref|if|to|displacementshader|surfaceshader|volumeshader|lightshader|filename|geomname|material|matrix33|matrix44|boolean|double2|double3|double4|integer|vector2|vector3|vector4|color2|color3|color4|double|float2|float3|float4|string|bool2|bool3|bool4|float|BSDF|auto|bool|int2|int3|int4|mat3|mat4|vec2|vec3|vec4|void|EDF|VDF|int|T)\\b)([A-Za-z_]\\w*)\\s*(?=(?:<\\s*[A-Za-z_]\\w*(?:\\s*,\\s*[A-Za-z_]\\w*)*\\s*>)?\\s*\\()",
+          "begin": "\\b(?!(?:consteval|namespace|nodegraph|comptime|geomprop|default|mutable|nodedef|uniform|varying|global|inline|return|switch|typeof|break|class|const|false|print|using|case|else|from|null|this|true|for|out|ref|if|to|displacementshader|surfaceshader|volumeshader|lightshader|filename|geomname|material|matrix33|matrix44|boolean|integer|vector2|vector3|vector4|color3|color4|string|float|BSDF|auto|bool|mat3|mat4|vec2|vec3|vec4|void|EDF|VDF|int|T)\\b)([A-Za-z_]\\w*)\\s*(?=(?:<\\s*[A-Za-z_]\\w*(?:\\s*,\\s*[A-Za-z_]\\w*)*\\s*>)?\\s*\\()",
           "end": "(?<=\\))",
           "beginCaptures": {
             "1": {
@@ -436,7 +436,7 @@
     },
     "types": {
       "name": "storage.type.slx",
-      "match": "\\b(?:displacementshader|surfaceshader|volumeshader|lightshader|filename|geomname|material|matrix33|matrix44|boolean|double2|double3|double4|integer|vector2|vector3|vector4|color2|color3|color4|double|float2|float3|float4|string|bool2|bool3|bool4|float|BSDF|auto|bool|int2|int3|int4|mat3|mat4|vec2|vec3|vec4|void|EDF|VDF|int|T)\\b"
+      "match": "\\b(?:displacementshader|surfaceshader|volumeshader|lightshader|filename|geomname|material|matrix33|matrix44|boolean|integer|vector2|vector3|vector4|color3|color4|string|float|BSDF|auto|bool|mat3|mat4|vec2|vec3|vec4|void|EDF|VDF|int|T)\\b"
     },
     "constants": {
       "patterns": [
