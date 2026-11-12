@@ -21,6 +21,7 @@
 ### Bug Fixes
 
 * Fixed an issue with the `comptime` modifier during function calls.
+* Fixed an issue when using a for loop inside an inline function.
 
 # (mxslc++) Version 0.3.2
 
