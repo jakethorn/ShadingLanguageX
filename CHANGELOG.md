@@ -17,6 +17,7 @@
 * Added reflection API ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/APIDocumentation.md#reflection))
 * Added `--default-function-behaviour` compile option ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md#default-function-behaviour))
 * Updated indexing operator; now the index value isn't required to be known at compile time ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#indexing-operator))
+* Added `Hello, SLX!` tutorial ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/HelloSLX.md))
 
 ### Bug Fixes
 

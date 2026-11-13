@@ -30,8 +30,8 @@ There are several editors and plugins that support ShadingLanguageX.
 It provides an SLX Material node, decompilation tools and allows users to create a library of nodes using SLX which can
 be re-used in other MaterialX material builders. Follow the link to see the full documentation.
 
-[VS Code Extension](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/vscode_extension) is the official SLX extension for VS Code.
-It supports syntax highlighting, code completion using `ctrl+space` and code navigation using `ctrl+click`, reports 
+[VS Code Extension](https://github.com/jakethorn/ShadingLanguageX/tree/main/tools/vscode_extension) is the official SLX extension for VS Code, allowing you to compile your SLX shader directly in VS Code.
+It supports syntax highlighting, code completion and navigation, reports 
 errors as you type and displays information as you hover over code. It also includes the ShadingLanguageX SKILL.md for 
 AI agents which can be queried as you work. Follow the link to see the full documentation.
 
@@ -78,6 +78,8 @@ mtlx = mxslc.compile_string_to_string(code)
 
 ## Learning Resources
 
+If you are new here, [Hello, SLX!](https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/HelloSLX.md) will walk you through writing your first SLX shader.
+
 The [Language Specification](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md) document contains 
 information about the features and syntax of SLX and covers everything from variable definition syntax to preprocessor directives.  
 
@@ -106,7 +108,6 @@ standard library function that is built into the language, such as `color3 c = i
 or `vec3 p = position()`, which compiles to the `position` node. Additionally, 
 declaring a variable (e.g., `vec3 up = vec3{0.0, 1.0, 0.0};`) compiles to a `constant` node (or a `combine` node depending on the inputs to the expression).  
 
-
 # Why Use ShadingLanguageX?
 
 Currently, MaterialX shaders can be made either using the official MaterialX API, or using a graph editor. __ShadingLanguageX__ offers a third way to create MaterialX shaders that provides several benefits over existing methods when creating complex shaders.
@@ -128,7 +129,6 @@ Currently, MaterialX shaders can be made either using the official MaterialX API
 
 [ASWF Open Source Days (2025)](https://youtu.be/n0-5Tx9cS58?si=tRpTGt7ZWPGW0eh0)  
 [ICE.ART 2026.II (2026)](https://youtu.be/bszZDcxKgGk?si=lgmiK5oldnK6OBL9)
-
 
 # Contributing
 Please try out __ShadingLanguageX__ and start a discussion about a feature you'd like to see or an issue if you find a bug, or feel free to contribute directly to the project by opening a pull request!

@@ -1,5 +1,13 @@
-# WARNING
-These examples were written while __ShadingLanguageX__ was being developed. It's possible that they will not compile as intended due to language features of __ShadingLanguageX__ being updated over time. I am keeping them here as a reference for developers as most of the code in them is still useful and valid, but they should not be copied verbatim.
+# Examples
+
+## Hello, ShadingLanguageX!
+
+This [tutorial](HelloSLX.md) takes the reader through the development of a basic shader and is meant as an introduction to ShadingLanguageX.
+
+## Other Examples
+
+This folder contains a collection of disjointed examples. They have been written at different times over the years,
+they all use valid syntax, but not necessarily the most up to date. 
 
 |            Procedural Rain            |            Interior Mapping             |     Shader Art (by Kishimisu)     |
 |:-------------------------------------:|:---------------------------------------:|:---------------------------------:|

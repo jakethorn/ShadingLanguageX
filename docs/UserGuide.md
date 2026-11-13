@@ -7,12 +7,11 @@
 # Table of Contents
 
 1. [What is ShadingLanguageX?](#what-is-shadinglanguagex)
-2. [Language Features](#language-features)
-3. [Installation](#installation)
-4. [Getting Started](#getting-started)
-5. [API Documentation](#api-documentation)
-6. [Decompiler](#decompiler)
-7. [MaterialX Libraries](#materialx-libraries)
+2. [Installation](#installation)
+3. [Getting Started](#getting-started)
+4. [API Documentation](#api-documentation)
+5. [Decompiler](#decompiler)
+6. [MaterialX Libraries](#materialx-libraries)
 
 # What is ShadingLanguageX?
 
@@ -38,102 +37,17 @@ and the language specification [here](https://github.com/jakethorn/ShadingLangua
 ShadingLanguageX files are compiled to .mtlx files using the `mxslc` compiler. See below for details on how to install
 and get started using `mxslc`.
 
-# Language Features
-
-## MaterialX Version
-
-You can easily target a specific MaterialX version either by defining the version in the compiled file using the `#version` directive or by
-passing it as an argument to the compiler. The default version is 1.39.5.
-
-```
-vec3 n = normal();
-float x = swizzle(n, "x");
-```
-
-```bash
-> ./mxslc example.mxsl -v 1.38.10
-```
-
-## Attributes
-
-ShadingLanguageX has built-in support for adding attributes to MaterialX elements using the `@` symbol.
-
-```
-@doc "an image of a butterfly"
-@file.colorspace "srgb_texture"
-color3 c = image("butterfly1.png");
-```
-
-```xml
-<image name="c" type="color3" doc="an image of a butterfly">
-  <input name="file" type="filename" value="butterfly1.png" colorspace="srgb_texture" />
-</image>
-```
-
-Attributes can be added to Nodes (as above), NodeDefs and at the document level (using `@@`).
-
-```
-@@madewith "ShadingLanguageX"
-standard_surface(base_color = randomcolor());
-```
-
-```xml
-<?xml version="1.0"?>
-<materialx version="1.39" madewith="ShadingLanguageX">
-  <randomcolor name="var__0" type="color3" />
-  <standard_surface name="var__1" type="surfaceshader">
-    <input name="base_color" type="color3" nodename="var__0" />
-  </standard_surface>
-</materialx>
-```
-
-## Loops
-
-ShadingLanguageX typically simply exposes MaterialX functionality in a convenient syntax. However, one thing that
-ShadingLanguageX allows that MaterialX does not is loops, with the caveat that the number of iterations must be known at
-compile-time.
-
-```
-// sum three layers of noise
-mutable float f = 0.0;
-for (float i from 1 to 3)
-{
-    f += noise2d(texcoord = texcoord() * i);
-}
-f /= 3.0;
-```
-
-## User-Defined Types
-
-ShadingLanguageX supports defining your own custom types. This can help organise data and functionality when creating complex shaders.
-
-```
-class Sphere
-{
-    vec3 position;
-    float radius;
-
-    Sphere(vec3 position = vec3{0}, float radius = 1)
-    {
-        this.position = position;
-        this.radius = radius;
-    }
-
-    bool is_inside(vec3 point)
-    {
-        return distance(point, position) < radius;
-    }
-}
-```
-
-## Compile-Time Operations
-
-Another benefit of using `mxslc` is that it will compute certain operations at compile-time when possible. For example, while
-`int i = 2 + 2;` would typically compile into an `add` node, the compiler can be instructed to compute the value at
-compile-time, reducing the number of nodes in the shader. This isn't always possible however, for example, `int i = geompropvalue<int>("i") + 2;`
-is not possible to compute at compile-time because the value of `geompropvalue` is not known until render-time.
+If you still haven't written your first SLX shader, try the [Hello, SLX!](https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/HelloSLX.md) tutorial.
 
 # Installation
+
+## Editors and Plugins
+
+If you simply want to use ShadingLanguageX "out of the box", it's available for many applications, such as Houdini, VS Code,
+MaterialXPlayground, and more. See the full list [here](https://github.com/jakethorn/ShadingLanguageX/tree/main#editors-and-plugins). 
+
+If you want more control over how the compiler runs, or want to call the compiler from a Python script or incorporate it
+into an existing codebase, follow the installation instructions below.
 
 ## Executable
 
