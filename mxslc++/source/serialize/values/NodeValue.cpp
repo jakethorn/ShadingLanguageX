@@ -43,7 +43,7 @@ namespace mxslc::serialize::values
             return;
 
         node_->setName(
-            node_->getParent()->createValidChildName(name)
+            mtlx_utils::create_unique_child_name(node_->getParent(), name)
         );
     }
 
@@ -55,7 +55,7 @@ namespace mxslc::serialize::values
         is_node_name_set_ = true;
 
         node_->setName(
-            node_->getParent()->createValidChildName(get_assigned_node_name(variable_name))
+            mtlx_utils::create_unique_child_name(node_->getParent(), get_assigned_node_name(variable_name))
         );
     }
 

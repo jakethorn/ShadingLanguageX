@@ -28,7 +28,7 @@ namespace mxslc::serialize::values
             return;
 
         node_->setName(
-            node_->getParent()->createValidChildName(name)
+            mtlx_utils::create_unique_child_name(node_->getParent(), name)
         );
     }
 

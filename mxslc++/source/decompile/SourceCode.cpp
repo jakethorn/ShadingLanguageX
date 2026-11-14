@@ -161,6 +161,24 @@ namespace mxslc::decompile
                 new_line(indent);
                 write_text("}");
                 break;
+            case SourceCode::Kind::Attributed:
+                if (fits(code, trailing))
+                {
+                    write_flat(code);
+                    break;
+                }
+                // the attributes are filled onto lines before the code, the last part
+                for (size_t i = 0; i + 1 < parts.size(); ++i)
+                {
+                    if (i > 0 and column_ + 1 + parts[i].width() <= MAX_LINE_LENGTH)
+                        write_text(" ");
+                    else if (i > 0)
+                        new_line(indent);
+                    write_flat(parts[i]);
+                }
+                new_line(indent);
+                write(parts.back(), indent, trailing);
+                break;
             }
         }
 
@@ -213,6 +231,14 @@ namespace mxslc::decompile
                 write_text("{ ");
                 write_flat(parts.front());
                 write_text(" }");
+                break;
+            case SourceCode::Kind::Attributed:
+                for (size_t i = 0; i < parts.size(); ++i)
+                {
+                    if (i > 0)
+                        write_text(" ");
+                    write_flat(parts[i]);
+                }
                 break;
             default:
                 for (const SourceCode& part : parts)
@@ -272,7 +298,7 @@ namespace mxslc::decompile
             width += part.width();
         if ((kind == Kind::List or kind == Kind::ParameterList or kind == Kind::BracedList) and not parts.empty())
             width += 2 * (parts.size() - 1);
-        if (kind == Kind::Chain and not parts.empty())
+        if ((kind == Kind::Chain or kind == Kind::Attributed) and not parts.empty())
             width += parts.size() - 1;
         if (kind == Kind::Branch)
             width += 4;
@@ -313,6 +339,16 @@ namespace mxslc::decompile
     SourceCode SourceCode::lines(vector<SourceCode> lines)
     {
         return SourceCode{Kind::Lines, "", std::move(lines)};
+    }
+
+    SourceCode SourceCode::attributed(vector<string> attributes, SourceCode code)
+    {
+        if (attributes.empty())
+            return code;
+
+        vector<SourceCode> parts(attributes.begin(), attributes.end());
+        parts.push_back(std::move(code));
+        return SourceCode{Kind::Attributed, "", std::move(parts)};
     }
 
     SourceCode SourceCode::block(SourceCode header, vector<SourceCode> body)
@@ -363,6 +399,9 @@ namespace mxslc::decompile
             return 0;
         case Kind::Branch:
             return 1;
+        // the line can be broken after the first attribute
+        case Kind::Attributed:
+            return node_->parts.front().width();
         case Kind::Chain:
         case Kind::Lines:
         case Kind::Block:
@@ -479,12 +518,8 @@ namespace mxslc::decompile
 
     SourceCode format_argument(const vector<string>& attributes, const string& name, const ExpressionCode& value)
     {
-        string prefix = join(attributes, " ");
-        if (not prefix.empty())
-            prefix += " ";
-        if (not name.empty())
-            prefix += name + " = ";
-        return prefix.empty() ? value.code : SourceCode::concat({prefix, value.code});
+        const SourceCode argument = name.empty() ? value.code : SourceCode::concat({name + " = ", value.code});
+        return SourceCode::attributed(attributes, argument);
     }
 
     SourceCode format_switch_case(const string& predicate, const ExpressionCode& value)

@@ -26,13 +26,19 @@ add_executable(mxslc_tests
         overwrite_data_files_tests.cpp
         compile_options_sources_tests.cpp
         materialx_library_cache_tests.cpp
-        roundtrip_tests.cpp
-        groundtruth_roundtrip_diff.cpp
-        groundtruth_decompile_tests.cpp
-        decompile_dependencies_tests.cpp
         value_override_tests.cpp
         compile_api_tests.cpp
         default_function_behaviour_tests.cpp
+        decompile/roundtrip_tests.cpp
+        decompile/groundtruth_roundtrip_diff.cpp
+        decompile/groundtruth_decompile_tests.cpp
+        decompile/decompile_dependencies_tests.cpp
+        decompile/decompile_library_names_tests.cpp
+        decompile/decompiler_api_tests.cpp
+        decompile/decompile_cases_tests.cpp
+        decompile/decompile_dropped_elements_tests.cpp
+        decompile/decompile_port_names_tests.cpp
+        decompile/decompile_readability_tests.cpp
 )
 
 target_link_libraries(mxslc_tests PRIVATE
@@ -41,8 +47,10 @@ target_link_libraries(mxslc_tests PRIVATE
         GTest::gtest_main
 )
 
+# the test utils, e.g., utils/comp_utils.h, are also included by the tests in subdirectories
 target_include_directories(mxslc_tests PRIVATE
         ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_definitions(mxslc_tests PRIVATE

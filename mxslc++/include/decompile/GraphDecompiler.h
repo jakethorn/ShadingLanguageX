@@ -46,6 +46,9 @@ namespace mxslc::decompile
 
         // the variable that the node is assigned to if the variable is declared outside of the graph, see outside_variables
         optional<string> get_outside_variable(const mx::NodePtr& node) const;
+        // the first value of the variable that the node is assigned to, which declares it, e.g., the node a for
+        // var__a__1, or null if the node is that value or the variable is declared outside of the graph
+        mx::NodePtr get_variable_declaration(const mx::NodePtr& node) const;
         // true if values are assigned to the variable in the graph, e.g., `x = x * 2.0;`
         bool is_assigned(const string& variable) const;
         // true if the port is connected to a value that is assigned to the variable, e.g., the output of an out parameter
@@ -158,6 +161,15 @@ namespace mxslc::decompile
         bool is_geomprop_definition(const mx::NodePtr& node) const;
         // compile-time values that are returned by a function are written to its outputs as constant nodes
         bool is_output_constant(const mx::NodePtr& node) const;
+        // parameters and node graphs that are returned by a function are passed to its outputs through dot nodes without
+        // a name, because outputs cannot be connected to them directly, e.g., `return a;`
+        bool is_output_pass_through(const mx::NodePtr& node) const;
+        // temporary separate nodes that are statements are written as the destructuring of their value into a variable for
+        // each channel, e.g., `float v_x, v_y = v;`, which compiles to a separate node again
+        bool is_destructured(const mx::NodePtr& node) const;
+        // the name that the variables of the channels of a destructured value start with, i.e., the name of the value if
+        // it is a variable, e.g., v of `float v_x, v_y = v;`, otherwise the name of the separate node
+        string get_destructured_name(const mx::NodePtr& node) const;
 
         optional<ExpressionCode> create_node_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_output_expression(const mx::NodePtr& node, const string& output_name);
@@ -182,6 +194,10 @@ namespace mxslc::decompile
         string get_template_type(const mx::NodePtr& node, const mx::NodeDefPtr& node_def) const;
         // true if the overloads of the function that accept the arguments of the call have different return types
         bool is_return_type_ambiguous(const mx::NodePtr& node, const mx::NodeDefPtr& node_def) const;
+        // true if the return type of the call is ambiguous and no template type can select its overload, e.g., for the
+        // functions of the document or ND_fractal2d_vector3FA, so it is assigned to a typed variable, whose type selects
+        // it, e.g., `vec3 v = fractal2d(-1.0);`
+        bool needs_typed_variable(const mx::NodePtr& node) const;
         // true if the node can be a statement on its own, e.g., `foo();`, otherwise it is assigned to a typed variable
         bool is_untyped_statement(const mx::NodePtr& node) const;
         // true if the parameter has the same type in all overloads of the function, i.e., the argument type is known

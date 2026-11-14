@@ -12,6 +12,7 @@
 namespace mxslc::decompile
 {
     string decompile_to_string(const fs::path& src_path);
+    // MaterialX source, or the path of a file if the string does not start with an element, see Decompiler
     string decompile_to_string(const string& source);
     string decompile_to_string(const mx::DocumentPtr& document);
 

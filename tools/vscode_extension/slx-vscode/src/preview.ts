@@ -14,11 +14,17 @@ interface PreviewContent {
     stale: boolean;
 }
 
-const COMPILING = '<!-- Compiling... -->\n';
-const HAS_ERRORS = '<!-- The source has errors, so it can\'t be shown as MaterialX. See the Problems panel. -->\n';
+// The placeholders start with an XML declaration, as the compiled MaterialX does. VS Code chooses the preview's language
+// when it opens, from the first line if no extension claims .mtlx files, and a declaration makes that XML.
+const XML_DECLARATION = '<?xml version="1.0"?>\n';
+const COMPILING = `${XML_DECLARATION}<!-- Compiling... -->\n`;
+const HAS_ERRORS = `${XML_DECLARATION}<!-- The source has errors, so it can't be shown as MaterialX. See the Problems panel. -->\n`;
 const STALE = '<!-- The source has errors, so this is the last version that compiled. See the Problems panel. -->';
 
-/** The preview of a source document. Its path ends in .mtlx so it opens as XML, and its query holds the source's URI. */
+/**
+ * The preview of a source document. Its path ends in .mtlx, so an extension for MaterialX files, such as the MaterialX
+ * Playground, can highlight it. Its query holds the source's URI.
+ */
 function toPreviewUri(source: vscode.Uri): vscode.Uri {
     const name = path.posix.basename(source.path).replace(/\.[^.]*$/, '');
     return vscode.Uri.from({ scheme: PREVIEW_SCHEME, path: `/${name}.mtlx`, query: source.toString() });
