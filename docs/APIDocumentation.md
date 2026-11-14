@@ -529,12 +529,12 @@ mxslc.decompile_file_to_file(src_path: str | pathlib.Path, dst_path: str | pathl
 Decompile a whole MaterialX document, or individual Nodes, NodeDefs and NodeGraphs from it.
 
 ```python
-Decompiler.__init__(src_path: str | pathlib.Path)
 Decompiler.__init__(source: str)
+Decompiler.__init__(src_path: str | pathlib.Path)
 ```
 
-A positional argument is always read as a file path, so pass MaterialX source by keyword:
-`mxslc.Decompiler(source=mtlx)`.
+A `str` is read as MaterialX source if it starts with an element, e.g., `<?xml` or `<materialx`, otherwise as the
+path of a file, so `mxslc.Decompiler(mtlx)` and `mxslc.Decompiler("example.mtlx")` both work.
 
 ```python
 Decompiler.decompile_document() -> str
@@ -610,6 +610,9 @@ public:
     string decompile_node_graph(const MaterialX::NodeGraphPtr& node_graph, bool with_dependencies = false);
 };
 ```
+
+A `string` is read as MaterialX source if it starts with an element, e.g., `<?xml` or `<materialx`, otherwise as
+the path of a file.
 
 The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs used by
 the given element or an element preceding it in the graph.

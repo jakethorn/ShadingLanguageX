@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <texcoord name="UV0_1" type="vector2" />
+  <atan2 name="angle_1" type="float">
+    <input name="iny" type="float" nodename="var__1" />
+    <input name="inx" type="float" nodename="var__2" />
+  </atan2>
+  <extract name="var__1" type="float">
+    <input name="in" type="vector2" nodename="UV0_1" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <extract name="var__2" type="float">
+    <input name="in" type="vector2" nodename="UV0_1" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <magnitude name="distance_1" type="float">
+    <input name="in" type="vector2" nodename="UV0_1" />
+  </magnitude>
+  <multiply name="var__0" type="float">
+    <input name="in1" type="float" nodename="distance_1" />
+    <input name="in2" type="float" value="20" />
+  </multiply>
+  <add name="var__3" type="float">
+    <input name="in1" type="float" nodename="var__0" />
+    <input name="in2" type="float" nodename="angle_1" />
+  </add>
+  <sin name="ring" type="float">
+    <input name="in" type="float" nodename="var__3" />
+  </sin>
+</materialx>

@@ -31,6 +31,11 @@ namespace mxslc::mtlx_utils
     mx::NodeDefPtr get_node_def(const mx::NodePtr& node);
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib);
     mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def);
+    // a name for a child of the element that its other children do not have, nor, if it is a document, the MaterialX
+    // libraries, because MaterialX finds the elements of the libraries first, e.g., a node named distance would be hidden
+    // by the unit type distance. Library names are numbered after an underscore, because the names of templated
+    // functions end with their type, e.g., ND_invert_vector2_1 rather than ND_invert_vector3.
+    string create_unique_child_name(const mx::ElementPtr& parent, const string& name);
 
     void set_value(const mx::InputPtr& input, const Primitive& value);
     void set_value(const mx::InterfaceElementPtr& element, const string& input_name, const Primitive& value);

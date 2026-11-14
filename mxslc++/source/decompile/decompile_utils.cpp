@@ -10,7 +10,6 @@
 #include "TokenType.h"
 #include "serialize/name_prefix_utils.h"
 #include "utils/container_utils.h"
-#include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 
 namespace mxslc::decompile_utils
@@ -38,6 +37,29 @@ namespace mxslc::decompile_utils
                 mx::Backdrop::HEIGHT_ATTRIBUTE,
             };
             return attributes;
+        }
+
+        // the identifier of the field of a struct return value that the output is, e.g., b for out__b or outx for outx,
+        // or nothing if the field has no name, e.g., for out__0
+        string get_field_name(const mx::OutputPtr& output)
+        {
+            const string field_name = without_prefix(output, RETURN_VALUE_PREFIX);
+            return is_index(field_name) ? "" : make_identifier(field_name);
+        }
+
+        // the rows of a matrix, formatted as vectors, e.g., `vec3{2.0, 0.0, 0.0}`
+        template <typename Matrix, typename Row>
+        vector<ExpressionCode> format_matrix_rows(const Matrix& matrix)
+        {
+            vector<ExpressionCode> rows;
+            for (size_t i = 0; i < Matrix::numRows(); ++i)
+            {
+                Row row;
+                for (size_t j = 0; j < Matrix::numColumns(); ++j)
+                    row[j] = matrix[i][j];
+                rows.push_back(*format_value(mx::Value::createValue(row)));
+            }
+            return rows;
         }
 
         struct TypeInfo
@@ -121,6 +143,12 @@ namespace mxslc::decompile_utils
         return not channels.empty() and channels.front() == 'r';
     }
 
+    string get_library_template_type(const mx::NodeDefPtr& node_def)
+    {
+        const string postfix = string_utils::get_postfix(node_def->getName(), '_');
+        return is_type_name(postfix) ? postfix : "";
+    }
+
     bool is_valid_identifier(const string& name)
     {
         if (name.empty() or std::isdigit(static_cast<unsigned char>(name.front())))
@@ -187,10 +215,15 @@ namespace mxslc::decompile_utils
             }
         }
 
-        // matrices have no literal syntax, but the identity matrix is their default value
+        // the identity matrix is the default value of matrices, and others are constructed from their rows, e.g.,
+        // `mat3{vec3{2.0, 0.0, 0.0}, vec3{0.0, 2.0, 0.0}, vec3{0.0, 0.0, 1.0}}`
         const string& type = value->getTypeString();
         if ((type == "matrix33" and value->asA<mx::Matrix33>() == mx::Matrix33::IDENTITY) or (type == "matrix44" and value->asA<mx::Matrix44>() == mx::Matrix44::IDENTITY))
             return ExpressionCode{"default(" + get_type_alias(type) + ")"};
+        if (type == "matrix33")
+            return decompile::format_constructor(get_type_alias(type), format_matrix_rows<mx::Matrix33, mx::Vector3>(value->asA<mx::Matrix33>()));
+        if (type == "matrix44")
+            return decompile::format_constructor(get_type_alias(type), format_matrix_rows<mx::Matrix44, mx::Vector4>(value->asA<mx::Matrix44>()));
 
         const Primitive primitive{value};
         if (primitive.is_null())
@@ -222,12 +255,27 @@ namespace mxslc::decompile_utils
         string fields;
         for (const mx::OutputPtr& output : outputs)
         {
-            const string field_name = without_prefix(output, RETURN_VALUE_PREFIX);
+            const string field_name = get_field_name(output);
             fields += (fields.empty() ? "" : ", ") + get_type_alias(output);
-            if (not is_index(field_name))
-                fields += " " + make_identifier(field_name);
+            if (not field_name.empty())
+                fields += " " + field_name;
         }
         return "{" + fields + "}";
+    }
+
+    vector<string> get_compiled_return_output_names(const vector<mx::OutputPtr>& outputs)
+    {
+        if (outputs.size() == 1)
+            return {RETURN_VALUE_PREFIX};
+
+        // the compiler names the fields without a name by their index
+        vector<string> names;
+        for (size_t i = 0; i < outputs.size(); ++i)
+        {
+            const string field_name = get_field_name(outputs[i]);
+            names.push_back(with_prefix(RETURN_VALUE_PREFIX, field_name.empty() ? std::to_string(i) : field_name));
+        }
+        return names;
     }
 
     bool is_separate(const mx::NodePtr& node)
@@ -343,9 +391,96 @@ namespace mxslc::decompile_utils
         return has_prefix(name, TEMPORARY_VARIABLE_PREFIX);
     }
 
+    bool is_default_node_name(const string& name)
+    {
+        const string prefix = mx::Node::CATEGORY;
+        return starts_with(name, prefix) and is_index(name.substr(prefix.size()));
+    }
+
     bool is_return_output(const mx::OutputPtr& output)
     {
         return not has_prefix(output, OUT_PARAMETER_PREFIX) and not has_prefix(output, NONLOCAL_OUT_PREFIX);
+    }
+
+    namespace
+    {
+        // Element::getChild, unlike Element::getChildOfType, does not look in the data library
+        template <typename T>
+        shared_ptr<T> get_child(const mx::ElementPtr& parent, const string& name)
+        {
+            const mx::ElementPtr child = parent->getChild(name);
+            return child ? child->asA<T>() : nullptr;
+        }
+
+        template <typename T>
+        vector<shared_ptr<T>> get_document_children(const mx::DocumentPtr& document)
+        {
+            vector<shared_ptr<T>> result;
+            for (const mx::ElementPtr& child : document->getChildren())
+            {
+                if (shared_ptr<T> element = child->asA<T>())
+                    result.push_back(std::move(element));
+            }
+            return result;
+        }
+    }
+
+    mx::NodeDefPtr get_document_node_def(const mx::DocumentPtr& document, const string& name)
+    {
+        return get_child<mx::NodeDef>(document, name);
+    }
+
+    mx::NodeGraphPtr get_document_node_graph(const mx::DocumentPtr& document, const string& name)
+    {
+        return get_child<mx::NodeGraph>(document, name);
+    }
+
+    vector<mx::NodeDefPtr> get_document_node_defs(const mx::DocumentPtr& document)
+    {
+        return get_document_children<mx::NodeDef>(document);
+    }
+
+    vector<mx::NodeGraphPtr> get_document_node_graphs(const mx::DocumentPtr& document)
+    {
+        return get_document_children<mx::NodeGraph>(document);
+    }
+
+    mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph)
+    {
+        const mx::DocumentPtr document = node_graph->getDocument();
+
+        // node defs can also share a node graph through implementation elements, e.g., the versions of a node def, and
+        // the implementation elements of the libraries are for their own node graphs
+        string node_def_name = node_graph->getNodeDefString();
+        if (node_def_name.empty())
+        {
+            for (const mx::ImplementationPtr& implementation : get_document_children<mx::Implementation>(document))
+            {
+                if (implementation->getNodeGraph() == node_graph->getName())
+                    node_def_name = implementation->getNodeDefString();
+            }
+        }
+
+        if (node_def_name.empty())
+            return nullptr;
+        if (const mx::NodeDefPtr node_def = get_document_node_def(document, node_def_name))
+            return node_def;
+        return document->getNodeDef(node_def_name);
+    }
+
+    mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def)
+    {
+        for (const mx::NodeGraphPtr& node_graph : get_document_node_graphs(node_def->getDocument()))
+        {
+            if (get_node_def(node_graph) == node_def)
+                return node_graph;
+        }
+        return nullptr;
+    }
+
+    mx::NodePtr get_node(const mx::GraphElementPtr& graph, const string& name)
+    {
+        return get_child<mx::Node>(graph, name);
     }
 
     namespace
@@ -364,9 +499,9 @@ namespace mxslc::decompile_utils
 
             vector<mx::ElementPtr> dependencies;
             const auto add_connections = [&](const mx::PortElementPtr& port) {
-                dependencies.push_back(graph->getNode(port->getNodeName()));
+                dependencies.push_back(get_node(graph, port->getNodeName()));
                 if (document)
-                    dependencies.push_back(document->getNodeGraph(port->getNodeGraphString()));
+                    dependencies.push_back(get_document_node_graph(document, port->getNodeGraphString()));
             };
             const auto add_calls = [&](const mx::NodeGraphPtr& body) {
                 for (const mx::NodePtr& node : body->getNodes())
@@ -374,7 +509,7 @@ namespace mxslc::decompile_utils
             };
             const auto add_nonlocal_variable = [&](const mx::PortElementPtr& port) {
                 if (has_prefix(port, NONLOCAL_IN_PREFIX) or has_prefix(port, NONLOCAL_OUT_PREFIX))
-                    dependencies.push_back(graph->getNode(without_prefix(port)));
+                    dependencies.push_back(get_node(graph, without_prefix(port)));
             };
 
             if (const mx::NodePtr node = element->asA<mx::Node>())
@@ -386,7 +521,7 @@ namespace mxslc::decompile_utils
             }
             else if (const mx::NodeDefPtr node_def = element->asA<mx::NodeDef>())
             {
-                if (const mx::NodeGraphPtr body = mtlx_utils::get_node_graph(node_def))
+                if (const mx::NodeGraphPtr body = get_node_graph(node_def))
                     add_calls(body);
                 for (const mx::InputPtr& input : node_def->getActiveInputs())
                     add_nonlocal_variable(input);
@@ -396,7 +531,7 @@ namespace mxslc::decompile_utils
             else if (const mx::NodeGraphPtr node_graph = element->asA<mx::NodeGraph>())
             {
                 // the node graphs of node defs are their bodies
-                if (const mx::NodeDefPtr implemented = node_graph->getNodeDef())
+                if (const mx::NodeDefPtr implemented = get_node_def(node_graph))
                 {
                     dependencies.push_back(implemented);
                 }
@@ -469,7 +604,7 @@ namespace mxslc::decompile_utils
                 const mx::NodeDefPtr node_def = node->getNodeDef();
                 for (const mx::InputPtr& input : node->getInputs())
                 {
-                    const mx::NodePtr used = graph->getNode(input->getNodeName());
+                    const mx::NodePtr used = get_node(graph, input->getNodeName());
                     if (used == nullptr)
                         continue;
                     uses[used].push_back(node);
@@ -487,7 +622,7 @@ namespace mxslc::decompile_utils
                     return get_assignment_number(a->getName()) < get_assignment_number(b->getName());
                 });
 
-                mx::NodePtr previous = graph->getNode(variable);
+                mx::NodePtr previous = get_node(graph, variable);
                 for (const mx::NodePtr& node : nodes)
                 {
                     if (previous)
@@ -581,7 +716,7 @@ namespace mxslc::decompile_utils
         set_child_order(document, sort_elements(document, document->getChildren()));
 
         // the nodes of node graphs are sorted in the places of the nodes, e.g., between its inputs and outputs
-        for (const mx::NodeGraphPtr& node_graph : document->getNodeGraphs())
+        for (const mx::NodeGraphPtr& node_graph : get_document_node_graphs(document))
         {
             const vector<mx::NodePtr> nodes = node_graph->getNodes();
             const vector<mx::ElementPtr> sorted_nodes = sort_elements(node_graph, {nodes.begin(), nodes.end()});

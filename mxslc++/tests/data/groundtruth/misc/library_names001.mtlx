@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_invert_float_1" node="invert_float">
+    <output name="out" type="float" />
+    <input name="in" type="float" value="0" />
+  </nodedef>
+  <nodegraph name="NG_invert_float" nodedef="ND_invert_float_1">
+    <multiply name="result" type="float">
+      <input name="in1" type="float" interfacename="in" />
+      <input name="in2" type="float" value="-1" />
+    </multiply>
+    <output name="out" type="float" nodename="result" />
+  </nodegraph>
+  <nodedef name="ND_invert_vector2_1" node="invert_vector2">
+    <output name="out" type="vector2" />
+    <input name="in" type="vector2" value="0, 0" />
+  </nodedef>
+  <nodegraph name="NG_invert_vector2" nodedef="ND_invert_vector2_1">
+    <multiply name="result" type="vector2">
+      <input name="in1" type="vector2" interfacename="in" />
+      <input name="in2" type="float" value="-1" />
+    </multiply>
+    <output name="out" type="vector2" nodename="result" />
+  </nodegraph>
+  <nodedef name="ND_latlongimage_1" node="latlongimage">
+    <output name="out" type="color3" />
+    <input name="file" type="filename" value="" />
+    <input name="gain" type="float" value="1" />
+  </nodedef>
+  <nodegraph name="NG_latlongimage_1" nodedef="ND_latlongimage_1">
+    <image name="var__0" type="color3">
+      <input name="file" type="filename" interfacename="file" />
+    </image>
+    <multiply name="c" type="color3">
+      <input name="in1" type="color3" nodename="var__0" />
+      <input name="in2" type="float" interfacename="gain" />
+    </multiply>
+    <output name="out" type="color3" nodename="c" />
+  </nodegraph>
+  <nodegraph name="NG_tiledimage_float_1">
+    <randomfloat name="b" type="float" />
+    <output name="out" type="float" nodename="b" />
+  </nodegraph>
+  <invert_float name="y" type="float">
+    <input name="in" type="float" value="0.25" />
+  </invert_float>
+  <invert_vector2 name="z" type="vector2">
+    <input name="in" type="vector2" value="1, 2" />
+  </invert_vector2>
+  <add name="w" type="float">
+    <input name="in1" type="float" nodegraph="NG_tiledimage_float_1" />
+    <input name="in2" type="float" nodename="y" />
+  </add>
+</materialx>

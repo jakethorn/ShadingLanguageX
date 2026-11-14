@@ -172,8 +172,8 @@ Supported data types match the ones found in the MaterialX specification, with t
 | `vector4`            | `vector4{0.0, 1.0, 2.0, 3.0}` |
 | `color3`             | `color3{1.0, 0.0, 0.0}`       |
 | `color4`             | `color4{1.0, 0.0, 0.0, 1.0}`  |
-| `matrix33`           | `creatematrix(...)`           |
-| `matrix44`           | `creatematrix(...)`           |
+| `matrix33`           | `matrix33{...}`               |
+| `matrix44`           | `matrix44{...}`               |
 | `string`             | `"tangent"`                   |
 | `filename`           | `"../textures/albedo.png"`    |
 | `surfaceshader`      | `standard_surface(...)`       |
@@ -1215,7 +1215,7 @@ float b = randomfloat(seed = i+=10); // seed = 20
 type{...}
 ```
 
-`type` can be `bool` `int` `float` `vec2` `vec3` `vec4` `color3` `color4`.
+`type` can be `bool` `int` `float` `vec2` `vec3` `vec4` `color3` `color4` `mat3` `mat4`.
 
 The constructor has the same name as the type itself and accepts zero or more arguments.
 The behaviour of the constructor changes depending on the number of arguments provided,
@@ -1263,6 +1263,17 @@ vectors/colors, e.g., `vec3{v2, z}`, `vec4{x, v2, w}` or `vec4{v2, v2}`. Missing
 `vec3 b = vec3{a, 3.0}; // will be vec3{1.0, 2.0, 3.0}`  
 `vec4 c = vec4{4.0, a, 5.0}; // will be vec4{4.0, 1.0, 2.0, 5.0}`  
 `color4 d = color4{color3{0.0, 1.0, 0.0}, 0.5}; // will be color4{0.0, 1.0, 0.0, 0.5}`
+
+## Matrices
+
+Matrices are constructed from their rows, which are `vec3`s for `mat3` and `vec4`s for `mat4`. This compiles to the
+`creatematrix` node, unless the rows are known at compile time. Matrices have no zero or one argument constructors;
+the identity matrix is `default(mat3)` or `default(mat4)`.
+
+### Example
+
+`mat3 a = mat3{vec3{2.0, 0.0, 0.0}, vec3{0.0, 2.0, 0.0}, vec3{0.0, 0.0, 1.0}};`  
+`mat4 b = mat4{vec4{1.0, 0.0, 0.0, 0.0}, vec4{0.0, 1.0, 0.0, 0.0}, vec4{0.0, 0.0, 1.0, 0.0}, vec4{position(), 1.0}};`
 
 # If Expression
 

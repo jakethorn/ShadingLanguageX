@@ -93,7 +93,8 @@ print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
    the name 'vec3'*). Argument counts must match an overload exactly: `vec3{x, y}` is an error, and so is
    `vec4{x, v2}`. Valid forms: `T{}`, `T{scalar}` (splat or convert), all components, or vector/scalar mixes
    such as `vec3{v2, z}`, `vec3{x, v2}`, `vec4{v3, w}`, `vec4{v2, v2}`, `vec4{x, v2, w}`. `vec4{}` and
-   `color4{}` are all zeros. Matrices have no named constructor: use `default(mat3)` or `creatematrix(...)`.
+   `color4{}` are all zeros. Matrices are built from their rows, `mat3{vec3{2, 0, 0}, vec3{0, 2, 0}, vec3{0, 0, 1}}`
+   (`mat4` takes four `vec4`s); the identity is `default(mat3)`.
 2. **Immutable by default.** Add `mutable` to any variable, parameter or struct field you reassign. That
    includes loop accumulators, out-argument targets and swizzle or index writes. Parameters are immutable
    too; a `mutable` parameter is a local copy.
@@ -187,8 +188,6 @@ user wants custom NodeDefs. The documentation's own examples write entry functio
 - The compositing node `out(...)` can't be called because `out` is a keyword.
 - A non-inline function that returns `default(T)` for a shader type (for example `volumeshader`) emits an
   invalid `constant` node and fails validation. Make it `inline`.
-- In Python, `mxslc.Decompiler("...")` always treats a `str` as a file path. For XML text use
-  `decompile_string_to_string`.
 
 ## References (load as needed)
 

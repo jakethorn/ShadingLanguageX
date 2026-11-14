@@ -772,3 +772,21 @@ comptime color4 __color4__()
 {
     return constant();
 }
+
+//
+// mat3
+//
+
+comptime matrix33 __matrix33__(vector3 row1, vector3 row2, vector3 row3)
+{
+    return creatematrix(row1, row2, row3);
+}
+
+//
+// mat4
+//
+
+comptime matrix44 __matrix44__(vector4 row1, vector4 row2, vector4 row3, vector4 row4)
+{
+    return creatematrix(row1, row2, row3, row4);
+}

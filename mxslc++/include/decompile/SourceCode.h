@@ -64,6 +64,12 @@ namespace mxslc::decompile
         static SourceCode branch(SourceCode value);
         // lines that are always written separately, e.g., the attributes of a statement and the statement
         static SourceCode lines(vector<SourceCode> lines);
+        // code with attributes, e.g., a parameter, which is written after its attributes on the same line if it fits,
+        // otherwise the attributes are written on as few lines as possible before it, e.g.,
+        //     @uimin "0.0" @uimax "1.0" @uiname "Diffuse Roughness" @uifolder "Base"
+        //     @doc "Roughness of the diffuse reflection."
+        //     float diffuse_roughness,
+        static SourceCode attributed(vector<string> attributes, SourceCode code);
         // e.g., `float f(float x)` `{` `return x;` `}`
         static SourceCode block(SourceCode header, vector<SourceCode> body);
 
@@ -74,7 +80,7 @@ namespace mxslc::decompile
         string str() const;
 
     private:
-        enum class Kind { Text, Concat, List, ParameterList, BracedList, Chain, Branch, Lines, Block };
+        enum class Kind { Text, Concat, List, ParameterList, BracedList, Chain, Branch, Lines, Block, Attributed };
         struct Node;
         friend class SourceCodeRenderer;
 
