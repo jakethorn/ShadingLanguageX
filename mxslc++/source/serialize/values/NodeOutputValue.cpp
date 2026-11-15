@@ -27,9 +27,7 @@ namespace mxslc::serialize::values
         if (node_->getName() == name)
             return;
 
-        node_->setName(
-            mtlx_utils::create_unique_child_name(node_->getParent(), name)
-        );
+        mtlx_utils::set_unique_name(node_, name);
     }
 
     bool NodeOutputValue::equals(const ValuePtr& other) const

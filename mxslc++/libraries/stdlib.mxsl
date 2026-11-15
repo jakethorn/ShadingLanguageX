@@ -782,6 +782,23 @@ comptime matrix33 __matrix33__(vector3 row1, vector3 row2, vector3 row3)
     return creatematrix(row1, row2, row3);
 }
 
+comptime matrix33 __matrix33__(
+    float in11, float in12, float in13,
+    float in21, float in22, float in23,
+    float in31, float in32, float in33)
+{
+    return creatematrix(
+        combine3(in11, in12, in13),
+        combine3(in21, in22, in23),
+        combine3(in31, in32, in33)
+    );
+}
+
+comptime matrix33 __matrix33__()
+{
+    return constant();
+}
+
 //
 // mat4
 //
@@ -789,4 +806,23 @@ comptime matrix33 __matrix33__(vector3 row1, vector3 row2, vector3 row3)
 comptime matrix44 __matrix44__(vector4 row1, vector4 row2, vector4 row3, vector4 row4)
 {
     return creatematrix(row1, row2, row3, row4);
+}
+
+comptime matrix44 __matrix44__(
+    float in11, float in12, float in13, float in14,
+    float in21, float in22, float in23, float in24,
+    float in31, float in32, float in33, float in34,
+    float in41, float in42, float in43, float in44)
+{
+    return creatematrix(
+        combine4(in11, in12, in13, in14),
+        combine4(in21, in22, in23, in24),
+        combine4(in31, in32, in33, in34),
+        combine4(in41, in42, in43, in44)
+    );
+}
+
+comptime matrix44 __matrix44__()
+{
+    return constant();
 }

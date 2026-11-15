@@ -533,8 +533,7 @@ Decompiler.__init__(source: str)
 Decompiler.__init__(src_path: str | pathlib.Path)
 ```
 
-A `str` is read as MaterialX source if it starts with an element, e.g., `<?xml` or `<materialx`, otherwise as the
-path of a file, so `mxslc.Decompiler(mtlx)` and `mxslc.Decompiler("example.mtlx")` both work.
+`source` can be either an xml string or a file path, so `mxslc.Decompiler(xml)` and `mxslc.Decompiler("example.mtlx")` both work.
 
 ```python
 Decompiler.decompile_document() -> str
@@ -611,8 +610,8 @@ public:
 };
 ```
 
-A `string` is read as MaterialX source if it starts with an element, e.g., `<?xml` or `<materialx`, otherwise as
-the path of a file.
+For the `Decompiler(const string& source)` overload, `source` can either be raw xml or a file path. It will read the string
+directly if it recognises it as xml, otherwise it will treat the string as a file path.
 
 The `with_dependencies` argument tells the decompiler to include all Nodes, NodeDefs and NodeGraphs used by
 the given element or an element preceding it in the graph.

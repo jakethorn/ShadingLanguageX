@@ -17,7 +17,7 @@
 #include "decompile/decompile.h"
 #include "utils/parse_cli_args.h"
 #include "utils/data_utils.h"
-#include "utils/graph_utils.h"
+#include "decompile/graph_utils.h"
 
 namespace fs = std::filesystem;
 using std::string;

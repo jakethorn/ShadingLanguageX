@@ -172,8 +172,8 @@ Supported data types match the ones found in the MaterialX specification, with t
 | `vector4`            | `vector4{0.0, 1.0, 2.0, 3.0}` |
 | `color3`             | `color3{1.0, 0.0, 0.0}`       |
 | `color4`             | `color4{1.0, 0.0, 0.0, 1.0}`  |
-| `matrix33`           | `matrix33{...}`               |
-| `matrix44`           | `matrix44{...}`               |
+| `matrix33`           | `matrix33{}`               |
+| `matrix44`           | `matrix44{}`               |
 | `string`             | `"tangent"`                   |
 | `filename`           | `"../textures/albedo.png"`    |
 | `surfaceshader`      | `standard_surface(...)`       |
@@ -1235,6 +1235,8 @@ In the case that no arguments are passed to the constructor, a default value wil
 | `vec4`    | `vec4{0.0, 0.0, 0.0, 0.0}`   |
 | `color3`  | `color3{0.0, 0.0, 0.0}`      |
 | `color4`  | `color4{0.0, 0.0, 0.0, 0.0}` |
+| `mat3`  | 3x3 identity matrix |
+| `mat4`  | 4x4 identity matrix |
 
 ## One Argument
 
@@ -1267,8 +1269,8 @@ vectors/colors, e.g., `vec3{v2, z}`, `vec4{x, v2, w}` or `vec4{v2, v2}`. Missing
 ## Matrices
 
 Matrices are constructed from their rows, which are `vec3`s for `mat3` and `vec4`s for `mat4`. This compiles to the
-`creatematrix` node, unless the rows are known at compile time. Matrices have no zero or one argument constructors;
-the identity matrix is `default(mat3)` or `default(mat4)`.
+`creatematrix` node. They also have 9 and 16 float constructors respectively, which fill the matrix in a row-major order.
+An empty matrix constructor will return an identity matrix.
 
 ### Example
 

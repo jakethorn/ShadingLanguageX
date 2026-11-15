@@ -127,7 +127,7 @@ TEST(decompiler_api_tests, dependencies_declare_the_variables_that_values_are_as
 
 TEST(decompiler_api_tests, strings_are_materialx_source_or_the_path_of_a_file)
 {
-    const fs::path path = get_test_data("decompile_cases/matrix_constants.mtlx");
+    const fs::path path = get_test_data("decompile/decompile_cases/matrix_constants.mtlx");
     const string expected = mxslc::decompile::Decompiler{path}.decompile_document();
     EXPECT_EQ(mxslc::decompile::Decompiler{path.string()}.decompile_document(), expected);
 

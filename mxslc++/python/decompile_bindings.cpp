@@ -20,7 +20,6 @@ void bind_decompile_functions(py::module_& m)
         py::arg("source")
     );
 
-    // dst_path is optional, so this also covers decompile_to_file(const fs::path&, const fs::path&)
     m.def(
         "decompile_file_to_file",
         py::overload_cast<const fs::path&, const std::optional<fs::path>&>(&decompile_to_file),

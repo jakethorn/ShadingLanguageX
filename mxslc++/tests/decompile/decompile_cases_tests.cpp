@@ -15,7 +15,7 @@
 #include "CompileOptions.h"
 #include "decompile/decompile.h"
 #include "utils/data_utils.h"
-#include "utils/graph_utils.h"
+#include "decompile/graph_utils.h"
 
 namespace fs = std::filesystem;
 using std::string;
@@ -41,7 +41,7 @@ namespace
     vector<fs::path> get_case_files()
     {
         vector<fs::path> files;
-        for (const auto& entry : fs::directory_iterator(get_test_data("decompile_cases")))
+        for (const auto& entry : fs::directory_iterator(get_test_data("decompile/decompile_cases")))
             if (entry.path().extension() == ".mtlx")
                 files.push_back(entry.path());
         std::sort(files.begin(), files.end());
