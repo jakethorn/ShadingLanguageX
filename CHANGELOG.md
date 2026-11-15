@@ -1,4 +1,4 @@
-# (mxslc++) Version 0.3.3
+# (mxslc++) Version 0.4.0
 
 ### Language Features
 
@@ -13,16 +13,17 @@
 
 ### Other Improvements 
 
+* Added `Hello, SLX!` tutorial ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/HelloSLX.md))
 * Added more compile-time node optimisations ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#compile-time-evaluation))
 * Added reflection API ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/APIDocumentation.md#reflection))
 * Added `--default-function-behaviour` compile option ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/UserGuide.md#default-function-behaviour))
 * Updated indexing operator; now the index value isn't required to be known at compile time ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/docs/LanguageSpecification.md#indexing-operator))
-* Added `Hello, SLX!` tutorial ([link](https://github.com/jakethorn/ShadingLanguageX/blob/main/examples/HelloSLX.md))
 
 ### Bug Fixes
 
 * Fixed an issue with the `comptime` modifier during function calls.
 * Fixed an issue when using a for loop inside an inline function.
+* Fixed decompiler bugs.
 
 # (mxslc++) Version 0.3.2
 
