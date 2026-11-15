@@ -404,12 +404,13 @@ namespace mxslc::decompile_utils
 
     namespace
     {
-        // Element::getChild, unlike Element::getChildOfType, does not look in the data library
+        // Element::getChild looks in the children of the element first, unlike Element::getChildOfType, but since
+        // MaterialX 1.39.5 it also looks in the data library of a document, so the parent of the child is checked
         template <typename T>
         shared_ptr<T> get_child(const mx::ElementPtr& parent, const string& name)
         {
             const mx::ElementPtr child = parent->getChild(name);
-            return child ? child->asA<T>() : nullptr;
+            return child and child->getParent() == parent ? child->asA<T>() : nullptr;
         }
 
         template <typename T>

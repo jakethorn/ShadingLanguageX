@@ -105,6 +105,22 @@ namespace mxslc::mtlx_utils
         return nullptr;
     }
 
+    namespace
+    {
+        string create_valid_child_name(const mx::ElementPtr& parent, const string& name)
+        {
+            const auto has_child = [&parent](const string& child_name) -> bool {
+                const mx::ElementPtr child = parent->getChild(child_name);
+                return child and child->getParent() == parent;
+            };
+
+            string result = name.empty() ? "_" : mx::createValidName(name);
+            while (has_child(result))
+                result = mx::incrementName(result);
+            return result;
+        }
+    }
+
     string create_unique_child_name(const mx::ElementPtr& parent, const string& name)
     {
         const mx::DocumentPtr document = parent->asA<mx::Document>();
@@ -113,9 +129,9 @@ namespace mxslc::mtlx_utils
             return document and document->hasDataLibrary() and document->getDataLibrary()->getChild(child_name);
         };
 
-        string result = parent->createValidChildName(name);
+        string result = create_valid_child_name(parent, name);
         for (size_t i = 1; is_library_name(result); ++i)
-            result = parent->createValidChildName(name + "_" + std::to_string(i));
+            result = create_valid_child_name(parent, name + "_" + std::to_string(i));
         return result;
     }
 
