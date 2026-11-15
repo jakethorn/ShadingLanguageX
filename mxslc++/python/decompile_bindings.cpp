@@ -28,13 +28,6 @@ void bind_decompile_functions(py::module_& m)
     );
 
     m.def(
-        "decompile_file_to_file",
-        py::overload_cast<const fs::path&, const fs::path&>(&decompile_to_file),
-        py::arg("src_path"),
-        py::arg("dst_path")
-    );
-
-    m.def(
         "decompile_string_to_file",
         py::overload_cast<const string&, const fs::path&>(&decompile_to_file),
         py::arg("source"),

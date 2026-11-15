@@ -215,7 +215,7 @@ namespace mxslc::decompile
         // node graphs can connect their inputs to nodes in the document
         if (graph_->isA<mx::Document>())
         {
-            for (const mx::NodeGraphPtr& node_graph : graph_->asA<mx::Document>()->getNodeGraphs())
+            for (const mx::NodeGraphPtr& node_graph : get_document_node_graphs(graph_->asA<mx::Document>()))
             {
                 for (const mx::InputPtr& input : node_graph->getInputs())
                     add_use(input, input);
@@ -252,6 +252,14 @@ namespace mxslc::decompile
         return std::nullopt;
     }
 
+    mx::NodePtr GraphDecompiler::get_variable_declaration(const mx::NodePtr& node) const
+    {
+        const VariableAssignments* assignments = get_assignments(node);
+        if (assignments == nullptr or assignments->is_declared_outside or assignments->nodes.front() == node)
+            return nullptr;
+        return assignments->nodes.front();
+    }
+
     bool GraphDecompiler::is_assigned(const string& variable) const
     {
         return std::any_of(assignments_.begin(), assignments_.end(), [&](const VariableAssignments& assignments) {
@@ -261,7 +269,7 @@ namespace mxslc::decompile
 
     bool GraphDecompiler::has_assigned_value(const mx::PortElementPtr& port, const string& variable) const
     {
-        const mx::NodePtr node = graph_->getNode(port->getNodeName());
+        const mx::NodePtr node = get_node(graph_, port->getNodeName());
         const VariableAssignments* assignments = node ? get_assignments(node) : nullptr;
         return assignments and assignments->identifier == variable;
     }
@@ -292,7 +300,7 @@ namespace mxslc::decompile
         {
             // the first value of a variable is the node of its definition, which is named after it, e.g., x, unless it
             // has no node, e.g., `mutable float x = 0.0;`
-            if (const mx::NodePtr definition = graph_->getNode(assignments.variable); definition and not assignments.is_declared_outside)
+            if (const mx::NodePtr definition = get_node(graph_, assignments.variable); definition and not assignments.is_declared_outside)
             {
                 // definitions that cannot be written as the declaration of a mutable variable keep their later values
                 // as separate values, e.g., `geomprop float x;`
@@ -464,7 +472,7 @@ namespace mxslc::decompile
         }
 
         // statements are checked separately
-        const mx::NodePtr node = port->getNodeName().empty() ? nullptr : graph_->getNode(port->getNodeName());
+        const mx::NodePtr node = port->getNodeName().empty() ? nullptr : get_node(graph_, port->getNodeName());
         if (node == nullptr or is_statement(node) or contains(visited, node))
             return;
 
@@ -538,12 +546,12 @@ namespace mxslc::decompile
     {
         if (const string& node_graph_name = port->getNodeGraphString(); not node_graph_name.empty())
         {
-            const mx::NodeGraphPtr node_graph = decompiler_.document()->getNodeGraph(node_graph_name);
+            const mx::NodeGraphPtr node_graph = get_document_node_graph(decompiler_.document(), node_graph_name);
             if (node_graph and not contains(functions, node_graph))
                 functions.push_back(node_graph);
         }
 
-        const mx::NodePtr node = port->isA<mx::Input>() ? get_connected_node(port->asA<mx::Input>()) : graph_->getNode(port->getNodeName());
+        const mx::NodePtr node = port->isA<mx::Input>() ? get_connected_node(port->asA<mx::Input>()) : get_node(graph_, port->getNodeName());
         if (node == nullptr or contains(visited, node))
             return;
 
@@ -567,7 +575,7 @@ namespace mxslc::decompile
         if (port->getNodeName().empty())
             return;
 
-        const mx::NodePtr node = graph_->getNode(port->getNodeName());
+        const mx::NodePtr node = get_node(graph_, port->getNodeName());
         if (node == nullptr)
             return;
 
@@ -613,7 +621,7 @@ namespace mxslc::decompile
     {
         if (input == nullptr or input->getNodeName().empty())
             return nullptr;
-        return graph_->getNode(input->getNodeName());
+        return get_node(graph_, input->getNodeName());
     }
 
     // `1.0 - v` is compiled to `subtract(convert(1.0), v)`
@@ -959,6 +967,54 @@ namespace mxslc::decompile
         return get_user_attributes(node).empty() and get_user_attributes(value).empty() and node->getInputs().size() == 1;
     }
 
+    bool GraphDecompiler::is_output_pass_through(const mx::NodePtr& node) const
+    {
+        if (not graph_->isA<mx::NodeGraph>() or node->getCategory() != "dot" or not is_default_node_name(node->getName()) or get_use_count(node) != 1)
+            return false;
+        if (not uses_.at(node).front().consumer->isA<mx::Output>())
+            return false;
+
+        // the outputs of nodes are connected to outputs directly
+        const mx::InputPtr in = node->getInput("in");
+        if (in == nullptr or not is_connected(in) or not in->getNodeName().empty())
+            return false;
+
+        // the dot node keeps the value of a ref parameter or nonlocal variable from before the function assigns to it,
+        // e.g., `float node2 = dot(x); x = 5.0; y = node2;`
+        if (const string& interface_name = in->getInterfaceName(); not interface_name.empty())
+        {
+            const string variable = has_prefix(interface_name, NONLOCAL_IN_PREFIX) ? remove_prefix(interface_name) : interface_name;
+            if (is_assigned(variable) or graph_->getOutput(with_prefix(OUT_PARAMETER_PREFIX, variable)) or graph_->getOutput(with_prefix(NONLOCAL_OUT_PREFIX, variable)))
+                return false;
+        }
+
+        return get_user_attributes(node).empty() and get_user_attributes(in).empty() and node->getInputs().size() == 1;
+    }
+
+    bool GraphDecompiler::is_destructured(const mx::NodePtr& node) const
+    {
+        // separate nodes with a name keep it as the name of their variable, e.g., `{float outx, float outy} s = separate2(v);`
+        const string& name = node->getName();
+        if (not is_separate(node) or not is_generated_node_name(name) or get_assigned_variable_name(name) or not is_statement(node))
+            return false;
+
+        // the destructuring of a constant value is evaluated at compile time
+        const mx::InputPtr in = node->getInput("in");
+        return in and is_connected(in) and get_user_attributes(node).empty() and get_user_attributes(in).empty();
+    }
+
+    string GraphDecompiler::get_destructured_name(const mx::NodePtr& node) const
+    {
+        const mx::InputPtr in = node->getInput("in");
+        if (const string& interface_name = in->getInterfaceName(); not interface_name.empty())
+            return has_prefix(interface_name, NONLOCAL_IN_PREFIX) ? remove_prefix(interface_name) : make_identifier(interface_name);
+
+        const mx::NodePtr value = get_connected_node(in);
+        if (value and is_statement(value) and value->getType() != mx::MULTI_OUTPUT_TYPE_STRING and contains(identifiers_, value))
+            return identifiers_.at(value);
+        return identifiers_.at(node);
+    }
+
     void GraphDecompiler::find_absorbed_nodes()
     {
         absorbed_.clear();
@@ -1015,7 +1071,7 @@ namespace mxslc::decompile
                 continue;
             }
 
-            if (contains(absorbed_, node) or is_output_constant(node))
+            if (contains(absorbed_, node) or is_output_constant(node) or is_output_pass_through(node))
                 continue;
 
             const bool is_named = not is_generated_node_name(node->getName());
@@ -1025,8 +1081,11 @@ namespace mxslc::decompile
             const bool has_out_parameters = not get_out_parameter_outputs(node).empty();
             // e.g., void functions that assign to nonlocal variables
             const bool has_no_return_value = get_return_outputs(node).empty();
+            // the type of an output selects the overload of the call that it returns, e.g., `return fractal2d(-1.0);`
+            const bool is_output_value = get_use_count(node) == 1 and uses_.at(node).front().consumer->isA<mx::Output>();
+            const bool needs_type = not is_output_value and needs_typed_variable(node);
 
-            if (is_named or is_shared or has_attributes or has_multiple_outputs or has_out_parameters or has_no_return_value)
+            if (is_named or is_shared or has_attributes or has_multiple_outputs or has_out_parameters or has_no_return_value or needs_type)
                 statements_.insert(node);
         }
     }
@@ -1075,6 +1134,21 @@ namespace mxslc::decompile
         {
             for (const mx::OutputPtr& output : get_out_parameter_outputs(node))
                 output_identifiers_[node->getName() + "." + output->getName()] = create_unique_identifier(make_identifier(without_prefix(output)));
+        }
+
+        // the channels of a destructured value are named after it, e.g., v_x and v_y of `float v_x, v_y = v;`
+        for (const mx::NodePtr& node : nodes_)
+        {
+            if (not is_destructured(node))
+                continue;
+
+            const string name = get_destructured_name(node);
+            for (const mx::OutputPtr& output : get_return_outputs(node))
+            {
+                const optional<char> channel = get_separate_channel(output->getName());
+                const string identifier = channel ? name + "_" + *channel : name + "_" + output->getName();
+                output_identifiers_[node->getName() + "." + output->getName()] = create_unique_identifier(identifier);
+            }
         }
     }
 
@@ -1166,6 +1240,15 @@ namespace mxslc::decompile
             const mx::InputPtr default_input = node->getInput("default");
             const optional<ExpressionCode> default_value = default_input ? create_port_expression(default_input) : std::nullopt;
             stmt = format_variable_definition("geomprop", get_variable_type(node), get_identifier(node), default_value);
+        }
+        else if (is_destructured(node))
+        {
+            // `float v_x, v_y = v;`, whose type is that of each channel
+            const vector<mx::OutputPtr> outputs = get_return_outputs(node);
+            string names;
+            for (const mx::OutputPtr& output : outputs)
+                names += (names.empty() ? "" : ", ") + get_output_identifier(node, output->getName());
+            stmt = format_variable_definition("", get_type_alias(outputs.front()->getType()), names, create_untyped_expression(node, "in"));
         }
         else if (get_assignments(node))
         {
@@ -1277,7 +1360,7 @@ namespace mxslc::decompile
     {
         if (not port->getNodeName().empty())
         {
-            const mx::NodePtr node = graph_->getNode(port->getNodeName());
+            const mx::NodePtr node = get_node(graph_, port->getNodeName());
             if (node == nullptr)
                 return std::nullopt;
             return create_output_expression(node, port->getOutputString());
@@ -1312,9 +1395,15 @@ namespace mxslc::decompile
 
         if (is_output_constant(node))
             return create_input_expression(node, "value");
+        if (is_output_pass_through(node))
+            return create_input_expression(node, "in");
 
         if (not is_statement(node))
             return create_node_expression(node);
+
+        // the variable of the channel, e.g., v_x of `float v_x, v_y = v;`
+        if (is_destructured(node))
+            return format_identifier(get_output_identifier(node, output_name));
 
         // out arguments and nonlocal variables that were assigned to by the function call
         if (has_prefix(output_name, OUT_PARAMETER_PREFIX))
@@ -1365,12 +1454,19 @@ namespace mxslc::decompile
         if (node_def == nullptr or decompiler_.is_document_node_def(node_def))
             return "";
 
-        // library functions are templated by the postfix of their node def name, e.g., ND_noise2d_float
-        const string type_name = string_utils::get_postfix(node_def->getName(), '_');
-        if (not is_type_name(type_name))
+        const string type_name = get_library_template_type(node_def);
+        if (type_name.empty())
             return "";
 
         return is_return_type_ambiguous(node, node_def) ? get_type_alias(type_name) : "";
+    }
+
+    bool GraphDecompiler::needs_typed_variable(const mx::NodePtr& node) const
+    {
+        const mx::NodeDefPtr node_def = node->getNodeDef();
+        if (not is_return_type_ambiguous(node, node_def))
+            return false;
+        return decompiler_.is_document_node_def(node_def) or get_library_template_type(node_def).empty();
     }
 
     bool GraphDecompiler::is_return_type_ambiguous(const mx::NodePtr& node, const mx::NodeDefPtr& node_def) const
@@ -1402,12 +1498,8 @@ namespace mxslc::decompile
 
     bool GraphDecompiler::is_untyped_statement(const mx::NodePtr& node) const
     {
-        // struct values and the functions of the document that are overloaded by their return type are assigned to a
-        // variable, whose type selects the overload, e.g., `vec2 v = foo();`, which cannot be done by a template type
-        if (node->getType() == mx::MULTI_OUTPUT_TYPE_STRING)
-            return false;
-        const mx::NodeDefPtr node_def = node->getNodeDef();
-        return not (decompiler_.is_document_node_def(node_def) and is_return_type_ambiguous(node, node_def));
+        // struct values are assigned to a variable, as are the calls that need its type to select their overload
+        return node->getType() != mx::MULTI_OUTPUT_TYPE_STRING and not needs_typed_variable(node);
     }
 
     bool GraphDecompiler::is_parameter_type_unique(const mx::NodeDefPtr& node_def, const string& param_name) const
@@ -1676,9 +1768,12 @@ namespace mxslc::decompile
         vector<SourceCode> args;
         unordered_set<string> handled_inputs;
 
-        // arguments are positional until an input is skipped, after which they must be named
+        // arguments are positional until an input is skipped, after which they must be named, by the identifier of the
+        // parameter for functions of the document, e.g., `if_ = 1.0` for the input if, otherwise by the name of the port,
+        // e.g., `image("a.png", default = c)`
         bool is_named = false;
-        const auto add_argument = [&](const vector<string>& attrs, const string& name, const ExpressionCode& value) {
+        const auto add_argument = [&](const vector<string>& attrs, const string& port_name, const ExpressionCode& value) {
+            const string name = is_document_function ? make_identifier(port_name) : port_name;
             args.push_back(format_argument(attrs, is_named ? name : "", value));
         };
 
@@ -1741,7 +1836,7 @@ namespace mxslc::decompile
 
     optional<ExpressionCode> GraphDecompiler::create_node_graph_reference(const mx::PortElementPtr& port) const
     {
-        const mx::NodeGraphPtr node_graph = decompiler_.document()->getNodeGraph(port->getNodeGraphString());
+        const mx::NodeGraphPtr node_graph = get_document_node_graph(decompiler_.document(), port->getNodeGraphString());
         if (node_graph == nullptr)
             return std::nullopt;
 

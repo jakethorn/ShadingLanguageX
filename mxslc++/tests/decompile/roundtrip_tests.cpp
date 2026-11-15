@@ -16,7 +16,7 @@
 #include "decompile/decompile.h"
 #include "utils/comp_utils.h"
 #include "utils/data_utils.h"
-#include "utils/graph_utils.h"
+#include "decompile/graph_utils.h"
 
 namespace fs = std::filesystem;
 using std::string;
@@ -95,7 +95,7 @@ TEST_P(roundtrip_tests, decompiling_decompiled_code_gives_the_same_code)
 
 vector<fs::path> get_roundtrip_files()
 {
-    const fs::path test_dir = get_test_data("roundtrip");
+    const fs::path test_dir = get_test_data("decompile/roundtrip");
 
     if (not fs::exists(test_dir))
         return {};

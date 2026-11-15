@@ -2,11 +2,11 @@
 // Created by jaket on 05/10/2026.
 //
 
-// Each file in data/decompile_dependencies is a document whose elements come before the elements that they depend on,
-// e.g., a node before the node def of the function that it calls, which never happens in documents that are compiled from
-// code. The decompiled code must still define everything before it is used, so the document must decompile to code that
-// compiles to the same graph, and each of its functions and nodes must decompile with its dependencies to code that
-// compiles on its own.
+// Each file in data/decompile/decompile_dependencies is a document whose elements come before the elements that they
+// depend on, e.g., a node before the node def of the function that it calls, which never happens in documents that are
+// compiled from code. The decompiled code must still define everything before it is used, so the document must
+// decompile to code that compiles to the same graph, and each of its functions and nodes must decompile with its
+// dependencies to code that compiles on its own.
 
 #include "gtest/gtest.h"
 #include <filesystem>
@@ -18,7 +18,7 @@
 #include "decompile/decompile.h"
 #include "decompile/Decompiler.h"
 #include "utils/data_utils.h"
-#include "utils/graph_utils.h"
+#include "decompile/graph_utils.h"
 
 namespace fs = std::filesystem;
 using std::string;
@@ -103,7 +103,7 @@ namespace
 {
     vector<fs::path> get_dependency_files()
     {
-        const fs::path test_dir = get_test_data("decompile_dependencies");
+        const fs::path test_dir = get_test_data("decompile/decompile_dependencies");
 
         if (not fs::exists(test_dir))
             return {};

@@ -98,7 +98,7 @@ Arrays don't exist. Use structs or tuples, which can be indexed (see §7).
 
 When more than one overload could accept an implicit conversion, the call is ambiguous and fails.
 
-**Named constructors** `T{...}` (bool, int, float, vec2-4, color3/4) are compile-time (`comptime`)
+**Named constructors** `T{...}` (bool, int, float, vec2-4, color3/4, mat3/4) are compile-time (`comptime`)
 functions defined in `stdlib.mxsl`:
 
 | Form | Meaning | Node, if the arg is runtime |
@@ -111,6 +111,7 @@ functions defined in `stdlib.mxsl`:
 | `vec2{x, y}` `vec3{x, y, z}` `vec4{x, y, z, w}` (same for colours) | build | `combine2/3/4` |
 | `vec3{v2, z}` `vec3{x, v2}` `color3{rg, b}` `color3{r, gb}` | mixed | `separate2` + `combine3` |
 | `vec4{v3, w}` `vec4{x, v3}` `vec4{v2, v2}` `vec4{v2, z, w}` `vec4{x, v2, w}` `vec4{x, y, v2}` `color4{c3, a}` ... | mixed | separate + combine |
+| `mat3{r0, r1, r2}` (vec3 rows) `mat4{r0, r1, r2, r3}` (vec4 rows) | build; the only matrix forms, the identity is `default(mat3)` | `creatematrix` |
 
 Arity must match one of these. `vec3{1.0, 2.0}` and `vec4{1.0, v2}` are **errors**, because missing
 components are not zero-filled. Keyword args such as `color3{g = 1.0}` don't work either. Class types

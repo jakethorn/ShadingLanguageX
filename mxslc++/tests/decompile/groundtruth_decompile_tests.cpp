@@ -3,8 +3,8 @@
 //
 
 // Every groundtruth file must compile to the same graph after it is decompiled, except the known exceptions, which are
-// listed by name in decompile_exceptions.txt. Known exceptions are skipped while they still fail, and fail once they pass,
-// so that the list is kept up to date.
+// listed by name in data/decompile/decompile_exceptions.txt. Known exceptions are skipped while they still fail, and
+// fail once they pass, so that the list is kept up to date.
 
 #include "gtest/gtest.h"
 #include <filesystem>
@@ -17,7 +17,7 @@
 #include "decompile/decompile.h"
 #include "utils/parse_cli_args.h"
 #include "utils/data_utils.h"
-#include "utils/graph_utils.h"
+#include "decompile/graph_utils.h"
 
 namespace fs = std::filesystem;
 using std::string;
@@ -31,7 +31,7 @@ namespace
     {
         static const std::unordered_set<string> exceptions = [] {
             std::unordered_set<string> result;
-            std::ifstream file{get_test_data("decompile_exceptions.txt")};
+            std::ifstream file{get_test_data("decompile/decompile_exceptions.txt")};
             string line;
             while (std::getline(file, line))
             {
@@ -99,7 +99,7 @@ TEST_P(groundtruth_decompile_tests, decompiled_code_compiles_to_the_same_graph)
     if (get_known_exceptions().count(name) > 0)
     {
         if (passed)
-            FAIL() << name << " compiles to the same graph now, remove it from decompile_exceptions.txt";
+            FAIL() << name << " compiles to the same graph now, remove it from data/decompile/decompile_exceptions.txt";
         GTEST_SKIP() << "known exception";
     }
 

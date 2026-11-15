@@ -82,8 +82,7 @@ slx: str = mxslc.decompile_string_to_string(xml)
 path = mxslc.decompile_file_to_file("a.mtlx")                   # -> a.mxsl; or (src, dst)
 path = mxslc.decompile_string_to_file(xml, "a.mxsl")
 
-d = mxslc.Decompiler(pathlib.Path("a.mtlx"))                    # a str is ALSO treated as a file path (bindings bug);
-                                                                # for XML text use decompile_string_to_string
+d = mxslc.Decompiler("a.mtlx")                                  # a str is XML text if it starts with '<', else a file path
 d.decompile_document(); d.decompile_node("y", with_dependencies=True)
 d.decompile_node_def("ND_foo"); d.decompile_node_graph("NG_foo", with_dependencies=False)
 ```

@@ -1,7 +1,7 @@
 ## Contributing to the SLX VS Code extension
 
 How the VS Code extension for ShadingLanguageX is laid out, built, tested and released. See
-[slx-vscode/README.md](slx-vscode/README.md) for what it does from a user's point of view.
+[README.md](README.md) for what it does from a user's point of view.
 
 ### Installing
 
@@ -19,6 +19,7 @@ installed, uninstall it first.
 
 | Path | What it is |
 | --- | --- |
+| `README.md` | The extension's README, shown in VS Code's Extensions view. `npm run package` copies it into `slx-vscode/`, and links its images to GitHub. |
 | `slx-vscode/` | The extension: `package.json`, TypeScript source in `src/`, tests in `test/` |
 | `slx-vscode/src/` | The source. See below. |
 | `slx-vscode/syntaxes/slx.tmLanguage.json` | The highlighting grammar. Generated, don't edit it by hand. |

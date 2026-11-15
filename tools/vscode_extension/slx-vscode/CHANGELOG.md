@@ -33,6 +33,8 @@
 - Removed *SLX: Validate*. SLX files are already checked as you type, compiling validates the MaterialX it produces,
   and *SLX: Decompile to SLX* reports errors in `.mtlx` files.
 - The compile and decompile buttons have a play icon instead of two arrows.
+- `.mtlx` files are no longer set to open as XML, so extensions for MaterialX files, such as the MaterialX
+  Playground, can open them. Without one, VS Code still opens them as XML when they start with `<?xml`.
 
 ## 0.3.0
 

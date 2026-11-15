@@ -518,10 +518,9 @@ def install_vsix(vsix: Path) -> None:
             print(f"  Error: {result.stderr.strip()}")
 
 
-def publish_extension() -> None:
-    """Publish to the VS Code Marketplace. Needs a VSCE_PAT for the publisher."""
-    install_dependencies()
-    run_npm("exec", "--", "vsce", "publish", "--no-dependencies")
+def publish_vsix(vsix: Path) -> None:
+    """Publish a packaged .vsix to the VS Code Marketplace. Needs a VSCE_PAT for the publisher."""
+    run_npm("exec", "--", "vsce", "publish", "--packagePath", str(vsix))
     print("\nPublished.")
 
 
@@ -576,15 +575,14 @@ def main() -> None:
         print("\nBundling the WebAssembly compiler...")
         copy_converter(args)
 
-    if args.vsix or args.install:
+    if args.vsix or args.install or args.publish:
         print("\nPackaging...")
         vsix = package_vsix()
         if args.install:
             install_vsix(vsix)
-
-    if args.publish:
-        print("\nPublishing...")
-        publish_extension()
+        if args.publish:
+            print("\nPublishing...")
+            publish_vsix(vsix)
 
 
 if __name__ == "__main__":

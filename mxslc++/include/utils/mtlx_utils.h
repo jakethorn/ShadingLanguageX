@@ -32,6 +32,9 @@ namespace mxslc::mtlx_utils
     mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph, const mx::DocumentPtr& mtlx_lib);
     mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def);
 
+    string create_unique_child_name(const mx::ElementPtr& parent, const string& name);
+    void set_unique_name(const mx::ElementPtr& element, const string& name);
+
     void set_value(const mx::InputPtr& input, const Primitive& value);
     void set_value(const mx::InterfaceElementPtr& element, const string& input_name, const Primitive& value);
     void set_connected_node(const mx::PortElementPtr& port, const mx::NodePtr& node);

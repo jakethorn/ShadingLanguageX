@@ -76,3 +76,28 @@ and clicking a node shows the line that made it. This needs the compiler to reco
 
 Step through a compile in VS Code's debugger, to see how each statement turns into nodes. It would build on the
 compiler's existing `debug::Debugger`.
+
+## Compiler
+
+Improvements to the compiler in [mxslc++](../mxslc++). Both also affect the decompiler.
+
+### Extreme int and float literals
+
+The compiler can't read two kinds of valid literals. MaterialX documents can hold these values, so the decompiler
+writes them, but the code it writes doesn't compile:
+
+- `-2147483648`, the smallest `int`, fails with the bare message `stoi`. The `-` is parsed as a unary operator on
+  `2147483648`, which is too large for an `int`. Folding a unary `-` in front of an int literal into the literal
+  would fix it. Today the only way to write the value is `-2147483647 - 1`, which adds a `subtract` node.
+- Denormal floats, such as `1.0e-40`, fail with the bare message `stof`. `std::stof` throws when its result is
+  denormal, but `std::strtof` accepts it.
+
+Literals that really are out of range, such as `2147483648`, should report a clear error instead of `stoi` or
+`stof`. Both conversions are in `Token::literal`.
+
+### Save files into new directories
+
+`compile_to_file`, `decompile_to_file` and the CLI's `-o` fail with "Cannot save file: <path>" when the destination's
+directory doesn't exist. The message is the same when the directory can't be written to, so it doesn't say what went
+wrong. Saving could create the missing directories, and the error could give the reason, such as "No such
+directory" or "Permission denied". All of them save through `io_utils::save_file`.

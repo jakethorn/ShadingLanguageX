@@ -9,8 +9,8 @@
 void bind_decompiler(py::module_& m)
 {
     py::class_<Decompiler>(m, "Decompiler")
-        .def(py::init<const fs::path&>(), py::arg("src_path"))
         .def(py::init<const string&>(), py::arg("source"))
+        .def(py::init<const fs::path&>(), py::arg("src_path"))
         .def(
             "decompile_document",
             &Decompiler::decompile_document

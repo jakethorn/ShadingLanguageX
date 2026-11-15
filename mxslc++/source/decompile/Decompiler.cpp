@@ -12,7 +12,6 @@
 #include "utils/load_mtlx.h"
 #include "serialize/name_prefix_utils.h"
 #include "utils/container_utils.h"
-#include "utils/mtlx_utils.h"
 #include "utils/string_utils.h"
 
 namespace mxslc::decompile
@@ -30,8 +29,21 @@ namespace mxslc::decompile
             return document;
         }
 
+        // MaterialX source starts with an element, e.g., <?xml or <materialx, after any whitespace and byte order mark
+        bool is_materialx_source(const string& text)
+        {
+            const size_t start = starts_with(text, "\xEF\xBB\xBF") ? 3 : 0;
+            const size_t first = text.find_first_not_of(" \t\r\n", start);
+            return first == string::npos or text[first] == '<';
+        }
+
         mx::DocumentPtr read_document(const string& source)
         {
+            // strings can also be the path of a file, e.g., `mxslc.Decompiler("example.mtlx")` in Python, where every str
+            // is a string, or a std::string that holds a path
+            if (not is_materialx_source(source))
+                return read_document(fs::path{source});
+
             const mx::DocumentPtr document = mx::createDocument();
             mx::readFromXmlString(document, source);
             return document;
@@ -49,17 +61,24 @@ namespace mxslc::decompile
             return copy;
         }
 
-        // the elements that are passed to the decompiler can belong to the original document instead of its copy
+        // the elements that are passed to the decompiler can belong to the original document instead of its copy, but not
+        // to another document, even if the copy has an element with the same path, e.g., the MaterialX libraries can have
+        // a node def with the name of a node
         template <typename T>
-        shared_ptr<T> find_copy(const mx::DocumentPtr& document, const shared_ptr<T>& element)
+        shared_ptr<T> find_copy(const mx::DocumentPtr& copy, const mx::DocumentPtr& original, const shared_ptr<T>& element)
         {
             if (element == nullptr)
-                throw CompileError{"Cannot find element"};
-            if (element->getDocument() == document)
+                throw CompileError{"Cannot decompile a null element"};
+
+            const mx::DocumentPtr document = element->getDocument();
+            if (document == copy)
                 return element;
-            if (const mx::ElementPtr& copy = document->getDescendant(element->getNamePath()))
-                return copy->asA<T>();
-            throw CompileError{"Cannot find element at path: " + element->getNamePath()};
+
+            // the copy has the elements that the original document had when it was copied
+            const mx::ElementPtr copied = document and document == original ? copy->getDescendant(element->getNamePath()) : nullptr;
+            if (shared_ptr<T> result = copied ? copied->asA<T>() : nullptr)
+                return result;
+            throw CompileError{element->getNamePath() + " is not an element of the decompiled document"};
         }
 
         unordered_set<string> find_nonlocal_inputs(const mx::NodeDefPtr& node_def)
@@ -76,7 +95,7 @@ namespace mxslc::decompile
         unordered_set<string> find_nonlocal_inputs(const mx::DocumentPtr& document)
         {
             unordered_set<string> nonlocal_inputs;
-            for (const mx::NodeDefPtr& node_def : document->getNodeDefs())
+            for (const mx::NodeDefPtr& node_def : get_document_node_defs(document))
                 nonlocal_inputs.merge(find_nonlocal_inputs(node_def));
             return nonlocal_inputs;
         }
@@ -95,7 +114,7 @@ namespace mxslc::decompile
         unordered_set<string> find_nonlocal_outputs(const mx::DocumentPtr& document)
         {
             unordered_set<string> nonlocal_outputs;
-            for (const mx::NodeDefPtr& node_def : document->getNodeDefs())
+            for (const mx::NodeDefPtr& node_def : get_document_node_defs(document))
                 nonlocal_outputs.merge(find_nonlocal_outputs(node_def));
             return nonlocal_outputs;
         }
@@ -120,7 +139,7 @@ namespace mxslc::decompile
             unordered_set<string> result;
             for (const string& name : find_nonlocals(document))
             {
-                if (document->getNode(name) == nullptr)
+                if (get_node(document, name) == nullptr)
                     result.insert(name);
             }
             return result;
@@ -162,15 +181,10 @@ namespace mxslc::decompile
         // e.g., `@uiname "Color" color3 c = color3{1.0}`
         SourceCode format_parameter(const vector<string>& attrs, const string& mods, const string& type, const string& name, const optional<SourceCode>& default_value)
         {
-            string declaration;
-            for (const string& attr : attrs)
-                declaration += attr + " ";
-            if (not mods.empty())
-                declaration += mods + " ";
-            declaration += type + " " + name;
+            const string declaration = (mods.empty() ? "" : mods + " ") + type + " " + name;
             if (not default_value)
-                return declaration;
-            return SourceCode::concat({declaration + " = ", *default_value});
+                return SourceCode::attributed(attrs, declaration);
+            return SourceCode::attributed(attrs, SourceCode::concat({declaration + " = ", *default_value}));
         }
 
         // e.g., `return x;`, or `return {x, y};` for multiple outputs
@@ -193,6 +207,7 @@ namespace mxslc::decompile
 
     Decompiler::Decompiler(const mx::DocumentPtr& document)
         : document_{copy_document(document)},
+        original_{document},
         function_assigned_variables_{find_nonlocal_outputs(document_)},
         graph_decompiler_{*this, document_, find_nonlocal_declarations(document_)}
     {
@@ -202,6 +217,7 @@ namespace mxslc::decompile
     string Decompiler::decompile_document()
     {
         clear_emitted_code();
+        emit_undecompiled_elements();
         emit_document_attributes();
 
         for (const mx::ElementPtr& element : document_->getChildren())
@@ -213,7 +229,7 @@ namespace mxslc::decompile
             else if (const mx::NodeGraphPtr node_graph = element->asA<mx::NodeGraph>())
             {
                 // node graphs that implement a node def are emitted with their node def
-                if (node_graph->getNodeDef() == nullptr)
+                if (get_node_def(node_graph) == nullptr)
                     emit_function(node_graph);
             }
             else if (const mx::NodePtr node = element->asA<mx::Node>())
@@ -228,12 +244,18 @@ namespace mxslc::decompile
 
     string Decompiler::decompile_node(const string& node_name, const bool with_dependencies)
     {
-        return decompile_node(document_->getNode(node_name), with_dependencies);
+        const mx::NodePtr node = get_node(document_, node_name);
+        if (node == nullptr)
+            throw CompileError{"The document has no node named '" + node_name + "'"};
+        return decompile_node(node, with_dependencies);
     }
 
     string Decompiler::decompile_node(const mx::NodePtr& node, const bool with_dependencies)
     {
-        const mx::NodePtr copy = find_copy<mx::Node>(document_, node);
+        const mx::NodePtr copy = find_copy<mx::Node>(document_, original_.lock(), node);
+        // the nodes of node graphs are decompiled with their function, see decompile_node_def and decompile_node_graph
+        if (copy->getParent() != document_)
+            throw CompileError{"Only top-level nodes can be passed to decompile_node, but " + copy->getNamePath() + " is in the node graph " + copy->getParent()->getName()};
         clear_emitted_code();
 
         if (with_dependencies)
@@ -249,25 +271,35 @@ namespace mxslc::decompile
 
     string Decompiler::decompile_node_def(const string& node_def_name, const bool with_dependencies)
     {
-        return decompile_node_def(document_->getNodeDef(node_def_name), with_dependencies);
+        const mx::NodeDefPtr node_def = get_document_node_def(document_, node_def_name);
+        if (node_def == nullptr)
+            throw CompileError{"The document has no node def named '" + node_def_name + "'"};
+        return decompile_node_def(node_def, with_dependencies);
     }
 
     string Decompiler::decompile_node_def(const mx::NodeDefPtr& node_def, const bool with_dependencies)
     {
-        return decompile_function(find_copy<mx::NodeDef>(document_, node_def), with_dependencies);
+        const mx::NodeDefPtr copy = find_copy<mx::NodeDef>(document_, original_.lock(), node_def);
+        // the node graph is the body of the function, e.g., the node defs of stdlib_defs.mtlx have none
+        if (get_node_graph(copy) == nullptr)
+            throw CompileError{"The node graph of the node def " + copy->getName() + " could not be found"};
+        return decompile_function(copy, with_dependencies);
     }
 
     string Decompiler::decompile_node_graph(const string& node_graph_name, const bool with_dependencies)
     {
-        return decompile_node_graph(document_->getNodeGraph(node_graph_name), with_dependencies);
+        const mx::NodeGraphPtr node_graph = get_document_node_graph(document_, node_graph_name);
+        if (node_graph == nullptr)
+            throw CompileError{"The document has no node graph named '" + node_graph_name + "'"};
+        return decompile_node_graph(node_graph, with_dependencies);
     }
 
     string Decompiler::decompile_node_graph(const mx::NodeGraphPtr& node_graph, const bool with_dependencies)
     {
-        const mx::NodeGraphPtr copy = find_copy<mx::NodeGraph>(document_, node_graph);
+        const mx::NodeGraphPtr copy = find_copy<mx::NodeGraph>(document_, original_.lock(), node_graph);
 
         // node graphs that implement a node def are decompiled as part of the node def
-        if (const mx::NodeDefPtr node_def = copy->getNodeDef(); is_document_node_def(node_def))
+        if (const mx::NodeDefPtr node_def = get_node_def(copy); is_document_node_def(node_def))
             return decompile_function(node_def, with_dependencies);
 
         return decompile_function(copy, with_dependencies);
@@ -328,9 +360,56 @@ namespace mxslc::decompile
             return false;
 
         // `return 0;` is compiled to a constant node, the placeholder is an unconnected output
-        const mx::NodeGraphPtr node_graph = mtlx_utils::get_node_graph(node_def);
+        const mx::NodeGraphPtr node_graph = get_node_graph(node_def);
         const mx::OutputPtr output = node_graph ? node_graph->getOutput(serialize::RETURN_VALUE_PREFIX) : nullptr;
         return output and output->getNodeName().empty() and output->getInterfaceName().empty() and output->getValueString() == "0";
+    }
+
+    bool Decompiler::is_decompiled(const mx::ElementPtr& element) const
+    {
+        // comments are not part of the graph
+        if (element->isA<mx::Node>() or element->isA<mx::CommentElement>())
+            return true;
+        // node defs are decompiled with their node graph, see emit_function
+        if (const mx::NodeDefPtr node_def = element->asA<mx::NodeDef>())
+            return get_node_graph(node_def) != nullptr;
+        // node graphs that implement a node def of the libraries have no function to be decompiled with
+        if (const mx::NodeGraphPtr node_graph = element->asA<mx::NodeGraph>())
+        {
+            const mx::NodeDefPtr node_def = get_node_def(node_graph);
+            return node_def == nullptr or is_document_node_def(node_def);
+        }
+        // implementations that give a node def its node graph are part of the function, others are source code, e.g.,
+        // IM_add_float_genglsl
+        if (const mx::ImplementationPtr implementation = element->asA<mx::Implementation>())
+            return implementation->hasNodeGraph();
+        return false;
+    }
+
+    void Decompiler::emit_undecompiled_elements()
+    {
+        // the names of the elements of each category, in the order of the document
+        vector<std::pair<string, vector<string>>> categories;
+        for (const mx::ElementPtr& element : document_->getChildren())
+        {
+            if (is_decompiled(element))
+                continue;
+
+            const string& category = element->getCategory();
+            auto it = std::find_if(categories.begin(), categories.end(), [&](const auto& c) { return c.first == category; });
+            if (it == categories.end())
+                it = categories.insert(categories.end(), {category, {}});
+            it->second.push_back(element->getName());
+        }
+
+        if (categories.empty())
+            return;
+
+        // long lists are counted, e.g., the implementations of a library
+        string comment = "// Not decompiled, because ShadingLanguageX has no equivalent:";
+        for (const auto& [category, names] : categories)
+            comment += "\n//   " + category + ": " + (names.size() <= 5 ? mx::joinStrings(names, ", ") : std::to_string(names.size()) + " elements");
+        writer_.add(comment, /*is_block*/true);
     }
 
     void Decompiler::emit_document_attributes()
@@ -352,6 +431,11 @@ namespace mxslc::decompile
         for (const mx::NodePtr& dependency : graph_decompiler_.get_statement_dependencies(node))
             emit_node(dependency);
 
+        // a value that is assigned to a variable does not have to read it, but it is assigned after its declaration,
+        // e.g., `a = normal();` after `mutable vec3 a = position();`
+        if (const mx::NodePtr declaration = graph_decompiler_.get_variable_declaration(node))
+            emit_node(declaration);
+
         emit_dependencies(graph_decompiler_.get_function_dependencies(node));
 
         // nonlocal variables without a node are declared before the first value that is assigned to them
@@ -369,7 +453,7 @@ namespace mxslc::decompile
         emitted_functions_.insert(function);
 
         const mx::NodeDefPtr node_def = function->asA<mx::NodeDef>();
-        const mx::NodeGraphPtr node_graph = node_def ? mtlx_utils::get_node_graph(node_def) : function->asA<mx::NodeGraph>();
+        const mx::NodeGraphPtr node_graph = node_def ? get_node_graph(node_def) : function->asA<mx::NodeGraph>();
         if (node_graph == nullptr)
             return;
 
@@ -408,9 +492,9 @@ namespace mxslc::decompile
         // `float foo(float b = bar())`
         for (const mx::InputPtr& input : node_graph->getInputs())
         {
-            if (const mx::NodePtr node = document_->getNode(input->getNodeName()))
+            if (const mx::NodePtr node = get_node(document_, input->getNodeName()))
                 emit_node(node);
-            if (const mx::NodeGraphPtr default_graph = document_->getNodeGraph(input->getNodeGraphString()))
+            if (const mx::NodeGraphPtr default_graph = get_document_node_graph(document_, input->getNodeGraphString()))
                 emit_function(default_graph);
         }
 
@@ -428,7 +512,7 @@ namespace mxslc::decompile
 
     void Decompiler::emit_nonlocal_variable(const mx::NodeDefPtr& node_def, const string& name, const string& type_name)
     {
-        if (const mx::NodePtr node = document_->getNode(name); node and graph_decompiler_.is_statement(node))
+        if (const mx::NodePtr node = get_node(document_, name); node and graph_decompiler_.is_statement(node))
         {
             emit_node(node);
             return;
@@ -465,7 +549,7 @@ namespace mxslc::decompile
 
     SourceCode Decompiler::create_function_definition(const mx::NodeDefPtr& node_def, GraphDecompiler& body)
     {
-        const mx::NodeGraphPtr node_graph = mtlx_utils::get_node_graph(node_def);
+        const mx::NodeGraphPtr node_graph = get_node_graph(node_def);
 
         vector<mx::OutputPtr> return_outputs;
         vector<mx::OutputPtr> out_parameter_outputs;
@@ -474,15 +558,18 @@ namespace mxslc::decompile
         for (const mx::OutputPtr& output : node_def->getActiveOutputs())
         {
             if (is_return_output(output) and not is_void)
-            {
                 return_outputs.push_back(output);
-                const vector<string> output_attrs = get_user_attributes(output, output->getName());
-                attrs.insert(attrs.end(), output_attrs.begin(), output_attrs.end());
-            }
             else if (has_prefix(output, OUT_PARAMETER_PREFIX))
-            {
                 out_parameter_outputs.push_back(output);
-            }
+        }
+
+        // the attributes of the return value are added to the outputs that the compiler names after it, e.g.,
+        // `@out__outx.default "0.0"` for the output outx of ND_separate3_vector3
+        const vector<string> output_names = get_compiled_return_output_names(return_outputs);
+        for (size_t i = 0; i < return_outputs.size(); ++i)
+        {
+            const vector<string> output_attrs = get_user_attributes(return_outputs[i], output_names[i]);
+            attrs.insert(attrs.end(), output_attrs.begin(), output_attrs.end());
         }
 
         // parameters without a default value are declared with the default of their type, e.g., 0.0

@@ -1,0 +1,19 @@
+// the node defs and node graphs of these functions would have the names of elements of the MaterialX libraries, e.g.,
+// ND_invert_float, ND_latlongimage and NG_tiledimage_float, which MaterialX finds first, so they are numbered
+T invert<float, vec2>(T in)
+{
+    T result = in * -1.0;
+    return result;
+}
+
+color3 latlongimage(filename file, float gain = 1.0)
+{
+    color3 c = image(file) * gain;
+    return c;
+}
+
+float tiledimage_float => { float b = randomfloat(); return b; }
+
+float y = invert(0.25);
+vec2 z = invert(vec2{1.0, 2.0});
+float w = tiledimage_float + y;

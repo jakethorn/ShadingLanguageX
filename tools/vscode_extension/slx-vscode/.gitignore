@@ -5,3 +5,5 @@ media/lib/
 data/
 skills/
 *.vsix
+# Copied from ../README.md by npm run package
+README.md

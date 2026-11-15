@@ -67,7 +67,10 @@ namespace test_utils
                 if (signatures.count(node_name))
                     return signatures.at(node_name);
 
-                const mx::NodePtr node = graph->getNode(node_name);
+                // GraphElement::getNode looks in the data library of a document first, so a node named like a library
+                // element would not be found, e.g., distance, which is also a unit type
+                const mx::ElementPtr child = graph->getChild(node_name);
+                const mx::NodePtr node = child ? child->asA<mx::Node>() : nullptr;
                 if (node == nullptr)
                     return "?" + node_name;
 

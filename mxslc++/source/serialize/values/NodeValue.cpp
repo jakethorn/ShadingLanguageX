@@ -42,9 +42,7 @@ namespace mxslc::serialize::values
         if (node_->getName() == name)
             return;
 
-        node_->setName(
-            node_->getParent()->createValidChildName(name)
-        );
+        mtlx_utils::set_unique_name(node_, name);
     }
 
     void NodeValue::set_assigned_node_name(const string& variable_name) const
@@ -54,9 +52,7 @@ namespace mxslc::serialize::values
             return;
         is_node_name_set_ = true;
 
-        node_->setName(
-            node_->getParent()->createValidChildName(get_assigned_node_name(variable_name))
-        );
+        mtlx_utils::set_unique_name(node_, get_assigned_node_name(variable_name));
     }
 
     bool NodeValue::equals(const ValuePtr& other) const

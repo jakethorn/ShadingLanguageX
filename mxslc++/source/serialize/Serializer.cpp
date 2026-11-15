@@ -595,11 +595,11 @@ namespace mxslc::serialize
 
     string Serializer::node_def_name(const FuncPtr& func) const
     {
-        return doc_->createValidChildName("ND_" + node_category(func));
+        return mtlx_utils::create_unique_child_name(doc_, "ND_" + node_category(func));
     }
 
     string Serializer::node_graph_name(const FuncPtr& func) const
     {
-        return doc_->createValidChildName("NG_" + node_category(func));
+        return mtlx_utils::create_unique_child_name(doc_, "NG_" + node_category(func));
     }
 }

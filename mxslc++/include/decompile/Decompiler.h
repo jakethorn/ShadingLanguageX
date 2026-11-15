@@ -19,6 +19,7 @@ namespace mxslc::decompile
     {
     public:
         explicit Decompiler(const fs::path& src_path);
+        // MaterialX source, or the path of a file if the string does not start with an element, e.g., example.mtlx
         explicit Decompiler(const string& source);
         // the document is copied, so that the MaterialX libraries of its version can be added to it and its elements can
         // be sorted into the order of code
@@ -52,6 +53,11 @@ namespace mxslc::decompile
         // the function of a node def or a node graph
         string decompile_function(const mx::ElementPtr& function, bool with_dependencies);
 
+        // false for the elements of the document that ShadingLanguageX cannot express, e.g., looks, collections, outputs
+        // of the document and node defs without a node graph
+        bool is_decompiled(const mx::ElementPtr& element) const;
+        // a comment that names the elements of the document that are not decompiled, so they are not lost silently
+        void emit_undecompiled_elements();
         void emit_document_attributes();
         void emit_node(const mx::NodePtr& node);
         void emit_function(const mx::ElementPtr& function);
@@ -69,6 +75,9 @@ namespace mxslc::decompile
         static SourceCode create_output_value(GraphDecompiler& body, const mx::OutputPtr& output);
 
         mx::DocumentPtr document_;
+        // only to tell if an element that is passed to the decompiler belongs to the document that was copied, which is
+        // not kept alive by the decompiler
+        weak_ptr<mx::Document> original_;
         SourceCodeWriter writer_;
         unordered_set<string> function_assigned_variables_;
         unordered_set<mx::NodePtr> emitted_nodes_;

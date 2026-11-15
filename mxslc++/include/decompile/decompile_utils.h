@@ -24,6 +24,9 @@ namespace mxslc::decompile_utils
     // the channels of vector and color types, e.g., "xyz" for vector3 and "rgba" for color4, otherwise empty
     string get_swizzle_channels(const string& type_name);
     bool is_color_type(const string& type_name);
+    // the template type that selects a node def of the libraries, which is the postfix of its name if it is a type,
+    // e.g., float for ND_noise2d_float, otherwise it has none, e.g., ND_fractal2d_vector3FA, as in the compiler
+    string get_library_template_type(const mx::NodeDefPtr& node_def);
 
     bool is_valid_identifier(const string& name);
     // a valid identifier that is as close to the name as possible, e.g., node_1 for node-1
@@ -44,6 +47,9 @@ namespace mxslc::decompile_utils
     // the return type of a function with these outputs, e.g., `float`, `{float a, vec2 b}` or `{float, vec2}` if its
     // fields have no names
     string get_return_type(const vector<mx::OutputPtr>& outputs);
+    // the names that the compiler gives the outputs of a return value with these outputs, which are out, or
+    // out__<field> for the fields of a struct, e.g., out__outx for the output outx of ND_separate3_vector3
+    vector<string> get_compiled_return_output_names(const vector<mx::OutputPtr>& outputs);
 
     // e.g., separate3
     bool is_separate(const mx::NodePtr& node);
@@ -73,10 +79,37 @@ namespace mxslc::decompile_utils
     // true if the node is not named after the definition of a variable, i.e., it is a temporary value, var__<n>, or a
     // value that is assigned to a variable after its definition, var__<variable>__<n>
     bool is_generated_node_name(const string& name);
+    // true if the node is named like MaterialX names nodes that are added without a name, i.e., node<n>, e.g., the dot
+    // nodes that the compiler passes parameters through to the outputs of a function
+    bool is_default_node_name(const string& name);
 
     // the outputs of a node def that are its return value, e.g., out, or out__<field> if it returns a struct, as opposed
     // to its out parameters and nonlocal variables
     bool is_return_output(const mx::OutputPtr& output);
+
+    // MaterialX looks up elements by name in the data library before the document, e.g., Document::getNodeDef and
+    // NodeGraph::getNodeDef, so an element of the document is hidden by a library element with the same name, e.g., the
+    // node def ND_invert_float of the templated function `T invert<float, vec3>(T in)`, and its lists of elements also
+    // contain the library elements, e.g., Document::getNodeGraphs. These find the elements of the document instead.
+    // Document::getNode even returns null if a library element of another type has the name, e.g., for a node named
+    // distance, because the libraries define the unit type distance.
+
+    // the node def or node graph of the document with the name, or null if the document has none, even if the MaterialX
+    // libraries have one
+    mx::NodeDefPtr get_document_node_def(const mx::DocumentPtr& document, const string& name);
+    mx::NodeGraphPtr get_document_node_graph(const mx::DocumentPtr& document, const string& name);
+    // the node defs or node graphs of the document, without those of the MaterialX libraries
+    vector<mx::NodeDefPtr> get_document_node_defs(const mx::DocumentPtr& document);
+    vector<mx::NodeGraphPtr> get_document_node_graphs(const mx::DocumentPtr& document);
+    // the node def that the node graph implements, named by the node graph or by an implementation element of its
+    // document, which is the node def of its document if it has one with the name, otherwise a node def of the MaterialX
+    // libraries, or null if the node graph does not implement a node def
+    mx::NodeDefPtr get_node_def(const mx::NodeGraphPtr& node_graph);
+    // the node graph that implements the node def, from the document of the node def, or null if it has none, e.g., it is
+    // implemented in GLSL
+    mx::NodeGraphPtr get_node_graph(const mx::NodeDefPtr& node_def);
+    // the node of the graph, the document or a node graph, with the name, or null if it has none
+    mx::NodePtr get_node(const mx::GraphElementPtr& graph, const string& name);
 
     // Sorts the elements of the document, and the nodes of its node graphs, into the order of the code that they could be
     // compiled from, where each element comes after the elements that it depends on, e.g., a node after the node def of

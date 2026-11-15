@@ -105,6 +105,39 @@ namespace mxslc::mtlx_utils
         return nullptr;
     }
 
+    string create_unique_child_name(const mx::ElementPtr& parent, const string& name)
+    {
+        const mx::DocumentPtr document = parent->asA<mx::Document>();
+
+        const auto is_child_name = [&parent](const string& child_name) -> bool {
+            const mx::ElementPtr child = parent->getChild(child_name);
+            return child and child->getParent() == parent;
+        };
+
+        const auto is_library_name = [&document](const string& child_name) -> bool {
+            return document and document->hasDataLibrary() and document->getDataLibrary()->getChild(child_name);
+        };
+
+        const string valid_name = name.empty() ? "_" : mx::createValidName(name);
+        string result = valid_name;
+        size_t i = 0;
+        while (is_child_name(result) or is_library_name(result))
+        {
+            if (is_child_name(result))
+                result = mx::incrementName(result);
+            else
+                result = valid_name + "_" + std::to_string(++i);
+        }
+        return result;
+    }
+
+    void set_unique_name(const mx::ElementPtr& element, const string& name)
+    {
+        element->setName(
+            create_unique_child_name(element->getParent(), name)
+        );
+    }
+
     void set_value(const mx::InputPtr& input, const Primitive& value)
     {
         clear_binding(input, value.to_string());

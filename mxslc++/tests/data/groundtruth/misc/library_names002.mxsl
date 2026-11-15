@@ -1,0 +1,6 @@
+// the nodes of these variables would have the names of elements of the MaterialX libraries, e.g., the geomprop UV0 and
+// the unit types angle and distance, which MaterialX finds first, so they are numbered
+vec2 UV0 = texcoord();
+float angle = atan2(UV0.y, UV0.x);
+float distance = magnitude(UV0);
+float ring = sin(distance * 20.0 + angle);

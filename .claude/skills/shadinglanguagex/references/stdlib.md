@@ -55,7 +55,7 @@ Listing notation:
 | Source | SLX |
 |---|---|
 | `vec3(a, b, c)`, `float(i)`, `vec3(1.0)` | `vec3{a, b, c}`, `float{i}`, `vec3{1.0}` |
-| `mat3(a, b, c)` | `creatematrix(a, b, c)`. Each `vec3` is one GLSL column (in genglsl). Identity is `default(mat3)` |
+| `mat3(a, b, c)` | `mat3{a, b, c}` (`creatematrix`). Each `vec3` is one GLSL column (in genglsl). Identity is `default(mat3)` |
 | `c ? a : b` | `if (c) { a } else { b }` |
 | `&&`, `\|\|` | `&`, `\|` (same precedence, so parenthesise) |
 | `abs(x)` | `absval(x)` or `\|x\|` |

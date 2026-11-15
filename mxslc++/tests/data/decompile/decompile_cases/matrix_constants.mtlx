@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- Matrix values are written as constructors of their rows, e.g., `mat3{vec3{2.0, 0.0, 0.0}, vec3{}, vec3{0.0, 0.0, 1.0}}`,
+     which are values, rather than calls to creatematrix, which would add a node and select the matrix44 overload outside
+     a typed context, e.g., the row of `m[0]` would be a vector4. The identity matrix is written as `default(mat3)`. -->
+<materialx version="1.39">
+  <constant name="i" type="integer">
+    <input name="value" type="integer" value="1" />
+  </constant>
+  <ifequal name="sel" type="matrix33">
+    <input name="value1" type="integer" nodename="i" />
+    <input name="in1" type="matrix33" value="2, 0, 0, 0, 2, 0, 0, 0, 1" />
+  </ifequal>
+  <extract name="row" type="vector3">
+    <input name="in" type="matrix33" value="1, 2, 3, 4, 5, 6, 7, 8, 9" />
+    <input name="index" type="integer" value="0" />
+  </extract>
+  <subtract name="zero_row" type="matrix33">
+    <input name="in1" type="matrix33" nodename="sel" />
+    <input name="in2" type="matrix33" value="2, 0, 0, 0, 0, 0, 0, 0, 1" />
+  </subtract>
+  <extract name="row4" type="vector4">
+    <input name="in" type="matrix44" value="1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 1" />
+    <input name="index" type="integer" value="1" />
+  </extract>
+  <constant name="identity" type="matrix44">
+    <input name="value" type="matrix44" value="1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1" />
+  </constant>
+</materialx>
