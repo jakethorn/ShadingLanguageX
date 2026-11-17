@@ -41,6 +41,8 @@ namespace mxslc::decompile_utils
     optional<ExpressionCode> format_value(const mx::ValuePtr& value);
     // the value of an input, output or parameter, which can also be the default of its type, e.g., `default(surfaceshader)`
     optional<ExpressionCode> format_value(const mx::ValueElementPtr& element);
+    // the defaultgeomprop of a node def or node graph input, e.g., `geomprop(UV0)`, or nothing if it has none
+    optional<ExpressionCode> format_default_geomprop(const mx::InputPtr& input);
 
     // the fields of structs without names are indexed, e.g., the 0 of out__0
     bool is_index(const string& field_name);
