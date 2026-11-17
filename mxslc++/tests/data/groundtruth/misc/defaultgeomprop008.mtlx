@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_quantize" node="quantize">
+    <output name="out" type="vector2" />
+    <input name="scale" type="float" value="0" />
+    <input name="uv" type="vector2" defaultgeomprop="UV0" />
+  </nodedef>
+  <nodegraph name="NG_quantize" nodedef="ND_quantize">
+    <multiply name="var__0" type="vector2">
+      <input name="in1" type="vector2" interfacename="uv" />
+      <input name="in2" type="float" interfacename="scale" />
+    </multiply>
+    <floor name="var__1" type="vector2">
+      <input name="in" type="vector2" nodename="var__0" />
+    </floor>
+    <divide name="var__2" type="vector2">
+      <input name="in1" type="vector2" nodename="var__1" />
+      <input name="in2" type="float" interfacename="scale" />
+    </divide>
+    <output name="out" type="vector2" nodename="var__2" />
+  </nodegraph>
+  <quantize name="a" type="vector2">
+    <input name="scale" type="float" value="1" />
+  </quantize>
+</materialx>

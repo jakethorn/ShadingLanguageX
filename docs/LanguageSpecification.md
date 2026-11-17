@@ -34,9 +34,10 @@
 26. [Attributes](#attributes)
 27. [Null Expression](#null-expression)
 28. [Default Expression](#default-expression)
-29. [Standard Library](#standard-library)
-30. [Scope](#scope)
-31. [Preprocessor Directives](#preprocessor-directives)
+29. [Geomprop Expression](#geomprop-expression)
+30. [Standard Library](#standard-library)
+31. [Scope](#scope)
+32. [Preprocessor Directives](#preprocessor-directives)
 
 # Introduction
 
@@ -360,6 +361,7 @@ in its own section. The following table gives a quick overview of all the expres
 | Unnamed Constructor Call        | `{a, b, c}`                   |
 | Range Operator                  | `0:3`                         |
 | Variable Declaration Expression | `foo(out float out_arg)`      |
+| Geomprop Expression         | `geomprop(Pobject)`          |
 | This                            | `this`                        |
 | Null                            | `null`                        |
 | Default                         | `default`                     |
@@ -2538,11 +2540,77 @@ Default expressions evaluate to the default value of the inferred or specified t
 float f = default;      // f = 0.0 (float type inferred)
 bool b = default(bool); // b = false (bool type specified)
 
+// function will return the default value for its template type
 T foo<bool, float, color3, filename, volumeshader>()
 {
     return default(T);
 }
+
+volumeshader v = foo();
 ```
+
+| Data Type            | Default Value                        |
+|----------------------|------------------------------- |
+| `boolean`            | `false`             |
+| `integer`            | `0`                          |
+| `float`              | `0.0`                         |
+| `vector2`            | `vector2{0.0, 0.0}`           |
+| `vector3`            | `vector3{0.0, 0.0, 0.0}`      |
+| `vector4`            | `vector4{0.0, 0.0, 0.0, 0.0}` |
+| `color3`             | `color3{0.0, 0.0, 0.0}`       |
+| `color4`             | `color4{0.0, 0.0, 0.0, 0.0}`  |
+| `matrix33`           | 3x3 identity matrix                |
+| `matrix44`           | 4x4 identity matrix              |
+| `string`             | `""`                   |
+| `filename`           | `""`    |
+| `surfaceshader`      | `""`       |
+| `displacementshader` | `""`       |
+| `volumeshader`       | `""`       |
+| `lightshader`        | `""`       |
+| `material`           | `""`        |
+| `BSDF`               | `""`        |
+| `EDF`                | `""`       |
+| `VDF`                | `""`       |
+
+# Geomprop Expression
+
+Geomprop expressions allow you to add the `defaultgeomprop="..."` attribute to NodeDef/NodeGraph inputs.
+
+```
+                           v v v v v v v v v v v v
+vec2 quantize(float scale, vec2 uv = geomprop(UV0))
+{
+    return floor(uv * scale) / scale;
+}
+```
+
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_quantize" node="quantize">
+    <output name="out" type="vector2" />
+    <input name="scale" type="float" value="0" />
+                                    v v v v v v v v v v v
+    <input name="uv" type="vector2" defaultgeomprop="UV0" />
+  </nodedef>
+  <nodegraph name="NG_quantize" nodedef="ND_quantize">
+    <multiply name="var__0" type="vector2">
+      <input name="in1" type="vector2" interfacename="uv" />
+      <input name="in2" type="float" interfacename="scale" />
+    </multiply>
+    <floor name="var__1" type="vector2">
+      <input name="in" type="vector2" nodename="var__0" />
+    </floor>
+    <divide name="var__2" type="vector2">
+      <input name="in1" type="vector2" nodename="var__1" />
+      <input name="in2" type="float" interfacename="scale" />
+    </divide>
+    <output name="out" type="vector2" nodename="var__2" />
+  </nodegraph>
+</materialx>
+```
+
+Note that either of the following syntax is accepted: `geomprop(UV0)` or `geomprop("UV0")`.
 
 # Standard Library
 

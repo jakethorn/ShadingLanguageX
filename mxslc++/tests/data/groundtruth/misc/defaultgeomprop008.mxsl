@@ -1,0 +1,6 @@
+vec2 quantize(float scale, vec2 uv = geomprop(UV0))
+{
+    return floor(uv * scale) / scale;
+}
+
+vec2 a = quantize(1);

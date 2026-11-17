@@ -1,0 +1,10 @@
+vec3 foo(vec3 a = geomprop("Pobject"), vec2 b = geomprop("UV0"))
+{
+    return a + vec3{b, 0};
+}
+
+foo();
+foo(vec3{});
+foo(constant());
+foo(vec3{}, vec2{});
+foo(constant(), constant());

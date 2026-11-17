@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+    <geompropdef name="UV1" type="vector2" geomprop="texcoord" index="1" />
+</materialx>

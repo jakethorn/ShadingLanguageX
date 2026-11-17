@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="vector3" />
+    <input name="a" type="vector3" defaultgeomprop="Pobject" />
+    <input name="b" type="vector3" defaultgeomprop="Pobject" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <add name="var__0" type="vector3">
+      <input name="in1" type="vector3" interfacename="a" />
+      <input name="in2" type="vector3" interfacename="b" />
+    </add>
+    <output name="out" type="vector3" nodename="var__0" />
+  </nodegraph>
+  <foo name="var__0" type="vector3" />
+  <position name="var__1" type="vector3">
+    <input name="space" type="string" value="world" />
+  </position>
+  <position name="var__2" type="vector3">
+    <input name="space" type="string" value="model" />
+  </position>
+  <foo name="var__3" type="vector3">
+    <input name="a" type="vector3" nodename="var__1" />
+    <input name="b" type="vector3" nodename="var__2" />
+  </foo>
+</materialx>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_foo" node="foo">
+    <output name="out" type="vector2" />
+    <input name="uv" type="vector2" defaultgeomprop="UV1" />
+  </nodedef>
+  <nodegraph name="NG_foo" nodedef="ND_foo">
+    <output name="out" type="vector2" nodename="node1" />
+    <dot name="node1" type="vector2">
+      <input name="in" type="vector2" interfacename="uv" />
+    </dot>
+  </nodegraph>
+</materialx>

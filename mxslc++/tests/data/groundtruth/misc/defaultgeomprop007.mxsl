@@ -1,0 +1,6 @@
+#library "../../includes/geompropdef_lib.mtlx"
+
+vec2 foo(vec2 uv = geomprop(UV1))
+{
+    return uv;
+}

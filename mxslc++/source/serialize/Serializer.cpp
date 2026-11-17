@@ -164,11 +164,12 @@ namespace mxslc::serialize
         {
             const Argument* arg = args[param];
 
-            if (arg == nullptr and
-                input_value->is_compile_time() and
-                input_value->equals(param.initial_value()))
+            if (arg == nullptr)
             {
-                continue;
+                const bool is_compile_time = input_value->is_compile_time() and input_value->equals(param.initial_value());
+                const bool is_default_geomprop = input_value->is_default_geomprop();
+                if (is_compile_time or is_default_geomprop)
+                    continue;
             }
 
             AttributeList input_attrs = arg != nullptr ? arg->attributes() : AttributeList{};

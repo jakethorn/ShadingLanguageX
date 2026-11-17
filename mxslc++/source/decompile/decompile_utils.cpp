@@ -240,6 +240,17 @@ namespace mxslc::decompile_utils
         return format_value(element->getValue());
     }
 
+    optional<ExpressionCode> format_default_geomprop(const mx::InputPtr& input)
+    {
+        if (not input->hasDefaultGeomPropString())
+            return std::nullopt;
+
+        // names that are not identifiers are written as strings, e.g., `geomprop("uv-1")`
+        const string& name = input->getDefaultGeomPropString();
+        const string arg = is_valid_identifier(name) ? name : "\"" + name + "\"";
+        return decompile::format_function_call("geomprop", "", {arg});
+    }
+
     bool is_index(const string& field_name)
     {
         return not field_name.empty() and std::all_of(field_name.begin(), field_name.end(), [](const char c) { return std::isdigit(static_cast<unsigned char>(c)); });

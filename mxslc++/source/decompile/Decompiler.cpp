@@ -341,8 +341,9 @@ namespace mxslc::decompile
     {
         if (not is_document_node_def(node_def))
             return false;
+        // parameters with a defaultgeomprop are declared with it, so they are optional even if the input has a value
         const mx::InputPtr input = node_def->getActiveInput(input_name);
-        return input and has_literal_syntax(input->getType()) and input->hasValue() and is_zero_value(input);
+        return input and not input->hasDefaultGeomPropString() and has_literal_syntax(input->getType()) and input->hasValue() and is_zero_value(input);
     }
 
     bool Decompiler::is_assigned_by_function(const string& variable) const
@@ -582,9 +583,12 @@ namespace mxslc::decompile
             // ref parameters are both an input and an out parameter output
             const bool is_ref = node_def->getActiveOutput(with_prefix(OUT_PARAMETER_PREFIX, input->getName())) != nullptr;
 
+            // a defaultgeomprop is used instead of the value of the input, as in MaterialX
             optional<SourceCode> default_value;
             if (is_ref)
                 default_value = std::nullopt;
+            else if (const optional<ExpressionCode> geomprop = format_default_geomprop(input))
+                default_value = geomprop->code;
             else if (not has_literal_syntax(input->getType()) or not input->hasValue())
                 default_value = "null";
             else if (not is_zero_value(input))
@@ -643,7 +647,9 @@ namespace mxslc::decompile
         vector<SourceCode> params;
         for (const mx::InputPtr& input : node_graph->getInputs())
         {
-            const optional<ExpressionCode> default_value = graph_decompiler_.create_port_expression(input);
+            optional<ExpressionCode> default_value = format_default_geomprop(input);
+            if (not default_value)
+                default_value = graph_decompiler_.create_port_expression(input);
             const SourceCode value = default_value ? default_value->code : "null";
             params.push_back(format_parameter(get_user_attributes(input), "", get_type_alias(input->getType()), make_identifier(input->getName()), value));
         }
