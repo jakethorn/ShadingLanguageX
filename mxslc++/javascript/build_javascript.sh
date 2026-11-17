@@ -85,6 +85,12 @@ emcmake cmake -S "$MATERIALX_ROOT" -B "$BUILD_DIR/materialx" \
     -G Ninja
 cmake --build "$BUILD_DIR/materialx" --target install --config Release --parallel
 
+echo "--------------------- Install JavaScript Dependencies ---------------------"
+# Provides tsc, which Emscripten needs to generate JsMxslc.d.ts.
+cd "$ROOT_DIR/javascript"
+npm install || echo "Warning: npm install reported issues"
+export PATH="$ROOT_DIR/javascript/node_modules/.bin:$PATH"
+
 echo "--------------------- Build mxslc JavaScript ---------------------"
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR/mxslc" \
     -DCMAKE_BUILD_TYPE=Release \
@@ -93,10 +99,6 @@ cmake -S "$ROOT_DIR" -B "$BUILD_DIR/mxslc" \
     -DMTLX_ROOT="$MTLX_INSTALL" \
     -G Ninja
 cmake --build "$BUILD_DIR/mxslc" --target JsMxslc --config Release --parallel
-
-echo "--------------------- Install JavaScript Dependencies ---------------------"
-cd "$ROOT_DIR/javascript"
-npm install || echo "Warning: npm install reported issues"
 
 echo "--------------------- Install Test Dependencies ---------------------"
 cd "$ROOT_DIR/javascript/tests"
@@ -129,4 +131,5 @@ echo "The WebAssembly module was written to:"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.js"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.wasm"
 echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.data"
+echo "  $BUILD_DIR/mxslc/javascript/bin/JsMxslc.d.ts"
 echo "Browser app can be found here: $BROWSER_DIR/index.html (run 'node serve.js' from $BROWSER_DIR)"

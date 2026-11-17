@@ -13,6 +13,16 @@ set(JS_LINK_FLAGS " -s WASM=1 \
     --preload-file ${PROJECT_SOURCE_DIR}/libraries@libraries \
     --bind ")
 
+# TypeScript declarations (bin/JsMxslc.d.ts) generated from the embind
+# bindings. Emscripten needs tsc on the PATH for this; build_javascript.sh
+# provides it from this folder's node_modules (npm install).
+find_program(TSC_EXECUTABLE tsc)
+if (TSC_EXECUTABLE)
+    string(APPEND JS_LINK_FLAGS " --emit-tsd JsMxslc.d.ts ")
+else()
+    message(WARNING "JS: tsc not found on the PATH, JsMxslc.d.ts will not be generated. Run 'npm install' in javascript/ and add javascript/node_modules/.bin to the PATH.")
+endif()
+
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     message(STATUS "JS: Building Debug")
     string(APPEND JS_LINK_FLAGS " -s ASSERTIONS=1 ")

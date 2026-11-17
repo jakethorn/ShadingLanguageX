@@ -27,6 +27,7 @@ mxslcxx = "mxslc.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/jakethorn/ShadingLanguageX"
+Documentation = "https://jakethorn.github.io/ShadingLanguageX/"
 Repository = "https://github.com/jakethorn/ShadingLanguageX"
 Issues = "https://github.com/jakethorn/ShadingLanguageX/issues"
 

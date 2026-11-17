@@ -11,19 +11,23 @@ name: Build JavaScript (WASM)
 #   * Any manual dispatch
 #
 # Build + deploy to GitHub Pages:
-#   * Push/merge to main
+#   * Publishing a GitHub release (through release-js.yml, see below)
 #   * Manual dispatch with "Deploy to GitHub Pages" enabled
 #
 # Manual test-deploy:
 #   gh workflow run build-js.yml --ref <branch> -f deploy=true
 #
 #  Note: a manual test-deploy publishes that branch's build to Pages and
-#  overwrites the live site until the next merge to `main`.
+#  overwrites the live site until the next release.
 #
-# Build only (called from another workflow):
+# Called from another workflow:
 #   * release-js.yml calls this workflow to build the release artifacts.
-#     The deploy job never runs in that case: github.event_name is the
-#     caller's event (e.g. 'release'), which the deploy condition rejects.
+#     github.event_name is then the caller's event: 'release' for a
+#     published release, which deploys the site, or 'workflow_dispatch' for
+#     a manual run of release-js.yml, which doesn't.
+#
+# The Pages site is the documentation (Sphinx, see docs/site/build.py), with
+# the browser compiler at /compiler/.
 # ============================================================================
 
 on:
@@ -33,7 +37,7 @@ on:
       - synchronize
       - reopened
 
-  # A merge into main to create a deployment.
+  # A merge into main, to validate the build.
   push:
     branches:
       - main
@@ -150,21 +154,34 @@ jobs:
             mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.js
             mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.wasm
             mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.data
+            mxslc++/javascript/build/mxslc/javascript/bin/JsMxslc.d.ts
           if-no-files-found: error
 
-      - name: Upload Pages artifact
-        # Upload browser app for GitHub Pages. 
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: mxslc++/javascript/browser
-
-      # Build, test and package the VS Code extension with the WebAssembly
-      # compiler built above. Allowed to fail without failing the build.
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: docs/site/requirements.txt
 
+      - name: Build the documentation site
+        # Sphinx builds the docs with the C++ (Doxygen), Python (stubs) and
+        # JavaScript (JsMxslc.d.ts, built above) API references, and copies
+        # the browser compiler built above to /compiler/. Any warning, e.g. a
+        # broken link or a missing image, fails the build.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+          python -m pip install -r docs/site/requirements.txt
+          python docs/site/build.py -W --keep-going
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/site/_build/html
+
+      # Build, test and package the VS Code extension with the WebAssembly
+      # compiler built above. Allowed to fail without failing the build.
       - name: Generate the VS Code extension and bundle the compiler
         continue-on-error: true
         run: python tools/vscode_extension/gen_extension.py --generate --converter
@@ -194,20 +211,19 @@ jobs:
           if-no-files-found: warn
 
   deploy:
-    name: Deploy browser app to GitHub Pages
+    name: Deploy site to GitHub Pages
     needs: build_js
     runs-on: ubuntu-latest
 
     # Deploy when:
     #
-    #   1. The workflow was triggered by a push to main.
-    #      This includes the push created by merging a PR.
+    #   1. A GitHub release was published, so the site matches the released
+    #      packages. release-js.yml calls this workflow with its event.
     #
     #   2. The workflow was manually dispatched with deploy=true.
     #
     if: >
-      (github.event_name == 'push' &&
-       github.ref == 'refs/heads/main') ||
+      github.event_name == 'release' ||
       (github.event_name == 'workflow_dispatch' &&
        inputs.deploy == true)
 

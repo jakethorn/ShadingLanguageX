@@ -14,11 +14,13 @@ name: Release JavaScript (WASM)
 # 1. Calls build-js.yml on the release tag. That builds MaterialX and the
 #    JsMxslc module with Emscripten, runs the Playwright unit tests, and
 #    uploads the WASM, GitHub Pages and VS Code extension artifacts. Nothing
-#    is released unless that build and its tests pass.
+#    is released unless that build and its tests pass. For a published
+#    release, it also deploys the GitHub Pages site.
 # 2. Downloads those artifacts, repackages them, and uploads them to the
 #    release as:
-#      * mxslc_JsMxslc_package.zip  - JsMxslc.js/.wasm/.data + LICENSE
-#      * mxslc_github_pages.zip     - the self-contained browser app
+#      * mxslc_JsMxslc_package.zip  - JsMxslc.js/.wasm/.data/.d.ts + LICENSE
+#      * mxslc_github_pages.zip     - the site: documentation, and the
+#                                     browser compiler in compiler/
 #      * slx-<version>.vsix         - the VS Code extension, as built (skipped
 #                                     with a warning if the optional extension
 #                                     build failed)
@@ -51,8 +53,8 @@ jobs:
     with:
       ref: refs/tags/${{ github.event.release.tag_name || inputs.tag }}
     # A called workflow can't be granted less than it declares, and
-    # build-js.yml declares pages/id-token for its deploy job (which is
-    # skipped here, since the event isn't a push to main).
+    # build-js.yml declares pages/id-token for its deploy job (which runs
+    # for a published release, and is skipped for a manual run).
     permissions:
       contents: read
       pages: write
@@ -96,10 +98,11 @@ jobs:
             artifacts/mxslc-js/JsMxslc.js \
             artifacts/mxslc-js/JsMxslc.wasm \
             artifacts/mxslc-js/JsMxslc.data \
+            artifacts/mxslc-js/JsMxslc.d.ts \
             LICENSE
 
           # upload-pages-artifact stores the site as artifact.tar; unpack it
-          # so the release zip holds the browser app itself.
+          # so the release zip holds the site itself.
           mkdir -p site
           tar -xf artifacts/github-pages/artifact.tar -C site
           (cd site && zip -r ../dist/mxslc_github_pages.zip .)
