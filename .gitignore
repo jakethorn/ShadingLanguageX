@@ -1,8 +1,4 @@
 # MXSL
-mxslc/examples/
-mxslc/LICENSE
-mxslc/pyproject.toml
-mxslc/notes.txt
 mxslc++/examples/
 mxslc++/tests/gtest_lib/
 mxslc++/main.rsp
@@ -11,7 +7,8 @@ mxslc++/rsp_reduce.py
 mxslc++/rsp_decomp.py
 mxslc++/todo.txt
 mxslc++/notes.txt
-mxslc++/build_python.sh
+mxslc++/local_build_python.sh
+mxslc++/javascript/local_build_javascript.sh
 mxslc++/build_python.ps1
 
 # Byte-compiled / optimized / DLL files
@@ -86,6 +83,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/site/_build/
 
 # PyBuilder
 .pybuilder/
