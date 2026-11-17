@@ -2,3 +2,6 @@ vec3 foo(vec3 a = geomprop(Tworld))
 {
     return a;
 }
+
+foo();
+foo(tangent("object"));

@@ -65,6 +65,7 @@ namespace mxslc::runtime
         template<typename T>
         bool is_compile_time() const { return is_compile_time() and has_value() and compile_time_value().is_a<T>(); }
         bool is_compile_time() const;
+        bool is_default_geomprop() const;
 
         template<typename T>
         T compile_time_value() const { return compile_time_value().as<T>(); }

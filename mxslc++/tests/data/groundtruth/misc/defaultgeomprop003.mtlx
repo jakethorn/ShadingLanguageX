@@ -12,4 +12,15 @@
     </add>
     <output name="out" type="vector3" nodename="var__0" />
   </nodegraph>
+  <foo name="var__0" type="vector3" />
+  <position name="var__1" type="vector3">
+    <input name="space" type="string" value="world" />
+  </position>
+  <position name="var__2" type="vector3">
+    <input name="space" type="string" value="model" />
+  </position>
+  <foo name="var__3" type="vector3">
+    <input name="a" type="vector3" nodename="var__1" />
+    <input name="b" type="vector3" nodename="var__2" />
+  </foo>
 </materialx>

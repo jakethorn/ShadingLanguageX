@@ -35,9 +35,9 @@
 27. [Null Expression](#null-expression)
 28. [Default Expression](#default-expression)
 29. [Geomprop Expression](#geomprop-expression)
-29. [Standard Library](#standard-library)
-30. [Scope](#scope)
-31. [Preprocessor Directives](#preprocessor-directives)
+30. [Standard Library](#standard-library)
+31. [Scope](#scope)
+32. [Preprocessor Directives](#preprocessor-directives)
 
 # Introduction
 
@@ -361,7 +361,7 @@ in its own section. The following table gives a quick overview of all the expres
 | Unnamed Constructor Call        | `{a, b, c}`                   |
 | Range Operator                  | `0:3`                         |
 | Variable Declaration Expression | `foo(out float out_arg)`      |
-| Geomprop Expression         | `geomprop(Pobject)`              |
+| Geomprop Expression         | `geomprop(Pobject)`          |
 | This                            | `this`                        |
 | Null                            | `null`                        |
 | Default                         | `default`                     |

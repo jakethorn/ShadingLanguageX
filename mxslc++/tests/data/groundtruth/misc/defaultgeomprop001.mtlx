@@ -10,4 +10,11 @@
       <input name="in" type="vector3" interfacename="a" />
     </dot>
   </nodegraph>
+  <foo name="var__0" type="vector3" />
+  <tangent name="var__1" type="vector3">
+    <input name="space" type="string" value="object" />
+  </tangent>
+  <foo name="var__2" type="vector3">
+    <input name="a" type="vector3" nodename="var__1" />
+  </foo>
 </materialx>

@@ -2,3 +2,6 @@ vec3 foo(vec3 a = geomprop("Pobject"), vec3 b = geomprop(Pobject))
 {
     return a + b;
 }
+
+foo();
+foo(position("world"), position("model"));

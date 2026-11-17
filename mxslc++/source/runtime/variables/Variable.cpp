@@ -16,6 +16,7 @@
 #include "serialize/name_prefix_utils.h"
 #include "serialize/values/CompileTimeValue.h"
 #include "serialize/values/NullValue.h"
+#include "serialize/values/DefaultGeomPropValue.h"
 
 namespace mxslc::runtime
 {
@@ -292,6 +293,11 @@ namespace mxslc::runtime
             }
             return true;
         }
+    }
+
+    bool Variable::is_default_geomprop() const
+    {
+        return has_value() and cast_value<DefaultGeomPropValue>(value_impl()) != nullptr;
     }
 
     Primitive Variable::compile_time_value() const

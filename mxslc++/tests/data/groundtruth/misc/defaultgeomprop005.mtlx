@@ -7,4 +7,7 @@
       <input name="in" type="vector3" interfacename="a" />
     </dot>
   </nodegraph>
+  <constant name="var__0" type="vector3">
+    <input name="value" type="vector3" nodegraph="NG_foo" />
+  </constant>
 </materialx>
