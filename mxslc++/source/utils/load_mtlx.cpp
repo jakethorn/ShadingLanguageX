@@ -150,6 +150,10 @@ namespace mxslc
 
     void add_library_to_scope(const mx::DocumentPtr& doc)
     {
+        // add library defs to working document
+        Runtime::get().serializer().document()->setDataLibrary(doc);
+
+        // add library defs to runtime scope
         Scope& scope = Runtime::get().scope();
 
         for (const mx::TypeDefPtr& td : doc->getTypeDefs())

@@ -103,7 +103,6 @@ namespace mxslc::runtime
     void Runtime::add_materialx_library()
     {
         mtlx_lib_ = load_materialx_library(opts_.version, opts_.search_directories());
-        serializer_.document()->setDataLibrary(mtlx_lib_);
         add_library_to_scope(mtlx_lib_);
 
         Logger::debug("Loaded MaterialX version " + opts_.version + " libraries.");

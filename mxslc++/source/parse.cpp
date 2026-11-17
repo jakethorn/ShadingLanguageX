@@ -485,7 +485,7 @@ namespace mxslc
         return mods;
     }
 
-    // the same as modifiers(), but without default and comptime so it doesn't clash with default and comptime expressions
+    // the same as modifiers(), but without default, comptime, geomprop
     ModifierList Parser::argument_modifiers()
     {
         auto modifiers_ = [this]() -> ModifierList {
@@ -495,7 +495,6 @@ namespace mxslc
                 TokenType::Const,
                 TokenType::Mutable,
                 TokenType::Global,
-                TokenType::Geomprop,
                 TokenType::Nodegraph,
                 TokenType::Nodedef,
                 TokenType::Inline,
