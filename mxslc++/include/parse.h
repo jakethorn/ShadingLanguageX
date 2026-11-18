@@ -76,6 +76,7 @@ namespace mxslc
         ExprPtr unnamed_constructor();
         ExprPtr variable_definition_argument(ModifierList mods);
         ExprPtr typeof_operator();
+        ExprPtr node_expression();
 
         Argument argument(size_t i);
         SwitchCase switch_case();

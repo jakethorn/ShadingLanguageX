@@ -34,3 +34,7 @@ scope002
 # library directives cannot be decompiled
 load_lib001
 defaultgeomprop007
+
+# node expressions dont have a decompile target
+node_expr001
+node_expr005

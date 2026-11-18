@@ -1,0 +1,1 @@
+comptime011.mxsl, line 1: Comptime expressions evaluated to a variable of type integer, not float

@@ -349,18 +349,26 @@ inline boolean __le__<integer, float>(T value1, T value2)
 
 inline boolean __and__(boolean in1, boolean in2)
 {
-    return and(in1, in2);
+    // use node expression to avoid infinite recursion
+    return node and(in1=in1, in2=in2);
 }
 
 inline boolean __or__(boolean in1, boolean in2)
 {
-    return or(in1, in2);
+    // use node expression to avoid infinite recursion
+    return node or(in1=in1, in2=in2);
+}
+
+inline boolean __xor__(boolean in1, boolean in2)
+{
+    // use node expression to avoid infinite recursion
+    return node xor(in1=in1, in2=in2);
 }
 
 // pow and xor use the same symbol '^'
 inline boolean __pow__(boolean in1, boolean in2)
 {
-    return xor(in1, in2);
+    return in1 xor in2;
 }
 
 //
@@ -384,7 +392,8 @@ comptime integer __neg__(integer in1)
 
 inline boolean __not__(boolean in1)
 {
-    return not(in1);
+    // use node expression to avoid infinite recursion
+    return node not(in=in1);
 }
 
 inline integer __inc__(integer in1)
@@ -526,7 +535,7 @@ comptime boolean __boolean__(integer in1)
 
 comptime boolean __boolean__(float in1)
 {
-    return not(ifequal(in1, 0.0));
+    return not ifequal(in1, 0.0);
 }
 
 comptime integer __integer__()

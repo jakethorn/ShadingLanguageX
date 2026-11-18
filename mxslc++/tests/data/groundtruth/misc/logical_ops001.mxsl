@@ -1,0 +1,11 @@
+bool a1 = true and false;
+bool b1 = (0.5 < randomfloat()) and geompropvalue<bool>("x");
+
+bool a2 = true or false;
+bool b2 = (0.5 < randomfloat()) or geompropvalue<bool>("x");
+
+bool a3 = true xor false;
+bool b3 = (0.5 < randomfloat()) xor geompropvalue<bool>("x");
+
+bool a4 = not true;
+bool b4 = not (randomfloat() < 0.5);

@@ -61,7 +61,7 @@ namespace mxslc
         vector<Token> consume_until(const Args&... types)
         {
             vector<Token> tokens;
-            while ((... || (peek() != types)))
+            while (not (... || (peek() == types)))
             {
                 tokens.push_back(consume());
             }

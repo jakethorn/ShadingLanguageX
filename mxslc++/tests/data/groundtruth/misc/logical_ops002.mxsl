@@ -1,0 +1,5 @@
+float a1 = |float{true and false}|;
+float a2 = |float{true or false}|;
+float a3 = |float{true xor false}|;
+float a4 = |float{true & false}|;
+float a5 = |float{true ^ false}|;

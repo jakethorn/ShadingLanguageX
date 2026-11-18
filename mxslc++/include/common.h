@@ -75,6 +75,9 @@ namespace mxslc
 
         class Parameter;
         using ParameterValues = vector<std::pair<const Parameter&, VarPtr>>;
+
+        class Argument;
+        using ArgumentValues = vector<std::pair<const Argument&, VarPtr>>;
     }
 
     namespace serialize::values

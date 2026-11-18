@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <and name="var__0" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </and>
+  <convert name="var__1" type="float">
+    <input name="in" type="boolean" nodename="var__0" />
+  </convert>
+  <absval name="a1" type="float">
+    <input name="in" type="float" nodename="var__1" />
+  </absval>
+  <or name="var__2" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </or>
+  <convert name="var__3" type="float">
+    <input name="in" type="boolean" nodename="var__2" />
+  </convert>
+  <absval name="a2" type="float">
+    <input name="in" type="float" nodename="var__3" />
+  </absval>
+  <xor name="var__4" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </xor>
+  <convert name="var__5" type="float">
+    <input name="in" type="boolean" nodename="var__4" />
+  </convert>
+  <absval name="a3" type="float">
+    <input name="in" type="float" nodename="var__5" />
+  </absval>
+  <and name="var__6" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </and>
+  <convert name="var__7" type="float">
+    <input name="in" type="boolean" nodename="var__6" />
+  </convert>
+  <absval name="a4" type="float">
+    <input name="in" type="float" nodename="var__7" />
+  </absval>
+  <xor name="var__8" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </xor>
+  <convert name="var__9" type="float">
+    <input name="in" type="boolean" nodename="var__8" />
+  </convert>
+  <absval name="a5" type="float">
+    <input name="in" type="float" nodename="var__9" />
+  </absval>
+</materialx>

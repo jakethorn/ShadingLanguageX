@@ -85,6 +85,7 @@ namespace mxslc
             Inline,
             Default,
             Comptime,
+            Node,
             Using,
             Class,
             This,
@@ -96,6 +97,10 @@ namespace mxslc
             Break,
             Switch,
             Case,
+            And,
+            Or,
+            Xor,
+            Not,
 
             // Dynamic
             Identifier,
@@ -123,8 +128,8 @@ namespace mxslc
 
         inline static const unordered_set Keywords {
             If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Nodegraph, Nodedef,
-            Inline, Default, Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break,
-            Switch, Case
+            Inline, Default, Comptime, Node, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break,
+            Switch, Case, And, Or, Xor, Not
         };
 
     private:
@@ -170,6 +175,7 @@ namespace mxslc
             {"inline", Inline},
             {"default", Default},
             {"comptime", Comptime},
+            {"node", Node},
             {"using", Using},
             {"class", Class},
             {"this", This},
@@ -181,6 +187,10 @@ namespace mxslc
             {"break", Break},
             {"switch", Switch},
             {"case", Case},
+            {"and", And},
+            {"or", Or},
+            {"xor", Xor},
+            {"not", Not},
             {"<bool>", Bool},
             {"<int>", Int},
             {"<float>", Float},
