@@ -35,9 +35,10 @@
 27. [Null Expression](#null-expression)
 28. [Default Expression](#default-expression)
 29. [Geomprop Expression](#geomprop-expression)
-30. [Standard Library](#standard-library)
-31. [Scope](#scope)
-32. [Preprocessor Directives](#preprocessor-directives)
+30. [Node Expression](#node-expression)
+31. [Standard Library](#standard-library)
+32. [Scope](#scope)
+33. [Preprocessor Directives](#preprocessor-directives)
 
 # Introduction
 
@@ -430,30 +431,33 @@ The following identifiers have a special meaning in ShadingLanguageX and cannot 
 
 `if` `else` `switch` `case` `for` `from` `to` `return` `true` `false` `void` `null` `T` `auto` `out` `ref` `inline` `const` `mutable` 
 `global` `default` `using` `class` `this` `print` `typeof` `break` `comptime` `nodegraph` `nodedef` `geomprop`
-`uniform` `varying` `namespace` `consteval`
+`uniform` `node` `and` `or` `xor` `not`
+
+### Note
+
+ShadingLanguageX is an evolving language. Keywords might be added in each update which might cause shaders to break which
+were previously working correctly. In general, try not to use identifiers that are popular keywords in similar
+languages (e.g., `namespace` `struct` `in`) or a term that is prominently used in the MaterialX specification (e.g., `input` `output` `varying`).
 
 # Modifiers
 
 Variables, functions and expressions can be prefixed with modifiers. For example:
 
 ```
+// const modifier
 const float PI = 3.14;
 
+// inline modifier
 inline float get_area(float r) 
 { 
     return PI * r ^ 2; 
 }
 
+// comptime modifier
 float area = comptime get_area(10);
 ```
 
 Modifiers can also optionally be surrounded by double square brackets, e.g., `[[inline]]` or `[[comptime]]`.
-
-### Note
-
-ShadingLanguageX is an evolving language. Keywords might be added in each update which might cause shaders to break which
-were previously working correctly. In general, try not to use identifiers that are popular keywords in similar
-languages (e.g., `namespace` `struct` `in`) or a term that is prominently used in the MaterialX specification (e.g., `node` `uniform` `varying`).
 
 # Whitespace
 
@@ -507,13 +511,17 @@ comment
 | `a == b`  | `ifequal`         |
 | `a != b`  | `ifequal`+`not`   |
 | `a & b`   | `and`             |
+| `a and b`   | `and`             |
 | `a \| b`  | `or`              |
+| `a or b`  | `or`              |
+| `a xor b`  | `xor`              |
 
 ## Unary Operators
 
 | Operation | MaterialX Node(s) |
 |-----------|-------------------|
 | `!a`      | `not`             |
+| `not a`      | `not`             |
 | `-a`      | `invert`          |
 | `+a`      |                   |
 
@@ -808,14 +816,14 @@ float c = a + b;
 | `a.b` `a[b]`                                                             |
 | `a++` `a--` `++a` `--a`                                                  |
 | `a += b` `a -= b` `a *= b` `a /= b` `a ^= b` `a %= b` `a &= b` `a \|= b` |
-| `-a` `+a` `!a`                                                           |
+| `-a` `+a` `!a` `not a`                                                           |
 | `a ^ b`                                                                  |
 | `a * b` `a / b` `a % b`                                                  |
 | `a + b` `a - b`                                                          |
 | `a:b` `a:b:c` `a to b`                                                   |
 | `a > b` `a >= b` `a < b` `a <= b`                                        |
 | `a == b` `a != b`                                                        |
-| `a & b` `a \| b`                                                         |
+| `a & b` `a and b` `a \| b` `a or b` `a xor b`                   |
 
 When two operators with equal precedence are used, the leftmost operator will evaluate first.  
 As shown in the table above, precedence can be controlled using the grouping operator `(a)`. For example, in the expression
@@ -2611,6 +2619,58 @@ vec2 quantize(float scale, vec2 uv = geomprop(UV0))
 ```
 
 Note that either of the following syntax is accepted: `geomprop(UV0)` or `geomprop("UV0")`.
+
+# Node Expression
+
+Node expressions allow users to create custom node elements. They do not check for an associated NodeDef when creating the
+node element, and no type checking is performed. This can be useful when using non-standard nodes without needing to include the `.mtlx` 
+library.
+
+Node expressions look similar to function calls, with some differences:
+1. They start with the `node` keyword.
+2. The template type is the expressions return type.
+3. All arguments must be named.
+4. The name can contain the `:` character.
+
+### Example 1
+
+```
+color3 c = node ext:my_color3_node(gamma=2.2, space="sRGB");
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <my_color3_node name="c" type="color3">
+    <input name="gamma" type="float" value="2.2" />
+    <input name="space" type="string" value="sRGB" />
+  </my_color3_node>
+</materialx>
+```
+
+### Example 2
+
+```
+@doc "add 1 and 1"
+float a = node ext:my_add(in1=1.0, in2=1.0);
+
+auto b = node my_randompoint<vec3>();
+
+color3 c = randomcolor(seed = node my_seed());
+```
+```xml
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <ext:my_add name="a" type="float" doc="add 1 and 1">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </ext:my_add>
+  <my_randompoint name="b" type="vector3" />
+  <my_seed name="var__0" type="integer" />
+  <randomcolor name="c" type="color3">
+    <input name="seed" type="integer" nodename="var__0" />
+  </randomcolor>
+</materialx>
+```
 
 # Standard Library
 

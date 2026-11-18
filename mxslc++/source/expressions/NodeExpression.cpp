@@ -4,12 +4,10 @@
 
 #include "expressions/NodeExpression.h"
 
-#include "expressions/MethodCall.h"
-#include "expressions/ThisExpression.h"
 #include "expressions/interface.h"
-#include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/utils/monomorphize.h"
+#include "serialize/Serializer.h"
 
 namespace mxslc::expressions
 {
