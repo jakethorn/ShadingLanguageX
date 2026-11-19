@@ -3,7 +3,7 @@
 Every NodeDef in the target MaterialX data library (stdlib, pbrlib, bxdf, nprlib, lights, cmlib) is
 callable without any `#include`. The listing at the end was generated from the MaterialX **1.39.5**
 NodeDefs using the compiler's own mapping rules. Every line was compile-checked with both positional and
-named arguments.
+named arguments, except the uncallable nodes listed below.
 
 ## How NodeDefs become functions
 
@@ -25,8 +25,13 @@ named arguments.
   is marked `default`. That is how `randomfloat()` (float `in` rather than int) and `noise2d<color3>()`
   (vec3 amplitude rather than float) resolve.
 - `#version` changes the node set. For example, the deprecated `swizzle` node only exists in 1.38.
-- **Uncallable**: the compositing node `out(fg, bg, mix)` can't be called because `out` is an SLX
-  keyword. `switch(...)` works as a call as long as it isn't followed by `{`.
+- **Uncallable**: `and`, `or`, `xor`, `not` and the compositing node `out(fg, bg, mix)` can't be called
+  as functions, because their names are SLX keywords. Use the operators (`a and b`, `a or b`,
+  `a xor b`, `not a`), or a node expression such as `color4 c = node out(fg = a, bg = b, mix = 0.5);`.
+  `not(x)` compiles, but only as the operator applied to `(x)`, so `not(in = x)` doesn't.
+  `switch(...)` works as a call as long as it isn't followed by `{`.
+- **Nodes without a NodeDef**, such as renderer-specific nodes whose library isn't loaded, are made with
+  a node expression, `vec3 n = node karma:foo(in = v);` (see language.md §14).
 
 Listing notation:
 
@@ -57,7 +62,7 @@ Listing notation:
 | `vec3(a, b, c)`, `float(i)`, `vec3(1.0)` | `vec3{a, b, c}`, `float{i}`, `vec3{1.0}` |
 | `mat3(a, b, c)` | `mat3{a, b, c}` (`creatematrix`). Each `vec3` is one GLSL column (in genglsl). Identity is `default(mat3)` |
 | `c ? a : b` | `if (c) { a } else { b }` |
-| `&&`, `\|\|` | `&`, `\|` (same precedence, so parenthesise) |
+| `&&`, `\|\|`, `^^`, `!` | `and`, `or`, `xor`, `not` (or `&`, `\|`, `!`). The binary ones share one precedence level, so parenthesise |
 | `abs(x)` | `absval(x)` or `\|x\|` |
 | `pow(x, y)` | `power(x, y)` or `x ^ y` |
 | `mod(x, y)`, `fmod` | `modulo(x, y)` or `x % y` (float and vector only) |

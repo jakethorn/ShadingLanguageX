@@ -237,7 +237,12 @@ element depends on.
 | `Variable is not available at compile-time` | runtime value in an `if` statement, loop range or `comptime` context, or a non-inline function param used that way | if-expression, or `inline` function, or compile-time value |
 | `Cannot assign a non-compile-time value to a comptime variable` | node assigned to `comptime` var or param | remove `comptime` or pass a constant |
 | `Missing else branch in if-expression` | `T x = if (c) { a };` in a definition | add `else`, or define first then `x = if (c) { a };` |
-| `Unexpected token: &&` / `\|\|` / `Scanning error ... character: ?` | C operators | `&`, `\|`, if-expression |
+| `Unexpected token: &&` / `\|\|` / `Scanning error ... character: ?` | C operators | `and`, `or`, if-expression |
+| `Invalid expression` at `and(`, `or(` or `xor(` | these nodes are keywords, not functions | `a and b`, `a or b`, `a xor b` |
+| `Unexpected token: \|` inside `\|...\|` | the `\|` operator in an absolute value | `or`, or `absval(...)` |
+| `Node expression arguments must be named` | a positional argument in `node foo(...)` | `node foo(in = x)` |
+| `Ambiguously typed node expression` | a node expression in an untyped context | `node foo<float>(...)` or a typed destination |
+| `Node interface error: Input 'in1' doesn't match declaration`, then *mxslc produced an invalid MaterialX document* | a node expression whose category has NodeDefs, but none with these types | match the NodeDef's types (`1.0`, not `1`), or call the function |
 | `Unexpected token: =` in `for (int i = 0:3)` | old loop syntax | `for (int i from 0 to 3)` |
 | `Unexpected token: =` in a switch | `default=x` | `default: x` |
 | `Cannot assign an expression of type integer to a variable or parameter of type float` | int variable into a float | `float{i}` |

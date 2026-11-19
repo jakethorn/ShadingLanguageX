@@ -101,3 +101,31 @@ Literals that really are out of range, such as `2147483648`, should report a cle
 directory doesn't exist. The message is the same when the directory can't be written to, so it doesn't say what went
 wrong. Saving could create the missing directories, and the error could give the reason, such as "No such
 directory" or "Permission denied". All of them save through `io_utils::save_file`.
+
+## Known Bugs
+
+Bugs that have been found but not fixed yet.
+
+### Node expressions are folded with their arguments in the written order
+
+When every argument of a node expression is known at compile time and its category is one of the nodes the
+compiler can evaluate, such as `add`, `divide` or `ifgreater`, the compiler evaluates it instead of writing the node.
+This happens with the `comptime` modifier, and also without it, because graph reduction is on by default.
+`serialize_constexpr` passes the argument values to the evaluating function in the order they're written, instead of
+matching them to the node's inputs by name:
+
+- `comptime node divide(in2=4.0, in1=2.0)` evaluates to `2.0`, but `comptime divide(in2=4.0, in1=2.0)` gives `0.5`.
+- `node ifgreater(value2=1.0, value1=2.0, in1=10.0, in2=20.0)` evaluates to `20.0` instead of `10.0` with the
+  default compile options.
+- `comptime node add(a=1.0, b=2.0)` evaluates to `3.0`, although `a` and `b` aren't inputs of `add`.
+- `comptime node add(in1=1.0)` reads past the end of the argument values, because `wrap` in
+  `serialize_constexpr_wrapper.h` indexes them without checking how many there are. It currently fails with
+  "Binary operator + not supported for values of type 'float' and 'void'".
+- `float b = node add<float>(in1=1, in2=1);` fails with "Comptime expressions evaluated to a variable of type
+  integer, not float", although it doesn't use `comptime`. Without graph reduction the node is written instead.
+
+A fix would match the arguments to the inputs of the node's NodeDef by name and fill in missing inputs with their
+default values, as function calls already do, and would skip evaluating the node if an argument doesn't name one of
+its inputs. Outside of `comptime`, a result of the wrong type could also write the node instead of failing. Evaluating
+node expressions can't be removed, because the standard library relies on it, e.g., `__not__` returns
+`node not(in=in1)`. The code is in `serialize_constexpr.cpp`.

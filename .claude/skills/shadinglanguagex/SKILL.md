@@ -71,7 +71,7 @@ float a, int b, string c = 1.0, 2, "hi";      float s, t = texcoord();       a, 
 vec3{1, 2, 3}  color3{0.5}  vec4{v3, 1.0}  float{i}  bool{1}      // NAMED CONSTRUCTORS USE BRACES
 {1.0, "world"}                                 // unnamed constructor / tuple / struct literal
 v.xy  c.rgb  v[0]  s.field  s[0]  t[-1]  surf.base_color = c;  surf.coat = null;   // swizzle, index, field, port
-+ - * / % ^(power; xor on bools)  == != < <= > >=  & | !  |x|(absval)  ++ -- += -= *= /= %= ^= &= |=
++ - * / % ^(power; xor on bools)  == != < <= > >=  & and | or xor ! not  |x|(absval)  ++ -- += -= *= /= %= ^= &= |=
 if (c) { a } else if (d) { b } else { e }      // expression; `x = if (c) { a };` keeps x when false
 switch (i) { a, b, case 5: c, case <=3: d, default: e }    // expression, indices 0-99
 if (COMPILE_TIME) { ... } else { ... }         // statement (compile-time condition only)
@@ -83,6 +83,7 @@ float viewing => { return dotproduct(normal(), viewdirection()); }   // paramete
 using Ray = {vec3 orig, vec3 dir};   class Sphere { vec3 c; float r; Sphere(vec3 c) { this.c = c; this.r = 1.0; } float area() { return 12.566 * r * r; } }
 Ray __add__(Ray a, Ray b) { ... }             // operator overloading by function name
 @doc "text"  @file.colorspace "srgb_texture"  @@madewith "slx"      // node / port / document attributes
+vec3 n = node karma:foo(in = v, scale = 0.5);   node my:seed<int>      // node expression: a node with no NodeDef lookup
 print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
 #include "f.mxsl"  #library "defs.mtlx"  #version 1.38.10  #define N 4  #ifdef/#ifndef/#if/#elif/#elifdef/#elifndef/#else/#endif
 ```
@@ -98,11 +99,13 @@ print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
 2. **Immutable by default.** Add `mutable` to any variable, parameter or struct field you reassign. That
    includes loop accumulators, out-argument targets and swizzle or index writes. Parameters are immutable
    too; a `mutable` parameter is a local copy.
-3. **Logic operators are `&` and `|`.** `&&`, `||` and `?:` don't exist. `&` and `|` have the **same**
-   precedence, evaluated left to right, so `a | b & c` means `(a | b) & c`. Use parentheses.
+3. **Logic operators are `and` or `&`, `or` or `|`, `xor`, and `not` or `!`.** `&&`, `||`, `^^` and `?:`
+   don't exist. The binary ones all have the **same** precedence, evaluated left to right, so
+   `a or b and c` means `(a or b) and c`, unlike C and Python. `not` binds like `!`, tighter than `==`,
+   so `not a == b` means `(not a) == b`. Use parentheses.
 4. **Unary minus binds tighter than `^`.** `-x ^ 2` means `(-x) ^ 2`, and `^` is left-associative. Write
    `-(x ^ 2)` if that's what you mean.
-5. **Ternary relations** like `0 < x < 1` aren't supported outside `#if`. Write `0 < x & x < 1`.
+5. **Ternary relations** like `0 < x < 1` aren't supported outside `#if`. Write `0 < x and x < 1`.
 6. **`==` and `!=` only work on bool, int and float.** Comparing vectors needs a component-wise expression.
    Relational operators only work on int and float.
 7. **Only literals convert implicitly**: int literal to float or bool, and string literal to filename. An
@@ -132,10 +135,11 @@ print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
     there is no recursion. Strings have no escape sequences. There are no hex literals; floats accept
     `1.`, `.5`, `2e3` and `1.5f`.
 14. **Keywords** can't be used as identifiers: `if else for from to return null ref out const mutable
-    consteval global geomprop nodegraph nodedef inline default comptime using class this uniform varying
-    namespace print typeof break switch case true false`. Avoid `T`, `auto` and `void` as names too. Don't
+    global geomprop nodegraph nodedef inline default comptime node using class this uniform print typeof
+    break switch case and or xor not true false`. Avoid `T`, `auto` and `void` as names too. Don't
     use `__` in identifiers, because the compiler uses it internally. MaterialX inputs named `default` or
-    `geomprop` still work as named args (`image("a.png", default = color3{1})`).
+    `geomprop` still work as named args (`image("a.png", default = color3{1})`). The nodes `and`, `or`,
+    `xor`, `not` and `out` can't be called as functions, so use the operators or a node expression (rule 18).
 15. **Classes** have fields, methods, constructors and `this`, but **no inheritance and no class templates**.
     Field initialisers (`float r = 1.0;` inside a class) are **silently ignored**, so set defaults in a
     constructor.
@@ -145,6 +149,11 @@ print expr, expr;   typeof(x).name   typeof(x).str   default   default(T)   null
     `#library` for `.mtlx` NodeDefs, and remember that the generated document references those nodes
     without containing them.
 17. **Switch default case**: write `default: value`. `default=value` is a syntax error.
+18. **Nodes without a NodeDef**, such as renderer-specific nodes whose library isn't loaded, are made
+    with a node expression: `vec3 n = node karma:foo(in = v, scale = 0.5);`. Every argument must be
+    named. Each input takes the type of its argument, so `1` makes an integer input and a file input
+    needs a `filename` variable. The output type comes from `<T>` (`node foo<float>(...)`) or a typed
+    destination. Nothing is type-checked against NodeDefs (see language.md §14).
 
 ## Picking a function kind
 
@@ -185,7 +194,12 @@ user wants custom NodeDefs. The documentation's own examples write entry functio
 - `#library` paths are resolved relative to the **main** file, even inside included files. A file with
   the same relative name in the process's working directory takes priority over one next to the
   including file.
-- The compositing node `out(...)` can't be called because `out` is a keyword.
+- The compositing node `out(...)` can't be called because `out` is a keyword. Use a node expression,
+  `color4 c = node out(fg = a, bg = b, mix = 0.5);`.
+- A node expression with a class or struct type (a multi-output node) produces an invalid document.
+- Known bug: a node expression whose category the compiler can fold (`add`, `divide`, `ifgreater`, ...,
+  see materialx-lowering.md) and whose arguments are all compile-time is folded with its arguments in
+  the order written, not matched by name, even without `comptime`. Write them in NodeDef input order.
 - A non-inline function that returns `default(T)` for a shader type (for example `volumeshader`) emits an
   invalid `constant` node and fails validation. Make it `inline`.
 
