@@ -2630,12 +2630,12 @@ Node expressions look similar to function calls, with some differences:
 1. They start with the `node` keyword.
 2. The template type is the expressions return type.
 3. All arguments must be named.
-4. The name can contain the `:` character.
+4. The name can be a keyword, and it can contain the `:` character.
 
 ### Example 1
 
 ```
-color3 c = node ext:my_color3_node(gamma=2.2, space="sRGB");
+color3 c = node my_color3_node(gamma=2.2, space="sRGB");
 ```
 ```xml
 <?xml version="1.0"?>
@@ -2651,21 +2651,21 @@ color3 c = node ext:my_color3_node(gamma=2.2, space="sRGB");
 
 ```
 @doc "add 1 and 1"
-float a = node ext:my_add(in1=1.0, in2=1.0);
+float a = node my:add(in1=1.0, in2=1.0);
 
-auto b = node my_randompoint<vec3>();
+auto b = node my:randompoint<vec3>();
 
-color3 c = randomcolor(seed = node my_seed());
+color3 c = randomcolor(seed = node my:seed);
 ```
 ```xml
 <?xml version="1.0"?>
 <materialx version="1.39">
-  <ext:my_add name="a" type="float" doc="add 1 and 1">
+  <my:add name="a" type="float" doc="add 1 and 1">
     <input name="in1" type="float" value="1" />
     <input name="in2" type="float" value="1" />
-  </ext:my_add>
-  <my_randompoint name="b" type="vector3" />
-  <my_seed name="var__0" type="integer" />
+  </my:add>
+  <my:randompoint name="b" type="vector3" />
+  <my:seed name="var__0" type="integer" />
   <randomcolor name="c" type="color3">
     <input name="seed" type="integer" nodename="var__0" />
   </randomcolor>

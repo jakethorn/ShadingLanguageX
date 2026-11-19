@@ -124,8 +124,8 @@ namespace mxslc
         };
 
         inline static const unordered_set Keywords {
-            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Nodegraph, Nodedef,
-            Inline, Default, Comptime, Node, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break,
+            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Global, Geomprop, Nodegraph, Nodedef,
+            Inline, Default, Comptime, Node, Using, Class, This, Uniform, Print, Typeof, Break,
             Switch, Case, And, Or, Xor, Not
         };
 
@@ -164,7 +164,6 @@ namespace mxslc
             {"out", Out},
             {"const", Const},
             {"mutable", Mutable},
-            {"consteval", Consteval},
             {"global", Global},
             {"geomprop", Geomprop},
             {"nodegraph", Nodegraph},
@@ -177,8 +176,6 @@ namespace mxslc
             {"class", Class},
             {"this", This},
             {"uniform", Uniform},
-            {"varying", Varying},
-            {"namespace", Namespace},
             {"print", Print},
             {"typeof", Typeof},
             {"break", Break},

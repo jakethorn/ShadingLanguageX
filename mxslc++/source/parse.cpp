@@ -989,7 +989,19 @@ namespace mxslc
     {
         Token token = match(TokenType::Node);
 
-        const vector<Token> name_tokens = consume_until('<', '(');
+        vector<Token> name_tokens;
+        while (true)
+        {
+            const Token& name_token = peek();
+            if (name_token == TokenType::Identifier or name_token.type().is_keyword() or name_token == TokenType::Colon)
+                name_tokens.push_back(consume());
+            else
+                break;
+        }
+
+        if (name_tokens.empty())
+            throw CompileError{"Node expression is missing a name"};
+
         string name = Stringable::join(name_tokens);
 
         TypePtr template_type = nullptr;
@@ -999,9 +1011,9 @@ namespace mxslc
             match('>');
         }
 
-        ArgumentList args = list<Argument>('(', ')', [this](const size_t i){ return argument(i); });
+        const optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
 
-        return create_expression<NodeExpression>(name, std::move(template_type), std::move(args), std::move(token));
+        return create_expression<NodeExpression>(name, std::move(template_type), args.value_or(ArgumentList{}), std::move(token));
     }
 
     Argument Parser::argument(const size_t i)

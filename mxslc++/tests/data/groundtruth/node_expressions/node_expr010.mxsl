@@ -1,0 +1,8 @@
+float a = node foo;
+float b = node foo2<float>;
+auto c = node foo3<bool>;
+
+color3 d = image(node filename);
+color3 e = image(node filename<filename>);
+color3 f = image(node filename, texcoord = node uv1<vec2> + node uv2<vec2>);
+color3 g = randomcolor(seed = node seed + 1);

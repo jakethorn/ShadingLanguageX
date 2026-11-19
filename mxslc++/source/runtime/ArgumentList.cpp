@@ -111,14 +111,23 @@ namespace mxslc::runtime
 
     void ArgumentList::validate_arguments() const
     {
-        // ensure all positional arguments come before all named arguments
         bool last_was_named = false;
         for (const Argument& arg : args_)
         {
+            // ensure all positional arguments come before all named arguments
             if (last_was_named and arg.is_positional())
                 throw CompileError{"Positional argument appears after a named argument"};
 
             last_was_named = arg.is_named();
+
+            // ensure no two arguments have the same name
+            for (const Argument& other_arg : args_)
+            {
+                if (&arg == &other_arg)
+                    continue;
+                if (arg.has_name() and arg.name() == other_arg.name())
+                    throw CompileError{"Two or more arguments have the name '" + arg.name() + "'"};
+            }
         }
     }
 
