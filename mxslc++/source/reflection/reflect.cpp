@@ -20,7 +20,7 @@ namespace mxslc::reflection
             reflect_opts.error_on_missing_globals = false;
             reflect_opts.error_on_unused_globals = false;
             reflect_opts.set_debug_mode(false);
-            reflect_opts.set_reflect_mode(true);
+            reflect_opts.enable_reflection();
             return reflect_opts;
         }
     }

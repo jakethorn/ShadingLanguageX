@@ -63,6 +63,12 @@ namespace mxslc
                 stmt->execute();
         }
 
+        void invoke_entry_function(const CompileOptions& opts)
+        {
+            if (opts.has_entry_function())
+                runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
+        }
+
         Runtime& compile(string source, CompileOptions opts, const optional<fs::path>& src_path)
         {
             opts.add_default_search_directories();
@@ -71,30 +77,32 @@ namespace mxslc
             vector<Token> stdlib_tokens = scan_file(stdlib_path);
             preprocess::preprocess(stdlib_tokens, opts, stdlib_path);
 
-            vector<Token> tokens = scan_string(source, src_path ? std::make_optional(io_utils::get_absolute_path(*src_path)) : std::nullopt);
+            vector<Token> tokens = scan_string(source, src_path);
             preprocess::preprocess(tokens, opts, src_path);
 
             Runtime& runtime = Runtime::create(opts);
+
+            runtime.enter_scope("mxsl_stdlib");
             {
-                runtime.enter_scope("mxsl_stdlib");
                 parse_and_execute(std::move(stdlib_tokens));
+
+                if (opts.debug_mode())
+                    Debugger::create(std::move(source), src_path);
+
+                runtime.enter_scope("global");
                 {
-                    if (opts.debug_mode())
-                        Debugger::create(std::move(source), src_path);
-
-                    runtime.enter_scope("global");
                     parse_and_execute(std::move(tokens));
-                    if (opts.has_entry_function())
-                        runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
-                    if (opts.reflect_mode())
-                        runtime.reflection().collect_info();
-                    runtime.exit_scope();
+                    invoke_entry_function(opts);
 
-                    if (opts.debug_mode())
-                        Debugger::close();
+                    if (opts.reflection_enabled())
+                        runtime.reflection().collect_info();
                 }
                 runtime.exit_scope();
+
+                if (opts.debug_mode())
+                    Debugger::close();
             }
+            runtime.exit_scope();
 
             runtime.finalise();
             return runtime;

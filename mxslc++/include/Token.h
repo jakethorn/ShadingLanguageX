@@ -38,7 +38,7 @@ namespace mxslc
             return literal().as<T>();
         }
 
-        void set_path(shared_ptr<const fs::path> path) { path_ = std::move(path); }
+        void set_path(SharedPathPtr path) { path_ = std::move(path); }
         void set_line(const size_t line) { line_ = line; }
 
         string to_string() const override { return lexeme_; }
@@ -77,7 +77,7 @@ namespace mxslc
     private:
         TokenType type_;
         string lexeme_;
-        shared_ptr<const fs::path> path_;
+        SharedPathPtr path_;
         size_t line_{0};
     };
 }

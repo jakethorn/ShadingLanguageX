@@ -19,6 +19,12 @@ namespace mxslc::container_utils
         return dst;
     }
 
+    template<typename T>
+    shared_ptr<T> copy_to_shared_ptr(const optional<T>& value)
+    {
+        return value ? std::make_shared<fs::path>(*value) : nullptr;
+    }
+
     template<typename T0, typename T1>
     auto position_of(const vector<T0>& ts, const T1& t)
     {

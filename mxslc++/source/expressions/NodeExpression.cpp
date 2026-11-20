@@ -41,6 +41,7 @@ namespace mxslc::expressions
         if (node_type_ == nullptr or node_type_->is_auto())
             throw CompileError{"Ambiguously typed node expression"};
 
+        // check all arguments are named
         for (const Argument& arg : args_)
         {
             if (not arg.is_named())

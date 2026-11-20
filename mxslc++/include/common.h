@@ -44,8 +44,11 @@ namespace mxslc
     USING_NAMESPACE(serialize)
     USING_NAMESPACE(serialize::values)
     USING_NAMESPACE(decompile)
+    USING_NAMESPACE(reflection)
 
 #undef USING_NAMESPACE
+
+    using SharedPathPtr = shared_ptr<fs::path>;
 
     namespace expressions
     {

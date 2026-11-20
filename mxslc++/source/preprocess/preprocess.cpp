@@ -253,9 +253,7 @@ namespace mxslc::preprocess
             return;
         }
 
-        vector<Token> tokens = source.is_in_memory()
-            ? scan_string(*source.contents, source.path)
-            : scan_file(source.path);
+        vector<Token> tokens = scan_source(source);
 
         Preprocessor preprocessor{this, std::move(tokens), opts_, source.path, true};
         preprocessor.preprocess();
