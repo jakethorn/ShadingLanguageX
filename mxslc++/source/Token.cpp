@@ -32,7 +32,7 @@ namespace mxslc
 
     string Token::filename() const
     {
-        return path_ ? path_->filename().string() : string{};
+        return path_ ? path_->filename().string() : "";
     }
 
     const fs::path& Token::path() const
