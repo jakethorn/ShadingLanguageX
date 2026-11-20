@@ -1,16 +1,13 @@
-from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version as dist_version
 
-# Load the compiled extension module.
-_native = import_module("._mxslc", package=__name__)
+# Re-export the compiled extension module's public names. A plain star import,
+# unlike a dynamic loop, lets type checkers and IDEs see them through the
+# _mxslc.pyi stubs.
+from . import _mxslc
+from ._mxslc import *
 
-__doc__ = getattr(_native, "__doc__", None)
-__version__ = getattr(_native, "__version__", None)
-
-# Re-export public native symbols at package level.
-for _name in dir(_native):
-    if not _name.startswith("_"):
-        globals()[_name] = getattr(_native, _name)
+__doc__ = _mxslc.__doc__
+__version__ = getattr(_mxslc, "__version__", None)
 
 # Fall back to distribution metadata when native version is unavailable.
 if __version__ is None:

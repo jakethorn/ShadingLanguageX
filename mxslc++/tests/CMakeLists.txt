@@ -23,6 +23,7 @@ add_executable(mxslc_tests
         primitive_utils_tests.cpp
         primitive_to_string_tests.cpp
         global_tests.cpp
+        reflection_tests.cpp
         overwrite_data_files_tests.cpp
         compile_options_sources_tests.cpp
         materialx_library_cache_tests.cpp

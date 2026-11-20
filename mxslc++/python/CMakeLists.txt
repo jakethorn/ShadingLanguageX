@@ -5,6 +5,12 @@ pybind11_add_module(_mxslc
         CompileOptions_bindings.cpp
         Variable_bindings.cpp
         GlobalInfo_bindings.cpp
+        Source_bindings.cpp
+        FieldInfo_bindings.cpp
+        ParameterInfo_bindings.cpp
+        OverloadInfo_bindings.cpp
+        TypeInfo_bindings.cpp
+        FunctionInfo_bindings.cpp
         Reflection_bindings.cpp
         compile_bindings.cpp
         reflect_bindings.cpp

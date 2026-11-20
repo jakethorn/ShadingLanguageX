@@ -90,6 +90,9 @@ namespace mxslc::statements
                 std::move(body_)
             ));
         }
+
+        for (const FuncPtr& func : funcs_)
+            func->set_token(token_);
     }
 
     void FunctionDefinition::init()

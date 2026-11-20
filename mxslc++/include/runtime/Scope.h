@@ -8,6 +8,7 @@
 #include <MaterialXCore/Node.h>
 
 #include "common.h"
+#include "Token.h"
 
 namespace mxslc::runtime
 {
@@ -65,17 +66,20 @@ namespace mxslc::runtime
         vector<FuncPtr> get_functions(const FunctionQuery& query) const;
         bool has_function(const FuncPtr& func) const;
         bool has_function(const FunctionQuery& query) const;
+        vector<FuncPtr> get_all_functions() const;
 
         /*
          * types
          */
 
         void add_type(TypePtr type);
-        void add_primitive_type(const string& name);
+        void add_primitive_type(const string& name, Token token);
         void add_alias(const string& name, TypePtr type);
         bool has_type(const string& name) const;
         TypePtr resolve_type(const TypePtr& type) const;
         TypePtr get_type(const string& name) const;
+        const Scope& get_type_defining_scope(const string& name) const;
+        vector<std::pair<string, TypePtr>> get_all_types() const;
 
     private:
         void resolve_fields(const TypePtr& type) const;

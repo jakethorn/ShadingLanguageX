@@ -37,6 +37,7 @@ namespace mxslc::runtime
         void init();
 
         bool has_default_value() const { return expr_ != nullptr; }
+        const ExprPtr& default_value() const { return expr_; }
         VarPtr evaluate() const;
         VarPtr initial_value() const { return initial_value_; }
 

@@ -159,6 +159,19 @@ namespace mxslc::runtime
         return not get_functions(query).empty();
     }
 
+    vector<FuncPtr> Scope::get_all_functions() const
+    {
+        vector<FuncPtr> all_funcs;
+
+        for (const auto& [name, funcs] : functions_)
+            extend(all_funcs, funcs);
+
+        if (parent_)
+            extend(all_funcs, parent_->get_all_functions());
+
+        return all_funcs;
+    }
+
     void Scope::add_type(TypePtr type)
     {
         assert(type->has_name());
@@ -172,9 +185,10 @@ namespace mxslc::runtime
         types_.emplace(type->name(), std::move(type));
     }
 
-    void Scope::add_primitive_type(const string& name)
+    void Scope::add_primitive_type(const string& name, Token token)
     {
         TypePtr type = create_type(name);
+        type->set_token(std::move(token));
         add_type(std::move(type));
     }
 
@@ -183,8 +197,8 @@ namespace mxslc::runtime
         if (contains(types_, name))
             throw CompileError{"Type '" + name + "' already defined"};
 
-        type = resolve_type(type);
-        types_.emplace(name, type);
+        assert(type->is_resolved());
+        types_.emplace(name, std::move(type));
     }
 
     bool Scope::has_type(const string& name) const
@@ -223,6 +237,25 @@ namespace mxslc::runtime
         if (parent_)
             return parent_->get_type(name);
         throw CompileError{"Type '" + name + "' not defined"};
+    }
+
+    const Scope& Scope::get_type_defining_scope(const string& name) const
+    {
+        if (contains(types_, name))
+            return *this;
+        if (parent_)
+            return parent_->get_type_defining_scope(name);
+        throw CompileError{"Type '" + name + "' not defined"};
+    }
+
+    vector<std::pair<string, TypePtr>> Scope::get_all_types() const
+    {
+        vector<std::pair<string, TypePtr>> types{types_.begin(), types_.end()};
+
+        if (parent_)
+            extend(types, parent_->get_all_types());
+
+        return types;
     }
 
     void Scope::resolve_fields(const TypePtr& type) const

@@ -154,4 +154,9 @@ namespace mxslc::io_utils
 
         throw CompileError{"File " + path.string() + " could not be found.\nSearched paths:\n" + searched_paths};
     }
+
+    fs::path get_absolute_path(const fs::path& path)
+    {
+        return fs::absolute(path).lexically_normal();
+    }
 }

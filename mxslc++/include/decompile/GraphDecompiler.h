@@ -43,6 +43,10 @@ namespace mxslc::decompile
         // most nodes create a single statement, but ref arguments are declared as variables before the function call
         vector<SourceCode> create_statements(const mx::NodePtr& node);
         optional<ExpressionCode> create_port_expression(const mx::PortElementPtr& port);
+        // the variables that the expressions created since the last call need, which must be declared before the
+        // statement that uses them, e.g., `filename file = "a.png";` for `node mytexture<color3>(file = file)`, see
+        // create_node_keyword_expression
+        vector<SourceCode> take_helper_definitions();
 
         // the variable that the node is assigned to if the variable is declared outside of the graph, see outside_variables
         optional<string> get_outside_variable(const mx::NodePtr& node) const;
@@ -183,7 +187,12 @@ namespace mxslc::decompile
         optional<ExpressionCode> create_switch_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_extract_expression(const mx::NodePtr& node);
         optional<ExpressionCode> create_combine_expression(const mx::NodePtr& node);
+        // a call of the function of the node, or a node expression if the node cannot be called by name, see
+        // is_node_keyword_expression
         optional<ExpressionCode> create_function_call(const mx::NodePtr& node, bool with_out_arguments);
+        // `node foo<T>(a = x)`, which writes every input of the node as a named argument, and whose template type can be
+        // omitted if the node expression is the initial value of a typed variable, e.g., `float a = node foo;`
+        optional<ExpressionCode> create_node_keyword_expression(const mx::NodePtr& node, bool with_template_type);
         optional<ExpressionCode> create_node_graph_reference(const mx::PortElementPtr& port) const;
         // e.g., `mutable float x = a;` for the first value of a variable, `x = x * 2.0;` or `x += b;` for later values
         SourceCode create_assignment(const mx::NodePtr& node);
@@ -202,6 +211,12 @@ namespace mxslc::decompile
         bool is_untyped_statement(const mx::NodePtr& node) const;
         // true if the parameter has the same type in all overloads of the function, i.e., the argument type is known
         bool is_parameter_type_unique(const mx::NodeDefPtr& node_def, const string& param_name) const;
+        // nodes without a node def, e.g., `node karma:foo<float>()`, and nodes whose category is not a valid function name,
+        // e.g., `node and<bool>(in1 = a, in2 = b)`, are written as node expressions
+        bool is_node_keyword_expression(const mx::NodePtr& node) const;
+        // true if the node has a value that can be assigned to a variable, i.e., a single output of the type of a node
+        // without a node def, or the return outputs of its node def
+        bool has_return_value(const mx::NodePtr& node) const;
         vector<mx::OutputPtr> get_return_outputs(const mx::NodePtr& node) const;
         vector<mx::OutputPtr> get_out_parameter_outputs(const mx::NodePtr& node) const;
         bool is_ref_parameter(const mx::NodeDefPtr& node_def, const string& param_name) const;
@@ -230,6 +245,8 @@ namespace mxslc::decompile
         // the value of the variable that the else branch of an if-expression can omit, e.g., `x = if (c) { a };`
         mx::NodePtr implied_else_;
         InitialValue initial_value_;
+        // see take_helper_definitions
+        vector<SourceCode> helper_definitions_;
     };
 }
 

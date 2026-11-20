@@ -10,6 +10,7 @@
 #include <MaterialXFormat/Util.h>
 #include <MaterialXFormat/XmlIo.h>
 
+#include "Token.h"
 #include "expressions/interface.h"
 #include "expressions/NullExpression.h"
 #include "runtime/interface.h"
@@ -20,6 +21,7 @@
 #include "runtime/Function.h"
 #include "runtime/Type.h"
 #include "utils/container_utils.h"
+#include "utils/io_utils.h"
 #include "utils/string_utils.h"
 
 namespace mxslc
@@ -29,6 +31,15 @@ namespace mxslc
 
     namespace
     {
+        Token create_token(const mx::ElementPtr& element)
+        {
+            Token token{TokenType::Identifier, element->getName()};
+            const string& source_uri = element->getActiveSourceUri();
+            if (not source_uri.empty())
+                token.set_path(std::make_shared<const fs::path>(io_utils::get_absolute_path(source_uri)));
+            return token;
+        }
+
         string get_return_type_key(const mx::NodeDefPtr& nd)
         {
             const vector<mx::OutputPtr> outputs = nd->getActiveOutputs();
@@ -143,6 +154,7 @@ namespace mxslc
             TypePtr template_type = scope.has_type(template_type_name) ? scope.get_type(template_type_name) : nullptr;
             ParameterList params = get_parameters(nd);
             FuncPtr func = create_function(std::move(mods), std::move(type), name, std::move(template_type), std::move(params), nd);
+            func->set_token(create_token(nd));
             func->init();
             return func;
         }
@@ -158,7 +170,7 @@ namespace mxslc
 
         for (const mx::TypeDefPtr& td : doc->getTypeDefs())
         {
-            scope.add_primitive_type(td->getName());
+            scope.add_primitive_type(td->getName(), create_token(td));
         }
 
         const unordered_set<string> default_node_defs = get_default_node_defs(doc);

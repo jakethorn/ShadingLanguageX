@@ -11,6 +11,7 @@
 #include "runtime/ModifierList.h"
 #include "runtime/ParameterList.h"
 #include "utils/RuntimeAware.h"
+#include "Token.h"
 #include "TokenType.h"
 
 namespace mxslc::runtime
@@ -48,9 +49,12 @@ namespace mxslc::runtime
         bool is_nodedef() const { return not is_inline() and not is_nodegraph(); }
         bool is_default() const { return mods_.contains(TokenType::Default); }
         bool is_uniform() const { return mods_.contains(TokenType::Uniform); }
+        const ModifierList& modifiers() const { return mods_; }
         const TypePtr& return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }
+        const Token& token() const { return token_; }
+        void set_token(Token token) { token_ = std::move(token); }
         bool has_template_type() const { return template_type_ != nullptr; }
         TypePtr template_type() const { return template_type_; }
         size_t min_arity() const;
@@ -92,6 +96,7 @@ namespace mxslc::runtime
         ModifierList mods_;
         TypePtr return_type_;
         string name_;
+        Token token_;
         TypePtr template_type_;
         ParameterList params_;
         StmtPtr body_;

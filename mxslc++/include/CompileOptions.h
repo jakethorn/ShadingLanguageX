@@ -93,6 +93,9 @@ namespace mxslc
         void set_debug_mode(const bool debug_mode) { debug_mode_ = debug_mode; }
         bool debug_mode() const { return debug_mode_; }
 
+        void set_reflect_mode(const bool reflect_mode) { reflect_mode_ = reflect_mode; }
+        bool reflect_mode() const { return reflect_mode_; }
+
         bool has_output_file() const { return output_file.has_value(); }
         bool has_entry_function() const { return func_name.has_value(); }
 
@@ -106,6 +109,7 @@ namespace mxslc
         unordered_map<string, VarPtr> globals_;
         vector<VarPtr> func_args_;
         bool debug_mode_{false};
+        bool reflect_mode_{false};
     };
 }
 

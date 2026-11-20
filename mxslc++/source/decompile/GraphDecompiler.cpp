@@ -8,6 +8,7 @@
 
 #include "decompile/Decompiler.h"
 #include "decompile/decompile_utils.h"
+#include "errors/CompileError.h"
 #include "serialize/name_prefix_utils.h"
 #include "utils/container_utils.h"
 #include "utils/mtlx_utils.h"
@@ -29,6 +30,23 @@ namespace mxslc::decompile
         }
 
         const unordered_map<string, string>& get_binary_operators()
+        {
+            static const unordered_map<string, string> operators {
+                {"add", "+"},
+                {"subtract", "-"},
+                {"multiply", "*"},
+                {"divide", "/"},
+                {"modulo", "%"},
+                {"power", "^"},
+                {"and", "and"},
+                {"or", "or"},
+                {"xor", "xor"},
+            };
+            return operators;
+        }
+
+        // the logical operators have no keyword form of their compound assignment, e.g., `x &= a;`
+        const unordered_map<string, string>& get_compound_operators()
         {
             static const unordered_map<string, string> operators {
                 {"add", "+"},
@@ -797,11 +815,11 @@ namespace mxslc::decompile
     optional<string> GraphDecompiler::get_compound_operator(const mx::NodePtr& node) const
     {
         const string& category = node->getCategory();
-        if (not contains(get_binary_operators(), category) or is_integer_arithmetic(node) or get_float_operand_convert(node))
+        if (not contains(get_compound_operators(), category) or is_integer_arithmetic(node) or get_float_operand_convert(node))
             return std::nullopt;
         if (not is_previous_value(node, node->getInput("in1")))
             return std::nullopt;
-        return get_binary_operators().at(category);
+        return get_compound_operators().at(category);
     }
 
     // `a > b` is compiled to `ifgreater(a, b)` with a boolean output
@@ -1080,7 +1098,7 @@ namespace mxslc::decompile
             const bool has_multiple_outputs = node->getType() == mx::MULTI_OUTPUT_TYPE_STRING;
             const bool has_out_parameters = not get_out_parameter_outputs(node).empty();
             // e.g., void functions that assign to nonlocal variables
-            const bool has_no_return_value = get_return_outputs(node).empty();
+            const bool has_no_return_value = not has_return_value(node);
             // the type of an output selects the overload of the call that it returns, e.g., `return fractal2d(-1.0);`
             const bool is_output_value = get_use_count(node) == 1 and uses_.at(node).front().consumer->isA<mx::Output>();
             const bool needs_type = not is_output_value and needs_typed_variable(node);
@@ -1181,6 +1199,21 @@ namespace mxslc::decompile
         return get_return_type(get_return_outputs(node));
     }
 
+    bool GraphDecompiler::is_node_keyword_expression(const mx::NodePtr& node) const
+    {
+        const mx::NodeDefPtr node_def = node->getNodeDef();
+        if (node_def == nullptr)
+            return true;
+        return not decompiler_.is_document_node_def(node_def) and not is_valid_identifier(node->getCategory());
+    }
+
+    bool GraphDecompiler::has_return_value(const mx::NodePtr& node) const
+    {
+        if (node->getNodeDef() == nullptr and node->getType() != mx::MULTI_OUTPUT_TYPE_STRING)
+            return true;
+        return not get_return_outputs(node).empty();
+    }
+
     vector<mx::OutputPtr> GraphDecompiler::get_return_outputs(const mx::NodePtr& node) const
     {
         const mx::NodeDefPtr node_def = node->getNodeDef();
@@ -1235,6 +1268,13 @@ namespace mxslc::decompile
         vector<SourceCode> result;
         SourceCode stmt;
 
+        // the variables that a statement needs are declared before it, see take_helper_definitions
+        const auto add_statement = [&](SourceCode statement) {
+            for (SourceCode& definition : take_helper_definitions())
+                result.push_back(std::move(definition));
+            result.push_back(std::move(statement));
+        };
+
         if (is_geomprop_definition(node))
         {
             const mx::InputPtr default_input = node->getInput("default");
@@ -1254,7 +1294,7 @@ namespace mxslc::decompile
         {
             // e.g., `mutable vec3 q = vec3{};` before `q.y = a;`, see SwizzleAssignment::initial_value
             if (contains(swizzle_assignments_, node) and swizzle_assignments_.at(node).initial_value)
-                result.push_back(format_variable_definition("mutable", get_variable_type(node), get_identifier(node), format_value(swizzle_assignments_.at(node).initial_value)));
+                add_statement(format_variable_definition("mutable", get_variable_type(node), get_identifier(node), format_value(swizzle_assignments_.at(node).initial_value)));
 
             stmt = create_assignment(node);
         }
@@ -1269,7 +1309,7 @@ namespace mxslc::decompile
 
                 const optional<ExpressionCode> value = create_input_expression(node, param_name);
                 const string var_name = get_output_identifier(node, output->getName());
-                result.push_back(format_variable_definition("mutable", get_type_alias(output->getType()), var_name, value));
+                add_statement(format_variable_definition("mutable", get_type_alias(output->getType()), var_name, value));
             }
 
             const optional<ExpressionCode> call = create_function_call(node, /*with_out_arguments*/true);
@@ -1289,13 +1329,16 @@ namespace mxslc::decompile
             else
                 stmt = format_expression_statement(*call);
         }
-        else if ((is_generated_node_name(node->getName()) and get_use_count(node) == 0 and is_untyped_statement(node)) or get_return_outputs(node).empty())
+        else if ((is_generated_node_name(node->getName()) and get_use_count(node) == 0 and is_untyped_statement(node)) or not has_return_value(node))
         {
             // the return type of an expression statement is not known, e.g., `texcoord<vec2>();`
             TypedContext context{is_typed_context_, false};
             const optional<ExpressionCode> expr = create_node_expression(node);
             if (not expr)
+            {
+                helper_definitions_.clear();
                 return result;
+            }
 
             // swizzles are only evaluated when they are used, so they are assigned to a variable, e.g., `vec2 a = v.yx;`
             if (expr->precedence == Precedence::Postfix)
@@ -1307,10 +1350,13 @@ namespace mxslc::decompile
         {
             // variables that are assigned to by functions, i.e., nonlocal variables, must be mutable
             const bool is_mutable = graph_->isA<mx::Document>() and decompiler_.is_assigned_by_function(get_identifier(node));
-            stmt = format_variable_definition(is_mutable ? "mutable" : "", get_variable_type(node), get_identifier(node), create_node_expression(node));
+            // the type of a node expression is inferred from the variable that it is the initial value of, e.g.,
+            // `float a = node foo;`
+            const optional<ExpressionCode> value = node->getNodeDef() == nullptr ? create_node_keyword_expression(node, /*with_template_type*/false) : create_node_expression(node);
+            stmt = format_variable_definition(is_mutable ? "mutable" : "", get_variable_type(node), get_identifier(node), value);
         }
 
-        result.push_back(add_attributes(get_user_attributes(node), stmt));
+        add_statement(add_attributes(get_user_attributes(node), stmt));
         return result;
     }
 
@@ -1354,6 +1400,13 @@ namespace mxslc::decompile
         const ScopedValue<mx::NodePtr> implied_else{implied_else_, is_if_expression(node) ? previous : nullptr};
         const optional<ExpressionCode> value = create_node_expression(node);
         return SourceCode::concat({variable + " = ", value ? value->code : "null", ";"});
+    }
+
+    vector<SourceCode> GraphDecompiler::take_helper_definitions()
+    {
+        vector<SourceCode> result = std::move(helper_definitions_);
+        helper_definitions_.clear();
+        return result;
     }
 
     optional<ExpressionCode> GraphDecompiler::create_port_expression(const mx::PortElementPtr& port)
@@ -1517,6 +1570,10 @@ namespace mxslc::decompile
     {
         const string& category = node->getCategory();
 
+        // the operators and other syntax below are only written for the nodes of the node defs that they compile to
+        if (node->getNodeDef() == nullptr)
+            return create_function_call(node, /*with_out_arguments*/false);
+
         if (category == "invert")
         {
             const mx::InputPtr amount = node->getInput("amount");
@@ -1541,7 +1598,7 @@ namespace mxslc::decompile
             }
 
             if (const optional<ExpressionCode> in = create_operand_expression(node, "in"))
-                return format_unary_expression("!", *in);
+                return format_unary_expression("not ", *in);
         }
 
         if (category == "absval")
@@ -1759,6 +1816,9 @@ namespace mxslc::decompile
 
     optional<ExpressionCode> GraphDecompiler::create_function_call(const mx::NodePtr& node, const bool with_out_arguments)
     {
+        if (is_node_keyword_expression(node))
+            return create_node_keyword_expression(node, /*with_template_type*/true);
+
         const mx::NodeDefPtr node_def = node->getNodeDef();
         const bool is_document_function = node_def and decompiler_.is_document_node_def(node_def);
         const string func_name = is_document_function ? decompiler_.get_function_name(node_def) : node->getCategory();
@@ -1832,6 +1892,41 @@ namespace mxslc::decompile
         }
 
         return format_function_call(func_name, func_template_type, args);
+    }
+
+    optional<ExpressionCode> GraphDecompiler::create_node_keyword_expression(const mx::NodePtr& node, const bool with_template_type)
+    {
+        // the outputs of a node expression with multiple outputs are not written by the compiler yet
+        if (node->getType() == mx::MULTI_OUTPUT_TYPE_STRING)
+            throw CompileError{"The node " + node->getNamePath() + " cannot be decompiled, because node expressions with multiple outputs are not supported yet"};
+
+        // the inputs of a node expression take the types of its arguments, so each argument is written without its
+        // context, e.g., `1.0` for a float input and `node foo<vec2>` for a vector2 input
+        TypedContext context{is_typed_context_, false};
+        vector<SourceCode> args;
+        for (const mx::InputPtr& input : node->getInputs())
+        {
+            optional<ExpressionCode> value;
+
+            // a string literal would be a string input, so filenames are passed through a variable, e.g.,
+            // `filename file = "a.png";` before `node mytexture<color3>(file = file)`
+            if (input->getType() == "filename" and input->hasValue() and not is_connected(input))
+            {
+                const string name = create_unique_identifier(make_identifier(input->getName()));
+                helper_definitions_.push_back(format_variable_definition("", "filename", name, format_value(input)));
+                value = format_identifier(name);
+            }
+            else
+            {
+                value = create_port_expression(input);
+            }
+
+            if (value)
+                args.push_back(format_argument(get_user_attributes(input), input->getName(), *value));
+        }
+
+        const string template_type = with_template_type ? get_type_alias(node->getType()) : "";
+        return format_node_keyword_expression(node->getCategory(), template_type, args);
     }
 
     optional<ExpressionCode> GraphDecompiler::create_node_graph_reference(const mx::PortElementPtr& port) const

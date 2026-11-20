@@ -4,7 +4,10 @@
 
 #include "reflection/reflect.h"
 
+#include <algorithm>
+
 #include "compile.h"
+#include "TokenType.h"
 #include "runtime/Runtime.h"
 
 namespace mxslc::reflection
@@ -17,8 +20,19 @@ namespace mxslc::reflection
             reflect_opts.error_on_missing_globals = false;
             reflect_opts.error_on_unused_globals = false;
             reflect_opts.set_debug_mode(false);
+            reflect_opts.set_reflect_mode(true);
             return reflect_opts;
         }
+    }
+
+    Reflection reflect()
+    {
+        return reflect(string{});
+    }
+
+    Reflection reflect(const CompileOptions& opts)
+    {
+        return reflect(string{}, opts);
     }
 
     Reflection reflect(const fs::path& src_path)
@@ -39,5 +53,14 @@ namespace mxslc::reflection
     Reflection reflect(const string& source, const CompileOptions& opts)
     {
         return compile(source, get_reflect_options(opts)).reflection();
+    }
+
+    vector<string> get_keywords()
+    {
+        vector<string> keywords;
+        for (const TokenType keyword : TokenType::Keywords)
+            keywords.push_back(keyword.to_string());
+        std::sort(keywords.begin(), keywords.end());
+        return keywords;
     }
 }

@@ -358,7 +358,7 @@ namespace mxslc
         TypePtr type_ = type();
         match(';');
 
-        return create_statement<UsingDeclaration>(std::move(token), std::move(name), std::move(type_));
+        return create_statement<UsingDeclaration>(std::move(name), std::move(type_), std::move(token));
     }
 
     StmtPtr Parser::for_loop()

@@ -1,0 +1,8 @@
+bool above = randomfloat() > 0.5;
+bool below = 0.2 > randomfloat();
+bool mixed = above or below and not (above and below);
+bool compared = randomfloat() > 0.5 xor below;
+bool different = randomfloat() != 0.5;
+float magnitude = |float{above or below}|;
+mutable bool flag = above xor below;
+flag &= different;

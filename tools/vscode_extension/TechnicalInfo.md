@@ -76,9 +76,12 @@ gen_extension.py [-h] [-g] [-c] [-v] [-i] [-p] [--js-build-dir JS_BUILD_DIR] [--
 
 `--generate` writes the grammar and `data/`, from:
 
-- the keywords and data types in [mxslc++/browser_shared/keywords.js](../../mxslc++/browser_shared/keywords.js),
-- the type aliases and functions in [mxslc++/libraries/stdlib.mxsl](../../mxslc++/libraries/stdlib.mxsl),
-- the node and type names in the MaterialX libraries in [mxslc++/libraries](../../mxslc++/libraries), for every
+- the keywords, type names and function names from the WebAssembly compiler in `media/lib`, for every MaterialX
+  version in [mxslc++/libraries](../../mxslc++/libraries), so they match the compiler the extension bundles. It runs
+  the compiler with Node.js, so copy it there first with `--converter`, which runs before `--generate`. The script
+  stops if a keyword class in it lists a word that isn't a keyword any more.
+- the type aliases in [mxslc++/libraries/stdlib.mxsl](../../mxslc++/libraries/stdlib.mxsl),
+- the node signatures in the MaterialX libraries in [mxslc++/libraries](../../mxslc++/libraries), for every
   version there. These versions are also the choices for the `slx.materialxVersion` setting.
 - the [MaterialX specification](https://github.com/AcademySoftwareFoundation/MaterialX/tree/main/documents/Specification)
   on MaterialX's `main` branch, which it downloads to find each node's section. Node hovers link there. If it can't be

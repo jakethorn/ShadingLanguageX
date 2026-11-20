@@ -71,7 +71,7 @@ namespace mxslc
             vector<Token> stdlib_tokens = scan_file(stdlib_path);
             preprocess::preprocess(stdlib_tokens, opts, stdlib_path);
 
-            vector<Token> tokens = scan_string(source, src_path);
+            vector<Token> tokens = scan_string(source, src_path ? std::make_optional(io_utils::get_absolute_path(*src_path)) : std::nullopt);
             preprocess::preprocess(tokens, opts, src_path);
 
             Runtime& runtime = Runtime::create(opts);
@@ -86,6 +86,8 @@ namespace mxslc
                     parse_and_execute(std::move(tokens));
                     if (opts.has_entry_function())
                         runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
+                    if (opts.reflect_mode())
+                        runtime.reflection().collect_info();
                     runtime.exit_scope();
 
                     if (opts.debug_mode())

@@ -48,6 +48,7 @@ namespace mxslc::statements
     void ClassDefinition::execute_impl() const
     {
         const TypePtr class_type = create_type(name_);
+        class_type->set_token(token_);
         add_fields(class_type);
         scope().add_type(class_type);
         add_methods_and_constructors(class_type);

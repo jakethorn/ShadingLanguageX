@@ -14,12 +14,14 @@ namespace mxslc::statements
     StmtPtr UsingDeclaration::monomorphize(const TypePtr& template_type) const
     {
         TypePtr type = type_->monomorphize(template_type);
-        return create_statement<UsingDeclaration>(token_, name_, std::move(type));
+        return create_statement<UsingDeclaration>(name_, std::move(type), token_);
     }
 
     void UsingDeclaration::execute_impl() const
     {
-        scope().add_alias(name_, type_);
+        TypePtr type = scope().resolve_type(type_)->copy();
+        type->set_token(token_);
+        scope().add_alias(name_, std::move(type));
     }
 
     string UsingDeclaration::to_string() const

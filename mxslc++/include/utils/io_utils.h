@@ -19,6 +19,7 @@ namespace mxslc::io_utils
     vector<fs::path> get_default_search_directories(const optional<fs::path>& src_path = std::nullopt);
 
     fs::path search(const vector<fs::path>& search_dirs, const fs::path& path);
+    fs::path get_absolute_path(const fs::path& path);
 }
 
 #endif //FENNEC_IO_UTILS_H

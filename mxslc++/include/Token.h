@@ -24,7 +24,8 @@ namespace mxslc
 
         TokenType type() const { return type_; }
         const string& lexeme() const { return lexeme_; }
-        const string& filename() const { return filename_; }
+        string filename() const;
+        const fs::path& path() const;
         size_t line() const { return line_; }
 
         Token monomorphize(const TypePtr& template_type) const override;
@@ -37,7 +38,7 @@ namespace mxslc
             return literal().as<T>();
         }
 
-        void set_filename(string filename) { filename_ = std::move(filename); }
+        void set_path(shared_ptr<const fs::path> path) { path_ = std::move(path); }
         void set_line(const size_t line) { line_ = line; }
 
         string to_string() const override { return lexeme_; }
@@ -76,7 +77,7 @@ namespace mxslc
     private:
         TokenType type_;
         string lexeme_;
-        string filename_;
+        shared_ptr<const fs::path> path_;
         size_t line_{0};
     };
 }

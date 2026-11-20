@@ -12,7 +12,7 @@ namespace mxslc::statements
     class UsingDeclaration final : public Statement
     {
     public:
-        UsingDeclaration(Token token, string name, TypePtr type)
+        UsingDeclaration(string name, TypePtr type, Token token)
             : Statement{std::move(token)}, name_{std::move(name)}, type_{std::move(type)} { }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
