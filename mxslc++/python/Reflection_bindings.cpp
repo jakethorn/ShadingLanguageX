@@ -11,5 +11,7 @@ using namespace mxslc::reflection;
 void bind_reflection(py::module_& m)
 {
     py::class_<Reflection>(m, "Reflection")
-        .def_property_readonly("globals", &Reflection::globals);
+        .def_property_readonly("globals", &Reflection::globals)
+        .def_property_readonly("types", &Reflection::types)
+        .def_property_readonly("functions", &Reflection::functions);
 }

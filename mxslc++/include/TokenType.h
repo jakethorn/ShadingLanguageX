@@ -77,7 +77,6 @@ namespace mxslc
             Out,
             Const,
             Mutable,
-            Consteval,
             Global,
             Geomprop,
             Nodegraph,
@@ -85,17 +84,20 @@ namespace mxslc
             Inline,
             Default,
             Comptime,
+            Node,
             Using,
             Class,
             This,
             Uniform,
-            Varying,
-            Namespace,
             Print,
             Typeof,
             Break,
             Switch,
             Case,
+            And,
+            Or,
+            Xor,
+            Not,
 
             // Dynamic
             Identifier,
@@ -122,9 +124,9 @@ namespace mxslc
         };
 
         inline static const unordered_set Keywords {
-            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Consteval, Global, Geomprop, Nodegraph, Nodedef,
-            Inline, Default, Comptime, Using, Class, This, Uniform, Varying, Namespace, Print, Typeof, Break,
-            Switch, Case
+            If, Else, For, From, To, Return, Null, Ref, Out, Const, Mutable, Global, Geomprop, Nodegraph, Nodedef,
+            Inline, Default, Comptime, Node, Using, Class, This, Uniform, Print, Typeof, Break,
+            Switch, Case, And, Or, Xor, Not
         };
 
     private:
@@ -162,7 +164,6 @@ namespace mxslc
             {"out", Out},
             {"const", Const},
             {"mutable", Mutable},
-            {"consteval", Consteval},
             {"global", Global},
             {"geomprop", Geomprop},
             {"nodegraph", Nodegraph},
@@ -170,17 +171,20 @@ namespace mxslc
             {"inline", Inline},
             {"default", Default},
             {"comptime", Comptime},
+            {"node", Node},
             {"using", Using},
             {"class", Class},
             {"this", This},
             {"uniform", Uniform},
-            {"varying", Varying},
-            {"namespace", Namespace},
             {"print", Print},
             {"typeof", Typeof},
             {"break", Break},
             {"switch", Switch},
             {"case", Case},
+            {"and", And},
+            {"or", Or},
+            {"xor", Xor},
+            {"not", Not},
             {"<bool>", Bool},
             {"<int>", Int},
             {"<float>", Float},

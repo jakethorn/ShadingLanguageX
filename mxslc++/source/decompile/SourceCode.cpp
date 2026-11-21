@@ -32,8 +32,9 @@ namespace mxslc::decompile
                 {"<", Precedence::Relational},
                 {">=", Precedence::Relational},
                 {"<=", Precedence::Relational},
-                {"&", Precedence::Logical},
-                {"|", Precedence::Logical},
+                {"and", Precedence::Logical},
+                {"or", Precedence::Logical},
+                {"xor", Precedence::Logical},
             };
             return precedences.at(op);
         }
@@ -490,6 +491,15 @@ namespace mxslc::decompile
     {
         const string template_string = template_type.empty() ? "" : "<" + template_type + ">";
         return ExpressionCode{SourceCode::list(function + template_string + "(", args, ")"), Precedence::Primary};
+    }
+
+    ExpressionCode format_node_keyword_expression(const string& category, const string& template_type, const vector<SourceCode>& args)
+    {
+        // nodes without inputs are written without an argument list, e.g., `node foo<float>`
+        const string head = "node " + category + (template_type.empty() ? "" : "<" + template_type + ">");
+        if (args.empty())
+            return ExpressionCode{head, Precedence::Primary};
+        return ExpressionCode{SourceCode::list(head + "(", args, ")"), Precedence::Primary};
     }
 
     ExpressionCode format_if_expression(const ExpressionCode& condition, const ExpressionCode& then_code, const optional<ExpressionCode>& else_code)

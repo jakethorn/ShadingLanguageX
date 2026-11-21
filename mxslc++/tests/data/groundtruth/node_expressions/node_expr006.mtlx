@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="i" type="integer" doc="add 1 and 1">
+    <input name="in1" type="integer" value="1" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <add name="j" type="integer">
+    <input name="in1" type="integer" value="1" doc="first" />
+    <input name="in2" type="integer" value="1" doc="second" />
+  </add>
+  <add name="k" type="integer">
+    <input name="in1" type="integer" value="1" doc="first" hello="world" />
+    <input name="in2" type="integer" value="1" doc="second" goodbye="my love" />
+  </add>
+</materialx>

@@ -31,12 +31,14 @@
 #include <emscripten/val.h>
 
 #include <exception>
-#include <set>
 
 #include "compile.h"
 #include "CompileOptions.h"
 #include "decompile/decompile.h"
-#include "utils/load_mtlx.h"
+#include "reflection/reflect.h"
+#include "runtime/Type.h"
+#include "runtime/variables/Variable.h"
+#include "Primitive.h"
 
 #include "common.h"
 
@@ -99,33 +101,157 @@ namespace
         }
     }
 
-    // Return the sorted set of MaterialX node-definition category names from
-    // the loaded standard library. This reuses mxslc's existing MaterialX
-    // library loader (the same one the compile path uses), so the library is
-    // resolved against the preloaded libraries/ folder in the WASM filesystem.
-    std::vector<std::string> get_mtlx_definition_names()
+    ems::val get_keywords()
+    {
+        return ems::val::array(mxslc::reflection::get_keywords());
+    }
+
+    ems::val to_js_object(const mxslc::reflection::GlobalInfo& global);
+    ems::val to_js_object(const mxslc::reflection::ParameterInfo& parameter);
+    ems::val to_js_object(const mxslc::reflection::OverloadInfo& overload);
+    ems::val to_js_object(const mxslc::reflection::FunctionInfo& function);
+    ems::val to_js_object(const mxslc::reflection::TypeInfo& type);
+
+    template<typename Info>
+    ems::val to_js_array(const std::vector<Info>& infos)
+    {
+        ems::val array = ems::val::array();
+        for (const Info& info : infos)
+            array.call<void>("push", to_js_object(info));
+        return array;
+    }
+
+    ems::val to_js_string_or_null(const std::string& str)
+    {
+        return str.empty() ? ems::val::null() : ems::val{str};
+    }
+
+    ems::val to_js_path_or_null(const fs::path& path)
+    {
+        return path.empty() ? ems::val::null() : ems::val{path.string()};
+    }
+
+    ems::val to_js_line_or_null(const size_t line)
+    {
+        return line == 0 ? ems::val::null() : ems::val{line};
+    }
+
+    ems::val to_js_value(const mxslc::Primitive& primitive)
+    {
+        return primitive.visit([](const auto& v) -> ems::val {
+            IF_VISITED_TYPE_IS(std::monostate)
+            {
+                return ems::val::null();
+            }
+            else IF_VISITED_TYPE_IS(fs::path)
+            {
+                return ems::val{v.string()};
+            }
+            else if constexpr (std::is_base_of_v<mx::VectorBase, VISITED_TYPE>)
+            {
+                return ems::val::array(v.begin(), v.end());
+            }
+            else if constexpr (std::is_base_of_v<mx::MatrixBase, VISITED_TYPE>)
+            {
+                ems::val rows = ems::val::array();
+                for (const auto& row : v)
+                    rows.call<void>("push", ems::val::array(row.begin(), row.end()));
+                return rows;
+            }
+            else
+            {
+                return ems::val{v};
+            }
+        });
+    }
+
+    ems::val to_js_value(const mxslc::runtime::VarPtr& var)
+    {
+        if (not var->is_compile_time())
+            return ems::val::null();
+        if (var->has_value())
+            return to_js_value(var->compile_time_value());
+
+        ems::val children = ems::val::array();
+        for (const mxslc::runtime::VarPtr& child : var->children())
+            children.call<void>("push", to_js_value(child));
+        return children;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::GlobalInfo& global)
+    {
+        ems::val object = ems::val::object();
+        object.set("name", global.name);
+        object.set("type", global.type->to_string());
+        object.set("defaultValue", to_js_value(global.default_value));
+        return object;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::ParameterInfo& parameter)
+    {
+        ems::val object = ems::val::object();
+        object.set("name", parameter.name);
+        object.set("type", parameter.type);
+        object.set("defaultExpression", to_js_string_or_null(parameter.default_expression));
+        object.set("modifiers", ems::val::array(parameter.modifiers));
+        return object;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::OverloadInfo& overload)
+    {
+        ems::val object = ems::val::object();
+        object.set("parameters", to_js_array(overload.parameters));
+        object.set("returnType", overload.return_type);
+        object.set("templateType", to_js_string_or_null(overload.template_type));
+        object.set("modifiers", ems::val::array(overload.modifiers));
+        object.set("source", overload.source);
+        object.set("classType", to_js_string_or_null(overload.class_type));
+        object.set("path", to_js_path_or_null(overload.path));
+        object.set("line", to_js_line_or_null(overload.line));
+        return object;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::FunctionInfo& function)
+    {
+        ems::val object = ems::val::object();
+        object.set("name", function.name);
+        object.set("overloads", to_js_array(function.overloads));
+        return object;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::TypeInfo& type)
+    {
+        ems::val object = ems::val::object();
+        object.set("name", type.name);
+        object.set("isAlias", type.is_alias);
+        object.set("source", type.source);
+        object.set("aliasedType", to_js_string_or_null(type.aliased_type));
+        object.set("fields", ems::val::array(type.fields));
+        object.set("methods", to_js_array(type.methods));
+        object.set("path", to_js_path_or_null(type.path));
+        object.set("line", to_js_line_or_null(type.line));
+        return object;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::Reflection& reflection)
+    {
+        ems::val object = ems::val::object();
+        object.set("globals", to_js_array(reflection.globals()));
+        object.set("types", to_js_array(reflection.types()));
+        object.set("functions", to_js_array(reflection.functions()));
+        return object;
+    }
+
+    template<typename... Args>
+    ems::val reflect(const Args&... args)
     {
         try
         {
-            mxslc::CompileOptions opts;
-            opts.add_default_search_directories();
-
-            const mx::DocumentPtr doc =
-                mxslc::load_materialx_library(opts.version, opts.search_directories());
-
-            std::set<std::string> names;
-            for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
-            {
-                // Skip non-default versioned nodedefs, matching how mxslc loads them.
-                if (nd->hasVersionString() && !nd->getDefaultVersion())
-                    continue;
-                names.insert(nd->getNodeString());
-            }
-            return std::vector<std::string>(names.begin(), names.end());
+            return to_js_object(mxslc::reflection::reflect(args...));
         }
         catch (const std::exception& e)
         {
-            rethrow_as_js_error(e, "Error");
+            rethrow_as_js_error(e, "CompileError");
         }
     }
 }
@@ -156,6 +282,20 @@ EMSCRIPTEN_BINDINGS(mxslc)
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);
 
+    ems::enum_<mxslc::reflection::Source>("Source")
+        .value("MaterialX", mxslc::reflection::Source::MaterialX)
+        .value("SlxStandardLibrary", mxslc::reflection::Source::SlxStandardLibrary)
+        .value("UserDefined", mxslc::reflection::Source::UserDefined);
+
+    ems::value_object<mxslc::reflection::FieldInfo>("FieldInfo")
+        .field("name", &mxslc::reflection::FieldInfo::name)
+        .field("type", &mxslc::reflection::FieldInfo::type);
+
+    ems::function("reflect", &reflect<>);
+    ems::function("reflect", &reflect<mxslc::CompileOptions>);
+    ems::function("reflectFromString", &reflect<std::string>);
+    ems::function("reflectFromString", &reflect<std::string, mxslc::CompileOptions>);
+    ems::function("getKeywords", &get_keywords);
+
     ems::register_vector<std::string>("StringVector");
-    ems::function("getMtlxDefinitionNames", &get_mtlx_definition_names);
 }

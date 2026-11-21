@@ -67,6 +67,7 @@ add_library(mxslc_lib
         expressions/DefaultExpression.cpp
         expressions/DefaultGeomPropExpression.cpp
         expressions/SwitchExpression.cpp
+        expressions/NodeExpression.cpp
         statements/Statement.cpp
         statements/VariableDefinition.cpp
         statements/PrintStatement.cpp

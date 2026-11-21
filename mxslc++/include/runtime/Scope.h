@@ -33,7 +33,7 @@ namespace mxslc::runtime
         Scope* parent() const { return parent_.get(); }
 
         mx::GraphElementPtr graph() const { return graph_; }
-        std::pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
+        pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
         void set_graph(mx::GraphElementPtr graph, FuncPtr func) { graph_ = std::move(graph); graph_func_ = func; func_ = func; }
 
         FuncPtr function() const { return func_; }
@@ -71,11 +71,19 @@ namespace mxslc::runtime
          */
 
         void add_type(TypePtr type);
-        void add_primitive_type(const string& name);
         void add_alias(const string& name, TypePtr type);
         bool has_type(const string& name) const;
         TypePtr resolve_type(const TypePtr& type) const;
         TypePtr get_type(const string& name) const;
+
+        /*
+         * reflection api
+         */
+
+        vector<FuncPtr> get_all_functions() const;
+
+        // the {string, Type} pair must be returned because of aliased types
+        vector<pair<string, TypePtr>> get_all_types() const;
 
     private:
         void resolve_fields(const TypePtr& type) const;

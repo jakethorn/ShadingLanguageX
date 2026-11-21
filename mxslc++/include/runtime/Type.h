@@ -7,6 +7,7 @@
 
 #include <MaterialXCore/Node.h>
 
+#include "Token.h"
 #include "runtime/Field.h"
 #include "runtime/utils/TypeName.h"
 
@@ -34,8 +35,13 @@ namespace mxslc::runtime
         Type(string name, TypePtr template_type);
         Type(const TypePtr& field_type, size_t field_count);
 
+        TypePtr copy() const { return std::make_shared<Type>(*this); }
+
         bool has_name() const { return not name_.empty(); }
         const string& name() const { return name_; }
+
+        const Token& token() const { return token_; }
+        void set_token(Token token) { token_ = std::move(token); }
 
         bool has_template_type() const { return template_type_ != nullptr; }
         const TypePtr& template_type() const { return template_type_; }
@@ -76,6 +82,8 @@ namespace mxslc::runtime
         bool equals(const TypePtr& other, bool field_names = false) const;
         bool is_in(const vector<TypePtr>& types) const;
 
+        Scope* defining_scope() const { return defining_scope_; }
+
         string to_string() const override;
         string full_str() const;
 
@@ -106,17 +114,19 @@ namespace mxslc::runtime
         static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
 
     private:
+        void set_resolved() { is_resolved_ = true; }
+        static TypePtr resolve(const string& name);
+
+        void validate() const;
+
         string name_;
         vector<Field> fields_;
         vector<weak_ptr<Function>> methods_;
         TypePtr template_type_;
 
+        Token token_;
         bool is_resolved_{false};
-
-        void set_resolved() { is_resolved_ = true; }
-        static TypePtr resolve(const string& name);
-
-        void validate() const;
+        Scope* defining_scope_{nullptr};
     };
 
     inline bool operator==(const TypePtr& type, const string& other)

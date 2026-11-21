@@ -1,0 +1,26 @@
+vec3 normals = normal();
+vec3 mapped = node normalmap2(in = normals, space = "tangent", scale = 0.1);
+float plain = node foo;
+auto templated = node foo<float>;
+vec3 namespaced = node karma:foo();
+color3 nested = randomcolor(seed = node seed<int> + 1);
+vec2 combined = node uv1<vec2> + node uv2<vec2>;
+node unused<float>;
+
+int documented = node bar<int>(
+    @doc "first"
+    in1 = 1,
+    in2 = 2
+);
+
+filename image_file = "a.png";
+color3 textured = node mytexture(file = image_file);
+
+[[nodedef]]
+color3 sample(float x)
+{
+    filename f = "b.png";
+    return node mytexture<color3>(file = f, x = x);
+}
+
+color3 sampled = sample(0.5);

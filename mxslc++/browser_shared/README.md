@@ -6,7 +6,6 @@ Single source of truth for the files shared by both browser integrations:
 |---------------|------------------------------------------------------------|
 | `index.html`  | The page markup + CSS (both integrations)                  |
 | `common.js`   | Engine-agnostic UI core (editors, log, status, conversion) |
-| `keywords.js` | Static MXSL keyword backup for syntax highlighting         |
 
 `app.js` is **not** shared — it is the per-integration engine adapter
 (Flask `fetch` vs WASM) and lives in each integration's folder.
@@ -20,19 +19,16 @@ self-contained for deployment:
 browser_shared/            <-- edit these (canonical)
     index.html
     common.js
-    keywords.js
 
 python/browser/            (Flask)
     templates/index.html
     static/app.js          (Flask engine)
     static/common.js
-    static/keywords.js
 
 javascript/browser/        (WASM)
     index.html
     app.js                 (WASM engine)
     common.js
-    keywords.js
 ```
 
 The only difference between the two `index.html` copies is the final `<script>`

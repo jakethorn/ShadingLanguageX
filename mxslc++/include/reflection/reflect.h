@@ -11,10 +11,14 @@
 
 namespace mxslc::reflection
 {
+    Reflection reflect();
+    Reflection reflect(const CompileOptions& opts);
     Reflection reflect(const fs::path& src_path);
     Reflection reflect(const fs::path& src_path, const CompileOptions& opts);
     Reflection reflect(const string& source);
     Reflection reflect(const string& source, const CompileOptions& opts);
+
+    vector<string> get_keywords();
 }
 
 #endif //MXSLC_REFLECT_H

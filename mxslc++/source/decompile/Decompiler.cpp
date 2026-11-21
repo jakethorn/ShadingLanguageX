@@ -18,6 +18,7 @@ namespace mxslc::decompile
 {
     using namespace decompile_utils;
     using container_utils::contains;
+    using container_utils::extend;
     using string_utils::starts_with;
 
     namespace
@@ -390,7 +391,7 @@ namespace mxslc::decompile
     void Decompiler::emit_undecompiled_elements()
     {
         // the names of the elements of each category, in the order of the document
-        vector<std::pair<string, vector<string>>> categories;
+        vector<pair<string, vector<string>>> categories;
         for (const mx::ElementPtr& element : document_->getChildren())
         {
             if (is_decompiled(element))
@@ -617,6 +618,7 @@ namespace mxslc::decompile
                 continue;
 
             const optional<ExpressionCode> value = body.create_port_expression(output);
+            vector<SourceCode> helper_definitions = body.take_helper_definitions();
             if (not value)
                 continue;
 
@@ -625,6 +627,7 @@ namespace mxslc::decompile
             if (body.has_assigned_value(output, var_name))
                 continue;
 
+            extend(body_statements, std::move(helper_definitions));
             body_statements.push_back(SourceCode::concat({var_name + " = ", value->code, ";"}));
         }
 
@@ -633,6 +636,7 @@ namespace mxslc::decompile
             vector<SourceCode> return_values;
             for (const mx::OutputPtr& output : return_outputs)
                 return_values.push_back(create_output_value(body, node_graph->getOutput(output->getName())));
+            extend(body_statements, body.take_helper_definitions());
             body_statements.push_back(format_return_statement(std::move(return_values)));
         }
 
@@ -662,6 +666,7 @@ namespace mxslc::decompile
             vector<SourceCode> return_values;
             for (const mx::OutputPtr& output : outputs)
                 return_values.push_back(create_output_value(body, output));
+            extend(body_statements, body.take_helper_definitions());
             body_statements.push_back(format_return_statement(std::move(return_values)));
         }
 

@@ -23,7 +23,7 @@ VALUES = {
     "color3": "color3{0.5, 0.25, 0.75}", "color4": "color4{0.5, 0.25, 0.75, 1.0}",
     "mat3": "default(mat3)", "mat4": "default(mat4)", "filename": '"a.png"',
 }
-KNOWN_UNCALLABLE = {"out"}  # `out` is an SLX keyword
+KNOWN_UNCALLABLE = {"out", "and", "or", "xor", "not"}  # SLX keywords
 
 
 def compile_code(mxslc, code, args=()):

@@ -13,10 +13,15 @@
 #include "runtime/Runtime.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
+#include "runtime/utils/TypeName.h"
 #include "statements/Statement.h"
+#include "utils/container_utils.h"
 
 namespace mxslc::debug
 {
+    using container_utils::contains;
+    using runtime_utils::TypeName;
+
     namespace
     {
         constexpr string_view blue = "\033[94m";
@@ -27,12 +32,10 @@ namespace mxslc::debug
         constexpr string_view magenta = "\033[95m";
         constexpr string_view reset = "\033[0m";
 
-        const unordered_set<string> data_types{
-            "BSDF", "EDF", "T", "VDF", "auto", "bool", "boolean", "color3", "color4",
-            "displacementshader", "filename", "float", "int", "integer", "lightshader", "mat3",
-            "mat4", "material", "matrix33", "matrix44", "string", "surfaceshader", "vec2", "vec3",
-            "vec4", "vector2", "vector3", "vector4", "void", "volumeshader"
-        };
+        bool is_type_name(const string& word)
+        {
+            return runtime::Runtime::get().scope().has_type(word) or contains(TypeName::Specials, word);
+        }
 
         bool is_identifier_character(const char c)
         {
@@ -145,7 +148,7 @@ namespace mxslc::debug
                     const TokenType type{word};
                     if (word == "true" or word == "false")
                         result += string{blue} + word + string{reset};
-                    else if (data_types.find(word) != data_types.end())
+                    else if (is_type_name(word))
                         result += string{orange} + word + string{reset};
                     else if (TokenType::Keywords.find(static_cast<TokenType::Enum>(type.index())) != TokenType::Keywords.end())
                         result += string{magenta} + word + string{reset};
@@ -331,7 +334,7 @@ namespace mxslc::debug
         }
 
         vector<string> scope_lines;
-        vector<std::pair<Scope*, vector<VarPtr>>> variable_groups;
+        vector<pair<Scope*, vector<VarPtr>>> variable_groups;
         unordered_map<Scope*, size_t> group_indices;
         for (const VarPtr& variable : runtime::Runtime::get().scope().get_all_variables())
         {

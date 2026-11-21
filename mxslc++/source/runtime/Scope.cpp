@@ -33,7 +33,7 @@ namespace mxslc::runtime
         }
     }
 
-    std::pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
+    pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
     {
         if (const mx::NodeGraphPtr& node_graph = std::dynamic_pointer_cast<mx::NodeGraph>(graph_))
             return {node_graph, graph_func_};
@@ -168,14 +168,8 @@ namespace mxslc::runtime
 
         resolve_fields(type);
         type->set_resolved();
-
+        type->defining_scope_ = this;
         types_.emplace(type->name(), std::move(type));
-    }
-
-    void Scope::add_primitive_type(const string& name)
-    {
-        TypePtr type = create_type(name);
-        add_type(std::move(type));
     }
 
     void Scope::add_alias(const string& name, TypePtr type)
@@ -183,8 +177,8 @@ namespace mxslc::runtime
         if (contains(types_, name))
             throw CompileError{"Type '" + name + "' already defined"};
 
-        type = resolve_type(type);
-        types_.emplace(name, type);
+        assert(type->is_resolved());
+        types_.emplace(name, std::move(type));
     }
 
     bool Scope::has_type(const string& name) const
@@ -223,6 +217,29 @@ namespace mxslc::runtime
         if (parent_)
             return parent_->get_type(name);
         throw CompileError{"Type '" + name + "' not defined"};
+    }
+
+    vector<FuncPtr> Scope::get_all_functions() const
+    {
+        vector<FuncPtr> all_funcs;
+
+        for (const auto& [name, funcs] : functions_)
+            extend(all_funcs, funcs);
+
+        if (parent_)
+            extend(all_funcs, parent_->get_all_functions());
+
+        return all_funcs;
+    }
+
+    vector<pair<string, TypePtr>> Scope::get_all_types() const
+    {
+        vector<pair<string, TypePtr>> types{types_.begin(), types_.end()};
+
+        if (parent_)
+            extend(types, parent_->get_all_types());
+
+        return types;
     }
 
     void Scope::resolve_fields(const TypePtr& type) const

@@ -38,6 +38,7 @@ namespace mxslc::serialize
         VarPtr write_node(const ConstFunctionCallPtr& func_call) const;
         VarPtr write_node(const ConstMethodCallPtr& method_call) const;
         VarPtr write_node(const VarPtr& instance, const ConstFunctionCallPtr& func_call) const;
+        VarPtr write_node(const string& category, const TypePtr& type, const ArgumentList& args, const AttributeList& attrs) const;
 
         VarPtr write_node_graph_value(const ConstFunctionCallPtr& func_call) const;
 

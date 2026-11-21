@@ -113,6 +113,22 @@ TEST(decompiler_api_tests, nodes_of_node_graphs_and_node_defs_without_node_graph
     EXPECT_EQ(get_error_message([&] { decompiler.decompile_node_def("ND_nobody"); }), "The node graph of the node def ND_nobody could not be found");
 }
 
+TEST(decompiler_api_tests, nodes_without_node_defs_and_with_multiple_outputs_are_rejected)
+{
+    // the compiler does not write the outputs of node expressions with multiple outputs yet
+    const string document = R"(<?xml version="1.0"?>
+        <materialx version="1.39">
+          <mynode name="pair" type="multioutput">
+            <input name="in" type="float" value="1" />
+            <output name="r" type="float" />
+            <output name="g" type="float" />
+          </mynode>
+        </materialx>
+    )";
+    mxslc::decompile::Decompiler decompiler{document};
+    EXPECT_EQ(get_error_message([&] { decompiler.decompile_document(); }), "The node pair cannot be decompiled, because node expressions with multiple outputs are not supported yet");
+}
+
 TEST(decompiler_api_tests, dependencies_declare_the_variables_that_values_are_assigned_to)
 {
     mxslc::decompile::Decompiler decompiler{compile(REASSIGNED_VARIABLES)};

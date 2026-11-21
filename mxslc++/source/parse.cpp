@@ -25,6 +25,7 @@
 #include "expressions/NullExpression.h"
 #include "expressions/DefaultExpression.h"
 #include "expressions/DefaultGeomPropExpression.h"
+#include "expressions/NodeExpression.h"
 #include "runtime/interface.h"
 #include "runtime/Parameter.h"
 #include "runtime/Argument.h"
@@ -357,7 +358,7 @@ namespace mxslc
         TypePtr type_ = type();
         match(';');
 
-        return create_statement<UsingDeclaration>(std::move(token), std::move(name), std::move(type_));
+        return create_statement<UsingDeclaration>(std::move(name), std::move(type_), std::move(token));
     }
 
     StmtPtr Parser::for_loop()
@@ -594,7 +595,10 @@ namespace mxslc
     {
         ExprPtr expr = equality();
 
-        const vector<TokenType> ops = in_abs_ ? vector<TokenType>{'&'} : vector<TokenType>{'&', '|'};
+        const vector<TokenType> ops = in_abs_ ?
+            vector<TokenType>{'&', TokenType::And, TokenType::Or, TokenType::Xor} :
+            vector<TokenType>{'&', '|', TokenType::And, TokenType::Or, TokenType::Xor};
+
         while (optional<Token> op = consume(ops))
         {
             ExprPtr right = equality();
@@ -706,7 +710,7 @@ namespace mxslc
 
     ExprPtr Parser::unary()
     {
-        if (optional<Token> op = consume('!', '+', '-'))
+        if (optional<Token> op = consume('!', '+', '-', TokenType::Not))
             return ExpressionFactory::unary(std::move(*op), compound());
         return compound();
     }
@@ -848,6 +852,11 @@ namespace mxslc
             return typeof_operator();
         }
 
+        if (peek() == TokenType::Node)
+        {
+            return node_expression();
+        }
+
         throw CompileError{peek(), "Invalid expression"};
     }
 
@@ -974,6 +983,37 @@ namespace mxslc
         ExprPtr expr = expression();
         match(')');
         return create_expression<TypeOfOperator>(std::move(expr), std::move(token));
+    }
+
+    ExprPtr Parser::node_expression()
+    {
+        Token token = match(TokenType::Node);
+
+        vector<Token> name_tokens;
+        while (true)
+        {
+            const Token& name_token = peek();
+            if (name_token == TokenType::Identifier or name_token.type().is_keyword() or name_token == TokenType::Colon)
+                name_tokens.push_back(consume());
+            else
+                break;
+        }
+
+        if (name_tokens.empty())
+            throw CompileError{"Node expression is missing a name"};
+
+        string name = Stringable::join(name_tokens);
+
+        TypePtr template_type = nullptr;
+        if (consume('<'))
+        {
+            template_type = type();
+            match('>');
+        }
+
+        const optional<ArgumentList> args = optional_list<Argument, ArgumentList>('(', ')', [this](const size_t i){ return argument(i); });
+
+        return create_expression<NodeExpression>(name, std::move(template_type), args.value_or(ArgumentList{}), std::move(token));
     }
 
     Argument Parser::argument(const size_t i)

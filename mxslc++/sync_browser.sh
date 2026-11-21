@@ -5,7 +5,6 @@
 #
 #   browser_shared/index.html   -> python/browser/templates/index.html, javascript/browser/index.html
 #   browser_shared/common.js    -> python/browser/static/common.js,     javascript/browser/common.js
-#   browser_shared/keywords.js  -> python/browser/static/keywords.js,   javascript/browser/keywords.js
 #
 # The copies are identical, except that javascript/browser/index.html loads "app.js" where the others load
 # "static/app.js", because the WASM app serves its files from a different root.
@@ -64,10 +63,8 @@ sync_file() {
 
 sync_file index.html  python/browser/templates/index.html
 sync_file common.js   python/browser/static/common.js
-sync_file keywords.js python/browser/static/keywords.js
 sync_file index.html  javascript/browser/index.html wasm
 sync_file common.js   javascript/browser/common.js
-sync_file keywords.js javascript/browser/keywords.js
 
 if [ "$CHECK" = true ]; then
     if [ "$DRIFTED" -ne 0 ]; then

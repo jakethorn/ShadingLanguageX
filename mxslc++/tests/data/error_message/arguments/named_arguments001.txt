@@ -1,0 +1,1 @@
+named_arguments001.mxsl, line 6: Two or more arguments have the name 'a'

@@ -1,5 +1,3 @@
-import { MXSL_KEYWORDS } from './keywords.js';
-
 // The engine (compile / decompile / keyword provider) is injected by the host
 // app (app.js) via setEngine() before start() is called. The shared functions
 // below reference this module-level binding.
@@ -40,12 +38,10 @@ function setServerStatus(label, icon, cls) {
 //  CodeMirror MXSL mode
 // ============================================================
 
-function registerMxslMode(dataTypes, control, builtins, functions, funcStyle) {
-    dataTypes = new Set(dataTypes || []);
-    control = new Set(control || []);
-    builtins = new Set(builtins || []);
-    functions = new Set(functions || []);
-    funcStyle = funcStyle || 'function';
+function registerMxslMode(keywords, types, functions) {
+    keywords = new Set(keywords);
+    types = new Set(types);
+    functions = new Set(functions);
 
     CodeMirror.defineMode('mxsl', function () {
         return {
@@ -67,10 +63,9 @@ function registerMxslMode(dataTypes, control, builtins, functions, funcStyle) {
                 if (stream.match(/[+\-*/%=<>!&|^~]+/)) return 'operator';
                 if (stream.match(/[a-zA-Z_$][\w$]*/)) {
                     const word = stream.current();
-                    if (dataTypes.has(word)) return 'type';
-                    if (control.has(word)) return 'keyword';
-                    if (builtins.has(word)) return 'builtin';
-                    if (functions.has(word) && stream.match(/\s*\(/, false)) return funcStyle;
+                    if (types.has(word)) return 'type';
+                    if (keywords.has(word)) return 'keyword';
+                    if (functions.has(word) && stream.match(/\s*\(/, false)) return 'function';
                     if (word === word.toUpperCase() && word.length >= 2) return 'atom';
                     return 'variable';
                 }
@@ -163,26 +158,19 @@ function initEditors() {
 }
 
 // ============================================================
-//  Keyword resolution — MaterialX list first, static backup second
+//  Keywords, types and functions, from the compiler
 // ============================================================
 
 async function loadKeywords() {
     try {
-        const kw = await engine.getKeywords();
-        const functions = kw.functions || [];
-        if (functions.length > 0) {
-            registerMxslMode(kw.data_types, kw.control, kw.builtins, functions);
-            logMessage(`Loaded ${functions.length} MaterialX keywords.`, 'success');
-            return 'materialx';
-        }
-        logMessage('No MaterialX keywords returned; using static backup.', 'info');
+        const { keywords, types, functions } = await engine.getKeywords();
+        registerMxslMode(keywords, types, functions);
+        logMessage(`Loaded ${keywords.length} keywords, ${types.length} types and ${functions.length} functions.`, 'success');
     } catch (err) {
-        logMessage('Failed to load MaterialX keywords: ' + errorMessage(err), 'error');
+        // Without the compiler there is nothing to highlight them with, but comments, strings and numbers still are.
+        registerMxslMode([], [], []);
+        logMessage('Failed to load the keywords, types and functions: ' + errorMessage(err), 'error');
     }
-    // Backup: static keyword list embedded in keywords.js.
-    registerMxslMode(MXSL_KEYWORDS.dataTypes, MXSL_KEYWORDS.control, [], MXSL_KEYWORDS.functions);
-    logMessage(`Using static keyword backup (${MXSL_KEYWORDS.functions.length} functions).`, 'info');
-    return 'backup';
 }
 
 // ============================================================
@@ -309,8 +297,8 @@ window.convertMxslToMtlx = convertMxslToMtlx;
 
 document.getElementById('file-input').addEventListener('change', onFileChosen);
 
-// Called by the host app after setEngine(). Loads the engine, resolves the
-// keyword list (MaterialX first, static backup), and initializes the editors.
+// Called by the host app after setEngine(). Loads the engine, gets the
+// keywords, types and functions from it, and initializes the editors.
 export async function start() {
     logMessage('Starting...', 'info');
     try {
@@ -320,9 +308,8 @@ export async function start() {
         logMessage('Failed to initialize: ' + errorMessage(err), 'error');
         setServerStatus('Server failed', 'bi-x-circle-fill', 'text-danger');
     }
-    // Always create the editors. loadKeywords uses the MaterialX list first and
-    // falls back to the static keyword list, so editing works even if the
-    // engine failed to load.
+    // Always create the editors, so editing works even if the engine failed to
+    // load. Then nothing is highlighted as a keyword, type or function.
     await loadKeywords();
     initEditors();
 }

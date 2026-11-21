@@ -26,7 +26,9 @@ compiler holds is one of: a compile-time constant, a node or node output, a Node
   by the compiler **if its category is foldable**. The foldable categories are `add`, `subtract`,
   `multiply`, `divide`, `invert`, `not`, `ifequal`, `ifgreater`, `ifgreatereq`, `constant`,
   `combine2/3/4`, `separate2/3/4`, `convert`, `extract`, `creatematrix`, `invertmatrix`, `switch`,
-  `fract`, `dotproduct`, `floor`, `ceil` and `round`.
+  `fract`, `dotproduct`, `floor`, `ceil` and `round`. Node expressions with one of these categories
+  fold too, but because of a known bug they take their arguments in the order written instead of
+  matching them by name.
 - Everything else **always emits a node**, even with constant inputs. That includes `power` (`^`),
   `modulo` (`%`), `absval` (`|x|`), `and`, `or`, `xor`, trig, `sqrt`, `clamp`, `mix`, noises and
   `smoothstep`.
@@ -62,7 +64,7 @@ When a name is taken, MaterialX's `createValidChildName` adds a suffix.
 | `int / int` | `convert`, `divide`, `floor` |
 | `-a` | `invert(in = a, amount = 0)`; for int, `subtract(0, a)` |
 | `+a` | nothing |
-| `!a`, `a & b`, `a \| b` | `not`, `and`, `or` |
+| `!a` or `not a`, `a & b` or `a and b`, `a \| b` or `a or b`, `a xor b` | `not`, `and`, `or`, `xor` |
 | `a > b` / `a >= b` | `ifgreater(a, b)` / `ifgreatereq(a, b)`, giving a boolean |
 | `a < b` / `a <= b` | `ifgreater(b, a)` / `ifgreatereq(b, a)`, operands swapped |
 | `a == b` / `a != b` | `ifequal(a, b)` / `ifequal` + `not` |
@@ -186,6 +188,7 @@ functions `inline` (`inline void main(...)`).
 | `geomprop float x = 0.5;` | `<geompropvalue name="x">` with `geomprop="x"` and `default=0.5` |
 | `s.base_color = c;` | sets or replaces that input on node `s` |
 | `s.base_color = null;` | removes the input |
+| `vec3 x = node cat(in = v);` | `<cat name="x" type="vector3">` with one input per argument, typed by its argument. No NodeDef is looked up, so the node is never checked against one |
 | `@doc "..."` above a statement | `doc="..."` on the node produced by a direct call. Dropped for operator expressions such as `a * b` |
 | `@file.colorspace "srgb_texture"` | `colorspace=` on the node's `file` input |
 | `@@madewith "slx"` | attribute on the `<materialx>` root |

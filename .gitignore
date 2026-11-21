@@ -7,8 +7,8 @@ mxslc++/rsp_reduce.py
 mxslc++/rsp_decomp.py
 mxslc++/todo.txt
 mxslc++/notes.txt
-mxslc++/local_build_python.sh
-mxslc++/javascript/local_build_javascript.sh
+mxslc++/build_python_local.sh
+mxslc++/javascript/build_javascript_local.sh
 mxslc++/build_python.ps1
 
 # Byte-compiled / optimized / DLL files
@@ -192,3 +192,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Personal notes on testing the integrations locally
+docs/LocalTesting.md

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <divide name="a1" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="4" />
+  </divide>
+  <divide name="a2" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="4" />
+  </divide>
+  <divide name="a3" type="float">
+    <input name="in1" type="float" value="2" />
+    <input name="in2" type="float" value="4" />
+  </divide>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodename="a1" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" value="0.5" />
+  </constant>
+  <constant name="var__2" type="float">
+    <input name="value" type="float" nodename="a2" />
+  </constant>
+  <constant name="var__3" type="float">
+    <input name="value" type="float" value="0.5" />
+  </constant>
+  <constant name="var__4" type="float">
+    <input name="value" type="float" nodename="a3" />
+  </constant>
+  <constant name="var__5" type="float">
+    <input name="value" type="float" value="0.5" />
+  </constant>
+</materialx>

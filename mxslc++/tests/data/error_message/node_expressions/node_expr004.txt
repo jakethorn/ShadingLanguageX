@@ -1,0 +1,1 @@
+node_expr004.mxsl, line 1: Ambiguously typed node expression
