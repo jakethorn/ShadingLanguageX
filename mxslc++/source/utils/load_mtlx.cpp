@@ -36,7 +36,7 @@ namespace mxslc
             Token token{TokenType::Identifier, element->getName()};
             const string& source_uri = element->getActiveSourceUri();
             if (not source_uri.empty())
-                token.set_path(std::make_shared<const fs::path>(io_utils::get_absolute_path(source_uri)));
+                token.set_path(io_utils::get_absolute_path(source_uri));
             return token;
         }
 
@@ -170,7 +170,9 @@ namespace mxslc
 
         for (const mx::TypeDefPtr& td : doc->getTypeDefs())
         {
-            scope.add_primitive_type(td->getName(), create_token(td));
+            TypePtr type = create_type(td->getName());
+            type->set_token(create_token(td));
+            scope.add_type(std::move(type));
         }
 
         const unordered_set<string> default_node_defs = get_default_node_defs(doc);

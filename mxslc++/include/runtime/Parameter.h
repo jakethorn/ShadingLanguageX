@@ -31,13 +31,13 @@ namespace mxslc::runtime
         bool is_uniform() const { return mods_.contains(TokenType::Uniform); }
         const TypePtr& type() const { return type_; }
         const string& name() const { return name_; }
+        const ExprPtr& expression() const { return expr_; }
         size_t index() const { return index_; }
 
         Parameter monomorphize(const TypePtr& template_type) const override;
         void init();
 
         bool has_default_value() const { return expr_ != nullptr; }
-        const ExprPtr& default_value() const { return expr_; }
         VarPtr evaluate() const;
         VarPtr initial_value() const { return initial_value_; }
 

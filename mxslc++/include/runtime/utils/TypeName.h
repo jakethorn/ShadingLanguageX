@@ -32,7 +32,7 @@ namespace mxslc::runtime_utils
         inline static const string Auto = "auto";
         inline static const string Template = "T";
 
-        inline static const vector<string> Reserved{Void, Auto, Template};
+        inline static const vector<string> Specials{Void, Auto, Template};
 
         template<typename T>
         static const string& of()

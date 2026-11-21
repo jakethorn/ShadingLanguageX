@@ -26,6 +26,7 @@ using std::string_view;
 using std::vector;
 using std::unordered_map;
 using std::unordered_set;
+using std::pair;
 namespace fs = std::filesystem;
 using namespace std::string_literals;
 
@@ -77,10 +78,10 @@ namespace mxslc
         using TypePtr = shared_ptr<Type>;
 
         class Parameter;
-        using ParameterValues = vector<std::pair<const Parameter&, VarPtr>>;
+        using ParameterValues = vector<pair<const Parameter&, VarPtr>>;
 
         class Argument;
-        using ArgumentValues = vector<std::pair<const Argument&, VarPtr>>;
+        using ArgumentValues = vector<pair<const Argument&, VarPtr>>;
     }
 
     namespace serialize::values

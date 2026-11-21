@@ -33,7 +33,7 @@ namespace mxslc::runtime
         }
     }
 
-    std::pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
+    pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
     {
         if (const mx::NodeGraphPtr& node_graph = std::dynamic_pointer_cast<mx::NodeGraph>(graph_))
             return {node_graph, graph_func_};
@@ -159,19 +159,6 @@ namespace mxslc::runtime
         return not get_functions(query).empty();
     }
 
-    vector<FuncPtr> Scope::get_all_functions() const
-    {
-        vector<FuncPtr> all_funcs;
-
-        for (const auto& [name, funcs] : functions_)
-            extend(all_funcs, funcs);
-
-        if (parent_)
-            extend(all_funcs, parent_->get_all_functions());
-
-        return all_funcs;
-    }
-
     void Scope::add_type(TypePtr type)
     {
         assert(type->has_name());
@@ -181,15 +168,8 @@ namespace mxslc::runtime
 
         resolve_fields(type);
         type->set_resolved();
-
+        type->defining_scope_ = this;
         types_.emplace(type->name(), std::move(type));
-    }
-
-    void Scope::add_primitive_type(const string& name, Token token)
-    {
-        TypePtr type = create_type(name);
-        type->set_token(std::move(token));
-        add_type(std::move(type));
     }
 
     void Scope::add_alias(const string& name, TypePtr type)
@@ -239,18 +219,22 @@ namespace mxslc::runtime
         throw CompileError{"Type '" + name + "' not defined"};
     }
 
-    const Scope& Scope::get_type_defining_scope(const string& name) const
+    vector<FuncPtr> Scope::get_all_functions() const
     {
-        if (contains(types_, name))
-            return *this;
+        vector<FuncPtr> all_funcs;
+
+        for (const auto& [name, funcs] : functions_)
+            extend(all_funcs, funcs);
+
         if (parent_)
-            return parent_->get_type_defining_scope(name);
-        throw CompileError{"Type '" + name + "' not defined"};
+            extend(all_funcs, parent_->get_all_functions());
+
+        return all_funcs;
     }
 
-    vector<std::pair<string, TypePtr>> Scope::get_all_types() const
+    vector<pair<string, TypePtr>> Scope::get_all_types() const
     {
-        vector<std::pair<string, TypePtr>> types{types_.begin(), types_.end()};
+        vector<pair<string, TypePtr>> types{types_.begin(), types_.end()};
 
         if (parent_)
             extend(types, parent_->get_all_types());

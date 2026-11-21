@@ -24,6 +24,9 @@ namespace mxslc::reflection
         const vector<FunctionInfo>& functions() const { return functions_; }
 
     private:
+        void collect_type_info();
+        void collect_function_info();
+
         vector<GlobalInfo> globals_;
         vector<TypeInfo> types_;
         vector<FunctionInfo> functions_;

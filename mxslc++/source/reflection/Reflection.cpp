@@ -31,11 +31,11 @@ namespace mxslc::reflection
             infos.erase(it, infos.end());
         }
 
-        Source get_source(const Scope& scope)
+        Source get_source(const Scope* scope)
         {
-            if (scope.name() == "mtlx_stdlib")
+            if (scope->name() == "mtlx_stdlib")
                 return Source::MaterialX;
-            if (scope.name() == "mxsl_stdlib")
+            if (scope->name() == "mxsl_stdlib")
                 return Source::SlxStandardLibrary;
             return Source::UserDefined;
         }
@@ -71,7 +71,7 @@ namespace mxslc::reflection
         {
             if (not param.has_default_value())
                 return "";
-            string expression = param.default_value()->to_string();
+            string expression = param.expression()->to_string();
             return expression == "null" ? "" : expression;
         }
 
@@ -117,7 +117,7 @@ namespace mxslc::reflection
                 info.template_type = func.template_type()->to_string();
             info.modifiers = get_modifier_names(func.modifiers());
             if (func.defining_scope())
-                info.source = get_source(*func.defining_scope());
+                info.source = get_source(func.defining_scope());
             if (func.has_class_type())
                 info.class_type = func.class_type()->name();
             info.path = func.token().path();
@@ -157,6 +157,21 @@ namespace mxslc::reflection
             sort_and_remove_duplicates(infos);
             return infos;
         }
+
+        TypeInfo get_type_info(const string& name, const TypePtr& type)
+        {
+            TypeInfo info;
+            info.name = name;
+            info.is_alias = name != type->name();
+            info.source = get_source(type->defining_scope());
+            if (info.is_alias)
+                info.aliased_type = type->to_string();
+            info.fields = get_field_infos(type);
+            info.methods = get_function_infos(type->methods());
+            info.path = type->token().path();
+            info.line = type->token().line();
+            return info;
+        }
     }
 
     void Reflection::add_global(string name, TypePtr type, VarPtr value)
@@ -170,30 +185,30 @@ namespace mxslc::reflection
 
     void Reflection::collect_info()
     {
+        collect_type_info();
+        collect_function_info();
+    }
+
+    void Reflection::collect_type_info()
+    {
         types_.clear();
+
         for (const auto& [name, type] : scope().get_all_types())
-        {
-            TypeInfo info;
-            info.name = name;
-            info.is_alias = name != type->name();
-            info.source = get_source(scope().get_type_defining_scope(name));
-            if (info.is_alias)
-                info.aliased_type = type->to_string();
-            info.fields = get_field_infos(type);
-            info.methods = get_function_infos(type->methods());
-            info.path = type->token().path();
-            info.line = type->token().line();
-            types_.push_back(std::move(info));
-        }
-        for (const string& name : TypeName::Reserved)
+            types_.push_back(get_type_info(name, type));
+
+        for (const string& name : TypeName::Specials)
         {
             TypeInfo info;
             info.name = name;
             info.source = Source::SlxStandardLibrary;
             types_.push_back(std::move(info));
         }
-        sort_and_remove_duplicates(types_);
 
+        sort_and_remove_duplicates(types_);
+    }
+
+    void Reflection::collect_function_info()
+    {
         functions_ = get_function_infos(scope().get_all_functions());
     }
 }

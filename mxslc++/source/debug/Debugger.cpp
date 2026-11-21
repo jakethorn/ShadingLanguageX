@@ -34,7 +34,7 @@ namespace mxslc::debug
 
         bool is_type_name(const string& word)
         {
-            return runtime::Runtime::get().scope().has_type(word) or contains(TypeName::Reserved, word);
+            return runtime::Runtime::get().scope().has_type(word) or contains(TypeName::Specials, word);
         }
 
         bool is_identifier_character(const char c)
@@ -334,7 +334,7 @@ namespace mxslc::debug
         }
 
         vector<string> scope_lines;
-        vector<std::pair<Scope*, vector<VarPtr>>> variable_groups;
+        vector<pair<Scope*, vector<VarPtr>>> variable_groups;
         unordered_map<Scope*, size_t> group_indices;
         for (const VarPtr& variable : runtime::Runtime::get().scope().get_all_variables())
         {

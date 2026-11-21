@@ -609,7 +609,7 @@ namespace mxslc::decompile_utils
         unordered_map<mx::ElementPtr, vector<mx::ElementPtr>> find_assignment_dependencies(const mx::GraphElementPtr& graph)
         {
             unordered_map<mx::NodePtr, vector<mx::NodePtr>> uses;
-            vector<std::pair<mx::NodePtr, mx::NodePtr>> overwritten_values;
+            vector<pair<mx::NodePtr, mx::NodePtr>> overwritten_values;
             unordered_map<string, vector<mx::NodePtr>> variable_values;
             for (const mx::NodePtr& node : graph->getNodes())
             {

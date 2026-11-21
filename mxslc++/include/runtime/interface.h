@@ -25,7 +25,7 @@ namespace mxslc::runtime
     using TypePtr = shared_ptr<Type>;
 
     class Parameter;
-    using ParameterValues = vector<std::pair<const Parameter&, VarPtr>>;
+    using ParameterValues = vector<pair<const Parameter&, VarPtr>>;
 
     template<typename... Args>
     FuncPtr create_function(Args&&... args)

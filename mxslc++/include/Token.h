@@ -39,6 +39,7 @@ namespace mxslc
         }
 
         void set_path(SharedPathPtr path) { path_ = std::move(path); }
+        void set_path(const fs::path& path) { path_ = std::make_shared<fs::path>(path); }
         void set_line(const size_t line) { line_ = line; }
 
         string to_string() const override { return lexeme_; }

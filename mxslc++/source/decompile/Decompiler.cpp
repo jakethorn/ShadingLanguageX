@@ -391,7 +391,7 @@ namespace mxslc::decompile
     void Decompiler::emit_undecompiled_elements()
     {
         // the names of the elements of each category, in the order of the document
-        vector<std::pair<string, vector<string>>> categories;
+        vector<pair<string, vector<string>>> categories;
         for (const mx::ElementPtr& element : document_->getChildren())
         {
             if (is_decompiled(element))

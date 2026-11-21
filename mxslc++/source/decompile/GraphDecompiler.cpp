@@ -179,7 +179,7 @@ namespace mxslc::decompile
         vector<SwitchCase> get_switch_cases(const vector<mx::InputPtr>& inputs)
         {
             // the ranges of consecutive indices with the same value
-            vector<std::pair<size_t, size_t>> ranges;
+            vector<pair<size_t, size_t>> ranges;
             for (size_t index = 0; index < inputs.size(); ++index)
             {
                 if (inputs[index] == nullptr)
