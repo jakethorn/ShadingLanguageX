@@ -31,12 +31,14 @@
 #include <emscripten/val.h>
 
 #include <exception>
-#include <set>
 
 #include "compile.h"
 #include "CompileOptions.h"
 #include "decompile/decompile.h"
-#include "utils/load_mtlx.h"
+#include "reflection/reflect.h"
+#include "runtime/Type.h"
+#include "runtime/variables/Variable.h"
+#include "Primitive.h"
 
 #include "common.h"
 
@@ -99,33 +101,85 @@ namespace
         }
     }
 
-    // Return the sorted set of MaterialX node-definition category names from
-    // the loaded standard library. This reuses mxslc's existing MaterialX
-    // library loader (the same one the compile path uses), so the library is
-    // resolved against the preloaded libraries/ folder in the WASM filesystem.
-    std::vector<std::string> get_mtlx_definition_names()
+    ems::val get_keywords()
+    {
+        return ems::val::array(mxslc::reflection::get_keywords());
+    }
+
+    ems::val to_js_value(const mxslc::Primitive& primitive)
+    {
+        return primitive.visit([](const auto& v) -> ems::val {
+            IF_VISITED_TYPE_IS(std::monostate)
+            {
+                return ems::val::null();
+            }
+            else IF_VISITED_TYPE_IS(fs::path)
+            {
+                return ems::val{v.string()};
+            }
+            else if constexpr (std::is_base_of_v<mx::VectorBase, VISITED_TYPE>)
+            {
+                return ems::val::array(v.begin(), v.end());
+            }
+            else if constexpr (std::is_base_of_v<mx::MatrixBase, VISITED_TYPE>)
+            {
+                ems::val rows = ems::val::array();
+                for (const auto& row : v)
+                    rows.call<void>("push", ems::val::array(row.begin(), row.end()));
+                return rows;
+            }
+            else
+            {
+                return ems::val{v};
+            }
+        });
+    }
+
+    ems::val to_js_value(const mxslc::runtime::VarPtr& var)
+    {
+        if (not var->is_compile_time())
+            return ems::val::null();
+        if (var->has_value())
+            return to_js_value(var->compile_time_value());
+
+        ems::val children = ems::val::array();
+        for (const mxslc::runtime::VarPtr& child : var->children())
+            children.call<void>("push", to_js_value(child));
+        return children;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::GlobalInfo& global)
+    {
+        ems::val object = ems::val::object();
+        object.set("name", global.name);
+        object.set("type", global.type->to_string());
+        object.set("defaultValue", to_js_value(global.default_value));
+        return object;
+    }
+
+    ems::val to_js_object(const mxslc::reflection::Reflection& reflection)
+    {
+        ems::val globals = ems::val::array();
+        for (const mxslc::reflection::GlobalInfo& global : reflection.globals())
+            globals.call<void>("push", to_js_object(global));
+
+        ems::val object = ems::val::object();
+        object.set("globals", globals);
+        object.set("typeNames", ems::val::array(reflection.type_names()));
+        object.set("functionNames", ems::val::array(reflection.function_names()));
+        return object;
+    }
+
+    template<typename... Args>
+    ems::val reflect(const Args&... args)
     {
         try
         {
-            mxslc::CompileOptions opts;
-            opts.add_default_search_directories();
-
-            const mx::DocumentPtr doc =
-                mxslc::load_materialx_library(opts.version, opts.search_directories());
-
-            std::set<std::string> names;
-            for (const mx::NodeDefPtr& nd : doc->getNodeDefs())
-            {
-                // Skip non-default versioned nodedefs, matching how mxslc loads them.
-                if (nd->hasVersionString() && !nd->getDefaultVersion())
-                    continue;
-                names.insert(nd->getNodeString());
-            }
-            return std::vector<std::string>(names.begin(), names.end());
+            return to_js_object(mxslc::reflection::reflect(args...));
         }
         catch (const std::exception& e)
         {
-            rethrow_as_js_error(e, "Error");
+            rethrow_as_js_error(e, "CompileError");
         }
     }
 }
@@ -156,6 +210,11 @@ EMSCRIPTEN_BINDINGS(mxslc)
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);
 
+    ems::function("reflect", &reflect<>);
+    ems::function("reflect", &reflect<mxslc::CompileOptions>);
+    ems::function("reflectFromString", &reflect<std::string>);
+    ems::function("reflectFromString", &reflect<std::string, mxslc::CompileOptions>);
+    ems::function("getKeywords", &get_keywords);
+
     ems::register_vector<std::string>("StringVector");
-    ems::function("getMtlxDefinitionNames", &get_mtlx_definition_names);
 }

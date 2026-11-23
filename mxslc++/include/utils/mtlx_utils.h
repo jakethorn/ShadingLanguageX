@@ -20,8 +20,8 @@ namespace mxslc::mtlx_utils
 {
     mx::NodePtr create_node(const mx::GraphElementPtr& graph, const string& type, const string& category);
     mx::NodePtr create_node(const mx::GraphElementPtr& graph, const TypePtr& type, const string& category);
-    std::pair<mx::NodePtr, mx::InputPtr> create_dot(const mx::GraphElementPtr& graph, const TypePtr& type);
-    std::pair<mx::NodePtr, mx::InputPtr> create_constant(const mx::GraphElementPtr& graph, const TypePtr& type);
+    pair<mx::NodePtr, mx::InputPtr> create_dot(const mx::GraphElementPtr& graph, const TypePtr& type);
+    pair<mx::NodePtr, mx::InputPtr> create_constant(const mx::GraphElementPtr& graph, const TypePtr& type);
     mx::NodePtr create_constant(const mx::GraphElementPtr& graph, const Primitive& value);
 
     mx::InputPtr add_or_get_input(const mx::InterfaceElementPtr& element, const string& type, const string& name);

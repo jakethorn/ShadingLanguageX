@@ -4,7 +4,6 @@
 
 #include "utils/load_mtlx.h"
 
-#include <map>
 #include <mutex>
 
 #include <MaterialXFormat/Util.h>
@@ -158,7 +157,8 @@ namespace mxslc
 
         for (const mx::TypeDefPtr& td : doc->getTypeDefs())
         {
-            scope.add_primitive_type(td->getName());
+            TypePtr type = create_type(td->getName());
+            scope.add_type(std::move(type));
         }
 
         const unordered_set<string> default_node_defs = get_default_node_defs(doc);

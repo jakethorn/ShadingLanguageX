@@ -88,6 +88,16 @@ jobs:
           CIBW_ENVIRONMENT_LINUX: >
             CMAKE_ARGS="-DMTLX_ROOT=/project/external/MaterialX/install -DBUILD_TESTING=OFF"
 
+      - name: Check the Python stubs are up to date
+        # Regenerates python/mxslc/_mxslc.pyi from the Linux wheel built above.
+        if: runner.os == 'Linux'
+        working-directory: mxslc++
+        run: |
+          python -m pip install wheelhouse/*.whl
+          bash python/generate_stubs.sh
+          git diff --exit-code -- python/mxslc/_mxslc.pyi ||
+            { echo "::error::Run 'mxslc++/build_python.sh <materialx_install>', or install the newly built wheel and run 'mxslc++/python/generate_stubs.sh', and commit the changes."; exit 1; }
+
       # macOS Build
       - name: Build wheels on macOS
         if: runner.os == 'macOS'

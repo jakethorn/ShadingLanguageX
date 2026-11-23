@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <normal name="normals" type="vector3" />
+  <normalmap2 name="nm1" type="vector3">
+    <input name="in" type="vector3" nodename="normals" />
+    <input name="space" type="string" value="tangent" />
+    <input name="scale" type="float" value="0.1" />
+  </normalmap2>
+  <karma:foo name="nm2" type="vector3" />
+  <karma:foo name="nm3" type="float" />
+  <bar name="nm4" type="vector2">
+    <input name="a" type="integer" value="1" />
+    <input name="b" type="integer" value="2" />
+    <input name="c" type="integer" value="3" />
+  </bar>
+  <position name="var__0" type="vector3" />
+  <bar name="nm5" type="vector3">
+    <input name="position" type="vector3" nodename="var__0" />
+  </bar>
+  <foo name="var__1" type="float" />
+  <bar name="nm6" type="boolean">
+    <input name="in1" type="float" nodename="var__1" />
+  </bar>
+</materialx>

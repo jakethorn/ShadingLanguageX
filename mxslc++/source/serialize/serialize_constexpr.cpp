@@ -84,6 +84,22 @@ namespace mxslc::serialize
 
             return true;
         }
+
+        bool is_constexpr(const string& category, const ArgumentValues& input_values, vector<Primitive>& comptime_values)
+        {
+            if (not contains(CONSTEXPR_FUNCS, category))
+                return false;
+
+            for (const auto& [arg, input_value] : input_values)
+            {
+                if (input_value->is_compile_time())
+                    comptime_values.push_back(input_value->compile_time_value());
+                else
+                    return false;
+            }
+
+            return true;
+        }
     }
 
     VarPtr serialize_constexpr(const FuncPtr& func, const ParameterValues& input_values)
@@ -95,6 +111,20 @@ namespace mxslc::serialize
             if (VarPtr basic_value = CONSTEXPR_FUNCS.at(func->name())(return_type, comptime_values))
             {
                 assert(basic_value->type()->equals(return_type));
+                return basic_value;
+            }
+        }
+        return nullptr;
+    }
+
+    VarPtr serialize_constexpr(const string& category, const TypePtr& type, const ArgumentValues& input_values)
+    {
+        if (vector<Primitive> comptime_values; is_constexpr(category, input_values, comptime_values))
+        {
+            if (VarPtr basic_value = CONSTEXPR_FUNCS.at(category)(type, comptime_values))
+            {
+                if (not basic_value->type()->equals(type))
+                    throw CompileError{"Comptime expressions evaluated to a variable of type " + basic_value->type()->to_string() + ", not " + type->to_string()};
                 return basic_value;
             }
         }

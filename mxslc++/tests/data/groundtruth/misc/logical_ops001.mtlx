@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <and name="a1" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </and>
+  <randomfloat name="var__0" type="float" />
+  <ifgreater name="var__1" type="boolean">
+    <input name="value1" type="float" nodename="var__0" />
+    <input name="value2" type="float" value="0.5" />
+  </ifgreater>
+  <geompropvalue name="var__2" type="boolean">
+    <input name="geomprop" type="string" value="x" />
+  </geompropvalue>
+  <and name="b1" type="boolean">
+    <input name="in1" type="boolean" nodename="var__1" />
+    <input name="in2" type="boolean" nodename="var__2" />
+  </and>
+  <or name="a2" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </or>
+  <randomfloat name="var__3" type="float" />
+  <ifgreater name="var__4" type="boolean">
+    <input name="value1" type="float" nodename="var__3" />
+    <input name="value2" type="float" value="0.5" />
+  </ifgreater>
+  <geompropvalue name="var__5" type="boolean">
+    <input name="geomprop" type="string" value="x" />
+  </geompropvalue>
+  <or name="b2" type="boolean">
+    <input name="in1" type="boolean" nodename="var__4" />
+    <input name="in2" type="boolean" nodename="var__5" />
+  </or>
+  <xor name="a3" type="boolean">
+    <input name="in1" type="boolean" value="true" />
+    <input name="in2" type="boolean" value="false" />
+  </xor>
+  <randomfloat name="var__6" type="float" />
+  <ifgreater name="var__7" type="boolean">
+    <input name="value1" type="float" nodename="var__6" />
+    <input name="value2" type="float" value="0.5" />
+  </ifgreater>
+  <geompropvalue name="var__8" type="boolean">
+    <input name="geomprop" type="string" value="x" />
+  </geompropvalue>
+  <xor name="b3" type="boolean">
+    <input name="in1" type="boolean" nodename="var__7" />
+    <input name="in2" type="boolean" nodename="var__8" />
+  </xor>
+  <not name="a4" type="boolean">
+    <input name="in" type="boolean" value="true" />
+  </not>
+  <randomfloat name="var__9" type="float" />
+  <ifgreater name="var__10" type="boolean">
+    <input name="value1" type="float" value="0.5" />
+    <input name="value2" type="float" nodename="var__9" />
+  </ifgreater>
+  <not name="b4" type="boolean">
+    <input name="in" type="boolean" nodename="var__10" />
+  </not>
+</materialx>

@@ -31,7 +31,6 @@ from pathlib import Path
 # Paths
 # ---------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-KEYWORDS_JS = REPO_ROOT / "mxslc++" / "browser_shared" / "keywords.js"
 STDLIB_MXSL = REPO_ROOT / "mxslc++" / "libraries" / "stdlib.mxsl"
 LIBRARIES_DIR = REPO_ROOT / "mxslc++" / "libraries"
 
@@ -75,18 +74,38 @@ SPEC_HEADINGS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Keyword classes. Every keyword in keywords.js that is not listed here is
+# Keyword classes. Every compiler keyword that is not listed here is
 # highlighted as keyword.other.
 # ---------------------------------------------------------------------------
 CONTROL_KEYWORDS = {"if", "else", "for", "from", "to", "return", "break", "switch", "case", "default"}
 MODIFIER_KEYWORDS = {
-    "const", "mutable", "consteval", "comptime", "global", "geomprop", "nodegraph", "nodedef",
-    "inline", "uniform", "varying", "ref", "out",
+    "const", "mutable", "comptime", "global", "geomprop", "nodegraph", "nodedef",
+    "inline", "uniform", "ref", "out",
 }
 # Keywords with rules of their own in the grammar template.
 SPECIAL_KEYWORDS = {"class", "this", "null"}
 LANGUAGE_CONSTANTS = {"true", "false", "null"}
-EXTRA_TYPES = {"void", "auto", "T"}
+
+# Prints the keywords, and the type and function names for each MaterialX version, as JSON. Run by
+# Node with the folder holding JsMxslc.mjs, then the versions, as its arguments.
+COMPILER_NAMES_SCRIPT = """
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const [libDir, ...versions] = process.argv.slice(1);
+const factory = (await import(pathToFileURL(path.join(libDir, 'JsMxslc.mjs')).href)).default;
+const mx = await factory({ locateFile: (file) => path.join(libDir, file), print: () => {} });
+const names = { keywords: mx.getKeywords(), types: {}, functions: {} };
+for (const version of versions) {
+    const opts = new mx.CompileOptions();
+    opts.version = version;
+    const reflection = mx.reflect(opts);
+    names.types[version] = reflection.typeNames;
+    names.functions[version] = reflection.functionNames;
+    opts.delete();
+}
+process.stdout.write(JSON.stringify(names));
+"""
 
 
 # ---------------------------------------------------------------------------
@@ -187,22 +206,35 @@ def generate_theme_colors(grammar: dict) -> dict:
 # Language data
 # ---------------------------------------------------------------------------
 
-def load_keywords() -> list[str]:
-    """Return the keywords from browser_shared/keywords.js, which mirrors the mxslc++
-    TokenType keyword enum (include/TokenType.h). Its data types aren't used: they include
-    types SLX doesn't have, such as float2, so the types come from the MaterialX libraries
-    and stdlib.mxsl instead."""
-    text = KEYWORDS_JS.read_text(encoding="utf-8")
-    match = re.search(r"\bcontrol\s*:\s*\[(.*?)\]", text, re.S)
-    return re.findall(r"'([^']*)'", match.group(1)) if match else []
+def load_compiler_names(versions: list[str]) -> dict:
+    """Return the keywords, and the type and function names for each MaterialX version, from
+    the WebAssembly compiler in media/lib, so they match the compiler the extension bundles."""
+    if not (LIB_DIR / "JsMxslc.mjs").exists():
+        sys.exit("error: the WebAssembly compiler is not in media/lib; run with --converter to bundle it.")
+    node = shutil.which("node")
+    if node is None:
+        sys.exit("error: node was not found. Install Node.js and retry.")
+    result = subprocess.run(
+        [node, "--input-type=module", "-e", COMPILER_NAMES_SCRIPT, str(LIB_DIR), *versions],
+        capture_output=True, text=True, check=False,
+    )
+    if result.returncode != 0:
+        sys.exit(f"error: couldn't get the names from the WebAssembly compiler:\n{result.stderr}")
+    return json.loads(result.stdout)
 
 
-def load_stdlib() -> tuple[dict[str, str], set[str]]:
-    """Return the type aliases (alias -> type) and function names defined in stdlib.mxsl."""
+def check_keyword_classes(keywords: set[str]) -> None:
+    """Stop if a keyword class lists a word that isn't a keyword of the compiler."""
+    unknown = (CONTROL_KEYWORDS | MODIFIER_KEYWORDS | SPECIAL_KEYWORDS) - keywords
+    if unknown:
+        sys.exit(f"error: {', '.join(sorted(unknown))} aren't SLX keywords; "
+                 f"remove them from the keyword classes in {Path(__file__).name}")
+
+
+def load_stdlib_aliases() -> dict[str, str]:
+    """Return the type aliases (alias -> type) defined in stdlib.mxsl."""
     text = STDLIB_MXSL.read_text(encoding="utf-8")
-    aliases = dict(re.findall(r"^\s*using\s+(\w+)\s*=\s*(\w+)\s*;", text, re.M))
-    functions = set(re.findall(r"\b([A-Za-z_]\w*)\s*(?:<[^<>()]*>)?\s*\(", text))
-    return aliases, {f for f in functions if not f.startswith("__")}
+    return dict(re.findall(r"^\s*using\s+(\w+)\s*=\s*(\w+)\s*;", text, re.M))
 
 
 def version_key(version: str) -> tuple[int, ...]:
@@ -321,37 +353,28 @@ def load_spec_links(node_names: list[str]) -> dict[str, str]:
     return links
 
 
-def load_materialx_types(versions: list[str]) -> set[str]:
-    types = {
-        typedef.get("name")
-        for version in versions
-        for root in load_library_documents(version)
-        for typedef in root.iter("typedef")
-    }
-    return {t for t in types if t and t != "none" and not t.endswith("array")}
-
-
 def load_language(versions: list[str]) -> dict:
     """Return the keywords, types and functions of SLX, for the grammar and the
     extension's completion, hover and parameter hints."""
-    keywords = load_keywords()
-    aliases, stdlib_functions = load_stdlib()
+    names = load_compiler_names(versions)
+    keywords = set(names["keywords"])
+    check_keyword_classes(keywords)
     nodes = load_node_signatures(versions)
-    all_keywords = set(keywords) | LANGUAGE_CONSTANTS
-    # The MaterialX types, the aliases stdlib.mxsl defines for some of them, and SLX's own.
-    types = set(aliases) | load_materialx_types(versions) | EXTRA_TYPES
+    all_keywords = keywords | LANGUAGE_CONSTANTS
+    types = set().union(*names["types"].values())
+    functions = set().union(*names["functions"].values())
     return {
         "versions": versions,
         "keywords": {
             "control": sorted(CONTROL_KEYWORDS),
             "modifiers": sorted(MODIFIER_KEYWORDS),
             "constants": sorted(LANGUAGE_CONSTANTS),
-            "other": sorted(set(keywords) - CONTROL_KEYWORDS - MODIFIER_KEYWORDS - LANGUAGE_CONSTANTS),
+            "other": sorted(keywords - CONTROL_KEYWORDS - MODIFIER_KEYWORDS - LANGUAGE_CONSTANTS),
             "all": sorted(all_keywords),
         },
         "types": sorted(types),
-        "aliases": dict(sorted(aliases.items())),
-        "builtinFunctions": sorted((set(nodes) | stdlib_functions) - all_keywords - types),
+        "aliases": dict(sorted(load_stdlib_aliases().items())),
+        "builtinFunctions": sorted(functions),
         "nodes": nodes,
         "specLinks": load_spec_links(list(nodes)),
     }
@@ -531,7 +554,8 @@ def publish_vsix(vsix: Path) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate, package and install the SLX extension for VS Code.")
     parser.add_argument("-g", "--generate", action="store_true",
-                        help="Regenerate syntaxes/slx.tmLanguage.json, data/, skills/ and the MaterialX version list in package.json.")
+                        help="Regenerate syntaxes/slx.tmLanguage.json, data/, skills/ and the MaterialX version list in package.json. "
+                             "Needs Node.js and the WebAssembly compiler in media/lib (see --converter).")
     parser.add_argument("-c", "--converter", action="store_true",
                         help="Copy the WebAssembly compiler (JsMxslc.{js,wasm,data}) into media/lib, "
                              "building it first if it is missing.")
@@ -561,8 +585,13 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
+    # Before generating, which gets the keywords, types and functions from the bundled compiler.
+    if args.converter:
+        print("Bundling the WebAssembly compiler...")
+        copy_converter(args)
+
     if args.generate:
-        print("Generating the grammar, language data and version list...")
+        print("\nGenerating the grammar, language data and version list...")
         versions = find_materialx_versions()
         language = load_language(versions)
         grammar = generate_grammar(language)
@@ -570,10 +599,6 @@ def main() -> None:
         update_package_json(versions, generate_theme_colors(grammar))
         copy_license()
         copy_skill()
-
-    if args.converter:
-        print("\nBundling the WebAssembly compiler...")
-        copy_converter(args)
 
     if args.vsix or args.install or args.publish:
         print("\nPackaging...")

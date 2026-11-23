@@ -111,9 +111,9 @@ namespace mxslc::decompile
     ExpressionCode format_identifier(const string& name);
     // e.g., `1.0`, negative numbers bind like unary expressions, e.g., `-1.0`
     ExpressionCode format_literal(const string& text);
-    // e.g., `a + b`, `a == b` or `a & b`
+    // e.g., `a + b`, `a == b` or `a and b`
     ExpressionCode format_binary_expression(const ExpressionCode& lhs, const string& op, const ExpressionCode& rhs);
-    // e.g., `-a` or `!a`
+    // e.g., `-a` or `not a`, whose operator includes the space after a keyword
     ExpressionCode format_unary_expression(const string& op, const ExpressionCode& operand);
     // `|a|`
     ExpressionCode format_absolute_value(const ExpressionCode& operand);
@@ -125,6 +125,8 @@ namespace mxslc::decompile
     ExpressionCode format_constructor(const string& type, const vector<ExpressionCode>& args);
     // `f<T>(a, b)`, whose arguments are complete, see format_argument
     ExpressionCode format_function_call(const string& function, const string& template_type, const vector<SourceCode>& args);
+    // `node foo<T>(a = x)`, or `node foo<T>` without arguments, whose arguments are complete, see format_argument
+    ExpressionCode format_node_keyword_expression(const string& category, const string& template_type, const vector<SourceCode>& args);
     // `if (c) { a } else { b }`, whose else branch can be implied by the variable it is assigned to, e.g.,
     // `x = if (c) { a };`
     ExpressionCode format_if_expression(const ExpressionCode& condition, const ExpressionCode& then_code, const optional<ExpressionCode>& else_code);

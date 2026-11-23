@@ -20,14 +20,14 @@ PYBIND11_MODULE(_mxslc, m)
     m.attr("__version__") = MXSLCXX_PY_VERSION;
 #endif
 
-    bind_compile_options(m);
+    bind_macro(m);
     bind_variable(m);
     bind_create_variable(m);
+    bind_compile_options(m);
     bind_global_info(m);
     bind_reflection(m);
     bind_compile_functions(m);
     bind_reflect_functions(m);
     bind_decompile_functions(m);
     bind_decompiler(m);
-    bind_macro(m);
 }

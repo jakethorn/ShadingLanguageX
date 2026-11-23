@@ -76,6 +76,12 @@ path = mxslc.compile_string_to_file(src, "out.mtlx")            # or (src, opts)
 gs = mxslc.reflect_from_file("a.mxsl", opts).globals           # also _from_string; each has .name, .type ("color3"),
                                                                 # .default_value (opts' value, else initializer or type
                                                                 # default; None if runtime)
+r = mxslc.reflect_from_string(src)                              # r.type_names, r.function_names: list[str], sorted,
+                                                                # unique, with the program's own; types include aliases
+                                                                # and void/auto/T; functions are nodes + stdlib +
+                                                                # methods, without keyword nodes or __ops__
+r = mxslc.reflect(opts)                                         # an empty program: what every program can use (opts optional)
+kws: list[str] = mxslc.get_keywords()                           # sorted
 
 slx: str = mxslc.decompile_file_to_string("a.mtlx")
 slx: str = mxslc.decompile_string_to_string(xml)
@@ -181,11 +187,16 @@ opts.defaultFunctionBehaviour = mx.FunctionBehaviour.Inline;    // or NodeDef (d
 opts.addSource('utils.mxsl', code);    // also clearSources, addSearchDirectory, clearSearchDirectories, searchDirectories()
 const mtlx = mx.compileSlxToMtlx(src, opts);     // throws Error with name 'CompileError'
 const slx = mx.decompileMtlxToSlx(mtlx);
-const names = mx.getMtlxDefinitionNames();       // node categories in the loaded library
+const keywords = mx.getKeywords();               // array of strings
+const { typeNames, functionNames } = mx.reflect(opts);  // arrays of strings, as in Python, for an empty
+                                                        // program; opts optional
+const { globals } = mx.reflectFromString(src, opts);  // also typeNames, functionNames; opts optional; globals are
+                                                      // { name, type, defaultValue }, with vectors/colors
+                                                      // as arrays, matrices as arrays of rows, runtime as null
 opts.delete();
 ```
 
-The JS API can't pass globals or an entry function.
+The JS API can't pass globals or an entry function, or compile or reflect a file.
 
 ## MaterialX versions and library lookup
 
@@ -205,10 +216,12 @@ The JS API can't pass globals or an entry function.
 ## Decompiler
 
 `mxslc decompile a.mtlx -o a.mxsl`, or the API calls above, turns MaterialX back into readable SLX.
-It reconstructs operators (`add` becomes `+`), swizzles (`p.zx`), constructors, if-expressions,
-switch-expressions, `geomprop` variables, functions from NodeDef/NodeGraph pairs (marked `[[nodedef]]`),
-nodegraph and parameterless functions, attributes, and destructured multi-output nodes. Its output
-compiles again:
+It reconstructs operators (`add` becomes `+`, and the logical nodes become `and`, `or`, `xor` and `not`),
+swizzles (`p.zx`), constructors, if-expressions, switch-expressions, `geomprop` variables, functions from
+NodeDef/NodeGraph pairs (marked `[[nodedef]]`), nodegraph and parameterless functions, attributes, and
+destructured multi-output nodes. Nodes without a NodeDef, e.g., custom or namespaced nodes, become node
+expressions (`vec3 n = node normalmap2(in = normals, scale = 0.1);`, `node karma:foo<float>` elsewhere),
+and so do nodes whose category can't be called by name (`node and<bool>(...)`). Its output compiles again:
 
 ```text
 {float outx, float outy} var_2 = separate2(texcoord() * 10.0);
@@ -221,8 +234,8 @@ float add_one(float x)
 ```
 
 Use it to learn the SLX form of an existing graph, or to port `.mtlx` files. It decompiles only what is in
-the document: it can't recover loops or source-level names of folded values, and nodegraph functions
-with nonlocals are a known weak spot. `with_dependencies=True` also emits every element the requested
+the document: it can't recover loops or source-level names of folded values, nodegraph functions
+with nonlocals are a known weak spot, and multi-output nodes without a NodeDef can't be decompiled yet. `with_dependencies=True` also emits every element the requested
 element depends on.
 
 ## Common errors and fixes
@@ -237,7 +250,12 @@ element depends on.
 | `Variable is not available at compile-time` | runtime value in an `if` statement, loop range or `comptime` context, or a non-inline function param used that way | if-expression, or `inline` function, or compile-time value |
 | `Cannot assign a non-compile-time value to a comptime variable` | node assigned to `comptime` var or param | remove `comptime` or pass a constant |
 | `Missing else branch in if-expression` | `T x = if (c) { a };` in a definition | add `else`, or define first then `x = if (c) { a };` |
-| `Unexpected token: &&` / `\|\|` / `Scanning error ... character: ?` | C operators | `&`, `\|`, if-expression |
+| `Unexpected token: &&` / `\|\|` / `Scanning error ... character: ?` | C operators | `and`, `or`, if-expression |
+| `Invalid expression` at `and(`, `or(` or `xor(` | these nodes are keywords, not functions | `a and b`, `a or b`, `a xor b` |
+| `Unexpected token: \|` inside `\|...\|` | the `\|` operator in an absolute value | `or`, or `absval(...)` |
+| `Node expression arguments must be named` | a positional argument in `node foo(...)` | `node foo(in = x)` |
+| `Ambiguously typed node expression` | a node expression in an untyped context | `node foo<float>(...)` or a typed destination |
+| `Node interface error: Input 'in1' doesn't match declaration`, then *mxslc produced an invalid MaterialX document* | a node expression whose category has NodeDefs, but none with these types | match the NodeDef's types (`1.0`, not `1`), or call the function |
 | `Unexpected token: =` in `for (int i = 0:3)` | old loop syntax | `for (int i from 0 to 3)` |
 | `Unexpected token: =` in a switch | `default=x` | `default: x` |
 | `Cannot assign an expression of type integer to a variable or parameter of type float` | int variable into a float | `float{i}` |

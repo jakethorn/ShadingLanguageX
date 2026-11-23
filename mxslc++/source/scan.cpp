@@ -189,7 +189,7 @@ namespace mxslc
     {
         vector<Token> tokens;
         size_t line = 1;
-        const string filename = src_path ? src_path->filename().string() : "";
+        const SharedPathPtr shared_path = copy_to_shared_ptr(src_path);
 
         while (not text.empty())
         {
@@ -209,8 +209,7 @@ namespace mxslc
             }
 
             token.set_line(line);
-            if (src_path)
-                token.set_filename(filename);
+            token.set_path(shared_path);
 
             if (token == TokenType::Newline)
             {
@@ -225,7 +224,13 @@ namespace mxslc
 
     vector<Token> scan_file(const fs::path& src_path)
     {
-        string text = io_utils::read_file(src_path);
-        return scan_string(std::move(text), src_path);
+        return scan_string(io_utils::read_file(src_path), src_path);
+    }
+
+    vector<Token> scan_source(const SourceRef& source)
+    {
+        if (source.is_in_memory())
+            return scan_string(*source.contents, source.path);
+        return scan_file(source.path);
     }
 }

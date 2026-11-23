@@ -18,7 +18,7 @@ sketches or deliberately invalid examples.
 11. Functions
 12. User-defined types: structs, `using`, classes
 13. Operator overloading
-14. `null`, `default`, `typeof`, `print`
+14. `null`, `default`, `typeof`, `print`, node expressions
 15. Attributes
 16. Scope and name resolution
 17. Preprocessor
@@ -30,11 +30,10 @@ sketches or deliberately invalid examples.
 - Whitespace and newlines are insignificant. Comments are `// line` and `/* block */`.
 - Identifiers match `[_a-zA-Z][_a-zA-Z0-9]*`. Don't use `__` in your own names, because the compiler uses
   it for generated element names.
-- **Keywords** (reserved): `if else for from to return null ref out const mutable consteval global
-  geomprop nodegraph nodedef inline default comptime using class this uniform varying namespace print
-  typeof break switch case`, plus the literals `true false`. Also treat `T`, `auto` and `void` as
-  reserved, since they are type names with special meaning. `uniform`, `varying`, `namespace` and
-  `consteval` are reserved but do nothing yet.
+- **Keywords** (reserved): `if else for from to return null ref out const mutable global geomprop
+  nodegraph nodedef inline default comptime node using class this uniform print typeof break switch
+  case and or xor not`, plus the literals `true false`. Also treat `T`, `auto` and `void` as reserved,
+  since they are type names with special meaning.
 - Literals:
   - `true`, `false`
   - int: `0`, `79`, `1000000` (decimal only, no hex)
@@ -175,17 +174,22 @@ Highest first. Binary operators are left-associative.
 | postfix | `a.b`, `a.m()`, `a[i]` |
 | increment | `++a --a a++ a--` |
 | compound assignment | `a += b` and friends (the RHS is a whole expression) |
-| unary | `-a +a !a` (**binds tighter than `^`**) |
+| unary | `-a +a !a not a` (**binds tighter than `^`**) |
 | power | `a ^ b` (power for numbers, xor for bools) |
 | multiplicative | `* / %` |
 | additive | `+ -` |
 | range | `a:b` `a:b:c` `a to b` |
 | relational | `> >= < <=` (a chain `a < b < c` parses but is rejected) |
 | equality | `== !=` |
-| logical | `&` `\|` (**same level**, left to right) |
+| logical | `&` `and` `\|` `or` `xor` (**same level**, left to right) |
 
-The logical `|` operator can't appear inside `|...|`, even in parentheses. If the expression needs one,
-call `absval(...)` instead.
+`and`, `or` and `not` are the same operators as `&`, `|` and `!`. Because all the logical operators
+share one level, `a or b and c` means `(a or b) and c`, unlike C and Python. `xor` is at that level
+too, far below `^` (also xor for bools), so `a ^ b == c` is `(a ^ b) == c` but `a xor b == c` is
+`a xor (b == c)`.
+
+The `|` operator can't appear inside `|...|`, even in parentheses. Write `or` instead, or call
+`absval(...)`.
 
 Type rules come from `stdlib.mxsl` overloads:
 - `+ - * / % ^` work on `T op T` and `T op float` / `float op T` for float, vec2-4 and color3/4.
@@ -195,8 +199,8 @@ Type rules come from `stdlib.mxsl` overloads:
 - int supports `+ - * / ^` but **not `%`**. `int * int`, `int / int` (floors) and `int ^ int` are
   computed through float and rounded.
 - `BSDF/EDF/VDF` support `+`, plus `* float` and `* color3`.
-- `< <= > >=` work on int or float only. `== !=` work on bool, int or float only. `& | !` and `^`
-  (as xor) work on bool only.
+- `< <= > >=` work on int or float only. `== !=` work on bool, int or float only. `& and | or xor
+  ! not` and `^` (as xor) work on bool only.
 - Unary `-` works on numbers and vectors (`invert(x, amount = 0)`, or `subtract(0, x)` for int).
 
 ## 7. Access: fields, swizzles, indexing, ports
@@ -458,6 +462,7 @@ Define free functions, never class members:
 |---|---|---|---|---|---|
 | `a>b` `__gt__` | `a>=b` `__ge__` | `a<b` `__lt__` | `a<=b` `__le__` | `a==b` `__eq__` | `a!=b` `__ne__` |
 | `a&b` `__and__` | `a\|b` `__or__` | `!a` `__not__` | `-a` `__neg__` | `+a` `__pos__` | `\|a\|` `__abs__` |
+| `a and b` `__and__` | `a or b` `__or__` | `not a` `__not__` | `a xor b` `__xor__` | | |
 
 Compound assignments use the binary overload (`p += q` calls `__add__`). Declare overloads `inline`
 unless you want NodeDefs named `__add__`.
@@ -477,7 +482,7 @@ q += p * 2.0;
 standard_surface(base = |q|);
 ```
 
-## 14. `null`, `default`, `typeof`, `print`
+## 14. `null`, `default`, `typeof`, `print`, node expressions
 
 - `null`: "no value". Passed or assigned to a node input, it leaves the input unset so MaterialX's
   default applies (`s.coat = null;`, `surfacematerial(surf, null, disp)`). It's useful as a parameter
@@ -491,6 +496,31 @@ standard_surface(base = |q|);
 - `print e1, e2;` writes each value to stdout at compile time. Constants print as values (`2`, `"hi"`,
   `vec3{1.0, 2.0, 3.0}`) and runtime values print as `node (category, name)` or
   `node-output (category, name.output)`.
+- **Node expressions**, `node category<T>(input = value, ...)`, create a node element without looking
+  up a NodeDef. Use them for renderer-specific or custom nodes whose library isn't loaded, and for the
+  nodes whose names are keywords (`node out(fg = a, bg = b, mix = 0.5)`).
+  - Every argument must be named. The parentheses are optional when there are none (`node my:seed`).
+  - The category may be a keyword and may contain `:` (`node karma:foo`).
+  - The output type is `<T>`, or otherwise the one type the context expects. `auto x = node foo();`
+    and an argument to an overloaded parameter fail with *Ambiguously typed node expression*.
+  - Each input gets the type of its argument, and nothing is type-checked. `in1 = 1` makes an
+    `integer` input, so write `1.0` for a float. A string literal makes a `string` input and there is
+    no `filename{...}` constructor, so pass a `filename` variable to a file input.
+  - Attributes work as they do on calls: `@doc` above the statement goes on the node, and `@in.doc`
+    above the statement or `@doc` before an argument goes on that input.
+  - A class or struct type (a multi-output node) produces an invalid document.
+  - Known bug: a foldable category (`add`, `divide`, `ifgreater`, ...) with compile-time arguments is
+    folded with the arguments in the order written, not matched by name. Write them in NodeDef order.
+
+```slx
+vec3 n = normal();
+vec3 nm = node karma:normalmap(in = n, space = "tangent", scale = 0.1);
+filename tex = "albedo.png";
+color3 albedo = node karma:image(file = tex, texcoord = node karma:uvset<vec2>(index = 1));
+@doc "a seed from the renderer"
+int seed = node karma:seed;
+color3 c = randomcolor(seed = seed);
+```
 
 ## 15. Attributes
 

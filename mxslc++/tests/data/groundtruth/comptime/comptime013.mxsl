@@ -1,0 +1,4 @@
+float a = node add(in1=1.0, in2=1.0);
+constant(a);
+float b = comptime node add(in1=1.0, in2=1.0);
+constant(b);

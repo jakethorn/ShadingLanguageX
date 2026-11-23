@@ -1,0 +1,7 @@
+vec3 normals = normal();
+vec3 nm1 = node normalmap2(normals, "tangent", 0.1);
+vec3 nm2 = node karma:foo();
+auto nm3 = node karma:foo<float>();
+vec2 nm4 = node bar<vec2>(a=1, b=2, c=3);
+vec3 nm5 = node bar(position=position());
+bool nm6 = node bar(in1=node foo<float>());

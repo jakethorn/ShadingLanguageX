@@ -19,6 +19,12 @@ namespace mxslc::container_utils
         return dst;
     }
 
+    template<typename T>
+    shared_ptr<T> copy_to_shared_ptr(const optional<T>& value)
+    {
+        return value ? std::make_shared<T>(*value) : nullptr;
+    }
+
     template<typename T0, typename T1>
     auto position_of(const vector<T0>& ts, const T1& t)
     {
@@ -56,6 +62,16 @@ namespace mxslc::container_utils
 
     bool contains(const string& str, char c);
     bool contains(const vector<TypePtr>& types, const TypePtr& type);
+
+    template<typename TMap>
+    vector<typename TMap::key_type> get_keys(const TMap& map)
+    {
+        vector<typename TMap::key_type> keys;
+        keys.reserve(map.size());
+        for (const auto& [key, value] : map)
+            keys.push_back(key);
+        return keys;
+    }
 
     template<typename T>
     void extend(vector<T>& dst, const vector<T>& src)

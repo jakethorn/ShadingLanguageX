@@ -24,7 +24,7 @@ namespace mxslc::mtlx_utils
         return create_node(graph, type->name(), category);
     }
 
-    std::pair<mx::NodePtr, mx::InputPtr> create_dot(const mx::GraphElementPtr& graph, const TypePtr& type)
+    pair<mx::NodePtr, mx::InputPtr> create_dot(const mx::GraphElementPtr& graph, const TypePtr& type)
     {
         const mx::NodePtr node = create_node(graph, type, "dot");
         const mx::InputPtr input = add_or_get_input(node, type, "in");
@@ -32,7 +32,7 @@ namespace mxslc::mtlx_utils
         return {node, input};
     }
 
-    std::pair<mx::NodePtr, mx::InputPtr> create_constant(const mx::GraphElementPtr& graph, const TypePtr& type)
+    pair<mx::NodePtr, mx::InputPtr> create_constant(const mx::GraphElementPtr& graph, const TypePtr& type)
     {
         const mx::NodePtr node = create_node(graph, type, "constant");
         const mx::InputPtr input = add_or_get_input(node, type, "value");

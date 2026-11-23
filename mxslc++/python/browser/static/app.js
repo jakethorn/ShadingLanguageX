@@ -19,18 +19,12 @@ const engine = {
     // True once conversions can be performed.
     isReady() { return true; },
 
-    // Return the authoritative keyword sets. `functions` is the MaterialX
-    // definition-name list and is used first; the static MXSL_KEYWORDS backup
-    // is only consulted if this returns no functions.
+    // Return the keywords, type names and function names, from the compiler.
     async getKeywords() {
         const r = await fetch('/api/keywords');
         const data = await r.json();
-        return {
-            data_types: data.data_types || [],
-            control: data.control || [],
-            builtins: data.builtins || [],
-            functions: data.functions || [],
-        };
+        if (data.error) throw new Error(data.error);
+        return data;
     },
 
     // Compile MXSL source to MTLX XML. Returns the MTLX string.

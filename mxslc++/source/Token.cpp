@@ -26,8 +26,19 @@ namespace mxslc
     {
         Token t{type(), runtime_utils::monomorphize(lexeme(), template_type)};
         t.set_line(line());
-        t.set_filename(filename());
+        t.set_path(path_);
         return t;
+    }
+
+    string Token::filename() const
+    {
+        return path_ ? path_->filename().string() : "";
+    }
+
+    const fs::path& Token::path() const
+    {
+        static const fs::path empty_path;
+        return path_ ? *path_ : empty_path;
     }
 
     Primitive Token::literal() const

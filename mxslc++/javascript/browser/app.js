@@ -5,7 +5,6 @@
 
 import { setEngine, start, logMessage } from './common.js';
 import Mxslc from './lib/JsMxslc.js';
-import { MXSL_KEYWORDS } from './keywords.js';
 
 // ============================================================
 //  Engine adapter (WASM)
@@ -21,30 +20,20 @@ const engine = {
         mx = await Mxslc({
             locateFile: (file) => new URL('./lib/' + file, import.meta.url).href,
         });
-        logMessage('WebAssembly module loaded (' +
-            MXSL_KEYWORDS.control.length + ' control keywords, ' +
-            MXSL_KEYWORDS.functions.length + ' built-in functions)', 'success');
+        logMessage('WebAssembly module loaded', 'success');
     },
 
     // True once the WASM module is available for conversions.
     isReady() { return !!mx; },
 
-    // Return the authoritative keyword sets. `functions` is the MaterialX
-    // nodedef-category list from the WASM library and is used first; the
-    // static MXSL_KEYWORDS backup is only consulted if this returns no
-    // functions. Control/data-type keywords always come from the static list
-    // (they are language keywords, not MaterialX nodedefs).
+    // Return the keywords, type names and function names, from the compiler.
     getKeywords() {
-        const defs = mx.getMtlxDefinitionNames();
-        const count = defs.size();
-        const functions = [];
-        for (let i = 0; i < count; i++) functions.push(defs.get(i));
-        return Promise.resolve({
-            data_types: MXSL_KEYWORDS.dataTypes,
-            control: MXSL_KEYWORDS.control,
-            builtins: [],
-            functions,
-        });
+        const reflection = mx.reflect();
+        return {
+            keywords: mx.getKeywords(),
+            types: reflection.typeNames,
+            functions: reflection.functionNames,
+        };
     },
 
     // Compile MXSL source to MTLX XML. Maps the shared plain options object

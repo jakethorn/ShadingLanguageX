@@ -32,5 +32,7 @@ nodegraphs008
 scope002
 
 # library directives cannot be decompiled
-load_lib001
 defaultgeomprop007
+
+# the compiler drops the attributes of operators, e.g., `@doc` above `int i = 1 + 1;`
+node_expr006

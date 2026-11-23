@@ -48,6 +48,7 @@ namespace mxslc::runtime
         bool is_nodedef() const { return not is_inline() and not is_nodegraph(); }
         bool is_default() const { return mods_.contains(TokenType::Default); }
         bool is_uniform() const { return mods_.contains(TokenType::Uniform); }
+        const ModifierList& modifiers() const { return mods_; }
         const TypePtr& return_type() const { return return_type_; }
         bool is_void() const;
         const string& name() const { return name_; }

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <add name="a" type="float">
+    <input name="in1" type="float" value="1" />
+    <input name="in2" type="float" value="1" />
+  </add>
+  <constant name="var__0" type="float">
+    <input name="value" type="float" nodename="a" />
+  </constant>
+  <constant name="var__1" type="float">
+    <input name="value" type="float" value="2" />
+  </constant>
+</materialx>

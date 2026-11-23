@@ -1,0 +1,1 @@
+bool nm6 = node bar(in1=node foo());

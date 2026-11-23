@@ -5,11 +5,12 @@
 #include "runtime/utils/monomorphize.h"
 
 #include "runtime/Type.h"
+#include "runtime/utils/TypeName.h"
 
 namespace mxslc::runtime_utils
 {
     string monomorphize(const string& src, const TypePtr& template_type)
     {
-        return src == "T" ? template_type->name() : src;
+        return src == TypeName::T ? template_type->name() : src;
     }
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <foo name="a" type="float" />
+  <foo2 name="b" type="float" />
+  <foo3 name="c" type="boolean" />
+  <filename name="var__0" type="filename" />
+  <image name="d" type="color3">
+    <input name="file" type="filename" nodename="var__0" />
+  </image>
+  <filename name="var__1" type="filename" />
+  <image name="e" type="color3">
+    <input name="file" type="filename" nodename="var__1" />
+  </image>
+  <filename name="var__2" type="filename" />
+  <uv1 name="var__3" type="vector2" />
+  <uv2 name="var__4" type="vector2" />
+  <add name="var__5" type="vector2">
+    <input name="in1" type="vector2" nodename="var__3" />
+    <input name="in2" type="vector2" nodename="var__4" />
+  </add>
+  <image name="f" type="color3">
+    <input name="file" type="filename" nodename="var__2" />
+    <input name="texcoord" type="vector2" nodename="var__5" />
+  </image>
+  <seed name="var__6" type="integer" />
+  <add name="var__7" type="integer">
+    <input name="in1" type="integer" nodename="var__6" />
+    <input name="in2" type="integer" value="1" />
+  </add>
+  <randomcolor name="g" type="color3">
+    <input name="seed" type="integer" nodename="var__7" />
+  </randomcolor>
+</materialx>

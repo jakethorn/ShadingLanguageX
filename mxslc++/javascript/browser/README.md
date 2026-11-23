@@ -10,7 +10,7 @@ WebAssembly module.
 browser/
 ├── index.html      # Page UI (two editors + log)
 ├── app.js          # App logic: loads WASM, wires editors + conversion
-├── keywords.js     # Embedded MXSL keyword lists for syntax highlighting
+├── common.js       # Shared UI core (a copy of browser_shared/common.js)
 ├── serve.js        # Minimal Node static file server
 ├── README.md       # This file
 └── lib/            # WASM package
@@ -81,10 +81,15 @@ const mx = await Mxslc({
 
 Then conversion calls (all synchronous, throw on error):
 
-- `mx.compileSlxToMtlx(slx)` → MTLX XML string
+- `mx.compileSlxToMtlx(slx, opts)` → MTLX XML string, with `opts = new mx.CompileOptions()`
 - `mx.decompileMtlxToSlx(mtlx)` → MXSL string
-- `mx.compileSlxToMtlxWithOptions(slx, opts)` / `new mx.CompileOptions()`
-- `mx.getMtlxDefinitionNames()` → array of MaterialX definition categories (e.g. 'add', 'image', 'standard_surface', etc.)
+- `mx.getKeywords()` → array of the SLX keywords
+- `mx.reflect()` / `mx.reflect(opts)` → `{ globals, typeNames, functionNames }` of an empty program: the names of
+  the types (e.g. 'float', 'vec3', 'surfaceshader') and functions (e.g. 'add', 'image', 'standard_surface') every
+  program can use
+- `mx.reflectFromString(slx)` / `mx.reflectFromString(slx, opts)` → `{ globals, typeNames, functionNames }` of the
+  source. `globals` is an array of `{ name, type, defaultValue }`, and `typeNames` and `functionNames` are sorted
+  arrays of strings
 
 ## CI / Deployment
 
@@ -109,5 +114,6 @@ unit tests, and (when enabled) deploys the `browser/` folder to GitHub Pages.
 
 ## Notes
 
-- Syntax highlighting uses the SLX keywords list from `keywords.js` and retrieves the MaterialX node/function names using `getMtlxDefinitionNames()`. In the event the library fails to the load
-there is a set of fallback MaterialX keywords in `keywords.js`.
+- Syntax highlighting gets the keywords, types and functions from the compiler, with `getKeywords()` and `reflect()`.
+  If the WebAssembly module fails to load, nothing is highlighted as a keyword, type or function, but the page can't
+  convert anything then either.

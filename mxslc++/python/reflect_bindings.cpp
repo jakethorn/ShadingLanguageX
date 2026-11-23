@@ -12,6 +12,17 @@ using namespace mxslc::reflection;
 void bind_reflect_functions(py::module_& m)
 {
     m.def(
+        "reflect",
+        py::overload_cast<>(&reflect)
+    );
+
+    m.def(
+        "reflect",
+        py::overload_cast<const CompileOptions&>(&reflect),
+        py::arg("opts")
+    );
+
+    m.def(
         "reflect_from_file",
         py::overload_cast<const fs::path&>(&reflect),
         py::arg("src_path")
@@ -35,5 +46,10 @@ void bind_reflect_functions(py::module_& m)
         py::overload_cast<const string&, const CompileOptions&>(&reflect),
         py::arg("source"),
         py::arg("opts")
+    );
+
+    m.def(
+        "get_keywords",
+        &get_keywords
     );
 }

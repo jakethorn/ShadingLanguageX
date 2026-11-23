@@ -30,6 +30,14 @@ namespace mxslc::serialize
 {
     namespace
     {
+        string serialize_type(const TypePtr& type)
+        {
+            if (type->has_fields())
+                return "multioutput";
+            else
+                return type->name();
+        }
+
         string serialize_type(const FuncPtr& func)
         {
             const vector<mx::OutputPtr> outputs = func->node_def()->getActiveOutputs();
@@ -220,6 +228,35 @@ namespace mxslc::serialize
         func_call_history_.add_call(func_call);
 
         return serialize_utils::create_node_value(node, func);
+    }
+
+    VarPtr Serializer::write_node(const string& category, const TypePtr& type, const ArgumentList& args, const AttributeList& attrs) const
+    {
+        // evaluate args
+        ArgumentValues input_values;
+        for (const Argument& arg : args)
+            input_values.emplace_back(arg, arg.evaluate());
+
+        // evaluate node now if possible (without creating node element in graph)
+        if (reduce_graph_ or comptime_scope_.top())
+        {
+            if (VarPtr value = serialize_constexpr(category, type, input_values))
+                return value;
+        }
+
+        // serialize node
+        const mx::GraphElementPtr& graph = scope().graph();
+        const mx::NodePtr node = graph->addNode(category, get_valid_node_name(graph), serialize_type(type));
+
+        // add inputs to node
+        for (const auto& [arg, input_value] : input_values)
+            write_node_input(node, arg.name(), arg.type(), input_value, arg.attributes());
+
+        // add attributes to node
+        attrs.add_to(node);
+
+        // turn into variable and return
+        return serialize_utils::create_node_value(node, type);
     }
 
     VarPtr Serializer::write_node_graph_value(const ConstFunctionCallPtr& func_call) const

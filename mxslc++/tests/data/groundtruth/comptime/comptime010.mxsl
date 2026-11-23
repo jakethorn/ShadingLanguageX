@@ -1,0 +1,12 @@
+float a1 = divide(in2=4, in1=2);
+float b1 = comptime divide(in2=4, in1=2);
+float a2 = divide(in1=2, in2=4);
+float b2 = comptime divide(in1=2, in2=4);
+float a3 = divide(2, 4);
+float b3 = comptime divide(2, 4);
+constant(a1);
+constant(b1);
+constant(a2);
+constant(b2);
+constant(a3);
+constant(b3);

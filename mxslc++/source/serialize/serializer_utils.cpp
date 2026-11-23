@@ -41,6 +41,19 @@ namespace mxslc::serialize_utils
         }
     }
 
+    VarPtr create_node_value(mx::NodePtr node, TypePtr type)
+    {
+        if (type->has_fields())
+        {
+            return create_node_output_value(std::move(node), std::move(type), RETURN_VALUE_PREFIX);
+        }
+        else
+        {
+            ValuePtr value = create_value<NodeValue>(std::move(node));
+            return create_variable(std::move(value));
+        }
+    }
+
     VarPtr create_node_value(mx::NodePtr node, const mx::NodeDefPtr& node_def, TypePtr type)
     {
         if (node_def->getActiveOutputs().size() == 1)
@@ -82,6 +95,27 @@ namespace mxslc::serialize_utils
     VarPtr create_node_graph_value(const FuncPtr& func)
     {
         return create_node_graph_value(func->node_graph(), func->return_type());
+    }
+
+    VarPtr create_node_output_value(mx::NodePtr node, TypePtr type, const string& output_name)
+    {
+        if (type->has_fields())
+        {
+            vector<VarPtr> field_values;
+            field_values.reserve(type->field_count());
+            for (size_t i = 0; i < type->field_count(); ++i)
+            {
+                VarPtr field_value = create_node_output_value(node, type->field_type(i), with_prefix(output_name, type, i));
+                field_values.push_back(std::move(field_value));
+            }
+
+            return create_variable(std::move(type), field_values);
+        }
+        else
+        {
+            ValuePtr value = create_value<NodeOutputValue>(std::move(type), std::move(node), output_name);
+            return create_variable(std::move(value));
+        }
     }
 
     VarPtr create_node_output_value(mx::NodePtr node, const mx::NodeDefPtr& node_def, TypePtr type, const string& output_name)

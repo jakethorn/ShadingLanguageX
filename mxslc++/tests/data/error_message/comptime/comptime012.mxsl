@@ -1,0 +1,2 @@
+float b = comptime node add<int>(in1=1, in2=1);
+constant(b);

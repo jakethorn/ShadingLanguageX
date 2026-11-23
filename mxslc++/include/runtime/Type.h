@@ -76,6 +76,8 @@ namespace mxslc::runtime
         bool equals(const TypePtr& other, bool field_names = false) const;
         bool is_in(const vector<TypePtr>& types) const;
 
+        Scope* defining_scope() const { return defining_scope_; }
+
         string to_string() const override;
         string full_str() const;
 
@@ -106,17 +108,18 @@ namespace mxslc::runtime
         static TypePtr unnamed_struct(TypePtr field_type, size_t field_count);
 
     private:
+        void set_resolved() { is_resolved_ = true; }
+        static TypePtr resolve(const string& name);
+
+        void validate() const;
+
         string name_;
         vector<Field> fields_;
         vector<weak_ptr<Function>> methods_;
         TypePtr template_type_;
 
         bool is_resolved_{false};
-
-        void set_resolved() { is_resolved_ = true; }
-        static TypePtr resolve(const string& name);
-
-        void validate() const;
+        Scope* defining_scope_{nullptr};
     };
 
     inline bool operator==(const TypePtr& type, const string& other)

@@ -30,6 +30,8 @@ namespace mxslc::type_utils
 
     TypePtr resolve(const TypePtr& type)
     {
+        if (type == nullptr)
+            return nullptr;
         return Runtime::get().scope().resolve_type(type);
     }
 

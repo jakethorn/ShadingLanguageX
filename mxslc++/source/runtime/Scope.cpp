@@ -19,6 +19,7 @@ namespace mxslc::runtime
 {
     using container_utils::contains;
     using container_utils::extend;
+    using container_utils::get_keys;
 
     Scope::Scope() : Scope{string{}, nullptr} { }
     Scope::Scope(string name) : Scope{std::move(name), nullptr} { }
@@ -33,7 +34,7 @@ namespace mxslc::runtime
         }
     }
 
-    std::pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
+    pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
     {
         if (const mx::NodeGraphPtr& node_graph = std::dynamic_pointer_cast<mx::NodeGraph>(graph_))
             return {node_graph, graph_func_};
@@ -168,14 +169,9 @@ namespace mxslc::runtime
 
         resolve_fields(type);
         type->set_resolved();
+        type->defining_scope_ = this;
 
         types_.emplace(type->name(), std::move(type));
-    }
-
-    void Scope::add_primitive_type(const string& name)
-    {
-        TypePtr type = create_type(name);
-        add_type(std::move(type));
     }
 
     void Scope::add_alias(const string& name, TypePtr type)
@@ -223,6 +219,26 @@ namespace mxslc::runtime
         if (parent_)
             return parent_->get_type(name);
         throw CompileError{"Type '" + name + "' not defined"};
+    }
+
+    vector<string> Scope::get_all_function_names() const
+    {
+        vector<string> names = get_keys(functions_);
+
+        if (parent_)
+            extend(names, parent_->get_all_function_names());
+
+        return names;
+    }
+
+    vector<string> Scope::get_all_type_names() const
+    {
+        vector<string> names = get_keys(types_);
+
+        if (parent_)
+            extend(names, parent_->get_all_type_names());
+
+        return names;
     }
 
     void Scope::resolve_fields(const TypePtr& type) const
