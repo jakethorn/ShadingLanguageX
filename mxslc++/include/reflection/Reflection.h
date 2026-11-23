@@ -7,8 +7,6 @@
 
 #include "common.h"
 #include "GlobalInfo.h"
-#include "TypeInfo.h"
-#include "FunctionInfo.h"
 #include "runtime/utils/RuntimeAware.h"
 
 namespace mxslc::reflection
@@ -20,16 +18,16 @@ namespace mxslc::reflection
         void collect_info();
 
         const vector<GlobalInfo>& globals() const { return globals_; }
-        const vector<TypeInfo>& types() const { return types_; }
-        const vector<FunctionInfo>& functions() const { return functions_; }
+        const vector<string>& type_names() const { return type_names_; }
+        const vector<string>& function_names() const { return function_names_; }
 
     private:
-        void collect_type_info();
-        void collect_function_info();
+        void collect_type_names();
+        void collect_function_names();
 
         vector<GlobalInfo> globals_;
-        vector<TypeInfo> types_;
-        vector<FunctionInfo> functions_;
+        vector<string> type_names_;
+        vector<string> function_names_;
     };
 }
 

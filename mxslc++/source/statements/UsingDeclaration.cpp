@@ -19,9 +19,7 @@ namespace mxslc::statements
 
     void UsingDeclaration::execute_impl() const
     {
-        TypePtr type = scope().resolve_type(type_)->copy();
-        type->set_token(token_);
-        scope().add_alias(name_, std::move(type));
+        scope().add_alias(name_, type_);
     }
 
     string UsingDeclaration::to_string() const

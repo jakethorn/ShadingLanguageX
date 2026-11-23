@@ -100,8 +100,8 @@ for (const version of versions) {
     const opts = new mx.CompileOptions();
     opts.version = version;
     const reflection = mx.reflect(opts);
-    names.types[version] = reflection.types.map((type) => type.name);
-    names.functions[version] = reflection.functions.map((func) => func.name);
+    names.types[version] = reflection.typeNames;
+    names.functions[version] = reflection.functionNames;
     opts.delete();
 }
 process.stdout.write(JSON.stringify(names));

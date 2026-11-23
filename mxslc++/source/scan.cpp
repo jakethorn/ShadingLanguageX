@@ -183,50 +183,43 @@ namespace mxslc
 
             throw CompileError{"Scanning error on line " + std::to_string(line) + ", character: " + text.front()};
         }
-
-        vector<Token> scan(string_view text, const optional<fs::path>& path)
-        {
-            vector<Token> tokens;
-            size_t line = 1;
-            const SharedPathPtr shared_path = copy_to_shared_ptr(path);
-
-            while (not text.empty())
-            {
-                Token token = next_token(text, line);
-                text.remove_prefix(token.lexeme().length());
-
-                if (token == TokenType::Whitespace)
-                {
-                    continue;
-                }
-
-                if (token == TokenType::Comment)
-                {
-                    const string& comment = token.lexeme();
-                    line += std::count(comment.begin(), comment.end(), '\n');
-                    continue;
-                }
-
-                token.set_line(line);
-                token.set_path(shared_path);
-
-                if (token == TokenType::Newline)
-                {
-                    ++line;
-                }
-
-                tokens.push_back(std::move(token));
-            }
-
-            return tokens;
-        }
     }
 
-    vector<Token> scan_string(const string_view text, const optional<fs::path>& src_path)
+    vector<Token> scan_string(string_view text, const optional<fs::path>& src_path)
     {
-        if (src_path)
-            return scan(text, io_utils::get_absolute_path(*src_path));
-        return scan(text, std::nullopt);
+        vector<Token> tokens;
+        size_t line = 1;
+        const SharedPathPtr shared_path = copy_to_shared_ptr(src_path);
+
+        while (not text.empty())
+        {
+            Token token = next_token(text, line);
+            text.remove_prefix(token.lexeme().length());
+
+            if (token == TokenType::Whitespace)
+            {
+                continue;
+            }
+
+            if (token == TokenType::Comment)
+            {
+                const string& comment = token.lexeme();
+                line += std::count(comment.begin(), comment.end(), '\n');
+                continue;
+            }
+
+            token.set_line(line);
+            token.set_path(shared_path);
+
+            if (token == TokenType::Newline)
+            {
+                ++line;
+            }
+
+            tokens.push_back(std::move(token));
+        }
+
+        return tokens;
     }
 
     vector<Token> scan_file(const fs::path& src_path)
@@ -237,7 +230,7 @@ namespace mxslc
     vector<Token> scan_source(const SourceRef& source)
     {
         if (source.is_in_memory())
-            return scan(*source.contents, source.path);
+            return scan_string(*source.contents, source.path);
         return scan_file(source.path);
     }
 }

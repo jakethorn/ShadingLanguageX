@@ -80,10 +80,8 @@ namespace mxslc::runtime
          * reflection api
          */
 
-        vector<FuncPtr> get_all_functions() const;
-
-        // the {string, Type} pair must be returned because of aliased types
-        vector<pair<string, TypePtr>> get_all_types() const;
+        vector<string> get_all_function_names() const;
+        vector<string> get_all_type_names() const;
 
     private:
         void resolve_fields(const TypePtr& type) const;

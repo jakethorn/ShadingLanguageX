@@ -1,3 +1,0 @@
-#include "light.mxsl"
-
-using Brightness = float;

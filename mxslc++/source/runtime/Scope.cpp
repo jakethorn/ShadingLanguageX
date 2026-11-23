@@ -19,6 +19,7 @@ namespace mxslc::runtime
 {
     using container_utils::contains;
     using container_utils::extend;
+    using container_utils::get_keys;
 
     Scope::Scope() : Scope{string{}, nullptr} { }
     Scope::Scope(string name) : Scope{std::move(name), nullptr} { }
@@ -168,7 +169,7 @@ namespace mxslc::runtime
 
         resolve_fields(type);
         type->set_resolved();
-        type->defining_scope_ = this;
+
         types_.emplace(type->name(), std::move(type));
     }
 
@@ -177,8 +178,8 @@ namespace mxslc::runtime
         if (contains(types_, name))
             throw CompileError{"Type '" + name + "' already defined"};
 
-        assert(type->is_resolved());
-        types_.emplace(name, std::move(type));
+        type = resolve_type(type);
+        types_.emplace(name, type);
     }
 
     bool Scope::has_type(const string& name) const
@@ -219,27 +220,24 @@ namespace mxslc::runtime
         throw CompileError{"Type '" + name + "' not defined"};
     }
 
-    vector<FuncPtr> Scope::get_all_functions() const
+    vector<string> Scope::get_all_function_names() const
     {
-        vector<FuncPtr> all_funcs;
-
-        for (const auto& [name, funcs] : functions_)
-            extend(all_funcs, funcs);
+        vector<string> names = get_keys(functions_);
 
         if (parent_)
-            extend(all_funcs, parent_->get_all_functions());
+            extend(names, parent_->get_all_function_names());
 
-        return all_funcs;
+        return names;
     }
 
-    vector<pair<string, TypePtr>> Scope::get_all_types() const
+    vector<string> Scope::get_all_type_names() const
     {
-        vector<pair<string, TypePtr>> types{types_.begin(), types_.end()};
+        vector<string> names = get_keys(types_);
 
         if (parent_)
-            extend(types, parent_->get_all_types());
+            extend(names, parent_->get_all_type_names());
 
-        return types;
+        return names;
     }
 
     void Scope::resolve_fields(const TypePtr& type) const

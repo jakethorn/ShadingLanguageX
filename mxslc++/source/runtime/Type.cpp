@@ -10,7 +10,6 @@
 #include "utils/string_utils.h"
 #include "errors/CompileError.h"
 #include "runtime/interface.h"
-#include "runtime/Runtime.h"
 
 namespace mxslc::runtime
 {

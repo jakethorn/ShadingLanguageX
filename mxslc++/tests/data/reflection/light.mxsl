@@ -1,4 +1,0 @@
-class Light
-{
-    vec3 pos;
-}

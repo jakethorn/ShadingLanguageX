@@ -34,7 +34,7 @@ namespace mxslc::debug
 
         bool is_type_name(const string& word)
         {
-            return runtime::Runtime::get().scope().has_type(word) or contains(TypeName::Specials, word);
+            return runtime::Runtime::get().scope().has_type(word) or contains(vector{TypeName::Auto, TypeName::Void, TypeName::Template}, word);
         }
 
         bool is_identifier_character(const char c)

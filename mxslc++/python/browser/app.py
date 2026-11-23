@@ -24,8 +24,8 @@ def get_keywords() -> dict:
     reflection = mxslc.reflect()
     return {
         "keywords": mxslc.get_keywords(),
-        "types": [t.name for t in reflection.types],
-        "functions": [f.name for f in reflection.functions],
+        "types": reflection.type_names,
+        "functions": reflection.function_names,
     }
 
 

@@ -76,20 +76,10 @@ path = mxslc.compile_string_to_file(src, "out.mtlx")            # or (src, opts)
 gs = mxslc.reflect_from_file("a.mxsl", opts).globals           # also _from_string; each has .name, .type ("color3"),
                                                                 # .default_value (opts' value, else initializer or type
                                                                 # default; None if runtime)
-r = mxslc.reflect_from_string(src)                              # r.types: TypeInfo (.name, .is_alias, .source,
-                                                                # .aliased_type, .fields: FieldInfo (.name, .type),
-                                                                # .methods: FunctionInfo, .path (absolute Path),
-                                                                # .line; None if unknown);
-                                                                # r.functions: FunctionInfo (.name, .overloads:
-                                                                # OverloadInfo); sorted, with the program's own;
-                                                                # functions are nodes + stdlib + methods, without
-                                                                # keyword nodes or __ops__; the program's overloads
-                                                                # shadow library ones with the same signature
-o = r.functions[0].overloads[0]                                 # .parameters: ParameterInfo (.name, .type,
-                                                                # .default_expression: SLX text, .modifiers), .return_type,
-                                                                # .template_type, .modifiers (e.g. ["inline"]), .source
-                                                                # (mxslc.Source.MaterialX / SlxStandardLibrary /
-                                                                # UserDefined), .class_type, .path, .line; None if unknown
+r = mxslc.reflect_from_string(src)                              # r.type_names, r.function_names: list[str], sorted,
+                                                                # unique, with the program's own; types include aliases
+                                                                # and void/auto/T; functions are nodes + stdlib +
+                                                                # methods, without keyword nodes or __ops__
 r = mxslc.reflect(opts)                                         # an empty program: what every program can use (opts optional)
 kws: list[str] = mxslc.get_keywords()                           # sorted
 
@@ -198,13 +188,9 @@ opts.addSource('utils.mxsl', code);    // also clearSources, addSearchDirectory,
 const mtlx = mx.compileSlxToMtlx(src, opts);     // throws Error with name 'CompileError'
 const slx = mx.decompileMtlxToSlx(mtlx);
 const keywords = mx.getKeywords();               // array of strings
-const { types, functions } = mx.reflect(opts);   // arrays of { name, isAlias, source, aliasedType,
-                                                 // fields: [{ name, type }], methods, path, line }
-                                                 // (null if unknown) and { name, overloads }, where
-                                                 // an overload has parameters, returnType, modifiers,
-                                                 // ...: the Python fields in camelCase,
-                                                 // for an empty program; opts optional
-const { globals } = mx.reflectFromString(src, opts);  // plain objects, opts optional; globals are
+const { typeNames, functionNames } = mx.reflect(opts);  // arrays of strings, as in Python, for an empty
+                                                        // program; opts optional
+const { globals } = mx.reflectFromString(src, opts);  // also typeNames, functionNames; opts optional; globals are
                                                       // { name, type, defaultValue }, with vectors/colors
                                                       // as arrays, matrices as arrays of rows, runtime as null
 opts.delete();

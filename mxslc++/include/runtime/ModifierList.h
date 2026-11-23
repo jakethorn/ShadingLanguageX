@@ -52,9 +52,6 @@ namespace mxslc::runtime
         size_t size() const { return mods_.size(); }
         bool empty() const { return mods_.empty(); }
 
-        auto begin() const { return mods_.begin(); }
-        auto end() const { return mods_.end(); }
-
         string to_string() const override;
 
     private:

@@ -106,36 +106,6 @@ namespace
         return ems::val::array(mxslc::reflection::get_keywords());
     }
 
-    ems::val to_js_object(const mxslc::reflection::GlobalInfo& global);
-    ems::val to_js_object(const mxslc::reflection::ParameterInfo& parameter);
-    ems::val to_js_object(const mxslc::reflection::OverloadInfo& overload);
-    ems::val to_js_object(const mxslc::reflection::FunctionInfo& function);
-    ems::val to_js_object(const mxslc::reflection::TypeInfo& type);
-
-    template<typename Info>
-    ems::val to_js_array(const std::vector<Info>& infos)
-    {
-        ems::val array = ems::val::array();
-        for (const Info& info : infos)
-            array.call<void>("push", to_js_object(info));
-        return array;
-    }
-
-    ems::val to_js_string_or_null(const std::string& str)
-    {
-        return str.empty() ? ems::val::null() : ems::val{str};
-    }
-
-    ems::val to_js_path_or_null(const fs::path& path)
-    {
-        return path.empty() ? ems::val::null() : ems::val{path.string()};
-    }
-
-    ems::val to_js_line_or_null(const size_t line)
-    {
-        return line == 0 ? ems::val::null() : ems::val{line};
-    }
-
     ems::val to_js_value(const mxslc::Primitive& primitive)
     {
         return primitive.visit([](const auto& v) -> ems::val {
@@ -187,58 +157,16 @@ namespace
         return object;
     }
 
-    ems::val to_js_object(const mxslc::reflection::ParameterInfo& parameter)
-    {
-        ems::val object = ems::val::object();
-        object.set("name", parameter.name);
-        object.set("type", parameter.type);
-        object.set("defaultExpression", to_js_string_or_null(parameter.default_expression));
-        object.set("modifiers", ems::val::array(parameter.modifiers));
-        return object;
-    }
-
-    ems::val to_js_object(const mxslc::reflection::OverloadInfo& overload)
-    {
-        ems::val object = ems::val::object();
-        object.set("parameters", to_js_array(overload.parameters));
-        object.set("returnType", overload.return_type);
-        object.set("templateType", to_js_string_or_null(overload.template_type));
-        object.set("modifiers", ems::val::array(overload.modifiers));
-        object.set("source", overload.source);
-        object.set("classType", to_js_string_or_null(overload.class_type));
-        object.set("path", to_js_path_or_null(overload.path));
-        object.set("line", to_js_line_or_null(overload.line));
-        return object;
-    }
-
-    ems::val to_js_object(const mxslc::reflection::FunctionInfo& function)
-    {
-        ems::val object = ems::val::object();
-        object.set("name", function.name);
-        object.set("overloads", to_js_array(function.overloads));
-        return object;
-    }
-
-    ems::val to_js_object(const mxslc::reflection::TypeInfo& type)
-    {
-        ems::val object = ems::val::object();
-        object.set("name", type.name);
-        object.set("isAlias", type.is_alias);
-        object.set("source", type.source);
-        object.set("aliasedType", to_js_string_or_null(type.aliased_type));
-        object.set("fields", ems::val::array(type.fields));
-        object.set("methods", to_js_array(type.methods));
-        object.set("path", to_js_path_or_null(type.path));
-        object.set("line", to_js_line_or_null(type.line));
-        return object;
-    }
-
     ems::val to_js_object(const mxslc::reflection::Reflection& reflection)
     {
+        ems::val globals = ems::val::array();
+        for (const mxslc::reflection::GlobalInfo& global : reflection.globals())
+            globals.call<void>("push", to_js_object(global));
+
         ems::val object = ems::val::object();
-        object.set("globals", to_js_array(reflection.globals()));
-        object.set("types", to_js_array(reflection.types()));
-        object.set("functions", to_js_array(reflection.functions()));
+        object.set("globals", globals);
+        object.set("typeNames", ems::val::array(reflection.type_names()));
+        object.set("functionNames", ems::val::array(reflection.function_names()));
         return object;
     }
 
@@ -281,15 +209,6 @@ EMSCRIPTEN_BINDINGS(mxslc)
 
     ems::function("compileSlxToMtlx", &compile_slx_to_mtlx);
     ems::function("decompileMtlxToSlx", &decompile_mtlx_to_slx);
-
-    ems::enum_<mxslc::reflection::Source>("Source")
-        .value("MaterialX", mxslc::reflection::Source::MaterialX)
-        .value("SlxStandardLibrary", mxslc::reflection::Source::SlxStandardLibrary)
-        .value("UserDefined", mxslc::reflection::Source::UserDefined);
-
-    ems::value_object<mxslc::reflection::FieldInfo>("FieldInfo")
-        .field("name", &mxslc::reflection::FieldInfo::name)
-        .field("type", &mxslc::reflection::FieldInfo::type);
 
     ems::function("reflect", &reflect<>);
     ems::function("reflect", &reflect<mxslc::CompileOptions>);

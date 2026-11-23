@@ -218,27 +218,6 @@ namespace utils
         }
     }
 
-    optional<string> to_py_str_or_none(const string& str)
-    {
-        if (str.empty())
-            return std::nullopt;
-        return str;
-    }
-
-    optional<fs::path> to_py_path_or_none(const fs::path& path)
-    {
-        if (path.empty())
-            return std::nullopt;
-        return path;
-    }
-
-    optional<size_t> to_py_line_or_none(const size_t line)
-    {
-        if (line == 0)
-            return std::nullopt;
-        return line;
-    }
-
     bool is_primitive_type(const py::handle& py_obj)
     {
         if (py::isinstance<py::bool_>(py_obj))

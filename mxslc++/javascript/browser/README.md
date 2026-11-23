@@ -84,14 +84,12 @@ Then conversion calls (all synchronous, throw on error):
 - `mx.compileSlxToMtlx(slx, opts)` → MTLX XML string, with `opts = new mx.CompileOptions()`
 - `mx.decompileMtlxToSlx(mtlx)` → MXSL string
 - `mx.getKeywords()` → array of the SLX keywords
-- `mx.reflect()` / `mx.reflect(opts)` → `{ globals, types, functions }` of an empty program: the types (e.g. 'float',
-  'vec3', 'surfaceshader') and functions (e.g. 'add', 'image', 'standard_surface') every program can use
-- `mx.reflectFromString(slx)` / `mx.reflectFromString(slx, opts)` → `{ globals, types, functions }` of the source.
-  `globals` is an array of `{ name, type, defaultValue }`, `types` is an array of
-  `{ name, isAlias, source, aliasedType, fields, methods, path, line }` (`null` if unknown), where `fields` is
-  an array of `{ name, type }`. `functions` and `methods` are arrays of `{ name, overloads }`, where an overload is
-  `{ parameters, returnType, templateType, modifiers, source, classType, path, line }`, a parameter is
-  `{ name, type, defaultExpression, modifiers }` and `source` is an `mx.Source`
+- `mx.reflect()` / `mx.reflect(opts)` → `{ globals, typeNames, functionNames }` of an empty program: the names of
+  the types (e.g. 'float', 'vec3', 'surfaceshader') and functions (e.g. 'add', 'image', 'standard_surface') every
+  program can use
+- `mx.reflectFromString(slx)` / `mx.reflectFromString(slx, opts)` → `{ globals, typeNames, functionNames }` of the
+  source. `globals` is an array of `{ name, type, defaultValue }`, and `typeNames` and `functionNames` are sorted
+  arrays of strings
 
 ## CI / Deployment
 

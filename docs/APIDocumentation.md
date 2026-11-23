@@ -638,10 +638,10 @@ string material_code = decompiler.decompile_node("m", true);
 # Reflection
 
 The `reflect` functions run ShadingLanguageX source code and return a `Reflection` of the program, which lists the
-`global` variables it declares, in declaration order, and the types and functions it can use. They let a tool find out
-which globals a program has, e.g., to show a parameter for each one like in the [Houdini SLX plugin](https://github.com/jakethorn/ShadingLanguageX/blob/main/tools/houdini/README.md#globals),
-or which types and functions to highlight in an editor. Reflecting without source code gives the types and functions
-every program can use.
+`global` variables it declares, in declaration order, and the names of the types and functions it can use. They let a
+tool find out which globals a program has, e.g., to show a parameter for each one like in the [Houdini SLX plugin](https://github.com/jakethorn/ShadingLanguageX/blob/main/tools/houdini/README.md#globals),
+or which type and function names to highlight in an editor. Reflecting without source code gives the names every
+program can use.
 
 The source is run as it is when compiling, with two differences: missing and unused globals aren't errors, and debug
 mode is off.
@@ -650,8 +650,8 @@ mode is off.
 
 ### reflect
 
-Run an empty program and return its `Reflection`, which has the types and functions every program can use. An optional
-[CompileOptions](#compile-options) object can be passed in to configure the run, e.g., the MaterialX version.
+Run an empty program and return its `Reflection`, which has the type and function names every program can use. An
+optional [CompileOptions](#compile-options) object can be passed in to configure the run, e.g., the MaterialX version.
 
 ```python
 mxslc.reflect() -> mxslc.Reflection
@@ -690,17 +690,16 @@ mxslc.get_keywords() -> list[str]
 
 ```python
 Reflection.globals: list[mxslc.GlobalInfo]
-Reflection.types: list[mxslc.TypeInfo]
-Reflection.functions: list[mxslc.FunctionInfo]
+Reflection.type_names: list[str]
+Reflection.function_names: list[str]
 ```
 
 The fields are read-only. A `Reflection` is only returned by the `reflect` functions; it has no constructor.
 
-`types` and `functions` are the types and functions the program can use by name at its end, sorted by name: those of
-the MaterialX libraries, the standard library (`stdlib.mxsl`) and the program itself. `types` also has `void`, `auto`
-and `T`. `functions` has one entry for each name, with its overloads, and leaves out the nodes named after keywords,
-such as `and` and `out`, and the operator functions, such as `__add__`. Class methods are in `functions` too, as well as
-in their class's `methods`.
+`type_names` and `function_names` are the names of the types and functions the program can use at its end, sorted and
+without duplicates: those of the MaterialX libraries, the standard library (`stdlib.mxsl`) and the program itself.
+`type_names` includes the aliases, such as `vec3`, and `void`, `auto` and `T`. `function_names` includes class methods,
+and leaves out the nodes named after keywords, such as `and` and `out`, and the operator functions, such as `__add__`.
 
 ### GlobalInfo
 
@@ -714,112 +713,6 @@ The fields are read-only. `type` is the variable's type name, e.g., `"float"` or
 variable's value in [CompileOptions](#compile-options) `globals`, if it has one. Otherwise, it is the initializer's
 value, or the type's default if there's no initializer. It is `None` if the initializer isn't known at compile time,
 e.g., `geompropvalue<float>("x")`.
-
-### TypeInfo
-
-```python
-TypeInfo.name: str
-TypeInfo.is_alias: bool
-TypeInfo.source: mxslc.Source
-TypeInfo.aliased_type: str | None
-TypeInfo.fields: list[mxslc.FieldInfo]
-TypeInfo.methods: list[mxslc.FunctionInfo]
-TypeInfo.path: pathlib.Path | None
-TypeInfo.line: int | None
-```
-
-The fields are read-only. An alias, such as `vec3`, has a `TypeInfo` of its own, with `is_alias` set to `True`.
-`source` is where the type comes from, see [Source](#source). If the program defines a type with the same name as a
-library type, `types` has the program's.
-
-`aliased_type` is the type an alias is an alias of, e.g., `"vector3"` for `vec3`, or `"{vector3 origin, vector3 dir}"`
-for `using Ray = {vec3 origin, vec3 dir};`. The alias's type is resolved, so an alias of an alias has the type itself. It
-is `None` if the type isn't an alias.
-
-`fields` are the fields of a class or a struct, in the order they're declared, and is empty for other types. `methods`
-are the methods of a class, sorted by name, with one entry for each name, however many overloads it has. Like
-`functions`, it leaves out the names starting with `__`, which include the constructors. An alias of a class has the
-class's fields and methods.
-
-`path` and `line` are where the type is defined: the `class` or `using` declaration, or the `typedef` of a MaterialX
-library. `path` is the file's absolute path. For a source added with [CompileOptions](#compile-options) `add_source`, it
-is the name the source was added with. It is `None` for the source given to `reflect_from_string`, for libraries given
-as strings, and for `void`, `auto` and `T`. `line` is `None` for MaterialX types, because MaterialX
-doesn't record line numbers, and for `void`, `auto` and `T`.
-
-### FieldInfo
-
-```python
-FieldInfo.name: str
-FieldInfo.type: str
-```
-
-The fields are read-only. `type` is the field's type name, resolved like `aliased_type`, e.g., `"vector3"` for a field
-declared as `vec3`.
-
-### FunctionInfo
-
-```python
-FunctionInfo.name: str
-FunctionInfo.overloads: list[mxslc.OverloadInfo]
-```
-
-The fields are read-only. `overloads` are the function's overloads: the program's first, then those of the standard
-library, then those of the MaterialX libraries. An overload is left out if an overload of the program has the same
-parameter types and return type, because the program's is called instead.
-
-### OverloadInfo
-
-```python
-OverloadInfo.parameters: list[mxslc.ParameterInfo]
-OverloadInfo.return_type: str
-OverloadInfo.template_type: str | None
-OverloadInfo.modifiers: list[str]
-OverloadInfo.source: mxslc.Source
-OverloadInfo.class_type: str | None
-OverloadInfo.path: pathlib.Path | None
-OverloadInfo.line: int | None
-```
-
-The fields are read-only.
-
-- `return_type` is resolved like `TypeInfo.aliased_type`. A MaterialX node with several outputs returns a struct, e.g.,
-  `"{float outr, float outg, float outb}"` for `separate3`.
-- `template_type` is the type the overload is for, e.g., `"float"` for `add<float>`, or `None`.
-- `modifiers` are the overload's modifiers, sorted, e.g., `["inline"]` or `["nodegraph"]`. A function without a
-  `nodedef`, `nodegraph`, `inline` or `comptime` modifier gets the one of [CompileOptions](#compile-options)
-  `default_function_behaviour`, unless that's `NodeDef`. A MaterialX node has `["default"]` if it's the default NodeDef
-  of its node, and `[]` otherwise.
-- `source` is where the overload comes from, see [Source](#source).
-- `class_type` is the name of the class a method belongs to, or `None`.
-- `path` and `line` are where the overload is defined, as in `TypeInfo`. `line` is `None` for MaterialX nodes.
-
-### Source
-
-```python
-mxslc.Source.MaterialX
-mxslc.Source.SlxStandardLibrary
-mxslc.Source.UserDefined
-```
-
-Where a type or an overload comes from. `MaterialX` is the MaterialX libraries, including the libraries in
-[CompileOptions](#compile-options) `libraries`. `SlxStandardLibrary` is the standard library (`stdlib.mxsl`), and the
-types `void`, `auto` and `T`, which are part of SLX. `UserDefined` is the program and the files it includes.
-
-### ParameterInfo
-
-```python
-ParameterInfo.name: str
-ParameterInfo.type: str
-ParameterInfo.default_expression: str | None
-ParameterInfo.modifiers: list[str]
-```
-
-The fields are read-only. `type` is resolved like `TypeInfo.aliased_type`. `default_expression` is the parameter's
-default as SLX code, e.g., `"0.0"`, `"color3{0.0, 0.0, 0.0}"` or `"geomprop(UV0)"`, or `None` if it has none. Unlike
-`GlobalInfo.default_value`, it is the expression rather than its value: a default is only evaluated when a call leaves
-the argument out, so it is given even if it's only known at runtime. `modifiers` are the parameter's modifiers, sorted,
-e.g., `["uniform"]` or `["mutable", "out"]`.
 
 ### Python Example
 
@@ -848,21 +741,20 @@ print(mxslc.reflect_from_string(code, opts).globals[0].default_value)
 opts = mxslc.CompileOptions(macros=["OPEN_PBR"])
 reflection = mxslc.reflect_from_file("example.mxsl", opts)
 
-type_names = [t.name for t in mxslc.reflect().types]
+type_names = mxslc.reflect().type_names
 print("vec3" in type_names, "Light" in type_names)
 
 # True False
 
 reflection = mxslc.reflect_from_string("class Light { vec3 pos; }")
-print("Light" in [t.name for t in reflection.types])
+print("Light" in reflection.type_names)
 
 # True
 ```
 
 ## C++
 
-The `reflect` and `get_keywords` functions, `Reflection`, `GlobalInfo`, `TypeInfo` and `FunctionInfo` are in the
-`mxslc::reflection` namespace.
+The `reflect` and `get_keywords` functions, `Reflection` and `GlobalInfo` are in the `mxslc::reflection` namespace.
 
 ### reflect
 
@@ -894,8 +786,8 @@ class Reflection
 {
 public:
     const vector<GlobalInfo>& globals() const;
-    const vector<TypeInfo>& types() const;
-    const vector<FunctionInfo>& functions() const;
+    const vector<string>& type_names() const;
+    const vector<string>& function_names() const;
 };
 ```
 
@@ -912,64 +804,6 @@ struct GlobalInfo
 
 `default_value` is set as it is in [Python](#globalinfo). `default_value->is_compile_time()` is false if the
 initializer isn't known at compile time.
-
-### TypeInfo, FieldInfo, FunctionInfo, OverloadInfo, ParameterInfo and Source
-
-```c++
-enum class Source
-{
-    MaterialX,
-    SlxStandardLibrary,
-    UserDefined,
-};
-
-struct TypeInfo
-{
-    string name;
-    bool is_alias;
-    Source source;
-    string aliased_type;
-    vector<FieldInfo> fields;
-    vector<FunctionInfo> methods;
-    fs::path path;
-    size_t line;
-};
-
-struct FieldInfo
-{
-    string name;
-    string type;
-};
-
-struct FunctionInfo
-{
-    string name;
-    vector<OverloadInfo> overloads;
-};
-
-struct OverloadInfo
-{
-    vector<ParameterInfo> parameters;
-    string return_type;
-    string template_type;
-    vector<string> modifiers;
-    Source source;
-    string class_type;
-    fs::path path;
-    size_t line;
-};
-
-struct ParameterInfo
-{
-    string name;
-    string type;
-    string default_expression;
-    vector<string> modifiers;
-};
-```
-
-The fields are set as they are in [Python](#typeinfo), except that strings and paths are empty and `line` is `0` where
-Python has `None`.
 
 ### C++ Example
 

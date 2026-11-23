@@ -6,7 +6,7 @@ import collections.abc
 import os
 import pathlib
 import typing
-__all__: list[str] = ['CompileOptions', 'Decompiler', 'FieldInfo', 'FunctionBehaviour', 'FunctionInfo', 'GlobalInfo', 'Macro', 'OverloadInfo', 'ParameterInfo', 'Reflection', 'Source', 'TypeInfo', 'Variable', 'compile_file_to_file', 'compile_file_to_string', 'compile_string_to_file', 'compile_string_to_string', 'create_variable', 'decompile_file_to_file', 'decompile_file_to_string', 'decompile_string_to_file', 'decompile_string_to_string', 'get_keywords', 'reflect', 'reflect_from_file', 'reflect_from_string']
+__all__: list[str] = ['CompileOptions', 'Decompiler', 'FunctionBehaviour', 'GlobalInfo', 'Macro', 'Reflection', 'Variable', 'compile_file_to_file', 'compile_file_to_string', 'compile_string_to_file', 'compile_string_to_string', 'create_variable', 'decompile_file_to_file', 'decompile_file_to_string', 'decompile_string_to_file', 'decompile_string_to_string', 'get_keywords', 'reflect', 'reflect_from_file', 'reflect_from_string']
 class Macro:
     @typing.overload
     def __init__(self, name: str) -> None:
@@ -152,150 +152,15 @@ class GlobalInfo:
     @property
     def type(self) -> str:
         ...
-class Source:
-    """
-    Members:
-    
-      MaterialX
-    
-      SlxStandardLibrary
-    
-      UserDefined
-    """
-    MaterialX: typing.ClassVar[Source]
-    SlxStandardLibrary: typing.ClassVar[Source]
-    UserDefined: typing.ClassVar[Source]
-    __members__: typing.ClassVar[dict[str, Source]]
-    @typing.overload
-    def __eq__(self, other: Source) -> bool:
-        ...
-    @typing.overload
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: typing.SupportsInt | typing.SupportsIndex) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    @typing.overload
-    def __ne__(self, other: Source) -> bool:
-        ...
-    @typing.overload
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: typing.SupportsInt | typing.SupportsIndex) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
-        ...
-class FieldInfo:
-    def __repr__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def type(self) -> str:
-        ...
-class ParameterInfo:
-    def __repr__(self) -> str:
-        ...
-    @property
-    def default_expression(self) -> str | None:
-        ...
-    @property
-    def modifiers(self) -> list[str]:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def type(self) -> str:
-        ...
-class OverloadInfo:
-    def __repr__(self) -> str:
-        ...
-    @property
-    def class_type(self) -> str | None:
-        ...
-    @property
-    def line(self) -> int | None:
-        ...
-    @property
-    def modifiers(self) -> list[str]:
-        ...
-    @property
-    def parameters(self) -> list[ParameterInfo]:
-        ...
-    @property
-    def path(self) -> pathlib.Path | None:
-        ...
-    @property
-    def return_type(self) -> str:
-        ...
-    @property
-    def source(self) -> Source:
-        ...
-    @property
-    def template_type(self) -> str | None:
-        ...
-class FunctionInfo:
-    def __repr__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def overloads(self) -> list[OverloadInfo]:
-        ...
-class TypeInfo:
-    def __repr__(self) -> str:
-        ...
-    @property
-    def aliased_type(self) -> str | None:
-        ...
-    @property
-    def fields(self) -> list[FieldInfo]:
-        ...
-    @property
-    def is_alias(self) -> bool:
-        ...
-    @property
-    def line(self) -> int | None:
-        ...
-    @property
-    def methods(self) -> list[FunctionInfo]:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def path(self) -> pathlib.Path | None:
-        ...
-    @property
-    def source(self) -> Source:
-        ...
 class Reflection:
     @property
-    def functions(self) -> list[FunctionInfo]:
+    def function_names(self) -> list[str]:
         ...
     @property
     def globals(self) -> list[GlobalInfo]:
         ...
     @property
-    def types(self) -> list[TypeInfo]:
+    def type_names(self) -> list[str]:
         ...
 class Decompiler:
     @typing.overload

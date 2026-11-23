@@ -31,8 +31,8 @@ const engine = {
         const reflection = mx.reflect();
         return {
             keywords: mx.getKeywords(),
-            types: reflection.types.map((type) => type.name),
-            functions: reflection.functions.map((func) => func.name),
+            types: reflection.typeNames,
+            functions: reflection.functionNames,
         };
     },
 
