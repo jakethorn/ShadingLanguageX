@@ -2622,15 +2622,15 @@ Note that either of the following syntax is accepted: `geomprop(UV0)` or `geompr
 
 # Node Expression
 
-Node expressions allow users to create custom node elements. They do not check for an associated NodeDef when creating the
-node element, and no type checking is performed. This can be useful when using non-standard nodes without needing to include the `.mtlx` 
+Node expressions allow users to use nodes without the compiler checking for an associated NodeDef or performing any type
+checking. This can be useful when using non-standard nodes without needing to include the additional `.mtlx`
 library.
 
 Node expressions look similar to function calls, with some differences:
 1. They start with the `node` keyword.
-2. The template type is the expressions return type.
+2. The template type is always the functions return type.
 3. All arguments must be named.
-4. The name can be a keyword, and it can contain the `:` character.
+4. The function name can be a keyword, and it can contain the `:` character.
 
 ### Example 1
 

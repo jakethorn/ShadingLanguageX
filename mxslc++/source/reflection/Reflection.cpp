@@ -50,7 +50,7 @@ namespace mxslc::reflection
     void Reflection::collect_type_names()
     {
         type_names_ = scope().get_all_type_names();
-        extend(type_names_, {TypeName::Auto, TypeName::Void, TypeName::Template});
+        extend(type_names_, {TypeName::Auto, TypeName::Void, TypeName::T});
         sort_and_remove_duplicates(type_names_);
     }
 

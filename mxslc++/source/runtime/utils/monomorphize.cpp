@@ -11,6 +11,6 @@ namespace mxslc::runtime_utils
 {
     string monomorphize(const string& src, const TypePtr& template_type)
     {
-        return src == TypeName::Template ? template_type->name() : src;
+        return src == TypeName::T ? template_type->name() : src;
     }
 }

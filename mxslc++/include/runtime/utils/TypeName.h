@@ -30,7 +30,7 @@ namespace mxslc::runtime_utils
         inline static const string Tuple = "tuple";
         inline static const string Void = "void";
         inline static const string Auto = "auto";
-        inline static const string Template = "T";
+        inline static const string T = "T";
 
         template<typename T>
         static const string& of()

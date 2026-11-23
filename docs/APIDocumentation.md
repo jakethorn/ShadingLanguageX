@@ -637,21 +637,18 @@ string material_code = decompiler.decompile_node("m", true);
 
 # Reflection
 
-The `reflect` functions run ShadingLanguageX source code and return a `Reflection` of the program, which lists the
-`global` variables it declares, in declaration order, and the names of the types and functions it can use. They let a
+The `reflect` functions run ShadingLanguageX source code and return a `Reflection` of the program. Currently, the `Reflection`
+lists the `global` variables, and the names of the types and functions the program declares. They let a
 tool find out which globals a program has, e.g., to show a parameter for each one like in the [Houdini SLX plugin](https://github.com/jakethorn/ShadingLanguageX/blob/main/tools/houdini/README.md#globals),
-or which type and function names to highlight in an editor. Reflecting without source code gives the names every
-program can use.
-
-The source is run as it is when compiling, with two differences: missing and unused globals aren't errors, and debug
-mode is off.
+or which type and function names to highlight in an editor. Reflecting without source code gives the type and function 
+names from just standard library.
 
 ## Python
 
 ### reflect
 
-Run an empty program and return its `Reflection`, which has the type and function names every program can use. An
-optional [CompileOptions](#compile-options) object can be passed in to configure the run, e.g., the MaterialX version.
+Run an empty program and return its `Reflection` which would contain reflected data from just the standard library. An
+optional [CompileOptions](#compile-options) object can be passed in to configure the run.
 
 ```python
 mxslc.reflect() -> mxslc.Reflection
@@ -661,7 +658,7 @@ mxslc.reflect(opts: mxslc.CompileOptions) -> mxslc.Reflection
 ### reflect_from_string
 
 Run a string containing the ShadingLanguageX source code and return its `Reflection`. An optional
-[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
+[CompileOptions](#compile-options) object can be passed in to configure the run.
 
 ```python
 mxslc.reflect_from_string(source: str) -> mxslc.Reflection
@@ -671,7 +668,7 @@ mxslc.reflect_from_string(source: str, opts: mxslc.CompileOptions) -> mxslc.Refl
 ### reflect_from_file
 
 Run a ShadingLanguageX source file provided by `src_path` and return its `Reflection`. An optional
-[CompileOptions](#compile-options) object can be passed in to configure the run, including the values of globals.
+[CompileOptions](#compile-options) object can be passed in to configure the run.
 
 ```python
 mxslc.reflect_from_file(src_path: str | pathlib.Path) -> mxslc.Reflection
@@ -680,7 +677,7 @@ mxslc.reflect_from_file(src_path: str | pathlib.Path, opts: mxslc.CompileOptions
 
 ### get_keywords
 
-Return the ShadingLanguageX keywords, sorted. `true` and `false` aren't included: they are literals.
+Return the list of ShadingLanguageX reserved keywords.
 
 ```python
 mxslc.get_keywords() -> list[str]
@@ -696,10 +693,10 @@ Reflection.function_names: list[str]
 
 The fields are read-only. A `Reflection` is only returned by the `reflect` functions; it has no constructor.
 
-`type_names` and `function_names` are the names of the types and functions the program can use at its end, sorted and
-without duplicates: those of the MaterialX libraries, the standard library (`stdlib.mxsl`) and the program itself.
-`type_names` includes the aliases, such as `vec3`, and `void`, `auto` and `T`. `function_names` includes class methods,
-and leaves out the nodes named after keywords, such as `and` and `out`, and the operator functions, such as `__add__`.
+`type_names` and `function_names` are the names of the types and functions the program declares: those of the MaterialX 
+standard libraries, the ShadingLanguageX standard library (i.e., `libraries/stdlib.mxsl`) and the program itself.
+`type_names` includes the aliases as well as `void`, `auto` and `T`. `function_names` includes class methods,
+but leaves out the nodes named after keywords, such as `and` and `or`, and the operator overload functions, such as `__add__`.
 
 ### GlobalInfo
 
@@ -709,10 +706,8 @@ GlobalInfo.type: str
 GlobalInfo.default_value: Any
 ```
 
-The fields are read-only. `type` is the variable's type name, e.g., `"float"` or `"color3"`. `default_value` is the
-variable's value in [CompileOptions](#compile-options) `globals`, if it has one. Otherwise, it is the initializer's
-value, or the type's default if there's no initializer. It is `None` if the initializer isn't known at compile time,
-e.g., `geompropvalue<float>("x")`.
+The fields are read-only. `type` is the variable's type name, e.g., `"float"` or `"color3"`. `default_value` is `None` 
+if the initializer isn't known at compile time, e.g., `global color3 c = randomcolor()`.
 
 ### Python Example
 
@@ -733,13 +728,7 @@ for g in reflection.globals:
 # tint color3 0, 0, 0
 # u float None
 
-opts = mxslc.CompileOptions(globals={"roughness": 0.5})
-print(mxslc.reflect_from_string(code, opts).globals[0].default_value)
-
-# 0.5
-
-opts = mxslc.CompileOptions(macros=["OPEN_PBR"])
-reflection = mxslc.reflect_from_file("example.mxsl", opts)
+reflection = mxslc.reflect_from_file("example.mxsl")
 
 type_names = mxslc.reflect().type_names
 print("vec3" in type_names, "Light" in type_names)
@@ -758,9 +747,8 @@ The `reflect` and `get_keywords` functions, `Reflection` and `GlobalInfo` are in
 
 ### reflect
 
-Run the source code given by `source` or `src_path`, or an empty program if there is neither, and return its
-`Reflection`. An optional [CompileOptions](#compile-options) object can be passed in to configure the run, including
-the values of globals.
+Run the ShadingLanguageX source code and return its `Reflection`. Calling `reflect` with no source returns a `Reflection`
+of just the standard library. An optional [CompileOptions](#compile-options) object can be passed in to configure the run.
 
 ```c++
 Reflection reflect();
@@ -773,7 +761,7 @@ Reflection reflect(const fs::path& src_path, const CompileOptions& opts);
 
 ### get_keywords
 
-Return the keywords as they are returned in [Python](#get_keywords).
+Return the list of ShadingLanguageX reserved keywords.
 
 ```c++
 vector<string> get_keywords();
@@ -802,9 +790,6 @@ struct GlobalInfo
 };
 ```
 
-`default_value` is set as it is in [Python](#globalinfo). `default_value->is_compile_time()` is false if the
-initializer isn't known at compile time.
-
 ### C++ Example
 
 ```c++
@@ -815,15 +800,24 @@ initializer isn't known at compile time.
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
 
-mxslc::CompileOptions opts;
-opts.add_macro("OPEN_PBR");
+using namesapce mxslc;
+using namespace mxslc::reflection;
 
-mxslc::reflection::Reflection reflection = mxslc::reflection::reflect(fs::path{"example.mxsl"}, opts);
-for (const mxslc::reflection::GlobalInfo& global : reflection.globals())
+Reflection reflection = reflect("example.mxsl");
+
+for (const GlobalInfo& global : reflection.globals())
 {
     std::cout << global.name << " " << global.type->to_string();
-    if (not global.default_value->is_compile_time())
+    if (global.default_value->is_compile_time())
+        std::cout << " " << global.default_value->to_string();
+    else
         std::cout << " (initializer not known at compile time)";
     std::cout << "\n";
 }
+
+for (const string& type_name : reflection.type_names())
+    std:: cout << type_name << "\n";
+
+for (const string& func_name : reflection.function_names())
+    std:: cout << func_name << "\n";
 ```

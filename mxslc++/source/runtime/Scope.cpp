@@ -169,6 +169,7 @@ namespace mxslc::runtime
 
         resolve_fields(type);
         type->set_resolved();
+        type->defining_scope_ = this;
 
         types_.emplace(type->name(), std::move(type));
     }
