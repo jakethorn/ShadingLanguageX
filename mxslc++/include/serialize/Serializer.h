@@ -24,6 +24,12 @@ namespace mxslc::serialize
     class Serializer : protected runtime_utils::RuntimeAware
     {
     public:
+        struct Checkpoint
+        {
+            size_t comptime_depth;
+            bool comptime_violated;
+        };
+
         Serializer() : Serializer{mx::createDocument()} { }
         explicit Serializer(mx::DocumentPtr doc) : doc_{std::move(doc)} { }
 
@@ -34,6 +40,9 @@ namespace mxslc::serialize
 
         void begin_comptime(bool is_comptime = true) const;
         bool end_comptime() const;
+
+        Checkpoint checkpoint() const;
+        void restore(const Checkpoint& checkpoint) const;
 
         VarPtr write_node(const ConstFunctionCallPtr& func_call) const;
         VarPtr write_node(const ConstMethodCallPtr& method_call) const;

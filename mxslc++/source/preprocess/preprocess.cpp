@@ -9,6 +9,9 @@
 #include "utils/token_utils.h"
 #include "utils/io_utils.h"
 #include "utils/Logger.h"
+#include "errors/ErrorReporter.h"
+#include "errors/FatalError.h"
+#include "errors/SuppressedError.h"
 
 namespace mxslc::preprocess
 {
@@ -16,43 +19,21 @@ namespace mxslc::preprocess
     using container_utils::position_of;
     using container_utils::extend;
 
-    vector<Token> preprocess(const fs::path& src_path, CompileOptions& opts, const bool is_include)
+    void preprocess(vector<Token>& tokens, CompileOptions& opts, const optional<fs::path>& src_path, ErrorReporter& error_reporter)
     {
-        vector<Token> included_tokens = scan_file(src_path);
-        preprocess(included_tokens, opts, src_path, is_include);
-        return included_tokens;
-    }
-
-    void preprocess(vector<Token>& tokens, CompileOptions& opts)
-    {
-        preprocess(tokens, opts, std::nullopt, false);
-    }
-
-    void preprocess(vector<Token>& tokens, CompileOptions& opts, const bool is_include)
-    {
-        preprocess(tokens, opts, std::nullopt, is_include);
-    }
-
-    void preprocess(vector<Token>& tokens, CompileOptions& opts, const optional<fs::path>& src_path)
-    {
-        preprocess(tokens, opts, src_path, false);
-    }
-
-    void preprocess(vector<Token>& tokens, CompileOptions& opts, const optional<fs::path>& src_path, const bool is_include)
-    {
-        Preprocessor preprocessor{std::move(tokens), opts, src_path, is_include};
+        Preprocessor preprocessor{std::move(tokens), opts, error_reporter, src_path};
         preprocessor.preprocess();
         tokens = preprocessor.tokens();
     }
 
-    Preprocessor::Preprocessor(vector<Token> tokens, CompileOptions& opts, const optional<fs::path>& src_path, const bool is_include)
-        : Preprocessor{nullptr, std::move(tokens), opts, src_path, is_include}
+    Preprocessor::Preprocessor(vector<Token> tokens, CompileOptions& opts, ErrorReporter& error_reporter, const optional<fs::path>& src_path, const bool is_include)
+        : Preprocessor{nullptr, std::move(tokens), opts, error_reporter, src_path, is_include}
     {
 
     }
 
-    Preprocessor::Preprocessor(const Preprocessor* parent, vector<Token> tokens, CompileOptions& opts, const optional<fs::path>& src_path, const bool is_include)
-        : TokenReader{std::move(tokens)}, parent_{parent}, opts_{opts}, path_{src_path}, is_include_{is_include}
+    Preprocessor::Preprocessor(const Preprocessor* parent, vector<Token> tokens, CompileOptions& opts, ErrorReporter& error_reporter, const optional<fs::path>& src_path, const bool is_include)
+        : TokenReader{std::move(tokens)}, parent_{parent}, opts_{opts}, error_reporter_{error_reporter}, path_{src_path}, is_include_{is_include}
     {
 
     }
@@ -75,27 +56,40 @@ namespace mxslc::preprocess
 
     void Preprocessor::process_next_token()
     {
-        if (consume(TokenType::Hash))
-        {
-            const Token token = consume();
-                 if (token == "include")  process_include();
-            else if (token == "library")  process_library();
-            else if (token == "version")  process_version();
-            else if (token == "define")   process_define();
-            else if (token == "undef")    process_undef();
-            else if (token == "if")       process_if();
-            else if (token == "ifdef")    process_ifdef();
-            else if (token == "ifndef")   process_ifndef();
-            else if (token == "elif")     throw CompileError{token, "#elif without #(if/ifdef/ifndef)"};
-            else if (token == "elifdef")  throw CompileError{token, "#elifdef without #(if/ifdef/ifndef)"};
-            else if (token == "elifndef") throw CompileError{token, "#elifndef without #(if/ifdef/ifndef)"};
-            else if (token == "else")     throw CompileError{token, "#else without #(if/ifdef/ifndef)"};
-            else if (token == "endif")    throw CompileError{token, "#endif without #(if/ifdef/ifndef)"};
-            else throw CompileError{token, "Unknown preprocessor directive: #" + token.lexeme()};
-        }
+        if (peek() == TokenType::Hash)
+            process_directive_or_skip_line();
+        else
+            process_non_directive();
+    }
+
+    void Preprocessor::process_directive_or_skip_line()
+    {
+        const Token hash = peek();
+        if (not try_reporting_errors(hash, [this] { process_directive(); }))
+            skip_line();
+    }
+
+    void Preprocessor::process_directive()
+    {
+        match(TokenType::Hash);
+        const Token token = consume();
+             if (token == "include")  process_include();
+        else if (token == "library")  process_library();
+        else if (token == "version")  process_version();
+        else if (token == "define")   process_define();
+        else if (token == "undef")    process_undef();
+        else if (token == "if")       process_if(token);
+        else if (token == "ifdef")    process_ifdef(token);
+        else if (token == "ifndef")   process_ifndef(token);
+        else if (token == "elif")     throw_unmatched_directive_error(CompileError{token, "#elif without #(if/ifdef/ifndef)"});
+        else if (token == "elifdef")  throw_unmatched_directive_error(CompileError{token, "#elifdef without #(if/ifdef/ifndef)"});
+        else if (token == "elifndef") throw_unmatched_directive_error(CompileError{token, "#elifndef without #(if/ifdef/ifndef)"});
+        else if (token == "else")     throw_unmatched_directive_error(CompileError{token, "#else without #(if/ifdef/ifndef)"});
+        else if (token == "endif")    throw_unmatched_directive_error(CompileError{token, "#endif without #(if/ifdef/ifndef)"});
         else
         {
-            process_non_directive();
+            has_unknown_directive_ = true;
+            throw CompileError{token, "Unknown preprocessor directive: #" + token.lexeme()};
         }
     }
 
@@ -131,23 +125,34 @@ namespace mxslc::preprocess
         undef_macro(match_macro());
     }
 
-    void Preprocessor::process_if(const bool ignore)
+    void Preprocessor::process_if(const Token& directive, const bool ignore)
+    {
+        process_remaining_if_blocks(evaluate_condition(directive, [this] { return evaluate_if_condition(); }), ignore);
+    }
+
+    void Preprocessor::process_ifdef(const Token& directive, const bool ignore)
+    {
+        process_remaining_if_blocks(evaluate_condition(directive, [this] { return macro_is_defined(match_macro()); }), ignore);
+    }
+
+    void Preprocessor::process_ifndef(const Token& directive, const bool ignore)
+    {
+        process_remaining_if_blocks(evaluate_condition(directive, [this] { return not macro_is_defined(match_macro()); }), ignore);
+    }
+
+    bool Preprocessor::evaluate_condition(const Token& directive, const std::function<bool()>& evaluate)
+    {
+        bool condition = false;
+        try_reporting_errors(directive, [&] { condition = evaluate(); });
+        return condition;
+    }
+
+    bool Preprocessor::evaluate_if_condition()
     {
         vector<Token> tokens = consume_and_expand_until(TokenType::Newline);
         if (tokens.empty())
             throw CompileError{peek(), "Empty #if condition"};
-        const bool condition = parse_primitive(std::move(tokens)).cast<bool>();
-        process_remaining_if_blocks(condition, ignore);
-    }
-
-    void Preprocessor::process_ifdef(const bool ignore)
-    {
-        process_remaining_if_blocks(macro_is_defined(match_macro()), ignore);
-    }
-
-    void Preprocessor::process_ifndef(const bool ignore)
-    {
-        process_remaining_if_blocks(not macro_is_defined(match_macro()), ignore);
+        return parse_primitive(std::move(tokens)).cast<bool>();
     }
 
     void Preprocessor::process_remaining_if_blocks(const bool condition, bool ignore)
@@ -164,11 +169,11 @@ namespace mxslc::preprocess
 
         const Token directive = match_directive();
         if (directive == "elif")
-            process_if(ignore);
+            process_if(directive, ignore);
         else if (directive == "elifdef")
-            process_ifdef(ignore);
+            process_ifdef(directive, ignore);
         else if (directive == "elifndef")
-            process_ifndef(ignore);
+            process_ifndef(directive, ignore);
         else if (directive == "else")
             process_else_block(ignore);
     }
@@ -200,11 +205,11 @@ namespace mxslc::preprocess
             {
                 const Token directive = match_directive();
                 if (directive == "if")
-                    process_if(/*ignore*/true);
+                    process_if(directive, /*ignore*/true);
                 else if (directive == "ifdef")
-                    process_ifdef(/*ignore*/true);
+                    process_ifdef(directive, /*ignore*/true);
                 else if (directive == "ifndef")
-                    process_ifndef(/*ignore*/true);
+                    process_ifndef(directive, /*ignore*/true);
             }
             else
             {
@@ -221,7 +226,7 @@ namespace mxslc::preprocess
     bool Preprocessor::end_of_if_block() const
     {
         if (size() < 2)
-            throw CompileError{"Unterminated #if directive"};
+            throw_unmatched_directive_error(CompileError{"Unterminated #if directive"});
         return peek() == TokenType::Hash and contains(vector{"elif", "elifdef", "elifndef", "else", "endif"}, peek(1));
     }
 
@@ -242,6 +247,38 @@ namespace mxslc::preprocess
             add_token(std::move(token));
     }
 
+    bool Preprocessor::try_reporting_errors(const Token& location, const std::function<void()>& action)
+    {
+        try
+        {
+            action();
+            return true;
+        }
+        catch (const FatalError&)
+        {
+            throw;
+        }
+        catch (CompileError& e)
+        {
+            e.set_debug_info(location);
+            error_reporter_.report(e);
+            return false;
+        }
+    }
+
+    void Preprocessor::skip_line()
+    {
+        while (not empty() and peek() != TokenType::Newline)
+            consume();
+    }
+
+    void Preprocessor::throw_unmatched_directive_error(const CompileError& e) const
+    {
+        if (has_unknown_directive_)
+            throw SuppressedError{};
+        throw e;
+    }
+
     void Preprocessor::include_file(const fs::path& path)
     {
         const SourceRef source = opts_.resolve_source(path);
@@ -255,7 +292,7 @@ namespace mxslc::preprocess
 
         vector<Token> tokens = scan_source(source);
 
-        Preprocessor preprocessor{this, std::move(tokens), opts_, source.path, true};
+        Preprocessor preprocessor{this, std::move(tokens), opts_, error_reporter_, source.path, true};
         preprocessor.preprocess();
         add_tokens(preprocessor.tokens());
         included_files_.push_back(source.path);

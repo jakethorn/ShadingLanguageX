@@ -26,6 +26,7 @@ namespace mxslc::type_utils
     }
 
     bool contains_auto(const TypePtr& type);
+    bool has_default_value(const TypePtr& type);
     TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type);
 
     string to_string(const vector<TypePtr>& types);

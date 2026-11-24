@@ -1,0 +1,2 @@
+float a = "text";
+string b = 1.0;

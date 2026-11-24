@@ -1,0 +1,2 @@
+float x = undefined_name;
+string s = x;

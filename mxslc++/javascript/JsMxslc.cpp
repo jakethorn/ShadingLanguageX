@@ -35,6 +35,7 @@
 #include "compile.h"
 #include "CompileOptions.h"
 #include "decompile/decompile.h"
+#include "errors/CompileError.h"
 #include "reflection/reflect.h"
 #include "runtime/Type.h"
 #include "runtime/variables/Variable.h"
@@ -50,10 +51,35 @@ namespace
     // Embind's default translation of a C++ exception crossing the boundary
     // surfaces an opaque value with no usable `.message` on the JS side, so we
     // catch and rethrow as a real Error carrying the exception's text.
-    [[noreturn]] void rethrow_as_js_error(const std::exception& e, const char* name)
+    ems::val create_js_error(const std::exception& e, const char* name)
     {
         ems::val err = ems::val::global("Error").new_(std::string(e.what()));
         err.set("name", std::string(name));
+        return err;
+    }
+
+    ems::val to_js_object(const mxslc::Diagnostic& diagnostic)
+    {
+        ems::val object = ems::val::object();
+        object.set("file", diagnostic.location.path.string());
+        object.set("line", diagnostic.location.line);
+        object.set("message", diagnostic.message);
+        return object;
+    }
+
+    [[noreturn]] void rethrow_as_js_error(const std::exception& e, const char* name)
+    {
+        create_js_error(e, name).throw_();
+    }
+
+    [[noreturn]] void rethrow_as_js_error(const mxslc::CompileError& e)
+    {
+        ems::val diagnostics = ems::val::array();
+        for (const mxslc::Diagnostic& diagnostic : e.diagnostics())
+            diagnostics.call<void>("push", to_js_object(diagnostic));
+
+        ems::val err = create_js_error(e, "CompileError");
+        err.set("diagnostics", diagnostics);
         err.throw_();
     }
 
@@ -81,6 +107,10 @@ namespace
         try
         {
             return mxslc::compile_to_string(source, opts);
+        }
+        catch (const mxslc::CompileError& e)
+        {
+            rethrow_as_js_error(e);
         }
         catch (const std::exception& e)
         {
@@ -177,6 +207,10 @@ namespace
         {
             return to_js_object(mxslc::reflection::reflect(args...));
         }
+        catch (const mxslc::CompileError& e)
+        {
+            rethrow_as_js_error(e);
+        }
         catch (const std::exception& e)
         {
             rethrow_as_js_error(e, "CompileError");
@@ -199,6 +233,7 @@ EMSCRIPTEN_BINDINGS(mxslc)
         .property("errorOnMissingGlobals", &mxslc::CompileOptions::error_on_missing_globals)
         .property("errorOnUnusedGlobals", &mxslc::CompileOptions::error_on_unused_globals)
         .property("defaultFunctionBehaviour", &mxslc::CompileOptions::default_function_behaviour)
+        .property("maxErrors", &mxslc::CompileOptions::max_errors)
         // In-memory sources resolved by #include / #library, plus the
         // file-system search directories used for everything else.
         .function("addSource", &mxslc::CompileOptions::add_source)

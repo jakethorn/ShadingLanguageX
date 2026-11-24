@@ -1,0 +1,6 @@
+float total = 0.0;
+for (int i from 0:3)
+{
+    total += undefined_name;
+}
+string s = total;

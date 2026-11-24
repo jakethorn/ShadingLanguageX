@@ -439,6 +439,26 @@ NodeDef/NodeGraph pair. The `--default-function-behaviour` option lets you overr
 `nodedef`, `nodegraph`, `inline` or `comptime` for every function without one of those modifiers.
 See the [Language Specification](./LanguageSpecification.md) for more information about function modifiers.
 
+### Max Errors
+
+The compiler reports every error it finds in a compile, not just the first one. Errors that are only caused by an
+earlier error aren't reported, e.g., later uses of a variable whose definition failed. Syntax errors are reported
+first: if the file has any, it isn't compiled any further, so other errors are shown once the syntax errors are fixed.
+
+```
+float a = "text";
+string b = 1.0;
+```
+
+```bash
+> ./mxslc example.mxsl
+[ERROR] example.mxsl, line 1: Cannot assign an expression of type string to a variable or parameter of type float
+[ERROR] example.mxsl, line 2: Cannot assign an expression of type float to a variable or parameter of type string
+```
+
+The `--max-errors` option sets how many errors are reported before the compiler stops (default: 20). Use
+`--max-errors 0` for no limit.
+
 ## Decompile
 
 `mxslc` can also decompile MaterialX files into ShadingLanguageX source files (see [below](#decompiler) for more information).
@@ -500,6 +520,7 @@ options:
   --no-validate-graph                       Do not validate the MaterialX graph
   --default-function-behaviour BEHAVIOUR    How functions without one of the following modifers compile: nodedef
                                             (default), nodegraph, inline or comptime
+  --max-errors MAX_ERRORS                   Stop after this many errors, 0 for no limit (default: 20)
   --decompile-hints                         Add hints for the decompiler as xml attributes
 ```
 

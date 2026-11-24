@@ -6,7 +6,23 @@ import collections.abc
 import os
 import pathlib
 import typing
-__all__: list[str] = ['CompileOptions', 'Decompiler', 'FunctionBehaviour', 'GlobalInfo', 'Macro', 'Reflection', 'Variable', 'compile_file_to_file', 'compile_file_to_string', 'compile_string_to_file', 'compile_string_to_string', 'create_variable', 'decompile_file_to_file', 'decompile_file_to_string', 'decompile_string_to_file', 'decompile_string_to_string', 'get_keywords', 'reflect', 'reflect_from_file', 'reflect_from_string']
+__all__: list[str] = ['CompileError', 'CompileOptions', 'Decompiler', 'Diagnostic', 'FunctionBehaviour', 'GlobalInfo', 'Macro', 'Reflection', 'Variable', 'compile_file_to_file', 'compile_file_to_string', 'compile_string_to_file', 'compile_string_to_string', 'create_variable', 'decompile_file_to_file', 'decompile_file_to_string', 'decompile_string_to_file', 'decompile_string_to_string', 'get_keywords', 'reflect', 'reflect_from_file', 'reflect_from_string']
+class Diagnostic:
+    def __repr__(self) -> str:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def file(self) -> pathlib.Path:
+        ...
+    @property
+    def line(self) -> int:
+        ...
+    @property
+    def message(self) -> str:
+        ...
+class CompileError(RuntimeError):
+    pass
 class Macro:
     @typing.overload
     def __init__(self, name: str) -> None:
@@ -80,7 +96,7 @@ class CompileOptions:
     reduce_graph: bool
     validate_graph: bool
     version: str
-    def __init__(self, output_file: os.PathLike | str | bytes | None = None, version: str = '1.39.5', macros: list = [], search_directories: collections.abc.Sequence[os.PathLike | str | bytes] = [], includes: collections.abc.Sequence[os.PathLike | str | bytes] = [], libraries: collections.abc.Sequence[os.PathLike | str | bytes] = [], globals: collections.abc.Mapping[str, typing.Any] = {}, error_on_missing_globals: bool = True, error_on_unused_globals: bool = True, func_name: str | None = None, func_args: list = [], reduce_graph: bool = True, validate_graph: bool = True, sources: collections.abc.Mapping[str, str] = {}, default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef) -> None:
+    def __init__(self, output_file: os.PathLike | str | bytes | None = None, version: str = '1.39.5', macros: list = [], search_directories: collections.abc.Sequence[os.PathLike | str | bytes] = [], includes: collections.abc.Sequence[os.PathLike | str | bytes] = [], libraries: collections.abc.Sequence[os.PathLike | str | bytes] = [], globals: collections.abc.Mapping[str, typing.Any] = {}, error_on_missing_globals: bool = True, error_on_unused_globals: bool = True, func_name: str | None = None, func_args: list = [], reduce_graph: bool = True, validate_graph: bool = True, sources: collections.abc.Mapping[str, str] = {}, default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef, max_errors: typing.SupportsInt | typing.SupportsIndex = 20) -> None:
         ...
     def add_source(self, name: str, contents: str) -> None:
         ...
@@ -121,6 +137,12 @@ class CompileOptions:
         ...
     @macros.setter
     def macros(self, arg1: list) -> None:
+        ...
+    @property
+    def max_errors(self) -> int:
+        ...
+    @max_errors.setter
+    def max_errors(self, arg0: typing.SupportsInt | typing.SupportsIndex) -> None:
         ...
     @property
     def output_file(self) -> pathlib.Path | None:

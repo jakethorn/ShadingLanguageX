@@ -13,6 +13,7 @@
 #include "runtime/variables/Variable.h"
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
+#include "errors/SuppressedError.h"
 #include "runtime/interface.h"
 
 namespace mxslc::runtime
@@ -32,6 +33,11 @@ namespace mxslc::runtime
             graph_ = parent_->graph_;
             graph_func_ = parent_->graph_func_;
         }
+    }
+
+    size_t Scope::depth() const
+    {
+        return parent_ ? parent_->depth() + 1 : 0;
     }
 
     pair<mx::NodeGraphPtr, FuncPtr> Scope::node_graph() const
@@ -59,9 +65,20 @@ namespace mxslc::runtime
         return false;
     }
 
+    void Scope::poison(string name)
+    {
+        poisoned_names_.insert(std::move(name));
+    }
+
+    void Scope::throw_if_poisoned(const string& name) const
+    {
+        if (is_poisoned(name))
+            throw SuppressedError{};
+    }
+
     void Scope::add_variable(string name, VarPtr var)
     {
-        if (contains(variables_, name))
+        if (defines_variable(name))
             throw CompileError{"Variable already defined: " + name};
 
         var->set_name(name);
@@ -71,10 +88,9 @@ namespace mxslc::runtime
 
     VarPtr Scope::get_variable(const string& name) const
     {
-        if (contains(variables_, name))
-            return variables_.at(name);
-        if (parent_)
-            return parent_->get_variable(name);
+        if (VarPtr var = find_variable(name))
+            return var;
+        throw_if_poisoned(name);
         throw CompileError{"Variable not defined: " + name};
     }
 
@@ -93,7 +109,12 @@ namespace mxslc::runtime
 
     bool Scope::has_variable(const string& name) const
     {
-        return contains(variables_, name) or (parent_ and parent_->has_variable(name));
+        return find_variable(name) != nullptr;
+    }
+
+    bool Scope::defines_variable(const string& name) const
+    {
+        return contains(variables_, name);
     }
 
     bool Scope::is_variable_local(const VarPtr& var) const
@@ -117,6 +138,13 @@ namespace mxslc::runtime
         assert(func->is_initialized());
         func->defining_scope_ = this;
         functions_[func->name()].push_back(std::move(func));
+    }
+
+    void Scope::remove_function(const FuncPtr& func)
+    {
+        const auto it = functions_.find(func->name());
+        if (it != functions_.end())
+            it->second.erase(std::remove(it->second.begin(), it->second.end(), func), it->second.end());
     }
 
     FuncPtr Scope::get_function(const FunctionQuery& query) const
@@ -185,11 +213,7 @@ namespace mxslc::runtime
 
     bool Scope::has_type(const string& name) const
     {
-        if (contains(types_, name))
-            return true;
-        if (parent_)
-            return parent_->has_type(name);
-        return false;
+        return find_type(name) != nullptr;
     }
 
     TypePtr Scope::resolve_type(const TypePtr& type) const
@@ -214,10 +238,9 @@ namespace mxslc::runtime
 
     TypePtr Scope::get_type(const string& name) const
     {
-        if (contains(types_, name))
-            return types_.at(name);
-        if (parent_)
-            return parent_->get_type(name);
+        if (TypePtr type = find_type(name))
+            return type;
+        throw_if_poisoned(name);
         throw CompileError{"Type '" + name + "' not defined"};
     }
 
@@ -239,6 +262,25 @@ namespace mxslc::runtime
             extend(names, parent_->get_all_type_names());
 
         return names;
+    }
+
+    VarPtr Scope::find_variable(const string& name) const
+    {
+        if (defines_variable(name))
+            return variables_.at(name);
+        return parent_ ? parent_->find_variable(name) : nullptr;
+    }
+
+    TypePtr Scope::find_type(const string& name) const
+    {
+        if (contains(types_, name))
+            return types_.at(name);
+        return parent_ ? parent_->find_type(name) : nullptr;
+    }
+
+    bool Scope::is_poisoned(const string& name) const
+    {
+        return contains(poisoned_names_, name) or (parent_ and parent_->is_poisoned(name));
     }
 
     void Scope::resolve_fields(const TypePtr& type) const

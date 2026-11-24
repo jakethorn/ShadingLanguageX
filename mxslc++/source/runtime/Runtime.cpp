@@ -19,7 +19,7 @@ namespace mxslc::runtime
 
     unique_ptr<Runtime> Runtime::instance_ = nullptr;
 
-    Runtime::Runtime(CompileOptions opts) : opts_{std::move(opts)}
+    Runtime::Runtime(CompileOptions opts) : opts_{std::move(opts)}, error_reporter_{opts_.max_errors}
     {
         scope_ = create_scope("mtlx_stdlib");
         scope_->set_graph(serializer_.document(), nullptr);
@@ -80,6 +80,23 @@ namespace mxslc::runtime
     Reflection& Runtime::reflection()
     {
         return reflection_;
+    }
+
+    ErrorReporter& Runtime::error_reporter()
+    {
+        return error_reporter_;
+    }
+
+    Runtime::Checkpoint Runtime::checkpoint() const
+    {
+        return {scope_->depth(), serializer_.checkpoint()};
+    }
+
+    void Runtime::restore(const Checkpoint& checkpoint)
+    {
+        while (scope_->depth() > checkpoint.scope_depth)
+            exit_scope();
+        serializer_.restore(checkpoint.serializer);
     }
 
     void Runtime::finalise() const

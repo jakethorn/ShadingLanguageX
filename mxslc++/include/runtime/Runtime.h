@@ -9,6 +9,7 @@
 
 #include "common.h"
 #include "CompileOptions.h"
+#include "errors/ErrorReporter.h"
 #include "serialize/Serializer.h"
 #include "reflection/Reflection.h"
 
@@ -24,6 +25,12 @@ namespace mxslc::runtime
     class Runtime
     {
     public:
+        struct Checkpoint
+        {
+            size_t scope_depth;
+            Serializer::Checkpoint serializer;
+        };
+
         explicit Runtime(CompileOptions opts);
 
         static Runtime& create(CompileOptions opts);
@@ -41,6 +48,10 @@ namespace mxslc::runtime
 
         Serializer& serializer();
         Reflection& reflection();
+        ErrorReporter& error_reporter();
+
+        Checkpoint checkpoint() const;
+        void restore(const Checkpoint& checkpoint);
 
         void finalise() const;
 
@@ -54,6 +65,7 @@ namespace mxslc::runtime
         ScopePtr scope_;
         Serializer serializer_;
         Reflection reflection_;
+        ErrorReporter error_reporter_;
 
         static unique_ptr<Runtime> instance_;
     };

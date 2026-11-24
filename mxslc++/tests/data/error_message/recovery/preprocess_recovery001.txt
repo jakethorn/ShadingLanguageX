@@ -1,0 +1,2 @@
+preprocess_recovery001.mxsl, line 1: Unknown preprocessor directive: #foo
+preprocess_recovery001.mxsl, line 2: Unknown preprocessor directive: #bar

@@ -27,6 +27,7 @@ namespace mxslc::statements
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void recover() const override;
         void create_functions();
 
         const vector<FuncPtr>& functions() const { return funcs_; }

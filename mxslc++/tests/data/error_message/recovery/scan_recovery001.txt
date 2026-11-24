@@ -1,0 +1,3 @@
+scan_recovery001.mxsl, line 1: Unexpected character: $
+scan_recovery001.mxsl, line 2: Unexpected character: €
+scan_recovery001.mxsl, line 3: Unexpected character: $$

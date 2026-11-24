@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as path from 'node:path';
 import { test } from 'node:test';
-import { findMissingFile, locateCompileError, locateDecompileError, parseCompileError } from '../src/compileErrors';
+import { findMissingFile, locateCompileError, locateCompileErrors, locateDecompileError, parseCompileError } from '../src/compileErrors';
 import { collectSources, type ReadSource } from '../src/includes';
 
 function readFrom(files: Record<string, string>): ReadSource {
@@ -20,11 +20,7 @@ test('parseCompileError reads the file and line prefix', () => {
     });
 });
 
-test('parseCompileError reads scanning errors and errors without a location', () => {
-    assert.deepEqual(parseCompileError('Scanning error on line 3, character: $'), {
-        line: 3,
-        message: 'Scanning error on line 3, character: $',
-    });
+test('parseCompileError reads errors without a location', () => {
     assert.deepEqual(parseCompileError('MaterialX version 9.9.9 libraries could not be found.\n'), {
         message: 'MaterialX version 9.9.9 libraries could not be found.',
     });
@@ -103,6 +99,43 @@ test('locateCompileError falls back to the first line for errors without a locat
         missing: [],
     });
     assert.deepEqual(report.span, { filePath: undefined, line: 0, start: 2, end: 16 });
+});
+
+test('locateCompileErrors puts each diagnostic on its line', () => {
+    const text = 'float a = nope;\nfloat b = 1.0;\n  string c = 1.0;\n';
+    const reports = locateCompileErrors(
+        {
+            message: 'line 1: Variable or parameterless function not defined: nope\nline 3: Cannot assign',
+            diagnostics: [
+                { file: '', line: 1, message: 'Variable or parameterless function not defined: nope' },
+                { file: '', line: 3, message: 'Cannot assign' },
+            ],
+        },
+        text,
+        { sources: [], missing: [] },
+    );
+    assert.deepEqual(reports, [
+        { span: { filePath: undefined, line: 0, start: 0, end: 15 }, message: 'Variable or parameterless function not defined: nope' },
+        { span: { filePath: undefined, line: 2, start: 2, end: 17 }, message: 'Cannot assign' },
+    ]);
+});
+
+test('locateCompileErrors reports a diagnostic in an included file in that file and on the #include', () => {
+    const text = '#include "sub/a.mxsl"\n';
+    const sourceSet = collectSources(root, text, [], readFrom({ '/work/sub/a.mxsl': 'float a = 1.0;\nfloat b = nope;\n' }));
+    const reports = locateCompileErrors({ message: '', diagnostics: [{ file: 'sub/a.mxsl', line: 2, message: 'Bad' }] }, text, sourceSet);
+    assert.deepEqual(
+        reports.map((r) => [r.span.filePath, r.span.line, r.message]),
+        [
+            [path.resolve('/work/sub/a.mxsl'), 1, 'Bad'],
+            [undefined, 0, 'Error in included file "sub/a.mxsl": Bad'],
+        ],
+    );
+});
+
+test('locateCompileErrors reads the message of a failure without diagnostics', () => {
+    const reports = locateCompileErrors({ message: 'line 2: Bad', diagnostics: [] }, 'a\nb\n', { sources: [], missing: [] });
+    assert.deepEqual(reports, [{ span: { filePath: undefined, line: 1, start: 0, end: 1 }, message: 'Bad' }]);
 });
 
 test('locateDecompileError uses the character offset of an XML parse error', () => {

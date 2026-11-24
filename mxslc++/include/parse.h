@@ -17,12 +17,14 @@
 
 namespace mxslc
 {
-    vector<StmtPtr> parse(vector<Token> tokens);
+    class ErrorReporter;
+
+    vector<StmtPtr> parse(vector<Token> tokens, ErrorReporter& error_reporter);
 
     class Parser final : protected TokenReader
     {
     public:
-        explicit Parser(vector<Token> tokens);
+        Parser(vector<Token> tokens, ErrorReporter& error_reporter);
 
         vector<StmtPtr> parse();
 
@@ -34,6 +36,7 @@ namespace mxslc
         StmtPtr variable_assignment(ExprPtr lhs);
         StmtPtr function_definition(ModifierList mods, TypePtr type);
         StmtPtr class_definition();
+        StmtPtr class_member();
         StmtPtr constructor_definition();
         StmtPtr using_declaration();
         StmtPtr for_loop();
@@ -50,7 +53,6 @@ namespace mxslc
         Field field();
         Parameter parameter(size_t index);
         vector<TypePtr> template_list();
-        StmtPtr function_body();
         StmtPtr return_statement();
 
         ExprPtr expression(const ModifierList& mods = {});
@@ -114,6 +116,15 @@ namespace mxslc
         bool is_constructor_definition() const;
 
         bool in_abs_{false};
+
+    private:
+        vector<StmtPtr> statements_until_closing_brace(const std::function<StmtPtr()>& parse_statement);
+        void parse_statement_or_skip(vector<StmtPtr>& stmts, const std::function<StmtPtr()>& parse_statement);
+        void skip_statement(size_t start);
+        bool is_statement_end_after_brace() const;
+
+        ErrorReporter& error_reporter_;
+        size_t block_depth_{0};
     };
 }
 

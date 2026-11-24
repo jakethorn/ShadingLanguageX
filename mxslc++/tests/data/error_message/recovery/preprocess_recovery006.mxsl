@@ -1,0 +1,6 @@
+#ifdeff FOO
+float a;
+#else
+float b;
+#endif
+#bar

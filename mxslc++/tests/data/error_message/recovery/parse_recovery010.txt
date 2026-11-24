@@ -1,0 +1,2 @@
+parse_recovery010.mxsl, line 1: Invalid expression
+parse_recovery010.mxsl, line 4: Unexpected end of tokens

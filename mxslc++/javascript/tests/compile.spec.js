@@ -82,4 +82,44 @@ test.describe('Compile (SLX -> MTLX)', () =>
         expect(() => mx.compileSlxToMtlx('float = ;', opts)).toThrow();
         opts.delete();
     });
+
+    test('lists every error in the diagnostics of the CompileError', () =>
+    {
+        const opts = new mx.CompileOptions();
+        let error;
+        try
+        {
+            mx.compileSlxToMtlx('float a = "text";\nstring b = 1.0;', opts);
+        }
+        catch (e)
+        {
+            error = e;
+        }
+        opts.delete();
+
+        expect(error.name).toBe('CompileError');
+        expect(error.diagnostics.map((d) => d.line)).toEqual([1, 2]);
+        expect(error.diagnostics[0].file).toBe('');
+        expect(error.diagnostics[1].message).toBe('Cannot assign an expression of type float to a variable or parameter of type string');
+    });
+
+    test('stops after maxErrors errors', () =>
+    {
+        const opts = new mx.CompileOptions();
+        expect(opts.maxErrors).toBe(20);
+        opts.maxErrors = 2;
+        let error;
+        try
+        {
+            mx.compileSlxToMtlx('float a = "x";\nfloat b = "x";\nfloat c = "x";', opts);
+        }
+        catch (e)
+        {
+            error = e;
+        }
+        opts.delete();
+
+        expect(error.diagnostics.length).toBe(3);
+        expect(error.diagnostics[2].message).toBe('Too many errors, stopping compilation');
+    });
 });

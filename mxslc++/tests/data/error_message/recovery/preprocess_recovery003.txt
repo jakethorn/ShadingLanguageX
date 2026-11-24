@@ -1,0 +1,2 @@
+preprocess_recovery003.mxsl, line 1: Invalid macro name: 123
+preprocess_recovery003.mxsl, line 4: Unknown preprocessor directive: #bar

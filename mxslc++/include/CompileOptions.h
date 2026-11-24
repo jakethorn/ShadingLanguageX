@@ -38,6 +38,8 @@ namespace mxslc
         bool error_on_missing_globals{true};
         bool error_on_unused_globals{true};
 
+        size_t max_errors{20};
+
         optional<string> func_name;
 
     public:

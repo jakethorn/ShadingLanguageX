@@ -26,10 +26,11 @@ Once macros can be set in the settings, highlight them where they're used, as ma
 file or its includes already are. The extension would take the names from the setting, so this needs nothing from
 the compiler beyond [More compile settings](#more-compile-settings).
 
-### Better errors
+### Exact error ranges
 
-Report errors with their exact column and range, rather than marking the whole line, and report more than one error
-per compile. The compiler stops at the first error, so a file with several mistakes shows them one at a time.
+Mark each error at its exact column and range, rather than the whole line. The compiler reports every error of a
+compile with its file and line, but tokens don't record a column. The scanner could track columns (a token expanded
+from a macro would take the position where the macro is used) and the compiler could pass them on with each error.
 
 ### Fix the build-up after failed compiles
 
@@ -129,3 +130,51 @@ default values, as function calls already do, and would skip evaluating the node
 its inputs. Outside of `comptime`, a result of the wrong type could also write the node instead of failing. Evaluating
 node expressions can't be removed, because the standard library relies on it, e.g., `__not__` returns
 `node not(in=in1)`. The code is in `serialize_constexpr.cpp`.
+
+### Evaluating a method of a class instance crashes
+
+[methods010.mxsl](../mxslc++/tests/data/groundtruth/classes/methods010.mxsl) crashes with a segmentation fault when
+it's compiled with graph reduction, which is on by default, e.g., with the CLI. The ground-truth tests compile with
+`reduce_graph = false`, so they don't catch it, and `--no-reduce-graph` compiles it correctly.
+
+```
+class A
+{
+    float x, y;
+
+    float add()
+    {
+        return x + y;
+    }
+}
+
+A a = {1.0, 2.0};
+constant(a.add());
+```
+
+The crash is a null pointer read in `primitive_utils::add`, called by `serialize_constexpr` when
+`Serializer::write_node` evaluates the method call at compile time. It looks like the instance's fields don't reach
+the evaluation as compile-time values.
+
+### User functions named after MaterialX nodes are evaluated as those nodes
+
+[library_names001.mxsl](../mxslc++/tests/data/groundtruth/misc/library_names001.mxsl) defines its own `invert`
+function. With graph reduction, which is on by default, it fails with "Cannot invert a value of type 'float'", and
+"Cannot invert a value of type 'vector2'" for the `vec2` call. The ground-truth tests compile with
+`reduce_graph = false`, so they don't catch it.
+
+```
+T invert<float, vec2>(T in)
+{
+    T result = in * -1.0;
+    return result;
+}
+
+float y = invert(0.25);
+vec2 z = invert(vec2{1.0, 2.0});
+```
+
+The error is thrown in `primitive_utils/invert.cpp`. It looks like `serialize_constexpr` picks the evaluating function
+by the node's category, so it evaluates the user's function as MaterialX's `invert` node instead of through its own
+body. User functions with the names of other MaterialX nodes, such as `add` or `multiply`, may be affected in the
+same way.

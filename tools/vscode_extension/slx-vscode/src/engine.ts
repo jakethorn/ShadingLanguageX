@@ -14,6 +14,7 @@ import * as path from 'node:path';
 import { Worker } from 'node:worker_threads';
 import {
     ENGINE_LOAD_ERROR,
+    type CompileDiagnostic,
     type CompileSettings,
     type EngineMessage,
     type EngineRequest,
@@ -25,7 +26,14 @@ export const ENGINE_MISSING_ERROR = 'EngineMissingError';
 export const ENGINE_CRASH_ERROR = 'EngineCrashError';
 
 export class EngineError extends Error {
-    constructor(name: string, message: string) {
+    /**
+     * @param diagnostics every error of a failed compile; empty for other failures
+     */
+    constructor(
+        name: string,
+        message: string,
+        readonly diagnostics: CompileDiagnostic[] = [],
+    ) {
         super(message);
         this.name = name;
     }
@@ -143,7 +151,7 @@ export class SlxEngine {
         if (!message.ok) this.failuresInWorker++;
         if (this.pending.size === 0) this.idleWorker();
         if (message.ok) request.resolve(message.output);
-        else request.reject(new EngineError(message.errorName, message.errorMessage));
+        else request.reject(new EngineError(message.errorName, message.errorMessage, message.diagnostics));
     }
 
     /** Lets an idle worker stop the process from exiting, or replaces it if it has failed too often. */

@@ -57,6 +57,7 @@ options:
   --no-validate-graph                       Do not validate the MaterialX graph
   --default-function-behaviour BEHAVIOUR    How functions without one of the following modifers compile: nodedef
                                             (default), nodegraph, inline or comptime
+  --max-errors MAX_ERRORS                   Stop after this many errors, 0 for no limit (default: 20)
   --decompile-hints                         Add hints for the decompiler as xml attributes
 )";
 
@@ -311,6 +312,27 @@ options:
             clargs.options.default_function_behaviour = *behaviour;
         }
 
+        void parse_max_errors(Span<string>& argv, CommandLineArgs& clargs)
+        {
+            if (argv.empty())
+            {
+                clargs.is_valid = false;
+                print_error("Empty --max-errors option");
+                return;
+            }
+
+            const string& value = argv.pop_front();
+            const optional<Primitive> max_errors = parse_literal(value);
+            if (not max_errors or not max_errors->is_a<int>() or max_errors->as<int>() < 0)
+            {
+                clargs.is_valid = false;
+                print_error("Invalid value in --max-errors option: " + value + " (expected 0 or a positive integer)");
+                return;
+            }
+
+            clargs.options.max_errors = max_errors->as<int>();
+        }
+
         void parse_no_validate_graph(Span<string>&, CommandLineArgs& clargs)
         {
             clargs.options.validate_graph = false;
@@ -361,6 +383,7 @@ options:
                 {"--no-reduce-graph", parse_no_reduce_graph},
                 {"--no-validate-graph", parse_no_validate_graph},
                 {"--default-function-behaviour", parse_default_function_behaviour},
+                {"--max-errors", parse_max_errors},
                 {"--decompile-hints", parse_decompile_hints}
             };
 

@@ -1,0 +1,4 @@
+#ifdef 123
+float a;
+#endif
+#bar

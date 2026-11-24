@@ -31,6 +31,7 @@ namespace mxslc::runtime
 
         bool has_parent() const { return parent_ != nullptr; }
         Scope* parent() const { return parent_.get(); }
+        size_t depth() const;
 
         mx::GraphElementPtr graph() const { return graph_; }
         pair<mx::NodeGraphPtr, FuncPtr> node_graph() const;
@@ -45,6 +46,9 @@ namespace mxslc::runtime
         // true if current scope is or is inside of an inline function
         bool is_inside_inline_function() const;
 
+        void poison(string name);
+        void throw_if_poisoned(const string& name) const;
+
         /*
          * variables
          */
@@ -53,6 +57,7 @@ namespace mxslc::runtime
         VarPtr get_variable(const string& name) const;
         vector<VarPtr> get_all_variables();
         bool has_variable(const string& name) const;
+        bool defines_variable(const string& name) const;
         bool is_variable_local(const VarPtr& var) const;
         bool is_variable_local(const string& name) const;
 
@@ -61,6 +66,7 @@ namespace mxslc::runtime
          */
 
         void add_function(FuncPtr func);
+        void remove_function(const FuncPtr& func);
         FuncPtr get_function(const FunctionQuery& query) const;
         vector<FuncPtr> get_functions(const FunctionQuery& query) const;
         bool has_function(const FuncPtr& func) const;
@@ -84,6 +90,9 @@ namespace mxslc::runtime
         vector<string> get_all_type_names() const;
 
     private:
+        VarPtr find_variable(const string& name) const;
+        TypePtr find_type(const string& name) const;
+        bool is_poisoned(const string& name) const;
         void resolve_fields(const TypePtr& type) const;
 
         string name_;
@@ -93,6 +102,7 @@ namespace mxslc::runtime
         unordered_map<string, VarPtr> variables_;
         unordered_map<string, vector<FuncPtr>> functions_;
         unordered_map<string, TypePtr> types_;
+        unordered_set<string> poisoned_names_;
 
         mx::GraphElementPtr graph_;
         FuncPtr graph_func_;

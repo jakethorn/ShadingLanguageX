@@ -1,0 +1,8 @@
+inline float f(float a)
+{
+    return a + undefined_name;
+}
+
+float x = f(1.0);
+float a = x;
+string s = 1.0;

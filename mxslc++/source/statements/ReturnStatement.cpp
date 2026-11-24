@@ -61,6 +61,11 @@ namespace mxslc::statements
         }
     }
 
+    void ReturnStatement::recover() const
+    {
+        throw Branch{};
+    }
+
     string ReturnStatement::to_string() const
     {
         if (expr_)

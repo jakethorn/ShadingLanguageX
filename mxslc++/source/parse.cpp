@@ -4,6 +4,9 @@
 
 #include "parse.h"
 
+#include "errors/ErrorReporter.h"
+#include "errors/FatalError.h"
+
 #include "expressions/CompoundAssignment.h"
 #include "expressions/DotOperator.h"
 #include "expressions/UnnamedConstructor.h"
@@ -57,44 +60,52 @@ namespace mxslc
         {
             return create_expression<UnnamedConstructor>(std::move(exprs));
         }
+
+        int get_brace_depth_change(const Token& token)
+        {
+            if (token == '{')
+                return 1;
+            if (token == '}')
+                return -1;
+            return 0;
+        }
+
+        bool is_statement_start(const Token& token)
+        {
+            return token == TokenType::Identifier or
+                   token.type().is_keyword() or
+                   token == '}' or
+                   token == '@' or
+                   token == TokenType::DoubleAt or
+                   token == TokenType::DoubleLeftBracket;
+        }
     }
 
-    vector<StmtPtr> parse(vector<Token> tokens)
+    vector<StmtPtr> parse(vector<Token> tokens, ErrorReporter& error_reporter)
     {
-        return Parser{std::move(tokens)}.parse();
+        return Parser{std::move(tokens), error_reporter}.parse();
     }
 
-    Parser::Parser(vector<Token> tokens) : TokenReader{std::move(tokens)}
+    Parser::Parser(vector<Token> tokens, ErrorReporter& error_reporter) : TokenReader{std::move(tokens)}, error_reporter_{error_reporter}
     {
         ignore(TokenType::Newline);
     }
 
     vector<StmtPtr> Parser::parse()
     {
-        Token debug_info;
-        try
+        vector<StmtPtr> statements;
+        while (not empty())
         {
-            vector<StmtPtr> statements;
-            while (not empty())
-            {
-                if (consume(';'))
-                    continue;
+            if (consume(';'))
+                continue;
 
-                debug_info = peek();
+            if (consume(TokenType::Break))
+                match(';');
 
-                if (consume(TokenType::Break))
-                    match(';');
-
-                statements.push_back(statement());
-            }
-
-            return statements;
+            parse_statement_or_skip(statements, [this] { return statement(); });
         }
-        catch (CompileError& e)
-        {
-            e.set_debug_info(debug_info);
-            throw;
-        }
+
+        return statements;
     }
 
     StmtPtr Parser::statement()
@@ -300,7 +311,7 @@ namespace mxslc
         if (not params)
             match(TokenType::FatArrow);
 
-        StmtPtr body = function_body();
+        StmtPtr body = block_statement();
 
         return create_statement<FunctionDefinition>(
             std::move(mods),
@@ -321,17 +332,17 @@ namespace mxslc
         TypePtr parent = consume(':') ? type() : nullptr;
 
         match('{');
-        vector<StmtPtr> body;
-        while (not consume('}'))
-        {
-            if (is_constructor_definition())
-                body.push_back(constructor_definition());
-            else
-                body.push_back(statement());
-        }
+        vector<StmtPtr> body = statements_until_closing_brace([this] { return class_member(); });
         consume(';');
 
         return create_statement<ClassDefinition>(std::move(name), std::move(template_types), std::move(parent), std::move(body), std::move(token));
+    }
+
+    StmtPtr Parser::class_member()
+    {
+        if (is_constructor_definition())
+            return constructor_definition();
+        return statement();
     }
 
     StmtPtr Parser::constructor_definition()
@@ -385,10 +396,7 @@ namespace mxslc
     StmtPtr Parser::block_statement()
     {
         Token token = match('{');
-        vector<StmtPtr> body;
-        while (not consume('}'))
-            body.push_back(statement());
-
+        vector<StmtPtr> body = statements_until_closing_brace([this] { return statement(); });
         return create_statement<BlockStatement>(std::move(body), std::move(token));
     }
 
@@ -554,17 +562,6 @@ namespace mxslc
         if (peek() == '<')
             return list<TypePtr>('<', '>', [this](const size_t){ return type(); });
         return {};
-    }
-
-    StmtPtr Parser::function_body()
-    {
-        vector<StmtPtr> body;
-
-        Token token = match('{');
-        while (not consume('}'))
-            body.push_back(statement());
-
-        return create_statement<BlockStatement>(std::move(body), std::move(token));
     }
 
     StmtPtr Parser::return_statement()
@@ -1141,5 +1138,83 @@ namespace mxslc
     {
         return (peek(0) == TokenType::Identifier and peek(1) == '(') or
                (peek(0) == TokenType::Inline and peek(1) == TokenType::Identifier and peek(2) == '(');
+    }
+
+    vector<StmtPtr> Parser::statements_until_closing_brace(const std::function<StmtPtr()>& parse_statement)
+    {
+        vector<StmtPtr> stmts;
+        ++block_depth_;
+        while (not empty() and peek() != '}')
+            parse_statement_or_skip(stmts, parse_statement);
+        --block_depth_;
+
+        match('}');
+        return stmts;
+    }
+
+    void Parser::parse_statement_or_skip(vector<StmtPtr>& stmts, const std::function<StmtPtr()>& parse_statement)
+    {
+        const size_t start = position();
+        const Token start_token = peek();
+        try
+        {
+            stmts.push_back(parse_statement());
+        }
+        catch (const FatalError&)
+        {
+            throw;
+        }
+        catch (CompileError& e)
+        {
+            e.set_debug_info(start_token);
+            error_reporter_.report(e);
+            skip_statement(start);
+        }
+    }
+
+    void Parser::skip_statement(const size_t start)
+    {
+        const size_t parsed_end = position();
+        set_position(start);
+
+        int brace_depth = 0;
+        while (position() < parsed_end)
+            brace_depth += get_brace_depth_change(consume());
+
+        int broken_brace_depth = std::max(brace_depth, 0);
+        while (not empty())
+        {
+            if (block_depth_ > 0 and position() > start and brace_depth == 0 and peek() == '}')
+                return;
+
+            const Token token = consume();
+            brace_depth += get_brace_depth_change(token);
+
+            if (token == ';' and brace_depth <= broken_brace_depth)
+                return;
+
+            if (token == '}' and broken_brace_depth > 0 and brace_depth < broken_brace_depth)
+            {
+                broken_brace_depth = brace_depth;
+            }
+            else if (token == '}' and brace_depth <= 0)
+            {
+                if (is_statement_end_after_brace())
+                {
+                    consume(';');
+                    return;
+                }
+                brace_depth = 0;
+            }
+        }
+    }
+
+    bool Parser::is_statement_end_after_brace() const
+    {
+        if (empty())
+            return true;
+        if (peek() == TokenType::Else)
+            return false;
+        return peek() == ';' or is_statement_start(peek());
     }
 }

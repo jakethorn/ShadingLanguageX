@@ -31,4 +31,9 @@ namespace mxslc::runtime_utils
     {
         return Runtime::get().reflection();
     }
+
+    ErrorReporter& RuntimeAware::error_reporter()
+    {
+        return Runtime::get().error_reporter();
+    }
 }

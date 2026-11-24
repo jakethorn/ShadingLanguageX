@@ -1,0 +1,3 @@
+float a, b = undefined_name;
+float c = a + b;
+string s = a;

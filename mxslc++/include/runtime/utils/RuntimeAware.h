@@ -10,6 +10,7 @@
 namespace mxslc
 {
     struct CompileOptions;
+    class ErrorReporter;
 }
 
 namespace mxslc::serialize
@@ -44,6 +45,7 @@ namespace mxslc::runtime_utils
         static Scope& scope();
         static Serializer& serializer();
         static Reflection& reflection();
+        static ErrorReporter& error_reporter();
     };
 }
 

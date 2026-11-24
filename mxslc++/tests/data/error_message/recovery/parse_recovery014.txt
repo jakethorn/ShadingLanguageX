@@ -1,0 +1,2 @@
+parse_recovery014.mxsl, line 1: Unexpected token: float
+parse_recovery014.mxsl, line 2: Invalid expression

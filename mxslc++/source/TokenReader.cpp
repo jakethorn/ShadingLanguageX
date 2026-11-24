@@ -52,7 +52,7 @@ namespace mxslc
     Token TokenReader::consume()
     {
         check_bounds();
-        return std::move(tokens_[index_++]);
+        return tokens_[index_++];
     }
 
     optional<Token> TokenReader::consume(const vector<TokenType>& types)
@@ -60,7 +60,7 @@ namespace mxslc
         if (empty())
             return std::nullopt;
         if (contains(types, peek().type()))
-            return std::move(tokens_[index_++]);
+            return tokens_[index_++];
         return std::nullopt;
     }
 

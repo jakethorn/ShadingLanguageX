@@ -60,6 +60,19 @@ namespace mxslc::statements
             value = expr_->evaluate();
         }
 
+        for (const StmtPtr& var_def : create_variable_definitions(value))
+            var_def->execute();
+    }
+
+    void MultiVariableDefinition::recover() const
+    {
+        for (const StmtPtr& var_def : create_variable_definitions(nullptr))
+            var_def->recover();
+    }
+
+    vector<StmtPtr> MultiVariableDefinition::create_variable_definitions(const VarPtr& value) const
+    {
+        vector<StmtPtr> var_defs;
         for (size_t i = 0; i < type_->field_count(); ++i)
         {
             Field field = type_->field(i);
@@ -71,13 +84,15 @@ namespace mxslc::statements
                 child_expr = as_expression(std::move(child));
             }
 
-            create_statement<VariableDefinition>(
+            var_defs.push_back(create_statement<VariableDefinition>(
                 field.modifiers(),
                 field.type(),
                 field.name(),
                 std::move(child_expr)
-            )->execute();
+            ));
         }
+
+        return var_defs;
     }
 
     string MultiVariableDefinition::to_string() const

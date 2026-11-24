@@ -1,0 +1,6 @@
+#if (
+float a = 1.0;
+#else
+float b = 2.0;
+#endif
+#foo

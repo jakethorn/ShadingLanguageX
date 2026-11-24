@@ -19,6 +19,7 @@ def test_compile_options_ctor_defaults():
     assert len(options.func_args) == 0
     assert options.reduce_graph == True
     assert options.default_function_behaviour == mxslc.FunctionBehaviour.NodeDef
+    assert options.max_errors == 20
 
 
 def test_compile_options_ctor_with_kwargs():

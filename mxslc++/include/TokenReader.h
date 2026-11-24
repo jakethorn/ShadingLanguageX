@@ -22,6 +22,9 @@ namespace mxslc
         size_t size() const;
         bool empty() const;
 
+        size_t position() const { return index_; }
+        void set_position(const size_t position) { index_ = position; }
+
         void ignore(TokenType token_type);
 
         const Token& peek(size_t n = 0) const;
@@ -39,7 +42,7 @@ namespace mxslc
             const Token& token = peek();
             if ((... || (token == types)))
             {
-                return std::move(tokens_[index_++]);
+                return tokens_[index_++];
             }
 
             return std::nullopt;
@@ -75,7 +78,7 @@ namespace mxslc
             const Token& token = peek();
             if ((... || (token == types)))
             {
-                return std::move(tokens_[index_++]);
+                return tokens_[index_++];
             }
 
             throw CompileError{token, "Unexpected token: " + token.lexeme()};

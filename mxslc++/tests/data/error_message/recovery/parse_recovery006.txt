@@ -1,0 +1,2 @@
+parse_recovery006.mxsl, line 1: Invalid expression
+parse_recovery006.mxsl, line 2: Invalid expression

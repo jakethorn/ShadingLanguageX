@@ -19,6 +19,7 @@ namespace mxslc::statements
         const string& class_name() const { return class_name_; }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void recover() const override;
 
         string to_string() const override;
 
@@ -27,6 +28,8 @@ namespace mxslc::statements
         void execute_impl() const override;
 
     private:
+        string outer_ctor_name() const;
+
         ModifierList mods_;
         string class_name_;
         ParameterList params_;

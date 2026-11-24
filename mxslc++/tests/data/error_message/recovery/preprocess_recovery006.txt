@@ -1,0 +1,2 @@
+preprocess_recovery006.mxsl, line 1: Unknown preprocessor directive: #ifdeff
+preprocess_recovery006.mxsl, line 6: Unknown preprocessor directive: #bar

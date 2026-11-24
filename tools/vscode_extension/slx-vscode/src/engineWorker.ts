@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { parentPort, workerData } from 'node:worker_threads';
 import {
     ENGINE_LOAD_ERROR,
+    type CompileDiagnostic,
     type CompileRequest,
     type EngineMessage,
     type EngineRequest,
@@ -83,9 +84,14 @@ function compile(mx: MxslcModule, request: CompileRequest): string {
     }
 }
 
-function describeError(error: unknown): { errorName: string; errorMessage: string } {
-    if (error instanceof Error) return { errorName: error.name, errorMessage: error.message };
-    return { errorName: 'Error', errorMessage: String(error) };
+// Compile errors from the Emscripten module carry every error as diagnostics.
+type ModuleError = Error & { diagnostics?: CompileDiagnostic[] };
+
+function describeError(error: unknown): { errorName: string; errorMessage: string; diagnostics: CompileDiagnostic[] } {
+    if (error instanceof Error) {
+        return { errorName: error.name, errorMessage: error.message, diagnostics: (error as ModuleError).diagnostics ?? [] };
+    }
+    return { errorName: 'Error', errorMessage: String(error), diagnostics: [] };
 }
 
 port.on('message', async (request: EngineRequest) => {
@@ -99,6 +105,7 @@ port.on('message', async (request: EngineRequest) => {
             ok: false,
             errorName: ENGINE_LOAD_ERROR,
             errorMessage: `Could not load the SLX compiler from ${libDir}: ${describeError(error).errorMessage}`,
+            diagnostics: [],
         });
         return;
     }

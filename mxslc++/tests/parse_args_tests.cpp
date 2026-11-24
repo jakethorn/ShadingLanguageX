@@ -358,3 +358,24 @@ TEST(parse_args_tests, test_bad_default_function_behaviour_options)
 
     ASSERT_FALSE(args.is_valid);
 }
+
+TEST(parse_args_tests, test_max_errors_option)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "--max-errors", "5" };
+    const mxslc::CommandLineArgs args = mxslc::parse_cli_args(argv);
+
+    ASSERT_TRUE(args.is_valid);
+    ASSERT_EQ(args.options.max_errors, 5);
+}
+
+TEST(parse_args_tests, test_bad_max_errors_option)
+{
+    const fs::path input_filepath = get_test_data("parse_args_tests/001.mxsl"s);
+
+    const vector<string> argv{ EXECUTABLE, input_filepath.string(), "--max-errors", "-1" };
+    const mxslc::CommandLineArgs args = mxslc::parse_cli_args(argv);
+
+    ASSERT_FALSE(args.is_valid);
+}

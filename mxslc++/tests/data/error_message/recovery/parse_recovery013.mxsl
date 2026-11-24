@@ -1,0 +1,6 @@
+inline vec3 f()
+{
+    return vec3{1.0, 2.0, 3.0;
+}
+
+float x = * 1.0;

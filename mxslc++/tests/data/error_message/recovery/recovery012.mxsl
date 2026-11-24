@@ -1,0 +1,14 @@
+inline float f(float a)
+{
+    if (undefined_name)
+    {
+        return 1.0;
+    }
+    else
+    {
+        return 2.0;
+    }
+}
+
+float x = f(1.0);
+string s = 1.0;

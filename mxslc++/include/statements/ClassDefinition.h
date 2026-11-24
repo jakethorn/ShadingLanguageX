@@ -19,6 +19,7 @@ namespace mxslc::statements
         ClassDefinition(string name, vector<TypePtr> template_types, TypePtr parent, vector<StmtPtr> body, Token token);
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void recover() const override;
 
         string to_string() const override;
 

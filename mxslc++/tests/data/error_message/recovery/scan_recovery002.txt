@@ -1,0 +1,2 @@
+bad_characters.mxsl, line 2: Unexpected character: $
+scan_recovery002.mxsl, line 2: Unknown preprocessor directive: #foo

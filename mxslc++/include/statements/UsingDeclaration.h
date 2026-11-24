@@ -16,6 +16,7 @@ namespace mxslc::statements
             : Statement{std::move(token)}, name_{std::move(name)}, type_{std::move(type)} { }
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void recover() const override;
 
         string to_string() const override;
 

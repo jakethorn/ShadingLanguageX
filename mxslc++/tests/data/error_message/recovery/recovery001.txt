@@ -1,0 +1,2 @@
+recovery001.mxsl, line 1: Cannot assign an expression of type string to a variable or parameter of type float
+recovery001.mxsl, line 2: Cannot assign an expression of type float to a variable or parameter of type string

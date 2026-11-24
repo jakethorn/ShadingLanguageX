@@ -37,7 +37,8 @@ namespace mxslc
 
     void Logger::error(const CompileError& e)
     {
-        error(e.what());
+        for (const Diagnostic& diagnostic : e.diagnostics())
+            error(diagnostic.to_string());
     }
 
     void Logger::assert(const bool condition, const string& message)
