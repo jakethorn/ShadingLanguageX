@@ -1,0 +1,2 @@
+parse_recovery015.mxsl, line 1: Unexpected token: b
+parse_recovery015.mxsl, line 3: Invalid expression

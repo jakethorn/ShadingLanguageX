@@ -338,20 +338,19 @@ Each stage leaves the tests passing and can be merged on its own.
    - A `return` at the top level stops the compile: the `Branch` its `recover()` throws has no function to catch it.
 3. **Parser recovery** (done): `parse_statement_or_skip()` is the recovery point. It is used by the top-level loop
    and by `statements_until_closing_brace()`, which is shared by blocks and class bodies. Gate 2 is
-   `throw_if_errors()` between parsing and executing, in `parse_and_execute()`. No ground-truth file changed. The 14
+   `throw_if_errors()` between parsing and executing, in `parse_and_execute()`. No ground-truth file changed. The 16
    `parse_recovery` files in `tests/data/error_message/recovery/` cover it. Differences from the design above:
    - The parser reports to the runtime's `ErrorReporter`, which `parse()` and the `Parser` constructor now take. So
      a compile has one reporter and one error limit, and `ConstructorDefinition` passes the same one.
-   - `skip_statement()` replaces `synchronize()`. It goes back to where the statement started and counts braces up
-     to the point where parsing failed. Braces still open there are taken to be broken, for example
-     `return vec3{1.0, 2.0;`. A `;` at their level ends the statement, and closing them doesn't. After that, the
-     statement ends at:
+   - `skip_statement()` replaces `synchronize()`, and is kept deliberately simple. It counts the braces the parser
+     already read from the start of the statement, then skips tokens until the statement ends at:
      - a `;` outside braces;
-     - a `}` that closes back to depth 0, unless the next token is `else` or can't start a statement (for example
-       `)`, `,` or an operator, as in `dot(v, {0, 1, 0})`).
+     - a `}` that closes back to depth 0, unless `else` follows. A `;` straight after it is skipped too.
 
-     Inside a block, it stops before a `}` at depth 0, which is taken to close the block. At the top level such a `}`
-     is skipped as part of the statement, since there is no block for it to close.
+     It stops before a `}` at depth 0, which closes the enclosing block. The costs of keeping it simple:
+     - An error inside a constructor or struct type that is followed by more of the statement, as in
+       `dot(v, {0 1, 0})`, gives a second error on the same line.
+     - A constructor missing its `}`, as in `return vec3{1.0, 2.0;`, skips to the end of the block.
    - Brackets aren't counted, so an unclosed `(` can't swallow the rest of the file.
    - `TokenReader` copies tokens when it consumes them instead of moving them. Tokens are then still intact when
      `skip_statement()` goes back over them, and "Unexpected end of tokens" now has its file name.
@@ -360,7 +359,9 @@ Each stage leaves the tests passing and can be merged on its own.
 
    A mutation test over the ground-truth files deleted one `;`, `(`, `)`, `{`, `}`, `,` or `=`, or inserted a `*`.
    Of the 1,133 mutants that failed to compile, 1,041 report one error. Most of the rest come from typos that are
-   ambiguous to a brace-counting parser:
+   ambiguous to a brace-counting parser. Compared with the first, more complex `skip_statement()`, the simple one
+   gives the same output for 1,077 of 1,158 mutants and the same first error for all of them. It drops 15 false
+   errors, mostly on a `}` after a missing `)`. It adds 66, of which 52 are on the line of the first error.
    - A missing `{` makes its `}` close a block early.
    - A `}` inside a block is taken to close the block.
    - A typo that stops a definition parsing as one (such as `Point p {1.0, 2.0};`) leaves the name undefined.

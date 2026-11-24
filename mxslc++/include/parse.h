@@ -121,10 +121,9 @@ namespace mxslc
         vector<StmtPtr> statements_until_closing_brace(const std::function<StmtPtr()>& parse_statement);
         void parse_statement_or_skip(vector<StmtPtr>& stmts, const std::function<StmtPtr()>& parse_statement);
         void skip_statement(size_t start);
-        bool is_statement_end_after_brace() const;
+        int count_open_braces_since(size_t start);
 
         ErrorReporter& error_reporter_;
-        size_t block_depth_{0};
     };
 }
 

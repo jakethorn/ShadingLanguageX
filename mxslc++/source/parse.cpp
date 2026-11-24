@@ -69,16 +69,6 @@ namespace mxslc
                 return -1;
             return 0;
         }
-
-        bool is_statement_start(const Token& token)
-        {
-            return token == TokenType::Identifier or
-                   token.type().is_keyword() or
-                   token == '}' or
-                   token == '@' or
-                   token == TokenType::DoubleAt or
-                   token == TokenType::DoubleLeftBracket;
-        }
     }
 
     vector<StmtPtr> parse(vector<Token> tokens, ErrorReporter& error_reporter)
@@ -1143,10 +1133,8 @@ namespace mxslc
     vector<StmtPtr> Parser::statements_until_closing_brace(const std::function<StmtPtr()>& parse_statement)
     {
         vector<StmtPtr> stmts;
-        ++block_depth_;
         while (not empty() and peek() != '}')
             parse_statement_or_skip(stmts, parse_statement);
-        --block_depth_;
 
         match('}');
         return stmts;
@@ -1174,47 +1162,36 @@ namespace mxslc
 
     void Parser::skip_statement(const size_t start)
     {
-        const size_t parsed_end = position();
-        set_position(start);
-
-        int brace_depth = 0;
-        while (position() < parsed_end)
-            brace_depth += get_brace_depth_change(consume());
-
-        int broken_brace_depth = std::max(brace_depth, 0);
+        int brace_depth = count_open_braces_since(start);
         while (not empty())
         {
-            if (block_depth_ > 0 and position() > start and brace_depth == 0 and peek() == '}')
+            if (position() > start and brace_depth == 0 and peek() == '}')
                 return;
 
             const Token token = consume();
             brace_depth += get_brace_depth_change(token);
+            if (brace_depth > 0)
+                continue;
 
-            if (token == ';' and brace_depth <= broken_brace_depth)
+            if (token == ';')
                 return;
 
-            if (token == '}' and broken_brace_depth > 0 and brace_depth < broken_brace_depth)
+            if (token == '}' and not consume(TokenType::Else))
             {
-                broken_brace_depth = brace_depth;
-            }
-            else if (token == '}' and brace_depth <= 0)
-            {
-                if (is_statement_end_after_brace())
-                {
-                    consume(';');
-                    return;
-                }
-                brace_depth = 0;
+                consume(';');
+                return;
             }
         }
     }
 
-    bool Parser::is_statement_end_after_brace() const
+    int Parser::count_open_braces_since(const size_t start)
     {
-        if (empty())
-            return true;
-        if (peek() == TokenType::Else)
-            return false;
-        return peek() == ';' or is_statement_start(peek());
+        const size_t end = position();
+        set_position(start);
+
+        int brace_depth = 0;
+        while (position() < end)
+            brace_depth += get_brace_depth_change(consume());
+        return brace_depth;
     }
 }

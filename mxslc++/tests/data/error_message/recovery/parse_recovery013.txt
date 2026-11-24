@@ -1,2 +1,3 @@
 parse_recovery013.mxsl, line 3: Unexpected token: ;
 parse_recovery013.mxsl, line 6: Invalid expression
+parse_recovery013.mxsl, line 6: Unexpected end of tokens
