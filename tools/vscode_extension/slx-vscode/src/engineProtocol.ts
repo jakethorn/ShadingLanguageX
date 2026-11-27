@@ -37,12 +37,23 @@ export interface EngineSuccess {
     output: string;
 }
 
+/** One error of a failed compile. */
+export interface CompileDiagnostic {
+    /** Path of the file the error is in, or '' for the source the compiler was given directly. */
+    file: string;
+    /** 1-based line, or 0 when the compiler gave none. */
+    line: number;
+    message: string;
+}
+
 export interface EngineFailure {
     kind: 'result';
     id: number;
     ok: false;
     errorName: string;
     errorMessage: string;
+    /** Every error of a failed compile. Empty for other failures. */
+    diagnostics: CompileDiagnostic[];
 }
 
 /** Text the compiler printed while handling a request, from `print` statements (stdout) or warnings (stderr). */

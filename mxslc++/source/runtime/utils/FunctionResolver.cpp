@@ -52,6 +52,8 @@ namespace mxslc::runtime_utils
                 return func;
         }
 
+        scope().throw_if_poisoned(*query_.name);
+
         if (checked_funcs.empty())
             checked_funcs = scope().get_functions(*query_.name);
 

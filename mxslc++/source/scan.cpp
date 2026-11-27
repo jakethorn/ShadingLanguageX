@@ -10,6 +10,7 @@
 #include "utils/io_utils.h"
 #include "utils/container_utils.h"
 #include "errors/CompileError.h"
+#include "errors/ErrorReporter.h"
 
 namespace mxslc
 {
@@ -166,34 +167,41 @@ namespace mxslc
             return false;
         }
 
-        Token next_token(const string_view text, const size_t line)
+        bool try_match_token(const string_view text, Token& token)
         {
-            if (Token token; try_match_whitespace(text, token)
-                             or try_match_compound_symbol(text, token)
-                             or try_match_comment(text, token)
-                             or try_match_symbol(text, token)
-                             or try_match_bool(text, token)
-                             or try_match_keyword_identifier(text, token)
-                             or try_match_float(text, token)
-                             or try_match_int(text, token)
-                             or try_match_string(text, token))
-            {
-                return token;
-            }
+            return try_match_whitespace(text, token)
+                or try_match_compound_symbol(text, token)
+                or try_match_comment(text, token)
+                or try_match_symbol(text, token)
+                or try_match_bool(text, token)
+                or try_match_keyword_identifier(text, token)
+                or try_match_float(text, token)
+                or try_match_int(text, token)
+                or try_match_string(text, token);
+        }
 
-            throw CompileError{"Scanning error on line " + std::to_string(line) + ", character: " + text.front()};
+        Token match_unexpected_characters(const string_view text)
+        {
+            size_t length = 1;
+            Token token;
+            while (length < text.size() and not try_match_token(text.substr(length), token))
+                ++length;
+            return Token{TokenType::Unknown, string{text.substr(0, length)}};
         }
     }
 
     vector<Token> scan_string(string_view text, const optional<fs::path>& src_path)
     {
         vector<Token> tokens;
+        ErrorReporter error_reporter{0};
         size_t line = 1;
         const SharedPathPtr shared_path = copy_to_shared_ptr(src_path);
 
         while (not text.empty())
         {
-            Token token = next_token(text, line);
+            Token token;
+            if (not try_match_token(text, token))
+                token = match_unexpected_characters(text);
             text.remove_prefix(token.lexeme().length());
 
             if (token == TokenType::Whitespace)
@@ -211,6 +219,12 @@ namespace mxslc
             token.set_line(line);
             token.set_path(shared_path);
 
+            if (token == TokenType::Unknown)
+            {
+                error_reporter.report(CompileError{token, "Unexpected character: " + token.lexeme()});
+                continue;
+            }
+
             if (token == TokenType::Newline)
             {
                 ++line;
@@ -219,6 +233,7 @@ namespace mxslc
             tokens.push_back(std::move(token));
         }
 
+        error_reporter.throw_if_errors();
         return tokens;
     }
 

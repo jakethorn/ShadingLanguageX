@@ -1,0 +1,2 @@
+recovery014.mxsl, line 1: No function could be found with the name 'undefined_function'
+recovery014.mxsl, line 3: Cannot assign an expression of type float to a variable or parameter of type string

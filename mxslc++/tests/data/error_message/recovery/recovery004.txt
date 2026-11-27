@@ -1,0 +1,2 @@
+recovery004.mxsl, line 1: Variable or parameterless function not defined: undefined_name
+recovery004.mxsl, line 2: Cannot assign an expression of type float to a variable or parameter of type string

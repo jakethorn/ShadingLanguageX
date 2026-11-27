@@ -1,16 +1,17 @@
-// Reads the location out of an mxslc error message.
+// Works out where the errors of a failed compile are.
 //
-// The compiler reports errors as plain text, prefixed with the file and line
-// when it knows them:
+// A failed compile lists every error as a diagnostic with its file and line.
+// Other failures only have a message, which is plain text prefixed with the
+// file and line when the compiler knows them:
 //
 //     line 2: Variable or parameterless function not defined: x
 //     colors.mxsl, line 4: Invalid expression
-//     Scanning error on line 3, character: $
-//     File colors.mxsl could not be found.\nSearched paths:\n...
+//     MaterialX version 9.9.9 libraries could not be found.
 //
-// The file is only ever a file name, never a path, and is absent for errors in
-// the source the compiler was given directly. Lines are 1-based.
+// The file in a message is only ever a file name, never a path, and is absent
+// for errors in the source the compiler was given directly. Lines are 1-based.
 import * as path from 'node:path';
+import type { CompileDiagnostic } from './engineProtocol';
 import { ROOT_KEY, normaliseKey, type DirectiveOrigin, type IncludedSource, type SourceSet } from './includes';
 
 export interface CompileErrorLocation {
@@ -23,7 +24,6 @@ export interface CompileErrorLocation {
 }
 
 const LOCATED_ERROR = /^(?:(.+?), )?line (\d+): ([\s\S]*)$/;
-const SCANNING_ERROR = /^Scanning error on line (\d+)/;
 const MISSING_FILE_ERROR = /^File (.+?) could not be found\./;
 const ANSI_ESCAPE = /\x1b\[[0-9;]*m/g;
 
@@ -43,12 +43,15 @@ export function parseCompileError(text: string): CompileErrorLocation {
         };
     }
 
-    const scanning = SCANNING_ERROR.exec(message);
-    if (scanning) {
-        return { line: Number(scanning[1]), message };
-    }
-
     return { message };
+}
+
+function toErrorLocation(diagnostic: CompileDiagnostic): CompileErrorLocation {
+    return {
+        fileName: diagnostic.file === '' ? undefined : path.posix.basename(diagnostic.file),
+        line: diagnostic.line === 0 ? undefined : diagnostic.line,
+        message: diagnostic.message,
+    };
 }
 
 /** Returns the path in a "File X could not be found" error, if it is one. */
@@ -132,14 +135,27 @@ function reportOnRootDirective(sourceSet: SourceSet, origin: DirectiveOrigin, in
     };
 }
 
-/**
- * Works out where a compile error is. An error in an included file is
- * reported in that file and again on the #include line of the document being
- * compiled, so it is visible from the document.
- */
-export function locateCompileError(errorMessage: string, rootText: string, sourceSet: SourceSet): ErrorReport[] {
-    const location = parseCompileError(errorMessage);
+/** Works out where each error of a failed compile is, from its diagnostics, or from its message when it has none. */
+export function locateCompileErrors(
+    error: { message: string; diagnostics: CompileDiagnostic[] },
+    rootText: string,
+    sourceSet: SourceSet,
+): ErrorReport[] {
+    if (error.diagnostics.length === 0) return locateCompileError(error.message, rootText, sourceSet);
+    return error.diagnostics.flatMap((diagnostic) => locateErrorLocation(toErrorLocation(diagnostic), rootText, sourceSet));
+}
 
+/** Works out where the error in a compile error message is. */
+export function locateCompileError(errorMessage: string, rootText: string, sourceSet: SourceSet): ErrorReport[] {
+    return locateErrorLocation(parseCompileError(errorMessage), rootText, sourceSet);
+}
+
+/**
+ * Works out where an error is. An error in an included file is reported in
+ * that file and again on the #include line of the document being compiled,
+ * so it is visible from the document.
+ */
+function locateErrorLocation(location: CompileErrorLocation, rootText: string, sourceSet: SourceSet): ErrorReport[] {
     if (location.fileName !== undefined) {
         const source = findSourceByFileName(sourceSet, location.fileName);
         if (!source) {

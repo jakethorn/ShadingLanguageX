@@ -1,0 +1,8 @@
+inline float f(float a)
+{
+    float b = a +;
+    float c = b;
+    float d = ) 2.0;
+    return d;
+}
+float x = * 1.0;

@@ -1,1 +1,1 @@
-Unterminated #if directive
+bad_directive002.mxsl, line 1: Unterminated #if directive

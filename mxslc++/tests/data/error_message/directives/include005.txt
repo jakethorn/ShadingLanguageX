@@ -1,1 +1,1 @@
-Circular dependency detected in circle2.mxsl when including circle1.mxsl
+circle2.mxsl, line 1: Circular dependency detected in circle2.mxsl when including circle1.mxsl

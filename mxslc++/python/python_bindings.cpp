@@ -3,6 +3,7 @@
 //
 
 #include "pybind.h"
+#include "CompileError_bindings.h"
 #include "CompileOptions_bindings.h"
 #include "Variable_bindings.h"
 #include "GlobalInfo_bindings.h"
@@ -20,6 +21,7 @@ PYBIND11_MODULE(_mxslc, m)
     m.attr("__version__") = MXSLCXX_PY_VERSION;
 #endif
 
+    bind_compile_error(m);
     bind_macro(m);
     bind_variable(m);
     bind_create_variable(m);

@@ -17,6 +17,7 @@ add_executable(mxslc_tests
         groundtruth_tests.cpp
         failure_tests.cpp
         error_message_tests.cpp
+        error_reporter_tests.cpp
         reduce_graph_tests.cpp
         primitive_type_tests.cpp
         primitive_op_tests.cpp

@@ -10,20 +10,20 @@
 #include "CompileOptions.h"
 #include "TokenReader.h"
 
+namespace mxslc
+{
+    class ErrorReporter;
+}
+
 namespace mxslc::preprocess
 {
-    vector<Token> preprocess(const fs::path& src_path, CompileOptions& opts, bool is_include = false);
-
-    void preprocess(vector<Token>& tokens, CompileOptions& opts);
-    void preprocess(vector<Token>& tokens, CompileOptions& opts, bool is_include);
-    void preprocess(vector<Token>& tokens, CompileOptions& opts, const optional<fs::path>& src_path);
-    void preprocess(vector<Token>& tokens, CompileOptions& opts, const optional<fs::path>& src_path, bool is_include);
+    void preprocess(vector<Token>& tokens, CompileOptions& opts, const optional<fs::path>& src_path, ErrorReporter& error_reporter);
 
     class Preprocessor : protected TokenReader
     {
     public:
-        Preprocessor(vector<Token> tokens, CompileOptions& opts, const optional<fs::path>& src_path = std::nullopt, bool is_include = false);
-        Preprocessor(const Preprocessor* parent, vector<Token> tokens, CompileOptions& opts, const optional<fs::path>& src_path = std::nullopt, bool is_include = false);
+        Preprocessor(vector<Token> tokens, CompileOptions& opts, ErrorReporter& error_reporter, const optional<fs::path>& src_path = std::nullopt, bool is_include = false);
+        Preprocessor(const Preprocessor* parent, vector<Token> tokens, CompileOptions& opts, ErrorReporter& error_reporter, const optional<fs::path>& src_path = std::nullopt, bool is_include = false);
 
         void preprocess();
 
@@ -43,14 +43,18 @@ namespace mxslc::preprocess
 
     private:
         void process_next_token();
+        void process_directive_or_skip_line();
+        void process_directive();
         void process_include();
         void process_library();
         void process_version();
         void process_define();
         void process_undef();
-        void process_if(bool ignore = false);
-        void process_ifdef(bool ignore = false);
-        void process_ifndef(bool ignore = false);
+        void process_if(const Token& directive, bool ignore = false);
+        void process_ifdef(const Token& directive, bool ignore = false);
+        void process_ifndef(const Token& directive, bool ignore = false);
+        bool evaluate_condition(const Token& directive, const std::function<bool()>& evaluate);
+        bool evaluate_if_condition();
         void process_remaining_if_blocks(bool condition, bool ignore = false);
         void process_else_block(bool ignore = false);
         void process_if_block();
@@ -58,6 +62,10 @@ namespace mxslc::preprocess
         bool start_of_if_block() const;
         bool end_of_if_block() const;
         void process_non_directive();
+
+        bool try_reporting_errors(const Token& location, const std::function<void()>& action);
+        void skip_line();
+        [[noreturn]] void throw_unmatched_directive_error(const CompileError& e) const;
 
         void include_file(const fs::path& path);
 
@@ -95,8 +103,10 @@ namespace mxslc::preprocess
         const Preprocessor* parent_;
         vector<Token> tokens_;
         CompileOptions& opts_;
+        ErrorReporter& error_reporter_;
         optional<fs::path> path_;
         bool is_include_;
+        bool has_unknown_directive_{false};
 
         vector<fs::path> included_files_;
     };

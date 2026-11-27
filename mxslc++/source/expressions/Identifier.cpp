@@ -34,9 +34,14 @@ namespace mxslc::expressions
         if (var_ == nullptr)
         {
             if (scope().has_function({name_, /*is_parameterless*/true}))
+            {
                 runtime_utils::resolve_function({types, name_, /*is_parameterless*/true});
+            }
             else
+            {
+                scope().throw_if_poisoned(name_);
                 throw CompileError{"Variable or parameterless function not defined: " + name_};
+            }
         }
     }
 

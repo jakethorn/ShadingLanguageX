@@ -84,7 +84,7 @@ namespace mxslc::statements
             funcs_.push_back(create_function(
                 std::move(mods_),
                 std::move(type_),
-                std::move(name_),
+                name_,
                 nullptr,
                 std::move(params_),
                 std::move(body_)
@@ -118,6 +118,13 @@ namespace mxslc::statements
                     func->update_nonlocal_variables();
             }
         }
+    }
+
+    void FunctionDefinition::recover() const
+    {
+        for (const FuncPtr& func : funcs_)
+            scope().remove_function(func);
+        scope().poison(name_);
     }
 
     void FunctionDefinition::validate_template_types()

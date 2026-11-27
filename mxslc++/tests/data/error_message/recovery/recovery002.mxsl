@@ -1,0 +1,2 @@
+float x = undefined_name;
+float y = x + 1.0;

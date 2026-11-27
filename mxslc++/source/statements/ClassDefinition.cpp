@@ -53,6 +53,12 @@ namespace mxslc::statements
         add_methods_and_constructors(class_type);
     }
 
+    void ClassDefinition::recover() const
+    {
+        if (not scope().has_type(name_))
+            scope().poison(name_);
+    }
+
     void ClassDefinition::validate_body() const
     {
         for (const StmtPtr& stmt : body_)

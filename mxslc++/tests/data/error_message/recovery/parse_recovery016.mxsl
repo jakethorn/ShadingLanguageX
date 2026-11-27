@@ -1,0 +1,5 @@
+void f()
+{
+    float a = 1.0
+}
+float x = * 1.0;

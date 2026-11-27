@@ -8,6 +8,7 @@
 #include "scan.h"
 #include "serialize/Serializer.h"
 #include "runtime/Function.h"
+#include "runtime/Runtime.h"
 #include "runtime/interface.h"
 #include "runtime/Scope.h"
 #include "runtime/Type.h"
@@ -55,8 +56,8 @@ namespace mxslc::statements
             )";
 
             vector<Token> tokens = scan_string(std::move(code));
-            Parser parser{std::move(tokens)};
-            return parser.function_body();
+            Parser parser{std::move(tokens), Runtime::get().error_reporter()};
+            return parser.block_statement();
         }
     }
 
@@ -79,7 +80,7 @@ namespace mxslc::statements
         outer_ctor_ = create_function(
             mods_,
             class_type,
-            "__" + class_name_ + "__",
+            outer_ctor_name(),
             nullptr, // template_type
             std::move(params_),
             std::move(body)
@@ -96,6 +97,18 @@ namespace mxslc::statements
 
         if (not outer_ctor_->is_inline())
             serializer().write_node_def_graph(outer_ctor_);
+    }
+
+    void ConstructorDefinition::recover() const
+    {
+        if (outer_ctor_)
+            scope().remove_function(outer_ctor_);
+        scope().poison(outer_ctor_name());
+    }
+
+    string ConstructorDefinition::outer_ctor_name() const
+    {
+        return "__" + class_name_ + "__";
     }
 
     string ConstructorDefinition::to_string() const

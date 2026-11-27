@@ -1,0 +1,2 @@
+preprocess_recovery002.mxsl, line 1: Unexpected end of tokens
+preprocess_recovery002.mxsl, line 6: Unknown preprocessor directive: #foo

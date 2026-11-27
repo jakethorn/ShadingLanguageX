@@ -16,6 +16,8 @@
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/type_cast.h"
 #include "errors/CompileError.h"
+#include "errors/ErrorReporter.h"
+#include "errors/SuppressedError.h"
 #include "serialize/Serializer.h"
 #include "statements/ReturnStatement.h"
 
@@ -194,7 +196,11 @@ namespace mxslc::runtime
         serializer().end_comptime();
 
         if (return_value == nullptr and not is_void())
+        {
+            if (error_reporter().has_errors())
+                throw SuppressedError{};
             throw CompileError{"Non-void function '" + name_ + "' did not return a value"};
+        }
 
         return return_value;
     }

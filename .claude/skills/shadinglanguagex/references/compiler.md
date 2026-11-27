@@ -30,6 +30,7 @@ mxslc @options.rsp
 | `--no-reduce-graph` | Turn off compile-time folding (named constructors and `comptime` still fold) |
 | `--no-validate-graph` | Skip `MaterialX::Document::validate()` |
 | `--default-function-behaviour B` | `nodedef` (default), `nodegraph`, `inline` or `comptime`: how functions without one of those modifiers compile. Functions with one keep it |
+| `--max-errors N` | Stop after `N` errors (default `20`), or `0` for no limit |
 | `-d, --debug` | Interactive step debugger (see below) |
 | `--decompile-hints` | Developer option: adds decompiler hint attributes to the output and defines the macro `__DC_HINTS__` |
 | `-h, --help` | Print help. It also prints a harmless "Invalid input file path: -h" |
@@ -55,9 +56,10 @@ shader.mxsl -o out/shader.mtlx -v 1.39.5
 --no-reduce-graph
 ```
 
-**Errors**: a compile error prints `<file>, line N: <message>`. The CLI aborts through an uncaught
-exception, so stderr shows `terminate called after throwing an instance of 'mxslc::CompileError'` and the
-exit code is non-zero. A `[DEBUG] Loaded MaterialX version ...` line on stdout is normal.
+**Errors**: each error prints `[ERROR] <file>, line N: <message>` on stderr and the exit code is 1. A compile
+reports every error it finds, up to `--max-errors`, but not errors that are only caused by an earlier one (such as
+uses of a variable whose definition failed). Syntax errors come first: a file with any isn't compiled further, so
+type errors only show once it parses. A `[DEBUG] Loaded MaterialX version ...` line on stdout is normal.
 
 **Debugger** (`-d`): before each top-level statement of the main file, the terminal shows three columns:
 the variables in scope with their values, the source (with the current line), and the XML so far
@@ -91,6 +93,12 @@ path = mxslc.decompile_string_to_file(xml, "a.mxsl")
 d = mxslc.Decompiler("a.mtlx")                                  # a str is XML text if it starts with '<', else a file path
 d.decompile_document(); d.decompile_node("y", with_dependencies=True)
 d.decompile_node_def("ND_foo"); d.decompile_node_graph("NG_foo", with_dependencies=False)
+
+try:
+    mxslc.compile_string_to_string(src)
+except mxslc.CompileError as e:                                 # a RuntimeError; str(e) is every error, one per line
+    for d in e.diagnostics:                                     # .file (pathlib.Path, empty for a string source),
+        print(d.line, d.message)                                # .line (0 if unknown), .message; str(d) as printed
 ```
 
 `CompileOptions` constructor keywords, all optional, are also readable and writable attributes:
@@ -111,6 +119,7 @@ d.decompile_node_def("ND_foo"); d.decompile_node_graph("NG_foo", with_dependenci
 | `reduce_graph` | `True` | |
 | `validate_graph` | `True` | |
 | `default_function_behaviour` | `FunctionBehaviour.NodeDef` | `mxslc.FunctionBehaviour.NodeDef`, `NodeGraph`, `Inline` or `Comptime`: how functions without a `nodedef`, `nodegraph`, `inline` or `comptime` modifier compile |
+| `max_errors` | `20` | errors a compile reports before it stops; `0` for no limit |
 | `sources` | `{}` | in-memory files `{"path/as/written.mxsl": "code"}`, checked before the file system. Methods: `add_source`, `remove_source`, `clear_sources`, `has_source`, `get_source` |
 
 **Value conversion** for `globals` and `func_args`:
@@ -170,8 +179,9 @@ std::string xml = mxslc::compile_to_string(std::string{"float f = 1.0;"});   // 
 fs::path out = mxslc::compile_to_file(fs::path{"a.mxsl"}, fs::path{"a.mtlx"});
 ```
 
-A `std::string` argument is source code and an `fs::path` is a file. Errors throw `mxslc::CompileError`,
-and validation failures throw `MaterialXValidateError`. `Decompiler` has the methods
+A `std::string` argument is source code and an `fs::path` is a file. Errors throw `mxslc::CompileError`, whose
+`diagnostics()` lists every error (`location.path`, `location.line`, `message`; `what()` is all of them, one per
+line), and validation failures throw `MaterialXValidateError`. `Decompiler` has the methods
 `decompile_document()`, `decompile_node(name, with_dependencies)`, `decompile_node_def(...)` and
 `decompile_node_graph(...)`, and can be constructed from a path, an XML string or a `DocumentPtr`.
 
@@ -182,10 +192,11 @@ import Mxslc from './JsMxslc.js';
 const mx = await Mxslc();
 const opts = new mx.CompileOptions();
 opts.version = '1.39.5';
-opts.reduceGraph = true;               // also errorOnMissingGlobals, errorOnUnusedGlobals
+opts.reduceGraph = true;               // also errorOnMissingGlobals, errorOnUnusedGlobals, maxErrors
 opts.defaultFunctionBehaviour = mx.FunctionBehaviour.Inline;    // or NodeDef (default), NodeGraph, Comptime
 opts.addSource('utils.mxsl', code);    // also clearSources, addSearchDirectory, clearSearchDirectories, searchDirectories()
-const mtlx = mx.compileSlxToMtlx(src, opts);     // throws Error with name 'CompileError'
+const mtlx = mx.compileSlxToMtlx(src, opts);     // throws Error with name 'CompileError' and .diagnostics,
+                                                 // an array of { file, line, message } (file '' for src)
 const slx = mx.decompileMtlxToSlx(mtlx);
 const keywords = mx.getKeywords();               // array of strings
 const { typeNames, functionNames } = mx.reflect(opts);  // arrays of strings, as in Python, for an empty

@@ -27,6 +27,7 @@ namespace mxslc::statements
 
         StmtPtr monomorphize(const TypePtr& template_type) const override = 0;
         void execute();
+        virtual void recover() const { }
 
         string to_string() const override = 0;
 
@@ -36,6 +37,12 @@ namespace mxslc::statements
 
         Token token_;
         bool is_initialized_{false};
+
+    private:
+        void execute_and_locate_errors();
+        bool is_recovery_point() const;
+
+        bool has_failed_{false};
     };
 }
 

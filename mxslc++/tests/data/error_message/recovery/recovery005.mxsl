@@ -1,0 +1,8 @@
+inline float f(float a)
+{
+    float b = undefined_name;
+    return a + b;
+}
+
+float x = f(1.0);
+float y = f(2.0);

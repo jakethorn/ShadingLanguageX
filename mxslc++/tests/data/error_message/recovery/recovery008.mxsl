@@ -1,0 +1,7 @@
+nodegraph float f(float a = 1.0)
+{
+    return a + undefined_name;
+}
+
+float x = f();
+string s = 1.0;

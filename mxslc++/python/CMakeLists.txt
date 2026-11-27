@@ -2,6 +2,7 @@ find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(_mxslc
         python_bindings.cpp
+        CompileError_bindings.cpp
         CompileOptions_bindings.cpp
         Variable_bindings.cpp
         GlobalInfo_bindings.cpp

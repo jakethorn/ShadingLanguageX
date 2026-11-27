@@ -34,7 +34,10 @@ namespace mxslc::expressions
         const bool has_method = scope().has_function({value_expr_->type(), target_types, field_name, /*is_parameterless*/true});
 
         if (not has_field and not has_method)
+        {
+            scope().throw_if_poisoned(field_name);
             throw CompileError{"Variable of type '" + value_expr_->type()->to_string() + "' does not have a field or parameterless method with the name: " + field_name};
+        }
 
         field_ = std::move(field_name);
     }

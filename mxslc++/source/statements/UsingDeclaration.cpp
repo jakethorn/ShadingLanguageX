@@ -22,6 +22,12 @@ namespace mxslc::statements
         scope().add_alias(name_, type_);
     }
 
+    void UsingDeclaration::recover() const
+    {
+        if (not scope().has_type(name_))
+            scope().poison(name_);
+    }
+
     string UsingDeclaration::to_string() const
     {
         return "using " + name_ + " = " + type_->to_string();

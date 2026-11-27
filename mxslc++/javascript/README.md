@@ -63,6 +63,23 @@ const slx = mx.decompileMtlxToSlx(mtlx);
 - `errorOnUnusedGlobals` (boolean)
 - `defaultFunctionBehaviour` (`NodeDef`, `NodeGraph`, `Inline` or `Comptime`) - how
   functions without one of these modifiers compile. Defaults to `NodeDef`.
+- `maxErrors` (number) - how many errors a compile reports before it stops, or `0`
+  for no limit. Defaults to `20`.
+
+### Errors
+
+A compile that fails throws an `Error` named `CompileError`. Its `message` is
+every error, one per line, and its `diagnostics` property lists them as
+`{ file, line, message }` objects. `file` is `''` for the source passed to
+`compileSlxToMtlx`, and `line` is `0` when the error has no location.
+
+```js
+try {
+    mx.compileSlxToMtlx('float a = "text";\nstring b = 1.0;', opts);
+} catch (e) {
+    for (const d of e.diagnostics) console.log(d.line, d.message);
+}
+```
 
 ## Testing
 

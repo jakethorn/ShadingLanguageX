@@ -1,0 +1,2 @@
+recovery010.mxsl, line 1: Type 'UndefinedType' not defined
+recovery010.mxsl, line 8: Cannot assign an expression of type float to a variable or parameter of type string

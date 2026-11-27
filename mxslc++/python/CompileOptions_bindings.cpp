@@ -34,7 +34,8 @@ void bind_compile_options(py::module_& m)
                 const bool reduce_graph,
                 const bool validate_graph,
                 const unordered_map<string, string>& sources,
-                const FunctionBehaviour default_function_behaviour)
+                const FunctionBehaviour default_function_behaviour,
+                const size_t max_errors)
             {
                 auto opts = std::make_unique<CompileOptions>();
                 opts->output_file = output_file;
@@ -64,6 +65,7 @@ void bind_compile_options(py::module_& m)
                 opts->reduce_graph = reduce_graph;
                 opts->validate_graph = validate_graph;
                 opts->default_function_behaviour = default_function_behaviour;
+                opts->max_errors = max_errors;
 
                 return opts;
             }),
@@ -81,7 +83,8 @@ void bind_compile_options(py::module_& m)
             py::arg("reduce_graph") = CompileOptions{}.reduce_graph,
             py::arg("validate_graph") = CompileOptions{}.validate_graph,
             py::arg("sources") = py::dict(),
-            py::arg("default_function_behaviour") = CompileOptions{}.default_function_behaviour
+            py::arg("default_function_behaviour") = CompileOptions{}.default_function_behaviour,
+            py::arg("max_errors") = CompileOptions{}.max_errors
         )
         .def_readwrite("output_file", &CompileOptions::output_file)
         .def_readwrite("version", &CompileOptions::version)
@@ -145,5 +148,6 @@ void bind_compile_options(py::module_& m)
         )
         .def_readwrite("reduce_graph", &CompileOptions::reduce_graph)
         .def_readwrite("validate_graph", &CompileOptions::validate_graph)
-        .def_readwrite("default_function_behaviour", &CompileOptions::default_function_behaviour);
+        .def_readwrite("default_function_behaviour", &CompileOptions::default_function_behaviour)
+        .def_readwrite("max_errors", &CompileOptions::max_errors);
 }

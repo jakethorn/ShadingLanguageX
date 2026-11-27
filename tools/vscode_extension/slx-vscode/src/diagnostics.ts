@@ -5,7 +5,7 @@
 // file as well as on the document's #include line. The diagnostics of all
 // owners are merged per file.
 import * as vscode from 'vscode';
-import { locateCompileError, locateDecompileError, type ErrorReport, type ErrorSpan } from './compileErrors';
+import { locateCompileErrors, locateDecompileError, type ErrorReport, type ErrorSpan } from './compileErrors';
 import { createBackgroundLogger } from './compilerOutput';
 import { collectDocumentSources, isSlxDocument, toComparablePath } from './documents';
 import { EngineError, type EngineLogger, type SlxEngine } from './engine';
@@ -108,7 +108,7 @@ export class SlxDiagnostics implements vscode.Disposable {
             this.reportEngineFailure(result.error);
             this.setOwnerDiagnostics(owner, []);
         } else {
-            const reports = result.error ? locateCompileError(result.error.message, text, sourceSet) : [];
+            const reports = result.error ? locateCompileErrors(result.error, text, sourceSet) : [];
             this.setOwnerDiagnostics(owner, reports.map((report) => this.toFileDiagnostics(document.uri, report)));
         }
         this.checked.fire({ document, result });

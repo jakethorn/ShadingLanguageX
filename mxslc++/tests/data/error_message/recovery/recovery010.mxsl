@@ -1,0 +1,8 @@
+class Foo
+{
+    UndefinedType a;
+}
+
+Foo foo;
+Foo bar = Foo{};
+string s = 1.0;

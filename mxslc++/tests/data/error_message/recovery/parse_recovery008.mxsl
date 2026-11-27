@@ -1,0 +1,6 @@
+class Foo
+{
+    float x = ;
+    float y;
+}
+float b = * 1.0;

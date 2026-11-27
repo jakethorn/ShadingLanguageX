@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { after, test } from 'node:test';
-import { locateCompileError } from '../src/compileErrors';
+import { locateCompileErrors } from '../src/compileErrors';
 import { ENGINE_MISSING_ERROR, EngineError, SlxEngine } from '../src/engine';
 import type { CompileSettings } from '../src/engineProtocol';
 import { collectSources } from '../src/includes';
@@ -43,7 +43,7 @@ async function compileFixture(name: string, overrides: Partial<CompileSettings> 
         return { output: await engine.compile(text, sources, { ...settings, ...overrides }) };
     } catch (error) {
         assert.ok(error instanceof EngineError);
-        return { reports: locateCompileError(error.message, text, sourceSet) };
+        return { reports: locateCompileErrors(error, text, sourceSet) };
     }
 }
 
@@ -90,6 +90,24 @@ test('passes print output to the logger of the request that printed it', { skip 
     ]);
     assert.ok(first.includes('stdout: "first"') && !first.includes('stdout: "second"'), first.join('\n'));
     assert.ok(second.includes('stdout: "second"') && !second.includes('stdout: "first"'), second.join('\n'));
+});
+
+test('lists every error of a compile as diagnostics', { skip }, async () => {
+    const error = await engine.compile('float a = nope;\nfloat b = 1.0 +;\n', [], settings).catch((e: unknown) => e);
+    assert.ok(error instanceof EngineError);
+    assert.deepEqual(
+        error.diagnostics.map((d) => d.line),
+        [2],
+    );
+    const semantic = await engine.compile('float a = nope;\nstring b = 1.0;\n', [], settings).catch((e: unknown) => e);
+    assert.ok(semantic instanceof EngineError);
+    assert.deepEqual(
+        semantic.diagnostics.map((d) => [d.file, d.line]),
+        [
+            ['', 1],
+            ['', 2],
+        ],
+    );
 });
 
 test('keeps working after a compile error', { skip }, async () => {

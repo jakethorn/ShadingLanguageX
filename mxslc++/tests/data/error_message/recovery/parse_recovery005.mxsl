@@ -1,0 +1,6 @@
+float f(float a float b)
+{
+    float c = a +;
+    return c;
+}
+float x = * 1.0;

@@ -1,0 +1,1 @@
+preprocess_recovery004.mxsl, line 1: Unknown preprocessor directive: #foo

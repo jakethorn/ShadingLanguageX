@@ -1,0 +1,21 @@
+recovery013.mxsl, line 1: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 2: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 3: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 4: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 5: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 6: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 7: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 8: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 9: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 10: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 11: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 12: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 13: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 14: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 15: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 16: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 17: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 18: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 19: Cannot assign an expression of type string to a variable or parameter of type float
+recovery013.mxsl, line 20: Cannot assign an expression of type string to a variable or parameter of type float
+Too many errors, stopping compilation

@@ -57,6 +57,19 @@ namespace mxslc::type_utils
         return false;
     }
 
+    bool has_default_value(const TypePtr& type)
+    {
+        if (not type->has_fields())
+            return runtime_utils::TypeName::is_primitive(type->name());
+
+        for (const Field& field : type->fields())
+        {
+            if (not has_default_value(field.type()))
+                return false;
+        }
+        return true;
+    }
+
     TypePtr replace_auto(const TypePtr& original_type, const TypePtr& replacement_type)
     {
         assert(original_type->is_resolved());

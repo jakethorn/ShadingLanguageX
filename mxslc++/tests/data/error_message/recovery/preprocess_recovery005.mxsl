@@ -1,0 +1,7 @@
+#if 1
+#if 0
+float a;
+#endif
+#foo
+#endif
+#bar

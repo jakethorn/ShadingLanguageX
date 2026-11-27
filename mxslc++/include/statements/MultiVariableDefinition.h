@@ -20,6 +20,7 @@ namespace mxslc::statements
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void recover() const override;
 
         string to_string() const override;
 
@@ -28,6 +29,8 @@ namespace mxslc::statements
         void execute_impl() const override;
 
     private:
+        vector<StmtPtr> create_variable_definitions(const VarPtr& value) const;
+
         TypePtr type_;
         ExprPtr expr_;
     };

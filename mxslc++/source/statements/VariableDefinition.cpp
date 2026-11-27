@@ -4,6 +4,7 @@
 
 #include "statements/VariableDefinition.h"
 
+#include "errors/CompileError.h"
 #include "runtime/Scope.h"
 #include "expressions/Expression.h"
 #include "expressions/interface.h"
@@ -14,6 +15,7 @@
 #include "runtime/variables/Variable.h"
 #include "runtime/utils/invoke.h"
 #include "runtime/utils/monomorphize.h"
+#include "runtime/utils/type_utils.h"
 #include "statements/interface.h"
 
 namespace mxslc::statements
@@ -82,11 +84,19 @@ namespace mxslc::statements
         if (not value)
             value = create_variable(type_);
 
-        const VarPtr var = create_variable(mods_.without(TokenType::Global, TokenType::Geomprop), type_, value);
-        var->add_to_scope(name_);
+        add_variable_to_scope(value);
 
         if (is_global)
             reflection().add_global(name_, type_, value);
+    }
+
+    void VariableDefinition::recover() const
+    {
+        if (scope().defines_variable(name_))
+            return;
+
+        if (not try_add_default_variable_to_scope())
+            scope().poison(name_);
     }
 
     VarPtr VariableDefinition::evaluate_global() const
@@ -108,6 +118,28 @@ namespace mxslc::statements
         if (default_value)
             args.add(std::move(default_value));
         return runtime_utils::invoke_function(type_, "geompropvalue", std::move(args));
+    }
+
+    void VariableDefinition::add_variable_to_scope(const VarPtr& value) const
+    {
+        const VarPtr var = create_variable(mods_.without(TokenType::Global, TokenType::Geomprop), type_, value);
+        var->add_to_scope(name_);
+    }
+
+    bool VariableDefinition::try_add_default_variable_to_scope() const
+    {
+        if (not type_->is_resolved() or not type_utils::has_default_value(type_))
+            return false;
+
+        try
+        {
+            add_variable_to_scope(create_variable(type_));
+            return true;
+        }
+        catch (const CompileError&)
+        {
+            return false;
+        }
     }
 
     string VariableDefinition::to_string() const

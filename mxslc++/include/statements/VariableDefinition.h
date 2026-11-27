@@ -22,6 +22,7 @@ namespace mxslc::statements
         void set_attributes(AttributeList attrs) override;
 
         StmtPtr monomorphize(const TypePtr& template_type) const override;
+        void recover() const override;
 
         string to_string() const override;
 
@@ -32,6 +33,8 @@ namespace mxslc::statements
     private:
         VarPtr evaluate_global() const;
         VarPtr evaluate_geomprop(VarPtr default_value) const;
+        void add_variable_to_scope(const VarPtr& value) const;
+        bool try_add_default_variable_to_scope() const;
 
         ModifierList mods_;
         TypePtr type_;

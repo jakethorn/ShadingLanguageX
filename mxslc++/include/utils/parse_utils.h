@@ -10,7 +10,6 @@
 
 namespace mxslc::parse_utils
 {
-    FuncPtr parse_function(const string& code);
     Primitive parse_literal(const string& code);
 }
 

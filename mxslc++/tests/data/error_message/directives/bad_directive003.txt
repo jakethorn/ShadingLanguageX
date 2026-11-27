@@ -1,1 +1,2 @@
 bad_directive003.mxsl, line 1: #else without #(if/ifdef/ifndef)
+bad_directive003.mxsl, line 3: #endif without #(if/ifdef/ifndef)

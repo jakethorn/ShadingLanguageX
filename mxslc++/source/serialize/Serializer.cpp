@@ -136,6 +136,18 @@ namespace mxslc::serialize
         return std::exchange(comptime_violated_, false);
     }
 
+    Serializer::Checkpoint Serializer::checkpoint() const
+    {
+        return {comptime_scope_.size(), comptime_violated_};
+    }
+
+    void Serializer::restore(const Checkpoint& checkpoint) const
+    {
+        while (comptime_scope_.size() > checkpoint.comptime_depth)
+            comptime_scope_.pop();
+        comptime_violated_ = checkpoint.comptime_violated;
+    }
+
     VarPtr Serializer::write_node(const ConstFunctionCallPtr& func_call) const
     {
         return write_node(nullptr, func_call);

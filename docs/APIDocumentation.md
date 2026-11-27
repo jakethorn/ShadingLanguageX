@@ -4,10 +4,11 @@
 
 1. [Compile Functions](#compile-functions)
 2. [Compile Options](#compile-options)
-3. [Macro](#macro)
-4. [Variable](#variable)
-5. [Decompile Functions](#decompile-functions)
-6. [Reflection](#reflection)
+3. [Compile Errors](#compile-errors)
+4. [Macro](#macro)
+5. [Variable](#variable)
+6. [Decompile Functions](#decompile-functions)
+7. [Reflection](#reflection)
 
 ---
 
@@ -154,7 +155,8 @@ CompileOptions.__init__(
     reduce_graph: bool = True,
     validate_graph: bool = True,
     sources: dict[str, str] = {},
-    default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef
+    default_function_behaviour: FunctionBehaviour = FunctionBehaviour.NodeDef,
+    max_errors: int = 20
 )
 ```
 
@@ -176,6 +178,7 @@ CompileOptions.reduce_graph: bool
 CompileOptions.validate_graph: bool
 CompileOptions.sources: dict[str, str]
 CompileOptions.default_function_behaviour: FunctionBehaviour
+CompileOptions.max_errors: int
 ```
 
 `globals` maps global variable names to their values, and `func_args` holds the entry function's arguments in order.
@@ -184,6 +187,9 @@ Each value can be a `bool`, `int`, `float`, `str`, `pathlib.Path`, MaterialX vec
 
 `default_function_behaviour` is how functions compile when they're defined without a `nodedef`, `nodegraph`,
 `inline` or `comptime` modifier: `mxslc.FunctionBehaviour.NodeDef` (the default), `NodeGraph`, `Inline` or `Comptime`.
+
+`max_errors` is how many errors a compile reports before it stops, or `0` for no limit. See
+[Compile Errors](#compile-errors).
 
 ### Methods
 
@@ -219,7 +225,8 @@ opts = mxslc.CompileOptions(
     reduce_graph = True,
     validate_graph = True,
     sources = {},
-    default_function_behaviour = mxslc.FunctionBehaviour.Inline
+    default_function_behaviour = mxslc.FunctionBehaviour.Inline,
+    max_errors = 20
 )
 
 mtlx = mxslc.compile_file_to_string("mxsl/example.mxsl", opts)
@@ -258,6 +265,9 @@ struct CompileOptions
 
     bool error_on_missing_globals{true};
     bool error_on_unused_globals{true};
+
+    // errors a compile reports before it stops, 0 for no limit
+    size_t max_errors{20};
 
     optional<string> func_name;
 
@@ -329,6 +339,94 @@ opts.error_on_missing_globals = false;
 opts.reduce_graph = false;
 
 mxslc::compile_to_file(fs::path{"example.mxsl"}, opts);
+```
+
+---
+
+# Compile Errors
+
+A compile that fails throws a `CompileError` that lists every error it found, up to `max_errors` (see
+[Compile Options](#compile-options)). Each error is a `Diagnostic`: the file and line it's in, and its message.
+
+## Python
+
+### CompileError
+
+```python
+class CompileError(RuntimeError):
+    diagnostics: list[Diagnostic]
+```
+
+`str(error)` is every diagnostic, one per line. `CompileError` is a `RuntimeError`, so `except RuntimeError` also
+catches it.
+
+### Diagnostic
+
+```python
+Diagnostic.file: pathlib.Path
+Diagnostic.line: int
+Diagnostic.message: str
+```
+
+`file` is empty for source compiled from a string, and `line` is `0` when the error has no location. `str(diagnostic)`
+is the error as the compiler prints it, e.g., `example.mxsl, line 2: Invalid expression`.
+
+### Python Example
+
+```python
+import mxslc
+
+try:
+    mxslc.compile_string_to_string('float a = "text";\nstring b = 1.0;')
+except mxslc.CompileError as error:
+    for diagnostic in error.diagnostics:
+        print(diagnostic.line, diagnostic.message)
+
+# 1 Cannot assign an expression of type string to a variable or parameter of type float
+# 2 Cannot assign an expression of type float to a variable or parameter of type string
+```
+
+## C++
+
+```c++
+struct SourceLocation
+{
+    fs::path path;
+    size_t line{0}; // 0 when unknown
+};
+
+struct Diagnostic
+{
+    SourceLocation location;
+    string message;
+
+    string to_string() const; // e.g., "example.mxsl, line 2: Invalid expression"
+};
+
+class CompileError : public std::exception
+{
+public:
+    const char* what() const noexcept override; // every diagnostic, one per line
+    const vector<Diagnostic>& diagnostics() const;
+};
+```
+
+### C++ Example
+
+```c++
+#include <iostream>
+#include "compile.h"
+#include "errors/CompileError.h"
+
+try
+{
+    mxslc::compile_to_string(std::string{"float a = \"text\";\nstring b = 1.0;"});
+}
+catch (const mxslc::CompileError& e)
+{
+    for (const mxslc::Diagnostic& diagnostic : e.diagnostics())
+        std::cout << diagnostic.location.line << " " << diagnostic.message << "\n";
+}
 ```
 
 ---

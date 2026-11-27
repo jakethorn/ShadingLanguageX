@@ -18,6 +18,7 @@
 #include "statements/Statement.h"
 #include "utils/io_utils.h"
 #include "errors/CompileError.h"
+#include "errors/ErrorReporter.h"
 #include "preprocess/preprocess.h"
 #include "runtime/utils/invoke.h"
 
@@ -56,9 +57,11 @@ namespace mxslc
             throw CompileError{"ShadingLanguageX standard library could not be found.\nSearched directories:\n" + searched_dirs};
         }
 
-        void parse_and_execute(vector<Token> tokens)
+        void parse_and_execute(Runtime& runtime, vector<Token> tokens)
         {
-            const vector<StmtPtr> stmts = parse(std::move(tokens));
+            const vector<StmtPtr> stmts = parse(std::move(tokens), runtime.error_reporter());
+            runtime.error_reporter().throw_if_errors();
+
             for (const StmtPtr& stmt : stmts)
                 stmt->execute();
         }
@@ -69,29 +72,20 @@ namespace mxslc
                 runtime_utils::invoke_function(*opts.func_name, opts.entry_function_arguments());
         }
 
-        Runtime& compile(string source, CompileOptions opts, const optional<fs::path>& src_path)
+        void execute_program(Runtime& runtime, vector<Token> stdlib_tokens, vector<Token> tokens, string source, const optional<fs::path>& src_path)
         {
-            opts.add_default_search_directories();
-
-            const fs::path stdlib_path = get_stdlib_path(opts);
-            vector<Token> stdlib_tokens = scan_file(stdlib_path);
-            preprocess::preprocess(stdlib_tokens, opts, stdlib_path);
-
-            vector<Token> tokens = scan_string(source, src_path);
-            preprocess::preprocess(tokens, opts, src_path);
-
-            Runtime& runtime = Runtime::create(opts);
+            const CompileOptions& opts = runtime.compile_options();
 
             runtime.enter_scope("mxsl_stdlib");
             {
-                parse_and_execute(std::move(stdlib_tokens));
+                parse_and_execute(runtime, std::move(stdlib_tokens));
 
                 if (opts.debug_mode())
                     Debugger::create(std::move(source), src_path);
 
                 runtime.enter_scope("global");
                 {
-                    parse_and_execute(std::move(tokens));
+                    parse_and_execute(runtime, std::move(tokens));
                     invoke_entry_function(opts);
 
                     if (opts.reflection_enabled())
@@ -103,7 +97,50 @@ namespace mxslc
                     Debugger::close();
             }
             runtime.exit_scope();
+        }
 
+        void report_escaped_error(ErrorReporter& error_reporter)
+        {
+            try
+            {
+                throw;
+            }
+            catch (const CompileError& e)
+            {
+                error_reporter.report(e);
+            }
+            catch (...)
+            {
+                if (not error_reporter.has_errors())
+                    throw;
+            }
+        }
+
+        Runtime& compile(string source, CompileOptions opts, const optional<fs::path>& src_path)
+        {
+            opts.add_default_search_directories();
+
+            ErrorReporter error_reporter{opts.max_errors};
+
+            const fs::path stdlib_path = get_stdlib_path(opts);
+            vector<Token> stdlib_tokens = scan_file(stdlib_path);
+            preprocess::preprocess(stdlib_tokens, opts, stdlib_path, error_reporter);
+
+            vector<Token> tokens = scan_string(source, src_path);
+            preprocess::preprocess(tokens, opts, src_path, error_reporter);
+            error_reporter.throw_if_errors();
+
+            Runtime& runtime = Runtime::create(opts);
+            try
+            {
+                execute_program(runtime, std::move(stdlib_tokens), std::move(tokens), std::move(source), src_path);
+            }
+            catch (...)
+            {
+                report_escaped_error(runtime.error_reporter());
+            }
+
+            runtime.error_reporter().throw_if_errors();
             runtime.finalise();
             return runtime;
         }
